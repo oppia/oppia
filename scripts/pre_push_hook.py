@@ -16,7 +16,7 @@
 
 """Pre-push hook that executes the Python/JS linters on all files that
 deviate from develop.
-(By providing the list of files to `scripts.pre_commit_linter`)
+(By providing the list of files to `scripts.linters.pre_commit_linter`)
 To install the hook manually simply execute this script from the oppia root dir
 with the `--install` flag.
 To bypass the validation upon `git push` use the following command:
@@ -26,6 +26,7 @@ This hook works only on Unix like systems as of now.
 On Vagrant under Windows it will still copy the hook to the .git/hooks dir
 but it will have no effect.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -40,6 +41,7 @@ import sys
 # `pre_push_hook.py` is symlinked into `/.git/hooks`, so we explicitly import
 # the current working directory so that Git knows where to find python_utils.
 sys.path.append(os.getcwd())
+from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
 import python_utils  # isort:skip  # pylint: disable=wrong-import-position
 
 GitRef = collections.namedtuple(
@@ -49,18 +51,24 @@ FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 # Git hash of /dev/null, refers to an 'empty' commit.
 GIT_NULL_COMMIT = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
-# caution, __file__ is here *OPPiA/.git/hooks* and not in *OPPIA/scripts*.
-LINTER_MODULE = 'scripts.pre_commit_linter'
+# CAUTION: __file__ is here *OPPIA/.git/hooks* and not in *OPPIA/scripts*.
+LINTER_MODULE = 'scripts.linters.pre_commit_linter'
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir)
 LINTER_FILE_FLAG = '--files'
 PYTHON_CMD = 'python'
 OPPIA_PARENT_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir, os.pardir)
 NPM_CMD = os.path.join(
-    OPPIA_PARENT_DIR, 'oppia_tools', 'node-10.15.3', 'bin', 'npm')
+    OPPIA_PARENT_DIR, 'oppia_tools', 'node-10.18.0', 'bin', 'npm')
 YARN_CMD = os.path.join(
-    OPPIA_PARENT_DIR, 'oppia_tools', 'yarn-v1.17.3', 'bin', 'yarn')
-FRONTEND_TEST_SCRIPT = 'run_frontend_tests'
+    OPPIA_PARENT_DIR, 'oppia_tools', 'yarn-v1.22.0', 'bin', 'yarn')
+FRONTEND_TEST_CMDS = [
+    PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage']
+TRAVIS_CI_PROTRACTOR_CHECK_CMDS = [
+    PYTHON_CMD, '-m', 'scripts.check_e2e_tests_are_captured_in_ci']
+TYPESCRIPT_CHECKS_CMDS = [PYTHON_CMD, '-m', 'scripts.typescript_checks']
+STRICT_TYPESCRIPT_CHECKS_CMDS = [
+    PYTHON_CMD, '-m', 'scripts.typescript_checks', '--strict_checks']
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
@@ -69,6 +77,7 @@ class ChangedBranch(python_utils.OBJECT):
     that need to be linted. It does not change branch when modified files are
     not committed.
     """
+
     def __init__(self, new_branch):
         get_branch_cmd = 'git symbolic-ref -q --short HEAD'.split()
         self.old_branch = subprocess.check_output(get_branch_cmd).strip()
@@ -93,15 +102,15 @@ class ChangedBranch(python_utils.OBJECT):
             subprocess.check_output(['git', 'checkout', self.old_branch, '--'])
 
 
-def _start_subprocess_for_result(cmd):
+def start_subprocess_for_result(cmd):
     """Starts subprocess and returns (stdout, stderr)."""
-    task = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
+    task = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = task.communicate()
     return out, err
 
 
-def _get_remote_name():
+def get_remote_name():
     """Get the remote name of the local repository.
 
     Returns:
@@ -110,16 +119,17 @@ def _get_remote_name():
     remote_name = ''
     remote_num = 0
     get_remotes_name_cmd = 'git remote'.split()
-    task = subprocess.Popen(get_remotes_name_cmd, stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
+    task = subprocess.Popen(
+        get_remotes_name_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = task.communicate()
     remotes = python_utils.UNICODE(out)[:-1].split('\n')
     if not err:
         for remote in remotes:
             get_remotes_url_cmd = (
                 'git config --get remote.%s.url' % remote).split()
-            task = subprocess.Popen(get_remotes_url_cmd, stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE)
+            task = subprocess.Popen(
+                get_remotes_url_cmd, stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE)
             remote_url, err = task.communicate()
             if not err:
                 if remote_url.endswith('oppia/oppia.git\n'):
@@ -150,16 +160,19 @@ def _get_remote_name():
     return remote_name
 
 
-def _git_diff_name_status(left, right, diff_filter=''):
+def git_diff_name_status(left, right, diff_filter=''):
     """Compare two branches/commits etc with git.
+
     Parameter:
         left: the lefthand comperator
         right: the righthand comperator
         diff_filter: arguments given to --diff-filter (ACMRTD...)
+
     Returns:
-        List of FileDiffs (tuple with name/status)
+        list. List of FileDiffs (tuple with name/status).
+
     Raises:
-        ValueError if git command fails.
+        ValueError. Raise ValueError if git command fails.
     """
     git_cmd = ['git', 'diff', '--name-status']
     if diff_filter:
@@ -168,7 +181,7 @@ def _git_diff_name_status(left, right, diff_filter=''):
     # Append -- to avoid conflicts between branch and directory name.
     # More here: https://stackoverflow.com/questions/26349191
     git_cmd.append('--')
-    out, err = _start_subprocess_for_result(git_cmd)
+    out, err = start_subprocess_for_result(git_cmd)
     if not err:
         file_list = []
         for line in out.splitlines():
@@ -186,27 +199,30 @@ def _git_diff_name_status(left, right, diff_filter=''):
         raise ValueError(err)
 
 
-def _compare_to_remote(remote, local_branch, remote_branch=None):
+def compare_to_remote(remote, local_branch, remote_branch=None):
     """Compare local with remote branch with git diff.
+
     Parameter:
         remote: Git remote being pushed to
         local_branch: Git branch being pushed to
         remote_branch: The branch on the remote to test against. If None same
             as local branch.
+
     Returns:
-        List of file names that are modified, changed, renamed or added
-        but not deleted
+        list(str). List of file names that are modified, changed, renamed or
+        added but not deleted.
+
     Raises:
-        ValueError if git command fails.
+        ValueError. Raise ValueError if git command fails.
     """
     remote_branch = remote_branch if remote_branch else local_branch
     git_remote = '%s/%s' % (remote, remote_branch)
     # Ensure that references to the remote branches exist on the local machine.
-    _start_subprocess_for_result(['git', 'pull', remote])
-    return _git_diff_name_status(git_remote, local_branch)
+    start_subprocess_for_result(['git', 'pull', remote])
+    return git_diff_name_status(git_remote, local_branch)
 
 
-def _extract_files_to_lint(file_diffs):
+def extract_files_to_lint(file_diffs):
     """Grab only files out of a list of FileDiffs that have a ACMRT status."""
     if not file_diffs:
         return []
@@ -215,14 +231,28 @@ def _extract_files_to_lint(file_diffs):
     return lint_files
 
 
-def _collect_files_being_pushed(ref_list, remote):
+def get_parent_branch_name_for_diff():
+    """Returns remote branch name against which the diff has to be checked.
+
+    Returns:
+        str. The name of the remote branch.
+    """
+    if common.is_current_branch_a_hotfix_branch():
+        return 'release-%s' % common.get_current_release_version_number(
+            common.get_current_branch_name())
+    return 'develop'
+
+
+def collect_files_being_pushed(ref_list, remote):
     """Collect modified files and filter those that need linting.
+
     Parameter:
         ref_list: list of references to parse (provided by git in stdin)
         remote: the remote being pushed to
+
     Returns:
-        dict: Dict mapping branch names to 2-tuples of the form (list of
-            changed files, list of files to lint).
+        dict. Dict mapping branch names to 2-tuples of the form (list of
+        changed files, list of files to lint).
     """
     if not ref_list:
         return {}
@@ -237,9 +267,9 @@ def _collect_files_being_pushed(ref_list, remote):
     # flag. Therefore we need to loop over the ref_list provided.
     for branch, _ in python_utils.ZIP(branches, hashes):
         # Get the difference to remote/develop.
-        modified_files = _compare_to_remote(
-            remote, branch, remote_branch='develop')
-        files_to_lint = _extract_files_to_lint(modified_files)
+        modified_files = compare_to_remote(
+            remote, branch, remote_branch=get_parent_branch_name_for_diff())
+        files_to_lint = extract_files_to_lint(modified_files)
         collected_files[branch] = (modified_files, files_to_lint)
 
     for branch, (modified_files, files_to_lint) in collected_files.items():
@@ -252,7 +282,7 @@ def _collect_files_being_pushed(ref_list, remote):
     return collected_files
 
 
-def _get_refs():
+def get_refs():
     """Returns the ref list taken from STDIN."""
     # Git provides refs in STDIN.
     ref_list = [GitRef(*ref_str.split()) for ref_str in sys.stdin]
@@ -262,7 +292,7 @@ def _get_refs():
     return ref_list
 
 
-def _start_linter(files):
+def start_linter(files):
     """Starts the lint checks and returns the returncode of the task."""
     task = subprocess.Popen(
         [PYTHON_CMD, '-m', LINTER_MODULE, LINTER_FILE_FLAG] + files)
@@ -270,25 +300,22 @@ def _start_linter(files):
     return task.returncode
 
 
-def _start_python_script(scriptname):
-    """Runs the 'start.py' script and returns the returncode of the task."""
-    cmd = [
-        'python', '-m',
-        os.path.join('scripts', scriptname).replace('/', '.')]
-    task = subprocess.Popen(cmd)
+def run_script_and_get_returncode(cmd_list):
+    """Runs script and returns the returncode of the task.
+
+    Args:
+        cmd_list: list(str). The cmd list containing the command to be run.
+
+    Returns:
+        int. The return code from the task executed.
+    """
+    task = subprocess.Popen(cmd_list)
     task.communicate()
     task.wait()
     return task.returncode
 
 
-def _start_npm_audit():
-    """Starts the npm audit checks and returns the returncode of the task."""
-    task = subprocess.Popen([YARN_CMD, 'audit'])
-    task.communicate()
-    return task.returncode
-
-
-def _has_uncommitted_files():
+def has_uncommitted_files():
     """Returns true if the repo contains modified files that are uncommitted.
     Ignores untracked files.
     """
@@ -296,20 +323,26 @@ def _has_uncommitted_files():
     return bool(len(uncommitted_files))
 
 
-def _install_hook():
+def install_hook():
     """Installs the pre_push_hook script and makes it executable.
     It ensures that oppia/ is the root folder.
 
     Raises:
-        ValueError if chmod command fails.
+        ValueError. Raise ValueError if chmod command fails.
     """
     oppia_dir = os.getcwd()
     hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
     pre_push_file = os.path.join(hooks_dir, 'pre-push')
     chmod_cmd = ['chmod', '+x', pre_push_file]
-    if os.path.islink(pre_push_file):
+    file_is_symlink = os.path.islink(pre_push_file)
+    file_exists = os.path.exists(pre_push_file)
+    if file_is_symlink and file_exists:
         python_utils.PRINT('Symlink already exists')
     else:
+        # If its a broken symlink, delete it.
+        if file_is_symlink and not file_exists:
+            os.unlink(pre_push_file)
+            python_utils.PRINT('Removing broken symlink')
         try:
             os.symlink(os.path.abspath(__file__), pre_push_file)
             python_utils.PRINT('Created symlink in .git/hooks directory')
@@ -319,7 +352,7 @@ def _install_hook():
             python_utils.PRINT('Copied file to .git/hooks directory')
 
     python_utils.PRINT('Making pre-push hook file executable ...')
-    _, err_chmod_cmd = _start_subprocess_for_result(chmod_cmd)
+    _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
 
     if not err_chmod_cmd:
         python_utils.PRINT('pre-push hook file is now executable!')
@@ -327,35 +360,52 @@ def _install_hook():
         raise ValueError(err_chmod_cmd)
 
 
-def _does_diff_include_js_or_ts_files(files_to_lint):
+def does_diff_include_js_or_ts_files(diff_files):
     """Returns true if diff includes JavaScript or TypeScript files.
 
     Args:
-        files_to_lint: list(str). List of files to be linted.
+        diff_files: list(str). List of files changed.
 
     Returns:
         bool. Whether the diff contains changes in any JavaScript or TypeScript
-            files.
+        files.
     """
 
-    for filename in files_to_lint:
-        if filename.endswith('.ts') or filename.endswith('.js'):
+    for file_path in diff_files:
+        if file_path.endswith('.ts') or file_path.endswith('.js'):
             return True
     return False
 
 
-def _does_diff_include_package_json(files_to_lint):
-    """Returns true if diff includes package.json or yarn.lock.
+def does_diff_include_ts_files(diff_files):
+    """Returns true if diff includes TypeScript files.
 
     Args:
-        files_to_lint: list(str). List of files to be linted.
+        diff_files: list(str). List of files changed.
 
     Returns:
-        bool. Whether the diff contains changes in package.json or
-            yarn.lock.
+        bool. Whether the diff contains changes in any TypeScript files.
     """
-    for filename in files_to_lint:
-        if filename == 'package.json' or filename == 'yarn.lock':
+
+    for file_path in diff_files:
+        if file_path.endswith('.ts'):
+            return True
+    return False
+
+
+def does_diff_include_travis_yml_or_js_files(diff_files):
+    """Returns true if diff includes .travis.yml or Javascript files.
+
+    Args:
+        diff_files: list(str). List of files changed.
+
+    Returns:
+        bool. Whether the diff contains changes in travis.yml or
+        Javascript files.
+    """
+
+    for file_path in diff_files:
+        if file_path.endswith('.js') or file_path.endswith('.travis.yml'):
             return True
     return False
 
@@ -367,19 +417,20 @@ def main(args=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('remote', nargs='?', help='provided by git before push')
     parser.add_argument('url', nargs='?', help='provided by git before push')
-    parser.add_argument('--install', action='store_true', default=False,
-                        help='Install pre_push_hook to the .git/hooks dir')
+    parser.add_argument(
+        '--install', action='store_true', default=False,
+        help='Install pre_push_hook to the .git/hooks dir')
     args = parser.parse_args(args=args)
     if args.install:
-        _install_hook()
+        install_hook()
         return
 
-    remote = _get_remote_name()
+    remote = get_remote_name()
     remote = remote if remote else args.remote
-    refs = _get_refs()
-    collected_files = _collect_files_being_pushed(refs, remote)
+    refs = get_refs()
+    collected_files = collect_files_being_pushed(refs, remote)
     # Only interfere if we actually have something to lint (prevent annoyances).
-    if collected_files and _has_uncommitted_files():
+    if collected_files and has_uncommitted_files():
         python_utils.PRINT(
             'Your repo is in a dirty state which prevents the linting from'
             ' working.\nStash your changes or commit them.\n')
@@ -389,27 +440,51 @@ def main(args=None):
             if not modified_files and not files_to_lint:
                 continue
             if files_to_lint:
-                lint_status = _start_linter(files_to_lint)
+                lint_status = start_linter(files_to_lint)
                 if lint_status != 0:
                     python_utils.PRINT(
                         'Push failed, please correct the linting issues above.')
                     sys.exit(1)
-            if _does_diff_include_package_json(files_to_lint):
-                npm_audit_status = _start_npm_audit()
-                if npm_audit_status != 0:
-                    python_utils.PRINT(
-                        'Push failed, please correct the npm audit issues '
-                        'above.')
-                    sys.exit(1)
+
+            typescript_checks_status = 0
+            if does_diff_include_ts_files(files_to_lint):
+                typescript_checks_status = run_script_and_get_returncode(
+                    TYPESCRIPT_CHECKS_CMDS)
+            if typescript_checks_status != 0:
+                python_utils.PRINT(
+                    'Push aborted due to failing typescript checks.')
+                sys.exit(1)
+
+            strict_typescript_checks_status = 0
+            if does_diff_include_ts_files(files_to_lint):
+                strict_typescript_checks_status = run_script_and_get_returncode(
+                    STRICT_TYPESCRIPT_CHECKS_CMDS)
+            if strict_typescript_checks_status != 0:
+                python_utils.PRINT(
+                    'Push aborted due to failing typescript checks in '
+                    'strict mode.')
+                sys.exit(1)
+
             frontend_status = 0
-            if _does_diff_include_js_or_ts_files(files_to_lint):
-                frontend_status = _start_python_script(FRONTEND_TEST_SCRIPT)
+            travis_ci_check_status = 0
+            if does_diff_include_js_or_ts_files(files_to_lint):
+                frontend_status = run_script_and_get_returncode(
+                    FRONTEND_TEST_CMDS)
             if frontend_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
                 sys.exit(1)
+            if does_diff_include_travis_yml_or_js_files(files_to_lint):
+                travis_ci_check_status = run_script_and_get_returncode(
+                    TRAVIS_CI_PROTRACTOR_CHECK_CMDS)
+            if travis_ci_check_status != 0:
+                python_utils.PRINT(
+                    'Push aborted due to failing e2e test configuration check.')
+                sys.exit(1)
     return
 
 
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when pre_push_hook.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
     main()

@@ -18,7 +18,7 @@
  */
 
 var logicProofConversion = (function() {
-  // NOTE: the 'old' values must all be single characters
+  // NOTE: the 'old' values must all be single characters.
   var REPLACEMENT_PAIRS = [{
     old: '&',
     // eslint-disable quote-props
@@ -44,7 +44,7 @@ var logicProofConversion = (function() {
   var convertToLogicCharacters = function(oldString) {
     var replacedString = oldString;
     for (var i = 0; i < REPLACEMENT_PAIRS.length; i++) {
-      // We don't use .replace() as it only affects the first instance
+      // We don't use .replace() as it only affects the first instance.
       replacedString = replacedString.split(
         REPLACEMENT_PAIRS[i].old).join(REPLACEMENT_PAIRS[i]['new']);
     }

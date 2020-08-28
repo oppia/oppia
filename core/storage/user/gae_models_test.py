@@ -15,16 +15,20 @@
 # limitations under the License.
 
 """Tests for core.storage.user.gae_models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import types
 
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
+import utils
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
@@ -35,42 +39,55 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
 
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_id'
+    USER_1_GAE_ID = 'gae_id'
     USER_1_EMAIL = 'user@example.com'
     USER_1_ROLE = feconf.ROLE_ID_ADMIN
     USER_2_ID = 'user2_id'
+    USER_2_GAE_ID = 'gae2_id'
     USER_2_EMAIL = 'user2@example.com'
     USER_2_ROLE = feconf.ROLE_ID_BANNED_USER
     USER_3_ID = 'user3_id'
+    USER_3_GAE_ID = 'gae3_id'
     USER_3_EMAIL = 'user3@example.com'
     USER_3_ROLE = feconf.ROLE_ID_ADMIN
+    PROFILE_1_ID = 'profile_id'
+    PROFILE_1_GAE_ID = 'gae_id'
+    PROFILE_1_EMAIL = 'user@example.com'
+    PROFILE_1_ROLE = feconf.ROLE_ID_LEARNER
     GENERIC_USERNAME = 'user'
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
+    GENERIC_EPOCH = utils.get_time_in_millisecs(datetime.datetime(2019, 5, 20))
     GENERIC_IMAGE_URL = 'www.example.com/example.png'
     GENERIC_USER_BIO = 'I am a user of Oppia!'
     GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
     GENERIC_LANGUAGE_CODES = ['en', 'es']
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.UserSettingsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+    GENERIC_DISPLAY_ALIAS = 'display_alias'
 
     def setUp(self):
         super(UserSettingsModelTest, self).setUp()
         user_models.UserSettingsModel(
-            id=self.USER_1_ID, email=self.USER_1_EMAIL, role=self.USER_1_ROLE
+            id=self.USER_1_ID,
+            gae_id=self.USER_1_GAE_ID,
+            email=self.USER_1_EMAIL,
+            role=self.USER_1_ROLE
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.PROFILE_1_ID,
+            gae_id=self.PROFILE_1_GAE_ID,
+            email=self.PROFILE_1_EMAIL,
+            role=self.PROFILE_1_ROLE
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_2_ID,
+            gae_id=self.USER_2_GAE_ID,
             email=self.USER_2_EMAIL,
             role=self.USER_2_ROLE,
             deleted=True
         ).put()
         user_models.UserSettingsModel(
-            email=self.USER_3_EMAIL, role=self.USER_3_ROLE
-        ).put()
-        user_models.UserSettingsModel(
             id=self.USER_3_ID,
+            gae_id=self.USER_3_GAE_ID,
+            gae_user_id=self.USER_3_GAE_ID,
             email=self.USER_3_EMAIL,
             role=self.USER_3_ROLE,
             username=self.GENERIC_USERNAME,
@@ -88,30 +105,85 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             subject_interests=self.GENERIC_SUBJECT_INTERESTS,
             first_contribution_msec=1,
             preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
-            preferred_site_language_code=(self.GENERIC_LANGUAGE_CODES[0]),
-            preferred_audio_language_code=(self.GENERIC_LANGUAGE_CODES[0])
+            preferred_site_language_code=self.GENERIC_LANGUAGE_CODES[0],
+            preferred_audio_language_code=self.GENERIC_LANGUAGE_CODES[0],
+            display_alias=self.GENERIC_DISPLAY_ALIAS
         ).put()
 
-    def test_has_reference_to_user_id(self):
+    def test_get_deletion_policy_is_delete(self):
+        self.assertEqual(
+            user_models.UserSettingsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy_for_registered_users_deletes_them(self):
+        # Case for a full user.
+        self.assertIsNotNone(
+            user_models.UserSettingsModel.get_by_id(self.USER_1_ID))
+        user_models.UserSettingsModel.apply_deletion_policy(self.USER_1_ID)
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.USER_1_ID))
+
+        # Case for a profile user.
+        self.assertIsNotNone(
+            user_models.UserSettingsModel.get_by_id(self.PROFILE_1_ID))
+        user_models.UserSettingsModel.apply_deletion_policy(self.PROFILE_1_ID)
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.PROFILE_1_ID))
+
+    def test_apply_deletion_policy_for_banned_user_deletes_them(self):
+        self.assertIsNotNone(
+            user_models.UserSettingsModel.get_by_id(self.USER_2_ID))
+        user_models.UserSettingsModel.apply_deletion_policy(self.USER_2_ID)
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.USER_2_ID))
+
+    def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.NONEXISTENT_USER_ID))
+        user_models.UserSettingsModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
+
+    def test_has_reference_to_registered_user_id_is_true(self):
+        # Case for a full user.
         self.assertTrue(
-            user_models.UserSettingsModel
-            .has_reference_to_user_id(self.USER_1_ID)
+            user_models.UserSettingsModel.has_reference_to_user_id(
+                self.USER_1_ID)
         )
+
+        # Case for a profile user.
         self.assertTrue(
-            user_models.UserSettingsModel
-            .has_reference_to_user_id(self.USER_2_ID)
+            user_models.UserSettingsModel.has_reference_to_user_id(
+                self.PROFILE_1_ID)
         )
+
+        # Case for a banned full user.
+        self.assertTrue(
+            user_models.UserSettingsModel.has_reference_to_user_id(
+                self.USER_2_ID)
+        )
+
+    def test_has_reference_to_non_existing_user_id_is_false(self):
         self.assertFalse(
             user_models.UserSettingsModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_by_role(self):
-        user = user_models.UserSettingsModel.get_by_role(
-            feconf.ROLE_ID_ADMIN)
-        self.assertEqual(user[0].role, feconf.ROLE_ID_ADMIN)
+    def test_get_by_role_for_admin_returns_admin_users(self):
+        actual_users = [
+            user_models.UserSettingsModel.get_by_id(self.USER_1_ID),
+            user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
+        ]
+        for user in user_models.UserSettingsModel.get_by_role(
+                feconf.ROLE_ID_ADMIN):
+            self.assertIn(user, actual_users)
 
-    def test_export_data_trivial(self):
+    def test_export_data_for_nonexistent_user_raises_exception(self):
+        with self.assertRaisesRegexp(
+            user_models.UserSettingsModel.EntityNotFoundError,
+            'Entity for class UserSettingsModel with id fake_user not found'):
+            user_models.UserSettingsModel.export_data('fake_user')
+
+    def test_export_data_for_trivial_case_returns_data_correctly(self):
         user = user_models.UserSettingsModel.get_by_id(self.USER_1_ID)
         user_data = user.export_data(user.id)
         expected_user_data = {
@@ -132,11 +204,12 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'first_contribution_msec': None,
             'preferred_language_codes': [],
             'preferred_site_language_code': None,
-            'preferred_audio_language_code': None
+            'preferred_audio_language_code': None,
+            'display_alias': None
         }
         self.assertEqual(expected_user_data, user_data)
 
-    def test_export_data_nontrivial(self):
+    def test_export_data_for_nontrivial_case_returns_data_correctly(self):
         user = user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
         user_data = user.export_data(user.id)
         expected_user_data = {
@@ -144,11 +217,11 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
-            'last_agreed_to_terms': self.GENERIC_DATE,
-            'last_started_state_editor_tutorial': self.GENERIC_DATE,
-            'last_started_state_translation_tutorial': self.GENERIC_DATE,
-            'last_logged_in': self.GENERIC_DATE,
-            'last_edited_an_exploration': self.GENERIC_DATE,
+            'last_agreed_to_terms': self.GENERIC_EPOCH,
+            'last_started_state_editor_tutorial': self.GENERIC_EPOCH,
+            'last_started_state_translation_tutorial': self.GENERIC_EPOCH,
+            'last_logged_in': self.GENERIC_EPOCH,
+            'last_edited_an_exploration': self.GENERIC_EPOCH,
             'profile_picture_data_url': self.GENERIC_IMAGE_URL,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
@@ -157,9 +230,31 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'first_contribution_msec': 1,
             'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
-            'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0]
+            'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
+            'display_alias': self.GENERIC_DISPLAY_ALIAS
         }
         self.assertEqual(expected_user_data, user_data)
+
+    def test_get_new_id_under_normal_behaviour_returns_unique_ids(self):
+        ids = set([])
+        for _ in python_utils.RANGE(100):
+            new_id = user_models.UserSettingsModel.get_new_id('')
+            self.assertNotIn(new_id, ids)
+            user_models.UserSettingsModel(
+                id=new_id, gae_id='gae_id', email='some@email.com').put()
+            ids.add(new_id)
+
+    def test_get_new_id_for_too_many_collisions_raises_error(self):
+        # Swap dependent method get_by_id to simulate collision every time.
+        get_by_id_swap = self.swap(
+            user_models.UserSettingsModel, 'get_by_id', types.MethodType(
+                lambda _, __: True, user_models.UserSettingsModel))
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'New id generator is producing too many collisions.')
+
+        with assert_raises_regexp_context_manager, get_by_id_swap:
+            user_models.UserSettingsModel.get_new_id('exploration')
 
 
 class CompletedActivitiesModelTests(test_utils.GenericTestBase):
@@ -170,11 +265,6 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
     USER_2_ID = 'id_2'
     EXPLORATION_IDS_1 = ['exp_1', 'exp_2', 'exp_3']
     COLLECTION_IDS_1 = ['col_1', 'col_2', 'col_3']
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.CompletedActivitiesModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -191,6 +281,21 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS_1,
             deleted=True
         ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.CompletedActivitiesModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        user_models.CompletedActivitiesModel.apply_deletion_policy(
+            self.USER_1_ID)
+        self.assertIsNone(
+            user_models.CompletedActivitiesModel.get_by_id(self.USER_1_ID))
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.CompletedActivitiesModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -210,7 +315,7 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.CompletedActivitiesModel.export_data(
             self.NONEXISTENT_USER_ID)
-        self.assertEqual(None, user_data)
+        self.assertEqual({}, user_data)
 
     def test_export_data_on_existent_user(self):
         """Test if export_data works as intended on a user in datastore."""
@@ -232,11 +337,6 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
     EXPLORATION_IDS_1 = ['exp_1', 'exp_2', 'exp_3']
     COLLECTION_IDS_1 = ['col_1', 'col_2', 'col_3']
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.IncompleteActivitiesModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
-
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(IncompleteActivitiesModelTests, self).setUp()
@@ -252,6 +352,21 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS_1,
             deleted=True
         ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.IncompleteActivitiesModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        user_models.IncompleteActivitiesModel.apply_deletion_policy(
+            self.USER_1_ID)
+        self.assertIsNone(
+            user_models.IncompleteActivitiesModel.get_by_id(self.USER_1_ID))
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.IncompleteActivitiesModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -271,7 +386,7 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.IncompleteActivitiesModel.export_data(
             self.NONEXISTENT_USER_ID)
-        self.assertEqual(None, user_data)
+        self.assertEqual({}, user_data)
 
     def test_export_data_on_existent_user(self):
         """Test if export_data works as intended on a user in datastore."""
@@ -296,11 +411,6 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
     STATE_NAME_1 = 'state_name_1'
     STATE_NAME_2 = 'state_name_2'
     EXP_VERSION = 1
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.ExpUserLastPlaythroughModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
 
     def setUp(self):
         super(ExpUserLastPlaythroughModelTest, self).setUp()
@@ -334,6 +444,21 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             last_played_state_name=self.STATE_NAME_2,
             deleted=True
         ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.ExpUserLastPlaythroughModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        user_models.ExpUserLastPlaythroughModel.apply_deletion_policy(
+            self.USER_ID_1)
+        self.assertIsNone(
+            user_models.ExpUserLastPlaythroughModel.get_by_id(self.USER_ID_1))
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.ExpUserLastPlaythroughModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -417,16 +542,12 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
 
 class LearnerPlaylistModelTests(test_utils.GenericTestBase):
     """Tests for the LearnerPlaylistModel."""
+
     NONEXISTENT_USER_ID = 'id_x'
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
     EXPLORATION_IDS_1 = ['exp_1', 'exp_2', 'exp_3']
     COLLECTION_IDS_1 = ['col_1', 'col_2', 'col_3']
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.LearnerPlaylistModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -443,6 +564,20 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS_1,
             deleted=True
         ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.LearnerPlaylistModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        user_models.LearnerPlaylistModel.apply_deletion_policy(self.USER_ID_1)
+        self.assertIsNone(
+            user_models.LearnerPlaylistModel.get_by_id(self.USER_ID_1))
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.LearnerPlaylistModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -462,7 +597,7 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.LearnerPlaylistModel.export_data(
             self.NONEXISTENT_USER_ID)
-        self.assertEqual(None, user_data)
+        self.assertEqual({}, user_data)
 
     def test_export_data_on_existent_user(self):
         """Test if export_data works as intended on a user in datastore."""
@@ -485,11 +620,6 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
     USER_B_USERNAME = 'b'
     EXP_ID_1 = 'exp_1'
     EXP_ID_2 = 'exp_2'
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.UserContributionsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -527,6 +657,20 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserContributionsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        user_models.UserContributionsModel.apply_deletion_policy(self.user_a_id)
+        self.assertIsNone(
+            user_models.UserContributionsModel.get_by_id(self.user_a_id))
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.UserContributionsModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
+
     def test_has_reference_to_user_id(self):
         self.assertTrue(
             user_models.UserContributionsModel
@@ -545,7 +689,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.UserContributionsModel.export_data(
             self.NONEXISTENT_USER_ID)
-        self.assertEqual(None, user_data)
+        self.assertEqual({}, user_data)
 
     def test_export_data_on_partially_involved_user(self):
         """Test export_data on user with no creations and two edits."""
@@ -575,11 +719,6 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.UserEmailPreferencesModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
-
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(UserEmailPreferencesModelTests, self).setUp()
@@ -589,6 +728,21 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
             id=self.USER_ID_2,
             deleted=True
         ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserEmailPreferencesModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        user_models.UserEmailPreferencesModel.apply_deletion_policy(
+            self.USER_ID_1)
+        self.assertIsNone(
+            user_models.UserEmailPreferencesModel.get_by_id(self.USER_ID_1))
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.UserEmailPreferencesModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -613,33 +767,66 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     USER_ID_2 = 'user_id_2'
     USER_ID_3 = 'user_id_3'
     USER_ID_4 = 'user_id_4'
-    CREATOR_IDS = ['4', '8', '16']
+    USER_ID_5 = 'user_id_5'
+    USER_ID_6 = 'user_id_6'
+    CREATOR_IDS = [USER_ID_5, USER_ID_6]
+    CREATOR_USERNAMES = ['usernameuser_id_5', 'usernameuser_id_6']
     COLLECTION_IDS = ['23', '42', '4']
     ACTIVITY_IDS = ['8', '16', '23']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.UserSubscriptionsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+    GENERIC_DATETIME = datetime.datetime(2020, 6, 2)
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(UserSubscriptionsModelTests, self).setUp()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_1,
+            gae_id='gae_1_id',
+            email='some@email.com'
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_2,
+            gae_id='gae_2_id',
+            email='some_other@email.com'
+        ).put()
+
         user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
+
+        for creator_id in self.CREATOR_IDS:
+            user_models.UserSettingsModel(
+                id=creator_id,
+                gae_id='gae_' + creator_id,
+                username='username' + creator_id,
+                email=creator_id + '@example.com'
+            ).put()
 
         user_models.UserSubscriptionsModel(
             id=self.USER_ID_2,
             creator_ids=self.CREATOR_IDS,
             collection_ids=self.COLLECTION_IDS,
             activity_ids=self.ACTIVITY_IDS,
-            general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS
+            general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
+            last_checked=self.GENERIC_DATETIME
         ).put()
 
         user_models.UserSubscriptionsModel(
             id=self.USER_ID_4,
             deleted=True
         ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserSubscriptionsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        user_models.UserSubscriptionsModel.apply_deletion_policy(self.USER_ID_1)
+        self.assertIsNone(
+            user_models.UserSubscriptionsModel.get_by_id(self.USER_ID_1))
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.UserSubscriptionsModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -648,7 +835,23 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         )
         self.assertTrue(
             user_models.UserSubscriptionsModel
+            .has_reference_to_user_id(self.USER_ID_2)
+        )
+        self.assertFalse(
+            user_models.UserSubscriptionsModel
+            .has_reference_to_user_id(self.USER_ID_3)
+        )
+        self.assertTrue(
+            user_models.UserSubscriptionsModel
             .has_reference_to_user_id(self.USER_ID_4)
+        )
+        self.assertTrue(
+            user_models.UserSubscriptionsModel
+            .has_reference_to_user_id(self.USER_ID_5)
+        )
+        self.assertTrue(
+            user_models.UserSubscriptionsModel
+            .has_reference_to_user_id(self.USER_ID_6)
         )
         self.assertFalse(
             user_models.UserSubscriptionsModel
@@ -660,7 +863,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         user_data = (
             user_models.UserSubscriptionsModel.export_data(self.USER_ID_1))
         test_data = {
-            'creator_ids': [],
+            'creator_usernames': [],
             'collection_ids': [],
             'activity_ids': [],
             'general_feedback_thread_ids': [],
@@ -673,21 +876,19 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         user_data = (
             user_models.UserSubscriptionsModel.export_data(self.USER_ID_2))
         test_data = {
-            'creator_ids': self.CREATOR_IDS,
+            'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
             'activity_ids': self.ACTIVITY_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
-            'last_checked': None
+            'last_checked': utils.get_time_in_millisecs(self.GENERIC_DATETIME)
         }
         self.assertEqual(user_data, test_data)
 
     def test_export_data_on_nonexistent_user(self):
         """Test if exception is raised on nonexistent UserSubscriptionsModel."""
-        export_data_exception = (
-            self.assertRaisesRegexp(
-                Exception, 'UserSubscriptionsModel does not exist.'))
-        with export_data_exception:
-            user_models.UserSubscriptionsModel.export_data(self.USER_ID_3)
+        user_data = user_models.UserSubscriptionsModel.export_data(
+            self.USER_ID_3)
+        self.assertEqual({}, user_data)
 
 
 class UserSubscribersModelTests(test_utils.GenericTestBase):
@@ -696,18 +897,40 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
+    USER_ID_3 = 'id_3'
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(UserSubscribersModelTests, self).setUp()
+
+        user_models.UserSettingsModel(
+            id=self.USER_ID_1,
+            gae_id='gae_1_id',
+            email='some@email.com'
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_2,
+            gae_id='gae_2_id',
+            email='some_other@email.com'
+        ).put()
+
+        user_models.UserSubscribersModel(
+            id=self.USER_ID_1, subscriber_ids=[self.USER_ID_3]).put()
+        user_models.UserSubscribersModel(id=self.USER_ID_2, deleted=True).put()
 
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.UserSubscribersModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
-    def setUp(self):
-        """Set up user models in datastore for use in testing."""
-        super(UserSubscribersModelTests, self).setUp()
-
-        user_models.UserSubscribersModel(id=self.USER_ID_1).put()
-        user_models.UserSubscribersModel(id=self.USER_ID_2, deleted=True).put()
+    def test_apply_deletion_policy(self):
+        user_models.UserSubscribersModel.apply_deletion_policy(self.USER_ID_1)
+        self.assertIsNone(
+            user_models.UserSubscribersModel.get_by_id(self.USER_ID_1))
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.UserSubscribersModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -717,6 +940,10 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
         self.assertTrue(
             user_models.UserSubscribersModel
             .has_reference_to_user_id(self.USER_ID_2)
+        )
+        self.assertTrue(
+            user_models.UserSubscribersModel
+            .has_reference_to_user_id(self.USER_ID_3)
         )
         self.assertFalse(
             user_models.UserSubscribersModel
@@ -731,11 +958,6 @@ class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.UserRecentChangesBatchModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
-
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(UserRecentChangesBatchModelTests, self).setUp()
@@ -745,6 +967,21 @@ class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):
             id=self.USER_ID_2,
             deleted=True
         ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserRecentChangesBatchModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        user_models.UserRecentChangesBatchModel.apply_deletion_policy(
+            self.USER_ID_1)
+        self.assertIsNone(
+            user_models.UserRecentChangesBatchModel.get_by_id(self.USER_ID_1))
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.UserRecentChangesBatchModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -807,11 +1044,6 @@ class UserStatsModelTest(test_utils.GenericTestBase):
         }
     ]
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.UserStatsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
-
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(UserStatsModelTest, self).setUp()
@@ -841,6 +1073,19 @@ class UserStatsModelTest(test_utils.GenericTestBase):
             weekly_creator_stats_list=self.USER_2_WEEKLY_CREATOR_STATS_LIST,
             deleted=True
         ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserStatsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        user_models.UserStatsModel.apply_deletion_policy(self.USER_ID_1)
+        self.assertIsNone(user_models.UserStatsModel.get_by_id(self.USER_ID_1))
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.UserStatsModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -895,7 +1140,7 @@ class UserStatsModelTest(test_utils.GenericTestBase):
         """Test if export_data returns None when user is not in data store."""
         user_data = user_models.UserStatsModel.export_data(
             self.NONEXISTENT_USER_ID)
-        test_data = None
+        test_data = {}
         self.assertEqual(user_data, test_data)
 
 
@@ -904,16 +1149,12 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
 
     NONEXISTENT_USER_ID = 'id_x'
     DATETIME_OBJECT = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
+    DATETIME_EPOCH = utils.get_time_in_millisecs(DATETIME_OBJECT)
     USER_1_ID = 'id_1'
     USER_2_ID = 'id_2'
     EXP_ID_ONE = 'exp_id_one'
     EXP_ID_TWO = 'exp_id_two'
     EXP_ID_THREE = 'exp_id_three'
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.ExplorationUserDataModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.ANONYMIZE)
 
     def setUp(self):
         super(ExplorationUserDataModelTest, self).setUp()
@@ -928,6 +1169,8 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             draft_change_list_exp_version=3,
             draft_change_list_id=1
         ).put()
+        user_models.ExplorationUserDataModel.create(
+            self.USER_1_ID, self.EXP_ID_TWO).put()
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.USER_2_ID, self.EXP_ID_ONE),
             user_id=self.USER_2_ID,
@@ -937,9 +1180,26 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             draft_change_list={'new_content': {}},
             draft_change_list_last_updated=self.DATETIME_OBJECT,
             draft_change_list_exp_version=3,
-            draft_change_list_id=1,
-            deleted=True
+            draft_change_list_id=1
         ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.ExplorationUserDataModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        user_models.ExplorationUserDataModel.apply_deletion_policy(
+            self.USER_1_ID)
+        self.assertIsNone(
+            user_models.ExplorationUserDataModel.query(
+                user_models.ExplorationUserDataModel.user_id == self.USER_1_ID
+            ).get()
+        )
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.ExplorationUserDataModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -971,9 +1231,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object.user_id, self.USER_1_ID)
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_ONE)
         self.assertEqual(retrieved_object.rating, 2)
-        self.assertEqual(retrieved_object.rated_on, self.DATETIME_OBJECT)
         self.assertEqual(
             retrieved_object.draft_change_list, {'new_content': {}})
+        self.assertEqual(retrieved_object.rated_on, self.DATETIME_OBJECT)
         self.assertEqual(
             retrieved_object.draft_change_list_last_updated,
             self.DATETIME_OBJECT)
@@ -986,16 +1246,21 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
 
         self.assertEqual(retrieved_object, None)
 
+    def test_export_data_nonexistent_user(self):
+        user_data = user_models.ExplorationUserDataModel.export_data(
+            'fake_user')
+        self.assertEqual(user_data, {})
+
     def test_export_data_one_exploration(self):
         """Test export data when user has one exploration."""
         user_data = user_models.ExplorationUserDataModel.export_data(
-            self.USER_1_ID)
+            self.USER_2_ID)
         expected_data = {
             self.EXP_ID_ONE: {
                 'rating': 2,
-                'rated_on': self.DATETIME_OBJECT,
+                'rated_on': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': self.DATETIME_OBJECT,
+                'draft_change_list_last_updated': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -1004,14 +1269,11 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
                     feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
             }
         }
-
         self.assertDictEqual(expected_data, user_data)
 
     def test_export_data_multiple_explorations(self):
         """Test export data when user has multiple explorations."""
         # Add two more explorations.
-        user_models.ExplorationUserDataModel.create(
-            self.USER_1_ID, self.EXP_ID_TWO).put()
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.USER_1_ID, self.EXP_ID_THREE),
             user_id=self.USER_1_ID,
@@ -1028,9 +1290,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         expected_data = {
             self.EXP_ID_ONE: {
                 'rating': 2,
-                'rated_on': self.DATETIME_OBJECT,
+                'rated_on': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': self.DATETIME_OBJECT,
+                'draft_change_list_last_updated': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -1052,9 +1314,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             },
             self.EXP_ID_THREE: {
                 'rating': 5,
-                'rated_on': self.DATETIME_OBJECT,
+                'rated_on': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {'content': 3}},
-                'draft_change_list_last_updated': self.DATETIME_OBJECT,
+                'draft_change_list_last_updated': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 2,
                 'draft_change_list_id': 2,
                 'mute_suggestion_notifications': (
@@ -1108,6 +1370,24 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.CollectionProgressModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        user_models.CollectionProgressModel.apply_deletion_policy(
+            self.USER_ID_1)
+        self.assertIsNone(
+            user_models.CollectionProgressModel.query(
+                user_models.CollectionProgressModel.user_id == self.USER_ID_1
+            ).get()
+        )
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.CollectionProgressModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
+
     def test_has_reference_to_user_id(self):
         self.assertTrue(
             user_models.CollectionProgressModel
@@ -1152,11 +1432,6 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
         }
         self.assertEqual(expected_data, user_data)
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.CollectionProgressModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
-
 
 class StoryProgressModelTests(test_utils.GenericTestBase):
     """Tests for StoryProgressModel."""
@@ -1169,11 +1444,6 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
     STORY_ID_2 = 'story_id_2'
     COMPLETED_NODE_IDS_1 = ['node_id_1', 'node_id_2']
     COMPLETED_NODE_IDS_2 = ['node_id_a']
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.StoryProgressModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
 
     def setUp(self):
         super(StoryProgressModelTests, self).setUp()
@@ -1202,6 +1472,23 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
             completed_node_ids=self.COMPLETED_NODE_IDS_1,
             deleted=True
         ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.StoryProgressModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        user_models.StoryProgressModel.apply_deletion_policy(self.USER_ID_2)
+        self.assertIsNone(
+            user_models.StoryProgressModel.query(
+                user_models.StoryProgressModel.user_id == self.USER_ID_2
+            ).get()
+        )
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.StoryProgressModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -1268,14 +1555,10 @@ class UserQueryModelTests(test_utils.GenericTestBase):
 
     QUERY_1_ID = 'id_1'
     QUERY_2_ID = 'id_2'
+    QUERY_3_ID = 'id_3'
     NONEXISTENT_USER_ID = 'submitter_id_x'
     USER_ID_1 = 'submitter_id_1'
     USER_ID_2 = 'submitter_id_2'
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.UserQueryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -1290,6 +1573,27 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             submitter_id=self.USER_ID_2,
             deleted=True
         ).put()
+        user_models.UserQueryModel(
+            id=self.QUERY_3_ID,
+            submitter_id=self.USER_ID_1
+        ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserQueryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        user_models.UserQueryModel.apply_deletion_policy(self.USER_ID_1)
+        self.assertIsNone(
+            user_models.UserQueryModel.query(
+                user_models.UserQueryModel.submitter_id == self.USER_ID_1
+            ).get()
+        )
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.UserQueryModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -1418,17 +1722,17 @@ class UserBulkEmailsModelTests(test_utils.GenericTestBase):
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.UserBulkEmailsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
-
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(UserBulkEmailsModelTests, self).setUp()
 
         user_models.UserBulkEmailsModel(id=self.USER_ID_1).put()
         user_models.UserBulkEmailsModel(id=self.USER_ID_2, deleted=True).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserBulkEmailsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -1455,11 +1759,6 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
     SKILL_ID_2 = 'skill_id_2'
     DEGREE_OF_MASTERY = 0.5
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.UserSkillMasteryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
-
     def setUp(self):
         super(UserSkillMasteryModelTests, self).setUp()
         user_models.UserSkillMasteryModel(
@@ -1484,6 +1783,23 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
             degree_of_mastery=self.DEGREE_OF_MASTERY,
             deleted=True
         ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserSkillMasteryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        user_models.UserSkillMasteryModel.apply_deletion_policy(self.USER_1_ID)
+        self.assertIsNone(
+            user_models.UserSkillMasteryModel.query(
+                user_models.UserSkillMasteryModel.user_id == self.USER_1_ID
+            ).get()
+        )
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.UserSkillMasteryModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -1567,32 +1883,77 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_1_id'
     USER_2_ID = 'user_2_id'
-    SCORE_CATEGORY = 'category'
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.UserContributionScoringModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+    USER_3_ID_OLD = 'user_3_id_old'
+    USER_3_ID_NEW = 'user_3_id_new'
+    SCORE_CATEGORY_1 = 'category_1'
+    SCORE_CATEGORY_2 = 'category_2'
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(UserContributionsScoringModelTests, self).setUp()
 
         user_models.UserContributionScoringModel(
-            id='%s.%s' % (self.SCORE_CATEGORY, self.USER_1_ID),
+            id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_1_ID),
             user_id=self.USER_1_ID,
-            score_category=self.SCORE_CATEGORY,
+            score_category=self.SCORE_CATEGORY_1,
             score=1.5,
             has_email_been_sent=False
         ).put()
         user_models.UserContributionScoringModel(
-            id='%s.%s' % (self.SCORE_CATEGORY, self.USER_2_ID),
+            id='%s.%s' % (self.SCORE_CATEGORY_2, self.USER_1_ID),
+            user_id=self.USER_1_ID,
+            score_category=self.SCORE_CATEGORY_2,
+            score=2,
+            has_email_been_sent=False
+        ).put()
+        user_models.UserContributionScoringModel(
+            id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_2_ID),
             user_id=self.USER_2_ID,
-            score_category=self.SCORE_CATEGORY,
+            score_category=self.SCORE_CATEGORY_1,
             score=1.5,
             has_email_been_sent=False,
             deleted=True
         ).put()
+
+    def test_export_data_trivial(self):
+        user_data = user_models.UserContributionScoringModel.export_data(
+            'USER_WITHOUT_DATA')
+        expected_data = {}
+        self.assertEqual(user_data, expected_data)
+
+    def test_export_data_nontrivial(self):
+        user_data = user_models.UserContributionScoringModel.export_data(
+            self.USER_1_ID)
+        expected_data = {
+            self.SCORE_CATEGORY_1: {
+                'has_email_been_sent': False,
+                'score': 1.5
+            },
+            self.SCORE_CATEGORY_2: {
+                'has_email_been_sent': False,
+                'score': 2
+            }
+        }
+        self.assertEqual(user_data, expected_data)
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserContributionScoringModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        user_models.UserContributionScoringModel.apply_deletion_policy(
+            self.USER_1_ID)
+        self.assertIsNone(
+            user_models.UserContributionScoringModel.query(
+                user_models.UserContributionScoringModel.user_id ==
+                self.USER_1_ID
+            ).get()
+        )
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.UserContributionScoringModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -1610,8 +1971,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
 
     def test_create_model(self):
         user_models.UserContributionScoringModel.create('user1', 'category1', 1)
-        score_models = (user_models.UserContributionScoringModel
-                        .get_all_scores_of_user('user1'))
+        score_models = (
+            user_models.UserContributionScoringModel
+            .get_all_scores_of_user('user1'))
         self.assertEqual(len(score_models), 1)
         self.assertEqual(score_models[0].id, 'category1.user1')
         self.assertEqual(score_models[0].user_id, 'user1')
@@ -1640,9 +2002,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         user_models.UserContributionScoringModel.create('user3', 'category2', 1)
         user_models.UserContributionScoringModel.create('user4', 'category2', 1)
 
-        score_models = (user_models.UserContributionScoringModel
-                        .get_all_users_with_score_above_minimum_for_category(
-                            'category1'))
+        score_models = (
+            user_models.UserContributionScoringModel
+            .get_all_users_with_score_above_minimum_for_category('category1'))
 
         self.assertEqual(len(score_models), 3)
         self.assertIn(user_models.UserContributionScoringModel.get_by_id(
@@ -1652,9 +2014,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertIn(user_models.UserContributionScoringModel.get_by_id(
             'category1.user4'), score_models)
 
-        score_models = (user_models.UserContributionScoringModel
-                        .get_all_users_with_score_above_minimum_for_category(
-                            'category2'))
+        score_models = (
+            user_models.UserContributionScoringModel
+            .get_all_users_with_score_above_minimum_for_category('category2'))
 
         self.assertEqual(len(score_models), 1)
         self.assertIn(user_models.UserContributionScoringModel.get_by_id(
@@ -1663,8 +2025,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
     def test_get_score_of_user_for_category(self):
         user_models.UserContributionScoringModel.create('user1', 'category1', 1)
 
-        score = (user_models.UserContributionScoringModel
-                 .get_score_of_user_for_category('user1', 'category1'))
+        score = (
+            user_models.UserContributionScoringModel
+            .get_score_of_user_for_category('user1', 'category1'))
 
         self.assertEqual(score, 1)
 
@@ -1674,8 +2037,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         user_models.UserContributionScoringModel.increment_score_for_user(
             'user1', 'category1', 2)
 
-        score = (user_models.UserContributionScoringModel
-                 .get_score_of_user_for_category('user1', 'category1'))
+        score = (
+            user_models.UserContributionScoringModel
+            .get_score_of_user_for_category('user1', 'category1'))
 
         self.assertEqual(score, 3)
 
@@ -1684,8 +2048,9 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         user_models.UserContributionScoringModel.create('user1', 'category2', 1)
         user_models.UserContributionScoringModel.create('user1', 'category3', 1)
 
-        score_models = (user_models.UserContributionScoringModel
-                        .get_all_scores_of_user('user1'))
+        score_models = (
+            user_models.UserContributionScoringModel
+            .get_all_scores_of_user('user1'))
         self.assertEqual(len(score_models), 3)
         self.assertIn(user_models.UserContributionScoringModel.get_by_id(
             'category1.user1'), score_models)
@@ -1706,3 +2071,317 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertIn('category1', score_categories)
         self.assertIn('category3', score_categories)
         self.assertNotIn('category2', score_categories)
+
+
+class UserContributionRightsModelTests(test_utils.GenericTestBase):
+    """Tests for UserContributionRightsModel."""
+
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    NONEXISTENT_USER_ID = 'id_3'
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserContributionRightsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            user_models.UserContributionRightsModel
+            .has_reference_to_user_id(self.USER_ID_1)
+        )
+        self.assertFalse(
+            user_models.UserContributionRightsModel
+            .has_reference_to_user_id(self.USER_ID_2)
+        )
+        self.assertFalse(
+            user_models.UserContributionRightsModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
+
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True).put()
+
+        self.assertTrue(
+            user_models.UserContributionRightsModel
+            .has_reference_to_user_id(self.USER_ID_1)
+        )
+        self.assertTrue(
+            user_models.UserContributionRightsModel
+            .has_reference_to_user_id(self.USER_ID_2)
+        )
+        self.assertFalse(
+            user_models.UserContributionRightsModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
+
+    def test_export_data_trivial(self):
+        user_data = user_models.UserContributionRightsModel.export_data(
+            self.USER_ID_1)
+        expected_data = {}
+        self.assertEqual(user_data, expected_data)
+
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True).put()
+
+        user_data = user_models.UserContributionRightsModel.export_data(
+            self.USER_ID_1)
+        expected_data = {
+            'can_review_translation_for_language_codes': ['hi', 'en'],
+            'can_review_voiceover_for_language_codes': ['hi'],
+            'can_review_questions': True
+        }
+        self.assertEqual(user_data, expected_data)
+
+    def test_get_translation_reviewer_user_ids(self):
+        translation_reviewer_ids = (
+            user_models.UserContributionRightsModel
+            .get_translation_reviewer_user_ids('hi'))
+        self.assertEqual(len(translation_reviewer_ids), 0)
+
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True).put()
+
+        translation_reviewer_ids = (
+            user_models.UserContributionRightsModel
+            .get_translation_reviewer_user_ids('hi'))
+        self.assertEqual(len(translation_reviewer_ids), 2)
+        self.assertTrue(self.USER_ID_1 in translation_reviewer_ids)
+        self.assertTrue(self.USER_ID_2 in translation_reviewer_ids)
+
+    def test_get_voiceover_reviewer_user_ids(self):
+        voiceover_reviewer_ids = (
+            user_models.UserContributionRightsModel
+            .get_voiceover_reviewer_user_ids('hi'))
+        self.assertEqual(len(voiceover_reviewer_ids), 0)
+
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True).put()
+
+        voiceover_reviewer_ids = (
+            user_models.UserContributionRightsModel
+            .get_voiceover_reviewer_user_ids('hi'))
+        self.assertEqual(len(voiceover_reviewer_ids), 1)
+        self.assertFalse(self.USER_ID_1 in voiceover_reviewer_ids)
+        self.assertTrue(self.USER_ID_2 in voiceover_reviewer_ids)
+
+    def test_get_question_reviewer_user_ids(self):
+        question_reviewer_ids = (
+            user_models.UserContributionRightsModel
+            .get_question_reviewer_user_ids())
+        self.assertEqual(len(question_reviewer_ids), 0)
+
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True).put()
+
+        question_reviewer_ids = (
+            user_models.UserContributionRightsModel
+            .get_question_reviewer_user_ids())
+        self.assertEqual(len(question_reviewer_ids), 1)
+        self.assertFalse(self.USER_ID_1 in question_reviewer_ids)
+        self.assertTrue(self.USER_ID_2 in question_reviewer_ids)
+
+
+class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
+    """Tests for PendingDeletionRequestModel."""
+
+    NONEXISTENT_USER_ID = 'id_x'
+    USER_1_ID = 'user_1_id'
+    USER_1_EMAIL = 'email@email.com'
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(PendingDeletionRequestModelTests, self).setUp()
+
+        user_models.PendingDeletionRequestModel(
+            id=self.USER_1_ID,
+            email=self.USER_1_EMAIL,
+            exploration_ids=[],
+            collection_ids=[],
+        ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.PendingDeletionRequestModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
+    def test_has_reference_to_user_id(self):
+        self.assertTrue(
+            user_models.PendingDeletionRequestModel
+            .has_reference_to_user_id(self.USER_1_ID)
+        )
+        self.assertFalse(
+            user_models.PendingDeletionRequestModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
+
+
+class PseudonymizedUserModelTests(test_utils.GenericTestBase):
+    """Tests for PseudonymizedUserModel."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.PendingDeletionRequestModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
+    def test_create_raises_error_when_many_id_collisions_occur(self):
+        # Swap dependent method get_by_id to simulate collision every time.
+        get_by_id_swap = self.swap(
+            user_models.PseudonymizedUserModel, 'get_by_id', types.MethodType(
+                lambda _, __: True, user_models.PseudonymizedUserModel))
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'New id generator is producing too many collisions.')
+
+        with assert_raises_regexp_context_manager, get_by_id_swap:
+            user_models.PseudonymizedUserModel.get_new_id('exploration')
+
+
+class UserAuthDetailsModelTests(test_utils.GenericTestBase):
+    """Tests for UserAuthDetailsModel."""
+
+    NONEXISTENT_AUTH_METHOD_NAME = 'auth_method_x'
+    NONEXISTENT_USER_ID = 'id_x'
+    NONREGISTERED_GAE_ID = 'gae_id_x'
+    USER_ID = 'user_id'
+    USER_GAE_ID = 'gae_id'
+    USER_PIN = '12345'
+    PROFILE_ID = 'profile_id'
+    PROFILE_PIN = '123'
+    PROFILE_2_ID = 'profile2_id'
+    PROFILE_2_PIN = None
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(UserAuthDetailsModelTests, self).setUp()
+
+        user_models.UserAuthDetailsModel(
+            id=self.USER_ID,
+            gae_id=self.USER_GAE_ID,
+            pin=self.USER_PIN
+        ).put()
+        user_models.UserAuthDetailsModel(
+            id=self.PROFILE_ID,
+            gae_id=None,
+            pin=self.PROFILE_PIN,
+            parent_user_id=self.USER_ID
+        ).put()
+        user_models.UserAuthDetailsModel(
+            id=self.PROFILE_2_ID,
+            gae_id=None,
+            pin=self.PROFILE_2_PIN,
+            parent_user_id=self.USER_ID
+        ).put()
+
+    def test_get_export_policy_is_not_applicable(self):
+        self.assertEqual(
+            user_models.UserAuthDetailsModel.get_export_policy(),
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+
+    def test_get_deletion_policy_is_delete(self):
+        self.assertEqual(
+            user_models.UserAuthDetailsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy_for_registered_user_deletes_them(self):
+        # Deleting a full user.
+        user_models.UserAuthDetailsModel.apply_deletion_policy(self.USER_ID)
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.USER_ID))
+
+        # Deleting a profile user.
+        user_models.UserAuthDetailsModel.apply_deletion_policy(self.PROFILE_ID)
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.PROFILE_ID))
+
+    def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.NONEXISTENT_USER_ID))
+        user_models.UserAuthDetailsModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
+
+    def test_has_reference_to_existing_user_id_is_true(self):
+        # For a full user.
+        self.assertTrue(
+            user_models.UserAuthDetailsModel.has_reference_to_user_id(
+                self.USER_ID)
+        )
+
+        # For a profile user.
+        self.assertTrue(
+            user_models.UserAuthDetailsModel.has_reference_to_user_id(
+                self.PROFILE_ID)
+        )
+
+    def test_has_reference_to_non_existing_user_id_is_false(self):
+        self.assertFalse(
+            user_models.UserAuthDetailsModel.has_reference_to_user_id(
+                self.NONEXISTENT_USER_ID)
+        )
+
+    def test_get_by_auth_id_with_invalid_auth_method_name_is_none(self):
+        # For registered gae_id.
+        self.assertIsNone(
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                self.NONEXISTENT_AUTH_METHOD_NAME, self.USER_GAE_ID)
+        )
+
+        # For non registered gae_id.
+        self.assertIsNone(
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                self.NONEXISTENT_AUTH_METHOD_NAME, self.NONREGISTERED_GAE_ID)
+        )
+
+    def test_get_by_auth_id_for_unregistered_auth_id_is_none(self):
+        self.assertIsNone(
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.NONREGISTERED_GAE_ID))
+
+    def test_get_by_auth_id_for_correct_user_id_auth_id_mapping(self):
+        self.assertEqual(
+            user_models.UserAuthDetailsModel.get_by_id(self.USER_ID),
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
+        )
+
+    def test_get_by_auth_id_registered_auth_id_returns_no_profile_user(self):
+        self.assertNotEqual(
+            user_models.UserAuthDetailsModel.get_by_id(self.PROFILE_ID),
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
+        )

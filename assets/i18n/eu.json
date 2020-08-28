@@ -284,7 +284,6 @@
 	"I18N_SIGNUP_EMAIL": "Helbide elektronikoa",
 	"I18N_SIGNUP_EMAIL_PREFERENCES": "Helbide elektronikoaren hobespenak",
 	"I18N_SIGNUP_ERROR_NO_USERNAME": "Mesedez, sartu erabiltzaile izen bat.",
-	"I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS": "Erabiltzaile izen baten, gehienez 50 karaketere izan ditzake.",
 	"I18N_SIGNUP_ERROR_USERNAME_NOT_AVAILABLE": "Erabiltzaile izena ez dago eskuragarri.",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "Erabiltzaile izenek karaktere alfanumerikoak bakarrik izan ditzakete.",
 	"I18N_SIGNUP_ERROR_USERNAME_TAKEN": "Barkatu, erabiltzaile izen hau hartuta dago.",

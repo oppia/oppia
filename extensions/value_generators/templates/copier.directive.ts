@@ -20,9 +20,14 @@
 // generators framework).
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
 
+interface CopierCustomScope extends ng.IScope {
+  generatorId?: string;
+  getTemplateUrl?: (() => string);
+}
+
 angular.module('oppia').directive('copier', ['$compile', function($compile) {
   return {
-    link: function(scope: ICustomScope, element) {
+    link: function(scope: CopierCustomScope, element) {
       scope.getTemplateUrl = function() {
         return '/value_generator_handler/' + scope.generatorId;
       };
@@ -37,16 +42,19 @@ angular.module('oppia').directive('copier', ['$compile', function($compile) {
     },
     template: '<span ng-include="getTemplateUrl()"></span>',
     controller: ['$scope', function($scope) {
-      $scope.generatorId = $scope.getGeneratorId();
-      $scope.initArgs = $scope.getInitArgs();
-      $scope.objType = $scope.getObjType();
-      $scope.$watch('initArgs', function() {
+      var ctrl = this;
+      ctrl.$onInit = function() {
+        $scope.generatorId = $scope.getGeneratorId();
         $scope.initArgs = $scope.getInitArgs();
-      }, true);
-
-      $scope.$watch('objType', function() {
         $scope.objType = $scope.getObjType();
-      }, true);
+        $scope.$watch('initArgs', function() {
+          $scope.initArgs = $scope.getInitArgs();
+        }, true);
+
+        $scope.$watch('objType', function() {
+          $scope.objType = $scope.getObjType();
+        }, true);
+      };
     }]
   };
 }]);

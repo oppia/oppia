@@ -16,16 +16,15 @@
  * @fileoverview Validator service for the drag and drop sorting interaction.
  */
 
-// TODO(#7403): Convert this to partial imports.
-import math from 'mathjs';
-
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
+import { DragAndDropSortInputCustomizationArgs } from
+  'extensions/interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
@@ -39,11 +38,8 @@ export class DragAndDropSortInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  getCustomizationArgsWarnings(customizationArgs: any): IWarning[] {
+  getCustomizationArgsWarnings(
+      customizationArgs: DragAndDropSortInputCustomizationArgs): Warning[] {
     var warningsList = [];
 
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
@@ -62,7 +58,7 @@ export class DragAndDropSortInputValidationService {
     }
 
     for (var i = 0; i < numChoices; i++) {
-      var choice = customizationArgs.choices.value[i];
+      var choice = customizationArgs.choices.value[i].getHtml();
       if (choice.trim().length === 0) {
         areAnyChoicesEmpty = true;
       }
@@ -89,13 +85,10 @@ export class DragAndDropSortInputValidationService {
     return warningsList;
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
   getAllWarnings(
-      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome): IWarning[] {
+      stateName: string,
+      customizationArgs: DragAndDropSortInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var warningsList = [];
     var seenItems = [];
     var ranges = [];
@@ -105,12 +98,18 @@ export class DragAndDropSortInputValidationService {
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
 
+    const shouldCheckForRedundancy = function(earlierRule, laterRule) {
+      return (
+        earlierRule.type ===
+        'IsEqualToOrderingWithOneItemAtIncorrectPosition' &&
+        laterRule.type === 'IsEqualToOrdering');
+    };
     var checkRedundancy = function(earlierRule, laterRule) {
       var noOfMismatches = 0;
       var inputs = earlierRule.inputs.x;
       var answer = laterRule.inputs.x;
-      for (var i = 0; i < math.min(inputs.length, answer.length); i++) {
-        for (var j = 0; j < math.max(answer[i].length, inputs[i].length);
+      for (var i = 0; i < Math.min(inputs.length, answer.length); i++) {
+        for (var j = 0; j < Math.max(answer[i].length, inputs[i].length);
           j++) {
           if (inputs[i].length > answer[i].length) {
             if (answer[i].indexOf(inputs[i][j]) === -1) {
@@ -127,38 +126,83 @@ export class DragAndDropSortInputValidationService {
     };
 
     for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].rules;
+      var rules = answerGroups[i].getRulesAsList();
       for (var j = 0; j < rules.length; j++) {
         var inputs = rules[j].inputs;
         var rule = rules[j];
+        if (!customizationArgs.allowMultipleItemsInSamePosition.value) {
+          var xInputs = <string[][]>inputs.x;
+          for (var k = 0; k < xInputs.length; k++) {
+            if (xInputs[k].length > 1) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: 'Multiple items in a single position are not allowed.'
+              });
+              break;
+            }
+          }
+        }
         var range = {
-          answerGroupIndex: i + 1,
-          ruleIndex: j + 1
+          answerGroupIndex: i,
+          ruleIndex: j
         };
         seenItems = [];
         areAnyItemsEmpty = false;
         areAnyItemsDuplicated = false;
 
+        let choiceValues = (
+          customizationArgs.choices.value.map(x => x.getHtml()));
         switch (rule.type) {
+          case 'HasElementXAtPositionY':
+            if (!choiceValues.includes(<string>inputs.x)) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'contains a choice that does not match any of ' +
+                  'the choices in the customization arguments.')
+              });
+            }
+            if (inputs.y > customizationArgs.choices.value.length) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'refers to an invalid choice position.')
+              });
+            }
+            break;
           case 'HasElementXBeforeElementY':
             if (inputs.x === inputs.y) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
-                  (i + 1) + ' will never be matched because both the ' +
-                  'selected elements are same.')
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'will never be matched because both the selected ' +
+                  'elements are same.')
+              });
+            }
+            if (
+              !choiceValues.includes(<string>inputs.x) ||
+              !choiceValues.includes(<string>inputs.y)) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'contains choices that do not match any of ' +
+                  'the choices in the customization arguments.')
               });
             }
             break;
           case 'IsEqualToOrdering':
           case 'IsEqualToOrderingWithOneItemAtIncorrectPosition':
-            for (var k = 0; k < inputs.x.length; k++) {
+            var xInputs = <string[][]>inputs.x;
+            for (var k = 0; k < xInputs.length; k++) {
               if (inputs.x[k].length === 0) {
                 areAnyItemsEmpty = true;
               } else {
-                for (var l = 0; l < inputs.x[k].length; l++) {
-                  var item = inputs.x[k][l];
+                for (var l = 0; l < xInputs[k].length; l++) {
+                  var item = xInputs[k][l];
                   if (item.trim().length === 0) {
                     areAnyItemsEmpty = true;
                   }
@@ -170,10 +214,11 @@ export class DragAndDropSortInputValidationService {
               }
             }
 
-            if (areAnyItemsEmpty) {
+            if (areAnyItemsEmpty || xInputs.length === 0) {
+              var message = areAnyItemsEmpty ? 'the items are' : 'the list is';
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: 'Please ensure the items are nonempty.'
+                message: `Please ensure ${message} nonempty.`
               });
             }
 
@@ -183,27 +228,75 @@ export class DragAndDropSortInputValidationService {
                 message: 'Please ensure the items are unique.'
               });
             }
+
+            if (!customizationArgs.allowMultipleItemsInSamePosition.value &&
+                rule.type === (
+                  'IsEqualToOrderingWithOneItemAtIncorrectPosition')) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  'Rule ' + (j + 1) + ' from answer group ' +
+                  (i + 1) + ' will never be matched because there will be ' +
+                  'at least 2 elements at incorrect positions if multiple ' +
+                  'elements cannot occupy the same position.')
+              });
+            }
+            var sortedCustomArgsChoices = choiceValues.sort();
+            var flattenedAndSortedXInputs = (
+              xInputs.reduce((acc, val) => acc.concat(val), []).sort());
+            if (
+              !angular.equals(
+                sortedCustomArgsChoices, flattenedAndSortedXInputs)) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: (
+                  `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                  'options do not match customization argument choices.')
+              });
+            }
             break;
           default:
         }
 
         for (var k = 0; k < ranges.length; k++) {
-          var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1].
-            rules[ranges[k].ruleIndex - 1];
-          if (earlierRule.type ===
-            'IsEqualToOrderingWithOneItemAtIncorrectPosition' &&
-            rule.type === 'IsEqualToOrdering') {
-            if (checkRedundancy(earlierRule, rule)) {
-              warningsList.push({
-                type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Rule ' + (j + 1) + ' from answer group ' +
-                  (i + 1) + ' will never be matched because it ' +
-                  'is made redundant by rule ' + ranges[k].ruleIndex +
-                  ' from answer group ' + ranges[k].answerGroupIndex +
-                  '.')
-              });
-            }
+          var earlierRule = answerGroups[ranges[k].answerGroupIndex].
+            getRulesAsList()[ranges[k].ruleIndex];
+
+          // Rules inside an AnswerGroup do not have a set order. We should
+          // check for redundant rules in both directions if rules are in the
+          // same AnswerGroup.
+          const redundantWithinAnswerGroup = (
+            ranges[k].answerGroupIndex === i &&
+            (
+              (
+                shouldCheckForRedundancy(earlierRule, rule) &&
+                checkRedundancy(earlierRule, rule)
+              ) || (
+                shouldCheckForRedundancy(rule, earlierRule) &&
+                checkRedundancy(rule, earlierRule)
+              )
+            )
+          );
+
+          // AnswerGroups do have a set order. If rules are not in the same
+          // AnswerGroup we only check in one direction.
+          const redundantBetweenAnswerGroups = (
+            ranges[k].answerGroupIndex !== i &&
+            (
+              shouldCheckForRedundancy(earlierRule, rule) &&
+              checkRedundancy(earlierRule, rule)
+            )
+          );
+
+          if (redundantWithinAnswerGroup || redundantBetweenAnswerGroups) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
+                'will never be matched because it is made redundant by ' +
+                `rule ${ranges[k].ruleIndex + 1} from answer group ` +
+                `${ranges[k].answerGroupIndex + 1}.`)
+            });
           }
         }
         ranges.push(range);

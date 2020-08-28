@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the collection editor page."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -214,6 +215,33 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
         self.assertEqual(self.COLLECTION_ID, json_response['collection']['id'])
         self.assertEqual(2, json_response['collection']['version'])
+
+        self.logout()
+
+    def test_cannot_put_long_commit_message(self):
+        """Check that putting a long commit message is denied."""
+        rights_manager.create_new_collection_rights(
+            self.COLLECTION_ID, self.owner_id)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
+
+        self.login(self.OWNER_EMAIL)
+
+        long_message_dict = self.json_dict.copy()
+        long_message_dict['commit_message'] = (
+            'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1))
+
+        # Call get handler to return the csrf token.
+        csrf_token = self.get_new_csrf_token()
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
+                self.COLLECTION_ID),
+            long_message_dict, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Commit messages must be at most 1000 characters long.'
+        )
 
         self.logout()
 

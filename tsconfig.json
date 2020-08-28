@@ -1,12 +1,14 @@
 {
   "compilerOptions": {
     "allowJs": true,
+    "downlevelIteration": true,
     "lib": ["es2017", "dom", "webworker"],
     "noImplicitUseStrict": true,
-    "outDir": "local_compiled_js",
+    "outDir": "local_compiled_js_for_test",
     "rootDir": ".",
     "skipLibCheck": true,
     "target": "es5",
+    "sourceMap": true,
     "typeRoots": ["./node_modules/@types"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -14,25 +16,28 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
-      "app.constants": ["core/templates/dev/head/app.constants"],
-      "components/*": ["core/templates/dev/head/components/*"],
-      "domain/*": ["core/templates/dev/head/domain/*"],
-      "pages/*": ["core/templates/dev/head/pages/*"],
-      "services/*": ["core/templates/dev/head/services/*"],
+      "app.constants": ["core/templates/app.constants"],
+      "app-type.constants": ["core/templates/app-type.constants"],
+      "components/*": ["core/templates/components/*"],
+      "domain/*": ["core/templates/domain/*"],
+      "expressions/*": ["core/templates/expressions/*"],
+      "pages/*": ["core/templates/pages/*"],
+      "services/*": ["core/templates/services/*"],
       "classifiers/*": ["extensions/classifiers/*"],
       "interactions/*": ["extensions/interactions/*"],
-      "filters/*": ["core/templates/dev/head/filters/*"]
+      "filters/*": ["core/templates/filters/*"],
+      "static/*": ["third_party/static/*"],
+      "tests/*": ["core/templates/tests/*"]
     }
   },
-  "files_explanation": "These files are included separately since we still do not have webpack in extensions folder and these files are still included through scripts tags, so they need to be compiled separately.",
   "files": [
-    "core/templates/dev/head/mathjaxConfig.ts",
-    "core/templates/dev/head/expressions/expression-parser.service.js",
-    "core/tests/karma-globals.ts"
+    "assets/constants.ts",
+    "assets/rich_text_components_definitions.ts",
+    "core/tests/karma.conf.ts"
   ],
-  "include_explanation": "The files in extensions/ckeditor_plugins are yet to be integrated into webpack (#6732).",
-  "include": [
-    "extensions/ckeditor_plugins",
-    "typings"
+  "include": ["core", "extensions", "typings"],
+  "exclude": [
+    "core/tests",
+    "core/templates/google-analytics.initializer.ts"
   ]
 }

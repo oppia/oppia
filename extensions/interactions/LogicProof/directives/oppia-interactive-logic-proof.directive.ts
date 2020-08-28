@@ -16,15 +16,21 @@
  * @fileoverview Directive for the LogicProof Interaction.
  */
 
-require('interactions/codemirrorRequires.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require('third-party-imports/ui-codemirror.import.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
 require('interactions/LogicProof/directives/logic-proof-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
-require('services/HtmlEscaperService.ts');
+require('services/contextual/url.service.ts');
+require('services/contextual/window-dimensions.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
+
+import { Subscription } from 'rxjs';
 
 import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
 import logicProofStudent from 'interactions/LogicProof/static/js/student.ts';
@@ -35,95 +41,26 @@ import LOGIC_PROOF_DEFAULT_QUESTION_DATA from
   'interactions/LogicProof/static/js/generatedDefaultData.ts';
 
 angular.module('oppia').directive('oppiaInteractiveLogicProof', [
-  'HtmlEscaperService', 'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
-  function(
-      HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
+  'InteractionAttributesExtractorService', 'PlayerPositionService',
+  function(InteractionAttributesExtractorService, PlayerPositionService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         getLastAnswer: '&lastAnswer',
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/LogicProof/directives/' +
-        'logic-proof-interaction.directive.html'),
+      template: require('./logic-proof-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', '$uibModal', 'LogicProofRulesService',
+        '$scope', '$attrs', '$timeout', '$uibModal', 'LogicProofRulesService',
         'WindowDimensionsService', 'UrlService',
         'CurrentInteractionService',
         function(
-            $scope, $attrs, $uibModal, LogicProofRulesService,
+            $scope, $attrs, $timeout, $uibModal, LogicProofRulesService,
             WindowDimensionsService, UrlService,
             CurrentInteractionService) {
           var ctrl = this;
-          ctrl.localQuestionData = HtmlEscaperService.escapedJsonToObj(
-            $attrs.questionWithValue);
-
-          // This is the information about how to mark a question (e.g. the
-          // permitted line templates) that is stored in defaultData.js within
-          // the dependencies.
-          ctrl.questionData = angular.copy(LOGIC_PROOF_DEFAULT_QUESTION_DATA);
-
-          ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            ctrl.interactionIsActive = false;
-          });
-
-          ctrl.questionData.assumptions =
-            ctrl.localQuestionData.assumptions;
-          ctrl.questionData.results = ctrl.localQuestionData.results;
-
-          // Deduce the new operators, as in logicProofTeacher.buildQuestion(),
-          // since these are not currently stored separately for each question.
-          ctrl.expressions = [];
-          ctrl.topTypes = [];
-          for (var i = 0; i < ctrl.questionData.assumptions.length; i++) {
-            ctrl.expressions.push(ctrl.questionData.assumptions[i]);
-            ctrl.topTypes.push('boolean');
-          }
-          ctrl.expressions.push(ctrl.questionData.results[0]);
-          ctrl.topTypes.push('boolean');
-          ctrl.typing = logicProofShared.assignTypesToExpressionArray(
-            ctrl.expressions, ctrl.topTypes,
-            logicProofData.BASE_STUDENT_LANGUAGE,
-            ['variable', 'constant', 'prefix_function']
-          );
-
-          ctrl.questionData.language.operators = ctrl.typing[0].operators;
-
-          if (ctrl.questionData.assumptions.length <= 1) {
-            ctrl.assumptionsString = logicProofShared.displayExpressionArray(
-              ctrl.questionData.assumptions,
-              ctrl.questionData.language.operators);
-          } else {
-            ctrl.assumptionsString = logicProofShared.displayExpressionArray(
-              ctrl.questionData.assumptions.slice(
-                0, ctrl.questionData.assumptions.length - 1
-              ), ctrl.questionData.language.operators
-            ) + ' and ' + logicProofShared.displayExpression(
-              ctrl.questionData.assumptions[
-                ctrl.questionData.assumptions.length - 1],
-              ctrl.questionData.language.operators);
-          }
-          ctrl.targetString = logicProofShared.displayExpression(
-            ctrl.questionData.results[0],
-            ctrl.questionData.language.operators);
-          ctrl.questionString = (
-            ctrl.assumptionsString === '' ?
-              'I18N_INTERACTIONS_LOGIC_PROOF_QUESTION_STR_NO_ASSUMPTION' :
-              'I18N_INTERACTIONS_LOGIC_PROOF_QUESTION_STR_ASSUMPTIONS');
-          ctrl.questionStringData = {
-            target: ctrl.targetString,
-            assumptions: ctrl.assumptionsString
-          };
-
-          ctrl.questionInstance = logicProofStudent.buildInstance(
-            ctrl.questionData);
-          // Denotes whether messages are in response to a submission, in which
-          // case they persist for longer.
-          ctrl.messageIsSticky = false;
-
+          ctrl.directiveSubscriptions = new Subscription();
           // NOTE: for information on integrating angular and code-mirror see
           // http://github.com/angular-ui/ui-codemirror
           ctrl.codeEditor = function(editor) {
@@ -139,19 +76,21 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
 
             // NOTE: this is necessary to avoid the textarea being greyed-out.
             // See: http://stackoverflow.com/questions/8349571 for discussion.
-            setTimeout(function() {
+            $timeout(function() {
               editor.refresh();
             }, 500);
 
             // NOTE: we must use beforeChange rather than change here to avoid
             // an infinite loop (which code-mirror will not catch).
             editor.on('beforeChange', function(instance, change) {
-              var convertedText = logicProofConversion.convertToLogicCharacters(
+              var convertedText =
+              logicProofConversion.convertToLogicCharacters(
                 change.text.join('\n'));
               if (convertedText !== change.text.join('\n')) {
                 // We update using the converted text, then cancel its being
                 // overwritten by the original text.
-                editor.doc.replaceRange(convertedText, change.from, change.to);
+                editor.doc.replaceRange(
+                  convertedText, change.from, change.to);
                 change.cancel();
               }
             });
@@ -286,27 +225,102 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
             CurrentInteractionService.onSubmit(
               submission, LogicProofRulesService);
           };
-
-          CurrentInteractionService.registerCurrentInteraction(
-            ctrl.submitProof, null);
-
           ctrl.showHelp = function() {
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-                '/interactions/LogicProof/directives/' +
-                'logic-proof-help-modal.directive.html'),
+              template: require('./logic-proof-help-modal.directive.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.close = function() {
-                    $uibModalInstance.close();
-                  };
-                }
-              ]
-            }).result.then(function() {});
+              controller: 'ConfirmOrCancelModalController'
+            }).result.then(function() {}, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
-        }]
+          ctrl.$onInit = function() {
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onNewCardAvailable.subscribe(
+                () => ctrl.interactionIsActive = false
+              )
+            );
+            const {
+              question
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'LogicProof',
+              $attrs
+            );
+            ctrl.localQuestionData = question;
+
+            // This is the information about how to mark a question (e.g. the
+            // permitted line templates) that is stored in defaultData.js within
+            // the dependencies.
+            ctrl.questionData = angular.copy(LOGIC_PROOF_DEFAULT_QUESTION_DATA);
+
+            ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
+            ctrl.questionData.assumptions =
+              ctrl.localQuestionData.assumptions;
+            ctrl.questionData.results = ctrl.localQuestionData.results;
+
+            // Deduce the new operators, as in
+            // logicProofTeacher.buildQuestion(),
+            // since these are not currently stored separately for each
+            // question.
+            ctrl.expressions = [];
+            ctrl.topTypes = [];
+            for (var i = 0; i < ctrl.questionData.assumptions.length; i++) {
+              ctrl.expressions.push(ctrl.questionData.assumptions[i]);
+              ctrl.topTypes.push('boolean');
+            }
+            ctrl.expressions.push(ctrl.questionData.results[0]);
+            ctrl.topTypes.push('boolean');
+            ctrl.typing = logicProofShared.assignTypesToExpressionArray(
+              ctrl.expressions, ctrl.topTypes,
+              logicProofData.BASE_STUDENT_LANGUAGE,
+              ['variable', 'constant', 'prefix_function']
+            );
+
+            ctrl.questionData.language.operators = ctrl.typing[0].operators;
+
+            if (ctrl.questionData.assumptions.length <= 1) {
+              ctrl.assumptionsString = logicProofShared.displayExpressionArray(
+                ctrl.questionData.assumptions,
+                ctrl.questionData.language.operators);
+            } else {
+              ctrl.assumptionsString = logicProofShared.displayExpressionArray(
+                ctrl.questionData.assumptions.slice(
+                  0, ctrl.questionData.assumptions.length - 1
+                ), ctrl.questionData.language.operators
+              ) + ' and ' + logicProofShared.displayExpression(
+                ctrl.questionData.assumptions[
+                  ctrl.questionData.assumptions.length - 1],
+                ctrl.questionData.language.operators);
+            }
+            ctrl.targetString = logicProofShared.displayExpression(
+              ctrl.questionData.results[0],
+              ctrl.questionData.language.operators);
+            ctrl.questionString = (
+              ctrl.assumptionsString === '' ?
+                'I18N_INTERACTIONS_LOGIC_PROOF_QUESTION_STR_NO_ASSUMPTION' :
+                'I18N_INTERACTIONS_LOGIC_PROOF_QUESTION_STR_ASSUMPTIONS');
+            ctrl.questionStringData = {
+              target: ctrl.targetString,
+              assumptions: ctrl.assumptionsString
+            };
+
+            ctrl.questionInstance = logicProofStudent.buildInstance(
+              ctrl.questionData);
+            // Denotes whether messages are in response to a submission, in
+            // which
+            // case they persist for longer.
+            ctrl.messageIsSticky = false;
+
+            CurrentInteractionService.registerCurrentInteraction(
+              ctrl.submitProof, null);
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
+          };
+        }
+      ]
     };
   }
 ]);

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the learner playlist."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -155,7 +156,6 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                     constants.ACTIVITY_TYPE_EXPLORATION,
                     'exp_id_%s' % exp_id), {},
                 csrf_token=csrf_token)
-
 
         # Now if we try and add an activity we should get a message saying we
         # are exceeding the limit.

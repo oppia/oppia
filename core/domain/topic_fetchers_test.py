@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for topic domain objects."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -32,6 +33,7 @@ import feconf
 
 class TopicFetchersUnitTests(test_utils.GenericTestBase):
     """Tests for topic fetchers."""
+
     user_id = 'user_id'
     story_id_1 = 'story_1'
     story_id_2 = 'story_2'
@@ -49,19 +51,23 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             'subtopic_id': 1
         })]
         self.save_new_topic(
-            self.TOPIC_ID, self.user_id, 'Name', 'Description',
-            [self.story_id_1, self.story_id_2], [self.story_id_3],
-            [self.skill_id_1, self.skill_id_2], [], 1
-        )
+            self.TOPIC_ID, self.user_id, name='Name',
+            abbreviated_name='name', url_fragment='name-one',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
+        self.save_new_story(self.story_id_1, self.user_id, self.TOPIC_ID)
         self.save_new_story(
-            self.story_id_1, self.user_id, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID)
-        self.save_new_story(
-            self.story_id_3, self.user_id, 'Title 3', 'Description 3', 'Notes',
-            self.TOPIC_ID)
+            self.story_id_3,
+            self.user_id,
+            self.TOPIC_ID,
+            title='Title 3',
+            description='Description 3')
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -81,6 +87,11 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         topic = topic_fetchers.get_topic_from_model(topic_model)
         self.assertEqual(topic.to_dict(), self.topic.to_dict())
 
+    def test_get_all_topics(self):
+        topics = topic_fetchers.get_all_topics()
+        self.assertEqual(len(topics), 1)
+        self.assertEqual(topics[0].id, self.topic.id)
+
     def test_cannot_get_topic_from_model_with_invalid_schema_version(self):
         topic_services.create_new_topic_rights('topic_id', self.user_id_a)
         commit_cmd = topic_domain.TopicChange({
@@ -95,7 +106,10 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model = topic_models.TopicModel(
             id='topic_id',
             name='name',
+            abbreviated_name='abbrev',
+            url_fragment='name-two',
             canonical_name='canonical_name',
+            description='description',
             next_subtopic_id=1,
             language_code='en',
             subtopics=[subtopic_dict],
@@ -116,6 +130,9 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model = topic_models.TopicModel(
             id='topic_id_2',
             name='name 2',
+            description='description 2',
+            abbreviated_name='abbrev',
+            url_fragment='name-three',
             canonical_name='canonical_name_2',
             next_subtopic_id=1,
             language_code='en',
@@ -130,7 +147,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Sorry, we can only process v1-v%d story reference schemas at '
-            'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
+            'present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
             topic_fetchers.get_topic_from_model(model)
 
     def test_get_topic_by_id(self):
@@ -141,8 +158,11 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
     def test_get_topic_by_version(self):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, self.user_id, 'topic name', 'Description',
-            [], [], [], [], 1)
+            topic_id, self.user_id, name='topic name',
+            abbreviated_name='topic-name', url_fragment='topic-name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
 
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
@@ -169,6 +189,23 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topics[0].to_dict(), expected_topic)
         self.assertIsNone(topics[1])
         self.assertEqual(len(topics), 2)
+
+    def test_get_all_topics_with_skills(self):
+        expected_topic = self.topic.to_dict()
+        topics = topic_fetchers.get_all_topics_with_skills()
+        self.assertEqual(topics[0].to_dict(), expected_topic)
+        self.assertEqual(len(topics), 1)
+
+    def test_get_all_topic_rights_of_user(self):
+        topic_services.assign_role(
+            self.user_admin, self.user_a,
+            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
+
+        topic_rights = topic_services.get_topic_rights_with_user(self.user_id_a)
+
+        self.assertEqual(len(topic_rights), 1)
+        self.assertEqual(topic_rights[0].id, self.TOPIC_ID)
+        self.assertEqual(topic_rights[0].manager_ids, [self.user_id_a])
 
     def test_commit_log_entry(self):
         topic_commit_log_entry = (

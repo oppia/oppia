@@ -15,9 +15,13 @@
 # limitations under the License.
 
 """Interface for storage model switching."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import inspect
+
+from constants import constants
 import feconf
 import python_utils
 import utils
@@ -25,7 +29,7 @@ import utils
 # Valid model names.
 NAMES = utils.create_enum(
     'activity', 'audit', 'base_model', 'classifier', 'collection', 'config',
-    'email', 'exploration', 'feedback', 'file', 'job', 'opportunity',
+    'email', 'exploration', 'feedback', 'improvements', 'job', 'opportunity',
     'question', 'recommendations', 'skill', 'statistics', 'story', 'suggestion',
     'topic', 'user')
 
@@ -41,10 +45,11 @@ class Platform(python_utils.OBJECT):
         classes.
 
         Raises:
-            NotImplementedError: The method is not overwritten in derived
+            NotImplementedError. The method is not overwritten in derived
                 classes.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'import_models() method is not overwritten in derived classes')
 
 
 class _Gae(Platform):
@@ -60,10 +65,10 @@ class _Gae(Platform):
             model_names: list(str). List of storage module names.
 
         Returns:
-            tuple(module): Tuple of storage modules.
+            tuple(module). Tuple of storage modules.
 
         Raises:
-            Exception: Invalid model name.
+            Exception. Invalid model name.
         """
         returned_models = []
         for name in model_names:
@@ -94,9 +99,9 @@ class _Gae(Platform):
             elif name == NAMES.feedback:
                 from core.storage.feedback import gae_models as feedback_models
                 returned_models.append(feedback_models)
-            elif name == NAMES.file:
-                from core.storage.file import gae_models as file_models
-                returned_models.append(file_models)
+            elif name == NAMES.improvements:
+                from core.storage.improvements import gae_models as improvements_models # pylint: disable=line-too-long
+                returned_models.append(improvements_models)
             elif name == NAMES.job:
                 from core.storage.job import gae_models as job_models
                 returned_models.append(job_models)
@@ -131,6 +136,44 @@ class _Gae(Platform):
                 raise Exception('Invalid model name: %s' % name)
 
         return tuple(returned_models)
+
+    @classmethod
+    def get_storage_model_classes(cls, model_names):
+        """Get the storage model classes that are in the modules listed in
+        model_names.
+
+        Args:
+            model_names: list(str). List of storage module names.
+
+        Returns:
+            list(class). The corresponding storage-layer model classes.
+        """
+
+        model_classes = []
+        for module in cls.import_models(model_names):
+            for member_name, member_obj in inspect.getmembers(module):
+                if inspect.isclass(member_obj):
+                    clazz = getattr(module, member_name)
+                    all_base_classes = [
+                        base_class.__name__ for base_class in inspect.getmro(
+                            clazz)]
+                    if 'Model' in all_base_classes:
+                        model_classes.append(clazz)
+        return model_classes
+
+    @classmethod
+    def get_all_storage_model_classes(cls):
+        """Get all model classes that are saved in the storage, NOT model
+        classes that are just inherited from (BaseModel,
+        BaseCommitLogEntryModel, etc.).
+
+        Returns:
+            list(class). The corresponding storage-layer model classes.
+        """
+        model_names = [
+            name for name in NAMES.__dict__
+            if '__' not in name and name != 'base_model']
+        return cls.get_storage_model_classes(model_names)
 
     @classmethod
     def import_transaction_services(cls):
@@ -173,48 +216,40 @@ class _Gae(Platform):
         return gae_app_identity_services
 
     @classmethod
-    def import_gae_image_services(cls):
-        """Imports and returns gae_image_services module.
-
-        Returns:
-            module. The gae_image_services module.
-        """
-        from core.platform.image import gae_image_services
-        return gae_image_services
-
-    @classmethod
     def import_email_services(cls):
         """Imports and returns the email services module specified in feconf.py.
+        If in DEV_MODE, uses the dev mode version of email services.
 
         Returns:
             module. The email_services module to use, based on the feconf.py
-            setting.
+            setting and DEV_MODE setting.
 
         Raises:
-            Exception: feconf.EMAIL_SERVICE_PROVIDER does not correspond
-            to a valid email_services module.
+            Exception. The value of feconf.EMAIL_SERVICE_PROVIDER does not
+                correspond to a valid email_services module.
         """
-        if feconf.EMAIL_SERVICE_PROVIDER == feconf.EMAIL_SERVICE_PROVIDER_GAE:
-            from core.platform.email import gae_email_services
-            return gae_email_services
-        elif (feconf.EMAIL_SERVICE_PROVIDER ==
-              feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):
+        if constants.DEV_MODE:
+            from core.platform.email import dev_mode_email_services
+            return dev_mode_email_services
+        elif (
+                feconf.EMAIL_SERVICE_PROVIDER ==
+                feconf.EMAIL_SERVICE_PROVIDER_MAILGUN):
             from core.platform.email import mailgun_email_services
             return mailgun_email_services
         else:
             raise Exception(
-                ('Invalid email service provider: %s'
-                 % feconf.EMAIL_SERVICE_PROVIDER))
+                'Invalid email service provider: %s' % (
+                    feconf.EMAIL_SERVICE_PROVIDER))
 
     @classmethod
-    def import_memcache_services(cls):
-        """Imports and returns gae_memcache_services.
+    def import_cache_services(cls):
+        """Imports and returns a cache_services module from core.platform.cache.
 
         Returns:
-            module. The gae_memcache_services module.
+            module. The core.platform.cache services module.
         """
-        from core.platform.memcache import gae_memcache_services
-        return gae_memcache_services
+        from core.platform.cache import redis_cache_services
+        return redis_cache_services
 
     @classmethod
     def import_taskqueue_services(cls):
@@ -255,7 +290,7 @@ class Registry(python_utils.OBJECT):
         imports.
 
         Returns:
-            class: The corresponding platform-specific interface class.
+            class. The corresponding platform-specific interface class.
         """
         return cls._PLATFORM_MAPPING.get(GAE_PLATFORM)
 
@@ -270,6 +305,30 @@ class Registry(python_utils.OBJECT):
             list(module). The corresponding storage-layer modules.
         """
         return cls._get().import_models(model_names)
+
+    @classmethod
+    def get_storage_model_classes(cls, model_names):
+        """Get the storage model classes that are in the modules listed in
+        model_names.
+
+        Args:
+            model_names: list(str). List of storage module names.
+
+        Returns:
+            list(class). The corresponding storage-layer model classes.
+        """
+        return cls._get().get_storage_model_classes(model_names)
+
+    @classmethod
+    def get_all_storage_model_classes(cls):
+        """Get all model classes that are saved in the storage, NOT model
+        classes that are just inherited from (BaseModel,
+        BaseCommitLogEntryModel, etc.).
+
+        Returns:
+            list(class). The corresponding storage-layer model classes.
+        """
+        return cls._get().get_all_storage_model_classes()
 
     @classmethod
     def import_current_user_services(cls):
@@ -308,15 +367,6 @@ class Registry(python_utils.OBJECT):
         return cls._get().import_app_identity_services()
 
     @classmethod
-    def import_gae_image_services(cls):
-        """Imports and returns gae_image_services module.
-
-        Returns:
-            module. The gae_image_services module.
-        """
-        return cls._get().import_gae_image_services()
-
-    @classmethod
     def import_email_services(cls):
         """Imports and returns email_services module.
 
@@ -326,13 +376,13 @@ class Registry(python_utils.OBJECT):
         return cls._get().import_email_services()
 
     @classmethod
-    def import_memcache_services(cls):
-        """Imports and returns memcache_services module.
+    def import_cache_services(cls):
+        """Imports and returns the platform cache_services module.
 
         Returns:
-            module. The memcache_services module.
+            module. The platform cache_services module.
         """
-        return cls._get().import_memcache_services()
+        return cls._get().import_cache_services()
 
     @classmethod
     def import_taskqueue_services(cls):

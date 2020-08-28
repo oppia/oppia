@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for the GAE current user services."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -30,11 +31,11 @@ class GaeCurrentUserServicesTests(test_utils.GenericTestBase):
     EXPECTED_OWNER_USER_ID = '176177241684014293971'
 
     def test_create_login_url(self):
-        login_url = gae_current_user_services.create_login_url('splash')
+        login_url = gae_current_user_services.create_login_url('')
         self.assertEqual(
             login_url,
             'https://www.google.com/accounts/Login' +
-            '?continue=http%3A//localhost/signup%3Freturn_url%3Dsplash')
+            '?continue=http%3A//localhost/signup%3Freturn_url%3D')
 
     def test_get_current_user(self):
         self.login(self.OWNER_EMAIL)

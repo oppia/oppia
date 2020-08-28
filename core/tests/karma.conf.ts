@@ -1,8 +1,6 @@
 var argv = require('yargs').argv;
-var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var path = require('path');
 var generatedJs = 'third_party/generated/js/third_party.js';
-const isDocker = require('is-docker')();
 if (argv.prodEnv) {
   generatedJs = (
     'third_party/generated/js/third_party.min.js');
@@ -13,32 +11,27 @@ module.exports = function(config) {
     basePath: '../../',
     frameworks: ['jasmine'],
     files: [
-      'local_compiled_js/core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
-      // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
+      // Since jquery, angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
-      'third_party/static/jquery-3.4.1/jquery.min.js',
-      'third_party/static/jqueryui-1.12.1/jquery-ui.min.js',
-      'third_party/static/angularjs-1.5.8/angular.js',
-      'third_party/static/angularjs-1.5.8/angular-mocks.js',
-      'third_party/static/headroom-js-0.9.4/headroom.min.js',
-      'third_party/static/headroom-js-0.9.4/angular.headroom.min.js',
+      'third_party/static/jquery-3.5.1/jquery.min.js',
+      'third_party/static/angularjs-1.7.9/angular.js',
+      'core/templates/karma.module.ts',
+      'third_party/static/angularjs-1.7.9/angular-mocks.js',
       'third_party/static/math-expressions-1.7.0/math-expressions.js',
-      'third_party/static/ckeditor-4.12.1/ckeditor.js',
       generatedJs,
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
-      'core/templates/dev/head/**/*_directive.html',
-      'core/templates/dev/head/**/*.directive.html',
-      'core/templates/dev/head/**/*.template.html',
-      'local_compiled_js/extensions/**/*.js',
-      'core/templates/dev/head/AppInit.ts',
+      'core/templates/**/*_directive.html',
+      'core/templates/**/*.directive.html',
+      'core/templates/**/*.component.html',
+      'core/templates/**/*.template.html',
       // This is a file that is generated on running the run_frontend_tests.py
       // script. This generated file is a combination of all the spec files
       // since Karma is unable to run tests on multiple files due to some
       // unknown reason.
-      'core/templates/dev/head/combined-tests.spec.ts',
+      'core/templates/combined-tests.spec.ts',
       {
         pattern: 'extensions/**/*.png',
         watched: false,
@@ -46,6 +39,7 @@ module.exports = function(config) {
         included: false
       },
       'extensions/interactions/**/*.directive.html',
+      'extensions/interactions/**/*.component.html',
       'extensions/interactions/rule_templates.json',
       'core/tests/data/*.json',
       {
@@ -56,7 +50,7 @@ module.exports = function(config) {
       }
     ],
     exclude: [
-      'local_compiled_js/core/templates/dev/head/**/*-e2e.js',
+      'local_compiled_js/core/templates/**/*-e2e.js',
       'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
     ],
@@ -68,16 +62,18 @@ module.exports = function(config) {
       '/extensions/': '/base/extensions/'
     },
     preprocessors: {
-      'core/templates/dev/head/*.ts': ['webpack'],
-      'core/templates/dev/head/**/*.ts': ['webpack'],
+      'core/templates/*.ts': ['webpack'],
+      'core/templates/**/*.ts': ['webpack'],
       'extensions/**/*.ts': ['webpack'],
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
-      'core/templates/dev/head/**/*_directive.html': ['ng-html2js'],
-      'core/templates/dev/head/**/*.directive.html': ['ng-html2js'],
-      'core/templates/dev/head/**/*.template.html': ['ng-html2js'],
+      'core/templates/**/*_directive.html': ['ng-html2js'],
+      'core/templates/**/*.directive.html': ['ng-html2js'],
+      'core/templates/**/*.component.html': ['ng-html2js'],
+      'core/templates/**/*.template.html': ['ng-html2js'],
       'extensions/interactions/**/*.directive.html': ['ng-html2js'],
+      'extensions/interactions/**/*.component.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
     },
@@ -91,29 +87,31 @@ module.exports = function(config) {
       }
     },
     autoWatch: true,
-    browsers: ['Chrome_Travis'],
+    browsers: ['CI_Chrome'],
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 60000,
+    browserNoActivityTimeout: 120000,
+    browserDisconnectTimeout: 60000,
+    browserDisconnectTolerance: 3,
     browserConsoleLogOptions: {
       level: 'log',
       format: '%b %T: %m',
       terminal: true
     },
-    browserNoActivityTimeout: 60000,
     // Continue running in the background after running tests.
     singleRun: true,
     customLaunchers: {
-      Chrome_Travis: {
-        // Karma can only connect to ChromeHeadless when inside Docker.
-        base: isDocker ? 'ChromeHeadless' : 'Chrome',
+      CI_Chrome: {
+        base: 'ChromeHeadless',
         // Discussion of the necessity of extra flags can be found here:
         // https://github.com/karma-runner/karma-chrome-launcher/issues/154
         // https://github.com/karma-runner/karma-chrome-launcher/issues/180
-        flags: isDocker ? [
+        flags: [
           '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-web-security'
-        ] : ['--no-sandbox']
+          '--disable-gpu',
+          '--disable-dev-shm-usage',
+          '--js-flags=--max-old-space-size=2048'
+        ]
       }
     },
 
@@ -128,7 +126,7 @@ module.exports = function(config) {
     ],
     ngHtml2JsPreprocessor: {
       moduleName: 'directiveTemplates',
-      // ngHtml2JsPreprocessor adds the html inside $templateCache,
+      // Key ngHtml2JsPreprocessor adds the html inside $templateCache,
       // the key that we use for that cache needs to be exactly the same as
       // the templateUrl in directive JS. The stripPrefix and prependPrefix are
       // used for modifying the $templateCache keys.
@@ -147,36 +145,47 @@ module.exports = function(config) {
         modules: [
           'core/tests/data',
           'assets',
-          'core/templates/dev/head',
+          'core/templates',
           'extensions',
           'node_modules',
           'third_party',
         ],
         extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
       },
-      devtool: 'inline-source-map',
+      devtool: 'inline-cheap-source-map',
       module: {
         rules: [
           {
             test: /\.ts$/,
             use: [
               'cache-loader',
-              'thread-loader',
               {
                 loader: 'ts-loader',
                 options: {
-                  // this is needed for thread-loader to work correctly
-                  happyPackMode: true
+                  // Typescript checks do the type checking.
+                  transpileOnly: true
                 }
+              },
+              {
+                loader: 'angular2-template-loader'
               }
             ]
           },
           {
             test: /\.html$/,
+            exclude: /(directive|component)\.html$/,
             loader: 'underscore-template-loader'
           },
           {
-            test: /\.ts$/,
+            test: /(directive|component)\.html$/,
+            loader: 'html-loader',
+            options: {
+              attributes: false,
+            },
+          },
+          {
+            // Exclude all the spec files from the report.
+            test: /^(?!.*(s|S)pec\.ts$).*\.ts$/,
             enforce: 'post',
             use: {
               loader: 'istanbul-instrumenter-loader',
@@ -185,13 +194,18 @@ module.exports = function(config) {
           },
           {
             test: /\.css$/,
-            use: ['style-loader', 'css-loader']
+            use: [
+              'style-loader',
+              {
+                loader: 'css-loader',
+                options: {
+                  url: false,
+                }
+              }
+            ]
           }
         ]
-      },
-      plugins: [
-        new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })
-      ]
+      }
     }
   });
 };

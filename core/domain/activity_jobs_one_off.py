@@ -15,23 +15,105 @@
 # limitations under the License.
 
 """One-off jobs for activities."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
 from core import jobs
+from core.domain import collection_services
+from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import search_services
 from core.platform import models
+import feconf
 
 (
-    collection_models, config_models,
-    exp_models, question_models,
-    skill_models, story_models,
-    topic_models) = (
-        models.Registry.import_models([
-            models.NAMES.collection, models.NAMES.config,
-            models.NAMES.exploration, models.NAMES.question,
-            models.NAMES.skill, models.NAMES.story,
-            models.NAMES.topic]))
+    collection_models, exp_models,
+    question_models, skill_models,
+    story_models, topic_models) = models.Registry.import_models([
+        models.NAMES.collection, models.NAMES.exploration,
+        models.NAMES.question, models.NAMES.skill,
+        models.NAMES.story, models.NAMES.topic])
+
+
+class ActivityContributorsSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job that computes the number of commits done by contributors for
+    each collection and exploration.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [collection_models.CollectionModel, exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(model):
+        if model.deleted:
+            return
+
+        if isinstance(model, collection_models.CollectionModel):
+            summary = collection_services.get_collection_summary_by_id(model.id)
+            summary.contributors_summary = (
+                collection_services.compute_collection_contributors_summary(
+                    model.id))
+            summary.contributor_ids = list(summary.contributors_summary)
+            collection_services.save_collection_summary(summary)
+        else:
+            summary = exp_fetchers.get_exploration_summary_by_id(model.id)
+            summary.contributors_summary = (
+                exp_services.compute_exploration_contributors_summary(model.id))
+            summary.contributor_ids = list(summary.contributors_summary)
+            exp_services.save_exploration_summary(summary)
+        yield ('SUCCESS', model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
+
+
+class AuditContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Audit job that compares the contents of contributor_ids and
+    contributors_summary.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExpSummaryModel,
+                collection_models.CollectionSummaryModel]
+
+    @staticmethod
+    def map(model):
+        ids_set = set(model.contributor_ids)
+        summary_set = set(model.contributors_summary)
+        if len(ids_set) != len(model.contributor_ids):
+            # When the contributor_ids contain duplicate ids.
+            yield (
+                'DUPLICATE_IDS',
+                (model.id, model.contributor_ids, model.contributors_summary)
+            )
+        if ids_set - summary_set:
+            # When the contributor_ids contain id that is not in
+            # contributors_summary.
+            yield (
+                'MISSING_IN_SUMMARY',
+                (model.id, model.contributor_ids, model.contributors_summary)
+            )
+        if summary_set - ids_set:
+            # When the contributors_summary contains id that is not in
+            # contributor_ids.
+            yield (
+                'MISSING_IN_IDS',
+                (model.id, model.contributor_ids, model.contributors_summary)
+            )
+        yield ('SUCCESS', model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)
 
 
 class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
@@ -57,32 +139,191 @@ class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
         pass
 
 
-class SnapshotMetadataModelsIndexesJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that re-puts all children of BaseSnapshotMetadataModel
-    (in order to, e.g., ensure that indexed fields are properly indexed).
+class RemoveCommitUsernamesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that sets the username in *CommitLogEntryModels to None in order to
+    remove it from the datastore.
     """
 
     @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(RemoveCommitUsernamesOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
     def entity_classes_to_map_over(cls):
-        return [collection_models.CollectionSnapshotMetadataModel,
-                collection_models.CollectionRightsSnapshotMetadataModel,
-                config_models.ConfigPropertySnapshotMetadataModel,
-                exp_models.ExplorationSnapshotMetadataModel,
-                exp_models.ExplorationRightsSnapshotMetadataModel,
-                question_models.QuestionSnapshotMetadataModel,
-                question_models.QuestionRightsSnapshotMetadataModel,
-                skill_models.SkillSnapshotMetadataModel,
-                skill_models.SkillRightsSnapshotMetadataModel,
-                story_models.StorySnapshotMetadataModel,
-                topic_models.TopicSnapshotMetadataModel,
-                topic_models.SubtopicPageSnapshotMetadataModel,
-                topic_models.TopicRightsSnapshotMetadataModel]
+        return [
+            collection_models.CollectionCommitLogEntryModel,
+            exp_models.ExplorationCommitLogEntryModel,
+            question_models.QuestionCommitLogEntryModel,
+            skill_models.SkillCommitLogEntryModel,
+            story_models.StoryCommitLogEntryModel,
+            topic_models.TopicCommitLogEntryModel,
+            topic_models.SubtopicPageCommitLogEntryModel
+        ]
 
     @staticmethod
-    def map(model_instance):
-        model_instance.put(update_last_updated_time=False)
-        yield ('SUCCESS', model_instance.id)
+    def map(commit_model):
+        class_name = commit_model.__class__.__name__
+        # This is an only way to remove the field from the model,
+        # see https://stackoverflow.com/a/15116016/3688189 and
+        # https://stackoverflow.com/a/12701172/3688189.
+        if 'username' in commit_model._properties:  # pylint: disable=protected-access
+            del commit_model._properties['username']  # pylint: disable=protected-access
+            if 'username' in commit_model._values:  # pylint: disable=protected-access
+                del commit_model._values['username']  # pylint: disable=protected-access
+            commit_model.put(update_last_updated_time=False)
+            yield ('SUCCESS_REMOVED - %s' % class_name, commit_model.id)
+        else:
+            yield ('SUCCESS_ALREADY_REMOVED - %s' % class_name, commit_model.id)
 
     @staticmethod
     def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
+
+
+class FixCommitLastUpdatedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that sets the last_updated in *CommitLogEntryModels to created_on if
+    the last_updated is in the timespan when user ID migration was done.
+    """
+
+    MIGRATION_START = datetime.datetime.strptime(
+        '2020-06-28T07:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+    MIGRATION_END = datetime.datetime.strptime(
+        '2020-06-30T13:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+    TEST_SERVER_MIGRATION_START = datetime.datetime.strptime(
+        '2020-06-12T07:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+    TEST_SERVER_MIGRATION_END = datetime.datetime.strptime(
+        '2020-06-14T13:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(FixCommitLastUpdatedOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            collection_models.CollectionCommitLogEntryModel,
+            exp_models.ExplorationCommitLogEntryModel,
+            question_models.QuestionCommitLogEntryModel,
+            skill_models.SkillCommitLogEntryModel,
+            story_models.StoryCommitLogEntryModel,
+            topic_models.TopicCommitLogEntryModel,
+            topic_models.SubtopicPageCommitLogEntryModel
+        ]
+
+    @staticmethod
+    def map(commit_model):
+        class_name = commit_model.__class__.__name__
+        last_updated = commit_model.last_updated
+        created_on = commit_model.created_on
+        if (FixCommitLastUpdatedOneOffJob.MIGRATION_START < last_updated <
+                FixCommitLastUpdatedOneOffJob.MIGRATION_END):
+            commit_model.last_updated = commit_model.created_on
+            commit_model.put(update_last_updated_time=False)
+            yield ('SUCCESS_FIXED - %s' % class_name, commit_model.id)
+        elif (FixCommitLastUpdatedOneOffJob.TEST_SERVER_MIGRATION_START <
+              last_updated <
+              FixCommitLastUpdatedOneOffJob.TEST_SERVER_MIGRATION_END):
+            commit_model.last_updated = commit_model.created_on
+            commit_model.put(update_last_updated_time=False)
+            yield (
+                'SUCCESS_TEST_SERVER_FIXED - %s' % class_name, commit_model.id)
+        elif (datetime.timedelta(0) < last_updated - created_on <
+              datetime.timedelta(hours=1)):
+            yield ('SUCCESS_NEWLY_CREATED - %s' % class_name, commit_model.id)
+        elif commit_model.user_id in feconf.SYSTEM_USERS.keys():
+            yield ('SUCCESS_ADMIN - %s' % class_name, commit_model.id)
+        else:
+            yield ('FAILURE_INCORRECT - %s' % class_name, commit_model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        if key.startswith('FAILURE_INCORRECT'):
+            yield (key, values)
+        else:
+            yield (key, len(values))
+
+
+class AuditSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits commit_cmds field of the snapshot metadata models. We log
+    the length of the commit_cmd, the possible 'cmd' values, and all the other
+    keys.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over three types of entity class.
+        super(AuditSnapshotMetadataModelsJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [collection_models.CollectionRightsSnapshotMetadataModel,
+                exp_models.ExplorationRightsSnapshotMetadataModel,
+                topic_models.TopicRightsSnapshotMetadataModel]
+
+    @staticmethod
+    def map(snapshot_model):
+        """Implements the map function for this job."""
+        if isinstance(
+                snapshot_model,
+                collection_models.CollectionRightsSnapshotMetadataModel):
+            model_type_name = 'collection'
+        elif isinstance(
+                snapshot_model,
+                exp_models.ExplorationRightsSnapshotMetadataModel):
+            model_type_name = 'exploration'
+        elif isinstance(
+                snapshot_model,
+                topic_models.TopicRightsSnapshotMetadataModel):
+            model_type_name = 'topic'
+
+        if snapshot_model.deleted:
+            yield ('%s-deleted' % model_type_name, 1)
+            return
+
+        first_commit_cmd = None
+        for commit_cmd in snapshot_model.commit_cmds:
+            if 'cmd' in commit_cmd:
+                cmd_name = commit_cmd['cmd']
+                yield ('%s-cmd-%s' % (model_type_name, cmd_name), 1)
+            else:
+                cmd_name = 'missing_cmd'
+                yield ('%s-missing-cmd' % model_type_name, 1)
+
+            if first_commit_cmd is None:
+                first_commit_cmd = cmd_name
+
+            for field_key in commit_cmd.keys():
+                if field_key != 'cmd':
+                    yield (
+                        '%s-%s-field-%s' % (
+                            model_type_name, cmd_name, field_key
+                        ),
+                        1
+                    )
+
+        if first_commit_cmd is not None:
+            yield (
+                '%s-%s-length-%s' % (
+                    model_type_name,
+                    first_commit_cmd,
+                    len(snapshot_model.commit_cmds)),
+                1
+            )
+        else:
+            yield (
+                '%s-length-%s' % (
+                    model_type_name, len(snapshot_model.commit_cmds)),
+                1
+            )
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
         yield (key, len(values))

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for the feedback controllers."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -39,10 +40,11 @@ import python_utils
 
 EXPECTED_THREAD_KEYS = [
     'status', 'original_author_username', 'state_name', 'summary',
-    'thread_id', 'subject', 'last_updated', 'message_count']
+    'thread_id', 'subject', 'last_updated_msecs', 'message_count',
+    'last_nonempty_message_text', 'last_nonempty_message_author']
 EXPECTED_MESSAGE_KEYS = [
-    'author_username', 'created_on', 'entity_type', 'message_id', 'entity_id',
-    'text', 'updated_status', 'updated_subject', 'received_via_email']
+    'author_username', 'created_on_msecs', 'entity_type', 'message_id',
+    'entity_id', 'text', 'updated_status', 'updated_subject']
 
 
 class MockFeedbackAnalyticsAggregator(
@@ -50,6 +52,7 @@ class MockFeedbackAnalyticsAggregator(
     """A modified FeedbackAnalyticsAggregator that does not start a new batch
     job when the previous one has finished.
     """
+
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
@@ -224,15 +227,13 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
         # Then, create a new message in that thread.
         thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
-        self.post_json(
+        response_dict = self.post_json(
             thread_url, {
                 'updated_status': None,
                 'updated_subject': None,
                 'text': 'Message 1'
             }, csrf_token=csrf_token)
 
-        # The resulting thread should contain two messages.
-        response_dict = self.get_json(thread_url)
         self.assertEqual(len(response_dict['messages']), 2)
         self.assertEqual(
             set(response_dict['messages'][0].keys()),
@@ -528,7 +529,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID, 1,
-            self.user_id, change_cmd, 'sample description', None)
+            self.user_id, change_cmd, 'sample description')
 
         response = self.get_json(
             '%s/%s' % (
@@ -597,7 +598,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID, 1,
-            self.owner_id_1, change, 'sample description', None)
+            self.owner_id_1, change, 'sample description')
 
         thread_id = suggestion_services.query_suggestions(
             [('author_id', self.owner_id_1),
@@ -628,8 +629,10 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
 
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.owner_id, 'Name', 'Description',
-            [], [], [], [], 1)
+            self.topic_id, self.owner_id, name='Name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
 
     def test_get_feedback_threads_linked_to_topics(self):
         self.login(self.OWNER_EMAIL)

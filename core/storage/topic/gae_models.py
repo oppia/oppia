@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for topics and related constructs."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -29,11 +30,13 @@ from google.appengine.ext import ndb
 
 class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic snapshot."""
+
     pass
 
 
 class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic snapshot."""
+
     pass
 
 
@@ -43,6 +46,7 @@ class TopicModel(base_models.VersionedModel):
     This class should only be imported by the topic services file
     and the topic model test file.
     """
+
     SNAPSHOT_METADATA_CLASS = TopicSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TopicSnapshotContentModel
     ALLOW_REVERT = False
@@ -51,6 +55,12 @@ class TopicModel(base_models.VersionedModel):
     name = ndb.StringProperty(required=True, indexed=True)
     # The canonical name of the topic, created by making `name` lowercase.
     canonical_name = ndb.StringProperty(required=True, indexed=True)
+    # The abbreviated name of the topic.
+    abbreviated_name = ndb.StringProperty(indexed=True, default='')
+    # The thumbnail filename of the topic.
+    thumbnail_filename = ndb.StringProperty(indexed=True)
+    # The thumbnail background color of the topic.
+    thumbnail_bg_color = ndb.StringProperty(indexed=True)
     # The description of the topic.
     description = ndb.TextProperty(indexed=False)
     # This consists of the list of objects referencing canonical stories that
@@ -74,6 +84,8 @@ class TopicModel(base_models.VersionedModel):
     next_subtopic_id = ndb.IntegerProperty(required=True)
     # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
+    # The url fragment of the topic.
+    url_fragment = ndb.StringProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -113,23 +125,15 @@ class TopicModel(base_models.VersionedModel):
         super(TopicModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
         topic_rights = TopicRightsModel.get_by_id(self.id)
-        status = ''
         if topic_rights.topic_is_published:
             status = constants.ACTIVITY_STATUS_PUBLIC
         else:
             status = constants.ACTIVITY_STATUS_PRIVATE
 
         topic_commit_log_entry = TopicCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds,
-            status, False
+            self.id, self.version, committer_id, commit_type,
+            commit_message, commit_cmds, status, False
         )
         topic_commit_log_entry.topic_id = self.id
         topic_commit_log_entry.put()
@@ -148,7 +152,29 @@ class TopicModel(base_models.VersionedModel):
         """
         return TopicModel.query().filter(
             cls.canonical_name == topic_name.lower()).filter(
-                cls.deleted == False).get() #pylint: disable=singleton-comparison
+                cls.deleted == False).get() # pylint: disable=singleton-comparison
+
+    @classmethod
+    def get_by_url_fragment(cls, url_fragment):
+        """Gets TopicModel by url_fragment. Returns None if the topic with
+        name url_fragment doesn't exist.
+
+        Args:
+            url_fragment: str. The url fragment of the topic.
+
+        Returns:
+            TopicModel|None. The topic model of the topic or None if not
+            found.
+        """
+        # TODO(#10210): Make fetching by URL fragment faster.
+        return TopicModel.query().filter(
+            cls.url_fragment == url_fragment).filter(
+                cls.deleted == False).get() # pylint: disable=singleton-comparison
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -157,9 +183,9 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     A new instance of this model is created and saved every time a commit to
     TopicModel occurs.
 
-    The id for this model is of the form
-    'topic-{{TOPIC_ID}}-{{TOPIC_VERSION}}'.
+    The id for this model is of the form 'topic-[topic_id]-[version]'.
     """
+
     # The id of the topic being edited.
     topic_id = ndb.StringProperty(indexed=True, required=True)
 
@@ -184,6 +210,13 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return 'topic-%s-%s' % (topic_id, version)
 
+    @staticmethod
+    def get_export_policy():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class TopicSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia Topic.
@@ -193,7 +226,8 @@ class TopicSummaryModel(base_models.BaseModel):
 
     A TopicSummaryModel instance stores the following information:
 
-        id, description, language_code, last_updated, created_on, version.
+        id, description, language_code, last_updated, created_on, version,
+        url_fragment.
 
     The key of each instance is the topic id.
     """
@@ -204,6 +238,10 @@ class TopicSummaryModel(base_models.BaseModel):
     canonical_name = ndb.StringProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
+    # The description of the topic.
+    description = ndb.TextProperty(indexed=False)
+    # The url fragment of the topic.
+    url_fragment = ndb.StringProperty(required=True, indexed=True)
 
     # Time when the topic model was last updated (not to be
     # confused with last_updated, which is the time when the
@@ -224,6 +262,10 @@ class TopicSummaryModel(base_models.BaseModel):
     uncategorized_skill_count = ndb.IntegerProperty(required=True, indexed=True)
     # The number of subtopics of the topic.
     subtopic_count = ndb.IntegerProperty(required=True, indexed=True)
+    # The thumbnail filename of the topic.
+    thumbnail_filename = ndb.StringProperty(indexed=True)
+    # The thumbnail background color of the topic.
+    thumbnail_bg_color = ndb.StringProperty(indexed=True)
     version = ndb.IntegerProperty(required=True)
 
     @staticmethod
@@ -231,14 +273,34 @@ class TopicSummaryModel(base_models.BaseModel):
         """Topic summary should be kept if associated topic is published."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """Check whether TopicSummaryModel references the given user.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data should
+                be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
+
     pass
 
 
 class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a subtopic page snapshot."""
+
     pass
 
 
@@ -247,6 +309,7 @@ class SubtopicPageModel(base_models.VersionedModel):
 
     This stores the HTML data for a subtopic page.
     """
+
     SNAPSHOT_METADATA_CLASS = SubtopicPageSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = SubtopicPageSnapshotContentModel
     ALLOW_REVERT = False
@@ -299,19 +362,18 @@ class SubtopicPageModel(base_models.VersionedModel):
         """
         super(SubtopicPageModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
 
         subtopic_page_commit_log_entry = SubtopicPageCommitLogEntryModel.create(
-            self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC, False
+            self.id, self.version, committer_id, commit_type, commit_message,
+            commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         subtopic_page_commit_log_entry.subtopic_page_id = self.id
         subtopic_page_commit_log_entry.put()
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -321,8 +383,9 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     SubtopicPageModel occurs.
 
     The id for this model is of the form
-    'subtopicpage-{{SUBTOPIC_PAGE_ID}}-{{SUBTOPIC_PAGE_VERSION}}'.
+    'subtopicpage-[subtopic_page_id]-[version]'.
     """
+
     # The id of the subtopic page being edited.
     subtopic_page_id = ndb.StringProperty(indexed=True, required=True)
 
@@ -348,14 +411,23 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return 'subtopicpage-%s-%s' % (subtopic_page_id, version)
 
+    @staticmethod
+    def get_export_policy():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic rights snapshot."""
+
     pass
 
 
 class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic rights snapshot."""
+
     pass
 
 
@@ -371,6 +443,7 @@ class TopicRightsModel(base_models.VersionedModel):
 
     # The user_ids of the managers of this topic.
     manager_ids = ndb.StringProperty(indexed=True, repeated=True)
+
     # Whether this topic is published.
     topic_is_published = ndb.BooleanProperty(
         indexed=True, required=True, default=False)
@@ -390,8 +463,9 @@ class TopicRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return (cls.query(cls.manager_ids == user_id).get() is not None or
-                cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+        return (cls.query(
+            cls.manager_ids == user_id).get(keys_only=True) is not None
+                or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
     @classmethod
     def get_by_user(cls, user_id):
@@ -402,7 +476,7 @@ class TopicRightsModel(base_models.VersionedModel):
 
         Returns:
             list(TopicRightsModel). The list of TopicRightsModel objects in
-                which the given user is a manager.
+            which the given user is a manager.
         """
         topic_rights_models = cls.query(
             cls.manager_ids == user_id
@@ -430,14 +504,7 @@ class TopicRightsModel(base_models.VersionedModel):
         super(TopicRightsModel, self)._trusted_commit(
             committer_id, commit_type, commit_message, commit_cmds)
 
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
         topic_rights = TopicRightsModel.get_by_id(self.id)
-        status = ''
         if topic_rights.topic_is_published:
             status = constants.ACTIVITY_STATUS_PUBLIC
         else:
@@ -446,7 +513,6 @@ class TopicRightsModel(base_models.VersionedModel):
         TopicCommitLogEntryModel(
             id=('rights-%s-%s' % (self.id, self.version)),
             user_id=committer_id,
-            username=committer_username,
             topic_id=self.id,
             commit_type=commit_type,
             commit_message=commit_message,
@@ -456,3 +522,27 @@ class TopicRightsModel(base_models.VersionedModel):
             post_commit_community_owned=False,
             post_commit_is_private=not topic_rights.topic_is_published
         ).put()
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Export user-relevant properties of TopicRightsModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. The user-relevant properties of TopicRightsModel in a dict
+            format. In this case, we are returning all the ids of the topics
+            this user manages.
+        """
+        managed_topics = cls.get_all().filter(cls.manager_ids == user_id)
+        managed_topic_ids = [right.id for right in managed_topics]
+
+        return {
+            'managed_topic_ids': managed_topic_ids
+        }

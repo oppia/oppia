@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for subtopic page domain objects."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -28,6 +29,7 @@ import utils
 
 class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
     """Tests for subtopic page domain objects."""
+
     topic_id = 'topic_id'
     subtopic_id = 1
 
@@ -62,8 +64,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
-        self.assertEqual(self.subtopic_page.to_dict(),
-                         expected_subtopic_page_dict)
+        self.assertEqual(
+            self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
     def test_create_default_subtopic_page(self):
         """Tests the create_default_topic() function."""
@@ -130,7 +132,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'filename': 'test.mp3',
                         'file_size_bytes': 100,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.5
                     }
                 }
             }
@@ -158,8 +161,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self.subtopic_page.update_page_contents_audio(
             state_domain.RecordedVoiceovers.from_dict(
                 recorded_voiceovers_dict))
-        self.assertEqual(self.subtopic_page.to_dict(),
-                         expected_subtopic_page_dict)
+        self.assertEqual(
+            self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
     def test_update_html(self):
         expected_subtopic_page_dict = {
@@ -191,15 +194,16 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello world</p>',
                 'content_id': 'content'
             }))
-        self.assertEqual(self.subtopic_page.to_dict(),
-                         expected_subtopic_page_dict)
+        self.assertEqual(
+            self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
     def test_update_written_translations(self):
         written_translations_dict = {
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'html': 'Translation in hindi.',
+                        'data_format': 'html',
+                        'translation': 'Translation in hindi.',
                         'needs_update': False
                     }
                 }
@@ -294,8 +298,9 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         }
-        self.assertEqual(subtopic_page_contents.to_dict(),
-                         expected_subtopic_page_contents_dict)
+        self.assertEqual(
+            subtopic_page_contents.to_dict(),
+            expected_subtopic_page_contents_dict)
 
     def test_to_and_from_dict(self):
         subtopic_page_contents_dict = {
@@ -309,7 +314,8 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
                         'en': {
                             'filename': 'test.mp3',
                             'file_size_bytes': 100,
-                            'needs_update': False
+                            'needs_update': False,
+                            'duration_secs': 0.34343
                         }
                     }
                 }
@@ -318,7 +324,8 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
                 'translations_mapping': {
                     'content': {
                         'en': {
-                            'html': 'Translation.',
+                            'data_format': 'html',
+                            'translation': 'Translation.',
                             'needs_update': False
                         }
                     }
@@ -328,8 +335,8 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
         subtopic_page_contents = (
             subtopic_page_domain.SubtopicPageContents.from_dict(
                 subtopic_page_contents_dict))
-        self.assertEqual(subtopic_page_contents.to_dict(),
-                         subtopic_page_contents_dict)
+        self.assertEqual(
+            subtopic_page_contents.to_dict(), subtopic_page_contents_dict)
 
 
 class SubtopicPageChangeTests(test_utils.GenericTestBase):

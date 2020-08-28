@@ -21,32 +21,32 @@
 // in via initArgs.
 
 angular.module('oppia').directive('nonnegativeIntEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/nonnegative-int-editor.directive.html'),
+      template: require('./nonnegative-int-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.SCHEMA = {
-          type: 'int',
-          validators: [{
-            id: 'is_at_least',
-            min_value: 0
-          }, {
-            id: 'is_integer'
-          }]
-        };
+        ctrl.$onInit = function() {
+          ctrl.SCHEMA = {
+            type: 'int',
+            validators: [{
+              id: 'is_at_least',
+              min_value: 0
+            }, {
+              id: 'is_integer'
+            }]
+          };
 
-        if (!ctrl.value) {
-          ctrl.value = 0;
-        }
+          if (!ctrl.value) {
+            ctrl.value = 0;
+          }
+        };
       }]
     };
   }]);

@@ -15,6 +15,7 @@
 """Tests for the controllers that communicate with VM for training
 classifiers.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -29,6 +30,7 @@ from core.domain import config_domain
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -37,7 +39,7 @@ import python_utils
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
 
-class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
+class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
     """Test the handler for storing job result of training job."""
 
     def setUp(self):
@@ -130,6 +132,7 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
 
         class FakeTrainingJob(python_utils.OBJECT):
             """Fake training class to invoke failed job functions."""
+
             def __init__(self):
                 self.status = feconf.TRAINING_JOB_STATUS_FAILED
 
@@ -165,11 +168,11 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
 
                 # Check that there are no sent emails to either
                 # email address before posting json.
-                messages = self.mail_stub.get_sent_messages(
-                    to=feconf.ADMIN_EMAIL_ADDRESS)
+                messages = self._get_sent_email_messages(
+                    feconf.ADMIN_EMAIL_ADDRESS)
                 self.assertEqual(len(messages), 0)
-                messages = self.mail_stub.get_sent_messages(
-                    to='moderator@example.com')
+                messages = self._get_sent_email_messages(
+                    'moderator@example.com')
                 self.assertEqual(len(messages), 0)
 
                 # Post ML Job.
@@ -178,13 +181,13 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
                     expected_status_int=500)
 
                 # Check that there are now emails sent.
-                messages = self.mail_stub.get_sent_messages(
-                    to=feconf.ADMIN_EMAIL_ADDRESS)
+                messages = self._get_sent_email_messages(
+                    feconf.ADMIN_EMAIL_ADDRESS)
                 expected_subject = 'Failed ML Job'
                 self.assertEqual(len(messages), 1)
                 self.assertEqual(messages[0].subject.decode(), expected_subject)
-                messages = self.mail_stub.get_sent_messages(
-                    to='moderator@example.com')
+                messages = self._get_sent_email_messages(
+                    'moderator@example.com')
                 self.assertEqual(len(messages), 1)
                 self.assertEqual(messages[0].subject.decode(), expected_subject)
 
@@ -265,8 +268,8 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         self.job_id = classifier_models.ClassifierTrainingJobModel.create(
             self.algorithm_id, interaction_id, self.exp_id, 1,
             datetime.datetime.utcnow(), self.training_data, 'Home',
-            feconf.TRAINING_JOB_STATUS_NEW, None, 1
-        )
+            feconf.TRAINING_JOB_STATUS_NEW, 1)
+        fs_services.save_classifier_data(self.exp_id, self.job_id, {})
 
         self.expected_response = {
             u'job_id': self.job_id,

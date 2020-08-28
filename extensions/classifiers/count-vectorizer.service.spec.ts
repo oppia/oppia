@@ -19,21 +19,30 @@
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 
 describe('Count vectorizer service', () => {
-  describe('Test count vectorizer service', () => {
-    let service: CountVectorizerService;
-    beforeEach(() => {
-      service = new CountVectorizerService();
-    });
+  let service: CountVectorizerService;
+  beforeEach(() => {
+    service = new CountVectorizerService();
+  });
 
-    it('should produce correct vector from tokens', () => {
-      var tokens = ['a', 'b', 'a', 'c', 'd', 'b', 'a'];
-      var vocabulary = {
-        a: 0, b: 1, c: 2
-      };
-      var vector = service.vectorize(tokens, vocabulary);
-      var expectedVector = [3, 2, 1];
-      expect(vector.length).toEqual(3);
-      expect(vector).toEqual(expectedVector);
-    });
+  it('should produce correct vector from tokens', () => {
+    const tokens = ['a', 'b', 'a', 'c', 'd', 'b', 'a'];
+    const vocabulary = {
+      a: 0, b: 1, c: 2
+    };
+    const vector = service.vectorize(tokens, vocabulary);
+    const expectedVector = [3, 2, 1];
+    expect(vector.length).toEqual(3);
+    expect(vector).toEqual(expectedVector);
+  });
+
+  it('should produce vector filled with zeros when tokens is null', () => {
+    const tokens = null;
+    const vocabulary = {
+      a: 0, b: 1, c: 2
+    };
+    const vector = service.vectorize(tokens, vocabulary);
+    const expectedVector = [0, 0, 0];
+    expect(vector.length).toEqual(3);
+    expect(vector).toEqual(expectedVector);
   });
 });

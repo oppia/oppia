@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """One-off jobs for questions."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -90,24 +91,3 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
-
-
-class QuestionSummaryModelIndexesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for indexing the creator_id for all
-    QuestionSummaryModels.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [question_models.QuestionSummaryModel]
-
-    @staticmethod
-    def map(model_instance):
-        """Implements the map function for this job."""
-        model_instance.put(update_last_updated_time=False)
-        yield ('SUCCESS', model_instance.id)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))

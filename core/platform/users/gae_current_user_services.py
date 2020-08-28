@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Provides a seam for user-related services."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -42,18 +43,6 @@ def create_login_url(slug):
             feconf.SIGNUP_URL, 'return_url', slug))
 
 
-def create_logout_url(url_to_redirect):
-    """Creates a logout url.
-
-    Args:
-        url_to_redirect: str. The URL to redirect to after logout.
-
-    Returns:
-        str. The correct logout URL that includes the page to redirect to.
-    """
-    return users.create_logout_url(url_to_redirect)
-
-
 def get_current_user():
     """Returns the current user."""
     return users.get_current_user()
@@ -71,6 +60,7 @@ def get_gae_id_from_email(email):
     """
     class _FakeUser(ndb.Model):
         """A fake user class."""
+
         _use_memcache = False
         _use_cache = False
         user = ndb.UserProperty(required=True)

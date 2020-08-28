@@ -22,6 +22,7 @@ If any of these tests result in errors, this script will terminate.
 Note: The test scripts are arranged in increasing order of time taken. This
 enables a broken build to be detected as quickly as possible.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -35,7 +36,8 @@ from . import run_frontend_tests
 from . import setup
 from . import setup_gae
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Run this script from the oppia root folder:
     python -m scripts.run_tests
 This script runs all the tests, in this order:

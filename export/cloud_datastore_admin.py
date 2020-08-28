@@ -18,6 +18,7 @@ Please see original reference here:
 
 https://cloud.google.com/datastore/docs/schedule-export
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -47,7 +48,7 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
         Export data described in request parameters.
 
         Raises:
-            AssertionError: Bucket url exists and doesn't start with 'gs://'.
+            AssertionError. Bucket url exists and doesn't start with 'gs://'.
         """
         gcs_bucket_url_prefix = 'gs://'
 
@@ -56,9 +57,10 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
         app_id = app_identity.get_application_id()
 
         if app_id != APP_NAME_OPPIASERVER:
-            logging.error('Export service has been pinged. '
-                          'Since this is not production, a real export request '
-                          'has not been initiated.')
+            logging.error(
+                'Export service has been pinged. '
+                'Since this is not production, a real export request '
+                'has not been initiated.')
             return
 
         timestamp = datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S')
@@ -93,7 +95,7 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
         url = 'https://datastore.googleapis.com/v1/projects/%s:export' % app_id
         try:
             result = urlfetch.fetch(
-                url=url,
+                url,
                 payload=json.dumps(request),
                 method=urlfetch.POST,
                 deadline=60,

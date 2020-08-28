@@ -29,13 +29,16 @@ import { Outcome, OutcomeObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { AppConstants } from 'app.constants';
+import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { GraphInputCustomizationArgs } from
+  'interactions/customization-args-defs';
+import { GraphIsomorphicRuleInputs } from 'interactions/rule-input-defs';
 
 describe('GraphInputValidationService', () => {
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
-  // preferably in the constants file itself.
-  let WARNING_TYPES: any, validatorService: GraphInputValidationService;
-  let currentState: string, customizationArguments: any;
+  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
+  let validatorService: GraphInputValidationService;
+  let currentState: string;
+  let customizationArguments: GraphInputCustomizationArgs;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
   let rof: RuleObjectFactory;
@@ -55,7 +58,7 @@ describe('GraphInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -68,7 +71,9 @@ describe('GraphInputValidationService', () => {
         value: {
           vertices: new Array(10),
           isWeighted: false,
-          isLabeled: false
+          isLabeled: false,
+          isDirected: false,
+          edges: []
         }
       },
       canEditEdgeWeight: {
@@ -76,10 +81,26 @@ describe('GraphInputValidationService', () => {
       },
       canEditVertexLabel: {
         value: false
+      },
+      canMoveVertex: {
+        value: false
+      },
+      canDeleteVertex: {
+        value: false
+      },
+      canDeleteEdge: {
+        value: false
+      },
+      canAddVertex: {
+        value: false
+      },
+      canAddEdge: {
+        value: false
       }
     };
 
-    var answerGroup = agof.createNew(
+    var answerGroup = agof.createNew(goodDefaultOutcome, null, null);
+    answerGroup.updateRuleTypesToInputs(
       [rof.createFromBackendDict({
         inputs: {
           g: {
@@ -94,10 +115,7 @@ describe('GraphInputValidationService', () => {
           }
         },
         rule_type: 'IsIsomorphicTo'
-      })],
-      goodDefaultOutcome,
-      false,
-      null
+      })]
     );
     answerGroups = [answerGroup, cloneDeep(answerGroup)];
   });
@@ -112,8 +130,14 @@ describe('GraphInputValidationService', () => {
   it('should expect graph and edit customization arguments', () => {
     expect(() => {
       validatorService.getAllWarnings(
+        // This throws "Argument of type '{}' is not assignable to
+        // parameter of type 'GraphInputCustomizationArgs'." We are purposely
+        // assigning the wrong type of customization args in order to test
+        // validations.
+        // @ts-expect-error
         currentState, {}, answerGroups, goodDefaultOutcome);
-    }).toThrow('Expected customization arguments to have properties: ' +
+    }).toThrowError(
+      'Expected customization arguments to have properties: ' +
       'graph, canEditEdgeWeight, canEditVertexLabel');
   });
 
@@ -134,9 +158,15 @@ describe('GraphInputValidationService', () => {
   it('The graph used in the rule x in group y exceeds supported maximum ' +
     'number of vertices of 10 for isomorphism check.',
   () => {
-    answerGroups[0].rules[0].inputs.g.vertices = new Array(11);
-    answerGroups[0].rules[1].inputs.g.vertices = new Array(11);
-    answerGroups[1].rules[0].inputs.g.vertices = new Array(11);
+    (<GraphIsomorphicRuleInputs>
+      answerGroups[0].ruleTypesToInputs.IsIsomorphicTo[0]
+    ).g.vertices = new Array(11);
+    (<GraphIsomorphicRuleInputs>
+      answerGroups[0].ruleTypesToInputs.IsIsomorphicTo[1]
+    ).g.vertices = new Array(11);
+    (<GraphIsomorphicRuleInputs>
+      answerGroups[1].ruleTypesToInputs.IsIsomorphicTo[0]
+    ).g.vertices = new Array(11);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);

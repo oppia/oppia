@@ -1,4 +1,4 @@
-# [Oppia](https://www.oppia.org) [![Build Status](https://api.travis-ci.org/oppia/oppia.svg?branch=develop)](https://travis-ci.org/oppia/oppia) [![Code Coverage](https://api.codeclimate.com/v1/badges/eaa9dfe89c760481079d/test_coverage)](https://codeclimate.com/github/oppia/oppia/test_coverage) [![codecov](https://codecov.io/gh/oppia/oppia/branch/develop/graph/badge.svg)](https://codecov.io/gh/oppia/oppia) [![Join the chat at https://gitter.im/oppia/oppia-chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/oppia/oppia-chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+# [Oppia](https://www.oppia.org) [![CircleCI](https://circleci.com/gh/oppia/oppia/tree/develop.svg?style=svg)](https://circleci.com/gh/oppia/oppia/tree/develop) [![Build Status](https://travis-ci.com/oppia/oppia.svg?branch=develop)](https://travis-ci.com/github/oppia/oppia) [![codecov](https://codecov.io/gh/oppia/oppia/branch/develop/graph/badge.svg)](https://codecov.io/gh/oppia/oppia) [![Join the chat at https://gitter.im/oppia/oppia-chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/oppia/oppia-chat?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Oppia is an online learning tool that enables anyone to easily create and share interactive activities (called 'explorations'). These activities simulate a one-on-one conversation with a tutor, making it possible for students to learn by doing while getting feedback.
 
@@ -20,23 +20,7 @@ Oppia is written using Python and AngularJS, and is built on top of Google App E
 
 ## Installation
 
-Please refer to the [developer wiki](https://github.com/oppia/oppia/wiki) for full installation instructions. This is just a short summary for developers who would like to contribute:
-
-1. Create a new, empty folder called `opensource/` within your home folder. Navigate to it (`cd opensource`), then [fork and clone](https://github.com/oppia/oppia/wiki/Fork-and-Clone-Oppia) the Oppia repo. This will create a new folder named `opensource/oppia`.
-
-2. Navigate to `opensource/oppia/` and run:
-
-  ```
-    git checkout develop
-    python -m scripts.start
-  ```
-
-3. To run tests:
-
-  ```
-    python -m scripts.run_tests
-  ```
-
+Please refer to the [Installing Oppia page](https://github.com/oppia/oppia/wiki/Installing-Oppia) for full instructions.
 
 ## Contributing
 
@@ -66,4 +50,4 @@ The Oppia code is released under the [Apache v2 license](https://github.com/oppi
   * [Announcements mailing list](http://groups.google.com/group/oppia-announce)
   * Social media: [YouTube](https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw), [FB](https://www.facebook.com/oppiaorg), [Twitter](https://twitter.com/oppiaorg)
 
-We also have public chat rooms on Gitter: [https://gitter.im/oppia/oppia-chat](https://gitter.im/oppia/oppia-chat) and the #oppia channel on Freenode IRC. Drop by and say hello!
+We also have public chat rooms on Gitter: [https://gitter.im/oppia/oppia-chat](https://gitter.im/oppia/oppia-chat). Drop by and say hello!

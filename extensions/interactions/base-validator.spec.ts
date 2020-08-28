@@ -50,7 +50,7 @@ describe('Interaction validator', function() {
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
@@ -115,8 +115,8 @@ describe('Interaction validator', function() {
     });
 
     goodAnswerGroups = [
-      agof.createNew([], goodOutcomeDest, false, null),
-      agof.createNew([], goodOutcomeFeedback, false, null)
+      agof.createNew(goodOutcomeDest, false, null),
+      agof.createNew(goodOutcomeFeedback, false, null)
     ];
     goodDefaultOutcome = goodOutcomeDest;
   }));
@@ -132,9 +132,9 @@ describe('Interaction validator', function() {
     it('should have a warning for an answer group with a confusing outcome',
       function() {
         var answerGroups = [
-          agof.createNew([], goodOutcomeDest, false, null),
-          agof.createNew([], badOutcome, false, null),
-          agof.createNew([], goodOutcomeFeedback, false, null)
+          agof.createNew(goodOutcomeDest, false, null),
+          agof.createNew(badOutcome, false, null),
+          agof.createNew(goodOutcomeFeedback, false, null)
         ];
         var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
         expect(warnings).toEqual([{
@@ -174,9 +174,9 @@ describe('Interaction validator', function() {
     it('should be able to concatenate warnings for both answer groups and ' +
         'the default outcome', function() {
       var badAnswerGroups = [
-        agof.createNew([], goodOutcomeDest, false, null),
-        agof.createNew([], badOutcome, false, null),
-        agof.createNew([], badOutcome, false, null)
+        agof.createNew(goodOutcomeDest, false, null),
+        agof.createNew(badOutcome, false, null),
+        agof.createNew(badOutcome, false, null)
       ];
       var warnings = bivs.getAllOutcomeWarnings(
         badAnswerGroups, badOutcome, currentState);
@@ -203,7 +203,9 @@ describe('Interaction validator', function() {
     it('should throw a warning for a missing top-level field', function() {
       expect(function() {
         bivs.requireCustomizationArguments({}, ['levelone']);
-      }).toThrow('Expected customization arguments to have property: levelone');
+      }).toThrowError(
+        'Expected customization arguments to have property: levelone'
+      );
     });
 
     it('should throw warnings for multiple missing top-level fields',
@@ -211,8 +213,9 @@ describe('Interaction validator', function() {
         var expectedArgs = ['first', 'second'];
         expect(function() {
           bivs.requireCustomizationArguments({}, expectedArgs);
-        }).toThrow(
-          'Expected customization arguments to have properties: first, second');
+        }).toThrowError(
+          'Expected customization arguments to have properties: first, second'
+        );
       }
     );
   });

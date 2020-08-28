@@ -16,23 +16,20 @@
  * @fileoverview Unit tests for text input validation service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// text-input-validation.service.ts is upgraded to Angular 8.
+import { TestBed } from '@angular/core/testing';
+
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
+import { AppConstants } from 'app.constants';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { TextInputValidationService } from
+  'interactions/TextInput/directives/text-input-validation.service';
 
-require('interactions/TextInput/directives/text-input-validation.service.ts');
-
-describe('TextInputValidationService', function() {
+describe('TextInputValidationService', () => {
   var validatorService, WARNING_TYPES;
   var INTERACTION_SPECS, customizationArgSpecs, rowsSpecs, minRows, maxRows;
 
@@ -40,37 +37,12 @@ describe('TextInputValidationService', function() {
   var goodAnswerGroups, goodDefaultOutcome;
   var oof, agof;
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value(
-      'baseInteractionValidationService',
-      new baseInteractionValidationService());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    validatorService = $injector.get('TextInputValidationService');
-    oof = $injector.get('OutcomeObjectFactory');
-    agof = $injector.get('AnswerGroupObjectFactory');
-    WARNING_TYPES = $injector.get('WARNING_TYPES');
-    INTERACTION_SPECS = $injector.get('INTERACTION_SPECS');
+  beforeEach(() => {
+    validatorService = TestBed.get(TextInputValidationService);
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    WARNING_TYPES = AppConstants.WARNING_TYPES;
+    INTERACTION_SPECS = InteractionSpecsConstants.INTERACTION_SPECS;
     customizationArgSpecs = INTERACTION_SPECS.TextInput.customization_arg_specs;
     rowsSpecs = customizationArgSpecs[1];
     minRows = rowsSpecs.schema.validators[0].min_value;
@@ -91,24 +63,24 @@ describe('TextInputValidationService', function() {
 
     customizationArguments = {
       placeholder: {
-        value: ''
+        value: new SubtitledUnicode('', '')
       },
       rows: {
         value: 1
       }
     };
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
-  }));
+    goodAnswerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
+  });
 
-  it('should be able to perform basic validation', function() {
+  it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
-  it('should catch non-string value for placeholder', function() {
+  it('should catch non-string value for placeholder', () => {
     customizationArguments.placeholder.value = 1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
@@ -119,7 +91,19 @@ describe('TextInputValidationService', function() {
     }]);
   });
 
-  it('should catch non-integer value for # rows', function() {
+  it('should catch non-string value for placeholder', () => {
+    customizationArguments.placeholder.value = (
+      new SubtitledUnicode(undefined, undefined));
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: ('Placeholder text must be a string.')
+    }]);
+  });
+
+  it('should catch non-integer value for # rows', () => {
     customizationArguments.rows.value = 1.5;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
@@ -130,7 +114,7 @@ describe('TextInputValidationService', function() {
     }]);
   });
 
-  it('should catch an out of range value for # rows', function() {
+  it('should catch an out of range value for # rows', () => {
     customizationArguments.rows.value = -1;
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,

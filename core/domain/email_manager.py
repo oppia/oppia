@@ -15,13 +15,16 @@
 # limitations under the License.
 
 """Config properties and functions for managing email notifications."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
 
+from constants import constants
 from core.domain import config_domain
+from core.domain import email_services
 from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import subscription_services
@@ -29,10 +32,10 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 app_identity_services = models.Registry.import_app_identity_services()
-email_services = models.Registry.import_email_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -42,6 +45,58 @@ def log_new_error(*args, **kwargs):
     """
     logging.error(*args, **kwargs)
 
+
+NEW_REVIEWER_EMAIL_DATA = {
+    constants.REVIEW_CATEGORY_TRANSLATION: {
+        'review_category': 'translations',
+        'to_check': 'translation suggestions',
+        'description_template': '%s language translations',
+        'rights_message_template': (
+            'review translation suggestions made by contributors in the %s '
+            'language')
+    },
+    constants.REVIEW_CATEGORY_VOICEOVER: {
+        'review_category': 'voiceovers',
+        'to_check': 'voiceover applications',
+        'description_template': '%s language voiceovers',
+        'rights_message_template': (
+            'review voiceover applications made by contributors in the %s '
+            'language')
+    },
+    constants.REVIEW_CATEGORY_QUESTION: {
+        'review_category': 'questions',
+        'to_check': 'question suggestions',
+        'description': 'questions',
+        'rights_message': 'review question suggestions made by contributors'
+    }
+}
+
+REMOVED_REVIEWER_EMAIL_DATA = {
+    constants.REVIEW_CATEGORY_TRANSLATION: {
+        'review_category': 'translation',
+        'role_description_template': (
+            'translation reviewer role in the %s language'),
+        'rights_message_template': (
+            'review translation suggestions made by contributors in the %s '
+            'language'),
+        'contribution_allowed': 'translations'
+    },
+    constants.REVIEW_CATEGORY_VOICEOVER: {
+        'review_category': 'voiceover',
+        'role_description_template': (
+            'voiceover reviewer role in the %s language'),
+        'rights_message_template': (
+            'review voiceover applications made by contributors in the %s '
+            'language'),
+        'contribution_allowed': 'voiceovers'
+    },
+    constants.REVIEW_CATEGORY_QUESTION: {
+        'review_category': 'question',
+        'role_description': 'question reviewer role',
+        'rights_message': 'review question suggestions made by contributors',
+        'contribution_allowed': 'questions'
+    }
+}
 
 NOTIFICATION_EMAIL_LIST_SCHEMA = {
     'type': 'list',
@@ -176,7 +231,13 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_ONBOARD_REVIEWER: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_REMOVE_REVIEWER: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_ACCOUNT_DELETED: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_MARKETING: user_services.is_admin,
     feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: user_services.is_admin,
@@ -187,7 +248,7 @@ SENDER_VALIDATORS = {
 }
 
 
-def _require_sender_id_is_valid(intent, sender_id):
+def require_sender_id_is_valid(intent, sender_id):
     """Ensure that the sender ID is valid, based on the email's intent.
 
     Many emails are only allowed to be sent by a certain user or type of user,
@@ -200,8 +261,8 @@ def _require_sender_id_is_valid(intent, sender_id):
         sender_id: str. The ID of the user sending the email.
 
     Raises:
-        Exception: The email intent is invalid.
-        Exception: The sender_id is not appropriate for the given intent.
+        Exception. The email intent is invalid.
+        Exception. The sender_id is not appropriate for the given intent.
     """
 
     if intent not in SENDER_VALIDATORS:
@@ -217,7 +278,8 @@ def _require_sender_id_is_valid(intent, sender_id):
 
 def _send_email(
         recipient_id, sender_id, intent, email_subject, email_html_body,
-        sender_email, bcc_admin=False, sender_name=None, reply_to_id=None):
+        sender_email, bcc_admin=False, sender_name=None, reply_to_id=None,
+        recipient_email=None):
     """Sends an email to the given recipient.
 
     This function should be used for sending all user-facing emails.
@@ -239,14 +301,20 @@ def _send_email(
             the email.
         reply_to_id: str or None. The unique reply-to id used in reply-to email
             address sent to recipient.
+        recipient_email: str or None. Override for the recipient email.
+            This should only be used when the user with user_id equal to
+            recipient_id does not exist or is deleted and their email cannot be
+            retrieved via get_email_from_user_id.
     """
 
     if sender_name is None:
         sender_name = EMAIL_SENDER_NAME.value
 
-    _require_sender_id_is_valid(intent, sender_id)
+    require_sender_id_is_valid(intent, sender_id)
 
-    recipient_email = user_services.get_email_from_user_id(recipient_id)
+    if recipient_email is None:
+        recipient_email = user_services.get_email_from_user_id(recipient_id)
+
     cleaned_html_body = html_cleaner.clean(email_html_body)
     if cleaned_html_body != email_html_body:
         log_new_error(
@@ -273,7 +341,7 @@ def _send_email(
 
         email_services.send_mail(
             sender_name_email, recipient_email, email_subject,
-            cleaned_plaintext_body, cleaned_html_body, bcc_admin,
+            cleaned_plaintext_body, cleaned_html_body, bcc_admin=bcc_admin,
             reply_to_id=reply_to_id)
         email_models.SentEmailModel.create(
             recipient_id, recipient_email, sender_id, sender_name_email, intent,
@@ -284,7 +352,7 @@ def _send_email(
 
 def _send_bulk_mail(
         recipient_ids, sender_id, intent, email_subject, email_html_body,
-        sender_email, sender_name, instance_id=None):
+        sender_email, sender_name, instance_id):
     """Sends an email to all given recipients.
 
     Args:
@@ -296,9 +364,9 @@ def _send_bulk_mail(
         sender_email: str. The sender's email address.
         sender_name: str. The name to be shown in the "sender" field of the
             email.
-        instance_id: str or None. The ID of the BulkEmailModel entity instance.
+        instance_id: str. The ID of the BulkEmailModel entity instance.
     """
-    _require_sender_id_is_valid(intent, sender_id)
+    require_sender_id_is_valid(intent, sender_id)
 
     recipients_settings = user_services.get_users_settings(recipient_ids)
     recipient_emails = [user.email for user in recipients_settings]
@@ -315,16 +383,18 @@ def _send_bulk_mail(
         '<br>', '\n').replace('<li>', '<li>- ').replace('</p><p>', '</p>\n<p>')
     cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
 
-    def _send_bulk_mail_in_transaction(instance_id=None):
-        """Sends the emails in bulk to the recipients."""
+    def _send_bulk_mail_in_transaction(instance_id):
+        """Sends the emails in bulk to the recipients.
+
+        Args:
+            instance_id: str. The ID of the BulkEmailModel entity instance.
+        """
         sender_name_email = '%s <%s>' % (sender_name, sender_email)
 
         email_services.send_bulk_mail(
             sender_name_email, recipient_emails, email_subject,
             cleaned_plaintext_body, cleaned_html_body)
 
-        if instance_id is None:
-            instance_id = email_models.BulkEmailModel.get_new_id('')
         email_models.BulkEmailModel.create(
             instance_id, recipient_ids, sender_id, sender_name_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
@@ -355,6 +425,23 @@ def send_job_failure_email(job_id):
             system_name_email, other_recipients,
             mail_subject, mail_body,
             mail_body.replace('\n', '<br/>'))
+
+
+def send_dummy_mail_to_admin(username):
+    """Send an email from the specified email address to admin.
+
+    Args:
+        username: str. Username of the sender.
+    """
+
+    email_body = 'This is a test mail from %s.' % (username)
+    email_subject = 'Test Mail'
+    system_name_email = '%s <%s>' % (
+        feconf.SYSTEM_EMAIL_NAME, feconf.SYSTEM_EMAIL_ADDRESS)
+
+    email_services.send_mail(
+        system_name_email, feconf.ADMIN_EMAIL_ADDRESS, email_subject,
+        email_body, email_body.replace('\n', '<br/>'), bcc_admin=False)
 
 
 def send_mail_to_admin(email_subject, email_body):
@@ -415,8 +502,8 @@ def get_moderator_unpublish_exploration_email():
 
     Returns:
         str. Draft of the email body for an email sent after the moderator
-            unpublishes an exploration, or an empty string if no email should
-            be sent.
+        unpublishes an exploration, or an empty string if no email should
+        be sent.
     """
 
     try:
@@ -431,8 +518,8 @@ def require_moderator_email_prereqs_are_satisfied():
     """Raises an exception if, for any reason, moderator emails cannot be sent.
 
     Raises:
-        Exception: feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION is False.
-        Exception: feconf.CAN_SEND_EMAILS is False.
+        Exception. The feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION is False.
+        Exception. The feconf.CAN_SEND_EMAILS is False.
     """
 
     if not feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
@@ -504,7 +591,7 @@ def send_role_notification_email(
             has been given the new role.
 
     Raises:
-        Exception: The role is invalid (i.e. not defined in
+        Exception. The role is invalid (i.e. not defined in
             EDITOR_ROLE_EMAIL_HTML_ROLES).
     """
 
@@ -641,7 +728,7 @@ def send_feedback_message_email(recipient_id, feedback_messages):
         'You\'ve received %s new message%s on your Oppia explorations:<br>'
         '<ul>%s</ul>'
         'You can view and reply to your messages from your '
-        '<a href="https://www.oppia.org/creator_dashboard">dashboard</a>.'
+        '<a href="https://www.oppia.org/creator-dashboard">dashboard</a>.'
         '<br>'
         '<br>Thanks, and happy teaching!<br>'
         '<br>'
@@ -764,8 +851,8 @@ def send_suggestion_email(
         can_users_receive_thread_email(recipient_list, exploration_id, True))
     for index, recipient_id in enumerate(recipient_list):
         recipient_user_settings = user_services.get_user_settings(recipient_id)
+        # Send email only if recipient wants to receive.
         if can_users_receive_email[index]:
-            # Send email only if recipient wants to receive.
             email_body = email_body_template % (
                 recipient_user_settings.username, author_settings.username,
                 exploration_id, exploration_title, exploration_id,
@@ -962,8 +1049,7 @@ def send_user_query_email(
     sender_email = user_services.get_email_from_user_id(sender_id)
     _send_bulk_mail(
         recipient_ids, sender_id, email_intent, email_subject, email_body,
-        sender_email, sender_name,
-        instance_id=bulk_email_model_id)
+        sender_email, sender_name, bulk_email_model_id)
     return bulk_email_model_id
 
 
@@ -1004,7 +1090,7 @@ def send_mail_to_onboard_new_reviewers(user_id, category):
         'edits made to lessons preserve the lessons\' quality and are '
         'beneficial for students.<br><br>'
         'If you\'d like to help out as a reviewer, please visit your '
-        '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a>. '
+        '<a href="https://www.oppia.org/creator-dashboard/">dashboard</a>. '
         'and set your review preferences accordingly. Note that, if you accept,'
         'you will receive occasional emails inviting you to review incoming '
         'suggestions by others.<br><br>'
@@ -1020,8 +1106,8 @@ def send_mail_to_onboard_new_reviewers(user_id, category):
     can_user_receive_email = user_services.get_email_preferences(
         user_id).can_receive_email_updates
 
+    # Send email only if recipient wants to receive.
     if can_user_receive_email:
-        # Send email only if recipient wants to receive.
         email_body = email_body_template % (
             recipient_user_settings.username, category, category,
             EMAIL_FOOTER.value)
@@ -1049,7 +1135,7 @@ def send_mail_to_notify_users_to_review(user_id, category):
         'review in %s, which you are registered as a reviewer for.'
         '<br><br>Please take a look at and accept/reject these suggestions at'
         ' your earliest convenience. You can visit your '
-        '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a> '
+        '<a href="https://www.oppia.org/creator-dashboard/">dashboard</a> '
         'to view the list of suggestions that need a review.<br><br>'
         'Thank you for helping improve Oppia\'s lessons!'
         '- The Oppia Team<br>'
@@ -1063,11 +1149,261 @@ def send_mail_to_notify_users_to_review(user_id, category):
     can_user_receive_email = user_services.get_email_preferences(
         user_id).can_receive_email_updates
 
+    # Send email only if recipient wants to receive.
     if can_user_receive_email:
-        # Send email only if recipient wants to receive.
         email_body = email_body_template % (
             recipient_user_settings.username, category, EMAIL_FOOTER.value)
         _send_email(
             user_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_accepted_voiceover_application_email(
+        user_id, lesson_title, language_code):
+    """Sends an email to users to an give update on the accepted voiceover
+    application.
+
+    Args:
+        user_id: str. The id of the user whose voiceover application got
+            accepted.
+        lesson_title: str. The title of the lessons for which the voiceover
+            application got accepted.
+        language_code: str. The language code for which the voiceover
+            application got accepted.
+    """
+    email_subject = '[Accepted] Updates on submitted voiceover application'
+
+    email_body_template = (
+        'Hi %s,<br><br>'
+        'Congratulations! Your voiceover application for "%s" lesson got '
+        'accepted and you have been assigned with a voice artist role in the '
+        'lesson. Now you will be able to add voiceovers to the lesson in %s '
+        'language.'
+        '<br><br>You can check the wiki page to learn'
+        '<a href="https://github.com/oppia/oppia/wiki/'
+        'Instructions-for-voice-artists">how to voiceover a lesson</a><br><br>'
+        'Thank you for helping improve Oppia\'s lessons!'
+        '- The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    recipient_user_settings = user_services.get_user_settings(user_id)
+    can_user_receive_email = user_services.get_email_preferences(
+        user_id).can_receive_email_updates
+
+    # Send email only if recipient wants to receive.
+    if can_user_receive_email:
+        language = utils.get_supported_audio_language_description(language_code)
+        email_body = email_body_template % (
+            recipient_user_settings.username, lesson_title, language,
+            EMAIL_FOOTER.value)
+        _send_email(
+            user_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,
+            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_rejected_voiceover_application_email(
+        user_id, lesson_title, language_code, rejection_message):
+    """Sends an email to users to give update on the rejected voiceover
+    application.
+
+    Args:
+        user_id: str. The id of the user whose voiceover application got
+            accepted.
+        lesson_title: str. The title of the lessons for which the voiceover
+            application got accepted.
+        language_code: str. The language code in which for which the voiceover
+            application got accepted.
+        rejection_message: str. The message left by the reviewer while rejecting
+            the voiceover application.
+    """
+    email_subject = 'Updates on submitted voiceover application'
+
+    email_body_template = (
+        'Hi %s,<br><br>'
+        'Your voiceover application for "%s" lesson in language %s got rejected'
+        ' and the reviewer has left a message.'
+        '<br><br>Review message: %s<br><br>'
+        'You can create a new voiceover application through the'
+        '<a href="https://oppia.org/contributor-dashboard">'
+        'contributor dashboard</a> page.<br><br>'
+        '- The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    recipient_user_settings = user_services.get_user_settings(user_id)
+    can_user_receive_email = user_services.get_email_preferences(
+        user_id).can_receive_email_updates
+
+    # Send email only if recipient wants to receive.
+    if can_user_receive_email:
+        language = utils.get_supported_audio_language_description(language_code)
+        email_body = email_body_template % (
+            recipient_user_settings.username, lesson_title, language,
+            rejection_message, EMAIL_FOOTER.value)
+        _send_email(
+            user_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,
+            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_account_deleted_email(user_id, user_email):
+    """Sends an email to user whose account was deleted.
+
+    Args:
+        user_id: str. The id of the user whose account got deleted.
+        user_email: str. The email of the user whose account got deleted.
+    """
+    email_subject = 'Account deleted'
+
+    email_body_template = (
+        'Hi %s,<br><br>'
+        'Your account was successfully deleted.'
+        '- The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    email_body = email_body_template % (
+        user_email, EMAIL_FOOTER.value)
+    _send_email(
+        user_id, feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_ACCOUNT_DELETED, email_subject, email_body,
+        feconf.NOREPLY_EMAIL_ADDRESS, bcc_admin=True,
+        recipient_email=user_email)
+
+
+def send_email_to_new_contribution_reviewer(
+        user_id, review_category, language_code=None):
+    """Sends an email to user who is assigned as a reviewer.
+
+    Args:
+        user_id: str. The ID of the user.
+        review_category: str. The category in which user can review.
+        language_code: None|str. The language code for a language if the review
+            item is translation or voiceover else None.
+    """
+    if review_category not in NEW_REVIEWER_EMAIL_DATA:
+        raise Exception('Invalid review_category: %s' % review_category)
+
+    review_category_data = NEW_REVIEWER_EMAIL_DATA[review_category]
+    email_subject = 'You have been invited to review Oppia %s' % (
+        review_category_data['review_category'])
+
+    if review_category in [
+            constants.REVIEW_CATEGORY_TRANSLATION,
+            constants.REVIEW_CATEGORY_VOICEOVER]:
+        language_description = utils.get_supported_audio_language_description(
+            language_code).capitalize()
+        review_category_description = (
+            review_category_data['description_template'] % language_description)
+        reviewer_rights_message = (
+            review_category_data['rights_message_template'] % (
+                language_description))
+    else:
+        review_category_description = review_category_data['description']
+        reviewer_rights_message = review_category_data['rights_message']
+
+    to_review = review_category_data['to_check']
+
+    email_body_template = (
+        'Hi %s,<br><br>'
+        'This is to let you know that the Oppia team has added you as a '
+        'reviewer for %s. This allows you to %s.<br><br>'
+        'You can check the %s waiting for review in the '
+        '<a href="https://www.oppia.org/contributor-dashboard">'
+        'Contributor Dashboard</a>.<br><br>'
+        'Thanks, and happy contributing!<br><br>'
+        'Best wishes,<br>'
+        'The Oppia Community')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    recipient_user_settings = user_services.get_user_settings(user_id)
+    can_user_receive_email = user_services.get_email_preferences(
+        user_id).can_receive_email_updates
+
+    # Send email only if recipient wants to receive.
+    if can_user_receive_email:
+        email_body = email_body_template % (
+            recipient_user_settings.username, review_category_description,
+            reviewer_rights_message, to_review)
+        _send_email(
+            user_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_ONBOARD_REVIEWER, email_subject, email_body,
+            feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_email_to_removed_contribution_reviewer(
+        user_id, review_category, language_code=None):
+    """Sends an email to user who is removed from the reviewer position.
+
+    Args:
+        user_id: str. The ID of the user.
+        review_category: str. The category which for which review role is
+            removed.
+        language_code: None|str. The language code for a language if the review
+            item is translation or voiceover else None.
+    """
+    if review_category not in REMOVED_REVIEWER_EMAIL_DATA:
+        raise Exception('Invalid review_category: %s' % review_category)
+
+    review_category_data = REMOVED_REVIEWER_EMAIL_DATA[review_category]
+    email_subject = 'You have been unassigned as a %s reviewer' % (
+        review_category_data['review_category'])
+
+    if review_category in [
+            constants.REVIEW_CATEGORY_TRANSLATION,
+            constants.REVIEW_CATEGORY_VOICEOVER]:
+        language_description = utils.get_supported_audio_language_description(
+            language_code).capitalize()
+        reviewer_role_description = (
+            review_category_data['role_description_template'] % (
+                language_description))
+        reviewer_rights_message = (
+            review_category_data['rights_message_template'] % (
+                language_description))
+    else:
+        reviewer_role_description = review_category_data['role_description']
+        reviewer_rights_message = review_category_data['rights_message']
+
+    email_body_template = (
+        'Hi %s,<br><br>'
+        'The Oppia team has removed you from the %s. You won\'t be able to %s '
+        'any more, but you can still contribute %s through the '
+        '<a href="https://www.oppia.org/contributor-dashboard">'
+        'Contributor Dashboard</a>.<br><br>'
+        'Thanks, and happy contributing!<br><br>'
+        'Best wishes,<br>'
+        'The Oppia Community')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    recipient_user_settings = user_services.get_user_settings(user_id)
+    can_user_receive_email = user_services.get_email_preferences(
+        user_id).can_receive_email_updates
+
+    # Send email only if recipient wants to receive.
+    if can_user_receive_email:
+        email_body = email_body_template % (
+            recipient_user_settings.username, reviewer_role_description,
+            reviewer_rights_message,
+            review_category_data['contribution_allowed'])
+        _send_email(
+            user_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_REMOVE_REVIEWER, email_subject, email_body,
+            feconf.NOREPLY_EMAIL_ADDRESS)

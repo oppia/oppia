@@ -17,8 +17,13 @@
  * in Protractor tests.
  */
 
+var dragAndDropScript = require('html-dnd').code;
+var action = require('../protractor_utils/action.js');
+var general = require('../protractor_utils/general.js');
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
+var workflow = require('../protractor_utils/workflow.js');
+var path = require('path');
 
 var TopicEditorPage = function() {
   var EDITOR_URL_PREFIX = '/topic_editor/';
@@ -26,15 +31,22 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-create-story-button'));
   var newStoryTitleField = element(
     by.css('.protractor-test-new-story-title-field'));
+  var newStoryUrlFragmentField = element(
+    by.css('.protractor-test-new-story-url-fragment-field'));
   var confirmStoryCreationButton = element(
     by.css('.protractor-test-confirm-story-creation-button'));
   var storyListItems = element.all(
     by.css('.protractor-test-story-list-item'));
+  var storyListTable = element(by.css('.protractor-test-story-list-table'));
 
   var topicNameField = element(
     by.css('.protractor-test-topic-name-field'));
+  var topicNameHeading = element(
+    by.css('.protractor-test-topic-name-heading'));
   var topicDescriptionField = element(
     by.css('.protractor-test-topic-description-field'));
+  var topicDescriptionHeading = element(
+    by.css('.protractor-test-topic-description-heading'));
   var saveTopicButton = element(
     by.css('.protractor-test-save-topic-button'));
   var publishTopicButton = element(
@@ -45,24 +57,37 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-close-save-modal-button'));
   var subtopicsTabButton = element(
     by.css('.protractor-test-subtopics-tab-button'));
-  var addSubtopicCard = element(by.css('.protractor-test-add-subtopic-card'));
+  var addSubtopicButton = element(
+    by.css('.protractor-test-add-subtopic-button'));
   var newSubtopicTitlefield = element(
     by.css('.protractor-test-new-subtopic-title-field'));
-  var confirmSubtopicCreationButton = element(
-    by.css('.protractor-test-confirm-subtopic-creation-button'));
+  var newSubtopicUrlFragmentField = element(
+    by.css('.protractor-test-new-subtopic-url-fragment-field'));
+  var confirmSubtopicCreationButton = element(by.css(
+    '.protractor-test-confirm-subtopic-creation-button'));
   var subtopics = element.all(by.css('.protractor-test-subtopic'));
-  var deleteSubtopicButtons = element.all(
+  var subtopicColumns = element.all(
+    by.css('.protractor-test-subtopic-column'));
+  var subtopicEditOptions = element.all(by.css(
+    '.protractor-test-show-subtopic-options'));
+  var deleteSubtopicButton = element(
     by.css('.protractor-test-delete-subtopic-button'));
+  var reassignSkillButton = element(
+    by.css('.protractor-test-reassign-skill-button'));
+  var skillCards = element.all(
+    by.css('.protractor-test-skill-card'));
+  var uncategorizedSkills = element.all(
+    by.css('.protractor-test-uncategorized-skill-card'));
+  var skillSelectorModal = element(
+    by.css('.protractor-test-skill-select-modal'));
   var uncategorizedSkillItems = element.all(
-    by.css('.protractor-test-uncategorized-skill-item'));
+    by.css('.protractor-test-skill-item'));
+  var uncategorizedSkillsContainer = element(
+    by.css('.protractor-test-uncategorized-skills-container'));
   var editSubtopicButtons = element.all(
     by.css('.protractor-test-edit-subtopic-button'));
   var subtopicTitleField = element(
     by.css('.protractor-test-subtopic-title-field'));
-  var saveSubtopicButton = element(
-    by.css('.protractor-test-save-subtopic-button'));
-  var pageEditor = element(
-    by.css('.protractor-test-subtopic-page-contents'));
   var subtopicTitles = element.all(by.css('.protractor-test-subtopic-title'));
   var questionsTabButton = element(
     by.css('.protractor-test-questions-tab-button'));
@@ -80,181 +105,359 @@ var TopicEditorPage = function() {
   var questionItem = element(by.css('.protractor-test-question-list-item'));
   var selectSkillDropdown = element(
     by.css('.protractor-test-select-skill-dropdown'));
-
-  this.get = function(topicId) {
-    browser.get(EDITOR_URL_PREFIX + topicId);
-    return waitFor.pageToFullyLoad();
+  var subtopicThumbnailImageElement = element(
+    by.css('.subtopic-thumbnail .protractor-test-custom-photo'));
+  var subtopicThumbnailButton = element(
+    by.css('.subtopic-thumbnail .protractor-test-photo-button'));
+  var topicThumbnailImageElement = element(
+    by.css('.thumbnail-editor .protractor-test-custom-photo'));
+  var topicThumbnailButton = element(
+    by.css('.thumbnail-editor .protractor-test-photo-button'));
+  var thumbnailContainer = element(
+    by.css('.protractor-test-thumbnail-container'));
+  var newStoryDescriptionField = element(
+    by.css('.protractor-test-new-story-description-field'));
+  var storyThumbnailButton = element(
+    by.css('.thumbnail-editor .protractor-test-photo-button'));
+  var dragAndDrop = async function(fromElement, toElement) {
+    await browser.executeScript(dragAndDropScript, fromElement, toElement);
   };
 
-  this.expectNumberOfQuestionsForSkillWithDescriptionToBe = function(
+  this.get = async function(topicId) {
+    await browser.get(EDITOR_URL_PREFIX + topicId);
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.getTopicThumbnailSource = async function() {
+    return await workflow.getImageSource(topicThumbnailImageElement);
+  };
+
+  this.getSubtopicThumbnailSource = async function() {
+    return await workflow.getImageSource(subtopicThumbnailImageElement);
+  };
+
+  this.submitTopicThumbnail = async function(imgPath, resetExistingImage) {
+    return await workflow.submitImage(
+      topicThumbnailButton, thumbnailContainer, imgPath,
+      resetExistingImage);
+  };
+
+  this.submitSubtopicThumbnail = async function(imgPath, resetExistingImage) {
+    return await workflow.submitImage(
+      subtopicThumbnailButton, thumbnailContainer, imgPath, resetExistingImage);
+  };
+
+  this.publishTopic = async function() {
+    await publishTopicButton.click();
+    await waitFor.invisibilityOf(
+      publishTopicButton, 'Topic is taking too long to publish.');
+  };
+
+  this.expectNumberOfQuestionsForSkillWithDescriptionToBe = async function(
       count, skillDescription) {
-    selectSkillDropdown.click();
-    element(by.css('option[label="' + skillDescription + '"]')).click();
-    waitFor.visibilityOf(
-      questionItem, 'Question takes too long to appear');
-    questionItems.then(function(items) {
-      expect(items.length).toEqual(count);
-    });
+    await waitFor.elementToBeClickable(
+      selectSkillDropdown, 'Skill select dropdown takes too long to appear.');
+    await selectSkillDropdown.click();
+    await element(by.css('option[label="' + skillDescription + '"]')).click();
+    await waitFor.visibilityOf(
+      questionItems.first(), 'Question takes too long to appear');
+    expect(await questionItems.count()).toEqual(count);
   };
 
-  this.saveQuestion = function() {
-    saveQuestionButton.click();
+  this.saveQuestion = async function() {
+    await saveQuestionButton.click();
+    await waitFor.invisibilityOf(
+      saveQuestionButton, 'Question modal takes too long to disappear');
   };
 
-  this.createQuestionForSkillWithIndex = function(index) {
-    createQuestionButton.click();
-    skillItems.then(function(elem) {
-      elem[index].click();
-      waitFor.elementToBeClickable(
-        confirmSkillButton,
-        'Confirm Skill button takes too long to be clickable');
-      confirmSkillButton.click();
-      confirmSkillDifficultyButton.click();
-    });
+  this.createQuestionForSkillWithName = async function(skillDescription) {
+    await action.click('Select skill dropdown', selectSkillDropdown);
+    await waitFor.elementToBeClickable(
+      selectSkillDropdown, 'Skill select dropdown takes too long to appear.');
+    await selectSkillDropdown.click();
+    await element(by.css('option[label="' + skillDescription + '"]')).click();
+
+    await action.click('Create question button', createQuestionButton);
+    await action.click(
+      'Confirm skill difficulty button', confirmSkillDifficultyButton);
+
+    await waitFor.invisibilityOf(
+      confirmSkillDifficultyButton,
+      'Confirm skill difficulty button takes too long to disappear');
   };
 
-  this.moveToQuestionsTab = function() {
-    questionsTabButton.click();
+  this.moveToQuestionsTab = async function() {
+    await waitFor.elementToBeClickable(
+      questionsTabButton,
+      'Questions tab button takes too long to be clickable');
+    await questionsTabButton.click();
   };
 
-  this.expectSubtopicPageContentsToMatch = function(contents) {
-    var subtopicPageEditor = forms.RichTextEditor(
-      pageEditor);
+  this.expectSubtopicPageContentsToMatch = async function(contents) {
+    var subtopicContentText = element(
+      by.css('.protractor-test-subtopic-html-content'));
+    var text = await subtopicContentText.getText();
+    expect(text).toMatch(contents);
+  };
+
+  this.expectTitleOfSubtopicWithIndexToMatch = async function(title, index) {
+    expect(await subtopics.get(index).getText()).toEqual(title);
+  };
+
+  this.changeSubtopicTitle = async function(title) {
+    await subtopicTitleField.clear();
+    await subtopicTitleField.sendKeys(title);
+  };
+
+  this.changeSubtopicPageContents = async function(content) {
+    await general.scrollToTop();
+    var subtopicPageContentButton = element(by.css(
+      '.protractor-test-edit-html-content'));
+    await waitFor.elementToBeClickable(subtopicPageContentButton,
+      'Edit subtopic htm content button taking too long to be clickable');
+    await subtopicPageContentButton.click();
+    var pageEditor = element(by.css(
+      '.protractor-test-edit-subtopic-page-contents'));
+    await waitFor.visibilityOf(pageEditor,
+      'Subtopic html editor takes too long to appear');
+    var pageEditorInput = pageEditor.element(by.css('.oppia-rte'));
+    await pageEditorInput.click();
+    await pageEditorInput.clear();
+    await pageEditorInput.sendKeys(content);
+    var saveSubtopicPageContentButton = element(by.css(
+      '.protractor-test-save-subtopic-content-button'));
+    await waitFor.elementToBeClickable(saveSubtopicPageContentButton,
+      'Save Subtopic Content button taking too long to be clickable');
+    await saveSubtopicPageContentButton.click();
+  };
+
+  this.expectNumberOfUncategorizedSkillsToBe = async function(count) {
+    expect(await uncategorizedSkillItems.count()).toEqual(count);
+  };
+
+  this.deleteSubtopicWithIndex = async function(index) {
+    var subtopicEditOptionBox = subtopicEditOptions.get(index);
+    await subtopicEditOptionBox.click();
+    await waitFor.elementToBeClickable(deleteSubtopicButton,
+      'Delete subtopic button taking too long to be clickable');
+    await deleteSubtopicButton.click();
+  };
+
+  this.expectNumberOfSubtopicsToBe = async function(count) {
+    expect(await subtopics.count()).toEqual(count);
+  };
+
+  this.addSubtopic = async function(title, urlFragment, imgPath, htmlContent) {
+    await addSubtopicButton.click();
+    await newSubtopicTitlefield.sendKeys(title);
+
+    await action.sendKeys(
+      'Create new url fragment', newSubtopicUrlFragmentField, urlFragment);
+    await workflow.submitImage(
+      topicThumbnailButton, thumbnailContainer, imgPath, false);
+    var subtopicPageContentButton = element(by.css(
+      '.protractor-test-show-schema-editor'));
+    await waitFor.elementToBeClickable(subtopicPageContentButton,
+      'Edit subtopic htm content button taking too long to be clickable');
+    await subtopicPageContentButton.click();
+    var pageEditor = element(by.css(
+      '.protractor-test-create-subtopic-page-content'));
+    await waitFor.visibilityOf(pageEditor,
+      'Subtopic html editor takes too long to appear');
+    var pageEditorInput = pageEditor.element(by.css('.oppia-rte'));
+    await pageEditorInput.click();
+    await pageEditorInput.sendKeys(htmlContent);
+
+    await waitFor.elementToBeClickable(
+      confirmSubtopicCreationButton,
+      'Confirm subtopic creation button takes too long to be clickable');
+    await confirmSubtopicCreationButton.click();
+    await waitFor.invisibilityOf(
+      element(by.css('.protractor-test-new-subtopic-editor')),
+      'Create subtopic modal taking too long to disappear.');
+  };
+
+  this.dragSkillToSubtopic = async function(skillDescription, subtopicIndex) {
+    await waitFor.visibilityOf(uncategorizedSkills.first(),
+      'Uncategorized skills taking too long to appear.');
+    const target = subtopicColumns.get(subtopicIndex);
+    var uncategorizedSkillIndex = -1;
+    for (var i = 0; i < await uncategorizedSkills.count(); i++) {
+      if (skillDescription === await uncategorizedSkills.get(i).getText()) {
+        uncategorizedSkillIndex = i;
+        break;
+      }
+    }
+    expect(uncategorizedSkillIndex).not.toEqual(-1);
+    var toMove = await uncategorizedSkills.get(uncategorizedSkillIndex);
+    await dragAndDrop(toMove, target);
+  };
+
+  this.navigateToReassignModal = async function() {
+    await waitFor.elementToBeClickable(reassignSkillButton,
+      'Reassign skill button taking too long to be clickable');
+    await reassignSkillButton.click();
+  };
+
+  this.expectSubtopicWithIndexToHaveSkills = async function(
+      subtopicIndex, skillNames) {
+    const assignedSkillDescriptions = (
+      subtopicColumns.get(subtopicIndex).all(
+        by.css('.protractor-test-subtopic-skill-description')));
+    const assignedSkillsLength = await assignedSkillDescriptions.count();
+
+    expect(skillNames.length).toEqual(assignedSkillsLength);
+
+    for (var i = 0; i < assignedSkillsLength; i++) {
+      const skillDescription = await assignedSkillDescriptions.get(i).getText();
+      expect(skillDescription).toEqual(skillNames[i]);
+    }
+  };
+
+  this.dragSkillFromSubtopicToSubtopic = async function(
+      fromSubtopicIndex, toSubtopicIndex, skillDescription) {
+    const assignedSkillToMove = await this.getTargetMoveSkill(
+      fromSubtopicIndex, skillDescription);
+    const toSubtopicColumn = subtopicColumns.get(toSubtopicIndex);
+    await dragAndDrop(assignedSkillToMove, toSubtopicColumn);
+  };
+
+  this.expectUncategorizedSkillsToBe = async function(skillDescriptions) {
+    await waitFor.visibilityOf(uncategorizedSkills.first(),
+      'Uncategorized skills taking too long to appear.');
+
+    for (var i = 0; i < await uncategorizedSkills.count(); i++) {
+      expect(skillDescriptions[i]).toEqual(
+        await uncategorizedSkills.get(i).getText());
+    }
+  };
+
+  this.getTargetMoveSkill = async function(
+      subtopicIndex, skillDescription) {
+    const fromSubtopicColumn = subtopicColumns.get(subtopicIndex);
+    const assignedSkills = fromSubtopicColumn.all(
+      by.css('.protractor-test-subtopic-skill-description'));
+    const assignedSkillsLength = await assignedSkills.count();
+    var toMoveSkillIndex = -1;
+    for (var i = 0; i < assignedSkillsLength; i++) {
+      if (skillDescription === await assignedSkills.get(i).getText()) {
+        toMoveSkillIndex = i;
+        break;
+      }
+    }
+    expect(toMoveSkillIndex).not.toEqual(-1);
+
+    return assignedSkills.get(toMoveSkillIndex);
+  };
+
+  this.dragSkillFromSubtopicToUncategorized = async function(
+      subtopicIndex, skillDescription) {
+    const assignedSkillToMove = await this.getTargetMoveSkill(
+      subtopicIndex, skillDescription);
+    await dragAndDrop(assignedSkillToMove, uncategorizedSkillsContainer);
+  };
+
+  this.navigateToTopicEditorTab = async function() {
+    var topicEditorTab = element(by.css('.protractor-test-edit-topic-tab'));
+    await waitFor.elementToBeClickable(topicEditorTab,
+      'Topic editor tab taking too long to be clickable');
+    await topicEditorTab.click();
+  };
+
+  this.navigateToSubtopicWithIndex = async function(subtopicIndex) {
+    var subtopic = await subtopics.get(subtopicIndex);
+    await subtopic.click();
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.expectNumberOfStoriesToBe = async function(count) {
+    expect(await storyListItems.count()).toEqual(count);
+  };
+
+  this.expectStoryTitleToBe = async function(title, index) {
     expect(
-      element.all(by.css('.oppia-rte')).first().getText()).toEqual(contents);
+      await storyListItems.get(index).all(
+        by.css('.protractor-test-story-title')).first().getText()
+    ).toEqual(title);
   };
 
-  this.expectTitleOfSubtopicWithIndexToMatch = function(title, index) {
-    subtopicTitles.then(function(elems) {
-      expect(elems[index].getText()).toEqual(title);
-    });
+  this.expectStoryPublicationStatusToBe = async function(status, index) {
+    expect(
+      await storyListItems.get(index).all(
+        by.css('.protractor-test-story-publication-status')).first().getText()
+    ).toEqual(status);
   };
 
-  this.changeSubtopicTitle = function(title) {
-    subtopicTitleField.clear();
-    subtopicTitleField.sendKeys(title);
+  this.navigateToStoryWithIndex = async function(index) {
+    await waitFor.visibilityOf(
+      storyListTable, 'Story list table takes too long to appear.');
+    var storyItem = await storyListItems.get(index);
+    await storyItem.click();
+    await waitFor.pageToFullyLoad();
+    await waitFor.invisibilityOf(
+      storyListTable, 'Story list table too long to disappear.');
   };
 
-  this.saveSubtopic = function() {
-    saveSubtopicButton.click();
-  };
-
-  this.changeSubtopicPageContents = function(richTextInstructions) {
-    var subtopicPageEditor = forms.RichTextEditor(
-      pageEditor);
-    subtopicPageEditor.clear();
-    richTextInstructions(subtopicPageEditor);
-  };
-
-  this.editSubtopicWithIndex = function(index) {
-    editSubtopicButtons.then(function(items) {
-      items[index].click();
-    });
-  };
-
-  this.expectNumberOfUncategorizedSkillsToBe = function(count) {
-    uncategorizedSkillItems.then(function(items) {
-      expect(items.length).toEqual(1);
-    });
-  };
-
-  this.deleteSubtopicWithIndex = function(index) {
-    deleteSubtopicButtons.then(function(items) {
-      items[index].click();
-    });
-  };
-
-  this.expectNumberOfSubtopicsToBe = function(count) {
-    subtopics.then(function(items) {
-      expect(items.length).toEqual(count);
-    });
-  };
-
-  this.addSubtopic = function(title) {
-    addSubtopicCard.click();
-    newSubtopicTitlefield.sendKeys(title);
-    confirmSubtopicCreationButton.click();
-  };
-
-  this.moveToSubtopicsTab = function() {
-    subtopicsTabButton.click();
-  };
-
-  this.expectNumberOfStoriesToBe = function(count) {
-    storyListItems.then(function(elems) {
-      expect(elems.length).toEqual(count);
-    });
-  };
-
-  this.expectStoryTitleToBe = function(title, index) {
-    storyListItems.then(function(elems) {
-      expect(
-        elems[index].all(
-          by.css('.protractor-test-story-title')).first().getText()
-      ).toEqual(title);
-    });
-  };
-
-  this.expectStoryPublicationStatusToBe = function(status, index) {
-    storyListItems.then(function(elems) {
-      expect(
-        elems[index].all(
-          by.css('.protractor-test-story-publication-status')).first().getText()
-      ).toEqual(status);
-    });
-  };
-
-  this.navigateToStoryWithIndex = function(index) {
-    storyListItems.then(function(elems) {
-      elems[index].click();
-    });
-    waitFor.pageToFullyLoad();
-  };
-
-  this.createStory = function(storyTitle) {
-    waitFor.elementToBeClickable(
+  this.createStory = async function(
+      storyTitle, storyUrlFragment, storyDescription, imgPath) {
+    await waitFor.elementToBeClickable(
       createStoryButton,
       'Create Story button takes too long to be clickable');
-    createStoryButton.click();
+    await createStoryButton.click();
 
-    newStoryTitleField.sendKeys(storyTitle);
-    waitFor.elementToBeClickable(
+    await action.sendKeys(
+      'Create new story title', newStoryTitleField, storyTitle);
+    await action.sendKeys(
+      'Create new story description', newStoryDescriptionField,
+      storyDescription);
+    await action.sendKeys(
+      'Create new story url fragment', newStoryUrlFragmentField,
+      storyUrlFragment);
+
+    await workflow.submitImage(
+      storyThumbnailButton, thumbnailContainer, imgPath, false);
+
+    await waitFor.elementToBeClickable(
       confirmStoryCreationButton,
       'Confirm Create Story button takes too long to be clickable');
-    confirmStoryCreationButton.click();
-    waitFor.pageToFullyLoad();
+    await confirmStoryCreationButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.changeTopicName = function(newName) {
-    topicNameField.clear();
-    topicNameField.sendKeys(newName);
+  this.changeTopicName = async function(newName) {
+    await topicNameField.clear();
+    await topicNameField.sendKeys(newName);
+    await topicNameHeading.click();
   };
 
-  this.expectTopicNameToBe = function(name) {
-    expect(topicNameField.getAttribute('value')).toEqual(name);
+  this.expectTopicNameToBe = async function(name) {
+    expect(await topicNameField.getAttribute('value')).toEqual(name);
   };
 
-  this.changeTopicDescription = function(newDescription) {
-    topicDescriptionField.clear();
-    topicDescriptionField.sendKeys(newDescription);
+  this.changeTopicDescription = async function(newDescription) {
+    await topicDescriptionField.clear();
+    await topicDescriptionField.sendKeys(newDescription);
+    await topicDescriptionHeading.click();
   };
 
-  this.expectTopicDescriptionToBe = function(description) {
-    expect(topicDescriptionField.getAttribute('value')).toEqual(description);
+  this.expectTopicDescriptionToBe = async function(description) {
+    expect(await topicDescriptionField.getAttribute('value')).toEqual(
+      description);
   };
 
-  this.saveTopic = function(commitMessage) {
-    waitFor.elementToBeClickable(
+  this.saveTopic = async function(commitMessage) {
+    await waitFor.elementToBeClickable(
       saveTopicButton,
       'Save topic button takes too long to be clickable');
-    saveTopicButton.click();
-    commitMessageField.sendKeys(commitMessage);
+    await saveTopicButton.click();
+    await commitMessageField.sendKeys(commitMessage);
 
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       closeSaveModalButton,
       'Close save modal button takes too long to be clickable');
-    closeSaveModalButton.click();
-    waitFor.pageToFullyLoad();
+    await closeSaveModalButton.click();
+    await waitFor.visibilityOfSuccessToast(
+      'Success toast for saving topic takes too long to appear.');
   };
 };
 

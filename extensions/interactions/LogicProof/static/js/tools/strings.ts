@@ -200,7 +200,7 @@ var DEFAULT_LINE_TEMPLATE_STRINGS = [{
   results: 'T',
   variables: '',
   error: []
-  // TODO(Jacob): add back or_eliminate_false template
+  // TODO(Jacob): Add back or_eliminate_false template
   // and associated logic mistakes from commit 2d9335019521
   // when speed issues are fixed.
 }, {
@@ -813,3 +813,13 @@ var DEFAULT_CONTROL_FUNCTION_STRINGS = [{
     'Whether there is a proof of contradiction under the assumption of A ' +
     'available at line n')
 }];
+
+export default {
+  DEFAULT_VOCABULARY,
+  DEFAULT_LINE_TEMPLATE_STRINGS,
+  DEFAULT_LAYOUT_MISTAKE_STRINGS,
+  DEFAULT_VARIABLE_MISTAKE_STRINGS,
+  DEFAULT_LOGIC_MISTAKE_STRINGS,
+  DEFAULT_TARGET_MISTAKE_STRINGS,
+  DEFAULT_CONTROL_FUNCTION_STRINGS
+};

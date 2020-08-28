@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Domain objects used within multiple extensions."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -29,3 +30,16 @@ class CustomizationArgSpec(python_utils.OBJECT):
         self.description = description
         self.schema = schema
         self.default_value = default_value
+
+    def to_dict(self):
+        """Returns a dict representing this CustomizationArgSpec domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of CustomizationArgSpec instance.
+        """
+        return {
+            'name': self.name,
+            'description': self.description,
+            'schema': self.schema,
+            'default_value': self.default_value
+        }

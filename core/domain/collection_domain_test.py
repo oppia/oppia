@@ -15,11 +15,13 @@
 # limitations under the License.
 
 """Tests for collection domain objects and methods defined on them."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
+from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.tests import test_utils
@@ -34,7 +36,8 @@ import utils
 # If evaluating differences in YAML, conversion to dict form via
 # utils.dict_from_yaml can isolate differences quickly.
 
-SAMPLE_YAML_CONTENT = ("""category: A category
+SAMPLE_YAML_CONTENT = (
+    """category: A category
 language_code: en
 nodes:
 - exploration_id: an_exploration_id
@@ -473,6 +476,15 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
                 versioned_collection_contents,
                 feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
+    def test_serialize_and_deserialize_returns_unchanged_collection(self):
+        """Checks that serializing and then deserializing a default collection
+        works as intended by leaving the collection unchanged.
+        """
+        self.assertEqual(
+            self.collection.to_dict(),
+            collection_domain.Collection.deserialize(
+                self.collection.serialize()).to_dict())
+
 
 class ExplorationGraphUnitTests(test_utils.GenericTestBase):
     """Test the general structure of explorations within a collection."""
@@ -555,7 +567,6 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
             collection.get_next_exploration_id_in_sequence(exploration_id),
             None)
 
-
         collection.add_node('exp_id_1')
         collection.add_node('exp_id_2')
         self.assertEqual(
@@ -631,7 +642,10 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         self.assertEqual(yaml_content_2, yaml_content)
 
         # Should not be able to create a collection from no YAML content.
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception, 'Please ensure that you are uploading a YAML text file, '
+            'not a zip file. The YAML parser returned the following error: '
+            '\'NoneType\' object has no attribute \'read\''):
             collection_domain.Collection.from_yaml('collection3', None)
 
     def test_from_yaml_with_no_schema_version_specified_raises_error(self):
@@ -659,7 +673,6 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
             'present.'):
             collection_domain.Collection.from_yaml(
                 self.COLLECTION_ID, yaml_content)
-
 
 
 class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
@@ -708,7 +721,8 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
 
-    YAML_CONTENT_V1 = ("""category: A category
+    YAML_CONTENT_V1 = (
+        """category: A category
 nodes:
 - acquired_skills:
   - Skill1
@@ -723,7 +737,8 @@ objective: ''
 schema_version: 1
 title: A title
 """)
-    YAML_CONTENT_V2 = ("""category: A category
+    YAML_CONTENT_V2 = (
+        """category: A category
 language_code: en
 nodes:
 - acquired_skills:
@@ -740,7 +755,8 @@ schema_version: 2
 tags: []
 title: A title
 """)
-    YAML_CONTENT_V3 = ("""category: A category
+    YAML_CONTENT_V3 = (
+        """category: A category
 language_code: en
 nodes:
 - acquired_skills:
@@ -757,7 +773,8 @@ schema_version: 2
 tags: []
 title: A title
 """)
-    YAML_CONTENT_V4 = ("""category: A category
+    YAML_CONTENT_V4 = (
+        """category: A category
 language_code: en
 next_skill_id: 2
 nodes:
@@ -782,7 +799,8 @@ skills:
 tags: []
 title: A title
 """)
-    YAML_CONTENT_V5 = ("""category: A category
+    YAML_CONTENT_V5 = (
+        """category: A category
 language_code: en
 next_skill_index: 2
 nodes:
@@ -807,7 +825,8 @@ skills:
 tags: []
 title: A title
 """)
-    YAML_CONTENT_V6 = ("""category: A category
+    YAML_CONTENT_V6 = (
+        """category: A category
 language_code: en
 nodes:
 - exploration_id: Exp1
@@ -876,7 +895,7 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
         current_time = datetime.datetime.utcnow()
         self.collection_summary_dict = {
             'category': 'category',
-            'status': 'status',
+            'status': constants.ACTIVITY_STATUS_PRIVATE,
             'community_owned': True,
             'viewer_ids': ['viewer_id'],
             'version': 1,
@@ -894,9 +913,10 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
         }
 
         self.collection_summary = collection_domain.CollectionSummary(
-            'col_id', 'title', 'category', 'objective', 'en', [], 'status',
-            True, ['owner_id'], ['editor_id'], ['viewer_id'],
-            ['contributor_id'], {}, 1, 1, current_time, current_time)
+            'col_id', 'title', 'category', 'objective', 'en', [],
+            constants.ACTIVITY_STATUS_PRIVATE, True, ['owner_id'],
+            ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
+            current_time, current_time)
 
     def test_collection_summary_gets_created(self):
         self.assertEqual(
@@ -1077,3 +1097,50 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected each id in contributor_ids to be string, received 2'):
             self.collection_summary.validate()
+
+    def test_is_private(self):
+        self.assertTrue(self.collection_summary.is_private())
+        self.collection_summary = collection_domain.CollectionSummary(
+            'col_id', 'title', 'category', 'objective', 'en', [],
+            constants.ACTIVITY_STATUS_PUBLIC, True, ['owner_id'],
+            ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
+            datetime.datetime.utcnow(), datetime.datetime.utcnow())
+        self.assertFalse(self.collection_summary.is_private())
+
+    def test_is_solely_owned_by_user_one_owner(self):
+        self.assertTrue(
+            self.collection_summary.is_solely_owned_by_user('owner_id'))
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('other_id'))
+        self.collection_summary = collection_domain.CollectionSummary(
+            'col_id', 'title', 'category', 'objective', 'en', [],
+            constants.ACTIVITY_STATUS_PUBLIC, True, ['other_id'],
+            ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
+            datetime.datetime.utcnow(), datetime.datetime.utcnow())
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('owner_id'))
+        self.assertTrue(
+            self.collection_summary.is_solely_owned_by_user('other_id'))
+
+    def test_is_solely_owned_by_user_multiple_owners(self):
+        self.assertTrue(
+            self.collection_summary.is_solely_owned_by_user('owner_id'))
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('other_id'))
+        self.collection_summary = collection_domain.CollectionSummary(
+            'col_id', 'title', 'category', 'objective', 'en', [],
+            constants.ACTIVITY_STATUS_PUBLIC, True, ['owner_id', 'other_id'],
+            ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
+            datetime.datetime.utcnow(), datetime.datetime.utcnow())
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('owner_id'))
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('other_id'))
+
+    def test_is_solely_owned_by_user_other_users(self):
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('editor_id'))
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('viewer_id'))
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('contributor_id'))

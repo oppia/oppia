@@ -17,8 +17,7 @@
  */
 
 angular.module('oppia').directive('dragAndDropPositiveIntEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -26,25 +25,26 @@ angular.module('oppia').directive('dragAndDropPositiveIntEditor', [
         getInitArgs: '&',
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/drag-and-drop-positive-int-editor.directive.html'),
+      template: require('./drag-and-drop-positive-int-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        if (!parseInt(ctrl.value)) {
-          ctrl.value = 1;
-        }
-        if (!ctrl.selectedRank) {
-          ctrl.selectedRank = '';
-        }
-        ctrl.allowedRanks = [];
-        ctrl.initArgs = ctrl.getInitArgs();
-        ctrl.choices = ctrl.initArgs.choices;
-        for (var i = 0; i < ctrl.choices.length; i++) {
-          ctrl.allowedRanks.push(i + 1);
-        }
         ctrl.selection = function(selectedRank) {
           ctrl.value = parseInt(selectedRank);
+        };
+        ctrl.$onInit = function() {
+          if (!parseInt(ctrl.value)) {
+            ctrl.value = 1;
+          }
+          if (!ctrl.selectedRank) {
+            ctrl.selectedRank = '';
+          }
+          ctrl.allowedRanks = [];
+          ctrl.initArgs = ctrl.getInitArgs();
+          ctrl.choices = ctrl.initArgs.choices;
+          for (var i = 0; i < ctrl.choices.length; i++) {
+            ctrl.allowedRanks.push(i + 1);
+          }
         };
       }]
     };

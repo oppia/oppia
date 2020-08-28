@@ -32,7 +32,8 @@
   <div class="filepath-editor-image-container"
        ng-attr-style="<[$ctrl.getImageContainerDynamicStyles()]>">
     <div ng-if="$ctrl.isNoImageUploaded()">
-      <image-uploader on-file-changed="$ctrl.onFileChanged">
+      <image-uploader on-file-changed="$ctrl.onFileChanged"
+                      allowed-image-formats="$ctrl.allowedImageFormats">
       </image-uploader>
     </div>
     <div ng-if="$ctrl.isImageUploaded()"
@@ -42,7 +43,7 @@
            class="filepath-editor-image-shade-overlay">
       </div>
       <div class="filepath-editor-crop-area"
-           ng-if="$ctrl.imageResizeRatio === 1"
+           ng-if="$ctrl.imageResizeRatio === 1 && $ctrl.isCropAllowed()"
            ng-attr-style="<[$ctrl.getCropAreaDynamicStyles()]>"
            ng-mousedown="$ctrl.onMouseDownOnCropArea($event)"
            ng-mouseup="$ctrl.onMouseUpOnCropArea($event)">
@@ -69,7 +70,7 @@
            title="Delete this image">
           &#xE872;
         </i>
-        <img ng-src="<[$ctrl.data.metadata.savedImageUrl]>">
+        <img ng-src="<[$ctrl.data.metadata.savedImageUrl]>" ng-style="$ctrl.imageContainerStyle">
       </div>
     </div>
   </div>
@@ -87,41 +88,51 @@
       Discard
     </button>
   </div>
+  <div class="oppia-form-error oppia-unsupported-svg-tag-attribute-error" ng-if="$ctrl.invalidTagsAndAttributes.tags.length">
+    Unsupported SVG tags found: <[$ctrl.invalidTagsAndAttributes.tags]>
+  </div>
+  <div class="oppia-form-error oppia-unsupported-svg-tag-attribute-error" ng-if="$ctrl.invalidTagsAndAttributes.attrs.length">
+    Unsupported SVG attributes found: <[$ctrl.invalidTagsAndAttributes.attrs]>
+  </div>
 </div>
 
 <style>
-  .filepath-editor-saved-image-container img {
+  filepath-editor .filepath-editor-saved-image-container img {
     background-color: white;
   }
 
-  .filepath-editor-saved-image-container {
-    position: relative;
-    margin: 0 auto;
-    display: inline-block;
+  filepath-editor .filepath-editor-saved-image-container {
     background-color: red;
+    display: inline-block;
+    margin: 0 auto;
+    position: relative;
   }
 
-  .filepath-editor-main-container {
+  filepath-editor .filepath-editor-main-container {
     margin: 0 auto;
-    user-select: none;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    user-select: none;
   }
 
-  .filepath-editor-crop-button {
+  filepath-editor .filepath-editor-main-container .oppia-form-error {
+    word-break: break-word;
+  }
+
+  filepath-editor .filepath-editor-crop-button {
     margin: 0px 4px 4px 4px;
     width: 50px;
   }
 
-  .filepath-editor-image-crop-button-bar {
+  filepath-editor .filepath-editor-image-crop-button-bar {
     position: absolute;
     z-index: 20;
   }
 
-  .filepath-editor-image-shade-overlay {
+  filepath-editor .filepath-editor-image-shade-overlay {
     background-color: rgba(80, 80, 80, 0.4);
     height: 100%;
     left: 0;
@@ -131,20 +142,20 @@
     z-index: 10;
   }
 
-  .filepath-editor-image-crop-container {
+  filepath-editor .filepath-editor-image-crop-container {
     display: inline-block;
     margin: auto;
     position: relative;
   }
 
-  .filepath-editor-crop-area {
+  filepath-editor .filepath-editor-crop-area {
     border: 3px dotted blue;
     margin: auto;
     position: absolute;
     z-index: 20;
   }
 
-  .filepath-editor-resize-input {
+  filepath-editor .filepath-editor-resize-input {
     border: 1px solid #ccc;
     display: inline-block;
     font-size: 12px;
@@ -152,16 +163,16 @@
     height: 24px;
     padding: 4px 2px;
     text-align: right;
-    width: 40px;
-    user-select: none;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    user-select: none;
+    width: 40px;
   }
 
-  .filepath-editor-button {
+  filepath-editor .filepath-editor-button {
     background: grey;
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #F2F2F2), color-stop(1, #D0D0D0));
     background-image: -o-linear-gradient(bottom, #F2F2F2 0%, #D0D0D0 100%);
@@ -175,15 +186,15 @@
     height: 24px;
     padding: 4px 8px;
     text-align: center;
-    user-select: none;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    user-select: none;
   }
 
-  .filepath-editor-button:hover {
+  filepath-editor .filepath-editor-button:hover {
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #D0D0D0), color-stop(1, #D0D0D0));
     background-image: -o-linear-gradient(bottom, #D0D0D0 0%, #D0D0D0 100%);
     background-image: -moz-linear-gradient(bottom, #D0D0D0 0%, #D0D0D0 100%);
@@ -193,7 +204,7 @@
     cursor: pointer;
   }
 
-  .filepath-editor-button:active {
+  filepath-editor .filepath-editor-button:active {
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #B0B0B0), color-stop(1, #B0B0B0));
     background-image: -o-linear-gradient(bottom, #B0B0B0 0%, #B0B0B0 100%);
     background-image: -moz-linear-gradient(bottom, #B0B0B0 0%, #B0B0B0 100%);
@@ -202,7 +213,7 @@
     background-image: linear-gradient(to bottom, #B0B0B0 0%, #B0B0B0 100%);
   }
 
-  .filepath-editor-decrease-size {
+  filepath-editor .filepath-editor-decrease-size {
     border-bottom: solid #ccc 1px;
     border-bottom-left-radius: 2px;
     border-left: solid #ccc 1px;
@@ -213,7 +224,7 @@
     width: 22px;
   }
 
-  .filepath-editor-increase-size {
+  filepath-editor .filepath-editor-increase-size {
     border-bottom: solid #ccc 1px;
     border-bottom-right-radius: 2px;
     border-left: none;
@@ -224,33 +235,33 @@
     width: 22px;
   }
 
-  .filepath-editor-img-toolbar-size {
+  filepath-editor .filepath-editor-img-toolbar-size {
     width: 300;
   }
 
-  .filepath-editor-img-toolbar-size i {
+  filepath-editor .filepath-editor-img-toolbar-size i {
     color: red;
     cursor: default;
     font-size: 18px;
     padding-bottom: 3px;
   }
 
-  .filepath-editor-img-toolbar-resize {
+  filepath-editor .filepath-editor-img-toolbar-resize {
     float: right;
     text-align: right;
   }
 
-  .filepath-editor-img-toolbar {
+  filepath-editor .filepath-editor-img-toolbar {
     padding: 4px;
     text-align: left;
   }
 
-  .filepath-editor-image-container {
+  filepath-editor .filepath-editor-image-container {
     position: relative;
     text-align: center;
   }
 
-  .filepath-editor-trash {
+  filepath-editor .filepath-editor-trash {
     color: black;
     position: absolute;
     right: 6px;
@@ -258,12 +269,16 @@
     top: 6px;
   }
 
-  .filepath-editor-save-box {
+  filepath-editor .filepath-editor-save-box {
     margin-top: 6px;
     text-align: right;
   }
 
-  .filepath-editor-save-box button {
+  filepath-editor .filepath-editor-save-box button {
     margin-left: 6px;
+  }
+
+  filepath-editor .oppia-unsupported-svg-tag-attribute-error {
+    margin-top: 15px;
   }
 </style>

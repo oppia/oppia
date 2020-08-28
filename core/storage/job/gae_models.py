@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for long-running jobs."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -93,8 +94,13 @@ class JobModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Job is not related to users."""
+        """JobModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @property
     def is_cancelable(self):
@@ -176,6 +182,7 @@ class ContinuousComputationModel(base_models.BaseModel):
     The id of each instance of this model is the name of the continuous
     computation manager class.
     """
+
     # The current status code for the computation.
     status_code = ndb.StringProperty(
         indexed=True,
@@ -204,5 +211,10 @@ class ContinuousComputationModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Continuous computation is not related to users."""
+        """ContinuousComputationModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE

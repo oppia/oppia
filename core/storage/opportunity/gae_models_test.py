@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for core.storage.opportunity.gae_models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -212,3 +213,17 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertFalse(more)
         self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+
+    def test_delete_all_skill_opportunities(self):
+        results, _, more = (
+            opportunity_models.SkillOpportunityModel.get_skill_opportunities(
+                1, None))
+        self.assertEqual(len(results), 1)
+
+        opportunity_models.SkillOpportunityModel.delete_all()
+
+        results, _, more = (
+            opportunity_models.SkillOpportunityModel.get_skill_opportunities(
+                1, None))
+        self.assertEqual(len(results), 0)
+        self.assertFalse(more)

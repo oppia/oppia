@@ -15,16 +15,18 @@
 # limitations under the License.
 
 """Tests for opportunity one-off jobs."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
+from core.domain import caching_services
 from core.domain import exp_domain
-from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_jobs_one_off
 from core.domain import opportunity_services
+from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
@@ -34,7 +36,6 @@ from core.tests import test_utils
 import python_utils
 
 
-memcache_services = models.Registry.import_memcache_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 (opportunity_models, story_models, exp_models) = models.Registry.import_models(
     [models.NAMES.opportunity, models.NAMES.story, models.NAMES.exploration])
@@ -42,14 +43,18 @@ taskqueue_services = models.Registry.import_taskqueue_services()
 
 class ExplorationOpportunitySummaryModelRegenerationJobTest(
         test_utils.GenericTestBase):
-    """Tests for the one-off dashboard subscriptions job."""
+    """Tests for the exploration opportunity summary model regenration job."""
 
     def setUp(self):
         super(
             ExplorationOpportunitySummaryModelRegenerationJobTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_admins([self.ADMIN_USERNAME])
 
         self.topic_id_1 = 'topic1'
         self.topic_id_2 = 'topic2'
@@ -65,26 +70,37 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
+            self.publish_exploration(self.owner_id, exp.id)
 
         topic_1 = topic_domain.Topic.create_default_topic(
-            topic_id=self.topic_id_1, name='topic1')
+            self.topic_id_1, 'topic', 'abbrev-one', 'description')
+        topic_1.thumbnail_filename = 'thumbnail.svg'
+        topic_1.thumbnail_bg_color = '#C6DCDA'
         topic_services.save_new_topic(self.owner_id, topic_1)
+        topic_services.publish_topic(self.topic_id_1, self.admin_id)
 
         topic_2 = topic_domain.Topic.create_default_topic(
-            topic_id=self.topic_id_2, name='topic2')
+            self.topic_id_2, 'topic2', 'abbrev-two', 'description')
+        topic_2.thumbnail_filename = 'thumbnail.svg'
+        topic_2.thumbnail_bg_color = '#C6DCDA'
         topic_services.save_new_topic(self.owner_id, topic_2)
+        topic_services.publish_topic(self.topic_id_2, self.admin_id)
 
         story_1 = story_domain.Story.create_default_story(
-            story_id_1, title='A story', corresponding_topic_id=self.topic_id_1)
+            story_id_1, 'A story', 'description', self.topic_id_1,
+            'story-one')
         story_2 = story_domain.Story.create_default_story(
-            story_id_2, title='A story', corresponding_topic_id=self.topic_id_2)
+            story_id_2, 'A story', 'description', self.topic_id_2,
+            'story-two')
 
         story_services.save_new_story(self.owner_id, story_1)
         story_services.save_new_story(self.owner_id, story_2)
         topic_services.add_canonical_story(
             self.owner_id, self.topic_id_1, story_id_1)
+        topic_services.publish_story(self.topic_id_1, story_id_1, self.admin_id)
         topic_services.add_canonical_story(
             self.owner_id, self.topic_id_2, story_id_2)
+        topic_services.publish_story(self.topic_id_2, story_id_2, self.admin_id)
         story_services.update_story(
             self.owner_id, story_id_1, [story_domain.StoryChange({
                 'cmd': 'add_story_node',
@@ -143,7 +159,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertFalse(more)
 
-        self.assertEqual(old_opportunities, new_opportunities)
+        old_opportunity_dicts = [opp.to_dict() for opp in old_opportunities]
+        new_opportunity_dicts = [opp.to_dict() for opp in new_opportunities]
+        self.assertEqual(old_opportunity_dicts, new_opportunity_dicts)
 
     def test_regeneration_job_returns_correct_output(self):
         exp_opp_summary_model_regen_job_class = (
@@ -302,9 +320,8 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
     def test_regeneration_job_with_no_exp_model_for_some_topics(self):
         exp_models.ExplorationModel.get('0').delete(
             self.owner_id, 'Delete exploration', force_deletion=True)
-        exploration_memcache_key = exp_fetchers.get_exploration_memcache_key(
-            '0')
-        memcache_services.delete(exploration_memcache_key)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None, ['0'])
 
         exp_opp_summary_model_regen_job_class = (
             opportunity_jobs_one_off
@@ -353,4 +370,109 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         self.process_and_flush_pending_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
+        self.assertEqual(output, [])
+
+
+class SkillOpportunityModelRegenerationJobTest(test_utils.GenericTestBase):
+    """Tests for the Skill opportunity model regeneration job."""
+
+    def setUp(self):
+        super(SkillOpportunityModelRegenerationJobTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        self.skill_id_1 = 'skill_1'
+        self.skill_desc_1 = 'skill 1'
+        self.skill_id_2 = 'skill_2'
+        self.skill_desc_2 = 'skill 2'
+
+        self.save_new_skill(
+            self.skill_id_1, self.admin_id, description=self.skill_desc_1)
+        self.save_new_skill(
+            self.skill_id_2, self.admin_id, description=self.skill_desc_2)
+
+    def test_regeneration_job_returns_the_initial_opportunity(self):
+        skill_opp_model_regen_job_class = (
+            opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob)
+
+        all_opportunity_models = list(
+            opportunity_models.SkillOpportunityModel.get_all())
+
+        self.assertEqual(len(all_opportunity_models), 2)
+
+        old_opportunities, _, more = (
+            opportunity_services.get_skill_opportunities(None))
+
+        job_id = skill_opp_model_regen_job_class.create_new()
+        skill_opp_model_regen_job_class.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        output = skill_opp_model_regen_job_class.get_output(job_id)
+
+        expected = [['SUCCESS', 2]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+        all_opportunity_models = list(
+            opportunity_models.SkillOpportunityModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 2)
+
+        new_opportunities, _, more = (
+            opportunity_services.get_skill_opportunities(None))
+        self.assertFalse(more)
+
+        old_opportunity_dicts = [opp.to_dict() for opp in old_opportunities]
+        new_opportunity_dicts = [opp.to_dict() for opp in new_opportunities]
+        self.assertEqual(old_opportunity_dicts, new_opportunity_dicts)
+
+    def test_regeneration_job_creates_new_models(self):
+        skill_opp_model_regen_job_class = (
+            opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob)
+
+        all_opportunity_models = list(
+            opportunity_models.SkillOpportunityModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 2)
+
+        old_creation_time = all_opportunity_models[0].created_on
+
+        job_id = skill_opp_model_regen_job_class.create_new()
+        skill_opp_model_regen_job_class.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        output = skill_opp_model_regen_job_class.get_output(job_id)
+        expected = [['SUCCESS', 2]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+        all_opportunity_models = list(
+            opportunity_models.SkillOpportunityModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 2)
+
+        new_creation_time = all_opportunity_models[0].created_on
+
+        self.assertLess(old_creation_time, new_creation_time)
+
+    def test_regeneration_job_for_deleted_skill_returns_empty_list_output(self):
+        skill_opp_model_regen_job_class = (
+            opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob)
+
+        skill_services.delete_skill(self.admin_id, self.skill_id_1)
+        skill_services.delete_skill(self.admin_id, self.skill_id_2)
+
+        job_id = skill_opp_model_regen_job_class.create_new()
+        skill_opp_model_regen_job_class.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        output = skill_opp_model_regen_job_class.get_output(job_id)
         self.assertEqual(output, [])

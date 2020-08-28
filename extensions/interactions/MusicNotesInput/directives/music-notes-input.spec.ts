@@ -21,10 +21,12 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 describe('MusicNotesInput interaction', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
@@ -35,7 +37,7 @@ describe('MusicNotesInput interaction', function() {
 
     beforeEach(angular.mock.module('directiveTemplates'));
     beforeEach(angular.mock.module(
-      'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS, function($provide) {
+      'oppia', TranslatorProviderForTests, function($provide) {
         $provide.value('ExplorationEngineService', {});
       }
     ));
@@ -232,14 +234,14 @@ describe('Music phrase player service', function() {
   describe('music phrase player service', function() {
     var mpps = null;
     beforeEach(
-      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+      angular.mock.module('oppia', TranslatorProviderForTests));
     beforeEach(angular.mock.inject(function($injector, $window) {
       mpps = $injector.get('MusicPhrasePlayerService');
       // This is here so that, if the test environment is modified
       // to include MIDI in the future, we will remember to swap
       // it out with a dummy MIDI and back again after the test.
       if ($window.MIDI) {
-        throw 'Expected MIDI library not to show up in tests.';
+        throw new Error('Expected MIDI library not to show up in tests.');
       }
 
       $window.MIDI = {

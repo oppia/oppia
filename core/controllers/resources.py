@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for Oppia resources (templates, images)."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -23,7 +24,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import fs_domain
-from core.domain import topic_fetchers
 from core.domain import value_generators_domain
 import feconf
 import python_utils
@@ -42,8 +42,8 @@ class ValueGeneratorHandler(base.BaseHandler):
                 value_generators_domain.Registry.get_generator_class_by_id(
                     generator_id).get_html_template())
         except Exception as e:
-            logging.error('Value generator not found: %s. %s' %
-                          (generator_id, e))
+            logging.error(
+                'Value generator not found: %s. %s' % (generator_id, e))
             raise self.PageNotFoundException
 
 
@@ -52,7 +52,12 @@ class AssetDevHandler(base.BaseHandler):
     image and audio files are served from GCS).
     """
 
-    _SUPPORTED_TYPES = ['image', 'audio']
+    _SUPPORTED_TYPES = ['image', 'audio', 'thumbnail']
+    _SUPPORTED_PAGE_CONTEXTS = [
+        feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_SKILL,
+        feconf.ENTITY_TYPE_TOPIC, feconf.ENTITY_TYPE_STORY,
+        feconf.ENTITY_TYPE_QUESTION
+    ]
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -72,7 +77,7 @@ class AssetDevHandler(base.BaseHandler):
                 subtopic: topic_name of the topic that it is part of.
             asset_type: str. Type of the asset, either image or audio.
             encoded_filename: str. The asset filename. This
-              string is encoded in the frontend using encodeURIComponent().
+                string is encoded in the frontend using encodeURIComponent().
         """
         if not constants.DEV_MODE:
             raise self.PageNotFoundException
@@ -83,26 +88,17 @@ class AssetDevHandler(base.BaseHandler):
 
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
-            self.response.headers[
-                b'Content-Type'] = python_utils.convert_to_bytes(
-                    '%s/%s' % (asset_type, file_format))
+            content_type = (
+                'image/svg+xml' if file_format == 'svg' else '%s/%s' % (
+                    asset_type, file_format))
+            self.response.headers[b'Content-Type'] = (
+                python_utils.convert_to_bytes(content_type))
 
-            if page_context == feconf.ENTITY_TYPE_SUBTOPIC:
-                entity_type = feconf.ENTITY_TYPE_TOPIC
-                topic = topic_fetchers.get_topic_by_name(page_identifier)
-                entity_id = topic.id
-            elif (
-                    page_context == feconf.ENTITY_TYPE_EXPLORATION or
-                    page_context == feconf.ENTITY_TYPE_SKILL or
-                    page_context == feconf.ENTITY_TYPE_TOPIC or
-                    page_context == feconf.ENTITY_TYPE_STORY):
-                entity_type = page_context
-                entity_id = page_identifier
-            else:
+            if page_context not in self._SUPPORTED_PAGE_CONTEXTS:
                 raise self.InvalidInputException
 
             fs = fs_domain.AbstractFileSystem(
-                fs_domain.DatastoreBackedFileSystem(entity_type, entity_id))
+                fs_domain.GcsFileSystem(page_context, page_identifier))
             raw = fs.get('%s/%s' % (asset_type, filename))
 
             self.response.cache_control.no_cache = None

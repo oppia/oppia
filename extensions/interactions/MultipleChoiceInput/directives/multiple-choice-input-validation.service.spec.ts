@@ -18,30 +18,34 @@
 
 import { TestBed } from '@angular/core/testing';
 
+import { AnswerGroup, AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { MultipleChoiceInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 /* eslint-disable max-len */
 import { MultipleChoiceInputValidationService } from
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
 /* eslint-enable max-len */
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 
 import { AppConstants } from 'app.constants';
+import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { MultipleChoiceRuleInputs } from 'interactions/rule-input-defs';
 
 describe('MultipleChoiceInputValidationService', () => {
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
-  // preferably in the constants file itself.
-  let WARNING_TYPES: any;
+  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
 
   let currentState: string;
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'goodAnswerGroups' is a array with elements whose type needs
-  // to be researched thoroughly.
-  let badOutcome: Outcome, goodAnswerGroups: any,
+  let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[],
     goodDefaultOutcome: Outcome;
   let validatorService: MultipleChoiceInputValidationService,
-    customizationArguments: any;
-  let oof: OutcomeObjectFactory;
+    customizationArguments: MultipleChoiceInputCustomizationArgs;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let rof: RuleObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -51,13 +55,15 @@ describe('MultipleChoiceInputValidationService', () => {
     validatorService = TestBed.get(MultipleChoiceInputValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    rof = TestBed.get(RuleObjectFactory);
     currentState = 'First State';
 
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -69,7 +75,7 @@ describe('MultipleChoiceInputValidationService', () => {
       dest: currentState,
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -79,24 +85,29 @@ describe('MultipleChoiceInputValidationService', () => {
 
     customizationArguments = {
       choices: {
-        value: ['Option 1', 'Option 2']
+        value: [
+          new SubtitledHtml('Option 1', ''),
+          new SubtitledHtml('Option 2', '')
+        ]
+      },
+      showChoicesInShuffledOrder: {
+        value: true
       }
     };
 
-    goodAnswerGroups = [{
-      rules: [{
-        type: 'Equals',
-        inputs: {
-          x: 0
-        }
-      }, {
-        type: 'Equals',
-        inputs: {
-          x: 1
-        }
-      }],
-      outcome: goodDefaultOutcome
-    }];
+    const goodAnwerGroup = agof.createNew(goodDefaultOutcome, null, null);
+    goodAnwerGroup.updateRuleTypesToInputs([{
+      rule_type: 'Equals',
+      inputs: {
+        x: 0
+      }
+    }, {
+      rule_type: 'Equals',
+      inputs: {
+        x: 1
+      }
+    }].map(rof.createFromBackendDict));
+    goodAnswerGroups = [goodAnwerGroup];
   });
 
   it('should be able to perform basic validation', () => {
@@ -109,12 +120,18 @@ describe('MultipleChoiceInputValidationService', () => {
   it('should expect a choices customization argument', () => {
     expect(() => {
       validatorService.getAllWarnings(
+      // This throws "Argument of type '{}' is not assignable to
+      // parameter of type 'MultipleChoiceInputCustomizationArgs'." We are
+      // purposely assigning the wrong type of customization args in order
+      // to test validations.
+      // @ts-expect-error
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-    }).toThrow('Expected customization arguments to have property: choices');
+    }).toThrowError(
+      'Expected customization arguments to have property: choices');
   });
 
   it('should expect non-empty and unique choices', () => {
-    customizationArguments.choices.value[0] = '';
+    customizationArguments.choices.value[0].setHtml('');
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
@@ -123,7 +140,7 @@ describe('MultipleChoiceInputValidationService', () => {
       message: 'Please ensure the choices are nonempty.'
     }]);
 
-    customizationArguments.choices.value[0] = 'Option 2';
+    customizationArguments.choices.value[0].setHtml('Option 2');
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
@@ -135,7 +152,8 @@ describe('MultipleChoiceInputValidationService', () => {
 
   it('should validate answer group rules refer to valid choices only once',
     () => {
-      goodAnswerGroups[0].rules[0].inputs.x = 2;
+      (<MultipleChoiceRuleInputs>
+        goodAnswerGroups[0].ruleTypesToInputs.Equals[0]).x = 2;
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
@@ -144,7 +162,8 @@ describe('MultipleChoiceInputValidationService', () => {
         message: 'Please ensure rule 1 in group 1 refers to a valid choice.'
       }]);
 
-      goodAnswerGroups[0].rules[0].inputs.x = 1;
+      (<MultipleChoiceRuleInputs>
+        goodAnswerGroups[0].ruleTypesToInputs.Equals[0]).x = 1;
       warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);
@@ -170,7 +189,7 @@ describe('MultipleChoiceInputValidationService', () => {
 
       // Taking away 1 rule reverts back to the expect validation behavior with
       // default outcome.
-      goodAnswerGroups[0].rules.splice(1, 1);
+      goodAnswerGroups[0].ruleTypesToInputs.Equals.splice(1, 1);
       warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups, null);
       expect(warnings).toEqual([{

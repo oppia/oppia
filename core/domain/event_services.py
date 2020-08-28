@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Classes for handling events."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -216,7 +217,7 @@ class StateHitEventHandler(BaseEventHandler):
 
     EVENT_TYPE = feconf.EVENT_TYPE_STATE_HIT
 
-    # TODO(sll): remove params before sending this event to the jobs taskqueue.
+    # TODO(sll): Remove params before sending this event to the jobs taskqueue.
     @classmethod
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id,

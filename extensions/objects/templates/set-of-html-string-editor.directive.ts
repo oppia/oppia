@@ -21,8 +21,7 @@
 // in via initArgs.
 
 angular.module('oppia').directive('setOfHtmlStringEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -30,27 +29,10 @@ angular.module('oppia').directive('setOfHtmlStringEditor', [
         getInitArgs: '&',
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/set-of-html-string-editor.directive.html'),
+      template: require('./set-of-html-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.SCHEMA = {
-          type: 'list',
-          items: {
-            type: 'html'
-          }
-        };
-
-        if (!ctrl.value) {
-          ctrl.value = [];
-        }
-        ctrl.initArgs = ctrl.getInitArgs();
-        ctrl.choices = ctrl.initArgs.choices;
-        ctrl.selections = ctrl.choices.map(function(choice) {
-          return ctrl.value.indexOf(choice.id) !== -1;
-        });
-
         // The following function is necessary to insert elements into the
         // answer groups for the Item Selection Widget.
         ctrl.toggleSelection = function(choiceListIndex) {
@@ -61,6 +43,23 @@ angular.module('oppia').directive('setOfHtmlStringEditor', [
           } else {
             ctrl.value.push(choiceHtml);
           }
+        };
+        ctrl.$onInit = function() {
+          ctrl.SCHEMA = {
+            type: 'list',
+            items: {
+              type: 'html'
+            }
+          };
+
+          if (!ctrl.value) {
+            ctrl.value = [];
+          }
+          ctrl.initArgs = ctrl.getInitArgs();
+          ctrl.choices = ctrl.initArgs.choices;
+          ctrl.selections = ctrl.choices.map(function(choice) {
+            return ctrl.value.indexOf(choice.id) !== -1;
+          });
         };
       }]
     };

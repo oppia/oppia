@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for core.storage.email.gae_models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -26,17 +27,12 @@ from core.tests import test_utils
 import feconf
 import utils
 
-(base_models, email_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.email])
+(base_models, email_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.email, models.NAMES.user])
 
 
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the SentEmailModel class."""
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            email_models.SentEmailModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
 
     def setUp(self):
         super(SentEmailModelUnitTests, self).setUp()
@@ -49,6 +45,27 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         self.generate_constant_hash_ctx = self.swap(
             email_models.SentEmailModel, '_generate_hash',
             types.MethodType(mock_generate_hash, email_models.SentEmailModel))
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            email_models.SentEmailModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
+    def test_has_reference_to_user_id(self):
+        with self.generate_constant_hash_ctx:
+            email_models.SentEmailModel.create(
+                'recipient_id', 'recipient@email.com', 'sender_id',
+                'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+                'Email Subject', 'Email Body', datetime.datetime.utcnow())
+
+            self.assertTrue(
+                email_models.SentEmailModel.has_reference_to_user_id(
+                    'recipient_id'))
+            self.assertTrue(
+                email_models.SentEmailModel.has_reference_to_user_id(
+                    'sender_id'))
+            self.assertFalse(
+                email_models.SentEmailModel.has_reference_to_user_id('id_x'))
 
     def test_saved_model_can_be_retrieved_with_same_hash(self):
         with self.generate_constant_hash_ctx:
@@ -123,16 +140,19 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 'Email Hash', sent_datetime_lower_bound=time_now1)
             self.assertEqual(len(results), 0)
 
-            time_before = (datetime.datetime.utcnow() -
-                           datetime.timedelta(minutes=10))
+            time_before = (
+                datetime.datetime.utcnow() - datetime.timedelta(minutes=10))
 
             results = email_models.SentEmailModel.get_by_hash(
                 'Email Hash', sent_datetime_lower_bound=time_before)
             self.assertEqual(len(results), 1)
 
             # Check that it accepts only DateTime objects.
-            with self.assertRaises(Exception):
-                results = email_models.SentEmailModel.get_by_hash(
+            with self.assertRaisesRegexp(
+                Exception,
+                'Expected datetime, received Not a datetime object of type '
+                '<type \'unicode\'>'):
+                email_models.SentEmailModel.get_by_hash(
                     'Email Hash',
                     sent_datetime_lower_bound='Not a datetime object')
 
@@ -176,6 +196,18 @@ class BulkEmailModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             email_models.BulkEmailModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
+
+    def test_has_reference_to_user_id(self):
+        email_models.BulkEmailModel.create(
+            'instance_id', ['recipient_1_id', 'recipient_2_id'], 'sender_id',
+            'sender@email.com', feconf.BULK_EMAIL_INTENT_MARKETING,
+            'Email Subject', 'Email Body', datetime.datetime.utcnow())
+
+        self.assertTrue(
+            email_models.BulkEmailModel.has_reference_to_user_id(
+                'sender_id'))
+        self.assertFalse(
+            email_models.BulkEmailModel.has_reference_to_user_id('id_x'))
 
 
 class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
@@ -303,40 +335,100 @@ class GenerateHashTests(test_utils.GenericTestBase):
     """Test that generating hash functionality works as expected."""
 
     def test_same_inputs_always_gives_same_hashes(self):
-        # pylint: disable=protected-access
-        email_hash1 = email_models.SentEmailModel._generate_hash(
-            'recipient_id', 'email_subject', 'email_html_body')
+        email_model_instance = email_models.SentEmailModel(
+            id='exp_id.new_id',
+            recipient_id='recipient_id',
+            recipient_email='recipient@email.com',
+            sender_id='sender_id',
+            sender_email='sender@email.com',
+            intent=feconf.EMAIL_INTENT_SIGNUP,
+            subject='email_subject',
+            html_body='email_html_body',
+            sent_datetime=datetime.datetime.utcnow())
+        email_model_instance.put()
 
-        email_hash2 = email_models.SentEmailModel._generate_hash(
-            'recipient_id', 'email_subject', 'email_html_body')
+        email_hash1 = email_model_instance.email_hash
+        email_hash2 = email_model_instance.email_hash
         self.assertEqual(email_hash1, email_hash2)
-        # pylint: enable=protected-access
 
     def test_different_inputs_give_different_hashes(self):
-        # pylint: disable=protected-access
-        email_hash1 = email_models.SentEmailModel._generate_hash(
-            'recipient_id', 'email_subject', 'email_html_body')
+        email_model_instance = email_models.SentEmailModel(
+            id='exp_id.new_id',
+            recipient_id='recipient_id',
+            recipient_email='recipient@email.com',
+            sender_id='sender_id',
+            sender_email='sender@email.com',
+            intent=feconf.EMAIL_INTENT_SIGNUP,
+            subject='email_subject',
+            html_body='email_html_body',
+            sent_datetime=datetime.datetime.utcnow())
+        email_model_instance.put()
 
-        email_hash2 = email_models.SentEmailModel._generate_hash(
-            'recipient_id', 'email_subject', 'email_html_body2')
+        email_model_instance2 = email_models.SentEmailModel(
+            id='exp_id.new_id2',
+            recipient_id='recipient_id',
+            recipient_email='recipient@email.com',
+            sender_id='sender_id',
+            sender_email='sender@email.com',
+            intent=feconf.EMAIL_INTENT_SIGNUP,
+            subject='email_subject',
+            html_body='email_html_body2',
+            sent_datetime=datetime.datetime.utcnow())
+        email_model_instance2.put()
+
+        email_hash1 = email_model_instance.email_hash
+        email_hash2 = email_model_instance2.email_hash
         self.assertNotEqual(email_hash1, email_hash2)
 
-        email_hash2 = email_models.SentEmailModel._generate_hash(
-            'recipient_id2', 'email_subject', 'email_html_body')
+        email_model_instance2 = email_models.SentEmailModel(
+            id='exp_id.new_id2',
+            recipient_id='recipient_id2',
+            recipient_email='recipient@email.com',
+            sender_id='sender_id',
+            sender_email='sender@email.com',
+            intent=feconf.EMAIL_INTENT_SIGNUP,
+            subject='email_subject',
+            html_body='email_html_body',
+            sent_datetime=datetime.datetime.utcnow())
+        email_model_instance2.put()
+
+        email_hash2 = email_model_instance2.email_hash
         self.assertNotEqual(email_hash1, email_hash2)
 
-        email_hash2 = email_models.SentEmailModel._generate_hash(
-            'recipient_id', 'email_subject2', 'email_html_body')
+        email_model_instance2 = email_models.SentEmailModel(
+            id='exp_id.new_id2',
+            recipient_id='recipient_id',
+            recipient_email='recipient@email.com',
+            sender_id='sender_id',
+            sender_email='sender@email.com',
+            intent=feconf.EMAIL_INTENT_SIGNUP,
+            subject='email_subject2',
+            html_body='email_html_body',
+            sent_datetime=datetime.datetime.utcnow())
+        email_model_instance2.put()
+
+        email_hash2 = email_model_instance2.email_hash
         self.assertNotEqual(email_hash1, email_hash2)
 
-        email_hash2 = email_models.SentEmailModel._generate_hash(
-            'recipient_id2', 'email_subject2', 'email_html_body2')
+        email_model_instance2 = email_models.SentEmailModel(
+            id='exp_id.new_id2',
+            recipient_id='recipient_id2',
+            recipient_email='recipient@email.com',
+            sender_id='sender_id',
+            sender_email='sender@email.com',
+            intent=feconf.EMAIL_INTENT_SIGNUP,
+            subject='email_subject2',
+            html_body='email_html_body2',
+            sent_datetime=datetime.datetime.utcnow())
+        email_model_instance2.put()
+
+        email_hash2 = email_model_instance2.email_hash
         self.assertNotEqual(email_hash1, email_hash2)
-        # pylint: enable=protected-access
 
 
 class GeneralFeedbackEmailReplyToIdTests(test_utils.GenericTestBase):
     """Tests for the GeneralFeedbackEmailReplyToId model."""
+
     USER_ID_1 = 'user_id_1'
     USER_ID_2 = 'user_id_2'
     THREAD_ID_1 = 'thread_id_1'
@@ -385,5 +477,13 @@ class GeneralFeedbackEmailReplyToIdTests(test_utils.GenericTestBase):
         user_data = (
             email_models.GeneralFeedbackEmailReplyToIdModel.export_data(
                 self.USER_ID_1))
+        expected_data = {}
+        self.assertEqual(expected_data, user_data)
+
+    def test_export_data_on_nonexistent_user(self):
+        """Verify proper export data output on nonexistent user."""
+        user_data = (
+            email_models.GeneralFeedbackEmailReplyToIdModel.export_data(
+                'fake_user'))
         expected_data = {}
         self.assertEqual(expected_data, user_data)

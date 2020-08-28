@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Controllers for the translation changes."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -78,13 +79,13 @@ class AudioUploadHandler(base.BaseHandler):
             # seems to return None. It's not clear if this is always
             # the case. Occasionally, mutagen.File() also seems to
             # raise a MutagenError.
-            raise self.InvalidInputException('Audio not recognized '
-                                             'as a %s file' % extension)
+            raise self.InvalidInputException(
+                'Audio not recognized as a %s file' % extension)
         tempbuffer.close()
 
         if audio is None:
-            raise self.InvalidInputException('Audio not recognized '
-                                             'as a %s file' % extension)
+            raise self.InvalidInputException(
+                'Audio not recognized as a %s file' % extension)
         if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
             raise self.InvalidInputException(
                 'Audio files must be under %s seconds in length. The uploaded '
@@ -98,6 +99,8 @@ class AudioUploadHandler(base.BaseHandler):
                 'Found mime types: %s' % (extension, audio.mime))
 
         mimetype = audio.mime[0]
+        # Fetch the audio file duration from the Mutagen metadata.
+        duration_secs = audio.info.length
 
         # For a strange, unknown reason, the audio variable must be
         # deleted before opening cloud storage. If not, cloud storage
@@ -111,10 +114,10 @@ class AudioUploadHandler(base.BaseHandler):
         fs = fs_domain.AbstractFileSystem(file_system_class(
             feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         fs.commit(
-            self.user_id, '%s/%s' % (self._FILENAME_PREFIX, filename),
+            '%s/%s' % (self._FILENAME_PREFIX, filename),
             raw_audio_file, mimetype=mimetype)
 
-        self.render_json({'filename': filename})
+        self.render_json({'filename': filename, 'duration_secs': duration_secs})
 
 
 class StartedTranslationTutorialEventHandler(base.BaseHandler):

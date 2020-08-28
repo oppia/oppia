@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for classifier domain objects."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -110,6 +111,42 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             expected_training_job_dict,
             observed_training_job.to_dict())
 
+    def test_to_player_dict(self):
+        expected_training_job_dict = {
+            'job_id': 'exp_id1.SOME_RANDOM_STRING',
+            'algorithm_id': 'TextClassifier',
+            'interaction_id': 'TextInput',
+            'exp_id': 'exp_id1',
+            'exp_version': 1,
+            'next_scheduled_check_time':
+                datetime.datetime.strptime(
+                    '2017-08-11 12:42:31', '%Y-%m-%d %H:%M:%S'),
+            'state_name': 'a state name',
+            'status': 'NEW',
+            'training_data': [
+                {
+                    'answer_group_index': 1,
+                    'answers': ['a1', 'a2']
+                },
+                {
+                    'answer_group_index': 2,
+                    'answers': ['a2', 'a3']
+                }
+            ],
+            'classifier_data': {},
+            'data_schema_version': 1
+        }
+        expected_training_job_player_dict = {
+            'algorithm_id': 'TextClassifier',
+            'classifier_data': {},
+            'data_schema_version': 1
+        }
+        observed_training_job = self._get_training_job_from_dict(
+            expected_training_job_dict)
+        self.assertDictEqual(
+            expected_training_job_player_dict,
+            observed_training_job.to_player_dict())
+
     def test_validation_exp_id(self):
         self.training_job_dict['exp_id'] = 1
         training_job = self._get_training_job_from_dict(self.training_job_dict)
@@ -129,8 +166,9 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         training_job = self._get_training_job_from_dict(self.training_job_dict)
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            re.escape('Expected status to be in %s'
-                      % (feconf.ALLOWED_TRAINING_JOB_STATUSES))):
+            re.escape(
+                'Expected status to be in %s'
+                % (feconf.ALLOWED_TRAINING_JOB_STATUSES))):
             training_job.validate()
 
     def test_validation_interaction_id_type(self):
@@ -269,6 +307,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
 
 class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
     """Tests for the TrainingJobExplorationMapping domain."""
+
     def setUp(self):
         super(TrainingJobExplorationMappingDomainTests, self).setUp()
 

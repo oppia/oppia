@@ -21,94 +21,100 @@
  */
 
 require('domain/collection/read-only-collection-backend-api.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('services/ContextService.ts');
-require('services/HtmlEscaperService.ts');
-require('services/contextual/UrlService.ts');
+require('services/context.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveEndExploration', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/EndExploration/directives/' +
-        'end-exploration-interaction.directive.html'),
+      template: require('./end-exploration-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$attrs', '$q', 'UrlService',
         'ContextService', 'ReadOnlyCollectionBackendApiService',
         'PAGE_CONTEXT', 'EXPLORATION_EDITOR_TAB_CONTEXT',
-        'HtmlEscaperService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+        'InteractionAttributesExtractorService',
+        'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
         function(
             $http, $attrs, $q, UrlService,
             ContextService, ReadOnlyCollectionBackendApiService,
             PAGE_CONTEXT, EXPLORATION_EDITOR_TAB_CONTEXT,
-            HtmlEscaperService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
+            InteractionAttributesExtractorService,
+            EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
           var ctrl = this;
-          var authorRecommendedExplorationIds = (
-            HtmlEscaperService.escapedJsonToObj(
-              $attrs.recommendedExplorationIdsWithValue));
+          ctrl.$onInit = function() {
+            const {
+              recommendedExplorationIds
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'EndExploration',
+              $attrs
+            );
+            var authorRecommendedExplorationIds = recommendedExplorationIds;
 
-          ctrl.isIframed = UrlService.isIframed();
-          ctrl.isInEditorPage = (
-            ContextService.getPageContext() === (
-              PAGE_CONTEXT.EXPLORATION_EDITOR));
-          ctrl.isInEditorPreviewMode = ctrl.isInEditorPage && (
-            ContextService.getEditorTabContext() ===
-              EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW);
-          ctrl.isInEditorMainTab = ctrl.isInEditorPage && (
-            ContextService.getEditorTabContext() ===
-              EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR);
+            ctrl.isIframed = UrlService.isIframed();
+            ctrl.isInEditorPage = (
+              ContextService.getPageContext() === (
+                PAGE_CONTEXT.EXPLORATION_EDITOR));
+            ctrl.isInEditorPreviewMode = ctrl.isInEditorPage && (
+              ContextService.getEditorTabContext() ===
+                EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW);
+            ctrl.isInEditorMainTab = ctrl.isInEditorPage && (
+              ContextService.getEditorTabContext() ===
+                EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR);
 
-          ctrl.collectionId = UrlService.getCollectionIdFromExplorationUrl();
-          if (ctrl.collectionId) {
-            ReadOnlyCollectionBackendApiService
-              .loadCollection(ctrl.collectionId)
-              .then(function(collection) {
-                ctrl.getCollectionTitle = function() {
-                  return collection.title;
-                };
-              });
-          }
+            ctrl.collectionId = UrlService.getCollectionIdFromExplorationUrl();
+            if (ctrl.collectionId) {
+              ReadOnlyCollectionBackendApiService
+                .loadCollection(ctrl.collectionId)
+                .then(function(collection) {
+                  ctrl.getCollectionTitle = function() {
+                    return collection.getTitle();
+                  };
+                });
+            }
 
-          ctrl.errorMessage = '';
+            ctrl.errorMessage = '';
 
-          if (ctrl.isInEditorPage) {
-            // Display a message if any author-recommended explorations are
-            // invalid.
-            var explorationId = ContextService.getExplorationId();
-            $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
-              params: {
-                stringified_exp_ids: JSON.stringify(
-                  authorRecommendedExplorationIds)
-              }
-            }).then(function(response) {
-              var data = response.data;
-              var foundExpIds = [];
-              data.summaries.map(function(expSummary) {
-                foundExpIds.push(expSummary.id);
-              });
+            if (ctrl.isInEditorPage) {
+              // Display a message if any author-recommended explorations are
+              // invalid.
+              var explorationId = ContextService.getExplorationId();
+              $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
+                params: {
+                  stringified_exp_ids: JSON.stringify(
+                    authorRecommendedExplorationIds)
+                }
+              }).then(function(response) {
+                var data = response.data;
+                var foundExpIds = [];
+                data.summaries.map(function(expSummary) {
+                  foundExpIds.push(expSummary.id);
+                });
 
-              var missingExpIds = [];
-              authorRecommendedExplorationIds.forEach(function(expId) {
-                if (foundExpIds.indexOf(expId) === -1) {
-                  missingExpIds.push(expId);
+                var missingExpIds = [];
+                authorRecommendedExplorationIds.forEach(function(expId) {
+                  if (foundExpIds.indexOf(expId) === -1) {
+                    missingExpIds.push(expId);
+                  }
+                });
+
+                if (missingExpIds.length === 0) {
+                  ctrl.errorMessage = '';
+                } else {
+                  var listOfIds = missingExpIds.join('", "');
+                  ctrl.errorMessage = (
+                    'Warning: exploration(s) with the IDs "' + listOfIds +
+                    '" will not be shown as recommendations because ' +
+                    'they either do not exist, or are not publicly viewable.');
                 }
               });
-
-              if (missingExpIds.length === 0) {
-                ctrl.errorMessage = '';
-              } else {
-                var listOfIds = missingExpIds.join('", "');
-                ctrl.errorMessage = (
-                  'Warning: exploration(s) with the IDs "' + listOfIds +
-                  '" will ' + 'not be shown as recommendations because they ' +
-                  'either do not exist, or are not publicly viewable.');
-              }
-            });
-          }
+            }
+          };
         }
       ]
     };

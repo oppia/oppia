@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for Oppia users."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -31,6 +32,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     The id of each instance is the id of the corresponding exploration.
     """
+
     topic_id = ndb.StringProperty(required=True, indexed=True)
     topic_name = ndb.StringProperty(required=True, indexed=True)
     story_id = ndb.StringProperty(required=True, indexed=True)
@@ -52,6 +54,11 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
         """ExplorationOpportunitySummaryModel doesn't reference any user_id
@@ -59,7 +66,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
+                should be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
@@ -82,7 +89,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 are to be fetched.
 
         Returns:
-            3-tuple of (results, cursor, more) as described in fetch_page() at:
+            3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 results: list(ExplorationOpportunitySummaryModel)|None. A list
@@ -121,7 +128,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 to be fetched.
 
         Returns:
-            3-tuple of (results, cursor, more) as described in fetch_page() at:
+            3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 results: list(ExplorationOpportunitySummaryModel)|None. A list
@@ -169,6 +176,7 @@ class SkillOpportunityModel(base_models.BaseModel):
     When a SkillModel's skill description changes, the corresponding instance
     of this model is also updated.
     """
+
     # The description of the opportunity's skill.
     skill_description = ndb.StringProperty(required=True, indexed=True)
     # The number of questions associated with this opportunity's skill.
@@ -181,14 +189,18 @@ class SkillOpportunityModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
-        """ExplorationOpportunitySummaryModel doesn't reference any user_id
-        directly.
+        """SkillOpportunityModel doesn't reference any user_id directly.
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
+                should be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
@@ -207,7 +219,7 @@ class SkillOpportunityModel(base_models.BaseModel):
                 of the full list of entities.
 
         Returns:
-            3-tuple of (results, cursor, more) as described in fetch_page() at:
+            3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 results: list(SkillOpportunityModel)|None. A list
@@ -227,3 +239,9 @@ class SkillOpportunityModel(base_models.BaseModel):
         results, cursor, more = cls.get_all().order(
             cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
         return (results, (cursor.urlsafe() if cursor else None), more)
+
+    @classmethod
+    def delete_all(cls):
+        """Deletes all entities of this class."""
+        keys = cls.query().fetch(keys_only=True)
+        ndb.delete_multi(keys)

@@ -21,8 +21,10 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
+import { NumericInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
@@ -36,21 +38,15 @@ export class NumericInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  getCustomizationArgsWarnings(customizationArgs: any): any[] {
+  getCustomizationArgsWarnings(
+      customizationArgs: NumericInputCustomizationArgs): Warning[] {
     return [];
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
   getAllWarnings(
-      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome): IWarning[] {
+      stateName: string,
+      customizationArgs: NumericInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var warningsList = [];
 
     warningsList = warningsList.concat(
@@ -83,13 +79,23 @@ export class NumericInputValidationService {
     };
 
     var ranges = [];
+    var raiseWarningForRuleIsInclusivelyBetween = function(ruleIndex,
+        answerGroupIndex) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: (
+          'In Rule ' + (ruleIndex + 1) + ' from answer group ' +
+          (answerGroupIndex + 1) + ', Please ensure that the second number ' +
+          'is greater than the first number.')
+      });
+    };
     for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].rules;
+      var rules = answerGroups[i].getRulesAsList();
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
         var range = {
-          answerGroupIndex: i + 1,
-          ruleIndex: j + 1,
+          answerGroupIndex: i,
+          ruleIndex: j,
           lb: null,
           ub: null,
           lbi: false,
@@ -97,46 +103,64 @@ export class NumericInputValidationService {
         };
         switch (rule.type) {
           case 'Equals':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, x, true, true);
             break;
           case 'IsInclusivelyBetween':
             var a = rule.inputs.a;
             var b = rule.inputs.b;
+            if (a > b) {
+              raiseWarningForRuleIsInclusivelyBetween(j, i);
+            }
             setLowerAndUpperBounds(range, a, b, true, true);
             break;
           case 'IsGreaterThan':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, Infinity, false, false);
             break;
           case 'IsGreaterThanOrEqualTo':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, Infinity, true, false);
             break;
           case 'IsLessThan':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, false);
             break;
           case 'IsLessThanOrEqualTo':
-            var x = rule.inputs.x;
+            var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, true);
             break;
           case 'IsWithinTolerance':
-            var x = rule.inputs.x;
-            var tol = rule.inputs.tol;
+            var x = (<number>rule.inputs.x);
+            var tol = (<number>rule.inputs.tol);
             setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
             break;
           default:
         }
         for (var k = 0; k < ranges.length; k++) {
-          if (isEnclosedBy(range, ranges[k])) {
+          // Rules inside an AnswerGroup do not have a set order. We should
+          // check for redundant rules in both directions if rules are in the
+          // same AnswerGroup.
+          const redundantWithinAnswerGroup = (
+            ranges[k].answerGroupIndex === i &&
+            (isEnclosedBy(range, ranges[k]) || isEnclosedBy(ranges[k], range))
+          );
+
+          // AnswerGroups do have a set order. If rules are not in the same
+          // AnswerGroup we only check in one direction.
+          const redundantBetweenAnswerGroups = (
+            ranges[k].answerGroupIndex !== i &&
+            isEnclosedBy(range, ranges[k])
+          );
+
+          if (redundantWithinAnswerGroup || redundantBetweenAnswerGroups) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (
                 'Rule ' + (j + 1) + ' from answer group ' +
                 (i + 1) + ' will never be matched because it ' +
-                'is made redundant by rule ' + ranges[k].ruleIndex +
-                ' from answer group ' + ranges[k].answerGroupIndex + '.')
+                'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
+                ' from answer group ' + (ranges[k].answerGroupIndex + 1) + '.')
             });
           }
         }
@@ -149,6 +173,43 @@ export class NumericInputValidationService {
         answerGroups, defaultOutcome, stateName));
 
     return warningsList;
+  }
+
+  getErrorString(value: number): string {
+    if (value === undefined || value === null) {
+      return 'Please enter a valid number.';
+    }
+    let stringValue = null;
+    // Convert exponential notation to decimal number.
+    // Logic derived from https://stackoverflow.com/a/16139848.
+    var data = String(value).split(/[eE]/);
+    if (data.length === 1) {
+      stringValue = data[0];
+    } else {
+      var z = '';
+      var sign = value < 0 ? '-' : '';
+      var str = data[0].replace('.', '');
+      var mag = Number(data[1]) + 1;
+
+      if (mag < 0) {
+        z = sign + '0.';
+        while (mag++) {
+          z += '0';
+        }
+        stringValue = z + str.replace(/^\-/, '');
+      } else {
+        mag -= str.length;
+        while (mag--) {
+          z += '0';
+        }
+        stringValue = str + z;
+      }
+    }
+
+    if (stringValue.match(/\d/g).length > 15) {
+      return 'The answer can contain at most 15 digits (0-9) or symbols ' +
+        '(. or -).';
+    }
   }
 }
 

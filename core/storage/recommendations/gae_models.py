@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for Oppia recommendations."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -33,6 +34,7 @@ class ExplorationRecommendationsModel(
 
     Instances of this class are keyed by exploration id.
     """
+
     # Ids of recommended explorations.
     recommended_exploration_ids = ndb.StringProperty(
         repeated=True, indexed=False)
@@ -44,6 +46,11 @@ class ExplorationRecommendationsModel(
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
         """ExplorationRecommendationsModel doesn't reference any user_id
@@ -51,7 +58,7 @@ class ExplorationRecommendationsModel(
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
+                should be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
@@ -71,6 +78,7 @@ class TopicSimilaritiesModel(base_models.BaseModel):
     Currently, topics are the same as the default categories. However, this may
     change in the future.
     """
+
     content = ndb.JsonProperty(required=True)
 
     @staticmethod
@@ -80,16 +88,7 @@ class TopicSimilaritiesModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """TopicSimilaritiesModel doesn't reference any user_id
-        directly.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE

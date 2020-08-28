@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Python configuration for FractionInput interaction."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -59,9 +60,13 @@ class FractionInput(base.BaseInteraction):
         'name': 'customPlaceholder',
         'description': 'Custom placeholder text (optional)',
         'schema': {
-            'type': 'unicode'
+            'type': 'custom',
+            'obj_type': 'SubtitledUnicode'
         },
-        'default_value': ''
+        'default_value': {
+            'content_id': None,
+            'unicode_str': ''
+        }
     }]
 
     _answer_visualization_specs = [{

@@ -1,0 +1,8 @@
+env:
+  jobs:
+    - RUN_E2E_TESTS_ONEWORD=true
+    - RUN_E2E_TESTS_TWO_WORDS=true
+
+script:
+  - if [ "RUN_E2E_TESTS_ONEWORD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="oneword" --prod_env; fi
+  - if [ "RUN_E2E_TESTS_TWO_WORDS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="twoWords" --prod_env; fi

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for user dashboard computations."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -69,6 +70,7 @@ class MockRecentUpdatesAggregator(
     """A modified DashboardRecentUpdatesAggregator that does not start a new
      batch job when the previous one has finished.
     """
+
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
@@ -131,7 +133,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             recent_notifications = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(USER_ID)[1])
+                .get_recent_user_changes(USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(
                 recent_notifications[0],
@@ -180,7 +182,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             recent_notifications = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(USER_ID)[1])
+                .get_recent_user_changes(USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(
                 recent_notifications[0],
@@ -207,7 +209,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             recent_notifications = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(USER_ID)[1])
+                .get_recent_user_changes(USER_ID)[1])
             self.assertEqual([{
                 'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                 'last_updated_ms': v3_last_updated_ms,
@@ -241,7 +243,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             recent_notifications = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(USER_ID)[1])
+                .get_recent_user_changes(USER_ID)[1])
             self.assertEqual([{
                 'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                 'last_updated_ms': expected_last_updated_ms,
@@ -291,7 +293,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             recent_notifications = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(editor_id)[1])
+                .get_recent_user_changes(editor_id)[1])
             self.assertEqual([(
                 self._get_expected_activity_created_dict(
                     editor_id, EXP_2_ID, EXP_2_TITLE, 'exploration',
@@ -346,10 +348,10 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             recent_notifications_for_user_a = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(user_a_id)[1])
+                .get_recent_user_changes(user_a_id)[1])
             recent_notifications_for_user_b = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(user_b_id)[1])
+                .get_recent_user_changes(user_b_id)[1])
             expected_thread_notification = {
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
@@ -388,7 +390,6 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
             user_a = user_services.UserActionsInfo(user_a_id)
 
-
             # User A creates an exploration.
             self.save_new_valid_exploration(
                 EXP_ID, user_a_id, title=EXP_TITLE, category='Category')
@@ -417,10 +418,10 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             recent_notifications_for_user_a = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(user_a_id)[1])
+                .get_recent_user_changes(user_a_id)[1])
             recent_notifications_for_user_b = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(user_b_id)[1])
+                .get_recent_user_changes(user_b_id)[1])
             expected_thread_notification = {
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
@@ -469,7 +470,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             recent_notifications = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(USER_ID)[1])
+                .get_recent_user_changes(USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(
                 recent_notifications[0],
@@ -506,7 +507,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             recent_notifications = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(USER_ID)[1])
+                .get_recent_user_changes(USER_ID)[1])
             self.assertEqual([{
                 'type': feconf.UPDATE_TYPE_COLLECTION_COMMIT,
                 'last_updated_ms': expected_last_updated_ms,
@@ -537,7 +538,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             recent_notifications = (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
-                .get_recent_notifications(USER_ID)[1])
+                .get_recent_user_changes(USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(sorted(recent_notifications[0].keys()), [
                 'activity_id', 'activity_title', 'author_id',
@@ -594,6 +595,7 @@ class MockUserStatsAggregator(
     """A modified UserStatsAggregator that does not start a new
      batch job when the previous one has finished.
     """
+
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass

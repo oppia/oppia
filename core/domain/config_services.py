@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Services for configuration properties."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -20,19 +21,20 @@ from core.domain import config_domain
 from core.platform import models
 
 (config_models,) = models.Registry.import_models([models.NAMES.config])
-memcache_services = models.Registry.import_memcache_services()
 
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
 
 def set_property(committer_id, name, value):
     """Sets a property value. The property must already be registered.
+
     Args:
         committer_id: str. The user ID of the committer.
         name: str. The name of the property.
         value: str. The value of the property.
+
     Raises:
-        Exception: No config property with the specified name is found.
+        Exception. No config property with the specified name is found.
     """
 
     config_property = config_domain.Registry.get_config_property(name)
@@ -44,11 +46,13 @@ def set_property(committer_id, name, value):
 
 def revert_property(committer_id, name):
     """Reverts a property value to the default value.
+
     Args:
         committer_id: str. The user ID of the committer.
         name: str. The name of the property.
+
     Raises:
-        Exception: No config property with the specified name is found.
+        Exception. No config property with the specified name is found.
     """
 
     config_property = config_domain.Registry.get_config_property(name)

@@ -18,6 +18,7 @@
 size limit is exceeded. The aim of this is to prevent us accidentally
 breaching the 10k file limit on App Engine.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -43,8 +44,8 @@ def _get_skip_files_list():
         list. The list of files which are to be skipped.
 
     Raises:
-        yaml.YAMLError if failed to parse app_dev.yaml.
-        IOError if failed to open app_dev.yaml in read mode.
+        yaml.YAMLError. If failed to parse app_dev.yaml.
+        IOError. If failed to open app_dev.yaml in read mode.
     """
     try:
         with python_utils.open_file('./app_dev.yaml', 'r') as app_dev_yaml:
@@ -69,23 +70,25 @@ def _check_size_in_dir(dir_path, skip_files_list):
     directory.
 
     Args:
-         dir_path: str. The directory which files will be counted.
-         skip_files_list: list. The list of files which are to be skipped
-         from the file count.
+        dir_path: str. The directory which files will be counted.
+        skip_files_list: list. The list of files which are to be skipped
+            from the file count.
 
     Returns:
         int. The number of files inside the given directory.
     """
     number_of_files_in_dir = 0
     for name in os.listdir(dir_path):
-        if os.path.join(dir_path, name) in skip_files_list:
+        file_path = os.path.join(dir_path, name)
+        # The dir pattern of skip_files in app_dev.yaml ends with '/'.
+        file_path += '/' if os.path.isdir(file_path) else ''
+        if file_path in skip_files_list:
             continue
-        if os.path.isfile(os.path.join(dir_path, name)):
+        if os.path.isfile(file_path):
             number_of_files_in_dir += 1
-        else:
-            if os.path.isdir(os.path.join(dir_path, name)):
-                number_of_files_in_dir += _check_size_in_dir(
-                    os.path.join(dir_path, name), skip_files_list)
+        elif os.path.isdir(file_path):
+            number_of_files_in_dir += _check_size_in_dir(
+                file_path, skip_files_list)
     return number_of_files_in_dir
 
 

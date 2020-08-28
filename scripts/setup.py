@@ -13,12 +13,13 @@
 # limitations under the License.
 
 """Python execution environent set up for all scripts."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
-import shutil
+import subprocess
 import sys
 import tarfile
 
@@ -27,21 +28,10 @@ import python_utils
 from . import clean
 from . import common
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Python execution environent set up for all scripts.
 """)
-
-
-def delete_directory_tree(directory_path):
-    """Recursively delete an existing directory tree. Does not do anything if
-    directory does not exists.
-
-    Args:
-        directory_path: str. Directory path to be deleted.
-    """
-    if not os.path.exists(directory_path):
-        return
-    shutil.rmtree(directory_path)
 
 
 def create_directory(directory_path):
@@ -65,8 +55,7 @@ def test_python_version():
         python_utils.PRINT('Please use Python2.7. Exiting...')
         # If OS is Windows, print helpful error message about adding Python to
         # path.
-        os_info = os.uname()
-        if os_info[0] != 'Darwin' and os_info[0] != 'Linux':
+        if common.is_windows_os():
             common.print_each_string_after_two_new_lines([
                 'It looks like you are using Windows. If you have Python '
                 'installed,',
@@ -79,7 +68,78 @@ def test_python_version():
                 'https://stackoverflow.com/questions/3701646/how-to-add-to-the-'
                 'pythonpath-in-windows-7'])
         # Exit when no suitable Python environment can be found.
-        raise Exception
+        raise Exception('No suitable python version found.')
+
+
+def download_and_install_package(url_to_retrieve, filename):
+    """Downloads and installs package in Oppia tools directory.
+
+    Args:
+        url_to_retrieve: string. The url from which package is to be
+            downloaded.
+        filename: string. The name of the tar file.
+    """
+    python_utils.url_retrieve(url_to_retrieve, filename=filename)
+    tar = tarfile.open(name=filename)
+    tar.extractall(path=common.OPPIA_TOOLS_DIR)
+    tar.close()
+    rename_yarn_folder(filename, common.OPPIA_TOOLS_DIR)
+    os.remove(filename)
+
+
+def rename_yarn_folder(filename, path):
+    """Removes the `v` from the yarn folder name.
+
+    Args:
+        filename: string. The name of the tar file.
+        path: string. The path of the yarn file.
+    """
+    if 'yarn' in filename:
+        old_name = filename.split('.tar.gz')[0]
+        new_name = ''.join(old_name.split('v'))
+        os.rename(path + '/' + old_name, path + '/' + new_name)
+
+
+def download_and_install_node():
+    """Download and install node to Oppia tools directory."""
+    outfile_name = 'node-download'
+
+    if common.is_windows_os():
+        if common.is_x64_architecture():
+            architecture = 'x64'
+        else:
+            architecture = 'x86'
+
+        extension = '.zip'
+        node_file_name = 'node-v%s-win-%s' % (
+            common.NODE_VERSION, architecture)
+        url_to_retrieve = 'https://nodejs.org/dist/v%s/%s%s' % (
+            common.NODE_VERSION, node_file_name, extension)
+        python_utils.url_retrieve(url_to_retrieve, filename=outfile_name)
+        subprocess.check_call(
+            ['powershell.exe', '-c', 'expand-archive',
+             outfile_name, '-DestinationPath',
+             common.OPPIA_TOOLS_DIR])
+    else:
+        extension = '.tar.gz'
+        if common.is_x64_architecture():
+            if common.is_mac_os():
+                node_file_name = 'node-v%s-darwin-x64' % (common.NODE_VERSION)
+            elif common.is_linux_os():
+                node_file_name = 'node-v%s-linux-x64' % (common.NODE_VERSION)
+        else:
+            node_file_name = 'node-v%s' % common.NODE_VERSION
+        download_and_install_package(
+            'https://nodejs.org/dist/v%s/%s%s' % (
+                common.NODE_VERSION, node_file_name, extension),
+            outfile_name)
+    os.rename(
+        os.path.join(common.OPPIA_TOOLS_DIR, node_file_name),
+        common.NODE_PATH)
+    if node_file_name == 'node-v%s' % common.NODE_VERSION:
+        with common.CD(common.NODE_PATH):
+            subprocess.check_call(['./configure'])
+            subprocess.check_call(['make'])
 
 
 def main(args=None):
@@ -95,7 +155,7 @@ def main(args=None):
         python_utils.PRINT(
             'WARNING   This script should be run from the oppia/ root folder.')
         python_utils.PRINT('')
-        raise Exception
+        raise Exception('Invalid root directory.')
 
     # Set COMMON_DIR to the absolute path of the directory above OPPIA_DIR. This
     # is necessary becaue COMMON_DIR (or subsequent variables which refer to it)
@@ -103,52 +163,29 @@ def main(args=None):
     # as $PYTHONPATH).
     create_directory(common.OPPIA_TOOLS_DIR)
     create_directory(common.THIRD_PARTY_DIR)
+    common.create_readme(
+        common.THIRD_PARTY_DIR,
+        'This folder contains third party libraries used in Oppia codebase.\n'
+        'You can regenerate this folder by deleting it and then running '
+        'the start.py script.\n')
     create_directory(common.NODE_MODULES_PATH)
-
-    os_info = os.uname()
-    if os_info[0] != 'Darwin' and os_info[0] != 'Linux':
-        # Node is a requirement for all installation scripts. Here, we check if
-        # the OS supports node.js installation; if not, we exit with an error.
-        common.print_each_string_after_two_new_lines([
-            'WARNING: Unsupported OS for installation of node.js.',
-            'If you are running this script on Windows, see the instructions',
-            'here regarding installation of node.js:',
-            'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Windows'
-            '%29',
-            'STATUS: Installation completed except for node.js. Exiting.'])
-        raise Exception
+    common.create_readme(
+        common.NODE_MODULES_PATH,
+        'This folder contains node utilities used in Oppia codebase.\n'
+        'You can regenerate this folder by deleting it and then running '
+        'the start.py script.\n')
 
     # Download and install node.js.
     python_utils.PRINT(
         'Checking if node.js is installed in %s' % common.OPPIA_TOOLS_DIR)
     if not os.path.exists(common.NODE_PATH):
         python_utils.PRINT('Installing Node.js')
-        if os_info[0] == 'Darwin':
-            if os_info[4] == 'x86_64':
-                node_file_name = 'node-v10.15.3-darwin-x64'
-            else:
-                node_file_name = 'node-v10.15.3-darwin-x86'
-        elif os_info[0] == 'Linux':
-            if os_info[4] == 'x86_64':
-                node_file_name = 'node-v10.15.3-linux-x64'
-            else:
-                node_file_name = 'node-v10.15.3-linux-x86'
-
-        python_utils.url_retrieve(
-            'https://nodejs.org/dist/v10.15.3/%s.tar.gz' % node_file_name,
-            filename='node-download.tgz')
-        tar = tarfile.open(name='node-download.tgz')
-        tar.extractall(path=common.OPPIA_TOOLS_DIR)
-        tar.close()
-        os.remove('node-download.tgz')
-        os.rename(
-            os.path.join(common.OPPIA_TOOLS_DIR, node_file_name),
-            common.NODE_PATH)
-
+        download_and_install_node()
     # Change ownership of node_modules.
     # Note: on some machines, these commands seem to take quite a long time.
-    common.recursive_chown(common.NODE_MODULES_PATH, os.getuid(), -1)
-    common.recursive_chmod(common.NODE_MODULES_PATH, 0o744)
+    if not common.is_windows_os():
+        common.recursive_chown(common.NODE_MODULES_PATH, os.getuid(), -1)
+        common.recursive_chmod(common.NODE_MODULES_PATH, 0o744)
 
     # Download and install yarn.
     python_utils.PRINT(
@@ -163,16 +200,10 @@ def main(args=None):
             'visit https://yarnpkg.com/en/docs/usage.'])
 
         # NB: Update .yarnrc if the yarn version below is changed.
-        yarn_version = 'v1.17.3'
-        yarn_file_name = 'yarn-%s.tar.gz' % yarn_version
-        python_utils.url_retrieve(
-            'https://github.com/yarnpkg/yarn/releases/download/%s/%s'
-            % (yarn_version, yarn_file_name),
-            filename=yarn_file_name)
-        tar = tarfile.open(name=yarn_file_name)
-        tar.extractall(path=common.OPPIA_TOOLS_DIR)
-        tar.close()
-        os.remove(yarn_file_name)
+        yarn_file_name = 'yarn-v%s.tar.gz' % common.YARN_VERSION
+        download_and_install_package(
+            'https://github.com/yarnpkg/yarn/releases/download/v%s/%s'
+            % (common.YARN_VERSION, yarn_file_name), yarn_file_name)
 
     # Adjust path to support the default Chrome locations for Unix, Windows and
     # Mac OS.
@@ -184,11 +215,18 @@ def main(args=None):
     elif os.path.isfile('/usr/bin/chromium-browser'):
         # Unix.
         chrome_bin = '/usr/bin/chromium-browser'
+    elif os.path.isfile('/usr/bin/chromium'):
+        # Arch Linux.
+        chrome_bin = '/usr/bin/chromium'
     elif os.path.isfile(
             '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'):
         # Windows.
         chrome_bin = (
             '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe')
+    elif os.path.isfile(
+            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe'):
+        chrome_bin = (
+            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe')
     elif os.path.isfile(
             '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'):
         # WSL.
@@ -201,11 +239,13 @@ def main(args=None):
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')
     else:
         python_utils.PRINT('Chrome is not found, stopping ...')
-        raise Exception
+        raise Exception('Chrome not found.')
 
     os.environ['CHROME_BIN'] = chrome_bin
     python_utils.PRINT('Environment setup completed.')
 
 
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when setup.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
     main()

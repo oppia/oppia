@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for the exploration editor page."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -143,7 +144,6 @@ class EditorTests(BaseEditorControllerTests):
         # by validating it.
         exploration.states[feconf.DEFAULT_INIT_STATE_NAME].validate(None, True)
 
-
     def test_that_default_exploration_cannot_be_published(self):
         """Test that publishing a default exploration raises an error
         due to failing strict validation.
@@ -248,13 +248,13 @@ class EditorTests(BaseEditorControllerTests):
         publish_url = '%s/%s' % (feconf.EXPLORATION_STATUS_PREFIX, exp_id)
 
         exploration_rights = self.put_json(
-            publish_url, payload={},
+            publish_url, {},
             csrf_token=csrf_token)['rights']
 
         self.assertEqual(exploration_rights['status'], 'private')
 
         exploration_rights = self.put_json(
-            publish_url, payload={'make_public': True},
+            publish_url, {'make_public': True},
             csrf_token=csrf_token)['rights']
 
         self.assertEqual(exploration_rights['status'], 'public')
@@ -282,9 +282,7 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTests):
 
         response = self.get_html_response('/logout', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
-        self.assertEqual(
-            response.headers['location'], 'https://www.google.com/accounts' +
-            '/Logout?continue=http%3A//localhost/')
+        self.assertEqual(response.headers['location'], 'http://localhost/')
         self.logout()
 
     def test_logout_from_published_exploration_editor(self):
@@ -307,8 +305,7 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTests):
         response = self.get_html_response('/logout', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         self.assertEqual(
-            response.headers['location'], 'https://www.google.com/accounts' +
-            '/Logout?continue=http%3A//localhost/')
+            response.headers['location'], 'http://localhost/')
         self.logout()
 
 
@@ -316,7 +313,8 @@ class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
 
     SAMPLE_JSON_CONTENT = {
-        'State A': ("""classifier_model_id: null
+        'State A': (
+            """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -325,7 +323,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: ca_placeholder_0
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -340,18 +340,22 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 """),
-        'State B': ("""classifier_model_id: null
+        'State B': (
+            """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -360,7 +364,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: ca_placeholder_0
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -375,18 +381,22 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 """),
-        feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
+        feconf.DEFAULT_INIT_STATE_NAME: (
+            """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -395,7 +405,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: ca_placeholder_0
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -410,20 +422,24 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
-    SAMPLE_STATE_STRING = ("""classifier_model_id: null
+    SAMPLE_STATE_STRING = (
+        """classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -432,7 +448,9 @@ interaction:
   confirmed_unclassified_answers: []
   customization_args:
     placeholder:
-      value: ''
+      value:
+        content_id: ca_placeholder_0
+        unicode_str: ''
     rows:
       value: 1
   default_outcome:
@@ -447,14 +465,17 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
   voiceovers_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 solicit_answer_details: false
 written_translations:
   translations_mapping:
+    ca_placeholder_0: {}
     content: {}
     default_outcome: {}
 """)
@@ -501,15 +522,81 @@ written_translations:
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'State A',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'State A',
+                    'new_value': 1
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'State 2',
                     'new_value': 'TextInput'
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'State 2',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'State 2',
+                    'new_value': 1
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'State 3',
                     'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': 'State 3',
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                    'state_name': 'State 3',
+                    'new_value': 1
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_RENAME_STATE,
@@ -520,7 +607,6 @@ written_translations:
                     'cmd': exp_domain.CMD_DELETE_STATE,
                     'state_name': 'State 3',
                 })], 'changes')
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         response = self.get_html_response('/create/%s' % exp_id)
 
         # Check download to zip file.
@@ -530,8 +616,9 @@ written_translations:
 
         # Check downloaded zip file.
         filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'
-        self.assertEqual(response.headers['Content-Disposition'],
-                         'attachment; filename=%s' % filename)
+        self.assertEqual(
+            response.headers['Content-Disposition'],
+            'attachment; filename=%s' % filename)
         zf_saved = zipfile.ZipFile(
             python_utils.string_io(buffer_value=response.body))
         self.assertEqual(
@@ -555,9 +642,13 @@ written_translations:
                 'The title for ZIP download handler test!.yaml').read())
 
         # Check download to JSON.
-        exploration.update_objective('Test JSON download')
-        exp_services._save_exploration(  # pylint: disable=protected-access
-            owner_id, exploration, '', [])
+        exp_services.update_exploration(
+            owner_id, exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'objective',
+                    'new_value': 'Test JSON download',
+                })], 'Updates exploration objective')
 
         # Download to JSON string using download handler.
         self.maxDiff = None
@@ -606,12 +697,42 @@ written_translations:
 
         # Check downloaded zip file.
         filename = 'oppia-Hola!-v1.zip'
-        self.assertEqual(response.headers['Content-Disposition'],
-                         'attachment; filename=%s' % filename)
+        self.assertEqual(
+            response.headers['Content-Disposition'],
+            'attachment; filename=%s' % filename)
 
         zf_saved = zipfile.ZipFile(
             python_utils.string_io(buffer_value=response.body))
         self.assertEqual(zf_saved.namelist(), [u'¡Hola!.yaml'])
+
+        self.logout()
+
+    def test_exploration_download_handler_with_no_title(self):
+        # This is the case for most unpublished explorations.
+        self.login(self.EDITOR_EMAIL)
+        owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        # Create a simple exploration.
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, owner_id,
+            title='',
+            category='This is just a test category',
+            objective='')
+
+        # Download to zip file using download handler.
+        download_url = '/createhandler/download/%s' % exp_id
+        response = self.get_custom_response(download_url, 'text/plain')
+
+        # Check downloaded zip file.
+        filename = 'oppia-unpublished_exploration-v1.zip'
+        self.assertEqual(
+            response.headers['Content-Disposition'],
+            'attachment; filename=%s' % filename)
+
+        zf_saved = zipfile.ZipFile(
+            python_utils.string_io(buffer_value=response.body))
+        self.assertEqual(zf_saved.namelist(), ['Unpublished_exploration.yaml'])
 
         self.logout()
 
@@ -628,7 +749,8 @@ written_translations:
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
-        exploration.states['State A'].update_interaction_id('TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State A'], 'TextInput')
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json('/createhandler/state_yaml/%s' % exp_id, {
@@ -858,17 +980,18 @@ class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class StateRulesStatsHandlerTests(test_utils.GenericTestBase):
+class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(StateRulesStatsHandlerTests, self).setUp()
+        super(StateInteractionStatsHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_get_with_invalid_exploration_id_raises_error(self):
         self.login(self.OWNER_EMAIL)
 
         self.get_json(
-            '/createhandler/state_rules_stats/invalid_exp_id/state_name',
+            '/createhandler/state_interaction_stats/%s/%s' % (
+                'invalid_exp_id', 'state_name'),
             expected_status_int=404)
 
         self.logout()
@@ -891,8 +1014,9 @@ class StateRulesStatsHandlerTests(test_utils.GenericTestBase):
 
         with logging_swap:
             self.get_json(
-                '/createhandler/state_rules_stats/%s/invalid_state_name'
-                % (exp_id), expected_status_int=404)
+                '/createhandler/state_interaction_stats/%s/%s' % (
+                    exp_id, 'invalid_state_name'),
+                expected_status_int=404)
 
         self.assertEqual(
             observed_log_messages,
@@ -912,8 +1036,8 @@ class StateRulesStatsHandlerTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(exp_id, owner_id)
 
         response = self.get_json(
-            '/createhandler/state_rules_stats/%s/%s'
-            % (exp_id, exploration.init_state_name))
+            '/createhandler/state_interaction_stats/%s/%s' % (
+                exp_id, exploration.init_state_name))
 
         visualizations_info = stats_services.get_visualizations_info(
             exploration.id, 'Introduction',
@@ -929,8 +1053,8 @@ class StateRulesStatsHandlerTests(test_utils.GenericTestBase):
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
         response = self.get_json(
-            '/createhandler/state_rules_stats/%s/%s'
-            % (exp_id, exploration.init_state_name))
+            '/createhandler/state_interaction_stats/%s/%s' % (
+                exp_id, exploration.init_state_name))
 
         visualizations_info = stats_services.get_visualizations_info(
             exploration.id, 'new_state_name',
@@ -1172,8 +1296,8 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
             if not isinstance(rev_version, int):
                 self.assertIn('Expected an integer', response_dict['error'])
             else:
-                self.assertIn('Cannot revert to version',
-                              response_dict['error'])
+                self.assertIn(
+                    'Cannot revert to version', response_dict['error'])
 
             # Check that exploration is really not reverted to old version.
             reader_dict = self.get_json(
@@ -1310,11 +1434,11 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         """Test exploration rights handler for assign role for exploration."""
         # Create several users.
         self.signup(
-            self.COLLABORATOR_EMAIL, username=self.COLLABORATOR_USERNAME)
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
         self.signup(
-            self.COLLABORATOR2_EMAIL, username=self.COLLABORATOR2_USERNAME)
+            self.COLLABORATOR2_EMAIL, self.COLLABORATOR2_USERNAME)
         self.signup(
-            self.COLLABORATOR3_EMAIL, username=self.COLLABORATOR3_USERNAME)
+            self.COLLABORATOR3_EMAIL, self.COLLABORATOR3_USERNAME)
 
         # Owner creates exploration.
         self.login(self.OWNER_EMAIL)
@@ -1325,9 +1449,12 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
-        exploration.states['State A'].update_interaction_id('TextInput')
-        exploration.states['State 2'].update_interaction_id('TextInput')
-        exploration.states['State 3'].update_interaction_id('TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State A'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 2'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 3'], 'TextInput')
 
         csrf_token = self.get_new_csrf_token()
 
@@ -1373,20 +1500,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         # Check that collaborator can add a new state called 'State 4'.
-        add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
         response_dict = self.put_json(
-            add_url,
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
                 'version': exploration.version,
                 'commit_message': 'Added State 4',
                 'change_list': [{
                     'cmd': 'add_state',
                     'state_name': 'State 4'
-                }, {
-                    'cmd': 'edit_state_property',
-                    'state_name': 'State 4',
-                    'property_name': 'widget_id',
-                    'new_value': 'TextInput',
                 }]
             },
             csrf_token=csrf_token,
@@ -1414,20 +1535,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         # Check that collaborator2 can add a new state called 'State 5'.
-        add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
         response_dict = self.put_json(
-            add_url,
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
                 'version': exploration.version,
                 'commit_message': 'Added State 5',
                 'change_list': [{
                     'cmd': 'add_state',
                     'state_name': 'State 5'
-                }, {
-                    'cmd': 'edit_state_property',
-                    'state_name': 'State 5',
-                    'property_name': 'widget_id',
-                    'new_value': 'TextInput',
                 }]
             },
             csrf_token=csrf_token,
@@ -1492,7 +1607,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         # Create a random user.
         self.signup(
-            self.RANDOM_USER_EMAIL, username=self.RANDOM_USER_USERNAME)
+            self.RANDOM_USER_EMAIL, self.RANDOM_USER_USERNAME)
 
         # Check community_owned_status value.
         exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
@@ -1549,6 +1664,45 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             params={'v': 'invalid_version'}, expected_status_int=404)
         self.logout()
 
+    def test_put_with_long_commit_message_raises_error(self):
+        # Create several users.
+        self.signup(self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+
+        # Owner creates exploration.
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+
+        csrf_token = self.get_new_csrf_token()
+
+        response_dict = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'commit_message':
+                    'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1),
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State 4'
+                }, {
+                    'cmd': 'edit_state_property',
+                    'state_name': 'State 4',
+                    'property_name': 'widget_id',
+                    'new_value': 'TextInput',
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response_dict['error'],
+            'Commit messages must be at most 1000 characters long.')
+
     def test_put_with_invalid_new_member_raises_error(self):
         self.login(self.OWNER_EMAIL)
         exp_id = 'exp_id'
@@ -1558,7 +1712,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         response = self.put_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
-            payload={
+            {
                 'version': exploration.version,
                 'new_member_username': 'invalid_new_member_username'},
             csrf_token=csrf_token, expected_status_int=400)
@@ -1577,7 +1731,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.assertFalse(exploration_rights.viewable_if_private)
         self.put_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
-            payload={
+            {
                 'version': exploration.version,
                 'viewable_if_private': True}, csrf_token=csrf_token)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
@@ -1593,7 +1747,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         response = self.put_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
-            payload={'version': exploration.version}, csrf_token=csrf_token,
+            {'version': exploration.version}, csrf_token=csrf_token,
             expected_status_int=400)
 
         self.assertEqual(
@@ -1666,7 +1820,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
 
         response = self.put_json(
             '%s/%s' % (feconf.USER_EXPLORATION_EMAILS_PREFIX, exp_id),
-            payload={'message_type': 'invalid_message_type'},
+            {'message_type': 'invalid_message_type'},
             csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(response['error'], 'Invalid message type.')
@@ -1674,7 +1828,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
         self.logout()
 
 
-class ModeratorEmailsTests(test_utils.GenericTestBase):
+class ModeratorEmailsTests(test_utils.EmailTestBase):
     """Integration test for post-moderator action emails."""
 
     EXP_ID = 'eid'
@@ -1777,14 +1931,14 @@ class ModeratorEmailsTests(test_utils.GenericTestBase):
                 valid_payload, csrf_token=csrf_token)
 
             # Check that an email was sent with the correct content.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
             self.assertEqual(
                 messages[0].sender,
                 'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
-            self.assertEqual(messages[0].to, self.EDITOR_EMAIL)
+            self.assertEqual(messages[0].to, [self.EDITOR_EMAIL])
             self.assertFalse(hasattr(messages[0], 'cc'))
             self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(
@@ -2086,7 +2240,6 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         }
-
 
     def test_resolve_issue_handler(self):
         """Test that resolving an issue deletes associated playthroughs."""
@@ -2467,7 +2620,6 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
 
     def setUp(self):
         super(LearnerAnswerInfoHandlerTests, self).setUp()
-        self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
@@ -2490,6 +2642,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.answer, self.answer_details)
 
     def test_get_learner_answer_details_of_exploration_states(self):
+        self.login(self.OWNER_EMAIL)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
             response = self.get_json(
@@ -2516,8 +2669,10 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
                     feconf.ENTITY_TYPE_EXPLORATION, self.exp_id))
             self.assertEqual(response, learner_answer_info_data)
+        self.logout()
 
     def test_get_learner_answer_details_of_question_states(self):
+        self.login(self.OWNER_EMAIL)
         question_id = question_services.get_new_question_id()
         question = self.save_new_question(
             question_id, self.owner_id,
@@ -2551,8 +2706,10 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
                     feconf.ENTITY_TYPE_QUESTION, question_id))
             self.assertEqual(response, learner_answer_info_data)
+        self.logout()
 
     def test_delete_learner_answer_info_of_exploration_states(self):
+        self.login(self.OWNER_EMAIL)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
             self.delete_json(
@@ -2589,8 +2746,10 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
                     feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
                     self.state_name), expected_status_int=404)
+        self.logout()
 
     def test_delete_learner_answer_info_of_question_states(self):
+        self.login(self.ADMIN_EMAIL)
         question_id = question_services.get_new_question_id()
         question = self.save_new_question(
             question_id, self.owner_id,
@@ -2620,6 +2779,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 feconf.ENTITY_TYPE_QUESTION, state_reference)
             self.assertEqual(
                 len(learner_answer_details.learner_answer_info_list), 0)
+        self.logout()
 
 
 class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):

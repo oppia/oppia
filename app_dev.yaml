@@ -7,7 +7,6 @@ instance_class: F2
 version: default
 
 builtins:
-- appstats: on
 - deferred: on
 - remote_api: on
 
@@ -41,6 +40,10 @@ handlers:
   static_dir: third_party/static
   secure: always
   expiration: "90d"
+- url: /security.txt
+  static_files: assets/security.txt
+  upload: assets/security.txt
+  secure: always
 
 # DEVELOPMENT STATIC
 - url: /webpack_bundles
@@ -53,22 +56,22 @@ handlers:
   secure: always
   application_readable: true
   expiration: "0"
-# Serve js scripts and css files under core/templates/dev/head.
+# Serve js scripts and css files under core/templates.
 # This regex allows us to recursively serve js scripts.
 # "\1" inserts text captured by the capture group in the URL pattern.
-- url: /templates/dev/head/(.*\.(css))$
-  static_files: core/templates/dev/head/\1
-  upload: core/templates/dev/head/(.*\.(css))$
+- url: /templates/(.*\.(css))$
+  static_files: core/templates/\1
+  upload: core/templates/(.*\.(css))$
   secure: always
   expiration: "0"
-- url: /templates/dev/head/(.*\.(js))$
-  static_files: local_compiled_js/core/templates/dev/head/\1
-  upload: local_compiled_js/core/templates/dev/head/(.*\.(js))$
+- url: /templates/(.*\.(js))$
+  static_files: local_compiled_js/core/templates/\1
+  upload: local_compiled_js/core/templates/(.*\.(js))$
   secure: always
   expiration: "0"
-- url: /templates/dev/head/(.*\.(html))$
-  static_files: core/templates/dev/head/\1
-  upload: core/templates/dev/head/(.*\.(html))$
+- url: /templates/(.*\.(html))$
+  static_files: core/templates/\1
+  upload: core/templates/(.*\.(html))$
   secure: always
   expiration: "0"
   application_readable: true
@@ -100,9 +103,9 @@ handlers:
   upload: extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(png))$
   secure: always
   expiration: "0"
-- url: /extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(js))$
-  static_files: local_compiled_js/extensions/\1/\2
-  upload: local_compiled_js/extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(js))$
+- url: /extensions/ckeditor_plugins/(.*\.(js))$
+  static_files: extensions/ckeditor_plugins/\1
+  upload: extensions/ckeditor_plugins/(.*\.(js))$
   secure: always
   expiration: "0"
 - url: /extensions/visualizations/(.*\.html)
@@ -137,7 +140,7 @@ handlers:
   login: admin
   script: main_mail.app
   secure: always
-  
+
 # STATIC PAGES.
 - url: /about
   static_files: webpack_bundles/about-page.mainpage.html
@@ -172,7 +175,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
-- url: /get_started
+- url: /get-started
   static_files: webpack_bundles/get-started-page.mainpage.html
   upload: webpack_bundles/get-started-page.mainpage.html
   http_headers:
@@ -183,20 +186,9 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
-- url: /privacy
+- url: /privacy-policy
   static_files: webpack_bundles/privacy-page.mainpage.html
   upload: webpack_bundles/privacy-page.mainpage.html
-  http_headers:
-    Pragma: no-cache
-    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
-    X-Content-Type-Options: "nosniff"
-    X-Frame-Options: "DENY"
-    X-Xss-Protection: "1; mode=block"
-  secure: always
-  expiration: "0"
-- url: /splash
-  static_files: webpack_bundles/splash-page.mainpage.html
-  upload: webpack_bundles/splash-page.mainpage.html
   http_headers:
     Pragma: no-cache
     Strict-Transport-Security: "max-age=31536000; includeSubDomains"
@@ -253,8 +245,21 @@ libraries:
 - name: webapp2
   version: "2.5.2"
 
+# This is an access connector that connects to the Google Cloud Redis instance
+# used for memory caching. Please replace PROJECT_ID with the correct project id
+# for oppia on the production server.
+vpc_access_connector:
+  name: projects/PROJECT_ID/locations/us-central1/connectors/oppia-redis-connector-1
+
 env_variables:
   PYTHONHTTPSVERIFY: 1
+# GAE_USE_SOCKETS_HTTPLIB is needed for the redis connector in the Python 2
+# runtime. More information can be found here:
+# https://cloud.google.com/appengine/docs/standard/python/connecting-vpc#configuring
+# (The second note under 'Configuring your app to use a connector') which
+# redirects to these instructions to disable URL fetch:
+# https://cloud.google.com/appengine/docs/standard/python/sockets#making_httplib_use_sockets
+  GAE_USE_SOCKETS_HTTPLIB : "anyvalue"
 
 skip_files:
 # .pyc and .pyo files
@@ -267,77 +272,153 @@ skip_files:
 - ^core/(.*/)?.*\.ts$
 # Typescript output log file
 - ^(.*/)tsc_output_log.txt$
+# Python test files
+- ^(.*/)?.*_test\.py$
 # Other folders to ignore
-- tests/
-- scripts/
-- integrations/
-- integrations_dev/
+- core/tests/
 - node_modules/
+- scripts/
 # Some third_party static scripts are directly imported, namely: jquery,
 # jqueryui, angularjs, jqueryui-touch-punch, MathJax, code-mirror,
 # ui-codemirror, d3js, midi-js, ui-map, guppy, skulpt, math-expressions.
 # We exclude some of the scripts that are not directly imported in order to
 # reduce deployed file count.
 # TODO(sll): Find a more structured way of doing this.
-- third_party/static/angular-audio-1.7.4
-- third_party/static/angular-scroll-1.0.0
-- third_party/static/angular-toastr-1.7.0
-- third_party/static/bower-material-0.6.0-rc1
-- third_party/static/fontawesome-free-5.9.0-web
-- third_party/static/guppy-b5055b/site
-- third_party/static/guppy-b5055b/test
-- third_party/static/MathJax-2.7.5/docs
-- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Pagella
-- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Termes
-- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Latin-Modern
-- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Neo-Euler
-- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/TeX/png
-- third_party/static/MathJax-2.7.5/localization/ast
-- third_party/static/MathJax-2.7.5/localization/bcc
-- third_party/static/MathJax-2.7.5/localization/bg
-- third_party/static/MathJax-2.7.5/localization/br
-- third_party/static/MathJax-2.7.5/localization/ca
-- third_party/static/MathJax-2.7.5/localization/cdo
-- third_party/static/MathJax-2.7.5/localization/cs
-- third_party/static/MathJax-2.7.5/localization/cy
-- third_party/static/MathJax-2.7.5/localization/da
-- third_party/static/MathJax-2.7.5/localization/de
-- third_party/static/MathJax-2.7.5/localization/eo
-- third_party/static/MathJax-2.7.5/localization/es
-- third_party/static/MathJax-2.7.5/localization/fa
-- third_party/static/MathJax-2.7.5/localization/fi
-- third_party/static/MathJax-2.7.5/localization/fr
-- third_party/static/MathJax-2.7.5/localization/gl
-- third_party/static/MathJax-2.7.5/localization/he
-- third_party/static/MathJax-2.7.5/localization/ia
-- third_party/static/MathJax-2.7.5/localization/it
-- third_party/static/MathJax-2.7.5/localization/ja
-- third_party/static/MathJax-2.7.5/localization/kn
-- third_party/static/MathJax-2.7.5/localization/ko
-- third_party/static/MathJax-2.7.5/localization/lb
-- third_party/static/MathJax-2.7.5/localization/lki
-- third_party/static/MathJax-2.7.5/localization/lt
-- third_party/static/MathJax-2.7.5/localization/mk
-- third_party/static/MathJax-2.7.5/localization/nl
-- third_party/static/MathJax-2.7.5/localization/oc
-- third_party/static/MathJax-2.7.5/localization/pl
-- third_party/static/MathJax-2.7.5/localization/pt
-- third_party/static/MathJax-2.7.5/localization/pt-br
-- third_party/static/MathJax-2.7.5/localization/qqq
-- third_party/static/MathJax-2.7.5/localization/ru
-- third_party/static/MathJax-2.7.5/localization/scn
-- third_party/static/MathJax-2.7.5/localization/sco
-- third_party/static/MathJax-2.7.5/localization/sl
-- third_party/static/MathJax-2.7.5/localization/sv
-- third_party/static/MathJax-2.7.5/localization/tr
-- third_party/static/MathJax-2.7.5/localization/uk
-- third_party/static/MathJax-2.7.5/localization/vi
-- third_party/static/MathJax-2.7.5/localization/zh-hans
-- third_party/static/MathJax-2.7.5/test
-- third_party/static/MathJax-2.7.5/unpacked
-- third_party/static/messageformat-2.0.5
-- third_party/static/ng-img-crop-0.3.2
-- third_party/static/nginfinitescroll-1.0.0
-- third_party/static/perfectscrollbar-0.6.16
-- third_party/static/rangy-1.3.0
-- third_party/static/widget
+#
+# Please do not remove line below this, as it is used for testing purpose.
+# Third party files:
+- third_party/static/angular-audio-1.7.4/
+- third_party/static/angular-toastr-1.7.0/
+- third_party/static/bootstrap-4.3.1/
+- third_party/static/bower-angular-translate-2.18.1/
+- third_party/static/bower-angular-translate-interpolation-messageformat-2.18.1/
+- third_party/static/bower-angular-translate-loader-partial-2.18.1/
+- third_party/static/bower-angular-translate-loader-static-files-2.18.1/
+- third_party/static/bower-angular-translate-storage-cookie-2.18.1/
+- third_party/static/bower-material-1.1.19/
+# CKEditor-4.12.1 plugins in the download from the CKEditor website include
+# only a11yhelp, about, clipboard, colordialog, copyformatting, dialog, div,
+# find, flash, forms, iframe, image, link, liststyle, magicline, pagebreak,
+# pastefromword, preview, scayt, showblocks, smiley, specialchar, table,
+# tableselection, tabletools, templates, widget and wsc. Our code is also using
+# the sharedspace plugin. So, for now, we exclude all others, as well as flash,
+# a11yhelp, about, colordialog, iframe, and anything related to tables, which
+# we definitely don't use.
+- third_party/static/ckeditor-4.12.1/plugins/a11yhelp/
+- third_party/static/ckeditor-4.12.1/plugins/about/
+- third_party/static/ckeditor-4.12.1/plugins/adobeair/
+- third_party/static/ckeditor-4.12.1/plugins/ajax/
+- third_party/static/ckeditor-4.12.1/plugins/autocomplete/
+- third_party/static/ckeditor-4.12.1/plugins/autoembed/
+- third_party/static/ckeditor-4.12.1/plugins/autogrow/
+- third_party/static/ckeditor-4.12.1/plugins/autolink/
+- third_party/static/ckeditor-4.12.1/plugins/balloonpanel/
+- third_party/static/ckeditor-4.12.1/plugins/balloontoolbar/
+- third_party/static/ckeditor-4.12.1/plugins/bbcode/
+- third_party/static/ckeditor-4.12.1/plugins/bidi/
+- third_party/static/ckeditor-4.12.1/plugins/cloudservices/
+- third_party/static/ckeditor-4.12.1/plugins/codesnippet/
+- third_party/static/ckeditor-4.12.1/plugins/codesnippetgeshi/
+- third_party/static/ckeditor-4.12.1/plugins/colorbutton/
+- third_party/static/ckeditor-4.12.1/plugins/colordialog/
+- third_party/static/ckeditor-4.12.1/plugins/devtools/
+- third_party/static/ckeditor-4.12.1/plugins/dialogadvtab/
+- third_party/static/ckeditor-4.12.1/plugins/divarea/
+- third_party/static/ckeditor-4.12.1/plugins/docprops/
+- third_party/static/ckeditor-4.12.1/plugins/easyimage/
+- third_party/static/ckeditor-4.12.1/plugins/embed/
+- third_party/static/ckeditor-4.12.1/plugins/embedbase/
+- third_party/static/ckeditor-4.12.1/plugins/embedsemantic/
+- third_party/static/ckeditor-4.12.1/plugins/emoji/
+- third_party/static/ckeditor-4.12.1/plugins/flash/
+- third_party/static/ckeditor-4.12.1/plugins/font/
+- third_party/static/ckeditor-4.12.1/plugins/iframe/
+- third_party/static/ckeditor-4.12.1/plugins/iframedialog/
+- third_party/static/ckeditor-4.12.1/plugins/image2/
+- third_party/static/ckeditor-4.12.1/plugins/imagebase/
+- third_party/static/ckeditor-4.12.1/plugins/indentblock/
+- third_party/static/ckeditor-4.12.1/plugins/justify/
+- third_party/static/ckeditor-4.12.1/plugins/language/
+- third_party/static/ckeditor-4.12.1/plugins/mathjax/
+- third_party/static/ckeditor-4.12.1/plugins/mentions/
+- third_party/static/ckeditor-4.12.1/plugins/newpage/
+- third_party/static/ckeditor-4.12.1/plugins/panelbutton/
+- third_party/static/ckeditor-4.12.1/plugins/placeholder/
+- third_party/static/ckeditor-4.12.1/plugins/print/
+- third_party/static/ckeditor-4.12.1/plugins/save/
+- third_party/static/ckeditor-4.12.1/plugins/selectall/
+- third_party/static/ckeditor-4.12.1/plugins/sourcedialog/
+- third_party/static/ckeditor-4.12.1/plugins/stylesheetparser/
+- third_party/static/ckeditor-4.12.1/plugins/table/
+- third_party/static/ckeditor-4.12.1/plugins/tableresize/
+- third_party/static/ckeditor-4.12.1/plugins/tabletools/
+- third_party/static/ckeditor-4.12.1/plugins/textmatch/
+- third_party/static/ckeditor-4.12.1/plugins/textwatcher/
+- third_party/static/ckeditor-4.12.1/plugins/uicolor/
+- third_party/static/ckeditor-4.12.1/plugins/uploadfile/
+- third_party/static/ckeditor-4.12.1/plugins/xml/
+- third_party/static/ckeditor-4.12.1/samples/
+- third_party/static/ckeditor-4.12.1/skins/kama/
+- third_party/static/ckeditor-4.12.1/skins/moono/
+- third_party/static/ckeditor-bootstrapck-1.0.0/core/
+- third_party/static/ckeditor-bootstrapck-1.0.0/lang/
+- third_party/static/ckeditor-bootstrapck-1.0.0/plugins/
+- third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck-dev/
+- third_party/static/ckeditor-bootstrapck-1.0.0/skins/moono/
+- third_party/static/ckeditor-bootstrapck-1.0.0/skins/ckbuilder.jar/
+- third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/sample/
+- third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/scss/
+- third_party/static/fontawesome-free-5.9.0-web/
+- third_party/static/guppy-7509f3/site/
+- third_party/static/guppy-7509f3/test/
+- third_party/static/MathJax-2.7.5/docs/
+- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Pagella/
+- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Termes/
+- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Latin-Modern/
+- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Neo-Euler/
+- third_party/static/MathJax-2.7.5/fonts/HTML-CSS/TeX/png/
+- third_party/static/MathJax-2.7.5/localization/ast/
+- third_party/static/MathJax-2.7.5/localization/bcc/
+- third_party/static/MathJax-2.7.5/localization/bg/
+- third_party/static/MathJax-2.7.5/localization/br/
+- third_party/static/MathJax-2.7.5/localization/ca/
+- third_party/static/MathJax-2.7.5/localization/cdo/
+- third_party/static/MathJax-2.7.5/localization/cs/
+- third_party/static/MathJax-2.7.5/localization/cy/
+- third_party/static/MathJax-2.7.5/localization/da/
+- third_party/static/MathJax-2.7.5/localization/de/
+- third_party/static/MathJax-2.7.5/localization/eo/
+- third_party/static/MathJax-2.7.5/localization/es/
+- third_party/static/MathJax-2.7.5/localization/fa/
+- third_party/static/MathJax-2.7.5/localization/fi/
+- third_party/static/MathJax-2.7.5/localization/fr/
+- third_party/static/MathJax-2.7.5/localization/gl/
+- third_party/static/MathJax-2.7.5/localization/he/
+- third_party/static/MathJax-2.7.5/localization/ia/
+- third_party/static/MathJax-2.7.5/localization/it/
+- third_party/static/MathJax-2.7.5/localization/ja/
+- third_party/static/MathJax-2.7.5/localization/kn/
+- third_party/static/MathJax-2.7.5/localization/ko/
+- third_party/static/MathJax-2.7.5/localization/lb/
+- third_party/static/MathJax-2.7.5/localization/lki/
+- third_party/static/MathJax-2.7.5/localization/lt/
+- third_party/static/MathJax-2.7.5/localization/mk/
+- third_party/static/MathJax-2.7.5/localization/nl/
+- third_party/static/MathJax-2.7.5/localization/oc/
+- third_party/static/MathJax-2.7.5/localization/pl/
+- third_party/static/MathJax-2.7.5/localization/pt/
+- third_party/static/MathJax-2.7.5/localization/pt-br/
+- third_party/static/MathJax-2.7.5/localization/qqq/
+- third_party/static/MathJax-2.7.5/localization/ru/
+- third_party/static/MathJax-2.7.5/localization/scn/
+- third_party/static/MathJax-2.7.5/localization/sco/
+- third_party/static/MathJax-2.7.5/localization/sl/
+- third_party/static/MathJax-2.7.5/localization/sv/
+- third_party/static/MathJax-2.7.5/localization/tr/
+- third_party/static/MathJax-2.7.5/localization/uk/
+- third_party/static/MathJax-2.7.5/localization/vi/
+- third_party/static/MathJax-2.7.5/localization/zh-hans/
+- third_party/static/MathJax-2.7.5/test/
+- third_party/static/MathJax-2.7.5/unpacked/
+- third_party/static/messageformat-2.0.5/
+- third_party/static/popperJs-1.15.0/

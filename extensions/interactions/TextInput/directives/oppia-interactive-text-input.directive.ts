@@ -23,47 +23,24 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('interactions/TextInput/directives/text-input-rules.service.ts');
 require(
+  'interactions/interaction-attributes-extractor.service.ts');
+require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-require('services/contextual/WindowDimensionsService.ts');
-require('services/HtmlEscaperService.ts');
-require('services/stateful/FocusManagerService.ts');
 
 angular.module('oppia').directive('oppiaInteractiveTextInput', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'InteractionAttributesExtractorService',
+  function(InteractionAttributesExtractorService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/TextInput/directives/' +
-        'text-input-interaction.directive.html'),
+      template: require('./text-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'FocusManagerService', 'TextInputRulesService',
-        'WindowDimensionsService', 'CurrentInteractionService',
+        '$attrs', 'TextInputRulesService', 'CurrentInteractionService',
         function(
-            $attrs, FocusManagerService, TextInputRulesService,
-            WindowDimensionsService, CurrentInteractionService) {
+            $attrs, TextInputRulesService, CurrentInteractionService) {
           var ctrl = this;
-          ctrl.placeholder = HtmlEscaperService.escapedJsonToObj(
-            $attrs.placeholderWithValue);
-          ctrl.rows = (
-            HtmlEscaperService.escapedJsonToObj($attrs.rowsWithValue));
-          ctrl.answer = '';
-          ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
-
-          ctrl.schema = {
-            type: 'unicode',
-            ui_config: {}
-          };
-          if (ctrl.placeholder) {
-            ctrl.schema.ui_config.placeholder = ctrl.placeholder;
-          }
-          if (ctrl.rows && ctrl.rows !== 1) {
-            ctrl.schema.ui_config.rows = ctrl.rows;
-          }
-
           ctrl.submitAnswer = function(answer) {
             if (!answer) {
               return;
@@ -79,9 +56,33 @@ angular.module('oppia').directive('oppiaInteractiveTextInput', [
           var validityCheckFn = function() {
             return ctrl.answer.length > 0;
           };
+          ctrl.$onInit = function() {
+            const {
+              placeholder,
+              rows
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'TextInput',
+              $attrs
+            );
+            ctrl.placeholder = placeholder.getUnicode();
+            ctrl.rows = rows;
+            ctrl.answer = '';
+            ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
-          CurrentInteractionService.registerCurrentInteraction(
-            submitAnswerFn, validityCheckFn);
+            ctrl.schema = {
+              type: 'unicode',
+              ui_config: {}
+            };
+            if (ctrl.placeholder) {
+              ctrl.schema.ui_config.placeholder = ctrl.placeholder;
+            }
+            if (ctrl.rows && ctrl.rows !== 1) {
+              ctrl.schema.ui_config.rows = ctrl.rows;
+            }
+
+            CurrentInteractionService.registerCurrentInteraction(
+              submitAnswerFn, validityCheckFn);
+          };
         }
       ]
     };

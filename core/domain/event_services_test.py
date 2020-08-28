@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for event handling."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -229,8 +230,9 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
     def _get_all_python_files(self):
         """Recursively collects all Python files in the core/ and extensions/
         directory.
+
         Returns:
-            a list of Python files.
+            list(str). A list of Python files.
         """
         files_in_directory = []
         for directory, _, files in os.walk('.'):

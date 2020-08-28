@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for continuous computations relating to feedback analytics."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -35,6 +36,7 @@ class MockFeedbackAnalyticsAggregator(
     """A modified FeedbackAnalyticsAggregator that does not start a new batch
     job when the previous one has finished.
     """
+
     @classmethod
     def _get_batch_job_manager_class(cls):
         return MockFeedbackAnalyticsMRJobManager
@@ -58,6 +60,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
     test environment the realtime datastore is not automatically cleared after
     a batch job completes.
     """
+
     ALL_CC_MANAGERS_FOR_TESTS = [MockFeedbackAnalyticsAggregator]
 
     def _get_swap_context(self):
@@ -86,12 +89,17 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
                 exp_id).to_dict(),
             expected_thread_analytics_dict)
 
+    def setUp(self):
+        super(FeedbackAnalyticsAggregatorUnitTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
     def test_no_threads_job_not_run(self):
         # Create a new exploration, but don't create any threads and don't even
         # start the MR job.
         with self._get_swap_context():
             exp_id = 'eid'
-            self.save_new_valid_exploration(exp_id, 'owner')
+            self.save_new_valid_exploration(exp_id, self.owner_id)
             self.assertEqual(
                 MockFeedbackAnalyticsAggregator.get_thread_analytics(
                     exp_id).to_dict(), {
@@ -103,8 +111,8 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
         with self._get_swap_context():
             exp_id_1 = 'eid1'
             exp_id_2 = 'eid2'
-            self.save_new_valid_exploration(exp_id_1, 'owner')
-            self.save_new_valid_exploration(exp_id_2, 'owner')
+            self.save_new_valid_exploration(exp_id_1, self.owner_id)
+            self.save_new_valid_exploration(exp_id_2, self.owner_id)
 
             initial_feedback_threads = (
                 MockFeedbackAnalyticsAggregator.get_thread_analytics_multi(
@@ -120,7 +128,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             })
 
             feedback_services.create_thread(
-                'exploration', exp_id_1, 'owner', 'subject', 'text')
+                'exploration', exp_id_1, self.owner_id, 'subject', 'text')
             self.process_and_flush_pending_tasks()
             feedback_threads = (
                 MockFeedbackAnalyticsAggregator.get_thread_analytics_multi(
@@ -152,7 +160,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
     def test_no_threads(self):
         with self._get_swap_context():
             exp_id = 'eid'
-            self.save_new_valid_exploration(exp_id, 'owner')
+            self.save_new_valid_exploration(exp_id, self.owner_id)
             self._run_job_and_check_results(
                 exp_id, {
                     'num_open_threads': 0,
@@ -163,7 +171,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
         with self._get_swap_context():
             exp_id = 'eid'
             thread_id = 'exploration.eid.tid'
-            self.save_new_valid_exploration(exp_id, 'owner')
+            self.save_new_valid_exploration(exp_id, self.owner_id)
             thread = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id)
             thread.message_count = 0
@@ -182,7 +190,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             exp_id = 'eid'
             thread_id_1 = 'exploration.eid.tid1'
             thread_id_2 = 'exploration.eid.tid2'
-            self.save_new_valid_exploration(exp_id, 'owner')
+            self.save_new_valid_exploration(exp_id, self.owner_id)
             thread_1 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_1)
             thread_1.message_count = 0
@@ -212,9 +220,9 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             thread_id_1 = 'exploration.eid1.tid1'
             thread_id_2 = 'exploration.eid1.tid2'
             thread_id_3 = 'exploration.eid3.tid3'
-            self.save_new_valid_exploration(exp_id_1, 'owner')
-            self.save_new_valid_exploration(exp_id_2, 'owner')
-            self.save_new_valid_exploration(exp_id_3, 'owner')
+            self.save_new_valid_exploration(exp_id_1, self.owner_id)
+            self.save_new_valid_exploration(exp_id_2, self.owner_id)
+            self.save_new_valid_exploration(exp_id_3, self.owner_id)
 
             thread_1 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_1)
@@ -294,7 +302,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             user_id = 'uid'
             exp_id = 'eid'
             thread_id_1 = 'exploration.eid.tid1'
-            self.save_new_valid_exploration(exp_id, 'owner')
+            self.save_new_valid_exploration(exp_id, self.owner_id)
             thread_1 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_1)
             thread_1.message_count = 0
@@ -334,7 +342,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             user_id = 'uid'
             exp_id = 'eid'
             thread_id_1 = 'exploration.eid.tid1'
-            self.save_new_valid_exploration(exp_id, 'owner')
+            self.save_new_valid_exploration(exp_id, self.owner_id)
             thread_1 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_1)
             thread_1.message_count = 0
@@ -394,7 +402,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             user_id = 'uid'
             exp_id = 'eid'
             thread_id_1 = 'exploration.eid.tid1'
-            self.save_new_valid_exploration(exp_id, 'owner')
+            self.save_new_valid_exploration(exp_id, self.owner_id)
             thread_1 = feedback_models.GeneralFeedbackThreadModel.create(
                 thread_id_1)
             thread_1.message_count = 0
@@ -452,6 +460,11 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
 
     ALL_CC_MANAGERS_FOR_TESTS = [MockFeedbackAnalyticsAggregator]
 
+    def setUp(self):
+        super(RealtimeFeedbackAnalyticsUnitTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
     def _get_swap_context(self):
         """Substitutes the jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS
         value with ALL_CC_MANAGERS_FOR_TESTS.
@@ -473,7 +486,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
     def test_no_threads(self):
         with self._get_swap_context():
             exp_id = 'eid'
-            self.save_new_valid_exploration(exp_id, 'owner')
+            self.save_new_valid_exploration(exp_id, self.owner_id)
 
             self._flush_tasks_and_check_analytics(
                 exp_id, {
@@ -485,7 +498,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
         with self._get_swap_context():
             # Create test objects.
             exp_id = 'eid'
-            self.save_new_valid_exploration(exp_id, 'owner')
+            self.save_new_valid_exploration(exp_id, self.owner_id)
 
             # Trigger thread creation event.
             self.process_and_flush_pending_tasks()
@@ -502,7 +515,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
         with self._get_swap_context():
             # Create test objects.
             exp_id = 'eid'
-            self.save_new_valid_exploration(exp_id, 'owner')
+            self.save_new_valid_exploration(exp_id, self.owner_id)
 
             # Trigger thread creation events.
             self.process_and_flush_pending_tasks()
@@ -522,8 +535,8 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Create test objects.
             exp_id_1 = 'eid1'
             exp_id_2 = 'eid2'
-            self.save_new_valid_exploration(exp_id_1, 'owner')
-            self.save_new_valid_exploration(exp_id_2, 'owner')
+            self.save_new_valid_exploration(exp_id_1, self.owner_id)
+            self.save_new_valid_exploration(exp_id_2, self.owner_id)
 
             # Trigger thread creation events.
             self.process_and_flush_pending_tasks()
@@ -551,7 +564,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
         with self._get_swap_context():
             # Create test objects.
             exp_id = 'eid'
-            self.save_new_valid_exploration(exp_id, 'owner')
+            self.save_new_valid_exploration(exp_id, self.owner_id)
 
             # Trigger thread creation events.
             self.process_and_flush_pending_tasks()
@@ -568,7 +581,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
                 'exploration', exp_id, False)
             thread_id = threadlist[0].id
             feedback_services.create_message(
-                thread_id, 'author', feedback_models.STATUS_CHOICES_FIXED,
+                thread_id, self.owner_id, feedback_models.STATUS_CHOICES_FIXED,
                 None, 'some text')
             self._flush_tasks_and_check_analytics(
                 exp_id, {
@@ -580,7 +593,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
         with self._get_swap_context():
             # Create test objects.
             exp_id = 'eid'
-            self.save_new_valid_exploration(exp_id, 'owner')
+            self.save_new_valid_exploration(exp_id, self.owner_id)
 
             # Trigger thread creation events.
             self.process_and_flush_pending_tasks()
@@ -598,7 +611,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
                 'exploration', exp_id, False)
             thread_id = threadlist[0].id
             feedback_services.create_message(
-                thread_id, 'author', feedback_models.STATUS_CHOICES_FIXED,
+                thread_id, self.owner_id, feedback_models.STATUS_CHOICES_FIXED,
                 None, 'some text')
             self._flush_tasks_and_check_analytics(
                 exp_id, {
@@ -611,7 +624,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
                 'exploration', exp_id, False)
             thread_id = threadlist[0].id
             feedback_services.create_message(
-                thread_id, 'author', feedback_models.STATUS_CHOICES_OPEN,
+                thread_id, self.owner_id, feedback_models.STATUS_CHOICES_OPEN,
                 None, 'some text')
             self._flush_tasks_and_check_analytics(
                 exp_id, {
@@ -623,7 +636,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
         with self._get_swap_context():
             # Create test objects.
             exp_id = 'eid'
-            self.save_new_valid_exploration(exp_id, 'owner')
+            self.save_new_valid_exploration(exp_id, self.owner_id)
 
             # Trigger thread creation events.
             self.process_and_flush_pending_tasks()
@@ -641,7 +654,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
                 'exploration', exp_id, False)
             thread_id = threadlist[0].id
             feedback_services.create_message(
-                thread_id, 'author', feedback_models.STATUS_CHOICES_FIXED,
+                thread_id, self.owner_id, feedback_models.STATUS_CHOICES_FIXED,
                 None, 'some text')
             self._flush_tasks_and_check_analytics(
                 exp_id, {
@@ -654,8 +667,8 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
                 'exploration', exp_id, False)
             thread_id = threadlist[0].id
             feedback_services.create_message(
-                thread_id, 'author', feedback_models.STATUS_CHOICES_IGNORED,
-                None, 'some text')
+                thread_id, self.owner_id,
+                feedback_models.STATUS_CHOICES_IGNORED, None, 'some text')
             self._flush_tasks_and_check_analytics(
                 exp_id, {
                     'num_open_threads': 0,
@@ -667,7 +680,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             # Create test objects.
             user_id = 'uid'
             exp_id = 'eid'
-            self.save_new_valid_exploration(exp_id, 'owner')
+            self.save_new_valid_exploration(exp_id, self.owner_id)
             feedback_services.create_thread(
                 'exploration', exp_id, None, 'a subject', 'some text')
 
@@ -704,7 +717,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
         with self._get_swap_context():
             # Create test objects.
             exp_id = 'eid'
-            self.save_new_valid_exploration(exp_id, 'owner')
+            self.save_new_valid_exploration(exp_id, self.owner_id)
 
             event_services.FeedbackThreadStatusChangedEventHandler.record(
                 exp_id, feedback_models.STATUS_CHOICES_FIXED,
@@ -720,7 +733,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
         with self._get_swap_context():
             # Create test objects.
             exp_id = 'eid'
-            self.save_new_valid_exploration(exp_id, 'owner')
+            self.save_new_valid_exploration(exp_id, self.owner_id)
 
             event_services.FeedbackThreadStatusChangedEventHandler.record(
                 exp_id, feedback_models.STATUS_CHOICES_OPEN,

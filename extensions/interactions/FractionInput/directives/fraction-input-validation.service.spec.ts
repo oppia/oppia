@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for fraction input validation service.
  */
+import cloneDeep from 'lodash/cloneDeep';
 
 import { AppConstants } from 'app.constants';
 import { AnswerGroupObjectFactory } from
@@ -215,23 +216,22 @@ describe('FractionInputValidationService', () => {
       }
     });
 
-    answerGroups = [agof.createNew(
-      [equalsOneRule, lessThanTwoRule],
-      goodDefaultOutcome,
-      false,
-      null
-    )];
+    const answerGroup = agof.createNew(goodDefaultOutcome, false, null);
+    answerGroup.updateRuleTypesToInputs([equalsOneRule, lessThanTwoRule]);
+    answerGroups = [answerGroup];
   });
 
   it('should be able to perform basic validation', function() {
+    const answerGroup = agof.createNew(goodDefaultOutcome, false, null);
+    answerGroup.updateRuleTypesToInputs([equalsOneRule]);
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups,
+      currentState, customizationArgs, [answerGroup],
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
   it('should catch redundant rules', function() {
-    answerGroups[0].rules = [lessThanTwoRule, equalsOneRule];
+    answerGroups[0].updateRuleTypesToInputs([lessThanTwoRule, equalsOneRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -243,22 +243,34 @@ describe('FractionInputValidationService', () => {
   });
 
   it('should not catch equals followed by equivalent as redundant', function() {
-    answerGroups[0].rules = [equalsOneRule, equivalentToOneRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups,
+    const answerGroup1 = agof.createNew(goodDefaultOutcome, false, null);
+    answerGroup1.updateRuleTypesToInputs([equalsOneRule]);
+
+    const answerGroup2 = agof.createNew(goodDefaultOutcome, false, null);
+    answerGroup1.updateRuleTypesToInputs([equivalentToOneRule]);
+
+    const warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, [answerGroup1, answerGroup2],
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
 
-    answerGroups[0].rules = [equalsOneRule, equivalentToOneAndSimplestFormRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups,
+
+    const answerGroup3 = agof.createNew(goodDefaultOutcome, false, null);
+    answerGroup1.updateRuleTypesToInputs([equalsOneRule]);
+
+    const answerGroup4 = agof.createNew(goodDefaultOutcome, false, null);
+    answerGroup1.updateRuleTypesToInputs([equivalentToOneAndSimplestFormRule]);
+
+    const warnings2 = validatorService.getAllWarnings(
+      currentState, customizationArgs, [answerGroup3, answerGroup4],
       goodDefaultOutcome);
-    expect(warnings).toEqual([]);
+    expect(warnings2).toEqual([]);
   });
 
   it('should catch equivalent followed by equals same value' +
     'as redundant', function() {
-    answerGroups[0].rules = [equivalentToOneRule, equalsOneRule];
+    answerGroups[0].updateRuleTypesToInputs(
+      [equivalentToOneRule, equalsOneRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -268,7 +280,8 @@ describe('FractionInputValidationService', () => {
         'because it is made redundant by rule 1 from answer group 1.'
     }]);
 
-    answerGroups[0].rules = [equivalentToOneAndSimplestFormRule, equalsOneRule];
+    answerGroups[0].updateRuleTypesToInputs(
+      [equivalentToOneAndSimplestFormRule, equalsOneRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -280,9 +293,9 @@ describe('FractionInputValidationService', () => {
   });
 
   it('should catch redundant rules in separate answer groups', () => {
-    answerGroups[1] = angular.copy(answerGroups[0]);
-    answerGroups[0].rules = [greaterThanMinusOneRule];
-    answerGroups[1].rules = [equalsOneRule];
+    answerGroups[1] = cloneDeep(answerGroups[0]);
+    answerGroups[0].updateRuleTypesToInputs([greaterThanMinusOneRule]);
+    answerGroups[1].updateRuleTypesToInputs([equalsOneRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -295,7 +308,8 @@ describe('FractionInputValidationService', () => {
 
   it('should catch redundant rules caused by greater/less than range',
     () => {
-      answerGroups[0].rules = [greaterThanMinusOneRule, equalsOneRule];
+      answerGroups[0].updateRuleTypesToInputs(
+        [greaterThanMinusOneRule, equalsOneRule]);
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups,
         goodDefaultOutcome);
@@ -307,7 +321,8 @@ describe('FractionInputValidationService', () => {
     });
 
   it('should catch redundant rules caused by exactly equals', () => {
-    answerGroups[0].rules = [exactlyEqualToOneAndNotInSimplestFormRule];
+    answerGroups[0].updateRuleTypesToInputs(
+      [exactlyEqualToOneAndNotInSimplestFormRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -319,7 +334,7 @@ describe('FractionInputValidationService', () => {
   });
 
   it('should catch non integer inputs in the numerator', () => {
-    answerGroups[0].rules = [nonIntegerRule];
+    answerGroups[0].updateRuleTypesToInputs([nonIntegerRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -334,7 +349,7 @@ describe('FractionInputValidationService', () => {
 
   it('should catch non integer inputs in the whole number', () => {
     nonIntegerRule.type = 'HasIntegerPartEqualTo';
-    answerGroups[0].rules = [nonIntegerRule];
+    answerGroups[0].updateRuleTypesToInputs([nonIntegerRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -349,7 +364,7 @@ describe('FractionInputValidationService', () => {
 
   it('should catch non integer inputs in the denominator', () => {
     nonIntegerRule.type = 'HasDenominatorEqualTo';
-    answerGroups[0].rules = [nonIntegerRule];
+    answerGroups[0].updateRuleTypesToInputs([nonIntegerRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -363,7 +378,7 @@ describe('FractionInputValidationService', () => {
   });
 
   it('should catch zero input in denominator', () => {
-    answerGroups[0].rules = [zeroDenominatorRule];
+    answerGroups[0].updateRuleTypesToInputs([zeroDenominatorRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -379,7 +394,7 @@ describe('FractionInputValidationService', () => {
   it('should catch not allowImproperFraction and rule has improper fraction',
     () => {
       customizationArgs.allowImproperFraction.value = false;
-      answerGroups[0].rules = [equalsThreeByTwoRule];
+      answerGroups[0].updateRuleTypesToInputs([equalsThreeByTwoRule]);
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups,
         goodDefaultOutcome);
@@ -395,7 +410,7 @@ describe('FractionInputValidationService', () => {
   it('should catch not allowNonzeroIntegerPart and rule has integer part',
     () => {
       customizationArgs.allowNonzeroIntegerPart.value = false;
-      answerGroups[0].rules = [equalsOneAndHalfRule];
+      answerGroups[0].updateRuleTypesToInputs([equalsOneAndHalfRule]);
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups,
         goodDefaultOutcome);
@@ -411,7 +426,7 @@ describe('FractionInputValidationService', () => {
   it('should catch if not allowNonzeroIntegerPart and ' +
     'rule is HasIntegerPartEqualTo a non zero value', () => {
     customizationArgs.allowNonzeroIntegerPart.value = false;
-    answerGroups[0].rules = [integerPartEqualsOne];
+    answerGroups[0].updateRuleTypesToInputs([integerPartEqualsOne]);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -427,7 +442,7 @@ describe('FractionInputValidationService', () => {
   it('should allow if not allowNonzeroIntegerPart and ' +
     'rule is HasIntegerPartEqualTo a zero value', () => {
     customizationArgs.allowNonzeroIntegerPart.value = false;
-    answerGroups[0].rules = [integerPartEqualsZero];
+    answerGroups[0].updateRuleTypesToInputs([integerPartEqualsZero]);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -437,9 +452,10 @@ describe('FractionInputValidationService', () => {
   it('should allow equivalent fractions with if not requireSimplestForm ' +
     'and rules are IsExactlyEqualTo', () => {
     customizationArgs.requireSimplestForm = false;
-    answerGroups[1] = angular.copy(answerGroups[0]);
-    answerGroups[0].rules = [equalsOneRule];
-    answerGroups[1].rules = [exactlyEqualToOneAndNotInSimplestFormRule];
+    answerGroups[1] = cloneDeep(answerGroups[0]);
+    answerGroups[0].updateRuleTypesToInputs([equalsOneRule]);
+    answerGroups[1].updateRuleTypesToInputs(
+      [exactlyEqualToOneAndNotInSimplestFormRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -449,9 +465,9 @@ describe('FractionInputValidationService', () => {
   it('should allow if numerator and denominator should equal the same value ' +
     'and are set in different rules', () => {
     customizationArgs.requireSimplestForm = false;
-    answerGroups[1] = angular.copy(answerGroups[0]);
-    answerGroups[0].rules = [numeratorEqualsFiveRule];
-    answerGroups[1].rules = [denominatorEqualsFiveRule];
+    answerGroups[1] = cloneDeep(answerGroups[0]);
+    answerGroups[0].updateRuleTypesToInputs([numeratorEqualsFiveRule]);
+    answerGroups[1].updateRuleTypesToInputs([denominatorEqualsFiveRule]);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -461,7 +477,8 @@ describe('FractionInputValidationService', () => {
   it('should correctly check validity of HasFractionalPartExactlyEqualTo rule',
     () => {
       customizationArgs.requireSimplestForm = false;
-      answerGroups[0].rules = [HasFractionalPartExactlyEqualToOneAndHalfRule];
+      answerGroups[0].updateRuleTypesToInputs(
+        [HasFractionalPartExactlyEqualToOneAndHalfRule]);
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups,
         goodDefaultOutcome);
@@ -473,7 +490,8 @@ describe('FractionInputValidationService', () => {
       }]);
 
       customizationArgs.allowImproperFraction = false;
-      answerGroups[0].rules = [HasFractionalPartExactlyEqualToThreeHalfs];
+      answerGroups[0].updateRuleTypesToInputs(
+        [HasFractionalPartExactlyEqualToThreeHalfs]);
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups,
         goodDefaultOutcome);
@@ -484,7 +502,8 @@ describe('FractionInputValidationService', () => {
           'improper fractions are not allowed')
       }]);
 
-      answerGroups[0].rules = [HasFractionalPartExactlyEqualToNegativeValue];
+      answerGroups[0].updateRuleTypesToInputs(
+        [HasFractionalPartExactlyEqualToNegativeValue]);
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups,
         goodDefaultOutcome);
@@ -496,15 +515,17 @@ describe('FractionInputValidationService', () => {
       }]);
 
       customizationArgs.allowImproperFraction = true;
-      answerGroups[0].rules = [HasFractionalPartExactlyEqualToTwoFifthsRule];
+      answerGroups[0].updateRuleTypesToInputs(
+        [HasFractionalPartExactlyEqualToTwoFifthsRule]);
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups,
         goodDefaultOutcome);
       expect(warnings).toEqual([]);
 
-      answerGroups[1] = angular.copy(answerGroups[0]);
-      answerGroups[0].rules = [denominatorEqualsFiveRule];
-      answerGroups[1].rules = [HasFractionalPartExactlyEqualToTwoFifthsRule];
+      answerGroups[1] = cloneDeep(answerGroups[0]);
+      answerGroups[0].updateRuleTypesToInputs([denominatorEqualsFiveRule]);
+      answerGroups[1].updateRuleTypesToInputs(
+        [HasFractionalPartExactlyEqualToTwoFifthsRule]);
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups,
         goodDefaultOutcome);

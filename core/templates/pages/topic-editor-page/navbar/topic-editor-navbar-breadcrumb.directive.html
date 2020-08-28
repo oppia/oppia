@@ -1,0 +1,15 @@
+<div class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak">
+  <span>
+    <a href="/topics-and-skills-dashboard" uib-tooltip="Back to Topics and Skills Dashboard" ng-if="!canNavigateToTopicEditorPage()" class="back-to-dashboard">
+      <i class="fa fa-arrow-left"></i>
+    </a>
+    <i class="fa fa-arrow-left protractor-test-edit-topic-tab" uib-tooltip="Back to Topic" ng-if="canNavigateToTopicEditorPage()" ng-click="navigateToMainTab()"></i>
+    <[topic.getName()]> (v<[topic.getVersion()]>)
+  </span>
+</div>
+<style>
+  topic-editor-navbar-breadcrumb .back-to-dashboard {
+    color: #FFF;
+    text-decoration: none;
+  }
+</style>

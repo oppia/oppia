@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for scripts/docstrings_checker."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -217,7 +218,8 @@ def func(test_var_one, test_var_two): #@
             finally:
                 setattr(obj, attr, original)
 
-        raise_node = astroid.extract_node("""
+        raise_node = astroid.extract_node(
+            """
         def func():
             raise Exception('An exception.') #@
         """)
@@ -230,7 +232,8 @@ def func(test_var_one, test_var_two): #@
         self.assertEqual(exceptions, set([]))
 
     def test_possible_exc_types_with_exception_message(self):
-        raise_node = astroid.extract_node("""
+        raise_node = astroid.extract_node(
+            """
         def func():
             \"\"\"Function to test raising exceptions.\"\"\"
             raise Exception('An exception.') #@
@@ -240,7 +243,8 @@ def func(test_var_one, test_var_two): #@
         self.assertEqual(exceptions, set(['Exception']))
 
     def test_possible_exc_types_with_no_exception(self):
-        raise_node = astroid.extract_node("""
+        raise_node = astroid.extract_node(
+            """
         def func():
             \"\"\"Function to test raising exceptions.\"\"\"
             raise #@
@@ -250,7 +254,8 @@ def func(test_var_one, test_var_two): #@
         self.assertEqual(exceptions, set([]))
 
     def test_possible_exc_types_with_exception_inside_function(self):
-        raise_node = astroid.extract_node("""
+        raise_node = astroid.extract_node(
+            """
         def func():
             try:
                 raise Exception('An exception.')

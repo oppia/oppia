@@ -20,39 +20,30 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('interactions/Continue/directives/continue-rules.service.ts');
 require(
+  'interactions/interaction-attributes-extractor.service.ts');
+require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-require('services/ContextService.ts');
-require('services/HtmlEscaperService.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('services/context.service.ts');
+
 
 angular.module('oppia').directive('oppiaInteractiveContinue', [
-  'ContinueRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
-  function(ContinueRulesService, HtmlEscaperService, UrlInterpolationService) {
+  'ContinueRulesService', 'InteractionAttributesExtractorService',
+  function(ContinueRulesService, InteractionAttributesExtractorService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/Continue/directives/' +
-        'continue-interaction.directive.html'),
+      template: require('./continue-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'WindowDimensionsService',
-        'CurrentInteractionService', 'ContextService',
+        '$attrs', 'CurrentInteractionService', 'ContextService',
         function(
-            $attrs, WindowDimensionsService,
-            CurrentInteractionService, ContextService) {
+            $attrs, CurrentInteractionService, ContextService) {
           var ctrl = this;
-          ctrl.buttonText = HtmlEscaperService.escapedJsonToObj(
-            $attrs.buttonTextWithValue);
           var DEFAULT_BUTTON_TEXT = 'Continue';
           var DEFAULT_HUMAN_READABLE_ANSWER = 'Please continue.';
-
-          ctrl.isInEditorMode = ContextService.isInExplorationEditorMode();
-
           ctrl.submitAnswer = function() {
             // We used to show "(Continue)" to indicate a 'continue' action when
             // the learner browses through the history of the exploration, but
@@ -67,9 +58,20 @@ angular.module('oppia').directive('oppiaInteractiveContinue', [
             CurrentInteractionService.onSubmit(
               humanReadableAnswer, ContinueRulesService);
           };
+          ctrl.$onInit = function() {
+            const {
+              buttonText
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'Continue',
+              $attrs
+            );
+            ctrl.buttonText = buttonText.getUnicode();
 
-          CurrentInteractionService.registerCurrentInteraction(
-            ctrl.submitAnswer, null);
+            ctrl.isInEditorMode = ContextService.isInExplorationEditorMode();
+
+            CurrentInteractionService.registerCurrentInteraction(
+              ctrl.submitAnswer, null);
+          };
         }
       ]
     };

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Domain object for statistics models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -115,8 +116,7 @@ class ExplorationStats(python_utils.OBJECT):
         state of the exploration and traversed to the next state.
 
         Returns:
-            int. The number of learners who actually attempted
-                the exploration.
+            int. The number of learners who actually attempted the exploration.
         """
         return self.num_actual_starts_v1 + self.num_actual_starts_v2
 
@@ -333,7 +333,7 @@ class StateStats(python_utils.OBJECT):
 
         Returns:
             int. Number of times the solution button was triggered to answer a
-                state only for events for schema version 2.
+            state only for events for schema version 2.
         """
         return self.num_times_solution_viewed_v2
 
@@ -476,7 +476,7 @@ class ExplorationIssues(python_utils.OBJECT):
 
         Returns:
             ExplorationIssues. The corresponding ExplorationIssues domain
-                object.
+            object.
         """
         unresolved_issues = [
             ExplorationIssue.from_dict(unresolved_issue_dict)
@@ -544,41 +544,20 @@ class Playthrough(python_utils.OBJECT):
         }
 
     @classmethod
-    def from_dict(cls, playthrough_dict):
-        """Returns a Playthrough object from a dict.
+    def from_dict(cls, playthrough_data):
+        """Checks whether the playthrough dict has the correct keys and then
+        returns a domain object instance.
 
         Args:
-            playthrough_dict: dict. A dict mapping of all fields of Playthrough
+            playthrough_data: dict. A dict mapping of all fields of Playthrough
                 object.
 
         Returns:
             Playthrough. The corresponding Playthrough domain object.
         """
-        actions = [
-            LearnerAction.from_dict(action_dict)
-            for action_dict in playthrough_dict['actions']]
-        return cls(
-            playthrough_dict['exp_id'],
-            playthrough_dict['exp_version'],
-            playthrough_dict['issue_type'],
-            playthrough_dict['issue_customization_args'],
-            actions)
-
-    @classmethod
-    def from_backend_dict(cls, playthrough_data):
-        """Checks whether the playthrough dict has the correct keys and then
-        returns a domain object instance.
-
-        Args:
-            playthrough_data: dict. Dict representing a playthrough.
-
-        Returns:
-            Playthrough. A playthrough domain object.
-        """
         playthrough_properties = [
             'exp_id', 'exp_version', 'issue_type',
             'issue_customization_args', 'actions']
-
         for playthrough_property in playthrough_properties:
             if playthrough_property not in playthrough_data:
                 raise utils.ValidationError(
@@ -675,61 +654,42 @@ class ExplorationIssue(python_utils.OBJECT):
         """
         return {
             'issue_type': self.issue_type,
-            'issue_customization_args': (
-                customization_args_util.get_full_customization_args(
-                    self.issue_customization_args,
-                    playthrough_issue_registry.Registry.get_issue_by_type(
-                        self.issue_type).customization_arg_specs)),
+            'issue_customization_args': self.issue_customization_args,
             'playthrough_ids': self.playthrough_ids,
             'schema_version': self.schema_version,
             'is_valid': self.is_valid
         }
 
     @classmethod
-    def from_dict(cls, issue_dict):
-        """Returns an ExplorationIssue object from a dict.
-
-        Args:
-            issue_dict: dict. A dict mapping of all fields of ExplorationIssue
-                object.
-
-        Returns:
-            ExplorationIssue. The corresponding ExplorationIssue domain object.
-        """
-        return cls(
-            issue_dict['issue_type'],
-            issue_dict['issue_customization_args'],
-            issue_dict['playthrough_ids'],
-            issue_dict['schema_version'],
-            issue_dict['is_valid'])
-
-    @classmethod
-    def from_backend_dict(cls, exp_issue_dict):
+    def from_dict(cls, exp_issue_dict):
         """Checks whether the exploration issue dict has the correct keys and
         then returns a domain object instance.
 
         Args:
-            exp_issue_dict: dict. Dict representing an exploration issue.
+            exp_issue_dict: dict. A dict mapping of all fields of
+                ExplorationIssue object.
 
         Returns:
-            ExplorationIssue. The exploration issue domain object.
+            ExplorationIssue. The corresponding ExplorationIssue domain object.
         """
         exp_issue_properties = [
             'issue_type', 'schema_version', 'issue_customization_args',
             'playthrough_ids', 'is_valid']
-
         for exp_issue_property in exp_issue_properties:
             if exp_issue_property not in exp_issue_dict:
                 raise utils.ValidationError(
-                    '%s not in exploration issue dict.' % (exp_issue_property))
+                    '%s not in exploration issue dict.' % (
+                        exp_issue_property))
 
-        dummy_exp_issue = cls(
+        exp_issue = cls(
             exp_issue_dict['issue_type'],
-            exp_issue_dict['issue_customization_args'], [],
-            exp_issue_dict['schema_version'], exp_issue_dict['is_valid'])
+            exp_issue_dict['issue_customization_args'],
+            exp_issue_dict['playthrough_ids'],
+            exp_issue_dict['schema_version'],
+            exp_issue_dict['is_valid'])
 
-        dummy_exp_issue.validate()
-        return dummy_exp_issue
+        exp_issue.validate()
+        return exp_issue
 
     @classmethod
     def update_exp_issue_from_model(cls, issue_dict):
@@ -753,7 +713,9 @@ class ExplorationIssue(python_utils.OBJECT):
         implemented only for testing purposes and must be rewritten when an
         actual schema migration from v1 to v2 takes place.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The _convert_issue_v1_dict_to_v2_dict() method is missing from the'
+            ' derived class. It should be implemented in the derived class.')
 
     def validate(self):
         """Validates the ExplorationIssue domain object."""
@@ -816,11 +778,7 @@ class LearnerAction(python_utils.OBJECT):
         """
         return {
             'action_type': self.action_type,
-            'action_customization_args': (
-                customization_args_util.get_full_customization_args(
-                    self.action_customization_args,
-                    action_registry.Registry.get_action_by_type(
-                        self.action_type).customization_arg_specs)),
+            'action_customization_args': self.action_customization_args,
             'schema_version': self.schema_version
         }
 
@@ -862,7 +820,9 @@ class LearnerAction(python_utils.OBJECT):
         implemented only for testing purposes and must be rewritten when an
         actual schema migration from v1 to v2 takes place.
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            'The _convert_action_v1_dict_to_v2_dict() method is missing from '
+            'the derived class. It should be implemented in the derived class.')
 
     def validate(self):
         """Validates the LearnerAction domain object."""
@@ -882,7 +842,6 @@ class LearnerAction(python_utils.OBJECT):
         except KeyError:
             raise utils.ValidationError(
                 'Invalid action type: %s' % self.action_type)
-
         customization_args_util.validate_customization_args_and_values(
             'action', self.action_type, self.action_customization_args,
             action.customization_arg_specs)
@@ -901,16 +860,17 @@ class StateAnswers(python_utils.OBJECT):
         """Constructs a StateAnswers domain object.
 
         Args:
-            exploration_id: The ID of the exploration corresponding to submitted
-                answers.
-            exploration_version: The version of the exploration corresponding to
+            exploration_id: str. The ID of the exploration corresponding to
                 submitted answers.
-            state_name: The state to which the answers were submitted.
-            interaction_id: The ID of the interaction which created the answers.
-            submitted_answer_list: The list of SubmittedAnswer domain objects
-                that were submitted to the exploration and version specified in
-                this object.
-            schema_version: The schema version of this answers object.
+            exploration_version: str. The version of the exploration
+                corresponding to submitted answers.
+            state_name: str. The state to which the answers were submitted.
+            interaction_id: str. The ID of the interaction which created the
+                answers.
+            submitted_answer_list: list. The list of SubmittedAnswer domain
+                objects that were submitted to the exploration and version
+                specified in this object.
+            schema_version: str. The schema version of this answers object.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version
@@ -1196,11 +1156,11 @@ class AnswerFrequencyList(AnswerCalculationOutput):
 
         Returns:
             list(dict). A list of answer occurrence dicts. Each dict has the
-                following format:
-                {
-                    'answer': *. The answer submitted by the learner.
-                    'frequency': int. The number of occurrences of the answer.
-                }
+            following format:
+            {
+                'answer': *. The answer submitted by the learner.
+                'frequency': int. The number of occurrences of the answer.
+            }
         """
         return [
             answer_occurrence.to_raw_type()
@@ -1247,12 +1207,12 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
 
         Returns:
             dict. A dict whose keys are category names and whose corresponding
-                values are lists of answer frequency dicts. Each answer
-                frequency dict has the following keys and values:
-                {
-                    'answer': *. The answer submitted by the learner.
-                    'frequency': int. The number of occurrences of the answer.
-                }
+            values are lists of answer frequency dicts. Each answer
+            frequency dict has the following keys and values:
+            {
+                'answer': *. The answer submitted by the learner.
+                'frequency': int. The number of occurrences of the answer.
+            }
         """
         return {
             category: answer_frequency_list.to_raw_type()
@@ -1277,7 +1237,7 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
 
         Returns:
             CategorizedAnswerFrequencyLists. The domain object for categorized
-                answer frequency dict.
+            answer frequency dict.
         """
         return cls({
             category: AnswerFrequencyList.from_raw_type(answer_occurrence_list)
@@ -1360,7 +1320,7 @@ class StateAnswersCalcOutput(python_utils.OBJECT):
 
         output_data = self.calculation_output.to_raw_type()
         if sys.getsizeof(output_data) > max_bytes_per_calc_output_data:
-            # TODO(msl): find a better way to deal with big
+            # TODO(msl): Find a better way to deal with big
             # calculation output data, e.g. just skip. At the moment,
             # too long answers produce a ValidationError.
             raise utils.ValidationError(
@@ -1440,7 +1400,7 @@ class LearnerAnswerDetails(python_utils.OBJECT):
 
         Returns:
             LearnerAnswerDetails. The corresponding LearnerAnswerDetails
-                domain object.
+            domain object.
         """
         return cls(
             learner_answer_details_dict['state_reference'],
@@ -1545,7 +1505,7 @@ class LearnerAnswerDetails(python_utils.OBJECT):
                 the learner_answer_info_list.
 
         Raises:
-            Exception: If the learner answer info with the given id is not
+            Exception. If the learner answer info with the given id is not
                 found in the learner answer info list.
         """
         new_learner_answer_info_list = []
@@ -1629,7 +1589,7 @@ class LearnerAnswerInfo(python_utils.OBJECT):
     def get_new_learner_answer_info_id(cls):
         """Generates the learner answer info domain object id.
 
-        Return:
+        Returns:
             learner_answer_info_id: str. The id generated by the function.
         """
         learner_answer_info_id = (
@@ -1662,8 +1622,8 @@ class LearnerAnswerInfo(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The answer details submitted cannot be an empty string.')
         if sys.getsizeof(self.answer_details) > MAX_ANSWER_DETAILS_BYTE_SIZE:
-            raise utils.ValidationError('The answer details size is to large '
-                                        'to be stored')
+            raise utils.ValidationError(
+                'The answer details size is to large to be stored')
         if not isinstance(self.created_on, datetime.datetime):
             raise utils.ValidationError(
                 'Expected created_on to be a datetime, received %s'

@@ -36,7 +36,8 @@
   <img ng-src="<[$ctrl.imageUrl]>"
        class="oppia-image-click-img"
        ng-click="$ctrl.onClickImage($event)"
-       ng-mousemove="$ctrl.onMousemoveImage($event)">
+       ng-mousemove="$ctrl.onMousemoveImage($event)"
+       ng-style="$ctrl.imageContainerStyle">
   <div ng-if="$ctrl.highlightRegionsOnHover">
     <div ng-repeat="region in $ctrl.allRegions"
          style="

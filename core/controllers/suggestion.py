@@ -15,13 +15,14 @@
 # limitations under the License.
 
 """Controllers for suggestions."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import opportunity_services
+from core.domain import skill_fetchers
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
@@ -30,24 +31,51 @@ import utils
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
-def _require_valid_suggestion_and_target_types(target_type, suggestion_type):
-    """Checks whether the given target_type and suggestion_type are valid.
+def _get_target_id_to_exploration_opportunity_dict(suggestions):
+    """Returns a dict of target_id to exploration opportunity summary dict.
 
     Args:
-        target_type: str. The type of the suggestion target.
-        suggestion_type: str. The type of the suggestion.
+        suggestions: list(BaseSuggestion). A list of suggestions to retrieve
+            opportunity dicts.
 
-    Raises:
-        InvalidInputException: If the given target_type of suggestion_type are
-            invalid.
+    Returns:
+        dict. Dict mapping target_id to corresponding exploration opportunity
+        summary dict.
     """
-    if target_type not in suggestion_models.TARGET_TYPE_CHOICES:
-        raise utils.InvalidInputException(
-            'Invalid target_type: %s' % target_type)
+    target_ids = set([s.target_id for s in suggestions])
+    opportunities = (
+        opportunity_services.get_exploration_opportunity_summaries_by_ids(
+            list(target_ids)))
+    return {opp.id: opp.to_dict() for opp in opportunities}
 
-    if suggestion_type not in suggestion_models.SUGGESTION_TYPE_CHOICES:
-        raise utils.InvalidInputException(
-            'Invalid suggestion_type: %s' % suggestion_type)
+
+def _get_target_id_to_skill_opportunity_dict(suggestions):
+    """Returns a dict of target_id to skill opportunity summary dict.
+
+    Args:
+        suggestions: list(BaseSuggestion). A list of suggestions to retrieve
+            opportunity dicts.
+
+    Returns:
+        dict. Dict mapping target_id to corresponding skill opportunity dict.
+    """
+    target_ids = set([s.target_id for s in suggestions])
+    opportunities = (
+        opportunity_services.get_skill_opportunities_by_ids(list(target_ids)))
+    opportunity_skill_ids = [opp.id for opp in opportunities]
+    opportunity_id_to_skill = {
+        skill.id: skill
+        for skill in skill_fetchers.get_multi_skills(opportunity_skill_ids)
+    }
+    opportunity_id_to_opportunity = {}
+    for opp in opportunities:
+        opp_dict = opp.to_dict()
+        skill = opportunity_id_to_skill.get(opp.id)
+        if skill is not None:
+            opp_dict['skill_rubrics'] = [
+                rubric.to_dict() for rubric in skill.rubrics]
+        opportunity_id_to_opportunity[opp.id] = opp_dict
+    return opportunity_id_to_opportunity
 
 
 class SuggestionHandler(base.BaseHandler):
@@ -55,13 +83,15 @@ class SuggestionHandler(base.BaseHandler):
 
     @acl_decorators.can_suggest_changes
     def post(self):
-        suggestion_services.create_suggestion(
-            self.payload.get('suggestion_type'),
-            self.payload.get('target_type'), self.payload.get('target_id'),
-            self.payload.get('target_version_at_submission'),
-            self.user_id, self.payload.get('change'),
-            self.payload.get('description'),
-            self.payload.get('final_reviewer_id'))
+        try:
+            suggestion_services.create_suggestion(
+                self.payload.get('suggestion_type'),
+                self.payload.get('target_type'), self.payload.get('target_id'),
+                self.payload.get('target_version_at_submission'),
+                self.user_id, self.payload.get('change'),
+                self.payload.get('description'))
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
         self.render_json(self.values)
 
 
@@ -74,23 +104,29 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
         if (
                 suggestion_id.split('.')[0] !=
                 suggestion_models.TARGET_TYPE_EXPLORATION):
-            raise self.InvalidInputException('This handler allows actions only'
-                                             ' on suggestions to explorations.')
+            raise self.InvalidInputException(
+                'This handler allows actions only'
+                ' on suggestions to explorations.')
 
         if suggestion_id.split('.')[1] != target_id:
-            raise self.InvalidInputException('The exploration id provided does '
-                                             'not match the exploration id '
-                                             'present as part of the '
-                                             'suggestion_id')
+            raise self.InvalidInputException(
+                'The exploration id provided does not match the exploration id '
+                'present as part of the suggestion_id')
 
         action = self.payload.get('action')
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         if suggestion.author_id == self.user_id:
-            raise self.UnauthorizedUserException('You cannot accept/reject your'
-                                                 ' own suggestion.')
+            raise self.UnauthorizedUserException(
+                'You cannot accept/reject your own suggestion.')
 
         if action == suggestion_models.ACTION_TYPE_ACCEPT:
+            commit_message = self.payload.get('commit_message')
+            if (commit_message is not None and
+                    len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+                raise self.InvalidInputException(
+                    'Commit messages must be at most %s characters long.'
+                    % feconf.MAX_COMMIT_MESSAGE_LENGTH)
             suggestion_services.accept_suggestion(
                 suggestion, self.user_id, self.payload.get('commit_message'),
                 self.payload.get('review_message'))
@@ -120,37 +156,28 @@ class ResubmitSuggestionHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class SuggestionToTopicActionHandler(base.BaseHandler):
-    """Handles actions performed on suggestions to topics."""
+class SuggestionToSkillActionHandler(base.BaseHandler):
+    """Handles actions performed on suggestions to skills."""
 
     @acl_decorators.get_decorator_for_accepting_suggestion(
-        acl_decorators.can_edit_topic)
+        acl_decorators.can_edit_skill)
     def put(self, target_id, suggestion_id):
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
-
-        if suggestion_id.split('.')[0] != suggestion_models.TARGET_TYPE_TOPIC:
+        if suggestion_id.split('.')[0] != suggestion_models.TARGET_TYPE_SKILL:
             raise self.InvalidInputException(
-                'This handler allows actions only on suggestions to topics.')
+                'This handler allows actions only on suggestions to skills.')
 
         if suggestion_id.split('.')[1] != target_id:
             raise self.InvalidInputException(
-                'The topic id provided does not match the topic id present as '
+                'The skill id provided does not match the skill id present as '
                 'part of the suggestion_id')
 
         action = self.payload.get('action')
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         if action == suggestion_models.ACTION_TYPE_ACCEPT:
-            if (
-                    suggestion.suggestion_type ==
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
-                # The skill_id is passed only at the time of accepting the
-                # suggestion.
-                skill_id = self.payload.get('skill_id')
-                suggestion.change.skill_id = skill_id
+            # Question suggestions do not use commit messages.
             suggestion_services.accept_suggestion(
-                suggestion, self.user_id, self.payload.get('commit_message'),
+                suggestion, self.user_id, 'UNUSED_COMMIT_MESSAGE',
                 self.payload.get('review_message'))
         elif action == suggestion_models.ACTION_TYPE_REJECT:
             suggestion_services.reject_suggestion(
@@ -161,76 +188,86 @@ class SuggestionToTopicActionHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class ReviewableSuggestionsHandler(base.BaseHandler):
+class SuggestionsProviderHandler(base.BaseHandler):
+    """Provides suggestions for a user and given suggestion type."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    def _require_valid_suggestion_and_target_types(
+            self, target_type, suggestion_type):
+        """Checks whether the given target_type and suggestion_type are valid.
+
+        Args:
+            target_type: str. The type of the suggestion target.
+            suggestion_type: str. The type of the suggestion.
+
+        Raises:
+            InvalidInputException. If the given target_type of suggestion_type
+                are invalid.
+        """
+        if target_type not in suggestion_models.TARGET_TYPE_CHOICES:
+            raise self.InvalidInputException(
+                'Invalid target_type: %s' % target_type)
+
+        if suggestion_type not in suggestion_models.SUGGESTION_TYPE_CHOICES:
+            raise self.InvalidInputException(
+                'Invalid suggestion_type: %s' % suggestion_type)
+
+    def _render_suggestions(self, target_type, suggestions):
+        """Renders retrieved suggestions.
+
+        Args:
+            target_type: str. The suggestion type.
+            suggestions: list(BaseSuggestion). A list of suggestions to render.
+        """
+        if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
+            target_id_to_opportunity_dict = (
+                _get_target_id_to_exploration_opportunity_dict(suggestions))
+            self.render_json({
+                'suggestions': [s.to_dict() for s in suggestions],
+                'target_id_to_opportunity_dict':
+                    target_id_to_opportunity_dict
+            })
+        elif target_type == suggestion_models.TARGET_TYPE_SKILL:
+            target_id_to_opportunity_dict = (
+                _get_target_id_to_skill_opportunity_dict(suggestions))
+            self.render_json({
+                'suggestions': [s.to_dict() for s in suggestions],
+                'target_id_to_opportunity_dict':
+                    target_id_to_opportunity_dict
+            })
+        else:
+            self.render_json({})
+
+
+class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
     """Provides all suggestions which can be reviewed by the user for a given
     suggestion type.
     """
 
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.can_view_reviewable_suggestions
     def get(self, target_type, suggestion_type):
         """Handles GET requests."""
-        try:
-            _require_valid_suggestion_and_target_types(
-                target_type, suggestion_type)
-
-            suggestions = suggestion_services.get_reviewable_suggestions(
-                self.user_id, suggestion_type)
-
-            if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-                target_ids = set([s.target_id for s in suggestions])
-                target_ids_to_opportunities = (
-                    opportunity_services
-                    .get_exploration_opportunity_summaries_by_ids(
-                        list(target_ids)))
-                self.render_json({
-                    'suggestions': [s.to_dict() for s in suggestions],
-                    'target_ids_to_opportunity_dicts': {
-                        t: d.to_dict() for (
-                            t, d) in target_ids_to_opportunities.items()
-                    }
-                })
-            else:
-                self.render_json({})
-        except Exception as e:
-            raise self.InvalidInputException(e)
+        self._require_valid_suggestion_and_target_types(
+            target_type, suggestion_type)
+        suggestions = suggestion_services.get_reviewable_suggestions(
+            self.user_id, suggestion_type)
+        self._render_suggestions(target_type, suggestions)
 
 
-class UserSubmittedSuggestionsHandler(base.BaseHandler):
+class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
     """Provides all suggestions which are submitted by the user for a given
     suggestion type.
     """
 
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     @acl_decorators.can_suggest_changes
     def get(self, target_type, suggestion_type):
         """Handles GET requests."""
-        try:
-            _require_valid_suggestion_and_target_types(
-                target_type, suggestion_type)
-
-            suggestions = suggestion_services.get_submitted_suggestions(
-                self.user_id, suggestion_type)
-
-            if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-                target_ids = set([s.target_id for s in suggestions])
-                target_ids_to_opportunities = (
-                    opportunity_services
-                    .get_exploration_opportunity_summaries_by_ids(
-                        list(target_ids)))
-                self.render_json({
-                    'suggestions': [s.to_dict() for s in suggestions],
-                    'target_ids_to_opportunity_dicts': {
-                        t: d.to_dict() for (
-                            t, d) in target_ids_to_opportunities.items()
-                    }
-                })
-            else:
-                self.render_json({})
-        except Exception as e:
-            raise self.InvalidInputException(e)
+        self._require_valid_suggestion_and_target_types(
+            target_type, suggestion_type)
+        suggestions = suggestion_services.get_submitted_suggestions(
+            self.user_id, suggestion_type)
+        self._render_suggestions(target_type, suggestions)
 
 
 class SuggestionListHandler(base.BaseHandler):

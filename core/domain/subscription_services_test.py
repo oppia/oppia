@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for subscription management."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -71,7 +72,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
         Returns:
             tuple(str). The tuple containing all the feedback thread ids to
-                which the user is subscribed to.
+            which the user is subscribed to.
         """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
@@ -88,7 +89,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
         Returns:
             tuple(str). The tuple containing all the exploration ids of the
-                explorations to which the user has subscribed to.
+            explorations to which the user has subscribed to.
         """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
@@ -105,7 +106,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
         Returns:
             tuple(str). The tuple containing all the collection ids of the
-                collections to which the user has subscribed to.
+            collections to which the user has subscribed to.
         """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
@@ -401,7 +402,7 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
 
         Returns:
             tuple(str). The tuple containing all the ids of the subscribers that
-                have subscribed to the creator.
+            have subscribed to the creator.
         """
         subscribers_model = user_models.UserSubscribersModel.get(
             user_id, strict=False)
@@ -417,7 +418,7 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
 
         Returns:
             tuple(str). The tuple containing all the creator ids the given user
-                has subscribed to.
+            has subscribed to.
         """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)

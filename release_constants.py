@@ -36,3 +36,48 @@ LABEL_FOR_RELEASED_PRS = 'PR: released'
 # The path for generating release_summary.md file for the current release.
 RELEASE_SUMMARY_FILEPATH = os.path.join(
     os.getcwd(), os.pardir, 'release_summary.md')
+
+REMOTE_URL = 'git@github.com:oppia/oppia.git'
+
+BRANCH_TYPE_RELEASE = 'release'
+BRANCH_TYPE_HOTFIX = 'hotfix'
+
+RELEASE_DRIVE_URL = (
+    'https://drive.google.com/drive/folders/0B9KSjiibL_WDNjJyYlEtbTNvY3c')
+RELEASE_NOTES_URL = (
+    'https://docs.google.com/document/d/'
+    '1pmcDNfM2KtmkZeYipuInC48RE5JfkSJWQYdIQAkD0hQ/edit#')
+RELEASE_ROTA_URL = (
+    'https://github.com/oppia/oppia/wiki/Release-Schedule#'
+    'release-coordinators-and-qa-coordinators-for-upcoming-releases')
+
+JOBS_SPREADSHEETS_URL = (
+    'https://docs.google.com/spreadsheets/d/'
+    '1Wegd0rZhVOm3Q3VCIw0xMbLC7IWtRyrEahiPn61Fhoo/edit#gid=948463314')
+
+ISSUE_FILING_URL = 'https://github.com/oppia/oppia/milestone/39'
+CREDITS_FORM_URL = (
+    'https://docs.google.com/forms/d/'
+    '1yH6ZO2UiD_VspgKJR40byRSjUP1AaBF9ARSe814p8K0/edit#responses')
+RELEASE_NOTES_TEMPLATE_URL = (
+    'https://docs.google.com/document/d/'
+    '1VBa3pdRLnvobNlfmZB6-uRYJHBz_Gc-6eN_ilSoVlhE/edit#')
+RELEASE_NOTES_EXAMPLE_URL = (
+    'https://docs.google.com/document/d/'
+    '1OUwgMPNORABJAz7DS0iuDUr5A2FxcXg4Y5-qUEdgo-M/edit#heading=h.l3dbee3s55ti')
+JOBS_FORM_URL = 'https://goo.gl/forms/XIj00RJ2h5L55XzU2'
+
+OPPIA_DEV_GROUP_URL = 'https://groups.google.com/forum/#!forum/oppia-dev'
+
+NEW_RELEASE_URL = 'https://github.com/oppia/oppia/releases/new'
+GITHUB_RELEASE_TAB_URL = 'https://github.com/oppia/oppia/releases'
+
+INVALID_EMAIL_SUFFIX = 'users.noreply.github.com'
+
+NEW_AUTHORS_HEADER = '### New Authors:\n'
+EXISTING_AUTHORS_HEADER = '### Existing Authors:\n'
+NEW_CONTRIBUTORS_HEADER = '### New Contributors:\n'
+EMAIL_HEADER = '### Email C&P Blurbs about authors:\n'
+CHANGELOG_HEADER = '### Changelog:\n'
+COMMIT_HISTORY_HEADER = '### Commit History:\n'
+ISSUES_HEADER = '### Issues mentioned in commits:\n'

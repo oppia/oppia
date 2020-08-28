@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for classes and methods relating to user rights."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -219,8 +220,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.signup('d@example.com', 'D')
         self.signup('e@example.com', 'E')
         self.signup('f@example.com', 'F')
-        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
-        self.signup(self.MODERATOR_EMAIL, username=self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -784,8 +785,8 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.signup('c@example.com', 'C')
         self.signup('d@example.com', 'D')
         self.signup('e@example.com', 'E')
-        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
-        self.signup(self.MODERATOR_EMAIL, username=self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -1087,6 +1088,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
 
 class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
     """Tests for check_can_release_ownership function."""
+
     published_exp_id = 'exp_id_1'
     private_exp_id = 'exp_id_2'
 
@@ -1128,6 +1130,7 @@ class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
 
 class CheckCanUnpublishActivityTest(test_utils.GenericTestBase):
     """Tests for check_can_unpublish_activity function."""
+
     published_exp_id = 'exp_id_1'
     private_exp_id = 'exp_id_2'
     private_col_id = 'col_id_1'

@@ -15,11 +15,11 @@
 # limitations under the License.
 
 """Controllers for the editor view."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import imghdr
 import logging
 
 from constants import constants
@@ -31,6 +31,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
+from core.domain import image_validation_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import search_services
@@ -63,12 +64,12 @@ def _require_valid_version(version_from_payload, exploration_version):
 
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
+
     pass
 
 
 class ExplorationPage(EditorHandler):
     """The editor page for a single exploration."""
-
 
     @acl_decorators.can_play_exploration
     def get(self, unused_exploration_id):
@@ -108,6 +109,8 @@ class ExplorationHandler(EditorHandler):
                 self.user_id and not has_seen_editor_tutorial)
             exploration_data['show_state_translation_tutorial_on_load'] = (
                 self.user_id and not has_seen_translation_tutorial)
+            exploration_data['exploration_is_linked_to_story'] = bool(
+                exp_services.get_story_id_linked_to_exploration(exploration_id))
         except:
             raise self.PageNotFoundException
 
@@ -122,6 +125,13 @@ class ExplorationHandler(EditorHandler):
         _require_valid_version(version, exploration.version)
 
         commit_message = self.payload.get('commit_message')
+
+        if (commit_message is not None and
+                len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+            raise self.InvalidInputException(
+                'Commit messages must be at most %s characters long.'
+                % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+
         change_list_dict = self.payload.get('change_list')
         change_list = [
             exp_domain.ExplorationChange(change) for change in change_list_dict]
@@ -261,7 +271,7 @@ class ExplorationStatusHandler(EditorHandler):
             exploration_id: str. Id of the exploration.
 
         Raises:
-            InvalidInputException: Given exploration is invalid.
+            InvalidInputException. Given exploration is invalid.
         """
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         try:
@@ -339,7 +349,7 @@ class UserExplorationEmailsHandler(EditorHandler):
             exploration_id: str. The exploration id.
 
         Raises:
-            InvalidInputException: Invalid message type.
+            InvalidInputException. Invalid message type.
         """
 
         mute = self.payload.get('mute')
@@ -385,9 +395,12 @@ class ExplorationFileDownloader(EditorHandler):
             version = exploration.version
 
         # If the title of the exploration has changed, we use the new title.
-        filename = utils.to_ascii(
-            'oppia-%s-v%s.zip'
-            % (exploration.title.replace(' ', ''), version)).decode('utf-8')
+        if not exploration.title:
+            init_filename = 'oppia-unpublished_exploration-v%s.zip' % version
+        else:
+            init_filename = 'oppia-%s-v%s.zip' % (
+                exploration.title.replace(' ', ''), version)
+        filename = utils.to_ascii(init_filename).decode('utf-8')
 
         if output_format == feconf.OUTPUT_FORMAT_ZIP:
             self.render_downloadable_file(
@@ -495,7 +508,7 @@ class ExplorationStatisticsHandler(EditorHandler):
             exploration_id, current_exploration.version).to_frontend_dict())
 
 
-class StateRulesStatsHandler(EditorHandler):
+class StateInteractionStatsHandler(EditorHandler):
     """Returns detailed learner answer statistics for a state."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -525,6 +538,7 @@ class FetchIssuesHandler(EditorHandler):
     exploration. This removes the invalid issues and returns the remaining
     unresolved ones.
     """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_view_exploration_stats
@@ -572,7 +586,7 @@ class ResolveIssueHandler(EditorHandler):
         """Handles POST requests."""
         exp_issue_dict = self.payload.get('exp_issue_dict')
         try:
-            unused_exp_issue = stats_domain.ExplorationIssue.from_backend_dict(
+            unused_exp_issue = stats_domain.ExplorationIssue.from_dict(
                 exp_issue_dict)
         except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
@@ -623,51 +637,30 @@ class ImageUploadHandler(EditorHandler):
 
         raw = self.request.get('image')
         filename = self.payload.get('filename')
-        if not raw:
-            raise self.InvalidInputException('No image supplied')
+        filename_prefix = self.payload.get('filename_prefix')
+        if filename_prefix is None:
+            filename_prefix = self._FILENAME_PREFIX
 
-        allowed_formats = ', '.join(
-            list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
-
-        # Verify that the data is recognized as an image.
-        file_format = imghdr.what(None, h=raw)
-        if file_format not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
-            raise self.InvalidInputException('Image not recognized')
-
-        # Verify that the file type matches the supplied extension.
-        if not filename:
-            raise self.InvalidInputException('No filename supplied')
-        if filename.rfind('.') == 0:
-            raise self.InvalidInputException('Invalid filename')
-        if '/' in filename or '..' in filename:
-            raise self.InvalidInputException(
-                'Filenames should not include slashes (/) or consecutive '
-                'dot characters.')
-        if '.' not in filename:
-            raise self.InvalidInputException(
-                'Image filename with no extension: it should have '
-                'one of the following extensions: %s.' % allowed_formats)
-
-        dot_index = filename.rfind('.')
-        extension = filename[dot_index + 1:].lower()
-        if (extension not in
-                feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
-            raise self.InvalidInputException(
-                'Expected a filename ending in .%s, received %s' %
-                (file_format, filename))
+        try:
+            file_format = image_validation_services.validate_image_and_filename(
+                raw, filename)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             entity_type, entity_id))
-        filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
+        filepath = '%s/%s' % (filename_prefix, filename)
 
         if fs.isfile(filepath):
             raise self.InvalidInputException(
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename)
-
+        image_is_compressible = (
+            file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
         fs_services.save_original_and_compressed_versions_of_image(
-            self.user_id, filename, entity_type, entity_id, raw)
+            filename, entity_type, entity_id, raw, filename_prefix,
+            image_is_compressible)
 
         self.render_json({'filename': filename})
 

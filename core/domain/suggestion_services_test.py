@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for suggestion related services."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -20,10 +21,15 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import question_domain
 from core.domain import rights_manager
+from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -48,7 +54,10 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
         'state_name': 'state_1',
-        'new_value': 'new suggestion content'
+        'new_value': {
+            'content_id': 'content',
+            'html': 'new suggestion content'
+        }
     }
 
     AUTHOR_EMAIL = 'author@example.com'
@@ -80,6 +89,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
     class MockExploration(python_utils.OBJECT):
         """Mocks an exploration. To be used only for testing."""
+
         def __init__(self, exploration_id, states):
             self.id = exploration_id
             self.states = states
@@ -114,12 +124,14 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'target_version_at_submission': self.target_version_at_submission,
             'status': suggestion_models.STATUS_IN_REVIEW,
             'author_name': 'author',
-            'final_reviewer_id': self.reviewer_id,
             'change': {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'state_name': 'state_1',
-                'new_value': 'new suggestion content',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': 'new suggestion content'
+                },
                 'old_value': None
             },
             'score_category': self.score_category
@@ -134,8 +146,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
 
             observed_suggestion = suggestion_services.get_suggestion_by_id(
                 self.suggestion_id)
@@ -148,8 +159,16 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'invalid_suggestion_type',
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, self.change, 'test description',
-                self.reviewer_id)
+                self.author_id, self.change, 'test description')
+
+    def test_cannot_create_suggestion_with_invalid_author_id(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected author_id to be in a valid user ID format'):
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id, self.target_version_at_submission,
+                'invalid author ID', self.change, 'test description')
 
     def test_cannot_create_translation_suggestion_with_invalid_content_html_raise_error(self): # pylint: disable=line-too-long
         add_translation_change_dict = {
@@ -168,16 +187,14 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
-                self.author_id, add_translation_change_dict, 'test description',
-                self.reviewer_id)
+                self.author_id, add_translation_change_dict, 'test description')
 
     def test_get_all_stale_suggestions(self):
         suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description',
-            self.reviewer_id)
+            self.author_id, self.change, 'test description')
 
         with self.swap(
             suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS', 0):
@@ -195,8 +212,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description',
-            self.reviewer_id)
+            self.author_id, self.change, 'test description')
 
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (
@@ -205,7 +221,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Invalid status after review.'):
             suggestion_services.mark_review_completed(
                 suggestion, 'invalid_status', self.reviewer_id)
-
 
     def mock_update_exploration(
             self, unused_user_id, unused_exploration_id, unused_change_list,
@@ -220,8 +235,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description',
-            self.reviewer_id)
+            self.author_id, self.change, 'test description')
 
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (
@@ -237,8 +251,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description',
-            self.reviewer_id)
+            self.author_id, self.change, 'test description')
 
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (
@@ -254,8 +267,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description',
-            self.reviewer_id)
+            self.author_id, self.change, 'test description')
 
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (
@@ -292,8 +304,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
-            self.author_id, change_dict, 'test description',
-            self.reviewer_id)
+            self.author_id, change_dict, 'test description')
 
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (
@@ -322,7 +333,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.check_if_email_has_been_sent_to_user(
                 self.author_id, suggestion.score_category))
 
-
     def test_accept_suggestion_successfully(self):
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
@@ -334,8 +344,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
 
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
@@ -367,6 +376,60 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 last_message.text, 'review message')
 
+    def test_accept_suggestion_with_invalid_math_fails(self):
+        """Test that the method for accepting suggestions raises error when
+        a suggestion with invalid math-tags is tried to be accepted.
+        """
+        change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': {
+                'content_id': 'content',
+                'html': (
+                    '<oppia-noninteractive-math raw_latex-with-value="&am'
+                    'p;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;q'
+                    'uot;"></oppia-noninteractive-math>')
+            }
+        }
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.mock_generate_new_thread_id):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, change_dict, 'test description')
+
+        suggestion = suggestion_services.get_suggestion_by_id(
+            self.suggestion_id)
+
+        expected_exception_regexp = (
+            'Invalid math tags found in the suggestion with id %s.' % (
+                suggestion.suggestion_id)
+        )
+        with self.swap(
+            exp_services, 'update_exploration', self.mock_update_exploration):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                with self.swap(
+                    suggestion_registry.SuggestionEditStateContent,
+                    'pre_accept_validate',
+                    self.mock_pre_accept_validate_does_nothing):
+                    with self.swap(
+                        suggestion_registry.SuggestionEditStateContent,
+                        'get_change_list_for_accepting_suggestion',
+                        self.mock_get_change_list_does_nothing):
+                        with self.assertRaisesRegexp(
+                            Exception, expected_exception_regexp):
+                            suggestion_services.accept_suggestion(
+                                suggestion, self.reviewer_id,
+                                self.COMMIT_MESSAGE, 'review message')
+
     def test_accept_suggestion_handled_suggestion_failure(self):
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
@@ -378,17 +441,18 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
 
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
         suggestion.status = suggestion_models.STATUS_ACCEPTED
         suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
-        with self.assertRaisesRegexp(
-            Exception,
-            'The suggestion has already been accepted/rejected.'):
+        expected_exception_regexp = (
+            'The suggestion with id %s has already been accepted/rejected.' % (
+                suggestion.suggestion_id)
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.accept_suggestion(
                 suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -399,9 +463,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion.status = suggestion_models.STATUS_REJECTED
         suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
 
-        with self.assertRaisesRegexp(
-            Exception,
-            'The suggestion has already been accepted/rejected.'):
+        expected_exception_regexp = (
+            'The suggestion with id %s has already been accepted/rejected.' % (
+                suggestion.suggestion_id)
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.accept_suggestion(
                 suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -420,8 +486,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
@@ -447,8 +512,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
@@ -468,8 +532,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
 
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
@@ -497,16 +560,17 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
         suggestion.status = suggestion_models.STATUS_ACCEPTED
         suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
-        with self.assertRaisesRegexp(
-            Exception,
-            'The suggestion has already been accepted/rejected.'):
+        expected_exception_regexp = (
+            'The suggestion with id %s has already been accepted/rejected.' % (
+                suggestion.suggestion_id)
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.reject_suggestion(
                 suggestion, self.reviewer_id, 'reject review message')
 
@@ -518,9 +582,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion.status = suggestion_models.STATUS_REJECTED
         suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
 
-        with self.assertRaisesRegexp(
-            Exception,
-            'The suggestion has already been accepted/rejected.'):
+        expected_exception_regexp = (
+            'The suggestion with id %s has already been accepted/rejected.' % (
+                suggestion.suggestion_id)
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.reject_suggestion(
                 suggestion, self.reviewer_id, 'reject review message')
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -539,12 +605,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
         suggestion_services.reject_suggestion(
             suggestion, self.reviewer_id, 'reject review message')
+        suggestion = suggestion_services.get_suggestion_by_id(
+            self.suggestion_id)
         suggestion_services.resubmit_rejected_suggestion(
             suggestion, 'resubmit summary message', self.author_id)
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -563,16 +630,18 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
         with self.assertRaisesRegexp(
             Exception, 'Summary message cannot be empty.'):
             suggestion_services.resubmit_rejected_suggestion(
                 suggestion, '', self.author_id)
-        with self.assertRaisesRegexp(
-            Exception, 'The suggestion is not yet handled.'):
+        expected_exception_regexp = (
+            'The suggestion with id %s is not yet handled.' % (
+                suggestion.suggestion_id)
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.resubmit_rejected_suggestion(
                 suggestion, 'resubmit summary message', self.author_id)
 
@@ -587,8 +656,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
                 suggestion = suggestion_services.get_suggestion_by_id(
                     self.suggestion_id)
                 with self.swap(
@@ -599,10 +667,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                         self.COMMIT_MESSAGE, 'review message')
                 suggestion = suggestion_services.get_suggestion_by_id(
                     self.suggestion_id)
+                expected_exception_regexp = (
+                    'The suggestion with id %s was accepted. Only rejected '
+                    'suggestions can be resubmitted.' % (
+                        suggestion.suggestion_id)
+                )
                 with self.assertRaisesRegexp(
-                    Exception,
-                    'The suggestion was accepted. Only rejected suggestions '
-                    'can be resubmitted.'):
+                    Exception, expected_exception_regexp):
                     suggestion_services.resubmit_rejected_suggestion(
                         suggestion, 'resubmit summary message', self.author_id)
 
@@ -617,8 +688,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description',
-                    self.reviewer_id)
+                    self.author_id, self.change, 'test description')
         can_resubmit = suggestion_services.check_can_resubmit_suggestion(
             self.suggestion_id, self.author_id)
         self.assertEqual(can_resubmit, True)
@@ -634,6 +704,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     target_id_1 = 'exp1'
     target_id_2 = 'exp2'
+    target_id_3 = 'exp3'
     target_version_at_submission = 1
     change = {
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -641,7 +712,6 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         'state_name': 'state_1',
         'new_value': 'new suggestion content'
     }
-
 
     AUTHOR_EMAIL_1 = 'author1@example.com'
     REVIEWER_EMAIL_1 = 'reviewer1@example.com'
@@ -651,15 +721,26 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     class MockExploration(python_utils.OBJECT):
         """Mocks an exploration. To be used only for testing."""
+
         def __init__(self, exploration_id, states):
             self.id = exploration_id
             self.states = states
             self.category = 'Algebra'
 
+        def get_content_html(self, state_name, content_id):
+            """Used to mock the get_content_html method for explorations."""
+            # state_name and content_id are used here to suppress the unused
+            # arguments warning. The main goal of this method is to just
+            # produce content html for the tests.
+            return '<p>State name: %s, Content id: %s</p>' % (
+                state_name, content_id
+            )
+
     # All mock explorations created for testing.
     explorations = [
         MockExploration('exp1', {'state_1': {}, 'state_2': {}}),
-        MockExploration('exp2', {'state_1': {}, 'state_2': {}})
+        MockExploration('exp2', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp3', {'state_1': {}, 'state_2': {}}),
     ]
 
     def mock_get_exploration_by_id(self, exp_id):
@@ -688,45 +769,36 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
-                self.author_id_1, self.change, 'test description',
-                self.reviewer_id_1)
+                self.author_id_1, self.change, 'test description')
 
             suggestion_services.create_suggestion(
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
-                self.author_id_1, self.change, 'test description', None)
+                self.author_id_1, self.change, 'test description')
 
             suggestion_services.create_suggestion(
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
-                self.author_id_1, self.change, 'test description', None)
+                self.author_id_1, self.change, 'test description')
 
             suggestion_services.create_suggestion(
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
-                self.author_id_2, self.change, 'test description',
-                self.reviewer_id_2)
+                self.author_id_2, self.change, 'test description')
 
             suggestion_services.create_suggestion(
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id_2, self.target_version_at_submission,
-                self.author_id_2, self.change, 'test description',
-                self.reviewer_id_2)
+                self.author_id_2, self.change, 'test description')
 
     def test_get_by_author(self):
         queries = [('author_id', self.author_id_1)]
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 3)
         queries = [('author_id', self.author_id_2)]
-        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 2)
-
-    def test_get_by_reviewer(self):
-        queries = [('final_reviewer_id', self.reviewer_id_1)]
-        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 1)
-        queries = [('final_reviewer_id', self.reviewer_id_2)]
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 2)
 
     def test_get_by_target_id(self):
@@ -776,6 +848,94 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Not allowed to query on field invalid_field'):
             suggestion_services.query_suggestions(queries)
 
+    def test_get_translation_suggestions_with_exp_ids_with_one_exp(self):
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'state_1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>State name: state_1, Content id: content</p>',
+            'translation_html': '<p>This is translated html.</p>'
+        }
+        # Create the translation suggestion associated with exploration id
+        # target_id_1.
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            with self.swap(
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_1, 1, self.author_id_1,
+                    add_translation_change_dict, 'test description')
+
+        # Assert that there is one translation suggestion with the given
+        # exploration id found.
+        self.assertEqual(
+            len(suggestion_services.get_translation_suggestions_with_exp_ids(
+                [self.target_id_1])), 1)
+
+    def test_get_translation_suggestions_with_exp_ids_with_multiple_exps(
+            self):
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'state_1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>State name: state_1, Content id: content</p>',
+            'translation_html': '<p>This is translated html.</p>'
+        }
+        # Create the translation suggestion associated with exploration id
+        # target_id_2.
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            with self.swap(
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_2, 1, self.author_id_1,
+                    add_translation_change_dict, 'test description')
+        # Create the translation suggestion associated with exploration id
+        # target_id_3.
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            with self.swap(
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_3, 1, self.author_id_1,
+                    add_translation_change_dict, 'test description')
+
+        # Assert that there are two translation suggestions with the given
+        # exploration ids found.
+        self.assertEqual(
+            len(suggestion_services.get_translation_suggestions_with_exp_ids(
+                [self.target_id_2, self.target_id_3])), 2)
+
+    def test_get_translation_suggestions_with_exp_ids_with_invalid_exp(
+            self):
+        # Assert that there are no translation suggestions with an invalid
+        # exploration id found.
+        self.assertEqual(
+            len(suggestion_services.get_translation_suggestions_with_exp_ids(
+                ['invalid_exp_id'])), 0)
+
+    def test_get_translation_suggestions_with_exp_ids_with_empty_exp_list(
+            self):
+        # Assert that there are no translation suggestions found when we
+        # use an empty exp_ids list.
+        self.assertEqual(
+            len(suggestion_services.get_translation_suggestions_with_exp_ids(
+                [])), 0)
+
     def test_query_suggestions_that_can_be_reviewed_by_user(self):
         suggestion_services.create_new_user_contribution_scoring_model(
             'user1', 'category1', 15)
@@ -816,10 +976,11 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             .get_all_suggestions_that_can_be_reviewed_by_user('user2')), 0)
 
 
-
 class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp1'
+    TOPIC_ID = 'topic1'
+    STORY_ID = 'story1'
     TRANSLATION_LANGUAGE_CODE = 'en'
 
     AUTHOR_EMAIL = 'author@example.com'
@@ -864,10 +1025,12 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                     self.TRANSLATION_LANGUAGE_CODE: {
                         'filename': 'filename3.mp3',
                         'file_size_bytes': 3000,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 42.43
                     }
                 },
-                'default_outcome': {}
+                'default_outcome': {},
+                'ca_placeholder_0': {}
             }
         }
         self.old_recorded_voiceovers = (
@@ -896,6 +1059,72 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         self.target_version_at_submission = exploration.version
 
+        # Set up for testing translation suggestions. Translation suggestions
+        # correspond to a given topic, story and exploration.
+
+        self.save_new_topic(self.TOPIC_ID, self.owner_id)
+
+        self.save_new_story(
+            self.STORY_ID, self.owner_id, self.TOPIC_ID, title='A story',
+            description='Description', notes='Notes')
+
+        # Adds the story to the topic.
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID, self.STORY_ID)
+
+        # Adds the exploration to the story.
+        story_change_list_to_add_an_exp = [
+            story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': self.EXP_ID
+            })
+        ]
+        story_services.update_story(
+            self.owner_id, self.STORY_ID,
+            story_change_list_to_add_an_exp, 'Added exploration.')
+
+    def create_translation_suggestion_associated_with_exp(
+            self, exp_id, author_id):
+        """Creates a translation suggestion that is associated with an
+        exploration with id exp_id. The author of the created suggestion is
+        author_id.
+        """
+        # Gets the html content in the exploration to be translated.
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        content_html = exploration.states['State 1'].content.html
+
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'State 1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': content_html,
+            'translation_html': '<p>This is translated html.</p>'
+        }
+
+        suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            exp_id, 1, author_id, add_translation_change_dict,
+            'test description')
+
+    def assert_created_suggestion_is_valid(self, target_id, author_id):
+        """Assert that the created suggestion is in review and that only one
+        suggestion with the given target_id and author_id exists.
+        """
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', author_id), ('target_id', target_id)])
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(
+            suggestions[0].status, suggestion_models.STATUS_IN_REVIEW)
+
     def test_create_and_accept_suggestion(self):
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
@@ -904,7 +1133,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.EXP_ID, self.target_version_at_submission,
-                self.author_id, self.change, 'test description', None)
+                self.author_id, self.change, 'test description')
 
         suggestion_id = self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
@@ -928,7 +1157,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.EXP_ID, self.target_version_at_submission,
-                self.author_id, self.change, 'test description', None)
+                self.author_id, self.change, 'test description')
 
         suggestion_id = self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
@@ -945,6 +1174,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             exploration.states['State 1'].content.html,
             '<p>old content</p>')
 
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
 
     def test_create_and_accept_suggestion_with_message(self):
@@ -955,7 +1185,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.EXP_ID, self.target_version_at_submission,
-                self.author_id, self.change, 'test description', None)
+                self.author_id, self.change, 'test description')
 
         suggestion_id = self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
@@ -975,6 +1205,90 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             '<p>new content</p>')
 
         self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
+
+    def test_delete_skill_rejects_question_suggestion(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.author_id, description='description')
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL, skill_id, 1,
+            self.author_id, suggestion_change, 'test description')
+        self.assert_created_suggestion_is_valid(skill_id, self.author_id)
+
+        skill_services.delete_skill(self.author_id, skill_id)
+
+        # Suggestion should be rejected after corresponding skill is deleted.
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', skill_id)])
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(
+            suggestions[0].status, suggestion_models.STATUS_REJECTED)
+
+    def test_delete_topic_rejects_translation_suggestion(self):
+        self.create_translation_suggestion_associated_with_exp(
+            self.EXP_ID, self.author_id)
+        self.assert_created_suggestion_is_valid(self.EXP_ID, self.author_id)
+
+        topic_services.delete_topic(self.author_id, self.TOPIC_ID)
+
+        # Suggestion should be rejected after the topic is deleted.
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', self.EXP_ID)])
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(
+            suggestions[0].status, suggestion_models.STATUS_REJECTED)
+
+    def test_delete_story_rejects_translation_suggestion(self):
+        self.create_translation_suggestion_associated_with_exp(
+            self.EXP_ID, self.author_id)
+        self.assert_created_suggestion_is_valid(self.EXP_ID, self.author_id)
+
+        story_services.delete_story(self.author_id, self.STORY_ID)
+
+        # Suggestion should be rejected after the story is deleted.
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', self.EXP_ID)])
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(
+            suggestions[0].status, suggestion_models.STATUS_REJECTED)
+
+    def test_remove_exp_from_story_rejects_translation_suggestion(self):
+        self.create_translation_suggestion_associated_with_exp(
+            self.EXP_ID, self.author_id)
+        self.assert_created_suggestion_is_valid(self.EXP_ID, self.author_id)
+
+        # Removes the exploration from the story.
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, [story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': self.EXP_ID,
+                'new_value': None
+            })], 'Removed exploration.')
+
+        # Suggestion should be rejected after exploration is removed from the
+        # story.
+        suggestions = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', self.EXP_ID)])
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(
+            suggestions[0].status, suggestion_models.STATUS_REJECTED)
 
 
 class UserContributionScoringUnitTests(test_utils.GenericTestBase):
@@ -1053,40 +1367,38 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
             suggestion_services.check_if_email_has_been_sent_to_user(
                 self.user_a_id, 'category_a'))
 
-    def test_get_next_user_in_rotation(self):
-        suggestion_services.create_new_user_contribution_scoring_model(
-            self.user_a_id, 'category_a', 15)
-        suggestion_services.create_new_user_contribution_scoring_model(
-            self.user_b_id, 'category_a', 15)
-        suggestion_services.create_new_user_contribution_scoring_model(
-            self.user_c_id, 'category_a', 15)
 
-        user_ids = [self.user_a_id, self.user_b_id, self.user_c_id]
-        user_ids.sort()
-        self.assertEqual(suggestion_services.get_next_user_in_rotation(
-            'category_a'), user_ids[0])
-        self.assertEqual(
-            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
-                'category_a').current_position_in_rotation, user_ids[0])
+class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
+    """Tests for the ExplorationVoiceoverApplication class."""
 
-        self.assertEqual(suggestion_services.get_next_user_in_rotation(
-            'category_a'), user_ids[1])
-        self.assertEqual(
-            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
-                'category_a').current_position_in_rotation, user_ids[1])
+    def setUp(self):
+        super(VoiceoverApplicationServiceUnitTest, self).setUp()
+        self.signup('author@example.com', 'author')
+        self.author_id = self.get_user_id_from_email('author@example.com')
 
-        self.assertEqual(suggestion_services.get_next_user_in_rotation(
-            'category_a'), user_ids[2])
-        self.assertEqual(
-            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
-                'category_a').current_position_in_rotation, user_ids[2])
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_id',
+            target_type='exploration',
+            target_id='0',
+            status='review',
+            author_id=self.author_id,
+            final_reviewer_id=None,
+            language_code='en',
+            filename='filename.mp3',
+            content='<p>content</p>',
+            rejection_message=None).put()
+        self.voiceover_application_model = (
+            suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
+                'application_id'))
 
-        # Rotates back.
-        self.assertEqual(suggestion_services.get_next_user_in_rotation(
-            'category_a'), user_ids[0])
-        self.assertEqual(
-            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
-                'category_a').current_position_in_rotation, user_ids[0])
+    def test_get_voiceover_application_from_model_with_invalid_type_raise_error(
+            self):
+        suggestion_services.get_voiceover_application(
+            self.voiceover_application_model.id)
 
-        self.assertEqual(suggestion_services.get_next_user_in_rotation(
-            'category_invalid'), None)
+        self.voiceover_application_model.target_type = 'invalid_type'
+        with self.assertRaisesRegexp(
+            Exception,
+            'Invalid target type for voiceover application: invalid_type'):
+            suggestion_services.get_voiceover_application(
+                self.voiceover_application_model.id)

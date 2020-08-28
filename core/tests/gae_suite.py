@@ -21,6 +21,7 @@ it from the command line by running
 
 from the oppia/ root folder.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -33,31 +34,35 @@ CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 
+GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
+    OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0', 'google-cloud-sdk', 'platform',
+    'google_appengine')
+
 DIRS_TO_ADD_TO_SYS_PATH = [
-    os.path.join(
-        OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine'),
-    os.path.join(OPPIA_TOOLS_DIR, 'webtest-2.0.33'),
-    os.path.join(
-        OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine',
-        'lib', 'webob_0_9'),
-    os.path.join(OPPIA_TOOLS_DIR, 'browsermob-proxy-0.8.0'),
-    os.path.join(OPPIA_TOOLS_DIR, 'selenium-3.13.0'),
-    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-6.0.0'),
+    GOOGLE_APP_ENGINE_SDK_HOME,
+    os.path.join(OPPIA_TOOLS_DIR, 'webtest-2.0.35'),
+    os.path.join(GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webob_0_9'),
+    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-6.2.2'),
+    os.path.join(OPPIA_TOOLS_DIR, 'psutil-5.7.0'),
+    os.path.join(OPPIA_TOOLS_DIR, 'PyGithub-1.45'),
     CURR_DIR,
-    os.path.join(THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.5'),
-    os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
-    os.path.join(THIRD_PARTY_DIR, 'bleach-3.1.0'),
+    os.path.join(THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.6.1'),
+    os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.9.1'),
+    os.path.join(THIRD_PARTY_DIR, 'bleach-3.1.5'),
     os.path.join(THIRD_PARTY_DIR, 'callbacks-0.3.0'),
     os.path.join(THIRD_PARTY_DIR, 'future-0.17.1'),
     os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
     os.path.join(THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
     os.path.join(THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
     os.path.join(THIRD_PARTY_DIR, 'graphy-1.0.0'),
-    os.path.join(THIRD_PARTY_DIR, 'html5lib-python-1.0.1'),
-    os.path.join(THIRD_PARTY_DIR, 'mutagen-1.42.0'),
-    os.path.join(THIRD_PARTY_DIR, 'simplejson-3.16.0'),
-    os.path.join(THIRD_PARTY_DIR, 'six-1.12.0'),
-    os.path.join(THIRD_PARTY_DIR, 'soupsieve-1.9.1'),
+    os.path.join(THIRD_PARTY_DIR, 'html5lib-python-1.1'),
+    os.path.join(THIRD_PARTY_DIR, 'mutagen-1.43.0'),
+    os.path.join(THIRD_PARTY_DIR, 'packaging-20.4'),
+    os.path.join(THIRD_PARTY_DIR, 'pylatexenc-2.6'),
+    os.path.join(THIRD_PARTY_DIR, 'redis-3.5.3'),
+    os.path.join(THIRD_PARTY_DIR, 'simplejson-3.17.0'),
+    os.path.join(THIRD_PARTY_DIR, 'six-1.15.0'),
+    os.path.join(THIRD_PARTY_DIR, 'soupsieve-1.9.5'),
     os.path.join(THIRD_PARTY_DIR, 'webencodings-0.5.1'),
 ]
 

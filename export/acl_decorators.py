@@ -17,6 +17,7 @@
 """Decorators to provide authorization for the cloud datastore admin
 service.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -37,7 +38,7 @@ def can_perform_cron_tasks(handler):
             *. The return value of the decorated function.
 
         Raises:
-            UnauthorizedUserException: The user does not have
+            UnauthorizedUserException. The user does not have
                 credentials to access the page.
         """
         if (self.request.headers.get('X-AppEngine-Cron') is None and

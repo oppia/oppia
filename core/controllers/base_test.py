@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for generic controller behavior."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -52,9 +53,24 @@ FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
 PADDING = 1
 
 
+class HelperFunctionTests(test_utils.GenericTestBase):
+
+    def test_load_template(self):
+        about_path = os.path.join('core', 'templates', 'pages', 'about-page')
+        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', about_path):
+            self.assertIn(
+                '"About | Oppia"',
+                base.load_template('about-page.mainpage.html'))
+        donate_path = os.path.join('core', 'templates', 'pages', 'donate-page')
+        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', donate_path):
+            self.assertIn(
+                '"Donate - Oppia"',
+                base.load_template('donate-page.mainpage.html'))
+
+
 class UniqueTemplateNamesTests(test_utils.GenericTestBase):
     """Tests to ensure that all template filenames in
-    core/templates/dev/head/pages have unique filenames. This is required
+    core/templates/pages have unique filenames. This is required
     for the backend tests to work correctly since they fetch templates
     from this directory based on name of the template. For details, refer
     get_filepath_from_filename function in test_utils.py.
@@ -62,7 +78,7 @@ class UniqueTemplateNamesTests(test_utils.GenericTestBase):
 
     def test_template_filenames_are_unique(self):
         templates_dir = os.path.join(
-            'core', 'templates', 'dev', 'head', 'pages')
+            'core', 'templates', 'pages')
         all_template_names = []
         for root, _, filenames in os.walk(templates_dir):
             template_filenames = [
@@ -80,6 +96,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     TEST_CREATOR_USERNAME = 'testcreatoruser'
     TEST_EDITOR_EMAIL = 'test.editor@example.com'
     TEST_EDITOR_USERNAME = 'testeditoruser'
+    DELETED_USER_EMAIL = 'deleted.user@example.com'
+    DELETED_USER_USERNAME = 'deleteduser'
 
     class MockHandlerWithInvalidReturnType(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = 'invalid_type'
@@ -95,7 +113,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
     class MockHandlerForTestingErrorPageWithIframed(base.BaseHandler):
         def get(self):
-            self.values['iframed'] = True
+            self.iframed = True
             self.render_template('invalid_page.html')
 
     class MockHandlerForTestingUiAccessWrapper(base.BaseHandler):
@@ -124,6 +142,14 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.signup(self.TEST_CREATOR_EMAIL, self.TEST_CREATOR_USERNAME)
         self.signup(self.TEST_EDITOR_EMAIL, self.TEST_EDITOR_USERNAME)
 
+        # Create user that is scheduled for deletion.
+        self.signup(self.DELETED_USER_EMAIL, self.DELETED_USER_USERNAME)
+        deleted_user_id = self.get_user_id_from_email(self.DELETED_USER_EMAIL)
+        deleted_user_model = (
+            user_models.UserSettingsModel.get_by_id(deleted_user_id))
+        deleted_user_model.deleted = True
+        deleted_user_model.put()
+
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
 
@@ -138,17 +164,17 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
             # This url is ignored since it is only needed for a protractor test.
             # The backend tests fetch templates from
-            # core/templates/dev/head/pages instead of webpack_bundles since we
+            # core/templates/pages instead of webpack_bundles since we
             # skip webpack compilation for backend tests.
             # The console_errors.html template is present in
-            # core/templates/dev/head/tests and we want one canonical
+            # core/templates/tests and we want one canonical
             # directory for retrieving templates so we ignore this url.
             if url == '/console_errors':
                 continue
 
             # Some of these will 404 or 302. This is expected.
             self.get_response_without_checking_for_errors(
-                url, [200, 302, 400, 401, 404])
+                url, [200, 301, 302, 400, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
         # TODO(sll): Set a self.payload attr in the BaseHandler for
@@ -159,10 +185,10 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         """Tests request without csrf_token results in 401 error."""
 
         self.post_json(
-            '/library/any', payload={}, expected_status_int=401)
+            '/community-library/any', payload={}, expected_status_int=401)
 
         self.put_json(
-            '/library/any', payload={}, expected_status_int=401)
+            '/community-library/any', payload={}, expected_status_int=401)
 
     def test_requests_for_invalid_paths(self):
         """Test that requests for invalid paths result in a 404 error."""
@@ -170,26 +196,64 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
         self.get_html_response(
-            '/library/extra', expected_status_int=404)
+            '/community-library/extra', expected_status_int=404)
 
         self.get_html_response(
-            '/library/data/extra', expected_status_int=404)
+            '/community-library/data/extra', expected_status_int=404)
 
         self.post_json(
-            '/library/extra', payload={}, csrf_token=csrf_token,
+            '/community-library/extra', payload={}, csrf_token=csrf_token,
             expected_status_int=404)
 
         self.put_json(
-            '/library/extra', payload={}, csrf_token=csrf_token,
+            '/community-library/extra', payload={}, csrf_token=csrf_token,
             expected_status_int=404)
 
-        self.delete_json('/library/data', expected_status_int=404)
+        self.delete_json('/community-library/data', expected_status_int=404)
 
-    def test_redirect_in_logged_out_states(self):
-        """Test for a redirect in logged out state on '/'."""
+    def test_maintenance_mode_when_enabled_html(self):
+        swap_maintenance_mode = self.swap(
+            feconf, 'ENABLE_MAINTENANCE_MODE', True)
+        with swap_maintenance_mode:
+            response = (
+                self.get_html_response(
+                    '/community-library', expected_status_int=503))
+            self.assertIn(
+                '<maintenance-page>', response.body)
+            self.assertNotIn('<library-page>', response.body)
 
-        response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('splash', response.headers['location'])
+    def test_maintenance_mode_when_enabled_and_super_admin_html(self):
+        swap_maintenance_mode = self.swap(
+            feconf, 'ENABLE_MAINTENANCE_MODE', True)
+        login_super_admin = self.login_context(
+            self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        with swap_maintenance_mode, login_super_admin:
+            response = self.get_html_response('/community-library')
+            self.assertIn('<library-page>', response.body)
+            self.assertNotIn(
+                'The Oppia site is temporarily unavailable', response.body)
+
+    def test_maintenance_mode_when_enabled_json(self):
+        swap_maintenance_mode = self.swap(
+            feconf, 'ENABLE_MAINTENANCE_MODE', True)
+        with swap_maintenance_mode:
+            response = (
+                self.get_json('/url_handler', expected_status_int=503))
+            self.assertIn('error', response)
+            self.assertEqual(
+                response['error'],
+                'Oppia is currently being upgraded, and the site should be up '
+                'and running again in a few hours. Thanks for your patience!')
+
+    def test_maintenance_mode_when_enabled_and_super_admin_json(self):
+        swap_maintenance_mode = self.swap(
+            feconf, 'ENABLE_MAINTENANCE_MODE', True)
+        login_super_admin = self.login_context(
+            self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        with swap_maintenance_mode, login_super_admin:
+            response = self.get_json('/url_handler')
+            self.assertIn('login_url', response)
+            self.assertIsNone(response['login_url'])
 
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
@@ -198,8 +262,20 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # learner dashboard, going to '/' should redirect to the learner
         # dashboard page.
         response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('learner_dashboard', response.headers['location'])
+        self.assertIn('learner-dashboard', response.headers['location'])
         self.logout()
+
+    def test_root_redirect_rules_for_deleted_user_prod_mode(self):
+        with self.swap(constants, 'DEV_MODE', False):
+            self.login(self.DELETED_USER_EMAIL)
+            response = self.get_html_response('/', expected_status_int=302)
+            self.assertIn('pending-account-deletion', response.headers['location'])
+
+    def test_root_redirect_rules_for_deleted_user_dev_mode(self):
+        with self.swap(constants, 'DEV_MODE', True):
+            self.login(self.DELETED_USER_EMAIL)
+            response = self.get_html_response('/', expected_status_int=302)
+            self.assertIn('pending-account-deletion', response.headers['location'])
 
     def test_root_redirect_rules_for_users_with_no_user_contribution_model(
             self):
@@ -215,7 +291,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # learner dashboard, going to '/' should redirect to the learner
         # dashboard page.
         response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('learner_dashboard', response.headers['location'])
+        self.assertIn('learner-dashboard', response.headers['location'])
         self.logout()
 
     def test_root_redirect_rules_for_logged_in_creators(self):
@@ -228,7 +304,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # Since the default dashboard has been set as creator dashboard, going
         # to '/' should redirect to the creator dashboard.
         response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('creator_dashboard', response.headers['location'])
+        self.assertIn('creator-dashboard', response.headers['location'])
 
     def test_root_redirect_rules_for_logged_in_editors(self):
         self.login(self.TEST_CREATOR_EMAIL)
@@ -350,7 +426,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             to a non-existent directory.
             """
             path = ''
-            if args[1] == 'Pillow-6.0.0':
+            if args[1] == 'Pillow-6.2.2':
                 return 'invalid_path'
             else:
                 path = '/'.join(args)
@@ -503,6 +579,11 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             response.headers['Location'], 'https://oppiatestserver.appspot.com')
 
+    def test_splash_redirect(self):
+        # Tests that the old '/splash' URL is redirected to '/'.
+        response = self.get_html_response('/splash', expected_status_int=302)
+        self.assertEqual('http://localhost/', response.headers['location'])
+
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
 
@@ -623,13 +704,25 @@ class LogoutPageTests(test_utils.GenericTestBase):
         # Logout with valid query arg. This test only validates that the login
         # cookies have expired after hitting the logout url.
         current_page = '/explore/0'
-        response = self.get_html_response(current_page)
+        self.get_html_response(current_page)
         response = self.get_html_response('/logout', expected_status_int=302)
+        expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
+        self.assertTrue(
+            datetime.datetime.utcnow() > datetime.datetime.strptime(
+                expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT'))
+
+    def test_logout_page_with_redirect_url(self):
+        exp_services.load_demo('0')
+        current_page = '/explore/0'
+        self.get_html_response(current_page)
+        response = self.get_html_response(
+            '/logout?redirect_url=community-library', expected_status_int=302)
         expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
 
         self.assertTrue(
             datetime.datetime.utcnow() > datetime.datetime.strptime(
-                expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT',))
+                expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT'))
+        self.assertIn('community-library', response.headers['Location'])
 
     def test_logout_page_with_dev_mode_disabled(self):
         with self.swap(constants, 'DEV_MODE', False):
@@ -749,6 +842,8 @@ class I18nDictsTests(test_utils.GenericTestBase):
                 key_list = [line[:line.find(':')].strip() for line in lines]
                 for key in key_list:
                     self.assertTrue(key.startswith('"I18N_'))
+                    if not key.startswith('"I18N_'):
+                        self.log_line('Bad line in file: %s' % filename)
                 self.assertEqual(sorted(key_list), key_list)
 
     def test_keys_match_en_qqq(self):
@@ -761,7 +856,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
         """Tests that keys in HTML files are present in en.json."""
         en_key_list = self._extract_keys_from_json_file('en.json')
         dirs_to_search = [
-            os.path.join('core', 'templates', 'dev', 'head'),
+            os.path.join('core', 'templates', ''),
             'extensions']
         files_checked = 0
         missing_keys_count = 0
@@ -1052,7 +1147,7 @@ class SignUpTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         response = self.get_html_response('/about', expected_status_int=302)
-        self.assertIn('Logout', response.location)
+        self.assertIn('logout', response.location)
         self.logout()
 
         response = self.post_json(
@@ -1077,7 +1172,7 @@ class SignUpTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token,
         )
 
-        self.get_html_response('/library')
+        self.get_html_response('/community-library')
 
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):

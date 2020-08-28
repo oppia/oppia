@@ -16,25 +16,26 @@
  * @fileoverview Directive for the NumberWithUnits interaction.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
   'interactions/NumberWithUnits/directives/' +
   'number-with-units-rules.service.ts');
-require('services/HtmlEscaperService.ts');
+require('services/html-escaper.service.ts');
+
+require('domain/objects/objects-domain.constants.ajs.ts');
 
 angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/NumberWithUnits/directives/' +
-        'number-with-units-interaction.directive.html'),
+      template: require('./number-with-units-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', '$uibModal', 'NumberWithUnitsObjectFactory',
@@ -44,38 +45,12 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
             NumberWithUnitsRulesService, NUMBER_WITH_UNITS_PARSING_ERRORS,
             CurrentInteractionService) {
           var ctrl = this;
-          ctrl.answer = '';
-          ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
-
           var errorMessage = '';
           // Label for errors caused whilst parsing number with units.
           var FORM_ERROR_TYPE = 'NUMBER_WITH_UNITS_FORMAT_ERROR';
-          ctrl.NUMBER_WITH_UNITS_FORM_SCHEMA = {
-            type: 'unicode',
-            ui_config: {}
-          };
-
           ctrl.getWarningText = function() {
             return errorMessage;
           };
-
-          try {
-            NumberWithUnitsObjectFactory.createCurrencyUnits();
-          } catch (parsingError) {}
-
-          $scope.$watch('$ctrl.answer', function(newValue) {
-            try {
-              var numberWithUnits =
-                NumberWithUnitsObjectFactory.fromRawInputString(newValue);
-              errorMessage = '';
-              ctrl.NumberWithUnitsForm.answer.$setValidity(
-                FORM_ERROR_TYPE, true);
-            } catch (parsingError) {
-              errorMessage = parsingError.message;
-              ctrl.NumberWithUnitsForm.answer.$setValidity(
-                FORM_ERROR_TYPE, false);
-            }
-          });
 
           ctrl.submitAnswer = function(answer) {
             try {
@@ -101,27 +76,49 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
           var submitAnswerFn = function() {
             ctrl.submitAnswer(ctrl.answer);
           };
-
-          CurrentInteractionService.registerCurrentInteraction(
-            submitAnswerFn, ctrl.isAnswerValid);
-
           ctrl.showHelp = function() {
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-                '/interactions/NumberWithUnits/directives/' +
-                'number-with-units-help-modal.directive.html'),
+              template: require(
+                './number-with-units-help-modal.directive.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.close = function() {
-                    $uibModalInstance.close();
-                  };
-                }
-              ]
-            }).result.then(function() {});
+              controller: 'ConfirmOrCancelModalController'
+            }).result.then(function() {}, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
-        }]
+          ctrl.$onInit = function() {
+            $scope.$watch('$ctrl.answer', function(newValue) {
+              try {
+                var numberWithUnits =
+                  NumberWithUnitsObjectFactory.fromRawInputString(newValue);
+                errorMessage = '';
+                ctrl.NumberWithUnitsForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, true);
+              } catch (parsingError) {
+                errorMessage = parsingError.message;
+                ctrl.NumberWithUnitsForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, false);
+              }
+            });
+            ctrl.answer = '';
+            ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
+
+            ctrl.NUMBER_WITH_UNITS_FORM_SCHEMA = {
+              type: 'unicode',
+              ui_config: {}
+            };
+
+            try {
+              NumberWithUnitsObjectFactory.createCurrencyUnits();
+            } catch (parsingError) {}
+
+            CurrentInteractionService.registerCurrentInteraction(
+              submitAnswerFn, ctrl.isAnswerValid);
+          };
+        }
+      ]
     };
   }
 ]);

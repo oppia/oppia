@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Jobs for queries personalized to individual users."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -41,6 +42,7 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for creating and populating UserContributionsModels for
     all registered users that have contributed.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
@@ -55,7 +57,6 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'version_string': item.get_version_string(),
             })
 
-
     @staticmethod
     def reduce(key, version_and_exp_ids):
         """Implements the reduce function for this job."""
@@ -63,7 +64,6 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         edited_exploration_ids = set()
 
         edits = [ast.literal_eval(v) for v in version_and_exp_ids]
-
         for edit in edits:
             edited_exploration_ids.add(edit['exploration_id'])
             if edit['version_string'] == '1':
@@ -77,6 +77,49 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_services.create_user_contributions(
                 key, list(created_exploration_ids), list(
                     edited_exploration_ids))
+
+
+# TODO(#10178): Remove the following migration job once we have verified
+# that UserAuthDetailsModels exists for every user.
+class PopulateUserAuthDetailsModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for creating and populating UserAuthDetailsModel for
+    all registered users.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        """Marks a job as queued and adds it to a queue for processing."""
+        super(PopulateUserAuthDetailsModelOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        """Implements the map function for this job."""
+
+        # Assumptions:
+        # 1) We are only having full users in the database, and no
+        #    profile users (For profiles we need to do a role check also and
+        #    ensure the gae_id attribute is None for them).
+        # 2) This migration assumes that, once a gae_id is assigned to a user,
+        #    it cannot be updated. Currently, there is no way to do so, but the
+        #    migration job would need modifications if it has to work in such a
+        #    setting in future.
+
+        user_models.UserAuthDetailsModel(
+            id=item.id,
+            gae_id=item.gae_id,
+            deleted=item.deleted
+        ).put()
+        yield ('SUCCESS - Created UserAuthDetails model', 1)
+
+    @staticmethod
+    def reduce(key, user_counter):
+        yield (key, len(user_counter))
 
 
 class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -99,6 +142,23 @@ class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         username_counter = [
             ast.literal_eval(v) for v in stringified_username_counter]
         yield (key, len(username_counter))
+
+
+class UsernameLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits and validates username lengths."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(model_instance):
+        if len(model_instance.username) > 20:
+            yield (len(model_instance.username), model_instance.username)
+
+    @staticmethod
+    def reduce(key, values):
+        yield ('Length: %s' % key, 'Usernames: %s' % sorted(values))
 
 
 class LongUserBiosOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -130,6 +190,7 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for subscribing users to explorations, collections, and
     feedback threads.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
@@ -248,6 +309,7 @@ class DashboardStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for populating weekly dashboard stats for all registered
     users who have a non-None value of UserStatsModel.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
@@ -305,30 +367,11 @@ class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_id, first_contribution_msec)
 
 
-class UserProfilePictureOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job that updates profile pictures for users which do not
-    currently have them. Users who already have profile pictures are
-    unaffected.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [user_models.UserSettingsModel]
-
-    @staticmethod
-    def map(item):
-        """Implements the map function for this job."""
-        if item.deleted or item.profile_picture_data_url is not None:
-            return
-
-        user_services.generate_initial_profile_picture(item.id)
-
-
 class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that adds fields to record last exploration created and last
     edited times.
     """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
@@ -392,26 +435,6 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
                         model_instance.id,
                         ', '.join(exp_ids_removed)),
                     1)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
-
-
-class UserGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for populating UserSettingsModel with gae_id."""
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [user_models.UserSettingsModel]
-
-    @staticmethod
-    def map(model_instance):
-        """Implements the map function for this job."""
-        if model_instance.gae_id is None:
-            model_instance.gae_id = model_instance.id
-        model_instance.put(update_last_updated_time=False)
-        yield ('SUCCESS', model_instance.id)
 
     @staticmethod
     def reduce(key, values):

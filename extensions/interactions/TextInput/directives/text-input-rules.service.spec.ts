@@ -16,32 +16,27 @@
  * @fileoverview Unit tests for Text Input rules.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require('interactions/TextInput/directives/text-input-rules.service.ts');
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
+import { TextInputRulesService } from
+  'interactions/TextInput/directives/text-input-rules.service';
 
-describe('Text Input rules service', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
-      $provide.value(key, value);
-    }
-  }));
-
-  var tirs = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    tirs = $injector.get('TextInputRulesService');
-  }));
+describe('Text Input rules service', () => {
+  var tirs: TextInputRulesService = null;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [NormalizeWhitespacePipe]
+    });
+    tirs = TestBed.get(TextInputRulesService);
+  });
 
   var RULE_INPUT = {
     x: 'abc def'
   };
 
-  it('should have a correct \'equals\' rule', function() {
+  it('should have a correct \'equals\' rule', () => {
     expect(tirs.Equals('abc def', RULE_INPUT)).toBe(true);
     expect(tirs.Equals('ABC def', RULE_INPUT)).toBe(true);
     expect(tirs.Equals('abc DeF', RULE_INPUT)).toBe(true);
@@ -50,7 +45,7 @@ describe('Text Input rules service', function() {
     expect(tirs.Equals('abc', RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'fuzzy equals\' rule', function() {
+  it('should have a correct \'fuzzy equals\' rule', () => {
     expect(tirs.FuzzyEquals('ABC DEF', RULE_INPUT)).toBe(true);
     expect(tirs.FuzzyEquals('abc def', RULE_INPUT)).toBe(true);
     expect(tirs.FuzzyEquals('acc def', RULE_INPUT)).toBe(true);
@@ -66,16 +61,7 @@ describe('Text Input rules service', function() {
     expect(tirs.FuzzyEquals('ghi jkl', RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'case sensitive equals\' rule', function() {
-    expect(tirs.CaseSensitiveEquals('abc def', RULE_INPUT)).toBe(true);
-    expect(tirs.CaseSensitiveEquals('abc   def ', RULE_INPUT)).toBe(true);
-    expect(tirs.CaseSensitiveEquals('ABC def', RULE_INPUT)).toBe(false);
-    expect(tirs.CaseSensitiveEquals('abc DeF', RULE_INPUT)).toBe(false);
-    expect(tirs.CaseSensitiveEquals('', RULE_INPUT)).toBe(false);
-    expect(tirs.CaseSensitiveEquals('abc', RULE_INPUT)).toBe(false);
-  });
-
-  it('should have a correct \'starts with\' rule', function() {
+  it('should have a correct \'starts with\' rule', () => {
     expect(tirs.StartsWith('  ABC  DEFGHI', RULE_INPUT)).toBe(true);
     expect(tirs.StartsWith('abc defghi', RULE_INPUT)).toBe(true);
     expect(tirs.StartsWith('ABC DEFGHI', RULE_INPUT)).toBe(true);
@@ -84,7 +70,7 @@ describe('Text Input rules service', function() {
     expect(tirs.StartsWith('cde', RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'contains\' rule', function() {
+  it('should have a correct \'contains\' rule', () => {
     expect(tirs.Contains(' abc  def', RULE_INPUT)).toBe(true);
     expect(tirs.Contains('abc def', RULE_INPUT)).toBe(true);
     expect(tirs.Contains('ghabc defjk', RULE_INPUT)).toBe(true);

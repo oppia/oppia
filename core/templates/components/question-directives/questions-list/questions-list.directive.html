@@ -1,0 +1,110 @@
+<div class="question-editor-container">
+  <md-card class="question-data-container">
+    <div class="question-list-container">
+      <div class="list-header">
+        <h3>Question List</h3>
+      </div>
+      <div ng-if="$ctrl.getQuestionSummariesForOneSkill().length === 0">
+        <span>
+          There are no questions in this skill.
+        </span>
+      </div>
+      <div  ng-repeat="questionSummaryForOneSkill in $ctrl.getQuestionSummariesForOneSkill() track by $index" class="question-list-item protractor-test-question-list-item" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
+        <div ng-click="$ctrl.editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDifficulty())">
+          <div class="question-data">
+            <angular-html-bind class="question-text" html-data="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()"></angular-html-bind>
+            <span ng-click="$ctrl.deleteQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription())"
+                  class="link-off-icon">
+              <i class="material-icons">link_off</i>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="page-navigation-arrows" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
+        <i class="material-icons md-18"
+           ng-if="$ctrl.getCurrentPageNumber() !== 0"
+           ng-click="$ctrl.goToPreviousPage()">&#xE5C4;
+        </i> Page <[$ctrl.getCurrentPageNumber() + 1]>
+        <i class="material-icons md-18" ng-if="!$ctrl.isLastPage()" ng-click="$ctrl.goToNextPage()">&#xE5C8;</i>
+      </div>
+    </div>
+  </md-card>
+  <div class="create-question-container">
+    <md-card class="oppia-page-card">
+      <div>
+        <div class="list-header create-question-header">
+          <h3>Create a new question</h3>
+        </div>
+        <button class="btn add-question-btn protractor-test-create-question-button"
+                ng-click="$ctrl.createQuestion()">
+          + ADD QUESTION
+        </button>
+        <div class="list-group" ng-if="$ctrl.showDifficultyChoices">
+          <div class="list-group-item"  ng-repeat="skillWithDifficulty in $ctrl.linkedSkillsWithDifficulty track by $index">
+            <label class="list-group-item-heading" style="font-size: 1em;"><[skillWithDifficulty.getDescription()]></label>
+            <question-difficulty-selector skill-id-to-rubrics-object="$ctrl.skillIdToRubricsObject"
+                                          skill-with-difficulty="skillWithDifficulty">
+            </question-difficulty-selector>
+            <button class="btn btn-success protractor-test-confirm-skill-difficulty-button" ng-click="$ctrl.initiateQuestionCreation($ctrl.linkedSkillsWithDifficulty)">Save Difficulty</button>
+          </div>
+        </div>
+      </div>
+    </md-card>
+  </div>
+</div>
+<style>
+  questions-list .oppia-editor-publish-button {
+    margin-top: 2%;
+  }
+  questions-list .question-data-container {
+    margin-right: 1%;
+    max-height: 70vh;
+    min-height: 70vh;
+    overflow-y: scroll;
+    width: 28%;
+  }
+  questions-list .question-editor-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 60px;
+  }
+  questions-list .question-list-container {
+    padding: 0 20px 20px;
+  }
+  questions-list .create-question-container {
+    padding: 10px 12px;
+    width: 40%;
+  }
+  questions-list .list-header {
+    border-bottom: 2px solid #000;
+    display: flex;
+    justify-content: space-between;
+    margin: 25px 0;
+  }
+  questions-list .question-list-item {
+    border-bottom: 1px solid #e3e3e3;
+    padding: 10px 12px;
+  }
+  questions-list .question-data {
+    cursor: pointer;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  questions-list  .create-question-header {
+    border-bottom: none;
+  }
+  questions-list .question-text {
+    width: 90%;
+  }
+  questions-list .page-navigation-arrows {
+    float: right;
+  }
+  questions-list .add-question-btn {
+    background-color: #008098;
+    color: #FFFFFF;
+    font-weight: bold;
+    text-align: left;
+  }
+</style>

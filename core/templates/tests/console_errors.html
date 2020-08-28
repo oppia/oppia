@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @load('base-components/header.template.html', {"title": "Oppia"})
+  </head>
+  <body>
+    <oppia-root>
+      <div ng-controller="Base">
+        <base-content>
+          <content>
+            <div>
+              <picture>
+                <source type="image/webp" srcset="/build/fail/logo/288x128_logo_white.webp">
+                <source type="image/png" srcset="/build/fail/logo/288x128_logo_white.png">
+                <img src="/build/fail/logo/288x128_logo_white.png">
+              </picture>
+            </div>
+          </content>
+          <page-footer></page-footer>
+        </base-content>
+      </div>
+    </oppia-root>
+    @load('pages/footer_js_libs.html')
+  </body>
+</html>

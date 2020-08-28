@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Main package for URL routing and the index page."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -33,6 +34,11 @@ URLS = [
     main.get_redirect_route(
         r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler),
     main.get_redirect_route(
+        r'/cron/users/user_deletion', cron.CronUserDeletionHandler),
+    main.get_redirect_route(
+        r'/cron/users/fully_complete_user_deletion',
+        cron.CronFullyCompleteUserDeletionHandler),
+    main.get_redirect_route(
         r'/cron/explorations/recommendations',
         cron.CronExplorationRecommendationsHandler),
     main.get_redirect_route(
@@ -40,12 +46,6 @@ URLS = [
         cron.CronActivitySearchRankHandler),
     main.get_redirect_route(
         r'/cron/jobs/cleanup', cron.CronMapreduceCleanupHandler),
-    main.get_redirect_route(
-        r'/cron/suggestions/accept_stale_suggestions',
-        cron.CronAcceptStaleSuggestionsHandler),
-    main.get_redirect_route(
-        '/cron/suggestions/notify_reviewers',
-        cron.CronMailReviewersInRotationHandler)
 ]
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name

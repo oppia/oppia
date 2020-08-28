@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the exploration voice artist work."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -49,11 +50,13 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
     RECORDED_VOICEOVERS = {
         'voiceovers_mapping': {
+            'ca_placeholder_0': {},
             'content': {
                 'en': {
                     'filename': 'testFile.mp3',
                     'file_size_bytes': 12200,
-                    'needs_update': False
+                    'needs_update': False,
+                    'duration_secs': 4.5
                 }
             },
             'default_outcome': {}
@@ -156,11 +159,13 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
     OLDER_DATETIME = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
     RECORDED_VOICEOVERS = {
         'voiceovers_mapping': {
+            'ca_placeholder_0': {},
             'content': {
                 'en': {
                     'filename': 'testFile.mp3',
                     'file_size_bytes': 12200,
-                    'needs_update': False
+                    'needs_update': False,
+                    'duration_secs': 4.5
                 }
             },
             'default_outcome': {}
@@ -263,6 +268,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
 
 class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
     """This controller tests the first time tutorial for translations."""
+
     EXP_ID = 'exp1'
 
     def setUp(self):

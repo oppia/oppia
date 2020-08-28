@@ -13,17 +13,23 @@
 # limitations under the License.
 
 """Tests for the topic editor page."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+
+from core.domain import config_domain
 from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 
 class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
@@ -49,21 +55,51 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.new_user = user_services.UserActionsInfo(self.new_user_id)
         self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
+        self.save_new_skill(
+            self.skill_id, self.admin_id, description='Skill Description')
         self.skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
-            self.skill_id_2, self.admin_id, 'Skill Description 2')
+            self.skill_id_2, self.admin_id, description='Skill Description 2')
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description', [], [],
-            [self.skill_id, self.skill_id_2], [], 1)
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='topic-one', url_fragment='topic-one',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
             'subtopic_id': 1
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': 1,
+            'skill_id': self.skill_id
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        new_config_value = [{
+            'name': 'math',
+            'url_fragment': 'math',
+            'topic_ids': [self.topic_id],
+            'course_details': '',
+            'topic_list_intro': ''
+        }]
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.CLASSROOM_PAGES_DATA.name: (
+                    new_config_value),
+            }
+        }
+        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+        self.logout()
 
 
 class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
@@ -84,16 +120,30 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         self.assertEqual(response['additional_story_summary_dicts'], [])
 
         self.save_new_topic(
-            topic_id, self.admin_id, 'New name', 'New description',
-            [canonical_story_id], [additional_story_id], [self.skill_id],
-            [], 1)
+            topic_id, self.admin_id, name='New name',
+            abbreviated_name='topic-two', url_fragment='topic-two',
+            description='New description',
+            canonical_story_ids=[canonical_story_id],
+            additional_story_ids=[additional_story_id],
+            uncategorized_skill_ids=[self.skill_id],
+            subtopics=[], next_subtopic_id=1)
 
         self.save_new_story(
-            canonical_story_id, self.admin_id, 'title', 'description',
-            'note', topic_id)
+            canonical_story_id,
+            self.admin_id,
+            topic_id,
+            title='title',
+            description='description',
+            notes='note'
+        )
         self.save_new_story(
-            additional_story_id, self.admin_id, 'another title',
-            'another description', 'another note', topic_id)
+            additional_story_id,
+            self.admin_id,
+            topic_id,
+            title='another title',
+            description='another description',
+            notes='another note'
+        )
 
         topic_services.publish_story(
             topic_id, canonical_story_id, self.admin_id)
@@ -128,15 +178,89 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
     def test_story_creation(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
+        payload = {
+            'title': 'Story title',
+            'description': 'Story Description',
+            'filename': 'test_svg.svg',
+            'thumbnailBgColor': '#F8BF74',
+            'story_url_fragment': 'story-frag-one'
+        }
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+
         json_response = self.post_json(
-            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id),
-            {'title': 'Story title'},
-            csrf_token=csrf_token)
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id), payload,
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),))
+
         story_id = json_response['storyId']
         self.assertEqual(len(story_id), 12)
         self.assertIsNotNone(
             story_fetchers.get_story_by_id(story_id, strict=False))
         self.logout()
+
+    def test_story_creation_fails_with_invalid_image(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'title': 'Story title',
+            'description': 'Story Description',
+            'filename': 'cafe.flac',
+            'thumbnailBgColor': '#F8BF74',
+            'story_url_fragment': 'story-frag-two'
+        }
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+
+        json_response = self.post_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id), payload,
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),),
+            expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'], 'Image exceeds file size limit of 100 KB.')
+
+    def test_story_creation_fails_with_duplicate_story_url_fragment(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'title': 'Story title',
+            'description': 'Story Description',
+            'filename': 'test_svg.svg',
+            'thumbnailBgColor': '#F8BF74',
+            'story_url_fragment': 'original'
+        }
+        self.save_new_story(
+            story_services.get_new_story_id(),
+            self.admin_id,
+            topic_services.get_new_topic_id(),
+            title='title',
+            description='description',
+            notes='note',
+            url_fragment='original'
+        )
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+
+        json_response = self.post_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id), payload,
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),),
+            expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Story url fragment is not unique across the site.')
 
 
 class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
@@ -240,9 +364,10 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
         self.logout()
 
 
-class TopicEditorTests(BaseTopicEditorControllerTests):
+class TopicEditorTests(
+        BaseTopicEditorControllerTests, test_utils.EmailTestBase):
 
-    def test_get_can_not_access_topic_page_with_invalid_topic_id(self):
+    def test_get_can_not_access_topic_page_with_nonexistent_topic_id(self):
         self.login(self.ADMIN_EMAIL)
 
         self.get_html_response(
@@ -250,6 +375,16 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 feconf.TOPIC_EDITOR_URL_PREFIX,
                 topic_services.get_new_topic_id()), expected_status_int=404)
 
+        self.logout()
+
+    def test_cannot_access_topic_editor_page_with_invalid_topic_id(self):
+        # Check that the editor page can not be accessed with an
+        # an invalid topic id.
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_URL_PREFIX, 'invalid_topic_id'),
+            expected_status_int=404)
         self.logout()
 
     def test_access_topic_editor_page(self):
@@ -276,7 +411,6 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
         self.logout()
 
-
     def test_editable_topic_handler_get(self):
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
         # Check that non-admins cannot access the editable topic data.
@@ -290,19 +424,27 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         # Check that admins can access the editable topic data.
         self.login(self.ADMIN_EMAIL)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
             json_response = self.get_json(
                 '%s/%s' % (
                     feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
             self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+            self.assertTrue(
+                self.skill_id in json_response['skill_question_count_dict'])
+            self.assertEqual(
+                json_response['skill_question_count_dict'][self.skill_id], 0)
+            self.assertTrue(
+                self.skill_id_2 in json_response['skill_question_count_dict'])
+            self.assertEqual(
+                json_response['skill_question_count_dict'][self.skill_id_2], 0)
             self.assertEqual(
                 'Skill Description',
                 json_response['skill_id_to_description_dict'][self.skill_id])
 
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
             expected_email_html_body = (
                 'The deleted skills: %s are still'
                 ' present in topic with id %s' % (
@@ -324,6 +466,29 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 topic_services.get_new_topic_id()), expected_status_int=404)
 
         self.logout()
+
+    def test_editable_topic_handler_put_fails_with_long_commit_message(self):
+        change_cmd = {
+            'version': 2,
+            'commit_message': 'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1),
+            'topic_and_subtopic_page_change_dicts': [{
+                'cmd': 'update_topic_property',
+                'property_name': 'name',
+                'old_value': '',
+                'new_value': 0
+            }]
+        }
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Commit messages must be at most 1000 characters long.')
 
     def test_editable_topic_handler_put_raises_error_with_invalid_name(self):
         change_cmd = {
@@ -369,9 +534,21 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                     'content_id': 'content'
                 }
             }, {
+                'cmd': 'update_subtopic_property',
+                'property_name': 'url_fragment',
+                'new_value': 'subtopic-one',
+                'old_value': '',
+                'subtopic_id': 1
+            }, {
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
                 'title': 'Title2'
+            }, {
+                'cmd': 'update_subtopic_property',
+                'property_name': 'url_fragment',
+                'new_value': 'subtopic-two',
+                'old_value': '',
+                'subtopic_id': 2
             }, {
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_html',
@@ -398,7 +575,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                             'en': {
                                 'filename': 'test.mp3',
                                 'file_size_bytes': 100,
-                                'needs_update': False
+                                'needs_update': False,
+                                'duration_secs': 0.34342
                             }
                         }
                     }
@@ -411,8 +589,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
             json_response = self.put_json(
                 '%s/%s' % (
@@ -425,8 +603,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'Skill Description',
                 json_response['skill_id_to_description_dict'][self.skill_id])
 
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
+            messages = self._get_sent_email_messages(
+                feconf.ADMIN_EMAIL_ADDRESS)
             expected_email_html_body = (
                 'The deleted skills: %s are still'
                 ' present in topic with id %s' % (
@@ -472,7 +650,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                         'en': {
                             'file_size_bytes': 100,
                             'filename': 'test.mp3',
-                            'needs_update': False
+                            'needs_update': False,
+                            'duration_secs': 0.34342
                         }
                     }
                 }
@@ -519,8 +698,12 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
 
         topic_id_1 = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id_1, self.admin_id, 'Name 1', 'Description 1', [], [],
-            [self.skill_id], [], 1)
+            topic_id_1, self.admin_id, name='Name 1',
+            abbreviated_name='topic-three', url_fragment='topic-three',
+            description='Description 1', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id],
+            subtopics=[], next_subtopic_id=1)
 
         json_response = self.put_json(
             '%s/%s' % (
@@ -557,9 +740,21 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                     'content_id': 'content'
                 }
             }, {
+                'cmd': 'update_subtopic_property',
+                'property_name': 'url_fragment',
+                'new_value': 'subtopic-one',
+                'old_value': '',
+                'subtopic_id': 1
+            }, {
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
                 'title': 'Title2'
+            }, {
+                'cmd': 'update_subtopic_property',
+                'property_name': 'url_fragment',
+                'new_value': 'subtopic-two',
+                'old_value': '',
+                'subtopic_id': 2
             }, {
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_html',
@@ -586,7 +781,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                             'en': {
                                 'filename': 'test.mp3',
                                 'file_size_bytes': 100,
-                                'needs_update': False
+                                'needs_update': False,
+                                'duration_secs': 0.34342
                             }
                         }
                     }
@@ -620,6 +816,15 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             response['error'],
             'You must be logged in to access this resource.')
 
+    def test_cannot_delete_invalid_topic(self):
+        # Check that an invalid topic can not be deleted.
+        self.login(self.ADMIN_EMAIL)
+        self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                'invalid_topic_id'), expected_status_int=404)
+        self.logout()
+
     def test_editable_topic_handler_delete(self):
         # Check that admins can delete a topic.
         self.login(self.ADMIN_EMAIL)
@@ -649,7 +854,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         self.logout()
 
 
-class TopicPublishSendMailHandlerTests(BaseTopicEditorControllerTests):
+class TopicPublishSendMailHandlerTests(
+        BaseTopicEditorControllerTests, test_utils.EmailTestBase):
 
     def test_send_mail(self):
         self.login(self.ADMIN_EMAIL)
@@ -659,8 +865,8 @@ class TopicPublishSendMailHandlerTests(BaseTopicEditorControllerTests):
                 '%s/%s' % (
                     feconf.TOPIC_SEND_MAIL_URL_PREFIX, self.topic_id),
                 {'topic_name': 'Topic Name'}, csrf_token=csrf_token)
-        messages = self.mail_stub.get_sent_messages(
-            to=feconf.ADMIN_EMAIL_ADDRESS)
+        messages = self._get_sent_email_messages(
+            feconf.ADMIN_EMAIL_ADDRESS)
         expected_email_html_body = (
             'wants to publish topic: Topic Name at URL %s, please review'
             ' and publish if it looks good.'
@@ -733,14 +939,14 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
             '%s/%s' % (
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
             {'publish_status': True}, csrf_token=csrf_token)
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
         self.assertTrue(topic_rights.topic_is_published)
 
         self.put_json(
             '%s/%s' % (
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
             {'publish_status': False}, csrf_token=csrf_token)
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
         self.assertFalse(topic_rights.topic_is_published)
         self.logout()
 
@@ -773,7 +979,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
             '%s/%s' % (
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
             {'publish_status': True}, csrf_token=csrf_token)
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
         self.assertTrue(topic_rights.topic_is_published)
 
         response = self.put_json(
@@ -786,7 +992,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
     def test_cannot_unpublish_an_unpublished_exploration(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
         self.assertFalse(topic_rights.topic_is_published)
 
         response = self.put_json(

@@ -17,43 +17,42 @@
  */
 
 angular.module('oppia').directive('numberWithUnitsEditor', [
-  'NumberWithUnitsObjectFactory', 'UrlInterpolationService',
-  function(NumberWithUnitsObjectFactory, UrlInterpolationService) {
+  'NumberWithUnitsObjectFactory', function(NumberWithUnitsObjectFactory) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/number-with-units-editor.directive.html'),
+      template: require('./number-with-units-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
         var errorMessage = '';
         var numberWithUnitsString = '';
-        if (ctrl.value !== null) {
-          var defaultNumberWithUnits =
-            NumberWithUnitsObjectFactory.fromDict(ctrl.value);
-          numberWithUnitsString = defaultNumberWithUnits.toString();
-        }
-        ctrl.localValue = {
-          label: numberWithUnitsString
-        };
-
-        $scope.$watch('$ctrl.localValue.label', function(newValue) {
-          try {
-            var numberWithUnits =
-              NumberWithUnitsObjectFactory.fromRawInputString(newValue);
-            ctrl.value = numberWithUnits;
-            errorMessage = '';
-          } catch (parsingError) {
-            errorMessage = parsingError.message;
-          }
-        });
 
         ctrl.getWarningText = function() {
           return errorMessage;
+        };
+        ctrl.$onInit = function() {
+          $scope.$watch('$ctrl.localValue.label', function(newValue) {
+            try {
+              var numberWithUnits =
+                NumberWithUnitsObjectFactory.fromRawInputString(newValue);
+              ctrl.value = numberWithUnits;
+              errorMessage = '';
+            } catch (parsingError) {
+              errorMessage = parsingError.message;
+            }
+          });
+          if (ctrl.value !== null) {
+            var defaultNumberWithUnits =
+              NumberWithUnitsObjectFactory.fromDict(ctrl.value);
+            numberWithUnitsString = defaultNumberWithUnits.toString();
+          }
+          ctrl.localValue = {
+            label: numberWithUnitsString
+          };
         };
       }]
     };

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for activity references."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -30,14 +31,20 @@ class ActivityReferencesModel(base_models.BaseModel):
     The id of each model instance is the name of the list. This should be one
     of the constants in feconf.ALL_ACTIVITY_REFERENCE_LIST_TYPES.
     """
+
     # The types and ids of activities to show in the library page. Each item
     # in this list is a dict with two keys: 'type' and 'id'.
     activity_references = ndb.JsonProperty(repeated=True)
 
     @staticmethod
     def get_deletion_policy():
-        """Activity references are not related to users."""
+        """ActivityReferencesModel are not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_or_create(cls, list_name):

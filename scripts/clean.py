@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Deletes temporary and installed files."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -25,7 +26,8 @@ import python_utils
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Deletes temporary and installed files.
 """)
 
@@ -65,6 +67,7 @@ def main(args=None):
     delete_file('.coverage')
     delete_directory_tree('local_compiled_js/')
     delete_directory_tree('local_compiled_js_for_test/')
+    delete_directory_tree('readme_test_dir/')
     delete_file('tsc_output_log.txt')
     delete_file('dev_output.txt')
     delete_file('.viminfo')
@@ -76,5 +79,7 @@ def main(args=None):
     python_utils.PRINT('Temporary and installed files deleted')
 
 
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when clean.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
     main()

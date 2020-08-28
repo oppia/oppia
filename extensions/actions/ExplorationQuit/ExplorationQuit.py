@@ -17,6 +17,7 @@
 """Python configuration for recording the action corresponding to a learner
 quitting an exploration.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 

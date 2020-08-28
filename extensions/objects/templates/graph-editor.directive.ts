@@ -21,20 +21,20 @@
 // in via initArgs.
 
 angular.module('oppia').directive('graphEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/graph-editor.directive.html'),
+      template: require('./graph-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.alwaysEditable = true;
+        ctrl.$onInit = function() {
+          ctrl.alwaysEditable = true;
+        };
       }]
     };
   }]);

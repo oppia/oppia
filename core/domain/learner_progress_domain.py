@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Domain objects for learner progress."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -89,7 +90,7 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
     def to_dict(self):
         """Return dictionary representation of ActivityIdsInLearnerDashboard.
 
-        Return:
+        Returns:
             dict. The keys of the dict are:
                 'completed_exploration_ids': list(str). The ids of the
                     explorations that are completed.

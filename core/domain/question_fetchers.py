@@ -15,6 +15,7 @@
 # limitations under the License.]
 
 """Getter commands for for question models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -42,11 +43,13 @@ def get_questions_and_skill_descriptions_by_skill_ids(
 
     Returns:
         list(Question), list(list(str)), str. The list of questions and the
-            corresponding linked skill descriptions which are linked to the
-            given skill ids and the next cursor value to be used for the next
-            batch of questions (or None if no more pages are left). The returned
-            next cursor value is urlsafe.
+        corresponding linked skill descriptions which are linked to the
+        given skill ids and the next cursor value to be used for the next
+        batch of questions (or None if no more pages are left). The returned
+        next cursor value is urlsafe.
     """
+    if not skill_ids:
+        return [], [], None
     question_skill_link_models, next_cursor = (
         question_models.QuestionSkillLinkModel
         .get_question_skill_links_by_skill_ids(
@@ -138,7 +141,7 @@ def _migrate_state_schema(versioned_question_state):
                 state data.
 
     Raises:
-        Exception: The given state_schema_version is invalid.
+        Exception. The given state_schema_version is invalid.
     """
     state_schema_version = versioned_question_state[
         'state_schema_version']

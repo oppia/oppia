@@ -13,10 +13,10 @@
 # limitations under the License.
 
 """Build file for production version of Oppia. Minifies JS and CSS."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-# pylint: disable=invalid-name
 import argparse
 import collections
 import fnmatch
@@ -29,13 +29,10 @@ import subprocess
 import threading
 
 import python_utils
+from scripts import common
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
-
-COMPILED_JS_DIR = os.path.join('local_compiled_js', '')
-TSC_OUTPUT_LOG_FILEPATH = 'tsc_output_log.txt'
-TSCONFIG_FILEPATH = 'tsconfig.json'
 
 THIRD_PARTY_STATIC_DIR = os.path.join('third_party', 'static')
 THIRD_PARTY_GENERATED_DEV_DIR = os.path.join('third_party', 'generated', '')
@@ -50,45 +47,44 @@ THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join('css', 'third_party.css')
 MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join(
     'css', 'third_party.min.css')
 
-FONTS_RELATIVE_DIRECTORY_PATH = os.path.join('fonts', '')
-# /webfonts is needed for font-awesome-5, due to changes
-# in its directory structure hence, FAM-5 now doesn't use /fonts
-# but /fonts is needed by BootStrap and will be removed later
-# if /fonts is not used by any other library.
 WEBFONTS_RELATIVE_DIRECTORY_PATH = os.path.join('webfonts', '')
 
 EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
     'dev_dir': os.path.join('extensions', ''),
-    'compiled_js_dir': os.path.join('local_compiled_js', 'extensions', ''),
     'staging_dir': os.path.join('backend_prod_files', 'extensions', ''),
     'out_dir': os.path.join('build', 'extensions', '')
 }
-TEMPLATES_DEV_DIR = os.path.join('templates', 'dev', 'head', '')
+TEMPLATES_DEV_DIR = os.path.join('templates', '')
 TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS = {
-    'dev_dir': os.path.join('core', 'templates', 'dev', 'head', ''),
-    'compiled_js_dir': os.path.join(
-        'local_compiled_js', 'core', 'templates', 'dev', 'head', ''),
-    'staging_dir': os.path.join('backend_prod_files', 'templates', 'head', ''),
-    'out_dir': os.path.join('build', 'templates', 'head', '')
+    'dev_dir': os.path.join('core', 'templates', ''),
+    'staging_dir': os.path.join('backend_prod_files', 'templates', ''),
+    'out_dir': os.path.join('build', 'templates', '')
 }
 WEBPACK_DIRNAMES_TO_DIRPATHS = {
     'staging_dir': os.path.join('backend_prod_files', 'webpack_bundles', ''),
     'out_dir': os.path.join('build', 'webpack_bundles', '')
 }
 
+# This json file contains a json object. The object's keys are file paths and
+# the values are corresponded hash value. The paths need to be in posix style,
+# as it is interpreted by the `url-interpolation` service, which which
+# interprets the paths in this file as URLs.
 HASHES_JSON_FILENAME = 'hashes.json'
 HASHES_JSON_FILEPATH = os.path.join('assets', HASHES_JSON_FILENAME)
 MANIFEST_FILE_PATH = os.path.join('manifest.json')
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
+
 YUICOMPRESSOR_DIR = os.path.join(
-    '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
+    os.pardir, 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
 PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-NODE_FILE = os.path.join(
-    PARENT_DIR, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
 UGLIFY_FILE = os.path.join('node_modules', 'uglify-js', 'bin', 'uglifyjs')
 WEBPACK_FILE = os.path.join('node_modules', 'webpack', 'bin', 'webpack.js')
+WEBPACK_DEV_CONFIG = 'webpack.dev.config.ts'
+WEBPACK_DEV_SOURCE_MAPS_CONFIG = 'webpack.dev.sourcemap.config.ts'
 WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
+WEBPACK_PROD_SOURCE_MAPS_CONFIG = 'webpack.prod.sourcemap.config.ts'
+WEBPACK_TERSER_CONFIG = 'webpack.terser.config.ts'
 
 # Files with these extensions shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
@@ -99,15 +95,11 @@ JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
 JS_FILENAME_SUFFIXES_NOT_TO_MINIFY = ('.bundle.js',)
 GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc', '.DS_Store')
 
-# These files are present in both extensions and local_compiled_js/extensions.
-# They are required in local_compiled_js since they contain code used in
-# other ts files and excluding them from compilation will create compile
-# errors due to missing variables. So, the files should be built only from
-# one location instead of both the locations.
 JS_FILEPATHS_NOT_TO_BUILD = (
-    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
-    'extensions/interactions/LogicProof/static/js/generatedParser.js',
-    'core/templates/dev/head/expressions/expression-parser.service.js')
+    os.path.join(
+        'core', 'templates', 'expressions', 'parser.js'),
+    os.path.join('extensions', 'ckeditor_plugins', 'pre', 'plugin.js')
+)
 
 # These filepaths shouldn't be renamed (i.e. the filepath shouldn't contain
 # hash).
@@ -117,82 +109,132 @@ JS_FILEPATHS_NOT_TO_BUILD = (
 # need cache invalidation.
 FILEPATHS_NOT_TO_RENAME = (
     '*.py',
-    'third_party/generated/fonts/*',
     'third_party/generated/js/third_party.min.js.map',
     'third_party/generated/webfonts/*',
     '*.bundle.js',
     '*.bundle.js.map',
+    'webpack_bundles/*'
+)
+
+PAGES_IN_APP_YAML = (
     'webpack_bundles/about-page.mainpage.html',
     'webpack_bundles/contact-page.mainpage.html',
     'webpack_bundles/donate-page.mainpage.html',
     'webpack_bundles/get-started-page.mainpage.html',
     'webpack_bundles/privacy-page.mainpage.html',
-    'webpack_bundles/splash-page.mainpage.html',
     'webpack_bundles/teach-page.mainpage.html',
     'webpack_bundles/terms-page.mainpage.html',
-    'webpack_bundles/thanks-page.mainpage.html')
+    'webpack_bundles/thanks-page.mainpage.html'
+)
 
 # Hashes for files with these paths should be provided to the frontend in
 # JS hashes object.
 FILEPATHS_PROVIDED_TO_FRONTEND = (
-    'images/*', 'videos/*', 'i18n/*', '*_directive.html', '*.directive.html',
-    '*.template.html', '*.png', '*.json')
+    'images/*', 'videos/*', 'i18n/*', '*.component.html',
+    '*_directive.html', '*.directive.html',
+    '*.template.html', '*.png', '*.json', '*.webp')
 
 HASH_BLOCK_SIZE = 2**20
 
 APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
 APP_YAML_FILEPATH = 'app.yaml'
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Creates a third-party directory where all the JS and CSS dependencies are
 built and stored. Depending on the options passed to the script, might also
 minify third-party libraries and/or generate a build directory.
 """)
 
 _PARSER.add_argument(
-    '--prod_env', action='store_true', default=False, dest='prod_mode')
+    '--prod_env', action='store_true', default=False, dest='prod_env')
+_PARSER.add_argument(
+    '--deploy_mode', action='store_true', default=False, dest='deploy_mode')
 _PARSER.add_argument(
     '--minify_third_party_libs_only', action='store_true', default=False,
     dest='minify_third_party_libs_only')
 _PARSER.add_argument(
-    '--enable_watcher', action='store_true', default=False)
+    '--deparallelize_terser',
+    action='store_true',
+    default=False,
+    dest='deparallelize_terser',
+    help='Disable parallelism on terser plugin in webpack. Use with prod_env.')
+_PARSER.add_argument(
+    '--maintenance_mode',
+    action='store_true',
+    default=False,
+    dest='maintenance_mode',
+    help=(
+        'Enable maintenance mode, '
+        'meaning that only super admins can access the site.'
+    )
+)
+_PARSER.add_argument(
+    '--source_maps',
+    action='store_true',
+    default=False,
+    dest='source_maps',
+    help='Build webpack with source maps.')
 
 
-def generate_app_yaml():
-    """Generate app.yaml from app_dev.yaml."""
+def generate_app_yaml(deploy_mode=False, maintenance_mode=False):
+    """Generate app.yaml from app_dev.yaml.
+
+    Args:
+        deploy_mode: bool. Whether the script is being called from deploy
+            script.
+        maintenance_mode: bool. Whether the site should be put into
+            maintenance mode.
+    """
     prod_file_prefix = 'build/'
+    maintenance_page_path = 'webpack_bundles/maintenance-page.mainpage.html'
     content = '# THIS FILE IS AUTOGENERATED, DO NOT MODIFY\n'
     with python_utils.open_file(APP_DEV_YAML_FILEPATH, 'r') as yaml_file:
         content += yaml_file.read()
-    for file_path in FILEPATHS_NOT_TO_RENAME:
-        if 'webpack_bundles/' in file_path:
+    for file_path in PAGES_IN_APP_YAML:
+        if maintenance_mode:
             content = content.replace(
-                file_path,
-                prod_file_prefix + file_path)
-    content = content.replace('version: default', '')
+                file_path, prod_file_prefix + maintenance_page_path)
+        else:
+            content = content.replace(
+                file_path, prod_file_prefix + file_path)
+
+    # The version: default line is required to run jobs on a local server (
+    # both in prod & non-prod env). This line is not required when app.yaml
+    # is generated during deployment. So, we remove this if the build process
+    # is being run from the deploy script.
+    if deploy_mode:
+        content = content.replace('version: default', '')
     if os.path.isfile(APP_YAML_FILEPATH):
         os.remove(APP_YAML_FILEPATH)
     with python_utils.open_file(APP_YAML_FILEPATH, 'w+') as prod_yaml_file:
         prod_yaml_file.write(content)
 
 
-def require_compiled_js_dir_to_be_valid():
-    """Checks if COMPILED_JS_DIR matches the output directory used in
-    TSCONFIG_FILEPATH.
+def modify_constants(prod_env=False, maintenance_mode=False):
+    """Modify constants.ts and feconf.py.
 
-    Raises:
-        Exception: The COMPILED_JS_DIR does not match the outDir in
-            TSCONFIG_FILEPATH.
+    Args:
+        prod_env: bool. Whether the server is started in prod mode.
+        maintenance_mode: bool. Whether the site should be put into
+            the maintenance mode.
     """
+    dev_mode_variable = (
+        '"DEV_MODE": false' if prod_env else '"DEV_MODE": true')
+    common.inplace_replace_file(
+        common.CONSTANTS_FILE_PATH, r'"DEV_MODE": .*', dev_mode_variable)
 
-    out_dir = ''
-    with python_utils.open_file(TSCONFIG_FILEPATH, 'r') as f:
-        config_data = json.load(f)
-        out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
-    if out_dir != COMPILED_JS_DIR:
-        raise Exception(
-            'COMPILED_JS_DIR: %s does not match the output directory '
-            'in %s: %s' % (COMPILED_JS_DIR, TSCONFIG_FILEPATH, out_dir))
+    enable_maintenance_mode_variable = (
+        'ENABLE_MAINTENANCE_MODE = %s' % python_utils.UNICODE(maintenance_mode))
+    common.inplace_replace_file(
+        common.FECONF_PATH,
+        r'ENABLE_MAINTENANCE_MODE = .*',
+        enable_maintenance_mode_variable)
+
+
+def set_constants_to_default():
+    """Set variables in constants.ts and feconf.py to default values."""
+    modify_constants(prod_env=False, maintenance_mode=False)
 
 
 def _minify(source_path, target_path):
@@ -208,8 +250,16 @@ def _minify(source_path, target_path):
     # experiments, 18m seems to work, but 12m is too small and results in an
     # out-of-memory error.
     # https://circleci.com/blog/how-to-handle-java-oom-errors/
+    # Use relative path to avoid java command line parameter parse error on
+    # Windows. Convert to posix style path because the java program requires
+    # the filepath arguments to be in posix path style.
+    target_path = common.convert_to_posixpath(
+        os.path.relpath(target_path))
+    source_path = common.convert_to_posixpath(
+        os.path.relpath(source_path))
+    yuicompressor_dir = common.convert_to_posixpath(YUICOMPRESSOR_DIR)
     cmd = 'java -Xmx24m -jar %s -o %s %s' % (
-        YUICOMPRESSOR_DIR, target_path, source_path)
+        yuicompressor_dir, target_path, source_path)
     subprocess.check_call(cmd, shell=True)
 
 
@@ -246,7 +296,7 @@ def _minify_and_create_sourcemap(source_path, target_file_path):
     python_utils.PRINT('Minifying and creating sourcemap for %s' % source_path)
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
     cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
-        NODE_FILE, UGLIFY_FILE, source_path,
+        common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
         source_map_properties, target_file_path)
     subprocess.check_call(cmd, shell=True)
 
@@ -259,8 +309,8 @@ def _generate_copy_tasks_for_fonts(source_paths, target_path):
         target_path: str. Path where the fonts should be copied.
 
     Returns:
-        deque(Thread). A deque that contains all copy tasks queued
-            to be processed.
+        deque(Thread). A deque that contains all copy tasks queued to be
+        processed.
     """
     copy_tasks = collections.deque()
     for font_path in source_paths:
@@ -289,8 +339,8 @@ def ensure_directory_exists(filepath):
     """Ensures if directory tree exists, if not creates the directories.
 
     Args:
-        filepath: str. Path to file located in directory that we want to
-            ensure exists.
+        filepath: str. Path to file located in directory that we want to ensure
+            exists.
     """
     directory = os.path.dirname(filepath)
     if not os.path.exists(directory):
@@ -315,7 +365,7 @@ def _ensure_files_exist(filepaths):
         filepaths: list(str). Paths to files that we want to ensure exist.
 
     Raises:
-        OSError: One or more of the files does not exist.
+        OSError. One or more of the files does not exist.
     """
     for filepath in filepaths:
         if not os.path.isfile(filepath):
@@ -373,11 +423,11 @@ def _compare_file_count(
     list matches the count of files in all the directories in the second list.
 
     Args:
-       first_dir_list: list(str). List of directories to compare.
-       second_dir_list: list(str). List of directories to compare.
+        first_dir_list: list(str). List of directories to compare.
+        second_dir_list: list(str). List of directories to compare.
 
     Raises:
-        ValueError: The source directory list does not have the same file
+        ValueError. The source directory list does not have the same file
             count as the target directory list.
     """
 
@@ -394,7 +444,7 @@ def _compare_file_count(
                 file_counts[0], file_counts[1]))
 
 
-def process_html(source_file_stream, target_file_stream, file_hashes):
+def process_html(source_file_stream, target_file_stream):
     """Remove whitespaces and add hashes to filepaths in the HTML file stream
     object.
 
@@ -403,34 +453,9 @@ def process_html(source_file_stream, target_file_stream, file_hashes):
             read from.
         target_file_stream: file. The stream object to write the minified HTML
             file to.
-        file_hashes: dict(str, str). Dictionary with filepaths as keys and
-            hashes of file content as values.
     """
-    content = source_file_stream.read()
-    for filepath, file_hash in file_hashes.items():
-        # We are adding hash in all file paths except for html paths.
-        # This is because html paths are used by backend and we work with
-        # paths without hash part in backend.
-        if not filepath.endswith('.html'):
-            filepath_with_hash = _insert_hash(filepath, file_hash)
-            content = content.replace(
-                '%s%s' % (TEMPLATES_DEV_DIR, filepath),
-                '%s%s' % (
-                    TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir'],
-                    filepath_with_hash))
-            content = content.replace(
-                '%s%s' % (ASSETS_DEV_DIR, filepath),
-                '%s%s' % (ASSETS_OUT_DIR, filepath_with_hash))
-            content = content.replace(
-                '%s%s' % (EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'], filepath),
-                '%s%s' % (
-                    EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
-                    filepath_with_hash))
-            content = content.replace(
-                '%s%s' % (THIRD_PARTY_GENERATED_DEV_DIR, filepath),
-                '%s%s' % (THIRD_PARTY_GENERATED_OUT_DIR, filepath_with_hash))
-    content = REMOVE_WS(' ', content)
-    write_to_file_stream(target_file_stream, content)
+    write_to_file_stream(
+        target_file_stream, REMOVE_WS(' ', source_file_stream.read()))
 
 
 def get_dependency_directory(dependency):
@@ -525,9 +550,9 @@ def get_dependencies_filepaths():
 
     Returns:
         dict(str, list(str)). A dict mapping file types to lists of filepaths.
-            The dict has three keys: 'js', 'css' and 'fonts'. Each of the
-            corresponding values is a full list of dependency file paths of the
-            given type.
+        The dict has three keys: 'js', 'css' and 'fonts'. Each of the
+        corresponding values is a full list of dependency file paths of the
+        given type.
     """
     filepaths = {
         'js': [],
@@ -558,22 +583,22 @@ def minify_third_party_libs(third_party_directory_path):
     """Minify third_party.js and third_party.css and remove un-minified
     files.
     """
-    THIRD_PARTY_JS_FILEPATH = os.path.join(
+    third_party_js_filepath = os.path.join(
         third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH)
-    THIRD_PARTY_CSS_FILEPATH = os.path.join(
+    third_party_css_filepath = os.path.join(
         third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH)
 
-    MINIFIED_THIRD_PARTY_JS_FILEPATH = os.path.join(
+    minified_third_party_js_filepath = os.path.join(
         third_party_directory_path, MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH)
-    MINIFIED_THIRD_PARTY_CSS_FILEPATH = os.path.join(
+    minified_third_party_css_filepath = os.path.join(
         third_party_directory_path, MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH)
 
     _minify_and_create_sourcemap(
-        THIRD_PARTY_JS_FILEPATH, MINIFIED_THIRD_PARTY_JS_FILEPATH)
-    _minify(THIRD_PARTY_CSS_FILEPATH, MINIFIED_THIRD_PARTY_CSS_FILEPATH)
+        third_party_js_filepath, minified_third_party_js_filepath)
+    _minify(third_party_css_filepath, minified_third_party_css_filepath)
     # Clean up un-minified third_party.js and third_party.css.
-    safe_delete_file(THIRD_PARTY_JS_FILEPATH)
-    safe_delete_file(THIRD_PARTY_CSS_FILEPATH)
+    safe_delete_file(third_party_js_filepath)
+    safe_delete_file(third_party_css_filepath)
 
 
 def build_third_party_libs(third_party_directory_path):
@@ -584,50 +609,44 @@ def build_third_party_libs(third_party_directory_path):
     python_utils.PRINT(
         'Building third party libs at %s' % third_party_directory_path)
 
-    THIRD_PARTY_JS_FILEPATH = os.path.join(
+    third_party_js_filepath = os.path.join(
         third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH)
-    THIRD_PARTY_CSS_FILEPATH = os.path.join(
+    third_party_css_filepath = os.path.join(
         third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH)
-    FONTS_DIR = os.path.join(
-        third_party_directory_path, FONTS_RELATIVE_DIRECTORY_PATH)
-    WEBFONTS_DIR = os.path.join(
+    webfonts_dir = os.path.join(
         third_party_directory_path, WEBFONTS_RELATIVE_DIRECTORY_PATH)
 
     dependency_filepaths = get_dependencies_filepaths()
-    ensure_directory_exists(THIRD_PARTY_JS_FILEPATH)
+    ensure_directory_exists(third_party_js_filepath)
     with python_utils.open_file(
-        THIRD_PARTY_JS_FILEPATH, 'w+') as third_party_js_file:
+        third_party_js_filepath, 'w+') as third_party_js_file:
         _join_files(dependency_filepaths['js'], third_party_js_file)
 
-    ensure_directory_exists(THIRD_PARTY_CSS_FILEPATH)
+    ensure_directory_exists(third_party_css_filepath)
     with python_utils.open_file(
-        THIRD_PARTY_CSS_FILEPATH, 'w+') as third_party_css_file:
+        third_party_css_filepath, 'w+') as third_party_css_file:
         _join_files(dependency_filepaths['css'], third_party_css_file)
 
-    ensure_directory_exists(FONTS_DIR)
+    ensure_directory_exists(webfonts_dir)
     _execute_tasks(
         _generate_copy_tasks_for_fonts(
-            dependency_filepaths['fonts'], FONTS_DIR))
-
-    ensure_directory_exists(WEBFONTS_DIR)
-    _execute_tasks(
-        _generate_copy_tasks_for_fonts(
-            dependency_filepaths['fonts'], WEBFONTS_DIR))
+            dependency_filepaths['fonts'], webfonts_dir))
 
 
-def build_using_webpack():
+def build_using_webpack(config_path):
     """Execute webpack build process. This takes all TypeScript files we have in
-    /templates/dev/head and generates JS bundles according the require() imports
+    /templates and generates JS bundles according the require() imports
     and also compiles HTML pages into the /backend_prod_files/webpack_bundles
     folder. The files are later copied into /build/webpack_bundles.
 
-    The settings for this are specified in webpack.prod.config.ts.
+    Args:
+        config_path: str. Webpack config to be used for building.
     """
 
     python_utils.PRINT('Building webpack')
 
-    cmd = '%s --config %s' % (
-        WEBPACK_FILE, WEBPACK_PROD_CONFIG)
+    cmd = '%s %s --config %s' % (
+        common.NODE_BIN_PATH, WEBPACK_FILE, config_path)
     subprocess.check_call(cmd, shell=True)
 
 
@@ -641,8 +660,9 @@ def hash_should_be_inserted(filepath):
     Returns:
         bool. True if filepath should contain hash else False.
     """
-    return not any(fnmatch.fnmatch(filepath, pattern) for pattern
-                   in FILEPATHS_NOT_TO_RENAME)
+    return not any(
+        fnmatch.fnmatch(filepath, pattern) for pattern
+        in FILEPATHS_NOT_TO_RENAME)
 
 
 def should_file_be_built(filepath):
@@ -663,8 +683,8 @@ def should_file_be_built(filepath):
         bool. True if filepath should be built, else False.
     """
     if filepath.endswith('.js'):
-        return filepath not in JS_FILEPATHS_NOT_TO_BUILD and not any(
-            filepath.endswith(p) for p in JS_FILENAME_SUFFIXES_TO_IGNORE)
+        return all(
+            not filepath.endswith(p) for p in JS_FILENAME_SUFFIXES_TO_IGNORE)
     elif filepath.endswith('_test.py'):
         return False
     elif filepath.endswith('.ts'):
@@ -690,7 +710,7 @@ def generate_copy_tasks_to_copy_from_source_to_target(
 
     Returns:
         deque(Thread). A deque that contains all copy tasks queued
-            to be processed.
+        to be processed.
     """
     python_utils.PRINT('Processing %s' % os.path.join(os.getcwd(), source))
     python_utils.PRINT('Copying into %s' % os.path.join(os.getcwd(), target))
@@ -704,7 +724,10 @@ def generate_copy_tasks_to_copy_from_source_to_target(
             if not any(
                     source_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 target_path = source_path
-                relative_path = os.path.relpath(source_path, source)
+                # The path in hashes.json file is in posix style,
+                # see the comment above HASHES_JSON_FILENAME for details.
+                relative_path = common.convert_to_posixpath(
+                    os.path.relpath(source_path, source))
                 if (hash_should_be_inserted(source + relative_path) and
                         relative_path in file_hashes):
                     relative_path = (
@@ -728,8 +751,9 @@ def is_file_hash_provided_to_frontend(filepath):
     Returns:
         bool. True if file hash should be provided to the frontend else False.
     """
-    return any(fnmatch.fnmatch(filepath, pattern) for pattern
-               in FILEPATHS_PROVIDED_TO_FRONTEND)
+    return any(
+        fnmatch.fnmatch(filepath, pattern) for pattern
+        in FILEPATHS_PROVIDED_TO_FRONTEND)
 
 
 def generate_md5_hash(filepath):
@@ -782,7 +806,7 @@ def get_file_hashes(directory_path):
 
     Returns:
         dict(str, str). Dictionary with keys specifying file paths and values
-            specifying file hashes.
+        specifying file hashes.
     """
     file_hashes = dict()
 
@@ -796,9 +820,12 @@ def get_file_hashes(directory_path):
             filepath = os.path.join(root, filename)
             if should_file_be_built(filepath) and not any(
                     filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
-                complete_filepath = os.path.join(root, filename)
-                relative_filepath = os.path.relpath(
-                    complete_filepath, directory_path)
+                # The path in hashes.json file is in posix style,
+                # see the comment above HASHES_JSON_FILENAME for details.
+                complete_filepath = common.convert_to_posixpath(
+                    os.path.join(root, filename))
+                relative_filepath = common.convert_to_posixpath(os.path.relpath(
+                    complete_filepath, directory_path))
                 file_hashes[relative_filepath] = generate_md5_hash(
                     complete_filepath)
 
@@ -815,7 +842,7 @@ def filter_hashes(file_hashes):
 
     Returns:
         dict(str, str). Filtered dictionary of only filepaths that should be
-            provided to the frontend.
+        provided to the frontend.
     """
     filtered_hashes = dict()
     for filepath, file_hash in file_hashes.items():
@@ -845,7 +872,7 @@ def save_hashes_to_file(file_hashes):
         hashes_json_file.write(u'\n')
 
 
-def minify_func(source_path, target_path, file_hashes, filename):
+def minify_func(source_path, target_path, filename):
     """Call the appropriate functions to handle different types of file
     formats:
         - HTML files: Remove whitespaces, interpolates paths in HTML to include
@@ -860,7 +887,7 @@ def minify_func(source_path, target_path, file_hashes, filename):
         with python_utils.open_file(source_path, 'r+') as source_html_file:
             with python_utils.open_file(
                 target_path, 'w+') as minified_html_file:
-                process_html(source_html_file, minified_html_file, file_hashes)
+                process_html(source_html_file, minified_html_file)
     elif ((filename.endswith('.css') or filename.endswith('.js')) and
           not skip_minify):
         python_utils.PRINT('Minifying %s' % source_path)
@@ -892,22 +919,19 @@ def _execute_tasks(tasks, batch_size=24):
                 raise OSError('threads can only be started once')
 
 
-def generate_build_tasks_to_build_all_files_in_directory(
-        source, target, file_hashes):
+def generate_build_tasks_to_build_all_files_in_directory(source, target):
     """This function queues up tasks to build all files in a directory,
     excluding files that should not be built.
 
     Args:
-        source: str.  Path relative to /oppia of directory containing source
+        source: str. Path relative to /oppia of directory containing source
             files and directories to be built.
         target: str. Path relative to /oppia of directory where the built files
             and directories will be saved to.
-        file_hashes: dict(str, str). Dictionary with filepaths as keys and
-            hashes of file content as values.
 
     Returns:
         deque(Thread). A deque that contains all build tasks queued
-            to be processed.
+        to be processed.
     """
     python_utils.PRINT('Processing %s' % os.path.join(os.getcwd(), source))
     python_utils.PRINT('Generating into %s' % os.path.join(os.getcwd(), target))
@@ -924,13 +948,13 @@ def generate_build_tasks_to_build_all_files_in_directory(
             if should_file_be_built(source_path):
                 task = threading.Thread(
                     target=minify_func,
-                    args=(source_path, target_path, file_hashes, filename,))
+                    args=(source_path, target_path, filename,))
                 build_tasks.append(task)
     return build_tasks
 
 
 def generate_build_tasks_to_build_files_from_filepaths(
-        source_path, target_path, filepaths, file_hashes):
+        source_path, target_path, filepaths):
     """This function queues up build tasks to build files from a list of
     filepaths, excluding files that should not be built.
 
@@ -940,12 +964,10 @@ def generate_build_tasks_to_build_files_from_filepaths(
         target_path: str. Path relative to /oppia directory of directory where
             to copy the files and directories.
         filepaths: list(str). List of filepaths to be built.
-        file_hashes: dict(str, str). Dictionary with filepaths as keys and
-            hashes of file content as values.
 
     Returns:
         deque(Thread). A deque that contains all build tasks queued
-            to be processed.
+        to be processed.
     """
     build_tasks = collections.deque()
     for filepath in filepaths:
@@ -956,7 +978,7 @@ def generate_build_tasks_to_build_files_from_filepaths(
             task = threading.Thread(
                 target=minify_func,
                 args=(
-                    source_file_path, target_file_path, file_hashes, filepath,))
+                    source_file_path, target_file_path, filepath,))
             build_tasks.append(task)
     return build_tasks
 
@@ -976,7 +998,7 @@ def generate_delete_tasks_to_remove_deleted_files(
 
     Returns:
         deque(Thread). A deque that contains all delete tasks
-            queued to be processed.
+        queued to be processed.
     """
     python_utils.PRINT(
         'Scanning directory %s to remove deleted file' % staging_directory)
@@ -988,7 +1010,11 @@ def generate_delete_tasks_to_remove_deleted_files(
             # Ignore files with certain extensions.
             if not any(
                     target_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
-                relative_path = os.path.relpath(target_path, staging_directory)
+                # On Windows the path is on Windows-Style, while the path in
+                # hashes is in posix style, we need to convert it so the check
+                # can run correctly.
+                relative_path = common.convert_to_posixpath(
+                    os.path.relpath(target_path, staging_directory))
                 # Remove file found in staging directory but not in source
                 # directory, i.e. file not listed in hash dict.
                 if relative_path not in source_dir_hashes:
@@ -1020,11 +1046,11 @@ def get_recently_changed_filenames(source_dir_hashes, out_dir):
     # If a file gets edited, a different MD5 hash is generated.
     recently_changed_filenames = []
     # Currently, Python files and HTML files are always re-built.
-    FILE_EXTENSIONS_NOT_TO_TRACK = ('.html', '.py',)
+    file_extensions_not_to_track = ('.html', '.py',)
     for filename, md5_hash in source_dir_hashes.items():
         # Skip files that are already built or should not be built.
         if should_file_be_built(filename) and not any(
-                filename.endswith(p) for p in FILE_EXTENSIONS_NOT_TO_TRACK):
+                filename.endswith(p) for p in file_extensions_not_to_track):
             final_filepath = _insert_hash(
                 os.path.join(out_dir, filename), md5_hash)
             if not os.path.isfile(final_filepath):
@@ -1038,7 +1064,7 @@ def get_recently_changed_filenames(source_dir_hashes, out_dir):
     return recently_changed_filenames
 
 
-def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
+def generate_build_tasks_to_build_directory(dirnames_dict):
     """This function queues up build tasks to build all files in source
     directory if there is no existing staging directory. Otherwise, selectively
     queue up build tasks to build recently changed files.
@@ -1047,21 +1073,16 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         dirnames_dict: dict(str, str). This dict should contain three keys,
             with corresponding values as follows:
             - 'dev_dir': the directory that contains source files to be built.
-            - 'compiled_js_dir': the directory that contains compiled js files
-                to be built.
             - 'staging_dir': the directory that contains minified files waiting
                 for final copy process.
             - 'out_dir': the final directory that contains built files with hash
                 inserted into filenames.
-        file_hashes: dict(str, str). Dictionary with filepaths as keys and
-            hashes of file content as values.
 
     Returns:
         deque(Thread). A deque that contains all build tasks queued
-            to be processed.
+        to be processed.
     """
     source_dir = dirnames_dict['dev_dir']
-    compiled_js_dir = dirnames_dict['compiled_js_dir']
     staging_dir = dirnames_dict['staging_dir']
     out_dir = dirnames_dict['out_dir']
     build_tasks = collections.deque()
@@ -1070,9 +1091,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         python_utils.PRINT('Creating new %s folder' % staging_dir)
         ensure_directory_exists(staging_dir)
         build_tasks += generate_build_tasks_to_build_all_files_in_directory(
-            source_dir, staging_dir, file_hashes)
-        build_tasks += generate_build_tasks_to_build_all_files_in_directory(
-            compiled_js_dir, staging_dir, file_hashes)
+            source_dir, staging_dir)
     else:
         # If staging dir exists, rebuild all HTML and Python files.
         file_extensions_to_always_rebuild = ('.html', '.py',)
@@ -1083,15 +1102,12 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         filenames_to_always_rebuild = get_filepaths_by_extensions(
             source_dir, file_extensions_to_always_rebuild)
         build_tasks += generate_build_tasks_to_build_files_from_filepaths(
-            source_dir, staging_dir, filenames_to_always_rebuild, file_hashes)
+            source_dir, staging_dir, filenames_to_always_rebuild)
 
         dev_dir_hashes = get_file_hashes(source_dir)
 
-        compiled_js_dir_hashes = get_file_hashes(compiled_js_dir)
-
         source_hashes = {}
         source_hashes.update(dev_dir_hashes)
-        source_hashes.update(compiled_js_dir_hashes)
 
         # Clean up files in staging directory that cannot be found in file
         # hashes dictionary.
@@ -1107,23 +1123,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
             python_utils.PRINT(
                 'Re-building recently changed files at %s' % source_dir)
             build_tasks += generate_build_tasks_to_build_files_from_filepaths(
-                source_dir, staging_dir, recently_changed_filenames,
-                file_hashes)
-        else:
-            python_utils.PRINT(
-                'No changes detected. Using previously built files.')
-
-        python_utils.PRINT(
-            'Getting files that have changed between %s and %s'
-            % (compiled_js_dir, out_dir))
-        recently_changed_filenames = get_recently_changed_filenames(
-            compiled_js_dir_hashes, out_dir)
-        if recently_changed_filenames:
-            python_utils.PRINT(
-                'Re-building recently changed files at %s' % source_dir)
-            build_tasks += generate_build_tasks_to_build_files_from_filepaths(
-                compiled_js_dir, staging_dir, recently_changed_filenames,
-                file_hashes)
+                source_dir, staging_dir, recently_changed_filenames)
         else:
             python_utils.PRINT(
                 'No changes detected. Using previously built files.')
@@ -1141,14 +1141,14 @@ def _verify_filepath_hash(relative_filepath, file_hashes):
             hashes of file content as values.
 
     Raises:
-        ValueError: The hash dict is empty.
-        ValueError: Filepath has less than 2 partitions after splitting by '.'
+        ValueError. The hash dict is empty.
+        ValueError. Filepath has less than 2 partitions after splitting by '.'
             delimiter.
-        ValueError: The filename does not contain hash.
-        KeyError: The filename's hash cannot be found in the hash dict.
+        ValueError. The filename does not contain hash.
+        KeyError. The filename's hash cannot be found in the hash dict.
     """
     # Final filepath example:
-    # head/pages/base.240933e7564bd72a4dde42ee23260c5f.html.
+    # pages/base.240933e7564bd72a4dde42ee23260c5f.html.
     if not file_hashes:
         raise ValueError('Hash dict is empty')
 
@@ -1198,13 +1198,19 @@ def _verify_hashes(output_dirnames, file_hashes):
     hash_final_filename = _insert_hash(
         HASHES_JSON_FILENAME, file_hashes[HASHES_JSON_FILENAME])
 
+    # The path in hashes.json (generated via file_hashes) file is in posix
+    # style, see the comment above HASHES_JSON_FILENAME for details.
     third_party_js_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH,
-        file_hashes[MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH])
+        file_hashes[common.convert_to_posixpath(
+            MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH)])
 
+    # The path in hashes.json (generated via file_hashes) file is in posix
+    # style, see the comment above HASHES_JSON_FILENAME for details.
     third_party_css_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH,
-        file_hashes[MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH])
+        file_hashes[common.convert_to_posixpath(
+            MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH)])
 
     _ensure_files_exist([
         os.path.join(ASSETS_OUT_DIR, hash_final_filename),
@@ -1223,14 +1229,12 @@ def generate_hashes():
     hashes = dict()
 
     # Create hashes for all directories and files.
-    HASH_DIRS = [
+    hash_dirs = [
         ASSETS_DEV_DIR, EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
-        EXTENSIONS_DIRNAMES_TO_DIRPATHS['compiled_js_dir'],
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
-        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['compiled_js_dir'],
         THIRD_PARTY_GENERATED_DEV_DIR]
-    for HASH_DIR in HASH_DIRS:
-        hashes.update(get_file_hashes(HASH_DIR))
+    for hash_dir in hash_dirs:
+        hashes.update(get_file_hashes(hash_dir))
 
     # Save hashes as JSON and write the JSON into JS file
     # to make the hashes available to the frontend.
@@ -1256,136 +1260,101 @@ def generate_build_directory(hashes):
 
     # Build files in /extensions and copy them into staging directory.
     build_tasks += generate_build_tasks_to_build_directory(
-        EXTENSIONS_DIRNAMES_TO_DIRPATHS, hashes)
+        EXTENSIONS_DIRNAMES_TO_DIRPATHS)
     # Minify all template files and copy them into staging directory.
     build_tasks += generate_build_tasks_to_build_directory(
-        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS, hashes)
+        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS)
     _execute_tasks(build_tasks)
 
     # Copy all files from staging directory to production directory.
-    COPY_INPUT_DIRS = [
+    copy_input_dirs = [
         ASSETS_DEV_DIR, EXTENSIONS_DIRNAMES_TO_DIRPATHS['staging_dir'],
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['staging_dir'],
         THIRD_PARTY_GENERATED_DEV_DIR,
         WEBPACK_DIRNAMES_TO_DIRPATHS['staging_dir']]
-    COPY_OUTPUT_DIRS = [
+    copy_output_dirs = [
         ASSETS_OUT_DIR, EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir'],
         THIRD_PARTY_GENERATED_OUT_DIR, WEBPACK_DIRNAMES_TO_DIRPATHS['out_dir']]
-    assert len(COPY_INPUT_DIRS) == len(COPY_OUTPUT_DIRS)
-    for i in python_utils.RANGE(len(COPY_INPUT_DIRS)):
-        safe_delete_directory_tree(COPY_OUTPUT_DIRS[i])
+    assert len(copy_input_dirs) == len(copy_output_dirs)
+    for i in python_utils.RANGE(len(copy_input_dirs)):
+        safe_delete_directory_tree(copy_output_dirs[i])
         copy_tasks += generate_copy_tasks_to_copy_from_source_to_target(
-            COPY_INPUT_DIRS[i], COPY_OUTPUT_DIRS[i], hashes)
+            copy_input_dirs[i], copy_output_dirs[i], hashes)
     _execute_tasks(copy_tasks)
 
-    _verify_hashes(COPY_OUTPUT_DIRS, hashes)
+    _verify_hashes(copy_output_dirs, hashes)
 
-    SOURCE_DIRS_FOR_ASSETS = [ASSETS_DEV_DIR, THIRD_PARTY_GENERATED_DEV_DIR]
-    OUTPUT_DIRS_FOR_ASSETS = [ASSETS_OUT_DIR, THIRD_PARTY_GENERATED_OUT_DIR]
-    _compare_file_count(SOURCE_DIRS_FOR_ASSETS, OUTPUT_DIRS_FOR_ASSETS)
+    source_dirs_for_assets = [ASSETS_DEV_DIR, THIRD_PARTY_GENERATED_DEV_DIR]
+    output_dirs_for_assets = [ASSETS_OUT_DIR, THIRD_PARTY_GENERATED_OUT_DIR]
+    _compare_file_count(source_dirs_for_assets, output_dirs_for_assets)
 
-    SOURCE_DIRS_FOR_THIRD_PARTY = [THIRD_PARTY_GENERATED_DEV_DIR]
-    OUTPUT_DIRS_FOR_THIRD_PARTY = [THIRD_PARTY_GENERATED_OUT_DIR]
+    source_dirs_for_third_party = [THIRD_PARTY_GENERATED_DEV_DIR]
+    output_dirs_for_third_party = [THIRD_PARTY_GENERATED_OUT_DIR]
     _compare_file_count(
-        SOURCE_DIRS_FOR_THIRD_PARTY, OUTPUT_DIRS_FOR_THIRD_PARTY)
+        source_dirs_for_third_party, output_dirs_for_third_party)
 
-    SOURCE_DIRS_FOR_WEBPACK = [WEBPACK_DIRNAMES_TO_DIRPATHS['staging_dir']]
-    OUTPUT_DIRS_FOR_WEBPACK = [WEBPACK_DIRNAMES_TO_DIRPATHS['out_dir']]
+    source_dirs_for_webpack = [WEBPACK_DIRNAMES_TO_DIRPATHS['staging_dir']]
+    output_dirs_for_webpack = [WEBPACK_DIRNAMES_TO_DIRPATHS['out_dir']]
     _compare_file_count(
-        SOURCE_DIRS_FOR_WEBPACK, OUTPUT_DIRS_FOR_WEBPACK)
+        source_dirs_for_webpack, output_dirs_for_webpack)
 
-    SOURCE_DIRS_FOR_EXTENSIONS = [
-        EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
-        EXTENSIONS_DIRNAMES_TO_DIRPATHS['compiled_js_dir']]
-    OUTPUT_DIRS_FOR_EXTENSIONS = [EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir']]
-    _compare_file_count(SOURCE_DIRS_FOR_EXTENSIONS, OUTPUT_DIRS_FOR_EXTENSIONS)
+    source_dirs_for_extensions = [
+        EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir']]
+    output_dirs_for_extensions = [EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir']]
+    _compare_file_count(source_dirs_for_extensions, output_dirs_for_extensions)
 
-    SOURCE_DIRS_FOR_TEMPLATES = [
-        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
-        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['compiled_js_dir']]
-    OUTPUT_DIRS_FOR_TEMPLATES = [
+    source_dirs_for_templates = [
+        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir']]
+    output_dirs_for_templates = [
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir']]
-    _compare_file_count(SOURCE_DIRS_FOR_TEMPLATES, OUTPUT_DIRS_FOR_TEMPLATES)
+    _compare_file_count(source_dirs_for_templates, output_dirs_for_templates)
 
     python_utils.PRINT('Build completed.')
-
-
-def compile_typescript_files(project_dir):
-    """Compiles typescript files to produce javascript files in
-    local_compiled_js folder.
-
-    Args:
-        project_dir: str. The project directory which contains the ts files
-            to be compiled.
-    """
-    require_compiled_js_dir_to_be_valid()
-    safe_delete_directory_tree(COMPILED_JS_DIR)
-    python_utils.PRINT('Compiling ts files...')
-    cmd = ['./node_modules/typescript/bin/tsc', '--project', project_dir]
-    subprocess.check_call(cmd)
-
-
-def compile_typescript_files_continuously(project_dir):
-    """Compiles typescript files continuously i.e enable a watcher which
-    monitors any changes in js files and recompiles them to ts files.
-
-    Args:
-        project_dir: str. The project directory which contains the ts files
-            to be compiled.
-    """
-    kill_cmd = (
-        'kill `ps aux | grep "node_modules/typescript/bin/tsc --project . '
-        '--watch" | awk \'{print $2}\'`'
-    )
-    subprocess.call(kill_cmd, shell=True, stdout=subprocess.PIPE)
-    require_compiled_js_dir_to_be_valid()
-    safe_delete_directory_tree(COMPILED_JS_DIR)
-    python_utils.PRINT('Compiling ts files in watch mode...')
-    cmd = [
-        './node_modules/typescript/bin/tsc', '--project', project_dir,
-        '--watch']
-
-    with python_utils.open_file('tsc_output_log.txt', 'w') as out:
-        subprocess.Popen(cmd, stdout=out)
-
-    while True:
-        with python_utils.open_file(TSC_OUTPUT_LOG_FILEPATH, 'r') as f:
-            lines = f.readlines()
-            if len(lines):
-                # We are checking only the last line here since whenever
-                # typescript is done with initial compilation with or
-                # without errors, the last line will always read
-                # 'Found x errors. Watching for file changes'.
-                last_output = lines[len(lines) - 1]
-                if 'Watching for file changes' in last_output:
-                    return
 
 
 def main(args=None):
     """The main method of this script."""
     options = _PARSER.parse_args(args=args)
+
+    if options.maintenance_mode and not options.prod_env:
+        raise Exception(
+            'maintenance_mode should only be enabled in prod build.')
+
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
 
-    if not options.enable_watcher:
-        compile_typescript_files('.')
-    else:
-        compile_typescript_files_continuously('.')
-
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.
-    if options.minify_third_party_libs_only and not options.prod_mode:
-        raise Exception(
-            'minify_third_party_libs_only should not be set in non-prod mode.')
-    if options.prod_mode:
+    if options.minify_third_party_libs_only:
+        if options.prod_env:
+            minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
+            return
+        else:
+            raise Exception(
+                'minify_third_party_libs_only should not be '
+                'set in non-prod env.')
+
+    modify_constants(
+        prod_env=options.prod_env, maintenance_mode=options.maintenance_mode)
+    if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
-        if not options.minify_third_party_libs_only:
-            hashes = generate_hashes()
-            build_using_webpack()
-            generate_app_yaml()
-            generate_build_directory(hashes)
+        hashes = generate_hashes()
+        if options.deparallelize_terser:
+            if options.source_maps:
+                raise Exception(
+                    'source_maps flag shouldn\'t be used with '
+                    'deparallelize_terser flag.')
+            build_using_webpack(WEBPACK_TERSER_CONFIG)
+        elif options.source_maps:
+            build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
+        else:
+            build_using_webpack(WEBPACK_PROD_CONFIG)
+        generate_app_yaml(
+            deploy_mode=options.deploy_mode,
+            maintenance_mode=options.maintenance_mode)
+        generate_build_directory(hashes)
 
     save_hashes_to_file(dict())
 

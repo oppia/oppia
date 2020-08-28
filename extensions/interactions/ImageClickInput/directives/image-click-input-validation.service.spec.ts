@@ -17,29 +17,33 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+
+import { AnswerGroup, AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { ImageClickInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 /* eslint-disable max-len*/
 import { ImageClickInputValidationService } from
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 /* eslint-enable max-len*/
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { AppConstants } from 'app.constants';
+import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+import { ImageClickRuleInputs } from 'interactions/rule-input-defs';
 
 describe('ImageClickInputValidationService', () => {
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
-  // preferably in the constants file itself.
-  let WARNING_TYPES: any, validatorService: ImageClickInputValidationService;
+  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
+  let validatorService: ImageClickInputValidationService;
 
   let currentState: string;
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'goodAnswerGroups' is a array with elements whose type needs
-  // to be researched thoroughly.
-  let badOutcome: Outcome, goodAnswerGroups: any;
+  let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[];
   let goodDefaultOutcome: Outcome;
-  var customizationArguments: any;
-  let oof: OutcomeObjectFactory;
+  var customizationArguments: ImageClickInputCustomizationArgs;
+  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let rof: RuleObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -48,6 +52,8 @@ describe('ImageClickInputValidationService', () => {
 
     validatorService = TestBed.get(ImageClickInputValidationService);
     oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    rof = TestBed.get(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -55,7 +61,7 @@ describe('ImageClickInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -67,7 +73,7 @@ describe('ImageClickInputValidationService', () => {
       dest: currentState,
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -80,31 +86,45 @@ describe('ImageClickInputValidationService', () => {
         value: {
           imagePath: '/path/to/image',
           labeledRegions: [{
-            label: 'FirstLabel'
+            label: 'FirstLabel',
+            region: {
+              area: [[0]]
+            }
           }, {
-            label: 'SecondLabel'
+            label: 'SecondLabel',
+            region: {
+              area: [[0]]
+            }
           }]
         }
+      },
+      highlightRegionsOnHover: {
+        value: true
       }
     };
-    goodAnswerGroups = [{
-      rules: [{
-        type: 'IsInRegion',
-        inputs: {
-          x: 'SecondLabel'
-        }
-      }],
-      outcome: goodDefaultOutcome
-    }];
+
+    const goodAnswerGroup = agof.createNew(goodDefaultOutcome, null, null);
+    goodAnswerGroup.updateRuleTypesToInputs([rof.createFromBackendDict({
+      rule_type: 'IsInRegion',
+      inputs: {
+        x: 'SecondLabel'
+      }
+    })]);
+    goodAnswerGroups = [goodAnswerGroup];
   });
 
   it('should expect a customization argument for image and regions',
     () => {
-      goodAnswerGroups[0].rules = [];
+      goodAnswerGroups[0].updateRuleTypesToInputs([]);
       expect(() => {
         validatorService.getAllWarnings(
+          // This throws "Argument of type '{}' is not assignable to
+          // parameter of type 'ImageClickInputCustomizationArgs'." We are
+          // purposely assigning the wrong type of customization args in
+          // order to test validations.
+          // @ts-expect-error
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-      }).toThrow(
+      }).toThrowError(
         'Expected customization arguments to have property: imageAndRegions');
     });
 
@@ -156,7 +176,7 @@ describe('ImageClickInputValidationService', () => {
     }]);
 
     customizationArguments.imageAndRegions.value.labeledRegions = [];
-    goodAnswerGroups[0].rules = [];
+    goodAnswerGroups[0].updateRuleTypesToInputs([]);
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
@@ -167,7 +187,8 @@ describe('ImageClickInputValidationService', () => {
   });
 
   it('should expect rule types to reference valid region labels', () => {
-    goodAnswerGroups[0].rules[0].inputs.x = 'FakeLabel';
+    (<ImageClickRuleInputs>
+      goodAnswerGroups[0].ruleTypesToInputs.IsInRegion[0]).x = 'FakeLabel';
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);

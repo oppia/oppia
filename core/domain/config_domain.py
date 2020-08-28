@@ -15,9 +15,12 @@
 # limitations under the License.
 
 """Domain objects for configuration properties."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
+from core.domain import caching_services
 from core.domain import change_domain
 from core.platform import models
 import feconf
@@ -25,9 +28,29 @@ import python_utils
 import schema_utils
 
 (config_models,) = models.Registry.import_models([models.NAMES.config])
-memcache_services = models.Registry.import_memcache_services()
 
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
+
+LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA = {
+    'type': 'list',
+    'items': {
+        'type': 'dict',
+        'properties': [{
+            'name': 'language_code',
+            'schema': {
+                'type': 'unicode',
+                'validators': [{
+                    'id': 'is_supported_audio_language_code',
+                }]
+            },
+        }, {
+            'name': 'explanation',
+            'schema': {
+                'type': 'unicode'
+            }
+        }]
+    }
+}
 
 SET_OF_STRINGS_SCHEMA = {
     'type': 'list',
@@ -47,6 +70,33 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
             'name': 'name',
             'schema': {
                 'type': 'unicode'
+            }
+        }, {
+            'name': 'url_fragment',
+            'schema': {
+                'type': 'unicode',
+                'validators': [{
+                    'id': 'is_url_fragment',
+                }, {
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+                }]
+            },
+        }, {
+            'name': 'course_details',
+            'schema': {
+                'type': 'unicode',
+                'ui_config': {
+                    'rows': 8,
+                }
+            }
+        }, {
+            'name': 'topic_list_intro',
+            'schema': {
+                'type': 'unicode',
+                'ui_config': {
+                    'rows': 5,
+                }
             }
         }, {
             'name': 'topic_ids',
@@ -91,6 +141,10 @@ UNICODE_SCHEMA = {
 
 FLOAT_SCHEMA = {
     'type': schema_utils.SCHEMA_TYPE_FLOAT
+}
+
+INT_SCHEMA = {
+    'type': schema_utils.SCHEMA_TYPE_INT
 }
 
 
@@ -188,15 +242,19 @@ class ConfigProperty(python_utils.OBJECT):
     def value(self):
         """Get the latest value from memcache, datastore, or use default."""
 
-        memcached_items = memcache_services.get_multi([self.name])
+        memcached_items = caching_services.get_multi(
+            caching_services.CACHE_NAMESPACE_CONFIG, None, [self.name])
         if self.name in memcached_items:
             return memcached_items[self.name]
 
         datastore_item = config_models.ConfigPropertyModel.get(
             self.name, strict=False)
         if datastore_item is not None:
-            memcache_services.set_multi({
-                datastore_item.id: datastore_item.value})
+            caching_services.set_multi(
+                caching_services.CACHE_NAMESPACE_CONFIG, None,
+                {
+                    datastore_item.id: datastore_item.value
+                })
             return datastore_item.value
 
         return self.default_value
@@ -221,15 +279,18 @@ class ConfigProperty(python_utils.OBJECT):
             }])
 
         # Set value in memcache.
-        memcache_services.set_multi({
-            model_instance.id: model_instance.value})
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_CONFIG, None,
+            {
+                model_instance.id: model_instance.value
+            })
 
     def normalize(self, value):
         """Validates the given object using the schema and normalizes if
         necessary.
 
         Args:
-            value: The value of the configuration property.
+            value: str. The value of the configuration property.
 
         Returns:
             instance. The normalized object.
@@ -286,6 +347,15 @@ class Registry(python_utils.OBJECT):
 
         return schemas_dict
 
+    @classmethod
+    def get_all_config_property_names(cls):
+        """Return a list of all the config property names.
+
+        Returns:
+            list. The list of all config property names.
+        """
+        return list(cls._config_registry)
+
 
 PROMO_BAR_ENABLED = ConfigProperty(
     'promo_bar_enabled', BOOL_SCHEMA,
@@ -310,11 +380,14 @@ WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
         '0FBWxCE5egOw', '670bU6d9JGBh', 'aHikhPlxYgOH', '-tMgcP1i_4au',
         'zW39GLG_BdN2', 'Xa3B_io-2WI5', '6Q6IyIDkjpYC', 'osw1m5Q3jK41'])
 
-TOPIC_IDS_FOR_CLASSROOM_PAGES = ConfigProperty(
-    'topic_ids_for_classroom_pages', SET_OF_CLASSROOM_DICTS_SCHEMA,
-    'The set of topic IDs for each classroom page.', [{
-        'name': 'Math',
-        'topic_ids': []
+CLASSROOM_PAGES_DATA = ConfigProperty(
+    'classroom_pages_data', SET_OF_CLASSROOM_DICTS_SCHEMA,
+    'The details for each classroom page.', [{
+        'name': 'math',
+        'url_fragment': 'math',
+        'topic_ids': [],
+        'course_details': '',
+        'topic_list_intro': ''
     }]
 )
 
@@ -325,9 +398,56 @@ RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
 IS_IMPROVEMENTS_TAB_ENABLED = ConfigProperty(
     'is_improvements_tab_enabled', BOOL_SCHEMA,
     'Exposes the Improvements Tab for creators in the exploration editor.',
-    True)
+    False)
 
 ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
     'always_ask_learners_for_answer_details', BOOL_SCHEMA,
     'Always ask learners for answer details. For testing -- do not use',
     False)
+
+CLASSROOM_PAGE_IS_ACCESSIBLE = ConfigProperty(
+    'classroom_page_is_accessible', BOOL_SCHEMA,
+    'Make classroom page accessible.', False)
+
+CLASSROOM_PROMOS_ARE_ENABLED = ConfigProperty(
+    'classroom_promos_are_enabled', BOOL_SCHEMA,
+    'Show classroom promos.', False)
+
+FEATURED_TRANSLATION_LANGUAGES = ConfigProperty(
+    'featured_translation_languages',
+    LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA,
+    'Featured Translation Languages', []
+)
+
+HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD = ConfigProperty(
+    'high_bounce_rate_task_state_bounce_rate_creation_threshold',
+    FLOAT_SCHEMA,
+    'The bounce-rate a state must exceed to create a new improvements task.',
+    0.20)
+
+HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD = ConfigProperty(
+    'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold',
+    FLOAT_SCHEMA,
+    'The bounce-rate a state must fall under to discard its improvement task.',
+    0.20)
+
+HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS = ConfigProperty(
+    'high_bounce_rate_task_minimum_exploration_starts',
+    INT_SCHEMA,
+    'The minimum number of times an exploration is started before it can '
+    'generate high bounce-rate improvements tasks.',
+    100)
+
+MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH = ConfigProperty(
+    'max_number_of_svgs_in_math_svgs_batch',
+    INT_SCHEMA,
+    'The maximum number of Math SVGs that can be send in a batch of math rich '
+    'text svgs.',
+    25)
+
+MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
+    'max_number_of_explorations_in_math_svgs_batch',
+    INT_SCHEMA,
+    'The maximum number of explorations that can be send in a batch of math '
+    'rich text svgs.',
+    2)

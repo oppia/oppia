@@ -13,16 +13,26 @@
 # limitations under the License.
 
 """Tests for Oppia storage models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
-import unittest
 
+from core.domain import takeout_service
 from core.platform import models
 from core.tests import test_utils
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(
+    base_models, collection_models, email_models,
+    exploration_models, feedback_models, skill_models,
+    topic_models, suggestion_models, user_models,
+    story_models, question_models, config_models
+) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
+    models.NAMES.topic, models.NAMES.suggestion, models.NAMES.user,
+    models.NAMES.story, models.NAMES.question, models.NAMES.config])
 
 
 class StorageModelsTest(test_utils.GenericTestBase):
@@ -52,11 +62,8 @@ class StorageModelsTest(test_utils.GenericTestBase):
     # List of model classes that don't have Wipeout related class methods
     # defined because they're not used directly but only as a base classes for
     # the other models.
-    #
-    # BaseCommitLogEntryModel is not included in this list because we implement
-    # has_reference_to_user_id inside it, since the children models don't differ
-    # that much.
     BASE_CLASSES = (
+        'BaseCommitLogEntryModel',
         'BaseMapReduceBatchResultsModel',
         'BaseModel',
         'BaseSnapshotContentModel',
@@ -82,10 +89,6 @@ class StorageModelsTest(test_utils.GenericTestBase):
             # adopt the policy of the associated VersionedModel.
             if 'BaseSnapshotContentModel' in base_classes:
                 continue
-            # BaseCommitLogEntryModel and models that inherit from it
-            # adopt the policy of the associated VersionedModel.
-            if 'BaseCommitLogEntryModel' in base_classes:
-                continue
             yield clazz
 
     def test_all_model_module_names_unique(self):
@@ -109,25 +112,54 @@ class StorageModelsTest(test_utils.GenericTestBase):
     def test_base_models_do_not_have_get_deletion_policy(self):
         for clazz in self._get_model_classes():
             if clazz.__name__ in self.BASE_CLASSES:
-                with self.assertRaises(NotImplementedError):
+                with self.assertRaisesRegexp(
+                    NotImplementedError,
+                    r'The get_deletion_policy\(\) method is missing from the '
+                    r'derived class. It should be implemented in the '
+                    r'derived class.'):
                     clazz.get_deletion_policy()
 
-    # TODO(#7858): Remove this after has_reference_to_user_id is implemented
-    # where needed.
-    @unittest.skip(
-        'has_reference_to_user_id is not yet implemented on all models')
     def test_base_or_versioned_child_classes_have_has_reference_to_user_id(
             self):
         for clazz in self._get_base_or_versioned_model_child_classes():
-            try:
-                self.assertIsNotNone(clazz.has_reference_to_user_id('any_id'))
-            except NotImplementedError:
-                self.fail(
-                    msg='has_reference_to_user_id is not defined for %s' % (
-                        clazz.__name__))
-
-    def test_base_models_do_not_have_method_has_reference_to_user_id(self):
-        for clazz in self._get_model_classes():
-            if clazz.__name__ in self.BASE_CLASSES:
-                with self.assertRaises(NotImplementedError):
+            if (clazz.get_deletion_policy() ==
+                    base_models.DELETION_POLICY.NOT_APPLICABLE):
+                with self.assertRaisesRegexp(
+                    NotImplementedError,
+                    r'The has_reference_to_user_id\(\) method is missing from '
+                    r'the derived class. It should be implemented in the '
+                    r'derived class.'):
                     clazz.has_reference_to_user_id('any_id')
+            else:
+                try:
+                    self.assertIsNotNone(
+                        clazz.has_reference_to_user_id('any_id'))
+                except NotImplementedError:
+                    self.fail(
+                        msg='has_reference_to_user_id is not defined for %s' % (
+                            clazz.__name__))
+
+    def test_get_models_which_should_be_exported(self):
+        """Ensure that the set of models to export is the set of models with
+        export policy CONTAINS_USER_DATA, and that all other models have
+        export policy NOT_APPLICABLE.
+        """
+        all_models = [
+            clazz
+            for clazz in self._get_model_classes()
+            if not clazz.__name__ in self.BASE_CLASSES
+        ]
+        models_with_export = (
+            takeout_service.get_models_which_should_be_exported())
+        for model in all_models:
+            export_policy = model.get_export_policy()
+            if model in models_with_export:
+                self.assertEqual(
+                    base_models.EXPORT_POLICY.CONTAINS_USER_DATA,
+                    export_policy
+                )
+            else:
+                self.assertEqual(
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                    export_policy
+                )

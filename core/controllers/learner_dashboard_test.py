@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the learner dashboard and the notifications dashboard."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -27,9 +28,25 @@ from core.domain import suggestion_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
     models.NAMES.suggestion, models.NAMES.feedback])
+
+
+class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
+    """Test for redirecting the old learner dashboard page URL
+    to the new one.
+    """
+
+    def test_old_learner_dashboard_page_url(self):
+        """Test to validate that the old learner dashboard page url redirects
+        to the new one.
+        """
+        response = self.get_html_response(
+            '/learner_dashboard', expected_status_int=301)
+        self.assertEqual(
+            'http://localhost/learner-dashboard', response.headers['location'])
 
 
 class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
@@ -283,7 +300,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
-        self.assertIn('{"title": "Learner Dashboard - Oppia"})', response.body)
+        self.assertIn('{"title": "Learner Dashboard | Oppia"})', response.body)
 
         self.logout()
 
@@ -397,9 +414,8 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             messages_summary['author_username'], self.EDITOR_USERNAME)
-        self.assertTrue(
-            messages_summary['author_picture_data_url'].startswith(
-                'data:image/png;'))
+        self.assertTrue(test_utils.check_image_png_or_webp(
+            messages_summary['author_picture_data_url']))
         self.assertFalse(messages_summary.get('suggestion_html'))
         self.assertFalse(messages_summary.get('current_content_html'))
         self.assertFalse(messages_summary.get('description'))
@@ -427,12 +443,15 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
                 suggestion.change.state_name].content.html)
         response_dict = self.get_json(thread_url)
         messages_summary = response_dict['message_summary_list'][0]
+        first_suggestion = feedback_services.get_messages(thread_id)[0]
 
         self.assertEqual(
             messages_summary['author_username'], self.EDITOR_USERNAME)
-        self.assertTrue(
-            messages_summary['author_picture_data_url'].startswith(
-                'data:image/png;'))
+        self.assertTrue(test_utils.check_image_png_or_webp(
+            messages_summary['author_picture_data_url']))
+        self.assertEqual(
+            utils.get_time_in_millisecs(first_suggestion.created_on),
+            messages_summary['created_on_msecs'])
         self.assertEqual(
             messages_summary['suggestion_html'], '<p>new content html</p>')
         self.assertEqual(

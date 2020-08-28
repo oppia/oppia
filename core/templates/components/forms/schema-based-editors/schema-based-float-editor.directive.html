@@ -1,0 +1,41 @@
+<span ng-model="$ctrl.localValue" ui-validate="'$ctrl.validate($value)'">
+  <span ng-form="$ctrl.floatForm">
+    <span ng-if="!expressionMode">
+      <input type="number" step="any" autocomplete="off" ng-model="$ctrl.localValue" class="form-control oppia-float-form-input protractor-test-float-form-input"
+             name="floatValue" ng-attr-placeholder="<['I18N_FORMS_TYPE_NUMBER' | translate]>"
+             focus-on="<[$ctrl.labelForFocusTarget()]>" ng-keypress="$ctrl.onKeypress($event)"
+             apply-validation validators="$ctrl.validators()"
+             ng-blur="$ctrl.onBlur()" ng-focus="$ctrl.onFocus()" style="display: inline;"
+             ng-change="$ctrl.generateErrors()">
+
+      <span class="oppia-form-error oppia-numeric-input-error" ng-if="$ctrl.errorString">
+        <[$ctrl.errorString]>
+      </span>
+      <span ng-if="$ctrl.hasLoaded && !$ctrl.isUserCurrentlyTyping && $ctrl.hasFocusedAtLeastOnce"
+            style="font-size: 0.85em; position: absolute;"
+            tabindex="-1" focus-on="<[$ctrl.labelForErrorFocusTarget]>">
+        <span ng-if="$ctrl.floatForm.floatValue.$error.isFloat && $ctrl.floatForm.floatValue.$viewValue" class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_INVALID_DECIMAL"></span>
+        <span ng-if="!$ctrl.floatForm.floatValue.$error.isFloat && $ctrl.floatForm.floatValue.$error.isAtLeast"
+              class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_AT_LEAST" translate-values="{minValue: minValue}">
+        </span>
+        <span ng-if="!$ctrl.floatForm.floatValue.$error.isFloat && $ctrl.floatForm.floatValue.$error.isAtMost"
+              class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_AT_MOST" translate-values="{maxValue: maxValue}">
+        </span>
+      </span>
+    </span>
+  </span>
+</span>
+
+<style>
+  .oppia-numeric-input-error {
+    margin-top: 10px;
+  }
+  input.oppia-float-form-input {
+    -moz-appearance: textfield;
+  }
+  input.oppia-float-form-input::-webkit-outer-spin-button,
+  input.oppia-float-form-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+</style>

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Registry for issues."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -73,7 +74,8 @@ class Registry(python_utils.OBJECT):
         """Get a list of instances of all issues.
 
         Returns:
-            list. A list of all issue class instances.
+            list(*). A list of all issue class instances. Classes all have
+            "BaseExplorationIssueSpec" as an ancestor class.
         """
         if len(cls._issues) == 0:
             cls._refresh()
@@ -90,7 +92,8 @@ class Registry(python_utils.OBJECT):
             issue_type: str. Type of the issue.
 
         Returns:
-            An instance of the corresponding issue class.
+            *. An instance of the corresponding issue class. This class has
+            "BaseExplorationIssueSpec" as an ancestor class.
         """
         if issue_type not in cls._issues:
             cls._refresh()

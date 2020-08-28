@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Services for the learner playlist feature of the learner dashboard."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -39,7 +40,7 @@ def get_learner_playlist_from_model(learner_playlist_model):
 
     Returns:
         LearnerPlaylist. The learner playlist domain object corresponding to the
-            given model.
+        given model.
     """
     return user_domain.LearnerPlaylist(
         learner_playlist_model.id,
@@ -55,12 +56,19 @@ def save_learner_playlist(learner_playlist):
         learner_playlist: LearnerPlaylist. The learner playlist domain object to
             be saved in the datastore.
     """
-    learner_playlist_model = user_models.LearnerPlaylistModel(
-        id=learner_playlist.id,
-        exploration_ids=learner_playlist.exploration_ids,
-        collection_ids=learner_playlist.collection_ids)
+    learner_playlist_dict = {
+        'exploration_ids': learner_playlist.exploration_ids,
+        'collection_ids': learner_playlist.collection_ids
+    }
 
-    learner_playlist_model.put()
+    learner_playlist_model = (user_models.LearnerPlaylistModel.get_by_id(
+        learner_playlist.id))
+    if learner_playlist_model is not None:
+        learner_playlist_model.populate(**learner_playlist_dict)
+        learner_playlist_model.put()
+    else:
+        learner_playlist_dict['id'] = learner_playlist.id
+        user_models.LearnerPlaylistModel(**learner_playlist_dict).put()
 
 
 def mark_exploration_to_be_played_later(
@@ -83,9 +91,9 @@ def mark_exploration_to_be_played_later(
 
     Returns:
         (bool, bool). The first boolean indicates whether the playlist limit
-            of the user has been exceeded, and the second boolean indicates
-            whether the exploration is among one of the created or
-            edited explorations of the user.
+        of the user has been exceeded, and the second boolean indicates
+        whether the exploration is among one of the created or edited
+        explorations of the user.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
         user_id, strict=False)
@@ -147,9 +155,9 @@ def mark_collection_to_be_played_later(
 
     Returns:
         (bool, bool). The first boolean indicates whether the playlist limit of
-            the user has been exceeded, and the second boolean indicates whether
-            the collection is among one of the created or edited collections of
-            the user.
+        the user has been exceeded, and the second boolean indicates whether the
+        collection is among one of the created or edited collections of the
+        user.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
         user_id, strict=False)
@@ -238,7 +246,7 @@ def get_all_exp_ids_in_learner_playlist(user_id):
 
     Returns:
         list(str). A list of the ids of the explorations that are in the
-            learner playlist of the user.
+        learner playlist of the user.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
         user_id, strict=False)
@@ -261,7 +269,7 @@ def get_all_collection_ids_in_learner_playlist(user_id):
 
     Returns:
         list(str). A list of the ids of the collections that are in the
-            learner playlist of the user.
+        learner playlist of the user.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
         user_id, strict=False)

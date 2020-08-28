@@ -15,12 +15,14 @@
 """Funtions to create, accept, reject, update and perform other operations on
 suggestions.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
+from core.domain import html_validation_service
 from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
@@ -36,15 +38,14 @@ DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 def create_suggestion(
         suggestion_type, target_type, target_id, target_version_at_submission,
-        author_id, change, description, final_reviewer_id):
+        author_id, change, description):
     """Creates a new SuggestionModel and the corresponding FeedbackThread.
 
     Args:
-        suggestion_type: str. The type of the suggestion.
-        target_type: str. The target entity being edited.
-
-        (The above 2 parameters should be one of the constants defined in
-        storage/suggestion/gae_models.py.)
+        suggestion_type: str. The type of the suggestion. This parameter should
+            be one of the constants defined in storage/suggestion/gae_models.py.
+        target_type: str. The target entity being edited. This parameter should
+            be one of the constants defined in storage/suggestion/gae_models.py.
 
         target_id: str. The ID of the target entity being suggested to.
         target_version_at_submission: int. The version number of the target
@@ -52,8 +53,9 @@ def create_suggestion(
         author_id: str. The ID of the user who submitted the suggestion.
         change: dict. The details of the suggestion.
         description: str. The description of the changes provided by the author.
-        final_reviewer_id: str|None. The ID of the reviewer who has
-            accepted/rejected the suggestion.
+
+    Returns:
+        Suggestion. The newly created suggestion domain object.
     """
     if description is None:
         description = DEFAULT_SUGGESTION_THREAD_SUBJECT
@@ -86,17 +88,27 @@ def create_suggestion(
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
 
+    suggestion_domain_class = (
+        suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
+            suggestion_type])
+    suggestion = suggestion_domain_class(
+        thread_id, target_id, target_version_at_submission, status, author_id,
+        None, change, score_category)
+    suggestion.validate()
+
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,
-        final_reviewer_id, change, score_category, thread_id)
+        None, change, score_category, thread_id)
+    return get_suggestion_by_id(thread_id)
 
 
 def get_suggestion_from_model(suggestion_model):
     """Converts the given SuggestionModel to a Suggestion domain object
 
     Args:
-        suggestion_model: SuggestionModel.
+        suggestion_model: SuggestionModel. SuggestionModel object to be
+            converted to Suggestion domain object.
 
     Returns:
         Suggestion. The corresponding Suggestion domain object.
@@ -120,7 +132,7 @@ def get_suggestion_by_id(suggestion_id):
 
     Returns:
         Suggestion|None. The corresponding suggestion, or None if no suggestion
-            is found.
+        is found.
     """
     model = suggestion_models.GeneralSuggestionModel.get_by_id(suggestion_id)
 
@@ -144,6 +156,29 @@ def query_suggestions(query_fields_and_values):
                 query_fields_and_values)]
 
 
+def get_translation_suggestions_with_exp_ids(exp_ids):
+    """Gets all translation suggestions corresponding to explorations with
+    the given exploration ids.
+
+    Args:
+        exp_ids: list(str). List of exploration ids to query for.
+
+    Returns:
+        list(Suggestion). A list of translation suggestions that
+        correspond to the given exploration ids. Note: it is not
+        guaranteed that the suggestions returned are ordered by the
+        exploration ids in exp_ids.
+    """
+    if len(exp_ids) == 0:
+        return []
+
+    return [
+        get_suggestion_from_model(s)
+        for s in suggestion_models.GeneralSuggestionModel
+        .get_translation_suggestions_with_exp_ids(exp_ids)
+    ]
+
+
 def get_all_stale_suggestions():
     """Gets a list of suggestions without any activity on them for
     THRESHOLD_TIME_BEFORE_ACCEPT time.
@@ -163,17 +198,38 @@ def _update_suggestion(suggestion):
     Args:
         suggestion: Suggestion. The suggestion to be updated.
     """
-    suggestion.validate()
 
-    suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
-        suggestion.suggestion_id)
+    _update_suggestions([suggestion])
 
-    suggestion_model.status = suggestion.status
-    suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
-    suggestion_model.change_cmd = suggestion.change.to_dict()
-    suggestion_model.score_category = suggestion.score_category
 
-    suggestion_model.put()
+def _update_suggestions(suggestions, update_last_updated_time=True):
+    """Updates the given suggestions.
+
+    Args:
+        suggestions: list(Suggestion). The suggestions to be updated.
+        update_last_updated_time: bool. Whether to update the last_updated
+            field of the suggestions.
+    """
+    suggestion_ids = []
+
+    for suggestion in suggestions:
+        suggestion.validate()
+        suggestion_ids.append(suggestion.suggestion_id)
+
+    suggestion_models_to_update = (
+        suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
+    )
+
+    for index, suggestion_model in enumerate(suggestion_models_to_update):
+        suggestion = suggestions[index]
+        suggestion_model.status = suggestion.status
+        suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
+        suggestion_model.change_cmd = suggestion.change.to_dict()
+        suggestion_model.score_category = suggestion.score_category
+
+    suggestion_models.GeneralSuggestionModel.put_multi(
+        suggestion_models_to_update,
+        update_last_updated_time=update_last_updated_time)
 
 
 def mark_review_completed(suggestion, status, reviewer_id):
@@ -185,14 +241,29 @@ def mark_review_completed(suggestion, status, reviewer_id):
             are STATUS_ACCEPTED or STATUS_REJECTED.
         reviewer_id: str. The ID of the user who completed the review.
     """
-    if(status not in [suggestion_models.STATUS_ACCEPTED,
-                      suggestion_models.STATUS_REJECTED]):
+    mark_multiple_reviews_completed([suggestion], status, reviewer_id)
+
+
+def mark_multiple_reviews_completed(
+        suggestions, status, reviewer_id):
+    """Marks that multiple reviews have been completed.
+
+    Args:
+        suggestions: list(Suggestion). The suggestions to be updated.
+        status: str. The status of the suggestions post review. Possible values
+            are STATUS_ACCEPTED or STATUS_REJECTED.
+        reviewer_id: str. The ID of the user who completed the reviews.
+    """
+    if status not in [
+            suggestion_models.STATUS_ACCEPTED,
+            suggestion_models.STATUS_REJECTED]:
         raise Exception('Invalid status after review.')
 
-    suggestion.status = status
-    suggestion.final_reviewer_id = reviewer_id
+    for suggestion in suggestions:
+        suggestion.status = status
+        suggestion.final_reviewer_id = reviewer_id
 
-    _update_suggestion(suggestion)
+    _update_suggestions(suggestions)
 
 
 def get_commit_message_for_suggestion(author_username, commit_message):
@@ -223,16 +294,28 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
             accepting the suggestion.
 
     Raises:
-        Exception: The suggestion is already handled.
-        Exception: The suggestion is not valid.
-        Exception: The commit message is empty.
+        Exception. The suggestion is already handled.
+        Exception. The suggestion is not valid.
+        Exception. The commit message is empty.
     """
     if suggestion.is_handled:
-        raise Exception('The suggestion has already been accepted/rejected.')
+        raise Exception(
+            'The suggestion with id %s has already been accepted/rejected.' % (
+                suggestion.suggestion_id)
+        )
     if not commit_message or not commit_message.strip():
         raise Exception('Commit message cannot be empty.')
-
     suggestion.pre_accept_validate()
+    html_string = ''.join(suggestion.get_all_html_content_strings())
+    error_list = (
+        html_validation_service.
+        validate_math_tags_in_html_with_attribute_math_content(
+            html_string))
+    if len(error_list) > 0:
+        raise Exception(
+            'Invalid math tags found in the suggestion with id %s.' % (
+                suggestion.suggestion_id)
+        )
 
     author_name = user_services.get_username(suggestion.author_id)
     commit_message = get_commit_message_for_suggestion(
@@ -266,50 +349,117 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
 def reject_suggestion(suggestion, reviewer_id, review_message):
     """Rejects the suggestion.
 
-     Args:
+    Args:
         suggestion: Suggestion. The suggestion to be rejected.
         reviewer_id: str. The ID of the reviewer rejecting the suggestion.
         review_message: str. The message provided by the reviewer while
             rejecting the suggestion.
 
     Raises:
-        Exception: The suggestion is already handled.
+        Exception. The suggestion is already handled.
     """
-    if suggestion.is_handled:
-        raise Exception('The suggestion has already been accepted/rejected.')
+
+    reject_suggestions([suggestion], reviewer_id, review_message)
+
+
+def reject_suggestions(suggestions, reviewer_id, review_message):
+    """Rejects the suggestions.
+
+    Args:
+        suggestions: list(Suggestion). The suggestions to be rejected.
+        reviewer_id: str. The ID of the reviewer rejecting the suggestions.
+        review_message: str. The message provided by the reviewer while
+            rejecting the suggestions.
+
+    Raises:
+        Exception. One or more of the suggestions has already been handled.
+    """
+
+    for suggestion in suggestions:
+        if suggestion.is_handled:
+            raise Exception(
+                'The suggestion with id %s has already been accepted/'
+                'rejected.' % (suggestion.suggestion_id)
+            )
     if not review_message:
         raise Exception('Review message cannot be empty.')
-    mark_review_completed(
-        suggestion, suggestion_models.STATUS_REJECTED, reviewer_id)
 
-    thread_id = suggestion.suggestion_id
-    feedback_services.create_message(
-        thread_id, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
-        None, review_message)
+    mark_multiple_reviews_completed(
+        suggestions, suggestion_models.STATUS_REJECTED, reviewer_id
+    )
+
+    thread_ids = [suggestion.suggestion_id for suggestion in suggestions]
+    feedback_services.create_messages(
+        thread_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
+        None, review_message
+    )
+
+
+def auto_reject_question_suggestions_for_skill_id(skill_id):
+    """Rejects all SuggestionAddQuestions with target ID matching the supplied
+    skill ID. Reviewer ID is set to SUGGESTION_BOT_USER_ID.
+
+    Args:
+        skill_id: str. The skill ID corresponding to the target ID of the
+            SuggestionAddQuestion.
+    """
+    suggestions = query_suggestions(
+        [
+            (
+                'suggestion_type',
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
+            ('target_id', skill_id)
+        ]
+    )
+    reject_suggestions(
+        suggestions, feconf.SUGGESTION_BOT_USER_ID,
+        suggestion_models.DELETED_SKILL_REJECT_MESSAGE)
+
+
+def auto_reject_translation_suggestions_for_exp_ids(exp_ids):
+    """Rejects all translation suggestions with target IDs matching the
+    supplied exploration IDs. These suggestions are being rejected because
+    their corresponding exploration was removed from a story or the story was
+    deleted. Reviewer ID is set to SUGGESTION_BOT_USER_ID.
+
+    Args:
+        exp_ids: list(str). The exploration IDs corresponding to the target IDs
+            of the translation suggestions.
+    """
+    suggestions = get_translation_suggestions_with_exp_ids(exp_ids)
+
+    reject_suggestions(
+        suggestions, feconf.SUGGESTION_BOT_USER_ID,
+        suggestion_models.INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG)
 
 
 def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
     """Resubmit a rejected suggestion.
 
-     Args:
+    Args:
         suggestion: Suggestion. The rejected suggestion.
         summary_message: str. The message provided by the author to
             summarize new suggestion.
         author_id: str. The ID of the author creating the suggestion.
 
     Raises:
-        Exception: The summary message is empty.
-        Exception: The suggestion has not been handled yet.
-        Exception: The suggestion has already been accepted.
+        Exception. The summary message is empty.
+        Exception. The suggestion has not been handled yet.
+        Exception. The suggestion has already been accepted.
     """
     if not summary_message:
         raise Exception('Summary message cannot be empty.')
     if not suggestion.is_handled:
-        raise Exception('The suggestion is not yet handled.')
+        raise Exception(
+            'The suggestion with id %s is not yet handled.' % (
+                suggestion.suggestion_id)
+        )
     if suggestion.status == suggestion_models.STATUS_ACCEPTED:
         raise Exception(
-            'The suggestion was accepted. '
-            'Only rejected suggestions can be resubmitted.')
+            'The suggestion with id %s was accepted. '
+            'Only rejected suggestions can be resubmitted.' % (
+                suggestion.suggestion_id)
+        )
 
     suggestion.status = suggestion_models.STATUS_IN_REVIEW
     _update_suggestion(suggestion)
@@ -329,7 +479,7 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
 
     Returns:
         list(Suggestion). A list of suggestions which the given user is allowed
-            to review.
+        to review.
     """
     score_categories = (
         user_models.UserContributionScoringModel
@@ -338,11 +488,12 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
     if len(score_categories) == 0:
         return []
 
-    return (
-        [get_suggestion_from_model(s)
-         for s in suggestion_models.GeneralSuggestionModel
-         .get_in_review_suggestions_in_score_categories(
-             score_categories, user_id)])
+    return ([
+        get_suggestion_from_model(s)
+        for s in suggestion_models.GeneralSuggestionModel
+        .get_in_review_suggestions_in_score_categories(
+            score_categories, user_id)
+    ])
 
 
 def get_reviewable_suggestions(user_id, suggestion_type):
@@ -355,14 +506,23 @@ def get_reviewable_suggestions(user_id, suggestion_type):
 
     Returns:
         list(Suggestion). A list of suggestions which the given user is allowed
-            to review.
+        to review.
     """
-    return ([
+    all_suggestions = ([
         get_suggestion_from_model(s) for s in (
             suggestion_models.GeneralSuggestionModel
             .get_in_review_suggestions_of_suggestion_type(
                 suggestion_type, user_id))
     ])
+    user_review_rights = user_services.get_user_contribution_rights(user_id)
+    if suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        language_codes = (
+            user_review_rights.can_review_translation_for_language_codes)
+        return [
+            suggestion for suggestion in all_suggestions
+            if suggestion.change.language_code in language_codes]
+
+    return all_suggestions
 
 
 def get_submitted_suggestions(user_id, suggestion_type):
@@ -393,7 +553,7 @@ def get_all_scores_of_user(user_id):
 
     Returns:
         dict. A dict containing all the scores of the user. The keys of the dict
-            are the score categories and the values are the scores.
+        are the score categories and the values are the scores.
     """
     scores = {}
     for model in (
@@ -415,7 +575,7 @@ def check_user_can_review_in_category(user_id, score_category):
 
     Returns:
         bool. Whether the user can review suggestions under category
-            score_category.
+        score_category.
     """
     score = (
         user_models.UserContributionScoringModel.get_score_of_user_for_category(
@@ -467,7 +627,7 @@ def get_all_user_ids_who_are_allowed_to_review(score_category):
 
     Returns:
         list(str). All user_ids of users who are allowed to review in the given
-            category.
+        category.
     """
     return [model.user_id for model in
             user_models.UserContributionScoringModel
@@ -504,63 +664,6 @@ def create_new_user_contribution_scoring_model(user_id, score_category, score):
         user_id, score_category, score)
 
 
-def get_next_user_in_rotation(score_category):
-    """Gets the id of the next user in the reviewer rotation for the given
-    score_category. The order is alphabetical, and the next user in the
-    alphabetical order is returned.
-
-    Args:
-        score_category: str. The score category.
-
-    Returns:
-        str|None. The user id of the next user in the reviewer rotation, if
-            there are reviewers for the given category. Else None.
-    """
-    reviewer_ids = get_all_user_ids_who_are_allowed_to_review(score_category)
-    reviewer_ids.sort()
-
-    if len(reviewer_ids) == 0:
-        # No reviewers available for the given category.
-        return None
-
-    position_tracking_model = (
-        suggestion_models.ReviewerRotationTrackingModel.get_by_id(
-            score_category))
-
-    next_user_id = None
-    if position_tracking_model is None:
-        # No rotation has started yet, start rotation at index 0.
-        next_user_id = reviewer_ids[0]
-    else:
-        current_position_user_id = (
-            position_tracking_model.current_position_in_rotation)
-
-        for reviewer_id in reviewer_ids:
-            if reviewer_id > current_position_user_id:
-                next_user_id = reviewer_id
-                break
-
-        if next_user_id is None:
-            # All names are lexicographically smaller than or equal to the
-            # current position username. Hence, Rotating back to the front.
-            next_user_id = reviewer_ids[0]
-
-    update_position_in_rotation(score_category, next_user_id)
-    return next_user_id
-
-
-def update_position_in_rotation(score_category, user_id):
-    """Updates the current position in the rotation to the given user_id.
-
-    Args:
-        score_category: str. The score category.
-        user_id: str. The ID of the user who completed their turn in the
-            rotation for the given category.
-    """
-    suggestion_models.ReviewerRotationTrackingModel.update_position_in_rotation(
-        score_category, user_id)
-
-
 def check_can_resubmit_suggestion(suggestion_id, user_id):
     """Checks whether the given user can resubmit the suggestion.
 
@@ -569,9 +672,58 @@ def check_can_resubmit_suggestion(suggestion_id, user_id):
         user_id: str. The ID of the user.
 
     Returns:
-        bool: Whether the user can resubmit the suggestion.
+        bool. Whether the user can resubmit the suggestion.
     """
 
     suggestion = get_suggestion_by_id(suggestion_id)
 
     return suggestion.author_id == user_id
+
+
+def _get_voiceover_application_class(target_type):
+    """Returns the voiceover application class for a given target type.
+
+    Args:
+        target_type: str. The target type of the voiceover application.
+
+    Returns:
+        class. The voiceover application class for the given target type.
+
+    Raises:
+        Exception. The voiceover application target type is invalid.
+    """
+    target_type_to_classes = (
+        suggestion_registry.VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES)
+    if target_type in target_type_to_classes:
+        return target_type_to_classes[target_type]
+    else:
+        raise Exception(
+            'Invalid target type for voiceover application: %s' % target_type)
+
+
+def get_voiceover_application(voiceover_application_id):
+    """Returns the BaseVoiceoverApplication object for the give
+    voiceover application model object.
+
+    Args:
+        voiceover_application_id: str. The ID of the voiceover application.
+
+    Returns:
+        BaseVoiceoverApplication. The domain object out of the given voiceover
+        application model object.
+    """
+    voiceover_application_model = (
+        suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
+            voiceover_application_id))
+    voiceover_application_class = _get_voiceover_application_class(
+        voiceover_application_model.target_type)
+    return voiceover_application_class(
+        voiceover_application_model.id,
+        voiceover_application_model.target_id,
+        voiceover_application_model.status,
+        voiceover_application_model.author_id,
+        voiceover_application_model.final_reviewer_id,
+        voiceover_application_model.language_code,
+        voiceover_application_model.filename,
+        voiceover_application_model.content,
+        voiceover_application_model.rejection_message)

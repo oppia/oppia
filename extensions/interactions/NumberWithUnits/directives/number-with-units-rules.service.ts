@@ -16,50 +16,65 @@
  * @fileoverview Rules service for the interaction.
  */
 
-// TODO(#7403): Convert this to partial imports.
-import math from 'mathjs';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-require('domain/objects/FractionObjectFactory.ts');
-require('domain/objects/NumberWithUnitsObjectFactory.ts');
+import { unit } from 'mathjs';
+
+import { NumberWithUnitsObjectFactory } from
+  'domain/objects/NumberWithUnitsObjectFactory';
+import { UtilsService } from 'services/utils.service';
+import { NumberWithUnitsAnswer } from 'interactions/answer-defs';
+import { NumberWithUnitsRuleInputs } from 'interactions/rule-input-defs';
 
 // Rules service for number with units interaction.
-angular.module('oppia').factory('NumberWithUnitsRulesService', [
-  'NumberWithUnitsObjectFactory',
-  function(NumberWithUnitsObjectFactory) {
+@Injectable({
+  providedIn: 'root'
+})
+export class NumberWithUnitsRulesService {
+  constructor(private unitsObjectFactory: NumberWithUnitsObjectFactory,
+    private utilsService: UtilsService) {
     try {
-      NumberWithUnitsObjectFactory.createCurrencyUnits();
+      this.unitsObjectFactory.createCurrencyUnits();
     } catch (parsingError) {}
-
-    return {
-      IsEqualTo: function(answer, inputs) {
-        // Returns true only if input is exactly equal to answer.
-        answer = NumberWithUnitsObjectFactory.fromDict(answer);
-        inputs = NumberWithUnitsObjectFactory.fromDict(inputs.f);
-
-        var answerString = answer.toMathjsCompatibleString();
-        var inputsString = inputs.toMathjsCompatibleString();
-
-        var answerList = NumberWithUnitsObjectFactory.fromRawInputString(
-          answerString).toDict();
-        var inputsList = NumberWithUnitsObjectFactory.fromRawInputString(
-          inputsString).toDict();
-        return angular.equals(answerList, inputsList);
-      },
-      IsEquivalentTo: function(answer, inputs) {
-        answer = NumberWithUnitsObjectFactory.fromDict(answer);
-        inputs = NumberWithUnitsObjectFactory.fromDict(inputs.f);
-        if (answer.type === 'fraction') {
-          answer.type = 'real';
-          answer.real = answer.fraction.toFloat();
-        }
-        if (inputs.type === 'fraction') {
-          inputs.type = 'real';
-          inputs.real = inputs.fraction.toFloat();
-        }
-        var answerString = answer.toMathjsCompatibleString();
-        var inputsString = inputs.toMathjsCompatibleString();
-        return math.unit(answerString).equals(math.unit(inputsString));
-      }
-    };
   }
-]);
+
+  IsEqualTo(
+      answer: NumberWithUnitsAnswer,
+      inputs: NumberWithUnitsRuleInputs): boolean {
+    // Returns true only if input is exactly equal to answer.
+    var answerObject = this.unitsObjectFactory.fromDict(answer);
+    var inputsObject = this.unitsObjectFactory.fromDict(inputs.f);
+
+    var answerString = answerObject.toMathjsCompatibleString();
+    var inputsString = inputsObject.toMathjsCompatibleString();
+
+    var answerList = this.unitsObjectFactory.fromRawInputString(
+      answerString).toDict();
+    var inputsList = this.unitsObjectFactory.fromRawInputString(
+      inputsString).toDict();
+    return this.utilsService.isEquivalent(answerList, inputsList);
+  }
+
+  IsEquivalentTo(
+      answer: NumberWithUnitsAnswer,
+      inputs: NumberWithUnitsRuleInputs): boolean {
+    var answerObject = this.unitsObjectFactory.fromDict(answer);
+    var inputsObject = this.unitsObjectFactory.fromDict(inputs.f);
+    if (answerObject.type === 'fraction') {
+      answerObject.type = 'real';
+      answerObject.real = answerObject.fraction.toFloat();
+    }
+    if (inputsObject.type === 'fraction') {
+      inputsObject.type = 'real';
+      inputsObject.real = inputsObject.fraction.toFloat();
+    }
+    var answerString = answerObject.toMathjsCompatibleString();
+    var inputsString = inputsObject.toMathjsCompatibleString();
+    return unit(answerString).equals(unit(inputsString));
+  }
+}
+
+angular.module('oppia').factory(
+  'NumberWithUnitsRulesService', downgradeInjectable(
+    NumberWithUnitsRulesService));

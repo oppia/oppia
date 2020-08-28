@@ -17,58 +17,63 @@
  * interaction.
  */
 
-var forms = require('../../../core/tests/protractor_utils/forms.js');
+var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 
 // The members of richTextInstructionsArray are functions, one for each option,
 // which will each be passed a 'handler' that they can use to edit the
 // rich-text area of the option, for example by
 //   handler.appendUnderlineText('emphasised');
-var customizeInteraction = function(elem, richTextInstructionsArray) {
-  forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
+var customizeInteraction = async function(elem, richTextInstructionsArray) {
+  await forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
   for (var i = 0; i < richTextInstructionsArray.length; i++) {
-    var richTextEditor = forms.ListEditor(elem).editItem(i, 'RichText');
-    richTextEditor.clear();
-    richTextInstructionsArray[i](richTextEditor);
+    var richTextEditor = await forms.ListEditor(elem).editItem(i, 'RichText');
+    await richTextEditor.clear();
+    await richTextInstructionsArray[i](richTextEditor);
   }
 };
 
 // These members of richTextInstructionsArray each describe how to check one of
 // the options.
-var expectInteractionDetailsToMatch = function(
+var expectInteractionDetailsToMatch = async function(
     elem, richTextInstructionsArray) {
-  elem.all(by.repeater('choice in $ctrl.choices track by $index'))
-    .then(function(optionElements) {
-      expect(optionElements.length).toEqual(richTextInstructionsArray.length);
-      for (var i = 0; i < optionElements.length; i++) {
-        forms.expectRichText(optionElements[i].element(by.css(
-          '.protractor-test-multiple-choice-option'
-        ))).toMatch(richTextInstructionsArray[i]);
-      }
-    });
+  var optionElements = elem.all(
+    by.css('.protractor-test-multiple-choice-option-container'));
+  var optionsCount = await optionElements.count();
+  expect(optionsCount).toEqual(richTextInstructionsArray.length);
+  var promises = [];
+  for (var i = 0; i < optionsCount; i++) {
+    promises.push(await (await optionElements.get(i)).element(by.css(
+      '.protractor-test-multiple-choice-option')).getText());
+  }
+  var rteInstructionArrayCopy = [...richTextInstructionsArray];
+  rteInstructionArrayCopy.sort();
+  var results = await protractor.promise.all(promises);
+  results.sort();
+  expect(rteInstructionArrayCopy).toEqual(results);
 };
 
 // 'elem' is the HTML element containing the form to submit the answer to.
 // 'answer' {String} is the text on the multiple-choice item to select.
-var submitAnswer = function(elem, answer) {
-  elem.element(by.tagName('oppia-interactive-multiple-choice-input')).
+var submitAnswer = async function(elem, answer) {
+  await elem.element(by.tagName('oppia-interactive-multiple-choice-input')).
     element(by.buttonText(answer)).click();
 };
 
 var answerObjectType = 'NonnegativeInt';
 
 var testSuite = [{
-  interactionArguments: [[function(editor) {
-    editor.appendBoldText('right');
-  }, function(editor) {
-    editor.appendItalicText('wrong');
+  interactionArguments: [[async function(editor) {
+    await editor.appendBoldText('right');
+  }, async function(editor) {
+    await editor.appendItalicText('wrong1');
+  }, async function(editor) {
+    await editor.appendItalicText('wrong2');
+  }, async function(editor) {
+    await editor.appendItalicText('wrong3');
   }]],
   ruleArguments: ['Equals', ['right']],
-  expectedInteractionDetails: [[function(checker) {
-    checker.readBoldText('right');
-  }, function(checker) {
-    checker.readItalicText('wrong');
-  }]],
-  wrongAnswers: ['wrong'],
+  expectedInteractionDetails: [['right', 'wrong1', 'wrong2', 'wrong3']],
+  wrongAnswers: ['wrong1', 'wrong2', 'wrong3'],
   correctAnswers: ['right']
 }];
 
