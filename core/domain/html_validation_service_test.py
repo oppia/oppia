@@ -1926,6 +1926,76 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'ot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;'
                 '&amp;quot;}"></oppia-noninteractive-math>')])
 
+    def test_validate_svg_filenames_format_when_all_filenames_are_valid(self):
+        """Test the validate_svg_filenames_in_math_rich_text when valid
+        filenames are present for each math rich-text components in html.
+        """
+        html_string_with_filename_having_valid_format = (
+            '<p>Feedback1</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';mathImg_20201216_331234_r3ir43lmfd_height_2d456_width_6d1'
+            '24_vertical_0d231.svg&amp;quot;}"></oppia-noninteractive-math>'
+            '<p>Feedback2</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';mathImg_20200216_133832_imzlvnf23a_height_4d123_width_23d'
+            '122_vertical_2d123.svg&amp;quot;}"></oppia-noninteractive-math>'
+        )
+        self.assertEqual(
+            html_validation_service.
+            validate_math_content_attribute_in_html(
+                html_string_with_filename_having_valid_format), [])
+
+    def test_validate_svg_filenames_format_when_all_filenames_are_invalid(self):
+        """Test the validate_svg_filenames_in_math_rich_text when valid
+        filenames are present for each math rich-text components in html.
+        """
+        html_string_with_filename_having_invalid_format = (
+            '<p>Feedback1</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';mathImg_20201216*331234_r3ir43lmfd_height_2d456_width_6d1'
+            '24_vertical_0d231.svg&amp;quot;}"></oppia-noninteractive-math>'
+            '<p>Feedback2</p><oppia-noninteractive-math math_content-with-v'
+            'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+'
+            '&amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot'
+            ';mathImg_20200216_133832_imzlvnf23a_invalid_4d123_width_23d'
+            '122_vertical_2d123.svg&amp;quot;}"></oppia-noninteractive-math>'
+        )
+        expected_output = [
+            {
+                'invalid_tag': (
+                    '<oppia-noninteractive-math math_content-with-value="{&am'
+                    'p;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, '
+                    '&amp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_20201'
+                    '216*331234_r3ir43lmfd_height_2d456_width_6d124_vertical_0'
+                    'd231.svg&amp;quot;}"></oppia-noninteractive-math>'),
+                'error': (
+                    'Invalid svg_filename attribute in math component: '
+                    'mathImg_20201216*331234_r3ir43lmfd_height_2d456_width_6d1'
+                    '24_vertical_0d231.svg'
+                )
+            }, {
+                'invalid_tag': (
+                    '<oppia-noninteractive-math math_content-with-value="{&amp;'
+                    'quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &a'
+                    'mp;quot;svg_filename&amp;quot;: &amp;quot;mathImg_2020021'
+                    '6_133832_imzlvnf23a_invalid_4d123_width_23d122_vertical_2'
+                    'd123.svg&amp;quot;}"></oppia-noninteractive-math>'),
+                'error': (
+                    'Invalid svg_filename attribute in math component: '
+                    'mathImg_20200216_133832_imzlvnf23a_inv'
+                    'alid_4d123_width_23d122_vertical_2d123.svg')
+            }]
+
+        self.assertEqual(
+            sorted(
+                html_validation_service.
+                validate_math_content_attribute_in_html(
+                    html_string_with_filename_having_invalid_format)), sorted(
+                        expected_output))
+
     def test_check_for_math_component_in_html(self):
         """Test that the check_for_math_component_in_html method checks for
          math-tags in an HTML string and returns a boolean.
