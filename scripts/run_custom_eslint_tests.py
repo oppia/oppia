@@ -31,7 +31,7 @@ def main():
     """Run the tests."""
     node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
     mocha_path = os.path.join('node_modules', 'mocha', 'bin', 'mocha')
-    filepath = 'scripts/linters/custom_eslint_checks/tests/lib/rules/'
+    filepath = 'scripts/linters/custom_eslint_checks/rules/'
     proc_args = [node_path, mocha_path, filepath]
 
     proc = subprocess.Popen(

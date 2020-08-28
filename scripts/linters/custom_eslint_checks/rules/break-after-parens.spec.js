@@ -18,7 +18,7 @@
 
 'use strict';
 
-var rule = require('../../../lib/rules/break-after-parens');
+var rule = require('./break-after-parens');
 var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester();
