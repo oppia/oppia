@@ -45,7 +45,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-import { AppConstants } from 'app.constants';
 import { ClassifiersExtensionConstants } from
   'classifiers/classifiers-extension.constants';
 import { CollectionSummaryTileConstants } from
@@ -74,7 +73,6 @@ import { ExplorationPlayerConstants } from
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
     ClassifiersExtensionConstants,
     CollectionSummaryTileConstants,
     InteractionsExtensionsConstants,

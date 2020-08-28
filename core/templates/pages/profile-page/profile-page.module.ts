@@ -37,7 +37,6 @@ import { OppiaAngularRootComponent } from
 import { ProfilePageNavbarComponent } from
   'pages/profile-page/profile-page-navbar.component';
 
-import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
@@ -58,7 +57,6 @@ import { ObjectsDomainConstants } from
     ProfilePageNavbarComponent
   ],
   providers: [
-    AppConstants,
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,
     {

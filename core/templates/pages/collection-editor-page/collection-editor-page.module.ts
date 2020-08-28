@@ -38,7 +38,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-import { AppConstants } from 'app.constants';
 import { CollectionDomainConstants } from
   'domain/collection/collection-domain.constants';
 import { CollectionEditorPageConstants } from
@@ -84,7 +83,6 @@ import { CollectionStatisticsTabComponent } from
     CollectionStatisticsTabComponent,
   ],
   providers: [
-    AppConstants,
     CollectionDomainConstants,
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,

@@ -38,7 +38,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
@@ -59,7 +58,6 @@ import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,
     ServicesConstants,

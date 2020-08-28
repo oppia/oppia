@@ -38,7 +38,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-import { AppConstants } from 'app.constants';
 import { CollectionSummaryTileConstants } from
   'components/summary-tile/collection-summary-tile.constants';
 import { InteractionsExtensionsConstants } from
@@ -62,7 +61,6 @@ import { LearnerDashboardPageConstants } from
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
     CollectionSummaryTileConstants,
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,

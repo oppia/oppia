@@ -48,7 +48,11 @@ module.exports = {
     extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
     alias: {
       '@angular/upgrade/static': (
-        '@angular/upgrade/bundles/upgrade-static.umd.js')
+        '@angular/upgrade/bundles/upgrade-static.umd.js'),
+      // This is needed because in app.constans.ts we need to import
+      // assets/consants.ts. We can't directly write import 'constants'
+      // because there is a package is node_modules with name constants.
+      'assets/constants': 'constants.ts'
     }
   },
   entry: {

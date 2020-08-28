@@ -35,8 +35,6 @@ import { NgModule, StaticProvider } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 
-
-import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
@@ -69,7 +67,6 @@ import { OppiaAngularRootComponent } from
       useClass: RequestInterceptor,
       multi: true
     },
-    AppConstants,
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,
     QuestionPlayerConstants,

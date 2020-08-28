@@ -150,7 +150,13 @@ module.exports = function(config) {
           'node_modules',
           'third_party',
         ],
-        extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
+        extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
+        alias: {
+          // This is needed because in app.constans.ts we need to import
+          // assets/consants.ts. We can't directly write import 'constants'
+          // because there is a package is node_modules with name constants.
+          'assets/constants': 'constants.ts'
+        }
       },
       devtool: 'inline-cheap-source-map',
       module: {

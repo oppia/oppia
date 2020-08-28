@@ -34,7 +34,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
-import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
@@ -76,7 +75,6 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
     TopicViewerNavbarBreadcrumbComponent
   ],
   providers: [
-    AppConstants,
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,
     TopicViewerDomainConstants,

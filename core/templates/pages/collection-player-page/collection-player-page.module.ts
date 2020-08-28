@@ -44,7 +44,6 @@ import { CollectionNodeListComponent } from
   'pages/collection-player-page/collection-node-list/collection-node-list.component';
 
 
-import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
@@ -67,7 +66,6 @@ import { ObjectsDomainConstants } from
     CollectionNodeListComponent
   ],
   providers: [
-    AppConstants,
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,
     {

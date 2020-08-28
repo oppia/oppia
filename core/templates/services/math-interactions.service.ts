@@ -238,8 +238,8 @@ export class MathInteractionsService {
     // ['alpha', 'beta'] and not ['alpha', 'b', 'eta'].
     greekLettersAndSymbols.sort((a, b) => b[0].length - a[0].length);
 
-    let greekLetterToSymbol = {};
-    let greekSymbolToLetter = {};
+    let greekLetterToSymbol: { [letter: string]: string } = {};
+    let greekSymbolToLetter: { [symbol: string]: string } = {};
     for (let letterAndSymbol of greekLettersAndSymbols) {
       greekLetterToSymbol[letterAndSymbol[0]] = letterAndSymbol[1];
       greekSymbolToLetter[letterAndSymbol[1]] = letterAndSymbol[0];

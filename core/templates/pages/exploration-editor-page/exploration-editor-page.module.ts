@@ -46,7 +46,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-import { AppConstants } from 'app.constants';
 import { CkEditorCopyToolbarComponent } from
   /* eslint-disable max-len */
   'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
@@ -83,7 +82,6 @@ import { ExplorationEditorPageConstants } from
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
     ClassifiersExtensionConstants,
     CollectionSummaryTileConstants,
     InteractionsExtensionsConstants,

@@ -38,7 +38,6 @@ import { TopicLandingPageComponent } from
   'pages/landing-pages/topic-landing-page/topic-landing-page.component';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 
-import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
@@ -63,7 +62,6 @@ import { TopicLandingPageConstants } from
     TopicLandingPageComponent
   ],
   providers: [
-    AppConstants,
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,
     ServicesConstants,

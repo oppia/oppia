@@ -37,7 +37,6 @@ import { OppiaAngularRootComponent } from
 import { TermsPageComponent } from
   'pages/terms-page/terms-page.component';
 
-import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
@@ -58,7 +57,6 @@ import { ObjectsDomainConstants } from
     TermsPageComponent
   ],
   providers: [
-    AppConstants,
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,
     {

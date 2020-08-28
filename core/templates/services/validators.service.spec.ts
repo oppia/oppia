@@ -35,7 +35,7 @@ describe('Validators service', () => {
     });
     vs = TestBed.get(ValidatorsService);
     /* eslint-disable dot-notation */
-    AppConstants['INVALID_NAME_CHARS'] = '#xyz';
+    AppConstants['INVALID_NAME_CHARS'] = ['#', 'x', 'y', 'z'];
     /* eslint-enable dot-notation */
   });
 

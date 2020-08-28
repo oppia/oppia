@@ -38,7 +38,6 @@ import { MaintenancePageComponent } from
   'pages/maintenance-page/maintenance-page.component';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 
-import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
@@ -60,7 +59,6 @@ import { ObjectsDomainConstants } from
     MaintenancePageComponent
   ],
   providers: [
-    AppConstants,
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,
     {
