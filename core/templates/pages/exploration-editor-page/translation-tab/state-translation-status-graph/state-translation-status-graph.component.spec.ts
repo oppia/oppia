@@ -180,12 +180,13 @@ describe('State Translation Status Graph Component', function() {
       testSubscriptions.unsubscribe();
     });
 
-    it('should show translation tab busy modal', function() {
-      spyOn(stateEditorService, 'setActiveStateName');
-      $scope.onClickStateInMap('State2');
+    it('should show translation tab busy modal when clicking on state in map',
+      function() {
+        spyOn(stateEditorService, 'setActiveStateName');
+        $scope.onClickStateInMap('State2');
 
-      expect(stateEditorService.setActiveStateName).not.toHaveBeenCalled();
-      expect(showTranslationTabBusyModalspy).toHaveBeenCalled();
-    });
+        expect(stateEditorService.setActiveStateName).not.toHaveBeenCalled();
+        expect(showTranslationTabBusyModalspy).toHaveBeenCalled();
+      });
   });
 });
