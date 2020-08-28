@@ -19,7 +19,7 @@
 module.exports = {
   'ci': {
     'collect': {
-      'numberOfRuns': 1,
+      'numberOfRuns': 3,
       'puppeteerScript': 'puppeteer-login-script.js',
       'url': [
         'http://127.0.0.1:8181/signup?return_url=%2F',
@@ -86,141 +86,187 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/signup?return_url=%2F$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/admin$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/about$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/community-library$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/contact$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/contributor-dashboard$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/creator-dashboard$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/delete-account$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/donate$',
           'assertions': {
-            // The YouTube embed on donate page sometimes loads images in jpg
-            // format.
-            'uses-webp-images': ['error', {'minScore': 0.8}]
+            // The YouTube embed on donate page loads images in jpg format, thus
+            // we need to allow one image.
+            'uses-webp-images': [
+              'error', {'maxLength': 1, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/get-started$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/learner-dashboard$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/nonprofits$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/parents$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/partners$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/preferences$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/privacy-policy$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/profile/username1$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/teach$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/teachers$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/terms$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/thanks$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         },
         {
           'matchingUrlPattern': 'http://[^/]+/volunteers$',
           'assertions': {
-            'uses-webp-images': ['error', {'minScore': 1}]
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ]
           }
         }
       ]
