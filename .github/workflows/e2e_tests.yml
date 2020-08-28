@@ -27,12 +27,9 @@ jobs:
       - name: Set Environment Variable
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: echo "::set-env name=DISPLAY:::99.0"
-      - name: Run Accessibility E2E Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --suite="contributorDashboard"  --contributor_dashboard_enabled --prod_env
       - name: Run Exploration Statistics Tab E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationStatisticsTab" --prod_env
+        run: xvfb-run -a python -m scripts.run_e2e_tests --suite="explorationStatisticsTab" --prod_env
       - name: Run Exploration Translation Tab E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationTranslationTab" --prod_env
