@@ -127,8 +127,8 @@ angular.module('oppia').directive('stateGraphVisualization', [
               var dimensions = getElementDimensions();
 
               d3.select($element.find('rect.pannable-rect')[0])
-                .call(d3.zoom().scaleExtent([1, 1])
-                  .on('zoom', function() {
+                .call(
+                  d3.zoom().scaleExtent([1, 1]).on('zoom', function() {
                     if (graphBounds.right - graphBounds.left < dimensions.w) {
                       (d3.event).transform.x = 0;
                     } else {

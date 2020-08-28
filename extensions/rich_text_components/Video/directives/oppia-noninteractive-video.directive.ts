@@ -61,7 +61,8 @@ angular.module('oppia').directive('oppiaNoninteractiveVideo', [
               var rect = angular.element($element)[0].getBoundingClientRect();
               var clientHeight = $window.innerHeight;
               var clientWidth = $window.innerWidth;
-              var isVisible = ((rect.left + rect.right) / 2 < clientWidth &&
+              var isVisible = (
+                (rect.left + rect.right) / 2 < clientWidth &&
                 (rect.top + rect.bottom) / 2 < clientHeight) &&
                 (rect.left > 0 && rect.right > 0);
 

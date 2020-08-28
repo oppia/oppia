@@ -267,7 +267,8 @@ var logicProofTeacher2 = (function() {
     for (var i = 0; i < message.length; i++) {
       if (message[i].format === 'expression') {
         if (message[i].content.type === 'element') {
-          output += (message[i].content.hasOwnProperty('kind') ?
+          output += (
+            message[i].content.hasOwnProperty('kind') ?
             '{{' + displayExpressionTemplate(message[i].content, operators) +
               '|variable}}' :
             '{{' + displayExpressionTemplate(message[i].content, operators) +

@@ -64,8 +64,9 @@ export class UrlInterpolationService {
     if (!Constants.DEV_MODE) {
       if (hashes[resourcePath]) {
         let index = resourcePath.lastIndexOf('.');
-        return (resourcePath.slice(0, index) + '.' + hashes[resourcePath] +
-            resourcePath.slice(index));
+        return (
+          resourcePath.slice(0, index) + '.' + hashes[resourcePath] +
+          resourcePath.slice(index));
       }
     }
     return resourcePath;

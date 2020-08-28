@@ -324,7 +324,8 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
 
       ctrl.getUpperLimitValueForPagination = function() {
         return (
-          Math.min(((ctrl.pageNumber * ctrl.itemsPerPage) +
+          Math.min((
+            (ctrl.pageNumber * ctrl.itemsPerPage) +
             ctrl.itemsPerPage), ctrl.currentCount));
       };
 

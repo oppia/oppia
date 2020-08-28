@@ -99,7 +99,8 @@ angular.module('oppia').component('stateTranslation', {
       $scope.isVoiceoverModeActive = (
         TranslationTabActiveModeService.isVoiceoverModeActive);
       var isTranslatedTextRequired = function() {
-        return (TranslationTabActiveModeService.isVoiceoverModeActive() &&
+        return (
+          TranslationTabActiveModeService.isVoiceoverModeActive() &&
           TranslationLanguageService.getActiveLanguageCode() !== (
             ExplorationLanguageCodeService.displayed));
       };
@@ -416,8 +417,8 @@ angular.module('oppia').component('stateTranslation', {
               name, content: value
             });
           } else if (value instanceof Array) {
-            value.forEach((element, index) =>
-              traverseValueAndRetrieveSubtitledContent(
+            value.forEach(
+              (element, index) => traverseValueAndRetrieveSubtitledContent(
                 `${name} (${index})`,
                 element)
             );

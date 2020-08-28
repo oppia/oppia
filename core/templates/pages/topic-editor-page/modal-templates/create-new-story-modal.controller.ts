@@ -66,9 +66,10 @@ angular.module('oppia').controller('CreateNewStoryModalController', [
     };
 
     $scope.isValid = function() {
-      return Boolean($scope.story.isValid() &&
-          ImageLocalStorageService.getStoredImagesData().length > 0 &&
-          !$scope.storyUrlFragmentExists);
+      return Boolean(
+        $scope.story.isValid() &&
+        ImageLocalStorageService.getStoredImagesData().length > 0 &&
+        !$scope.storyUrlFragmentExists);
     };
   }
 ]);

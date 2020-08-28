@@ -96,7 +96,8 @@ angular.module('oppia').directive('progressNav', [
 
           var doesInteractionHaveNavSubmitButton = function() {
             try {
-              return (Boolean($scope.interactionId) &&
+              return (
+                Boolean($scope.interactionId) &&
                 INTERACTION_SPECS[$scope.interactionId].
                   show_generic_submit_button);
             } catch (e) {

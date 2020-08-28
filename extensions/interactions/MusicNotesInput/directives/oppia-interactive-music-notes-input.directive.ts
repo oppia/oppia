@@ -644,15 +644,16 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           var lastHorizontalPositionOffset = element.find(
             '.oppia-music-input-note-choices div:first-child').position().left;
           var leftOffset =
-            lastHorizontalPositionOffset - ((MAXIMUM_NOTES_POSSIBLE - 1) *
-                            scope.HORIZONTAL_GRID_SPACING);
+            lastHorizontalPositionOffset - (
+              (MAXIMUM_NOTES_POSSIBLE - 1) * scope.HORIZONTAL_GRID_SPACING);
           return leftOffset + (
             noteStartAsFloat * scope.HORIZONTAL_GRID_SPACING);
         };
 
         var isCloneOffStaff = function(helperClone) {
-          return (!(helperClone.position().top > scope.staffTop &&
-                  helperClone.position().top < scope.staffBottom));
+          return (!(
+            helperClone.position().top > scope.staffTop &&
+            helperClone.position().top < scope.staffBottom));
         };
 
         var isLedgerLineNote = function(lineValue) {
