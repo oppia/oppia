@@ -1675,18 +1675,51 @@ class SingleLineCommentChecker(checkers.BaseChecker):
 
     def _check_no_capital_letter_at_beginning(self, line, line_num):
         """Checks if the comment starts with a capital letter.
+        Comments may include a lowercase character at the beginning only if they
+        start with version info or a data type or a variable name e.g.
+        "# next_line is of string type." or "# v2 version does not have
+        ExplorationStats Model." or "# int. The file size, in bytes.".
 
         Args:
             line: str. The current line of comment.
             line_num: int. Line number of the current comment.
         """
+        allowed_comment_prefixes = ['int', 'str', 'float', 'bool', 'v']
+        # Check if variable name is used.
+        underscore_is_present = '_' in line.split()[1]
+
+        # Check if allowed prefix is used.
+        allowed_prefix_is_present = any(
+            line[2:].startswith(word) for word in allowed_comment_prefixes)
+
         # Check if comment contains any excluded phrase.
         excluded_phrase_is_present_at_beginning = any(
             word in line.split()[1] for word in EXCLUDED_PHRASES)
-        if (re.search(br'^# [a-z][A-Za-z]*.*$', line) and not
-                excluded_phrase_is_present_at_beginning):
+        if (re.search(br'^# [a-z][A-Za-z]*.*$', line) and not (
+                excluded_phrase_is_present_at_beginning or
+                underscore_is_present or allowed_prefix_is_present)):
             self.add_message(
                 'no-capital-letter-at-beginning', line=line_num)
+
+    def _check_punctuation(self, line, line_num):
+        """Checks if the comment starts with a correct punctuation.
+
+        Args:
+            line: str. The current line of comment.
+            line_num: int. Line number of the current comment.
+        """
+        excluded_phrase_is_present_at_end = any(
+            word in line for word in EXCLUDED_PHRASES)
+        # Comments must end with the proper punctuation.
+        last_char_is_invalid = line[-1] not in (
+            ALLOWED_TERMINATING_PUNCTUATIONS)
+
+        excluded_phrase_at_beginning_of_line = any(
+            line[1:].startswith(word) for word in EXCLUDED_PHRASES)
+        if (last_char_is_invalid and not (
+                excluded_phrase_is_present_at_end or
+                excluded_phrase_at_beginning_of_line)):
+            self.add_message('invalid-punctuation-used', line=line_num)
 
     def process_tokens(self, tokens):
         """Custom pylint checker to ensure that comments follow correct style.
@@ -1694,10 +1727,8 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         Args:
             tokens: Token. Object to access all tokens of a module.
         """
-        allowed_comment_prefixes = ['int', 'str', 'float', 'bool', 'v']
-        previous_line_num = 0
-        previous_line = ''
         space_at_beginning_of_comment = True
+        comments = []
 
         for (token_type, _, (line_num, _), _, line) in tokens:
             if token_type == tokenize.COMMENT:
@@ -1706,58 +1737,28 @@ class SingleLineCommentChecker(checkers.BaseChecker):
                 if not line.startswith('#'):
                     continue
 
-                # Comments must start with a space.
-                space_at_beginning_of_comment = (
-                    self._check_space_at_beginning_of_comment(line, line_num))
+                comments.append((line, line_num))
 
-                if line_num - previous_line_num > 1:
-                    prev_line_list = previous_line.split()
+        for i, (line, line_num) in enumerate(comments):
+            previous_line_num = -1
+            next_line_num = -1
 
-                    if len(previous_line) > 1:
-                        excluded_phrase_is_present_at_end = any(
-                            word in prev_line_list[-1] for word in
-                            EXCLUDED_PHRASES)
-                        excluded_phrase_at_beginning_of_prev_line = any(
-                            word in prev_line_list[1] for word in
-                            EXCLUDED_PHRASES)
+            # Comments must start with a space.
+            space_at_beginning_of_comment = (
+                self._check_space_at_beginning_of_comment(line, line_num))
 
-                        # Comments must end with the proper punctuation.
-                        last_char_is_invalid = previous_line[-1] not in (
-                            ALLOWED_TERMINATING_PUNCTUATIONS)
-                        if (last_char_is_invalid and not (
-                                excluded_phrase_is_present_at_end or
-                                excluded_phrase_at_beginning_of_prev_line)):
-                            self.add_message(
-                                'invalid-punctuation-used',
-                                line=previous_line_num)
+            if i > 0:
+                _, previous_line_num = comments[i - 1]
+            if i + 1 < len(comments):
+                _, next_line_num = comments[i + 1]
 
-                    # Comments may include a lowercase character at the
-                    # beginning only if they start with version info or a data
-                    # type or a variable name e.g. "# next_line is of string
-                    # type." or "# v2 version does not have ExplorationStats
-                    # Model." or "# int. The file size, in bytes.".
-                    if len(line) > 1 and space_at_beginning_of_comment:
+            if len(line) > 1 and space_at_beginning_of_comment:
 
-                        # Check if variable name is used.
-                        underscore_is_present = '_' in line.split()[1]
-                        if underscore_is_present:
-                            previous_line_num = line_num
-                            previous_line = line
-                            continue
-
-                        # Check if allowed prefix is used.
-                        allowed_prefix_is_present = any(
-                            line[2:].startswith(word) for word in (
-                                allowed_comment_prefixes))
-                        if allowed_prefix_is_present:
-                            previous_line_num = line_num
-                            previous_line = line
-                            continue
-
-                    # Comments must start with a capital letter.
+                if previous_line_num + 1 < line_num:
                     self._check_no_capital_letter_at_beginning(line, line_num)
-                previous_line_num = line_num
-                previous_line = line
+
+                if line_num + 1 < next_line_num:
+                    self._check_punctuation(line, line_num)
 
 
 class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
