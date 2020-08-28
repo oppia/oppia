@@ -613,7 +613,7 @@ def execute_deployment():
 
         python_utils.PRINT('Done!')
     finally:
-        common.run_cmd([
+        subprocess.check_output([
             'git', 'checkout', '--',
             update_configs.LOCAL_FECONF_PATH,
             update_configs.LOCAL_CONSTANTS_PATH,

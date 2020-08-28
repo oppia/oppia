@@ -98,6 +98,8 @@ class DeployTests(test_utils.GenericTestBase):
             self.print_arr.append(msg)
         def mock_check_release_doc():
             pass
+        def mock_add_redishost():
+            pass
 
         self.install_swap = self.swap(
             install_third_party_libs, 'main', mock_main)
@@ -133,6 +135,8 @@ class DeployTests(test_utils.GenericTestBase):
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
         self.release_doc_swap = self.swap(
             deploy, 'check_release_doc', mock_check_release_doc)
+        self.redishost_swap = self.swap(
+            update_configs, 'add_redishost', mock_add_redishost)
 
     def test_invalid_app_name(self):
         args_swap = self.swap(
@@ -288,7 +292,7 @@ class DeployTests(test_utils.GenericTestBase):
         third_party_swap = self.swap(deploy, 'THIRD_PARTY_DIR', 'INVALID_DIR')
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
-                with self.run_swap, self.args_swap:
+                with self.run_swap, self.args_swap, self.redishost_swap:
                     with third_party_swap, self.assertRaisesRegexp(
                         Exception,
                         'Could not find third_party directory at INVALID_DIR. '
@@ -304,7 +308,7 @@ class DeployTests(test_utils.GenericTestBase):
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with self.args_swap, self.exists_swap, self.check_output_swap:
                     with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
-                        with self.run_swap, getcwd_swap:
+                        with self.run_swap, self.redishost_swap, getcwd_swap:
                             with self.assertRaisesRegexp(
                                 Exception,
                                 'Invalid directory accessed '
@@ -377,7 +381,7 @@ class DeployTests(test_utils.GenericTestBase):
                 with self.args_swap, self.exists_swap, self.check_output_swap:
                     with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
                         with cwd_swap, preprocess_swap, update_swap, build_swap:
-                            with deploy_swap, switch_swap, self.run_swap:
+                            with deploy_swap, switch_swap, self.redishost_swap:
                                 with memcache_swap, check_breakage_swap:
                                     deploy.execute_deployment()
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -452,7 +456,7 @@ class DeployTests(test_utils.GenericTestBase):
                 with args_swap, self.exists_swap, self.check_output_swap:
                     with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
                         with cwd_swap, preprocess_swap, update_swap, build_swap:
-                            with deploy_swap, switch_swap, self.run_swap:
+                            with deploy_swap, switch_swap, self.redishost_swap:
                                 with memcache_swap, check_breakage_swap:
                                     deploy.execute_deployment()
         self.assertEqual(check_function_calls, expected_check_function_calls)
