@@ -161,7 +161,8 @@ export class AppConstants {
     TOPIC: 'topic',
     SKILL: 'skill',
     STORY: 'story',
-    QUESTION: 'question'
+    QUESTION: 'question',
+    SUGGESTION: 'suggestion'
   };
 
   public static IMAGE_SAVE_DESTINATION_SERVER = 'imageSaveDestinationServer';
