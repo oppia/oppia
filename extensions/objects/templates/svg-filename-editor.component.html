@@ -2,9 +2,10 @@
   <div ng-if="!$ctrl.isDiagramSaved()" class="diagram-editor-size-toolbar">
     <div class="input-box">Width: <input type="number" ng-model="$ctrl.diagramWidth" ng-blur="$ctrl.onWidthInputBlur()"></div>
     <div class="input-box">Height: <input type="number" ng-model="$ctrl.diagramHeight" ng-blur="$ctrl.onHeightInputBlur()"></div>
-    <i class="material-icons" title="<[$ctrl.getDiagramSizeInfo()]>">
-      &#xE887;
-    </i>
+    <div class="dimension-note">
+      This diagram has a maximum dimension of 490 X 550 px to ensure that it fits in the card and note that the change will
+      be reflected after SVG is created.
+    </div>
   </div>
   <div class="svg-editor" ng-if="!$ctrl.isDiagramSaved()">
     <div class="fabric-canvas" ng-attr-id="<[$ctrl.canvasContainerId]>">
@@ -38,6 +39,9 @@
     </div>
     <div ng-if="$ctrl.isDrawModePieChart()" class="fabric-canvas custom-tool-form">
       <div class="container">
+        <div class="piechart-note">
+          Note: The pie chart can't be edited once created.
+        </div>
         <div class="row">
           <div class="col-md-5 col-sm-5 col-4">
             Name:
@@ -216,6 +220,9 @@
       </div>
       <div class="input-tag" ng-if="$ctrl.objectIsSelected">
         Layer number:{{ $ctrl.layerNum }}
+        <i class="material-icons layerInfo" tooltip-placement="bottom" uib-tooltip="This denotes the layer in which the shape is present. Layer 1 is the bottom layer.">
+          &#xE887;
+        </i>
       </div>
     </div>
   </div>
@@ -238,6 +245,9 @@
   svg-filename-editor .diagram-editor-size-toolbar .input-box {
     display: inline-block;
   }
+  svg-filename-editor .diagram-editor-size-toolbar .dimension-note {
+    font-size: 15px;
+  }
 
   svg-filename-editor .diagram-editor-saved-image-container {
     position: relative;
@@ -254,7 +264,7 @@
 
   svg-filename-editor .svg-editor {
     background-color: #ffffff;
-    min-height: 430px;
+    min-height: 450px;
     position: relative;
   }
 
@@ -284,6 +294,10 @@
     background-color: #ffffff;
     bottom: 0px;
     overflow: auto;
+  }
+
+  .svg-editor .fabric-canvas .piechart-note {
+    font-size: 13px;
   }
 
   .svg-editor .fabric-canvas .upload-warning {
@@ -342,15 +356,24 @@
   }
 
   svg-filename-editor .svg-editor .horizontal-toolbar .info-tag {
-    font-size: 13px;
     padding-left: 3px;
     padding-top: 5px;
+  }
+
+  @media only screen and (min-width: 400px) {
+    .svg-editor .horizontal-toolbar .info-tag {
+      font-size: 13px;
+    }
   }
 
   @media only screen and (max-width: 400px) {
     .svg-editor .horizontal-toolbar .info-tag {
       font-size: 3vw;
     }
+  }
+
+  svg-filename-editor .svg-editor .horizontal-toolbar .layerInfo {
+    font-size: 19px;
   }
 
   svg-filename-editor .svg-editor .vertical-toolbar {

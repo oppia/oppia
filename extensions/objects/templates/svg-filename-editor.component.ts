@@ -51,8 +51,10 @@ angular.module('oppia').component('svgFilenameEditor', {
       // testing and reference from OUTPUT_IMAGE_MAX_WIDTH_PX in
       // filepath-editor file so that the created diagram fits the card
       // content.
-      var MAX_DIAGRAM_WIDTH = 491;
-      var MAX_DIAGRAM_HEIGHT = 551;
+      var MAX_DIAGRAM_WIDTH = 490;
+      var MAX_DIAGRAM_HEIGHT = 550;
+      var MIN_DIAGRAM_WIDTH = 30;
+      var MIN_DIAGRAM_HEIGHT = 30;
       const STATUS_EDITING = 'editing';
       const STATUS_SAVED = 'saved';
       const DRAW_MODE_POLY = 'polygon';
@@ -82,20 +84,20 @@ angular.module('oppia').component('svgFilenameEditor', {
         '1px', '2px', '3px', '5px', '9px', '10px', '12px',
         '14px', '18px', '24px', '30px', '36px'];
       ctrl.fontFamily = [
-        'arial',
-        'helvetica',
-        'myriad pro',
-        'delicious',
-        'verdana',
-        'georgia',
-        'courier',
-        'comic sans ms',
-        'impact',
-        'monaco',
-        'optima',
-        'hoefler text',
-        'plaster',
-        'engagement'
+        'Arial',
+        'Helvetica',
+        'Myriad Pro',
+        'Delicious',
+        'Verdana',
+        'Georgia',
+        'Courier',
+        'Comic Sans MS',
+        'Impact',
+        'Monaco',
+        'Optima',
+        'Hoefler Text',
+        'Plaster',
+        'Engagement'
       ];
       // Dynamically assign a unique id to each lc editor to avoid clashes
       // when there are multiple RTEs in the same page.
@@ -104,6 +106,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.canvasElement = null;
       ctrl.fillPicker = null;
       ctrl.strokePicker = null;
+      ctrl.bgPicker = null;
       ctrl.diagramWidth = 450;
       ctrl.currentDiagramWidth = 450;
       ctrl.diagramHeight = 350;
@@ -127,7 +130,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         stroke: 'rgba(0, 0, 0, 1)',
         fill: 'rgba(0, 0, 0, 0)',
         bg: 'rgba(0, 0, 0, 0)',
-        fontFamily: 'helvetica',
+        fontFamily: 'Helvetica',
         size: '3px',
         bold: false,
         italic: false
@@ -152,29 +155,21 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.loadType = 'group';
 
       ctrl.onWidthInputBlur = function() {
-        if (ctrl.diagramWidth < MAX_DIAGRAM_WIDTH) {
-          ctrl.currentDiagramWidth = ctrl.diagramWidth;
-        } else {
+        if (ctrl.diagramWidth > MAX_DIAGRAM_WIDTH) {
           ctrl.diagramWidth = MAX_DIAGRAM_WIDTH;
-          ctrl.currentDiagramWidth = ctrl.diagramWidth;
+        } else if (ctrl.diagramWidth < MIN_DIAGRAM_WIDTH) {
+          ctrl.diagramWidth = MIN_DIAGRAM_WIDTH;
         }
+        ctrl.currentDiagramWidth = ctrl.diagramWidth;
       };
 
       ctrl.onHeightInputBlur = function() {
-        if (ctrl.diagramHeight < MAX_DIAGRAM_HEIGHT) {
-          ctrl.currentDiagramHeight = ctrl.diagramHeight;
-        } else {
+        if (ctrl.diagramHeight > MAX_DIAGRAM_HEIGHT) {
           ctrl.diagramHeight = MAX_DIAGRAM_HEIGHT;
-          ctrl.currentDiagramHeight = ctrl.diagramHeight;
+        } else if (ctrl.diagramHeight < MIN_DIAGRAM_HEIGHT) {
+          ctrl.diagramHeight = MIN_DIAGRAM_HEIGHT;
         }
-      };
-
-      ctrl.getDiagramSizeInfo = function() {
-        var maxWidth = MAX_DIAGRAM_WIDTH;
-        var maxHeight = MAX_DIAGRAM_HEIGHT;
-        return (
-          'This diagram has a maximum dimension of ' + maxWidth +
-          'px X ' + maxHeight + 'px to ensure that it fits in the card.');
+        ctrl.currentDiagramHeight = ctrl.diagramHeight;
       };
 
       ctrl.isDiagramCreated = function() {
@@ -438,6 +433,10 @@ angular.module('oppia').component('svgFilenameEditor', {
                       elements[index].width.baseVal.valueAsString === '100%' &&
                       elements[index].height.baseVal.valueAsString === '100%') {
                       ctrl.canvas.setBackgroundColor(obj.get('fill'));
+                      ctrl.fabricjsOptions.bg = obj.get('fill');
+                      ctrl.bgPicker.setOptions({
+                        color: obj.get('fill')
+                      });
                     } else {
                       ctrl.canvas.add(obj);
                     }
@@ -1108,6 +1107,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         ctrl.canvasObjects = [];
         if (ctrl.canvas) {
           ctrl.canvas.clear();
+          ctrl.onBgChange();
         }
       };
 
@@ -1231,6 +1231,7 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       var createColorPicker = function(value) {
         var parent = document.getElementById(value + '-color');
+
         var onChangeFunc = {
           stroke: ctrl.onStrokeChange,
           fill: ctrl.onFillChange,
@@ -1244,6 +1245,16 @@ angular.module('oppia').component('svgFilenameEditor', {
         if (value === 'fill') {
           ctrl.fillPicker = picker;
         }
+        if (value === 'bg') {
+          ctrl.bgPicker = picker;
+        }
+        picker.onOpen = function() {
+          var alphaSliders = document.querySelectorAll(
+            '.picker_alpha .picker_selector');
+          alphaSliders.forEach(function(element) {
+            element.setAttribute('title', 'Transparency Slider');
+          });
+        };
         picker.onChange = function(color) {
           parent.style.background = color.rgbaString;
           var topAlphaSquare = document.getElementById(
@@ -1256,8 +1267,9 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.fabricjsOptions[value] = color.rgbaString;
           onChangeFunc[value]();
         };
+        picker.onOpen();
         picker.setOptions({
-          color: ctrl.fabricjsOptions[value]
+          color: ctrl.fabricjsOptions[value],
         });
       };
 

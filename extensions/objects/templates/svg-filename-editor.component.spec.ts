@@ -29,9 +29,15 @@ var initializeMockDocument = function(svgFilenameCtrl) {
     topAlphaDiv.setAttribute('id', 'top-' + colors[i] + '-alpha');
     var bottomAlphaDiv = document.createElement('div');
     bottomAlphaDiv.setAttribute('id', 'bottom-' + colors[i] + '-alpha');
+    var pickerAlpha = document.createElement('div');
+    pickerAlpha.setAttribute('class', 'picker_alpha');
+    var pickerSlider = document.createElement('div');
+    pickerSlider.setAttribute('class', 'picker_selector');
+    pickerAlpha.append(pickerSlider);
     colorDiv.appendChild(topAlphaDiv);
     colorDiv.appendChild(bottomAlphaDiv);
     mockDocument.appendChild(colorDiv);
+    mockDocument.appendChild(pickerAlpha);
   }
   var mockCanvas = document.createElement('canvas');
   mockDocument.setAttribute('id', svgFilenameCtrl.canvasContainerId);
@@ -222,13 +228,16 @@ describe('SvgFilenameEditor', function() {
     };
     svgFilenameCtrl.fillPicker = mockPicker;
     svgFilenameCtrl.strokePicker = mockPicker;
+    svgFilenameCtrl.bgPicker = mockPicker;
   }));
 
   it('should update diagram size', function() {
     var WIDTH = 100;
     var HEIGHT = 100;
-    var MAX_DIAGRAM_WIDTH = 491;
-    var MAX_DIAGRAM_HEIGHT = 551;
+    var MAX_DIAGRAM_WIDTH = 490;
+    var MAX_DIAGRAM_HEIGHT = 550;
+    var MIN_DIAGRAM_WIDTH = 30;
+    var MIN_DIAGRAM_HEIGHT = 30;
     svgFilenameCtrl.diagramWidth = WIDTH;
     svgFilenameCtrl.diagramHeight = HEIGHT;
     svgFilenameCtrl.onWidthInputBlur();
@@ -241,16 +250,12 @@ describe('SvgFilenameEditor', function() {
     expect(svgFilenameCtrl.currentDiagramWidth).toBe(MAX_DIAGRAM_WIDTH);
     svgFilenameCtrl.onHeightInputBlur();
     expect(svgFilenameCtrl.currentDiagramHeight).toBe(MAX_DIAGRAM_HEIGHT);
-  });
-
-  it('should return information on diagram size', function() {
-    var maxDiagramWidth = 491;
-    var maxDiagramHeight = 551;
-    var helpText = (
-      'This diagram has a maximum dimension of ' +
-      maxDiagramWidth + 'px X ' + maxDiagramHeight +
-      'px to ensure that it fits in the card.');
-    expect(svgFilenameCtrl.getDiagramSizeInfo()).toBe(helpText);
+    svgFilenameCtrl.diagramWidth = 0;
+    svgFilenameCtrl.diagramHeight = 0;
+    svgFilenameCtrl.onWidthInputBlur();
+    expect(svgFilenameCtrl.currentDiagramWidth).toBe(MIN_DIAGRAM_WIDTH);
+    svgFilenameCtrl.onHeightInputBlur();
+    expect(svgFilenameCtrl.currentDiagramHeight).toBe(MIN_DIAGRAM_HEIGHT);
   });
 
   it('should check if diagram is created', function() {
