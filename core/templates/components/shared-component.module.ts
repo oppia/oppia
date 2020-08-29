@@ -37,8 +37,8 @@ import { SkillMasteryViewerComponent } from
   './skill-mastery/skill-mastery.component';
 import { ExplorationEmbedButtonModalComponent } from
   './button-directives/exploration-embed-button-modal.component';
-import { KeyboardShortcutHelpModalComponent } from 
- 'components/keyboard-shortcut-help/keyboard-shortcut-help.component.ts';
+import { KeyboardShortcutHelpModalComponent } from
+  'components/keyboard-shortcut-help/keyboard-shortcut-help.component.ts';
 import { SharingLinksComponent } from
   './common-layout-directives/common-elements/sharing-links.component';
 import { StorySummaryTileDirective } from
