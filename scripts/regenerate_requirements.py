@@ -18,10 +18,8 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from scripts import common
-import collections
 import os
 import sys
-import python_utils
 import re
 
 
@@ -29,11 +27,11 @@ sys.path.insert(0, os.path.join(
     common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION))
 
 def main():
-    from piptools.scripts.compile import cli
+    from piptools.scripts import compile
 
     sys.argv[0] = re.sub(
         r'(-script\.pyw|\.exe)?$', '',
         common.PRE_COMPILED_REQUIREMENTS_FILE_PATH)
-    cli()
+    compile.cli() # pylint: disable=no-value-for-parameter
 
 main()

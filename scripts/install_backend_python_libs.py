@@ -17,17 +17,19 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from scripts import common
 import collections
 import os
+from pip._internal.utils.misc import get_installed_distributions
+from pkg_resources import parse_version
+import shutil
 import subprocess
 import sys
-import python_utils
-import re
-import shutil
 
-from pkg_resources import parse_version
-from pip._internal.utils.misc import get_installed_distributions
+
+import python_utils
+from scripts import common
+
+
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 THIRD_PARTY_STATIC_DIR = os.path.join(THIRD_PARTY_DIR, 'static')
 
@@ -172,7 +174,7 @@ def _rectify_third_party_directory(mismatches):
 def main():
     sys.path.insert(0, os.path.join(
         common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION))
-    python_utils.PRINT("Regenerating 'requirements.txt' file...")
+    python_utils.PRINT('Regenerating 'requirements.txt' file...')
     subprocess.check_call(
         ['python', '-m', 'scripts.regenerate_requirements'],
         stdin=subprocess.PIPE,
