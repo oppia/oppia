@@ -2390,7 +2390,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
             msg_id='no-space-at-beginning',
             line=1)
 
-        with self.checker_test_object.assertAddsMessages(message):
+        with self.checker_test_object.assertAddsMessages(message, message):
             temp_file.close()
 
     def test_no_capital_letter_at_beginning(self):
@@ -2602,6 +2602,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
+
                     \"\"\" this file does something \"\"\"
 
 

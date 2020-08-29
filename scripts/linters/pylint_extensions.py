@@ -1727,38 +1727,39 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         Args:
             tokens: Token. Object to access all tokens of a module.
         """
-        space_at_beginning_of_comment = True
+        prev_line_num = -1
         comments = []
+        comments_index = -1
 
         for (token_type, _, (line_num, _), _, line) in tokens:
             if token_type == tokenize.COMMENT:
                 line = line.strip()
 
-                if not line.startswith('#'):
-                    continue
+                if line.startswith('#'):
+                    if prev_line_num + 1 == line_num:
+                        comments[comments_index].append((line_num, line))
+                    else:
+                        comments.append([(line_num, line)])
+                        comments_index += 1
+                    prev_line_num = line_num
 
-                comments.append((line, line_num))
-
-        for i, (line, line_num) in enumerate(comments):
-            previous_line_num = -1
-            next_line_num = -1
-
-            # Comments must start with a space.
-            space_at_beginning_of_comment = (
-                self._check_space_at_beginning_of_comment(line, line_num))
-
-            if i > 0:
-                _, previous_line_num = comments[i - 1]
-            if i + 1 < len(comments):
-                _, next_line_num = comments[i + 1]
-
-            if len(line) > 1 and space_at_beginning_of_comment:
-
-                if previous_line_num + 1 < line_num:
-                    self._check_no_capital_letter_at_beginning(line, line_num)
-
-                if line_num + 1 < next_line_num:
-                    self._check_punctuation(line, line_num)
+        for comment in comments:
+            space_at_beginning_of_first_comment = True
+            space_at_beginning_of_last_comment = True
+            first_comment_line_num, first_comment = comment[0]
+            last_comment_line_num, last_comment = comment[-1]
+            space_at_beginning_of_first_comment = (
+                self._check_space_at_beginning_of_comment(
+                    first_comment, first_comment_line_num))
+            space_at_beginning_of_last_comment = (
+                self._check_space_at_beginning_of_comment(
+                    last_comment, last_comment_line_num))
+            if space_at_beginning_of_first_comment:
+                self._check_no_capital_letter_at_beginning(
+                    first_comment, first_comment_line_num)
+            if space_at_beginning_of_last_comment:
+                self._check_punctuation(
+                    last_comment, last_comment_line_num)
 
 
 class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
