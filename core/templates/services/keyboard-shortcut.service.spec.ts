@@ -17,7 +17,6 @@
  */
 import 'mousetrap';
 
-import { TestBed } from '@angular/core/testing';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -57,7 +56,8 @@ describe('Keyboard Shortcuts', () => {
     document.body.append(searchBar);
     document.body.append(categoryBar);
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue(mockWindow);
-    openQuickReferenceSpy = spyOn(keyboardShortcutService, 'openQuickReference');
+    openQuickReferenceSpy = spyOn(
+      keyboardShortcutService, 'openQuickReference');
   });
 
 
@@ -116,7 +116,7 @@ describe('Keyboard Shortcuts', () => {
 
     Mousetrap.trigger('c');
     expect(categoryBar.isEqualNode(document.activeElement));
-    
+
     Mousetrap.trigger('?');
     expect(openQuickReferenceSpy).toHaveBeenCalled();
 
@@ -134,7 +134,7 @@ describe('Keyboard Shortcuts', () => {
     document.body.append(nextButton);
     Mousetrap.trigger('j');
     expect(nextButton.isEqualNode(document.activeElement));
-    
+
     Mousetrap.trigger('?');
     expect(openQuickReferenceSpy).toHaveBeenCalled();
   });

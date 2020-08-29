@@ -32,12 +32,11 @@ export class KeyboardShortcutService {
   constructor(
     private windowRef: WindowRef,
     private ngbModal: NgbModal) {}
-  
+
   openQuickReference(): void {
     this.ngbModal.dismissAll();
     this.ngbModal.open(
       KeyboardShortcutHelpModalComponent, {backdrop: true});
-    
   }
 
   bindExplorationPlayerShortcuts(): void {
