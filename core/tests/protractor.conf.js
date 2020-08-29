@@ -259,6 +259,8 @@ exports.config = {
         '--use-fake-ui-for-media-stream',
         '--use-file-for-fake-audio-capture=data/cafe.mp3',
       ],
+      // Adding this in order to make Chrome download to a fixed directory.
+      // This allows us to check if files are downloaded.
       prefs: {
         'download': {
             'prompt_for_download': false,
