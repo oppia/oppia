@@ -248,7 +248,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'regexp': re.compile(r'\$broadcast'),
         'message': (
             'Please do not use $broadcast/$on for propagating events. '
-            'Use EventEmitters and Subscriptions instead.'),
+            'Use @Input/@Output instead.'),
         'excluded_files': (
             'core/templates/pages/exploration-editor-page/translation-tab/'
             'audio-translation-bar/audio-translation-bar.directive.spec.ts',
