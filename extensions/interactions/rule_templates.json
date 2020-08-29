@@ -276,5 +276,16 @@
     "FuzzyEquals": {
       "description": "is equal to {{x|NormalizedString}}, misspelled by at most one character"
     }
+  },
+  "RatioExpressionInput": {
+    "Equals": {
+      "description": "is equal to {{x|RatioExpression}}"
+    },
+    "IsEquivalent": {
+      "description": "is equivalent to {{x|RatioExpression}}"
+    },
+    "HasNumberOfTermsEqualTo": {
+      "description": "has number of terms equal to {{y|NonnegativeInt}}"
+    }
   }
 }

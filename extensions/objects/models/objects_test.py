@@ -762,6 +762,21 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.AlgebraicIdentifier, mappings,
             invalid_values_with_error_messages)
 
+    def test_ratio_validation(self):
+        """Tests objects of type RatioExpression."""
+
+        mappings = [([1, 2], [1, 2]), ([1, 2, 3], [1, 2, 3])]
+
+        invalid_values_with_error_messages = [
+            (None, 'Expected list, received None'),
+            (2, 'Expected list, received 2'),
+            ({'a': 1}, r'Expected list, received \{u\'a\': 1\}'),
+            ('1: 2: 1', r'Expected list, received 1: 2: 1')]
+
+        self.check_normalization(
+            objects.RatioExpression, mappings,
+            invalid_values_with_error_messages)
+
     def test_set_of_algebraic_identifier_validation(self):
         """Tests objects of type SetOfAlgebraicIdentifier."""
 
@@ -800,7 +815,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEqual(count, 48)
+        self.assertEqual(count, 49)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):

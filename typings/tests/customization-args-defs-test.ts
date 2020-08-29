@@ -54,6 +54,8 @@ import {
   NumericInputCustomizationArgsBackendDict,
   PencilCodeEditorCustomizationArgs,
   PencilCodeEditorCustomizationArgsBackendDict,
+  RatioExpressionInputCustomizationArgs,
+  RatioExpressionInputCustomizationArgsBackendDict,
   SetInputCustomizationArgs,
   SetInputCustomizationArgsBackendDict,
   TextInputCustomizationArgs,
@@ -227,6 +229,14 @@ type TestPencilCodeEditorCustomizationArgsInterfacesMatch = AssertTrue<
     PencilCodeEditorCustomizationArgsBackendDict,
     {},
     PencilCodeEditorCustomizationArgs
+  >
+>;
+
+type TestRatioExpressionInputCustomizationArgsInterfacesMatch = AssertTrue<
+  IsExactAfterReplacement<
+    RatioExpressionInputCustomizationArgsBackendDict,
+    {placeholder: {value: SubtitledUnicode}},
+    RatioExpressionInputCustomizationArgs
   >
 >;
 
