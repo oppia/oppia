@@ -1923,7 +1923,7 @@ class SingleSpaceAfterIfElifWhileChecker(checkers.BaseChecker):
     a bracket is used.
     """
 
-    __implements__ = interfaces.IRawChecker
+    __implements__ = interfaces.IAstroidChecker
 
     name = 'single-space-after-if-elif-while'
     priority = -1
@@ -1940,23 +1940,52 @@ class SingleSpaceAfterIfElifWhileChecker(checkers.BaseChecker):
         ),
     }
 
-    def process_module(self, node):
-        """Process a module.
+    def visit_if_elif(self, node):
+        """Visit every `if`, and `elif` statement to make sure they are
+        followed by a single space.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
+            node: astroid.nodes.If. Node to access `If` content.
         """
-        file_content = read_from_node(node)
-        for (line_num, line) in enumerate(file_content):
-            line = line.strip()
-            regexes = [br'^if\s*\(', br'^elif\s*\(', br'^while\s*\(']
-            if any([re.search(regex, line) for regex in regexes]):
+
+        # Check the `if` statement only if it has a parenthesis.
+        line_number = node.fromlineno
+        line = linecache.getline(node.root().file, line_number).strip()
+        if re.search(br'^if\s*\(', line):
+            parenthesis_index = line.find('(')
+            first_space_index = line.find(' ')
+            # There should be exactly one space between these indices.
+            if parenthesis_index - first_space_index != 1:
+                self.add_message(
+                    'single-space-after-if-elif-while', line=line_number)
+
+        # Check each `elif` that has a parenthesis.
+        for line_number in python_utils.RANGE(line_number, node.tolineno + 1):
+            line = linecache.getline(node.root().file, line_number).strip()
+            if re.search(br'^elif\s*\(', line):
                 parenthesis_index = line.find('(')
-                first_space_index = line.find(' ', 0, parenthesis_index)
+                first_space_index = line.find(' ')
                 # There should be exactly one space between these indices.
                 if parenthesis_index - first_space_index != 1:
                     self.add_message(
-                        'single-space-after-if-elif-while', line=line_num + 1)
+                        'single-space-after-if-elif-while', line=line_number)
+
+    def visit_while(self, node):
+        """Visit every `while` statement to make sure they are followed
+        by a single space.
+
+        Args:
+            node: astroid.nodes.While. Node to access `While` content.
+        """
+        line_number = node.fromlineno
+        line = linecache.getline(node.root().file, line_number).lstrip()
+        if re.search(br'^while\s*\(', line):
+            parenthesis_index = line.find('(')
+            first_space_index = line.find(' ')
+            # There should be exactly one space between these indices.
+            if parenthesis_index - first_space_index != 1:
+                self.add_message(
+                    'single-space-after-if-elif-while', node=node)
 
 
 def register(linter):
