@@ -483,6 +483,19 @@ def main(args=None):
                     'Push aborted due to failing e2e test configuration check.')
                 sys.exit(1)
 
+    # Check the state of the 'third_party/python_libs' folder and compare it to
+    # the required libraries specified in 'requirements.txt'.
+    # Presents options to the developer if there are inconsistencies found.
+    mismatches = install_backend_python_libs.get_mismatches()
+    if mismatches:
+        python_utils.PRINT(
+            '{:<15} |{:<25}|{:<25}'.format(
+                'Library','Requirements Version',
+                'Currently Installed Version'))
+        for library, versions in mismatches.items():
+            python_utils.PRINT('{:<15}|{:<25}|{:<25}'.format(
+                library, versions[0], versions[1]))
+
     return
 
 
