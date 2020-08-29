@@ -164,8 +164,8 @@ angular.module('oppia').component('historyTab', {
 
         ctrl.explorationVersionMetadata = (
           ctrl.totalExplorationVersionMetadata.filter((metadata) => {
-            return (metadata &&
-              metadata.committerId.trim().toLowerCase().includes(
+            return (
+              metadata && metadata.committerId.trim().toLowerCase().includes(
                 ctrl.username.trim().toLowerCase()));
           }));
         ctrl.versionNumbersToDisplay = ctrl.explorationVersionMetadata.length;
