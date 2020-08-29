@@ -56,6 +56,8 @@ import {
   NumericExpressionInputCustomizationArgs,
   NumericInputCustomizationArgs,
   PencilCodeEditorCustomizationArgs,
+  RatioExpressionInputCustomizationArgs,
+  RatioExpressionInputCustomizationArgsBackendDict,
   SetInputCustomizationArgs,
   SetInputCustomizationArgsBackendDict,
   TextInputCustomizationArgs,
@@ -341,6 +343,19 @@ export class InteractionObjectFactory {
     };
   }
 
+  _createFromRatioExpressionInputCustomizationArgsBackendDict(
+      caBackendDict: RatioExpressionInputCustomizationArgsBackendDict
+  ): RatioExpressionInputCustomizationArgs {
+    const { numberOfTerms, placeholder } = caBackendDict;
+    return {
+      numberOfTerms,
+      placeholder: {
+        value: this.subtitledUnicodeFactory.createFromBackendDict(
+          placeholder.value)
+      }
+    };
+  }
+
   convertFromCustomizationArgsBackendDict(
       interactionId: string,
       caBackendDict: InteractionCustomizationArgsBackendDict
@@ -393,6 +408,9 @@ export class InteractionObjectFactory {
         return <NumericInputCustomizationArgs> cloneDeep(caBackendDict);
       case 'PencilCodeEditor':
         return <PencilCodeEditorCustomizationArgs> cloneDeep(caBackendDict);
+      case 'RatioExpressionInput':
+        return this._createFromRatioExpressionInputCustomizationArgsBackendDict(
+          <RatioExpressionInputCustomizationArgsBackendDict> caBackendDict);
       case 'SetInput':
         return this._createFromSetInputCustomizationArgsBackendDict(
           <SetInputCustomizationArgsBackendDict> caBackendDict);
