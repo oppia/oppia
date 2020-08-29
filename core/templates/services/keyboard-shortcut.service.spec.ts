@@ -18,6 +18,7 @@
 import 'mousetrap';
 
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Keyboard Shortcuts', () => {
@@ -27,7 +28,7 @@ describe('Keyboard Shortcuts', () => {
   var backButton = document.createElement('button');
   var searchBar = document.createElement('input');
   var categoryBar = document.createElement('select');
-  var ngbModal;
+  var ngbModal: NgbModal;
 
 
   var mockWindow = {
