@@ -54,11 +54,6 @@ describe('Admin Page', function() {
     await adminPage.getUsersAsssignedToRole('collection editor');
     await adminPage.expectUsernamesToMatch(['collectionEditor1']);
 
-    await adminPage.get();
-    await adminPage.addReviewer('newQuestionReviewer', 'question');
-    await adminPage.showReviewersAssignedToRole('question');
-    await adminPage.expectReviewerUsernamesStrToMatch(
-      'Usernames: ["newQuestionReviewer"]');
     await users.logout();
   });
 

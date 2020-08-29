@@ -242,6 +242,10 @@ jobs:
           name: Run e2e file upload extensions test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions"
+      - run:
+          name: Run e2e contributor dashboard test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --contributor_dashboard_enabled
 
   e2e_non_prod_new_structure_tests:
     <<: *job_defaults

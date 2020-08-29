@@ -23,24 +23,25 @@
       </div>
       <div class="oppia-contributor-username-container" data-tab-name="username">
         <lazy-loading ng-show="$ctrl.userInfoIsLoading"></lazy-loading>
-        <span ng-show="!$ctrl.userInfoIsLoading && $ctrl.userIsLoggedIn"><[$ctrl.username]></span>
-        <span ng-show="!$ctrl.userInfoIsLoading && !$ctrl.userIsLoggedIn">Guest</span>
+        <span class="protractor-test-username" ng-show="!$ctrl.userInfoIsLoading">
+          <[$ctrl.userIsLoggedIn ? $ctrl.username : 'Guest']>
+        </span>
       </div>
-      <div class="oppia-review-right-details-container" ng-if="$ctrl.userIsReviewer">
+      <div class="oppia-review-right-details-container protractor-test-review-rights" ng-if="$ctrl.userIsReviewer">
         <strong>Review rights:</strong>
         <div ng-if="$ctrl.userCanReviewTranslationSuggestionsInLanguages.length > 0">
           Translations in languages:
-          <span ng-repeat="languageCode in $ctrl.userCanReviewTranslationSuggestionsInLanguages">
-            <span class="oppia-review-item-detail-container"><[languageCode]></span>
+          <span ng-repeat="languageDescription in $ctrl.userCanReviewTranslationSuggestionsInLanguages">
+            <span class="oppia-review-item-detail-container protractor-test-translation-<[languageDescription]>-reviewer"><[languageDescription]></span>
           </span>
         </div>
         <div ng-if="$ctrl.userCanReviewVoiceoverSuggestionsInLanguages.length > 0">
           Voiceovers in languages:
-          <span ng-repeat="languageCode in $ctrl.userCanReviewVoiceoverSuggestionsInLanguages">
-            <span class="oppia-review-item-detail-container"><[languageCode]></span>
+          <span ng-repeat="languageDescription in $ctrl.userCanReviewVoiceoverSuggestionsInLanguages">
+            <span class="oppia-review-item-detail-container protractor-test-voiceover-<[languageDescription]>-reviewer"><[languageDescription]></span>
           </span>
         </div>
-        <div ng-if="$ctrl.userCanReviewQuestions">
+        <div ng-if="$ctrl.userCanReviewQuestions" class="protractor-test-question-reviewer">
           Questions
         </div>
       </div>
