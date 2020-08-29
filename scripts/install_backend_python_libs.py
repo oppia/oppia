@@ -174,7 +174,7 @@ def _rectify_third_party_directory(mismatches):
 def main():
     sys.path.insert(0, os.path.join(
         common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION))
-    python_utils.PRINT('Regenerating 'requirements.txt' file...')
+    python_utils.PRINT('Regenerating "requirements.txt" file...')
     subprocess.check_call(
         ['python', '-m', 'scripts.regenerate_requirements'],
         stdin=subprocess.PIPE,
