@@ -32,7 +32,7 @@ export class KeyboardShortcutHelpModalComponent implements OnInit {
     private urlService: UrlService,
     private contextService: ContextService) {}
 
-    KEYBOARD_SHORTCUTS = {};
+  KEYBOARD_SHORTCUTS = {};
 
   ngOnInit(): void {
     if (this.urlService.getPathname() === '/community-library') {
