@@ -474,7 +474,7 @@ describe('Exploration history', function() {
     }];
     await explorationEditorPage.navigateToHistoryTab();
     var historyGraph = explorationEditorHistoryTab.getHistoryGraph();
-    await historyGraph.selectTwoVersions(1, 2);
+    await historyGraph.selectTwoVersions('1', '2');
     await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     await historyGraph.expectNumberOfLinksToMatch(2, 2, 0);
     await historyGraph.openStateHistory('first (was: Introd...');
@@ -488,8 +488,8 @@ describe('Exploration history', function() {
 
     // Reset all checkboxes.
     // Switching the 2 compared versions should give the same result.
-    await historyGraph.deselectTwoVersions(1, 2);
-    await historyGraph.selectTwoVersions(2, 1);
+    await historyGraph.deselectVersion();
+    await historyGraph.selectTwoVersions('2', '1');
     await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     await historyGraph.expectNumberOfLinksToMatch(2, 2, 0);
 
@@ -513,7 +513,8 @@ describe('Exploration history', function() {
     }];
     await explorationEditorPage.navigateToHistoryTab();
     historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
-    await historyGraph.selectTwoVersions(2, 3);
+    await historyGraph.deselectVersion();
+    await historyGraph.selectTwoVersions('2', '3');
     await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     await historyGraph.expectNumberOfLinksToMatch(3, 1, 2);
 
@@ -535,7 +536,7 @@ describe('Exploration history', function() {
     }];
     await explorationEditorPage.navigateToHistoryTab();
     historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
-    await historyGraph.selectTwoVersions(3, 4);
+    await historyGraph.selectTwoVersions('3', '4');
     await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     await historyGraph.expectNumberOfLinksToMatch(1, 0, 0);
 
@@ -566,7 +567,8 @@ describe('Exploration history', function() {
     }];
     await explorationEditorPage.navigateToHistoryTab();
     historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
-    await historyGraph.selectTwoVersions(2, 5);
+    await historyGraph.deselectVersion();
+    await historyGraph.selectTwoVersions('2', '5');
     await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     await historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
 
@@ -620,10 +622,9 @@ describe('Exploration history', function() {
     }];
     await explorationEditorPage.navigateToHistoryTab();
     var historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
-    await historyGraph.selectTwoVersions(2, 3);
+    await historyGraph.selectTwoVersions('2', '3');
     await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     await historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
-
     // Revert to version 2.
     await explorationEditorPage.navigateToHistoryTab();
     await explorationEditorHistoryTab.revertToVersion(2);
@@ -655,7 +656,7 @@ describe('Exploration history', function() {
     }];
     await explorationEditorPage.navigateToHistoryTab();
     historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
-    await historyGraph.selectTwoVersions(2, 4);
+    await historyGraph.selectTwoVersions('2', '4');
     await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     await historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
 

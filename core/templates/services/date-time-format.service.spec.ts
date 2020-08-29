@@ -17,6 +17,7 @@
  */
 
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import moment from 'moment';
 
 // Needed because MockDateContructor should be of same type as
 // DateConstructor to be used in callFake.
@@ -81,6 +82,12 @@ describe('datetimeformatter', () => {
     expect(
       df.getLocaleAbbreviatedDatetimeString(
         NOW_MILLIS - 365 * 24 * 60 * 60 * 1000)).toBe('11/21/13');
+  });
+
+  it('should provide date time hour string', function() {
+    expect(
+      df.getLocaleDateTimeHourString(NOW_MILLIS)).toBe(
+      moment(new Date(NOW_MILLIS)).format('MMM D HH:mm A'));
   });
 
   it('should provide correct date format MM/DD/YYY string', () => {
