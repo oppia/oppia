@@ -53,6 +53,7 @@ describe('SvgFilenameEditor', function() {
   var CsrfService = null;
   var svgFilenameCtrl = null;
   var $scope = null;
+  // This sample SVG is generated from different tools used in the SVG editor.
   var samplesvg = (
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="494" height="368" viewBox="0 0 494 368' +

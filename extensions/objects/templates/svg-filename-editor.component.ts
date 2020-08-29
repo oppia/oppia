@@ -153,6 +153,9 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.allowedImageFormats = ['svg'];
       ctrl.uploadedSvgDataUrl = null;
       ctrl.loadType = 'group';
+      ctrl.defaultTopCoordinate = 50;
+      ctrl.defaultLeftCoordinate = 50;
+      ctrl.defaultRadius = 30;
 
       ctrl.onWidthInputBlur = function() {
         if (ctrl.diagramWidth > MAX_DIAGRAM_WIDTH) {
@@ -401,6 +404,78 @@ angular.module('oppia').component('svgFilenameEditor', {
         };
       };
 
+      var loadGroupedObject = function(objId, obj, groupedObjects) {
+        // Checks the first five characters of the id.
+        if (objId.slice(0, 5) === 'group') {
+          if (groupedObjects.length <= objId.slice(5)) {
+            groupedObjects.push([]);
+          }
+          obj.toSVG = ctrl.createCustomToSVG(
+            obj.toSVG, obj.type, obj.id);
+          groupedObjects[objId.slice(5)].push(obj);
+        }
+        return groupedObjects;
+      };
+
+      var loadTextObject = function(element, obj) {
+        var childrens = [].slice.call(element.childNodes);
+        var value = '';
+        var coloredTextIndex = [];
+        // It extracts the text from the tspan tags and appends
+        // with a \n tag to ensure that the texts are subsequent lines.
+        childrens.forEach(function(el, index) {
+          if (el.nodeName === 'tspan') {
+            value += el.childNodes[0].nodeValue;
+            if (el.style.fill !== '') {
+              // This if block fetches the position of the coloured text so
+              // it can be given color after the text is rendered.
+              coloredTextIndex.push({
+                startIndex: (
+                  value.length - el.childNodes[0].nodeValue.length),
+                endIndex: value.length,
+                fill: el.style.fill,
+                stroke: el.style.stroke,
+                strokeWidth: el.style.strokeWidth
+              });
+            } else if (index < childrens.length - 1) {
+              value += '\n';
+            }
+          }
+        });
+
+        value = (
+          obj['text-transform'] === 'uppercase' ?
+          value.toUpperCase() : value);
+
+        obj.set({
+          text: value,
+        });
+        var text = new fabric.Textbox(obj.text, obj.toObject());
+        text.set({
+          type: 'textbox',
+          strokeUniform: true,
+        });
+        // The text moves to the right everytime the svg is
+        // rendered so this is to ensure that the text doesn't
+        // render outside the canvas.
+        if (text.left > CANVAS_WIDTH) {
+          text.set({
+            left: CANVAS_WIDTH
+          });
+        }
+        coloredTextIndex.forEach(function(obj) {
+          text.setSelectionStart(obj.startIndex);
+          text.setSelectionEnd(obj.endIndex);
+          text.setSelectionStyles({
+            stroke: obj.stroke,
+            strokeWidth: obj.strokeWidth,
+            fill: obj.fill
+          });
+        });
+        ctrl.canvas.add(text);
+      };
+
+
       ctrl.continueDiagramEditing = function() {
         if (
           ctrl.data.savedSvgFileName &&
@@ -419,83 +494,22 @@ angular.module('oppia').component('svgFilenameEditor', {
               objects.forEach(function(obj, index) {
                 var objId = elements[index].id;
                 if (objId !== '') {
-                  if (objId.slice(0, 5) === 'group') {
-                    if (groupedObjects.length <= objId.slice(5)) {
-                      groupedObjects.push([]);
-                    }
-                    obj.toSVG = ctrl.createCustomToSVG(
-                      obj.toSVG, obj.type, obj.id);
-                    groupedObjects[objId.slice(5)].push(obj);
-                  }
+                  groupedObjects = loadGroupedObject(
+                    objId, obj, groupedObjects);
                 } else {
-                  if (obj.get('type') === 'rect') {
-                    if (
-                      elements[index].width.baseVal.valueAsString === '100%' &&
-                      elements[index].height.baseVal.valueAsString === '100%') {
-                      ctrl.canvas.setBackgroundColor(obj.get('fill'));
-                      ctrl.fabricjsOptions.bg = obj.get('fill');
-                      ctrl.bgPicker.setOptions({
-                        color: obj.get('fill')
-                      });
-                    } else {
-                      ctrl.canvas.add(obj);
-                    }
+                  // This if condition is to detect the background color
+                  // which has a rect shape.
+                  if (
+                    obj.get('type') === 'rect' &&
+                    elements[index].width.baseVal.valueAsString === '100%' &&
+                    elements[index].height.baseVal.valueAsString === '100%') {
+                    ctrl.canvas.setBackgroundColor(obj.get('fill'));
+                    ctrl.fabricjsOptions.bg = obj.get('fill');
+                    ctrl.bgPicker.setOptions({
+                      color: obj.get('fill')
+                    });
                   } else if (obj.type === 'text') {
-                    var element = elements[index];
-                    var childrens = [].slice.call(element.childNodes);
-                    var value = '';
-                    var coloredTextIndex = [];
-                    childrens.forEach(function(el, index) {
-                      if (el.nodeName === 'tspan') {
-                        if (el.style.fill !== '') {
-                          coloredTextIndex.push({
-                            startIndex: value.length,
-                            endIndex: (
-                              value.length +
-                              el.childNodes[0].nodeValue.length),
-                            fill: el.style.fill,
-                            stroke: el.style.stroke,
-                            strokeWidth: el.style.strokeWidth
-                          });
-                        }
-                        value += el.childNodes[0].nodeValue;
-                      }
-                      if (
-                        index < childrens.length - 1 &&
-                        el.style.fill === '') {
-                        value += '\n';
-                      }
-                    });
-                    value = (
-                      obj['text-transform'] === 'uppercase' ?
-                      value.toUpperCase() : value);
-
-                    obj.set({
-                      text: value,
-                    });
-                    var text = new fabric.Textbox(obj.text, obj.toObject());
-                    text.set({
-                      type: 'textbox',
-                      strokeUniform: true,
-                    });
-                    // The text moves to the right everytime the svg is
-                    // rendered so this is to ensure that the text doesn't
-                    // render outside the canvas.
-                    if (text.left > CANVAS_WIDTH) {
-                      text.set({
-                        left: CANVAS_WIDTH
-                      });
-                    }
-                    coloredTextIndex.forEach(function(obj) {
-                      text.setSelectionStart(obj.startIndex);
-                      text.setSelectionEnd(obj.endIndex);
-                      text.setSelectionStyles({
-                        stroke: obj.stroke,
-                        strokeWidth: obj.strokeWidth,
-                        fill: obj.fill
-                      });
-                    });
-                    ctrl.canvas.add(text);
+                    loadTextObject(elements[index], obj);
                   } else {
                     ctrl.canvas.add(obj);
                   }
@@ -516,17 +530,22 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.data.savedSvgFileName.length > 0);
       };
 
+      var getStrokeWidth = function() {
+        var size = ctrl.fabricjsOptions.size;
+        // Removes the word "px" from the end of the string.
+        return parseInt(size.substring(0, size.length - 2));
+      };
+
       ctrl.createRect = function() {
         ctrl.canvas.discardActiveObject();
-        var size = ctrl.fabricjsOptions.size;
         var rect = new fabric.Rect({
-          top: 50,
-          left: 50,
+          top: ctrl.defaultTopCoordinate,
+          left: ctrl.defaultLeftCoordinate,
           width: 60,
           height: 70,
           fill: ctrl.fabricjsOptions.fill,
           stroke: ctrl.fabricjsOptions.stroke,
-          strokeWidth: parseInt(size.substring(0, size.length - 2)),
+          strokeWidth: getStrokeWidth(),
           strokeUniform: true
         });
         ctrl.canvas.add(rect);
@@ -534,25 +553,24 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       ctrl.createLine = function() {
         ctrl.canvas.discardActiveObject();
-        var size = ctrl.fabricjsOptions.size;
-        var line = new fabric.Line([50, 50, 100, 100], {
-          stroke: ctrl.fabricjsOptions.stroke,
-          strokeWidth: parseInt(size.substring(0, size.length - 2)),
-          strokeUniform: true
-        });
+        var line = new fabric.Line(
+          [ctrl.defaultTopCoordinate, ctrl.defaultLeftCoordinate, 100, 100], {
+            stroke: ctrl.fabricjsOptions.stroke,
+            strokeWidth: getStrokeWidth(),
+            strokeUniform: true
+          });
         ctrl.canvas.add(line);
       };
 
       ctrl.createCircle = function() {
         ctrl.canvas.discardActiveObject();
-        var size = ctrl.fabricjsOptions.size;
         var circle = new fabric.Circle({
-          top: 50,
-          left: 50,
-          radius: 30,
+          top: ctrl.defaultTopCoordinate,
+          left: ctrl.defaultLeftCoordinate,
+          radius: ctrl.defaultRadius,
           fill: ctrl.fabricjsOptions.fill,
           stroke: ctrl.fabricjsOptions.stroke,
-          strokeWidth: parseInt(size.substring(0, size.length - 2)),
+          strokeWidth: getStrokeWidth(),
           strokeUniform: true
         });
         ctrl.canvas.add(circle);
@@ -564,12 +582,11 @@ angular.module('oppia').component('svgFilenameEditor', {
           color: 'rgba(0,0,0,1)'
         });
         ctrl.fabricjsOptions.size = '18px';
-        var size = ctrl.fabricjsOptions.size;
         var text = new fabric.Textbox('Enter Text', {
-          top: 50,
-          left: 50,
+          top: ctrl.defaultTopCoordinate,
+          left: ctrl.defaultLeftCoordinate,
           fontFamily: ctrl.fabricjsOptions.fontFamily,
-          fontSize: parseInt(size.substring(0, size.length - 2)),
+          fontSize: getStrokeWidth(),
           fill: ctrl.fabricjsOptions.fill,
           fontWeight: ctrl.fabricjsOptions.bold ? 'bold' : 'normal',
           fontStyle: ctrl.fabricjsOptions.italic ? 'italic' : 'normal',
@@ -592,11 +609,9 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       ctrl.togglePencilDrawing = function() {
         ctrl.canvas.discardActiveObject();
-        var size = ctrl.fabricjsOptions.size;
         ctrl.canvas.isDrawingMode = !ctrl.canvas.isDrawingMode;
         ctrl.canvas.freeDrawingBrush.color = ctrl.fabricjsOptions.stroke;
-        ctrl.canvas.freeDrawingBrush.width = parseInt(
-          size.substring(0, size.length - 2));
+        ctrl.canvas.freeDrawingBrush.width = getStrokeWidth();
         ctrl.drawMode = DRAW_MODE_NONE;
         if (ctrl.canvas.isDrawingMode) {
           ctrl.drawMode = DRAW_MODE_PENCIL;
@@ -614,11 +629,10 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.polyOptions.bboxPoints.push(
             new polyPoint(startPt.x, startPt.y));
         }
-        var size = ctrl.fabricjsOptions.size;
         var shape = new fabric.Polyline(ctrl.polyOptions.bboxPoints, {
           fill: ctrl.fabricjsOptions.fill,
           stroke: ctrl.fabricjsOptions.stroke,
-          strokeWidth: parseInt(size.substring(0, size.length - 2)),
+          strokeWidth: getStrokeWidth(),
           strokeUniform: true,
           strokeLineCap: 'round'
         });
@@ -694,11 +708,10 @@ angular.module('oppia').component('svgFilenameEditor', {
       var createBezierControlPoints = function(left, top) {
         // This function is used to add the control points for the quadratic
         // bezier curve which is used to control the position of the curve.
-        var size = ctrl.fabricjsOptions.size;
         var circle = new fabric.Circle({
           left: left,
           top: top,
-          radius: parseInt(size.substring(0, size.length - 2)) + 2,
+          radius: getStrokeWidth() + 2,
           fill: '#666666',
           stroke: '#666666',
           hasBorders: false,
@@ -708,11 +721,10 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       var drawQuadraticCurve = function() {
-        var size = ctrl.fabricjsOptions.size;
         var curve = new fabric.Path('M 40 40 Q 95, 100, 150, 40', {
           stroke: ctrl.fabricjsOptions.stroke,
           fill: ctrl.fabricjsOptions.fill,
-          strokeWidth: parseInt(size.substring(0, size.length - 2)),
+          strokeWidth: getStrokeWidth(),
           objectCaching: false,
           selectable: false
         });
@@ -775,11 +787,10 @@ angular.module('oppia').component('svgFilenameEditor', {
           // cavasObjects array.
           ctrl.drawMode = DRAW_MODE_NONE;
           // Adding a new path so that the bbox is computed correctly.
-          var size = ctrl.fabricjsOptions.size;
           var curve = new fabric.Path(path, {
             stroke: ctrl.fabricjsOptions.stroke,
             fill: ctrl.fabricjsOptions.fill,
-            strokeWidth: parseInt(size.substring(0, size.length - 2)),
+            strokeWidth: getStrokeWidth(),
           });
           ctrl.canvas.add(curve);
         }
@@ -803,6 +814,9 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       var getPieSlice = function(center, radius, startAngle, endAngle, color) {
+        // The pie slice is a combination of a semicircle and a triangle.
+        // The following code is used to calculate the angle of the arc and
+        // the points for drawing the polygon.
         var angle = endAngle - startAngle;
         var halfAngle = angle / 2;
         var halfChord = radius * Math.sin(angle / 2);
@@ -859,6 +873,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         var legendText = '';
         for (var i = 0; i < ctrl.pieChartDataInput.length; i++) {
           total += ctrl.pieChartDataInput[i].data;
+          // This symbols is used to indicate the color of the pie slice
+          // it corresponds to.
           legendText += '\u2587 - ';
           legendText += (
             ctrl.pieChartDataInput[i].name + ' - ' +
@@ -869,7 +885,9 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.pieChartDataInput[i].angle = (
             ctrl.pieChartDataInput[i].data / total * Math.PI * 2);
           pieSlices.push(getPieSlice(
-            new polyPoint(50, 50), 30, currentAngle,
+            new polyPoint(
+              ctrl.defaultTopCoordinate, ctrl.defaultLeftCoordinate
+            ), ctrl.defaultRadius, currentAngle,
             currentAngle + ctrl.pieChartDataInput[i].angle,
             ctrl.pieChartDataInput[i].color));
           // If a pie slice has an angle greater than 180, then
@@ -884,17 +902,18 @@ angular.module('oppia').component('svgFilenameEditor', {
         // This is to prevent the text from being too small. This can be
         // changed again using editor.
         ctrl.fabricjsOptions.size = '18px';
-        var size = ctrl.fabricjsOptions.size;
         var text = new fabric.Textbox(legendText, {
           top: 100,
           left: 120,
           fontFamily: ctrl.fabricjsOptions.fontFamily,
-          fontSize: parseInt(size.substring(0, size.length - 2)),
+          fontSize: getStrokeWidth(),
           fill: '#000000',
           fontWeight: ctrl.fabricjsOptions.bold ? 'bold' : 'normal',
           fontStyle: ctrl.fabricjsOptions.italic ? 'italic' : 'normal',
           width: 200
         });
+        // The following code is used to give the color to the rectangle which
+        // is used to indentify the pie slice.
         for (var i = 0; i < ctrl.pieChartDataInput.length; i++) {
           text.setSelectionStart(getTextIndex(legendText, i, 0));
           text.setSelectionEnd(getTextIndex(legendText, i, 1));
@@ -916,6 +935,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.drawMode = DRAW_MODE_PIECHART;
         } else {
           createChart();
+          // This resets the pie chart form.
           ctrl.pieChartDataInput = [{
             name: 'Data name 1',
             data: 10,
@@ -1192,32 +1212,28 @@ angular.module('oppia').component('svgFilenameEditor', {
         // This if condition is required to ensure that the size change is
         // applied only to the curve and not to all the control points.
         if (ctrl.drawMode === DRAW_MODE_BEZIER) {
-          var size = ctrl.fabricjsOptions.size;
-          var actualSize = parseInt(size.substring(0, size.length - 2));
           ctrl.canvas.getObjects().slice(-2).forEach(function(object) {
             object.set({
-              radius: actualSize + 2
+              radius: getStrokeWidth() + 2
             });
           });
           getQuadraticBezierCurve().set({
-            strokeWidth: actualSize
+            strokeWidth: getStrokeWidth()
           });
           ctrl.canvas.renderAll();
         } else {
           var shape = ctrl.canvas.getActiveObject();
-          var size = ctrl.fabricjsOptions.size;
-          ctrl.canvas.freeDrawingBrush.width = parseInt(
-            size.substring(0, size.length - 2));
+          ctrl.canvas.freeDrawingBrush.width = getStrokeWidth();
           var strokeWidthShapes = [
             'rect', 'circle', 'path', 'line', 'polyline'];
           if (shape && strokeWidthShapes.indexOf(shape.get('type')) !== -1) {
             shape.set({
-              strokeWidth: parseInt(size.substring(0, size.length - 2))
+              strokeWidth: getStrokeWidth()
             });
             ctrl.canvas.renderAll();
           } else if (shape && shape.get('type') === 'textbox') {
             shape.set({
-              fontSize: parseInt(size.substring(0, size.length - 2))
+              fontSize: getStrokeWidth()
             });
             ctrl.canvas.renderAll();
           }
@@ -1291,13 +1307,12 @@ angular.module('oppia').component('svgFilenameEditor', {
             var y = ctrl.polyOptions.y;
             ctrl.polyOptions.bboxPoints.push(new polyPoint(x, y));
             var points = [x, y, x, y];
-            var size = ctrl.fabricjsOptions.size;
             var stroke = ctrl.fabricjsOptions.stroke;
             // This is to ensure that the polygon lines are visible when
             // creating the polygon.
             stroke = stroke.slice(0, -2) + '1)';
             var line = new fabric.Line(points, {
-              strokeWidth: parseInt(size.substring(0, size.length - 2)),
+              strokeWidth: getStrokeWidth(),
               selectable: false,
               stroke: stroke,
               strokeLineCap: 'round'
