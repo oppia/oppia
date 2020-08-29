@@ -408,7 +408,7 @@ def main(args=None):
             'The redis command line interface will not be installed because '
             'your machine is on the Windows operating system.')
     unused_parsed_args = _PARSER.parse_args(args=args)
-    # Install third party libraries to third_party/
+    #Install third party libraries to third_party/
     # command = [
     #     sys.executable, '-m', 'pip', 'install', '-r'
     #     'requirements.txt', '--target', THIRD_PARTY_DIR]
@@ -422,7 +422,7 @@ def main(args=None):
     #     python_utils.PRINT(
     #         'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
     #     raise Exception('Error installing python third party packages.')
-    # Install static frontend libraries to third_party/static
+    #Install static frontend libraries to third_party/static
     download_manifest_files(MANIFEST_FILE_PATH)
 
     install_redis_cli()

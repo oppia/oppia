@@ -31,7 +31,6 @@ from pip._internal.utils.misc import get_installed_distributions
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
-THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 THIRD_PARTY_STATIC_DIR = os.path.join(THIRD_PARTY_DIR, 'static')
 # The requirements.txt file is auto-generated and contains a deterministic list
 # of all libraries and versions of those libraries that should exist in the
@@ -119,7 +118,7 @@ def _remove_metadata(library, version):
         '%s-%s' % (library, version),
         '%s-%s' % (library.replace('-', '_'), version) #some metadata folders replace the hyphens with underscores
     ]
-    for f in os.listdir(THIRD_PARTY_PYTHON_LIBS_DIR):
+    for f in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
         if (f.startswith(possible_filename_start_strings[0]) or
             f.startswith(possible_filename_start_strings[0])):
             to_delete_path = os.join(THIRD_PARTY_PYTHON_LIBS_DIR, f)
@@ -137,27 +136,22 @@ def _rectify_third_party_directory(mismatches):
             parse_version(versions[1]) if versions[1] else None)
 
         # Library exists in requirements but not in the directory.
-        if not directory_version:
-            subprocess.check_call([
-                'pip', 'install', '--target', THIRD_PARTY_PYTHON_LIBS_DIR,
-                '%s==%s' % (
-                    library,
-                    python_utils.convert_to_bytes(requirements_version)),
-                '--upgrade'
-            ])
-        # Library is installed in the directory but not listed in requirements.
-        elif not requirements_version:
+        if not requirements_version:
             os.rmdir(THIRD_PARTY_PYTHON_LIBS_DIR)
             subprocess.check_call([
-                'pip', 'install', '--target', THIRD_PARTY_PYTHON_LIBS_DIR,
+                'pip', 'install', '--target',
+                common.THIRD_PARTY_PYTHON_LIBS_DIR,
                 '%s==%s' % (
                     library,
                     python_utils.convert_to_bytes(requirements_version)),
             ])
-        # Upgrade the library version to 'requirements_version'.
-        elif requirements_version > directory_version:
+        # Library is installed in the directory but not listed in requirements
+        # or upgrade the library version to 'requirements_version'.
+        elif (not directory_version or
+            requirements_version > directory_version):
             subprocess.check_call([
-                'pip', 'install', '--target', THIRD_PARTY_PYTHON_LIBS_DIR,
+                'pip', 'install', '--target',
+                common.THIRD_PARTY_PYTHON_LIBS_DIR,
                 '%s==%s' % (
                     library,
                     python_utils.convert_to_bytes(requirements_version)),
@@ -166,7 +160,8 @@ def _rectify_third_party_directory(mismatches):
         # Downgrade the library version to 'requirements_version'.
         elif requirements_version < directory_version:
             subprocess.check_call([
-                'pip', 'install', '--target', THIRD_PARTY_PYTHON_LIBS_DIR,
+                'pip', 'install', '--target',
+                common.THIRD_PARTY_PYTHON_LIBS_DIR,
                 '%s==%s' % (
                     library,
                     python_utils.convert_to_bytes(requirements_version)),
