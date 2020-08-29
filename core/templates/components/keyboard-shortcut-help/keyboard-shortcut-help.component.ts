@@ -35,13 +35,12 @@ export class KeyboardShortcutHelpModalComponent implements OnInit {
     KEYBOARD_SHORTCUTS = {};
 
   ngOnInit(): void {
-    if (this.urlService.getPathname() === '/community-library' {
+    if (this.urlService.getPathname() === '/community-library') {
       this.KEYBOARD_SHORTCUTS = {
         '?': 'Show this help dialog',
          '/': 'Search',
          s: 'Select skip to main content button',
-         c: 'Select exploration category'
-
+         c: 'Select exploration category',
       };
     } else if (this.contextService.isInExplorationPlayerPage()) {
       this.KEYBOARD_SHORTCUTS = {
