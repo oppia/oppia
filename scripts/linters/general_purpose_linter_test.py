@@ -356,7 +356,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             ).perform_all_lint_checks()
         self.assert_same_list_elements([
             'Line 26: Please do not use $broadcast/$on for propagating events. '
-            'Use EventEmitters and Subscriptions instead.'], self.linter_stdout)
+            'Use @Input/@Output instead.'], self.linter_stdout)
         self.assert_failed_messages_count(self.linter_stdout, 1)
 
 
