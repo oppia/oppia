@@ -17,7 +17,9 @@
  */
 import 'mousetrap';
 
+import { TestBed } from '@angular/core/testing';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Keyboard Shortcuts', () => {
@@ -27,6 +29,8 @@ describe('Keyboard Shortcuts', () => {
   var backButton = document.createElement('button');
   var searchBar = document.createElement('input');
   var categoryBar = document.createElement('select');
+  var ngbModal;
+  
 
   var mockWindow = {
     location: {
@@ -35,7 +39,8 @@ describe('Keyboard Shortcuts', () => {
   };
 
   const windowRef = new WindowRef();
-  const keyboardShortcutService = new KeyboardShortcutService(windowRef);
+  const keyboardShortcutService = new KeyboardShortcutService(windowRef,
+     ngbModal);
 
   beforeAll(() => {
     skipButton.setAttribute('id', 'skipToMainContentId');
@@ -109,7 +114,8 @@ describe('Keyboard Shortcuts', () => {
 
     Mousetrap.trigger('c');
     expect(categoryBar.isEqualNode(document.activeElement));
-
+    Mousetrap.trigger('?');
+    
     keyboardShortcutService.bindExplorationPlayerShortcuts();
 
     Mousetrap.trigger('s');
@@ -124,5 +130,6 @@ describe('Keyboard Shortcuts', () => {
     document.body.append(nextButton);
     Mousetrap.trigger('j');
     expect(nextButton.isEqualNode(document.activeElement));
+    Mousetrap.trigger('?');
   });
 });
