@@ -68,7 +68,6 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import { TranslatorProviderForTests } from 'tests/test.extras';
 
 require('App.ts');
-require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/responses.service.ts');

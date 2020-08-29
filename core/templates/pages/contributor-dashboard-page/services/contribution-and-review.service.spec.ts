@@ -22,7 +22,6 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/contributor-dashboard-page/services/' +
   'contribution-and-review.service.ts');
