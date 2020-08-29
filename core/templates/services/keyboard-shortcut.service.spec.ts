@@ -54,6 +54,8 @@ describe('Keyboard Shortcuts', () => {
     document.body.append(searchBar);
     document.body.append(categoryBar);
 
+    spyOn(ngbModal, 'open');
+    spyOn(ngbModal, 'dismissAll');
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue(mockWindow);
   });
 
