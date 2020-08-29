@@ -121,6 +121,16 @@ REDIS_CONF_PATH = os.path.join('.', 'redis.conf')
 # Path for the dump file the redis server autogenerates. It contains data
 # used by the Redis server.
 REDIS_DUMP_PATH = os.path.join(CURR_DIR, 'dump.rdb')
+# The requirements.txt file is auto-generated and contains a deterministic list
+# of all libraries and versions of those libraries that should exist in the
+# "third_party/python_libs" directory.
+# NOTE: Developers should NOT modify this file.
+REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.txt')
+# The precompiled requirements file is the one that developers should be
+# modifying. It is the file that pip-tools will use to compile a deterministic
+# "requirements.txt" file so that all installations using "requirements.txt"
+# will be the same.
+PRE_COMPILED_REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.in')
 
 
 def is_windows_os():
