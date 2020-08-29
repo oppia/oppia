@@ -79,7 +79,6 @@ describe('Settings Tab Component', function() {
   var explorationWarningsService = null;
   var userEmailPreferencesService = null;
   var userExplorationPermissionsService = null;
-  var windowDimensionsService = null;
   var windowRef = null;
   var routerService = null;
 
@@ -166,7 +165,6 @@ describe('Settings Tab Component', function() {
       explorationWarningsService = $injector.get('ExplorationWarningsService');
       userEmailPreferencesService = $injector.get(
         'UserEmailPreferencesService');
-      windowDimensionsService = $injector.get('WindowDimensionsService');
 
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve(userPermissions));
@@ -605,7 +603,6 @@ describe('Settings Tab Component', function() {
       explorationWarningsService = $injector.get('ExplorationWarningsService');
       userEmailPreferencesService = $injector.get(
         'UserEmailPreferencesService');
-      windowDimensionsService = $injector.get('WindowDimensionsService');
 
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve(userPermissions));
