@@ -46,6 +46,7 @@ require('services/context.service.ts');
 require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
+import { AlertsService } from 'services/alerts.service';
 
 angular.module('oppia').directive('answerGroupEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -295,10 +296,18 @@ angular.module('oppia').directive('answerGroupEditor', [
             // ad hoc.
             ctrl.directiveSubscriptions.add(
               ExternalSaveService.onExternalSave.subscribe(() => {
-                if (
-                  ctrl.isRuleEditorOpen() &&
-                  StateEditorService.checkCurrentRuleInputIsValid()) {
-                  ctrl.saveRules();
+                if(ctrl.isRuleEditorOpen()) {
+                  if (StateEditorService.checkCurrentRuleInputIsValid()) {
+                    ctrl.saveRules();
+                  } else {
+                    var messageContent = (
+                      'There was an unsaved rule input which was invalid and ' +
+                      'has been discarded.');
+                    if (!AlertsService.messages.some(messageObject => (
+                      messageObject.content === messageContent))) {
+                      AlertsService.addInfoMessage(messageContent);
+                    }
+                  }
                 }
               })
             );
