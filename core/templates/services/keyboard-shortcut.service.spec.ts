@@ -17,6 +17,7 @@
  */
 import 'mousetrap';
 
+import { TestBed } from '@angular/core/testing';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -29,7 +30,7 @@ describe('Keyboard Shortcuts', () => {
   var searchBar = document.createElement('input');
   var categoryBar = document.createElement('select');
   var ngbModal: NgbModal;
-
+  var openQuickReferenceSpy;
 
   var mockWindow = {
     location: {
@@ -38,8 +39,10 @@ describe('Keyboard Shortcuts', () => {
   };
 
   const windowRef = new WindowRef();
-  const keyboardShortcutService = new KeyboardShortcutService(windowRef,
-    ngbModal);
+  const keyboardShortcutService = new KeyboardShortcutService(
+    windowRef,
+    ngbModal
+  );
 
   beforeAll(() => {
     skipButton.setAttribute('id', 'skipToMainContentId');
@@ -53,8 +56,8 @@ describe('Keyboard Shortcuts', () => {
     document.body.append(backButton);
     document.body.append(searchBar);
     document.body.append(categoryBar);
-
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue(mockWindow);
+    openQuickReferenceSpy = spyOn(keyboardShortcutService, 'openQuickReference');
   });
 
 
@@ -103,8 +106,6 @@ describe('Keyboard Shortcuts', () => {
 
   it('should move the focus to the corresponding element' +
     ' when the action key is pressed', () => {
-    spyOn(ngbModal, 'open');
-    spyOn(ngbModal, 'dismissAll');
     keyboardShortcutService.bindLibraryPageShortcuts();
 
     Mousetrap.trigger('s');
@@ -115,7 +116,9 @@ describe('Keyboard Shortcuts', () => {
 
     Mousetrap.trigger('c');
     expect(categoryBar.isEqualNode(document.activeElement));
+    
     Mousetrap.trigger('?');
+    expect(openQuickReferenceSpy).toHaveBeenCalled();
 
     keyboardShortcutService.bindExplorationPlayerShortcuts();
 
@@ -131,6 +134,8 @@ describe('Keyboard Shortcuts', () => {
     document.body.append(nextButton);
     Mousetrap.trigger('j');
     expect(nextButton.isEqualNode(document.activeElement));
+    
     Mousetrap.trigger('?');
+    expect(openQuickReferenceSpy).toHaveBeenCalled();
   });
 });

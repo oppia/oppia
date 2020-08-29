@@ -32,6 +32,13 @@ export class KeyboardShortcutService {
   constructor(
     private windowRef: WindowRef,
     private ngbModal: NgbModal) {}
+  
+  openQuickReference(): void {
+    this.ngbModal.dismissAll();
+    this.ngbModal.open(
+      KeyboardShortcutHelpModalComponent, {backdrop: true});
+    
+  }
 
   bindExplorationPlayerShortcuts(): void {
     Mousetrap.bind('s', function() {
@@ -59,9 +66,7 @@ export class KeyboardShortcutService {
     });
 
     Mousetrap.bind('?', () => {
-      this.ngbModal.dismissAll();
-      this.ngbModal.open(
-        KeyboardShortcutHelpModalComponent, {backdrop: true});
+      this.openQuickReference();
     });
   }
 
@@ -84,9 +89,7 @@ export class KeyboardShortcutService {
     });
 
     Mousetrap.bind('?', () => {
-      this.ngbModal.dismissAll();
-      this.ngbModal.open(
-        KeyboardShortcutHelpModalComponent, {backdrop: true});
+      this.openQuickReference();
     });
   }
 
