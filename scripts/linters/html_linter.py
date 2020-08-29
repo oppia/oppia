@@ -107,6 +107,8 @@ class CustomHTMLParser(html.parser.HTMLParser):
             self.tag_stack.append((tag, line_number, column_number))
             self.indentation_level += 1
 
+        # TODO(#10482): Check if the DEBUG mode is useful if it is not useful
+        # then remove it.
         if self.debug:
             concurrent_task_utils.log('DEBUG MODE: Start tag_stack')
             concurrent_task_utils.log(self.tag_stack)
