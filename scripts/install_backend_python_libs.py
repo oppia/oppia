@@ -44,6 +44,7 @@ REQUIREMENTS_FILE_PATH = os.path.join('.', 'requirements.txt')
 # will be the same.
 PRE_COMPILED_REQUIREMENTS_FILE_PATH = os.path.join('.', 'requirements.in')
 
+# TODO: WHy we don't care about the pip version on the developers local machine?
 
 def _get_requirements_file_contents():
     requirements_contents = collections.defaultdict()
@@ -72,26 +73,6 @@ def _get_third_party_directory_contents():
 
     return directory_contents
 
-
-def validate_third_party_directory():
-    requirements_contents = _get_requirements_file_contents()
-    directory_contents = _get_third_party_directory_contents()
-    if len(requirements_contents) != len(directory_contents):
-        return False
-    for library in requirements_contents:
-        # Library library exists in directory.
-        if library in directory_contents:
-            # Library and version match.
-            if directory_contents[library] == requirements_contents[library]:
-                 continue
-            # Library matches but version doesn't match.
-            else:
-                return False
-        # Library library doesn't exist in directory.
-        else:
-            return False
-
-    return True
 
 
 def get_mismatches():
@@ -198,7 +179,14 @@ def _rectify_third_party_directory(mismatches):
 def main():
     sys.path.insert(0, os.path.join(
         common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION))
-    regenerate_requirements_file()
+    os.environ["PATH"] += (
+        os.pathsep + os.path.join(
+        common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION,
+        'bin'))
+
+    print(_get_requirements_file_contents())
+    #regenerate_requirements_file()
+    #subprocess.check_call(['pip', '--help'])
     # validate_third_party_directory()
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

@@ -19,13 +19,53 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.tests import test_utils
+
+import python_utils
+from scripts import install_backend_python_libs
+
 class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     """Test the methods for installing backend python libs."""
 
     def setUp(self):
         super(InstallBackendPythonLibsTests, self).setUp()
-        self.check_function_calls = {
-            'remove_is_called': False,
-            'rename_is_called': False,
-            'extractall_is_called': False
-        }
+
+    def test_adding_library_to_requirements_triggers_validation_error():
+        def _mock_get_requirements_file_contents():
+            return {
+                u'html5lib': u'1.0.1',
+                u'six': u'1.15.0',
+                u'redis': u'3.5.3',
+                u'webencodings': u'0.5.1',
+                u'flask': u'1.0.1'
+            }
+        def _mock_get_directory_file_contents():
+            return {
+                u'html5lib': u'1.0.1',
+                u'six': u'1.15.0',
+                u'redis': u'3.5.3',
+                u'webencodings': u'0.5.1',
+            }
+
+        swap_get_requirements_file_contents = self.swap(
+            install_backend_python_libs, '_get_requirements_file_contents',
+            _mock_get_requirements_file_contents)
+        swap_get_requirements_file_contents = self.swap(
+            install_backend_python_libs, '_get_third_party_directory_contents',
+            _mock_get_directory_file_contents)
+        with swap_get_requirements_file_contents, (
+            swap_get_requirements_file_contents):
+            self.assertEqual(
+                {
+                    u'flask', ('1.0.1', None)
+                },
+                install_backend_python_libs.get_mismatches())
+
+    def test_downgrade_produces_correct_mismatches():
+        def _mock_get_requirements_file_contents():
+            return {
+                u'html5lib': u'1.0.1',
+                u'six': u'1.15.0',
+                u'redis': u'3.5.3',
+                u'webencodings': u'0.5.1',
+            }
