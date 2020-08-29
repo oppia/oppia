@@ -111,6 +111,20 @@ def _remove_metadata(library, version):
 
 
 def _rectify_third_party_directory(mismatches):
+
+    # pip install using requirements.txt is optimized so handling 5
+    # mismatches is slower than reinstalling the python libraries from
+    # scratch.
+    if len(mismatches) >= 5:
+        if os.path.isdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
+            shutil.rmtree(common.THIRD_PARTY_PYTHON_LIBS_DIR)
+        subprocess.check_call([
+            'pip', 'install', '--target',
+            common.THIRD_PARTY_PYTHON_LIBS_DIR,
+            '--no-dependencies', '-r',
+            common.REQUIREMENTS_FILE_PATH
+        ])
+        return
     for library, versions in mismatches.items():
         requirements_version = (
             parse_version(versions[0]) if versions[0] else None)
@@ -119,10 +133,7 @@ def _rectify_third_party_directory(mismatches):
 
         # 1. Library is installed in the directory but not listed in
         #    requirements
-        # 2. pip install using requirements.txt is optimized so handling 5
-        #    mismatches is slower than reinstalling the python libraries from
-        #    scratch.
-        if not requirements_version or len(mismatches) >= 5:
+        if not requirements_version:
             shutil.rmtree(common.THIRD_PARTY_PYTHON_LIBS_DIR)
             subprocess.check_call([
                 'pip', 'install', '--target',
@@ -159,27 +170,20 @@ def _rectify_third_party_directory(mismatches):
 
 
 def main():
-    # sys.path.insert(0, os.path.join(
-    #     common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION))
-    # python_utils.PRINT("Regenerating 'requirements.txt' file...")
-    # subprocess.check_call(
-    #     ['python', '-m', 'scripts.regenerate_requirements'],
-    #     stdin=subprocess.PIPE,
-    #     stdout=subprocess.PIPE,
-    #     stderr=subprocess.PIPE)
-    # mismatches = get_mismatches()
-    import time
-    start = time.time()
+    sys.path.insert(0, os.path.join(
+        common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION))
+    python_utils.PRINT("Regenerating 'requirements.txt' file...")
     subprocess.check_call(
-        ['pip', 'install', '--target', 'lib', 'setuptools']
-    )
-    end = time.time()
-    print(end-start)
-    # if mismatches:
-    #     _rectify_third_party_directory(mismatches)
-    # else:
-    #     python_utils.PRINT(
-    #         'Third party python libraries already installed correctly.')
+        ['python', '-m', 'scripts.regenerate_requirements'],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
+    mismatches = get_mismatches()
+    if mismatches:
+        _rectify_third_party_directory(mismatches)
+    else:
+        python_utils.PRINT(
+            'Third party python libraries already installed correctly.')
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when install_third_party_libs.py is used as a script.
