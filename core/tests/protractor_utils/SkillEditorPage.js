@@ -17,6 +17,7 @@
  * in Protractor tests.
  */
 
+var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
 var SkillEditorPage = function() {
@@ -191,6 +192,7 @@ var SkillEditorPage = function() {
   };
 
   this.saveQuestion = async function() {
+    await general.scrollToTop();
     await saveQuestionButton.click();
     await waitFor.pageToFullyLoad();
   };

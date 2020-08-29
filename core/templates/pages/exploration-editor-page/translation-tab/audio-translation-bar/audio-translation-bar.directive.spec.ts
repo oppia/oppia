@@ -779,7 +779,7 @@ describe('Audio translation bar directive', function() {
     });
 
     it('should trigger drop event in translation tab element and open add' +
-      ' audio translation modal with $uibModal', function() {
+      ' audio translation modal', function() {
       translationTabDivMock.triggerHandler('dragover');
 
       spyOn($uibModal, 'open').and.callThrough();
