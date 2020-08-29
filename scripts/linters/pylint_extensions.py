@@ -1754,10 +1754,10 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             space_at_beginning_of_last_comment = (
                 self._check_space_at_beginning_of_comment(
                     last_comment, last_comment_line_num))
-            if space_at_beginning_of_first_comment:
+            if space_at_beginning_of_first_comment and len(first_comment) > 1:
                 self._check_no_capital_letter_at_beginning(
                     first_comment, first_comment_line_num)
-            if space_at_beginning_of_last_comment:
+            if space_at_beginning_of_last_comment and len(last_comment) > 1:
                 self._check_punctuation(
                     last_comment, last_comment_line_num)
 
