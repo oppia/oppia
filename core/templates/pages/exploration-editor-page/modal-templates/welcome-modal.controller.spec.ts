@@ -45,11 +45,12 @@ describe('Welcome Modal Controller', function() {
     });
   }));
 
-  it('should evaluate scope variables values correctly', function() {
-    expect($scope.explorationId).toBe(explorationId);
-    expect($scope.editorWelcomeImgUrl).toBe(
-      '/assets/images/general/editor_welcome.svg');
-    expect(SiteAnalyticsService.registerTutorialModalOpenEvent)
-      .toHaveBeenCalled();
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.explorationId).toBe(explorationId);
+      expect($scope.editorWelcomeImgUrl).toBe(
+        '/assets/images/general/editor_welcome.svg');
+      expect(SiteAnalyticsService.registerTutorialModalOpenEvent)
+        .toHaveBeenCalled();
+    });
 });
