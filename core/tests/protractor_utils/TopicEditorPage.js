@@ -167,6 +167,7 @@ var TopicEditorPage = function() {
   };
 
   this.saveQuestion = async function() {
+    await general.scrollToTop();
     await saveQuestionButton.click();
     await waitFor.invisibilityOf(
       saveQuestionButton, 'Question modal takes too long to disappear');
@@ -180,12 +181,6 @@ var TopicEditorPage = function() {
     await element(by.css('option[label="' + skillDescription + '"]')).click();
 
     await action.click('Create question button', createQuestionButton);
-    await action.click(
-      'Confirm skill difficulty button', confirmSkillDifficultyButton);
-
-    await waitFor.invisibilityOf(
-      confirmSkillDifficultyButton,
-      'Confirm skill difficulty button takes too long to disappear');
   };
 
   this.moveToQuestionsTab = async function() {
