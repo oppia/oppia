@@ -3,8 +3,8 @@
     <div class="input-box">Width: <input type="number" ng-model="$ctrl.diagramWidth" ng-blur="$ctrl.onWidthInputBlur()"></div>
     <div class="input-box">Height: <input type="number" ng-model="$ctrl.diagramHeight" ng-blur="$ctrl.onHeightInputBlur()"></div>
     <div class="dimension-note">
-      This diagram has a maximum dimension of 490 X 550 px to ensure that it fits in the card and note that the change will
-      be reflected after SVG is created.
+      This diagram has a maximum dimension of 490 X 550 px. Note that the change will
+      be reflected after Use this Image button is clicked.
     </div>
   </div>
   <div class="svg-editor" ng-if="!$ctrl.isDiagramSaved()">
@@ -220,7 +220,7 @@
       </div>
       <div class="input-tag" ng-if="$ctrl.objectIsSelected">
         Layer number:{{ $ctrl.layerNum }}
-        <i class="material-icons layerInfo" tooltip-placement="bottom" uib-tooltip="This denotes the layer in which the shape is present. Layer 1 is the bottom layer.">
+        <i class="material-icons layer-info" tooltip-placement="bottom" uib-tooltip="This denotes the layer in which the currently selected shape is present. Layer 1 is the bottom layer.">
           &#xE887;
         </i>
       </div>
@@ -372,7 +372,7 @@
     }
   }
 
-  svg-filename-editor .svg-editor .horizontal-toolbar .layerInfo {
+  svg-filename-editor .svg-editor .horizontal-toolbar .layer-info {
     font-size: 19px;
   }
 

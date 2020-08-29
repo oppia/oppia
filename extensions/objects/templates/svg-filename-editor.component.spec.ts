@@ -234,16 +234,19 @@ describe('SvgFilenameEditor', function() {
   it('should update diagram size', function() {
     var WIDTH = 100;
     var HEIGHT = 100;
-    var MAX_DIAGRAM_WIDTH = 490;
-    var MAX_DIAGRAM_HEIGHT = 550;
-    var MIN_DIAGRAM_WIDTH = 30;
-    var MIN_DIAGRAM_HEIGHT = 30;
     svgFilenameCtrl.diagramWidth = WIDTH;
     svgFilenameCtrl.diagramHeight = HEIGHT;
     svgFilenameCtrl.onWidthInputBlur();
     expect(svgFilenameCtrl.currentDiagramWidth).toBe(WIDTH);
     svgFilenameCtrl.onHeightInputBlur();
     expect(svgFilenameCtrl.currentDiagramHeight).toBe(HEIGHT);
+  });
+
+  it('should reset the diagram size', function() {
+    var MAX_DIAGRAM_WIDTH = 490;
+    var MAX_DIAGRAM_HEIGHT = 550;
+    var MIN_DIAGRAM_WIDTH = 30;
+    var MIN_DIAGRAM_HEIGHT = 30;
     svgFilenameCtrl.diagramWidth = 600;
     svgFilenameCtrl.diagramHeight = 600;
     svgFilenameCtrl.onWidthInputBlur();

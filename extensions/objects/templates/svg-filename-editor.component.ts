@@ -1249,6 +1249,8 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.bgPicker = picker;
         }
         picker.onOpen = function() {
+          // This DOM manipulation is necessary because this is not
+          // configurable in the third-party module.
           var alphaSliders = document.querySelectorAll(
             '.picker_alpha .picker_selector');
           alphaSliders.forEach(function(element) {
@@ -1269,7 +1271,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         };
         picker.onOpen();
         picker.setOptions({
-          color: ctrl.fabricjsOptions[value],
+          color: ctrl.fabricjsOptions[value]
         });
       };
 
