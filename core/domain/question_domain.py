@@ -48,8 +48,8 @@ from pylatexenc import latex2text
 QUESTION_PROPERTY_LANGUAGE_CODE = 'language_code'
 QUESTION_PROPERTY_QUESTION_STATE_DATA = 'question_state_data'
 QUESTION_PROPERTY_LINKED_SKILL_IDS = 'linked_skill_ids'
-QUESTION_PROPERTY_NOT_APPLICABLE_MISCONCEPTION_IDS = (
-    'not_applicable_misconception_ids')
+QUESTION_PROPERTY_INAPPLICABLE_MISCONCEPTION_IDS = (
+    'inapplicable_misconception_ids')
 
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
@@ -85,7 +85,7 @@ class QuestionChange(change_domain.BaseChange):
         QUESTION_PROPERTY_QUESTION_STATE_DATA,
         QUESTION_PROPERTY_LANGUAGE_CODE,
         QUESTION_PROPERTY_LINKED_SKILL_IDS,
-        QUESTION_PROPERTY_NOT_APPLICABLE_MISCONCEPTION_IDS)
+        QUESTION_PROPERTY_INAPPLICABLE_MISCONCEPTION_IDS)
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -131,7 +131,7 @@ class Question(python_utils.OBJECT):
     def __init__(
             self, question_id, question_state_data,
             question_state_data_schema_version, language_code, version,
-            linked_skill_ids, not_applicable_misconception_ids,
+            linked_skill_ids, inapplicable_misconception_ids,
             created_on=None, last_updated=None):
         """Constructs a Question domain object.
 
@@ -147,7 +147,7 @@ class Question(python_utils.OBJECT):
             version: int. The version of the question.
             linked_skill_ids: list(str). Skill ids linked to the question.
                 Note: Do not update this field manually.
-            not_applicable_misconception_ids: list(str). Optional misconception
+            inapplicable_misconception_ids: list(str). Optional misconception
                 ids that are marked as not relevant to the question.
             created_on: datetime.datetime. Date and time when the question was
                 created.
@@ -161,8 +161,8 @@ class Question(python_utils.OBJECT):
             question_state_data_schema_version)
         self.version = version
         self.linked_skill_ids = linked_skill_ids
-        self.not_applicable_misconception_ids = (
-            not_applicable_misconception_ids)
+        self.inapplicable_misconception_ids = (
+            inapplicable_misconception_ids)
         self.created_on = created_on
         self.last_updated = last_updated
 
@@ -180,8 +180,8 @@ class Question(python_utils.OBJECT):
             'language_code': self.language_code,
             'version': self.version,
             'linked_skill_ids': self.linked_skill_ids,
-            'not_applicable_misconception_ids': (
-                self.not_applicable_misconception_ids)
+            'inapplicable_misconception_ids': (
+                self.inapplicable_misconception_ids)
         }
 
     @classmethod
@@ -823,18 +823,18 @@ class Question(python_utils.OBJECT):
             raise utils.ValidationError(
                 'linked_skill_ids has duplicate skill ids')
 
-        if not (isinstance(self.not_applicable_misconception_ids, list) and (
+        if not (isinstance(self.inapplicable_misconception_ids, list) and (
                 all(isinstance(
                     elem, python_utils.BASESTRING) for elem in (
-                        self.not_applicable_misconception_ids)))):
+                        self.inapplicable_misconception_ids)))):
             raise utils.ValidationError(
-                'Expected not_applicable_misconception_ids to be a list of '
-                'strings, received %s' % self.not_applicable_misconception_ids)
+                'Expected inapplicable_misconception_ids to be a list of '
+                'strings, received %s' % self.inapplicable_misconception_ids)
 
-        if len(set(self.not_applicable_misconception_ids)) != len(
-                self.not_applicable_misconception_ids):
+        if len(set(self.inapplicable_misconception_ids)) != len(
+                self.inapplicable_misconception_ids):
             raise utils.ValidationError(
-                'not_applicable_misconception_ids has duplicate values')
+                'inapplicable_misconception_ids has duplicate values')
 
         if not isinstance(self.question_state_data_schema_version, int):
             raise utils.ValidationError(
@@ -916,7 +916,7 @@ class Question(python_utils.OBJECT):
             question_dict['question_state_data_schema_version'],
             question_dict['language_code'], question_dict['version'],
             question_dict['linked_skill_ids'],
-            question_dict['not_applicable_misconception_ids'])
+            question_dict['inapplicable_misconception_ids'])
 
         return question
 
@@ -955,17 +955,17 @@ class Question(python_utils.OBJECT):
         """
         self.linked_skill_ids = list(set(linked_skill_ids))
 
-    def update_not_applicable_misconception_ids(
-            self, not_applicable_misconception_ids):
+    def update_inapplicable_misconception_ids(
+            self, inapplicable_misconception_ids):
         """Updates the optional misconception ids marked as not applicable
         to the question.
 
         Args:
-            not_applicable_misconception_ids: list(str). The optional
+            inapplicable_misconception_ids: list(str). The optional
                 misconception ids marked as not applicable to the question.
         """
-        self.not_applicable_misconception_ids = list(
-            set(not_applicable_misconception_ids))
+        self.inapplicable_misconception_ids = list(
+            set(inapplicable_misconception_ids))
 
     def update_question_state_data(self, question_state_data):
         """Updates the question data of the question.

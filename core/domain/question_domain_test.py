@@ -307,7 +307,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'language_code': 'en',
             'version': 1,
             'linked_skill_ids': ['skill1'],
-            'not_applicable_misconception_ids': ['skill1-123']
+            'inapplicable_misconception_ids': ['skill1-123']
         }
 
         observed_object = question_domain.Question.from_dict(question_dict)
@@ -452,15 +452,15 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(['skill_id1'], self.question.linked_skill_ids)
 
-    def test_update_not_applicable_misconception_ids(self):
-        """Test to verify update_not_applicable_misconception_ids method of the
+    def test_update_inapplicable_misconception_ids(self):
+        """Test to verify update_inapplicable_misconception_ids method of the
         Question domain object.
         """
-        self.question.update_not_applicable_misconception_ids(
+        self.question.update_inapplicable_misconception_ids(
             ['skillid-misconceptionid'])
         self.assertEqual(
             ['skillid-misconceptionid'],
-            self.question.not_applicable_misconception_ids)
+            self.question.inapplicable_misconception_ids)
 
     def test_update_question_state_data(self):
         """Test to verify update_question_state_data method of the Question
