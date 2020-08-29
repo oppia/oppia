@@ -255,6 +255,12 @@ export class ContextService {
         this.questionPlayerIsManuallySet);
   }
 
+  isInExplorationPlayerPage(): boolean {
+    return (
+      this.getPageContext() ===
+        ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
+  }
+
   isInExplorationEditorPage(): boolean {
     return (
       this.getPageContext() ===
