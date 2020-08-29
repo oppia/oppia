@@ -34,6 +34,9 @@ import { FractionObjectFactory } from
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 
+import { RatioObjectFactory } from
+  'domain/objects/RatioObjectFactory';
+
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
@@ -412,6 +415,7 @@ describe('State translation component', function() {
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
     $provide.value('StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
+    $provide.value('RatioObjectFactory', TestBed.get(RatioObjectFactory));
   }));
 
   beforeEach(function() {

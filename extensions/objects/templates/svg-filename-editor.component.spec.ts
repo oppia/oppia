@@ -365,29 +365,29 @@ describe('SvgFilenameEditor', function() {
 
   it('should draw polygon using mouse events', function() {
     svgFilenameCtrl.createClosedPolygon();
-    svgFilenameCtrl.canvas.trigger('mouse:down', {
+    svgFilenameCtrl.canvas.fire('mouse:down', {
       e: {
         pageX: 0,
         pageY: 0
       }
     });
-    svgFilenameCtrl.canvas.trigger('mouse:move', {
+    svgFilenameCtrl.canvas.fire('mouse:move', {
       e: {
         pageX: 100,
         pageY: 100
       }
     });
-    svgFilenameCtrl.canvas.trigger('mouse:dblclick');
+    svgFilenameCtrl.canvas.fire('mouse:dblclick');
     expect(svgFilenameCtrl.canvas.getObjects()[0].get('type')).toBe('polyline');
     svgFilenameCtrl.createClosedPolygon();
     svgFilenameCtrl.isTouchDevice = true;
-    svgFilenameCtrl.canvas.trigger('mouse:down', {
+    svgFilenameCtrl.canvas.fire('mouse:down', {
       e: {
         pageX: 0,
         pageY: 0
       }
     });
-    svgFilenameCtrl.canvas.trigger('mouse:down', {
+    svgFilenameCtrl.canvas.fire('mouse:down', {
       e: {
         pageX: 10,
         pageY: 10
@@ -401,21 +401,21 @@ describe('SvgFilenameEditor', function() {
     svgFilenameCtrl.createRect();
     svgFilenameCtrl.createQuadraticBezier();
     expect(svgFilenameCtrl.isDrawModeBezier()).toBe(true);
-    svgFilenameCtrl.canvas.trigger('object:moving', {
+    svgFilenameCtrl.canvas.fire('object:moving', {
       target: {
         name: 'p0',
         left: 100,
         top: 100
       }
     });
-    svgFilenameCtrl.canvas.trigger('object:moving', {
+    svgFilenameCtrl.canvas.fire('object:moving', {
       target: {
         name: 'p1',
         left: 200,
         top: 200
       }
     });
-    svgFilenameCtrl.canvas.trigger('object:moving', {
+    svgFilenameCtrl.canvas.fire('object:moving', {
       target: {
         name: 'p2',
         left: 300,
@@ -438,6 +438,7 @@ describe('SvgFilenameEditor', function() {
     expect(svgFilenameCtrl.isPieChartEnabled()).toBe(true);
     expect(svgFilenameCtrl.isDrawModePieChart()).toBe(true);
     svgFilenameCtrl.onAddItem();
+    svgFilenameCtrl.pieChartDataInput[2].data = 100;
     svgFilenameCtrl.createPieChart();
     expect(svgFilenameCtrl.isDrawModePieChart()).toBe(false);
   });
@@ -481,7 +482,7 @@ describe('SvgFilenameEditor', function() {
       svgFilenameCtrl.canvas.getObjects()[1]);
     expect(svgFilenameCtrl.isSizeVisible()).toBe(true);
     expect(svgFilenameCtrl.displayFontStyles).toBe(true);
-    svgFilenameCtrl.canvas.trigger('object:scaling');
+    svgFilenameCtrl.canvas.fire('object:scaling');
     expect(svgFilenameCtrl.canvas.getObjects()[1].get('scaleX')).toBe(1);
     expect(svgFilenameCtrl.canvas.getObjects()[1].get('scaleY')).toBe(1);
   });

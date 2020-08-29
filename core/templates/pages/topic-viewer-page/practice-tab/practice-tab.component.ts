@@ -37,6 +37,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class PracticeTabComponent implements OnInit {
   @Input() topicName: string;
+  @Input() startButtonIsDisabled: boolean = false;
   @Input() subtopicsList: Subtopic[];
   selectedSubtopics: Subtopic[] = [];
   availableSubtopics: Subtopic[] = [];
@@ -60,6 +61,9 @@ export class PracticeTabComponent implements OnInit {
   }
 
   isStartButtonDisabled(): boolean {
+    if (this.startButtonIsDisabled) {
+      return true;
+    }
     for (var idx in this.selectedSubtopicIndices) {
       if (this.selectedSubtopicIndices[idx]) {
         return false;
