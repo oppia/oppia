@@ -258,7 +258,10 @@ exports.config = {
         '--use-fake-device-for-media-stream',
         '--use-fake-ui-for-media-stream',
         '--use-file-for-fake-audio-capture=data/cafe.mp3',
-<<<<<<< HEAD
+        // These arguments are required to run the tests on GitHub
+        // Actions.
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
       ],
       // Adding this in order to make Chrome download to a fixed directory.
       // This allows us to check if files are downloaded.
@@ -267,14 +270,7 @@ exports.config = {
             'prompt_for_download': false,
             'default_directory': DOWNLOAD_PATH,
         }
-      }
-=======
-        // These arguments are required to run the tests on GitHub
-        // Actions.
-        '--no-sandbox',
-        '--disable-dev-shm-usage',
-      ]
->>>>>>> upstream/develop
+      },       
     },
     prefs: {
       intl: {
