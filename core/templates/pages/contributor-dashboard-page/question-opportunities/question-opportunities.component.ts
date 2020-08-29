@@ -138,7 +138,6 @@ angular.module('oppia').component('questionOpportunities', {
           QuestionObjectFactory.createDefaultQuestion([skillId]);
         const questionId = question.getId();
         const questionStateData = question.getStateData();
-        ContextService.setImageSaveDestinationToLocalStorage();
         QuestionUndoRedoService.clearChanges();
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

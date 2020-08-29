@@ -28,6 +28,7 @@ from core.domain import html_cleaner
 from core.domain import image_validation_services
 from core.domain import opportunity_services
 from core.domain import skill_fetchers
+from core.domain import state_domain
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
@@ -88,17 +89,11 @@ class SuggestionHandler(base.BaseHandler):
 
     @acl_decorators.can_suggest_changes
     def post(self):
-        try:
-            suggestion = suggestion_services.create_suggestion(
-                self.payload.get('suggestion_type'),
-                self.payload.get('target_type'), self.payload.get('target_id'),
-                self.payload.get('target_version_at_submission'),
-                self.user_id, self.payload.get('change'),
-                self.payload.get('description'))
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
-
-        html_list = suggestion.get_all_html_content_strings()
+        change_dict = self.payload.get('change')
+        target_id = self.payload.get('target_id')
+        state_dict = change_dict['question_dict']['question_state_data']
+        state = state_domain.State.from_dict(state_dict)
+        html_list = state.get_all_html_content_strings()
         filenames = (
             html_cleaner.get_image_filenames_from_html_strings(html_list))
         for filename in filenames:
@@ -106,8 +101,8 @@ class SuggestionHandler(base.BaseHandler):
             if not image:
                 logging.error(
                     'Image not provided for file with name %s when the '
-                    ' suggestion with id %s was created.' % (
-                        filename, suggestion.suggestion_id))
+                    ' suggestion with target id %s was created.' % (
+                        filename, target_id))
                 raise self.InvalidInputException(
                     'No image data provided for file with name %s.'
                     % (filename))
@@ -122,8 +117,16 @@ class SuggestionHandler(base.BaseHandler):
                 file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
             fs_services.save_original_and_compressed_versions_of_image(
                 filename, feconf.ENTITY_TYPE_SUGGESTION,
-                suggestion.target_id, image, 'image', image_is_compressible)
+                target_id, image, 'image', image_is_compressible)
 
+        try:
+            suggestion_services.create_suggestion(
+                self.payload.get('suggestion_type'),
+                self.payload.get('target_type'), target_id,
+                self.payload.get('target_version_at_submission'),
+                self.user_id, change_dict, self.payload.get('description'))
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
         self.render_json(self.values)
 
 

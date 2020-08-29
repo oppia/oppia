@@ -57,6 +57,7 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     $scope.misconceptionsBySkill = {};
     $scope.misconceptionsBySkill[$scope.skill.getId()] = (
       $scope.skill.getMisconceptions());
+    ContextService.setImageSaveDestinationToLocalStorage();
     $scope.done = function() {
       if (!$scope.isQuestionValid()) {
         return;
