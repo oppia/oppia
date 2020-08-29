@@ -98,7 +98,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             ' in the CODEOWNER_IMPORTANT_PATHS list in scripts/linters/'
             'pre_commit_linter.py. Please add this rule in the '
             'mentioned list or remove this rule from the \'Critical files'
-            '\' section.'], lint_task_report.messages)
+            '\' section.'], lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -112,7 +112,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements([
             'Duplicate pattern(s) found in critical '
-            'rules section.'], lint_task_report.messages)
+            'rules section.'], lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -132,7 +132,8 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
                 lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements([
             'Duplicate pattern(s) found '
-            'in CODEOWNER_IMPORTANT_PATHS list.'], lint_task_report.messages)
+            'in CODEOWNER_IMPORTANT_PATHS list.'
+            ], lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -151,7 +152,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             'section since it is an important rule. Alternatively please '
             'remove it from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
             'scripts/linters/pre_commit_linter.py if it is no longer an '
-            'important rule.'], lint_task_report.messages)
+            'important rule.'], lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -168,7 +169,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
                 linter = codeowner_linter.CodeownerLintChecksManager(FILE_CACHE)
                 lint_task_report = linter.check_codeowner_file()
         self.assertEqual(
-            ['SUCCESS  CODEOWNERS check passed'], lint_task_report.all_messages)
+            ['SUCCESS  CODEOWNERS check passed'], lint_task_report.get_report())
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertFalse(lint_task_report.failed)
 
@@ -182,7 +183,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements(
             ['Pattern on line 18 doesn\'t have codeowner'],
-            lint_task_report.messages)
+            lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -196,7 +197,8 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements([
             'Pattern on line 18 is invalid. Use full path '
-            'relative to the root directory'], lint_task_report.messages)
+            'relative to the root directory'
+            ], lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -210,7 +212,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements([
             'Pattern on line 18 is invalid. '
-            '\'**\' wildcard not allowed'], lint_task_report.messages)
+            '\'**\' wildcard not allowed'], lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -224,7 +226,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements([
             'Pattern on line 18 doesn\'t match '
-            'any file or directory'], lint_task_report.messages)
+            'any file or directory'], lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 

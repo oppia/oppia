@@ -48,7 +48,7 @@ class TaskResult(python_utils.OBJECT):
     """Task result for concurrent_task_utils."""
 
     def __init__(
-            self, name, failed, trimmed_messages, full_messages,
+            self, name, failed, trimmed_messages, messages,
             report_enabled=True):
         """Constructs a TaskResult object.
 
@@ -58,14 +58,13 @@ class TaskResult(python_utils.OBJECT):
                 failed.
             trimmed_messages: list(str). List of error messages that are
                 trimmed to keep main part of messages.
-            full_messages: list(str). List of full messages returned by the
-                objects.
+            messages: list(str). List of full messages returned by the objects.
             report_enabled: bool. Decide whether task result will print or not.
         """
         self.name = name
         self.failed = failed
         self.trimmed_messages = trimmed_messages
-        self.full_messages = full_messages
+        self.messages = messages
         self.report_enabled = report_enabled
 
     def get_report(self):
@@ -76,14 +75,15 @@ class TaskResult(python_utils.OBJECT):
             list(str). List of full messages corresponding to the given
             task.
         """
+        all_messages = self.messages[:]
         if self.report_enabled:
             status_message = (
                 '%s %s check %s' % (
                     (FAILED_MESSAGE_PREFIX, self.name, 'failed')
                     if self.failed else (
                         SUCCESS_MESSAGE_PREFIX, self.name, 'passed')))
-            self.full_messages.append(status_message)
-        return self.full_messages
+            all_messages.append(status_message)
+        return all_messages
 
 
 class TaskThread(threading.Thread):

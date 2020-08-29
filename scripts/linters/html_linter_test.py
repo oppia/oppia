@@ -62,7 +62,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         self.assert_same_list_elements([
             'invalid_style_indentation.html --> Expected indentation of 6,'
             ' found indentation of 4 for content of style tag on line 7'
-            ], lint_task_report.messages)
+            ], lint_task_report.trimmed_messages)
         self.assertEqual('HTML tag and attribute', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -72,7 +72,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
             debug=True).check_html_tags_and_attributes()
         self.assert_same_list_elements([
             'Expected indentation of 10, found indentation of 12 for '
-            'classroom-page tag on line 14'], lint_task_report.messages)
+            'classroom-page tag on line 14'], lint_task_report.trimmed_messages)
         self.assertEqual('HTML tag and attribute', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -83,7 +83,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         self.assert_same_list_elements([
             'The value color:white; of attribute '
             'style for the tag content on line 12 should be enclosed '
-            'within double quotes.'], lint_task_report.messages)
+            'within double quotes.'], lint_task_report.trimmed_messages)
         self.assertEqual('HTML tag and attribute', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -93,7 +93,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
             debug=True).check_html_tags_and_attributes()
         self.assert_same_list_elements([
             'Attribute for tag content on line 13 should align with the '
-            'leftmost attribute on line 12'], lint_task_report.messages)
+            'leftmost attribute on line 12'], lint_task_report.trimmed_messages)
         self.assertEqual('HTML tag and attribute', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -118,7 +118,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         self.assert_same_list_elements([
             'Indentation for end tag content on line 18 does not match the'
             ' indentation of the start tag content on line 12'
-            ], lint_task_report.messages)
+            ], lint_task_report.trimmed_messages)
         self.assertEqual('HTML tag and attribute', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -135,7 +135,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
             debug=True).check_html_tags_and_attributes()
         self.assertEqual(
             ['SUCCESS  HTML tag and attribute check passed'],
-            lint_task_report.all_messages)
+            lint_task_report.get_report())
         self.assertEqual('HTML tag and attribute', lint_task_report.name)
         self.assertFalse(lint_task_report.failed)
 
@@ -146,7 +146,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
             [
                 'There are no HTML files to lint.',
                 'SUCCESS  HTML lint check passed'],
-            lint_task_report[0].all_messages)
+            lint_task_report[0].get_report())
         self.assertEqual('HTML lint', lint_task_report[0].name)
         self.assertFalse(lint_task_report[0].failed)
 
@@ -157,7 +157,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
             [
                 'There are no HTML files to lint.',
                 'SUCCESS  HTML lint check passed'],
-            lint_task_report[0].all_messages)
+            lint_task_report[0].get_report())
         self.assertEqual('HTML lint', lint_task_report[0].name)
         self.assertFalse(lint_task_report[0].failed)
 
@@ -166,7 +166,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
             [INVALID_QUOTES_HTML_FILEPATH]).lint_html_files()
         self.assert_same_list_elements(
             ['line 10, col 20, line contains trailing whitespace'],
-            lint_task_report.messages)
+            lint_task_report.trimmed_messages)
         self.assertEqual('HTMLLint', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
