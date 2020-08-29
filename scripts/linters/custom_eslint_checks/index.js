@@ -20,5 +20,5 @@
 
 var requireIndex = require('requireindex');
 
-// Import all rules in lib/rules.
+// Import all rules in custom_eslint_checks/rules.
 module.exports.rules = requireIndex(__dirname + '/rules');

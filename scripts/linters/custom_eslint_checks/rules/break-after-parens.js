@@ -16,6 +16,7 @@
  * @fileoverview Lint check to ensure that there is a break after parenthesis
  * in case of multiline hanging indentation.
  */
+
 'use strict';
 
 // TODO(#10479): Implement this rule using the nodes instead of tokens.

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for the break-after-paren.js file
+ * @fileoverview Tests for the break-after-paren.js file.
  */
 
 'use strict';
