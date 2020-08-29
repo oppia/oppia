@@ -1653,6 +1653,14 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             'Please use capital letter to begin the content of comment.'
         )
     }
+    options = ((
+        'allowed-comment-prefixes',
+        {
+            'default': ('int', 'str', 'float', 'bool', 'v'),
+            'type': 'csv', 'metavar': '<comma separated list>',
+            'help': 'List of allowed prefixes in a comment.'
+        }
+    ),)
 
     def _check_space_at_beginning_of_comment(self, line, line_num):
         """Checks if the comment starts with a space at the beginnig of the
@@ -1684,13 +1692,13 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             line: str. The current line of comment.
             line_num: int. Line number of the current comment.
         """
-        allowed_comment_prefixes = ['int', 'str', 'float', 'bool', 'v']
         # Check if variable name is used.
         underscore_is_present = '_' in line.split()[1]
 
         # Check if allowed prefix is used.
         allowed_prefix_is_present = any(
-            line[2:].startswith(word) for word in allowed_comment_prefixes)
+            line[2:].startswith(word) for word in
+            self.config.allowed_comment_prefixes)
 
         # Check if comment contains any excluded phrase.
         excluded_phrase_is_present_at_beginning = any(
