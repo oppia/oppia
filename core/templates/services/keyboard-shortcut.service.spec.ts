@@ -54,8 +54,6 @@ describe('Keyboard Shortcuts', () => {
     document.body.append(searchBar);
     document.body.append(categoryBar);
 
-    spyOn(ngbModal, 'open');
-    spyOn(ngbModal, 'dismissAll');
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue(mockWindow);
   });
 
@@ -105,6 +103,8 @@ describe('Keyboard Shortcuts', () => {
 
   it('should move the focus to the corresponding element' +
     ' when the action key is pressed', () => {
+    spyOn(ngbModal, 'open');
+    spyOn(ngbModal, 'dismissAll');
     keyboardShortcutService.bindLibraryPageShortcuts();
 
     Mousetrap.trigger('s');
