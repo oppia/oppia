@@ -29,7 +29,7 @@ export class SafePipe implements PipeTransform {
   public transform(value: string, type: string):
     SafeHtml | SafeStyle | SafeScript | SafeUrl | SafeResourceUrl {
     switch (type) {
-      case 'html': return this.sanitizer.bypassSecurityTrustHtml(value);
+      case 'html': return this.sanitizer.bypassSecurityTrust(value);
       case 'style': return this.sanitizer.bypassSecurityTrustStyle(value);
       case 'script': return this.sanitizer.bypassSecurityTrustScript(value);
       case 'url': return this.sanitizer.bypassSecurityTrustUrl(value);
@@ -37,5 +37,9 @@ export class SafePipe implements PipeTransform {
         return this.sanitizer.bypassSecurityTrustResourceUrl(value);
       default: throw new Error(`Invalid safe type specified: ${type}`);
     }
+  }
+
+  random(): void {
+    return;
   }
 }

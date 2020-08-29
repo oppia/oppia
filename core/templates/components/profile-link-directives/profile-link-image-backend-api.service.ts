@@ -20,6 +20,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { map } from 'rxjs/operators';
+
 interface ProfileDict {
   'profile_picture_data_url_for_username': string;
 }
@@ -32,8 +34,10 @@ export class ProfileLinkImageBackendApiService {
     private http: HttpClient
   ) {}
 
-  fetchProfilePictureData(profileImageUrl: string): Promise<ProfileDict> {
-    return this.http.get<ProfileDict>(profileImageUrl).toPromise();
+  fetchProfilePictureData(profileImageUrl: string): Promise<string> {
+    return this.http.get<ProfileDict>(profileImageUrl).pipe(
+      map(response => decodeURIComponent(
+        response.profile_picture_data_url_for_username))).toPromise();
   }
 }
 

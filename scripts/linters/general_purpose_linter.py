@@ -27,6 +27,7 @@ import python_utils
 
 from . import js_ts_linter
 from . import linter_utils
+from . import warranted_angular_security_bypasses
 from .. import common
 
 EXCLUDED_PATHS = (
@@ -131,6 +132,14 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'message': 'In tests, please do not use browser.waitForAngular().',
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'\bypassSecurityTrust'),
+        'message': 'The use of bypassSecurityTrust is not allowed.',
+        'excluded_files': (warranted_angular_security_bypasses
+            .EXCULDED_BYPASS_SECURTIY_TRUST_FILES),
+        'excluded_dir': (warranted_angular_security_bypasses
+            .EXCULDED_BYPASS_SECURTIY_TRUST_DIRECTORIES)
     },
     {
         'regexp': re.compile(r'\b(ddescribe|fdescribe)\('),
