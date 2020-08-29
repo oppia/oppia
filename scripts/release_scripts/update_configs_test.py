@@ -377,6 +377,47 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with python_utils.open_file(temp_feconf_path, 'r') as f:
             self.assertEqual(f.read(), expected_feconf_text)
 
+    def test_error_is_raised_if_redishost_not_updated(self):
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
+            return '192.123.23.1'
+        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
+
+        feconf_lines = [
+            'REDISHOST = \'localhost\'\n',
+            '# When the site terms were last updated, in UTC.\n',
+            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n',
+            '# Format of string for dashboard statistics logs.\n',
+            '# NOTE TO DEVELOPERS: This format should not be changed, '
+            'since it is used in\n',
+            '# the existing storage models for UserStatsModel.\n',
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n']
+
+        class MockFile(python_utils.OBJECT):
+            def readlines(self):
+                """Mock method to read lines of the file object."""
+                return mock_readlines()
+            def write(self, unused_line):
+                """Mock method to write lines."""
+                pass
+            def __enter__(self):
+                return self
+            def __exit__(self, exc_type, exc_value, exc_traceback):
+                pass
+
+        def mock_readlines():
+            return feconf_lines
+
+        def mock_open_file(unused_path, unused_mode):
+            return MockFile()
+
+        open_file_swap = self.swap(python_utils, 'open_file', mock_open_file)
+
+        with getpass_swap, open_file_swap, self.assertRaisesRegexp(
+            AssertionError,
+            'REDISHOST not updated correctly in feconf.py'):
+            update_configs.add_redishost()
+
     def test_invalid_config(self):
         config_swap = self.swap(
             update_configs, 'FECONF_CONFIG_PATH', INVALID_FECONF_CONFIG_PATH)
