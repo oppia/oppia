@@ -38,9 +38,9 @@ export class KeyboardShortcutHelpModalComponent implements OnInit {
     if (this.urlService.getPathname() === '/community-library') {
       this.KEYBOARD_SHORTCUTS = {
         '?': 'Show this help dialog',
-         '/': 'Search',
-         s: 'Select skip to main content button',
-         c: 'Select exploration category',
+        '/': 'Search',
+        s: 'Select skip to main content button',
+        c: 'Select exploration category',
       };
     } else if (this.contextService.isInExplorationPlayerPage()) {
       this.KEYBOARD_SHORTCUTS = {
