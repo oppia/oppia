@@ -90,14 +90,15 @@ describe('Add Answer Group Modal Controller', function() {
     testSubscriptions.unsubscribe();
   });
 
-  it('should evaluate scope variables values correctly', function() {
-    expect(true).toBe(true);
-    expect($scope.feedbackEditorIsOpen).toBe(false);
-    expect($scope.addState).toBe(addState);
-    expect($scope.questionModeEnabled).toBe(true);
-    expect($scope.tmpTaggedSkillMisconceptionId).toBe(null);
-    expect($scope.addAnswerGroupForm).toEqual({});
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect(true).toBe(true);
+      expect($scope.feedbackEditorIsOpen).toBe(false);
+      expect($scope.addState).toBe(addState);
+      expect($scope.questionModeEnabled).toBe(true);
+      expect($scope.tmpTaggedSkillMisconceptionId).toBe(null);
+      expect($scope.addAnswerGroupForm).toEqual({});
+    });
 
   it('should update answer group feedback', function() {
     expect($scope.feedbackEditorIsOpen).toBe(false);
@@ -121,7 +122,7 @@ describe('Add Answer Group Modal Controller', function() {
     expect($scope.tmpTaggedSkillMisconceptionId).toBe('skill_1-mis_1');
   });
 
-  it('shoudl check if correctness feedback is enabled', function() {
+  it('should check if correctness feedback is enabled', function() {
     spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled').and
       .returnValue(true);
     expect($scope.isCorrectnessFeedbackEnabled()).toBe(true);
@@ -141,7 +142,7 @@ describe('Add Answer Group Modal Controller', function() {
     expect($scope.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
   });
 
-  it('should save response', function() {
+  it('should save answer group response when closing the modal', function() {
     $scope.saveResponse(null);
 
     expect(saveOutcomeDestDetailsSpy).toHaveBeenCalled();
