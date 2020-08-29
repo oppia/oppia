@@ -25,14 +25,11 @@ var path = require('path');
 
 var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
-<<<<<<< HEAD
   var numExtractionHandles = 0;
-=======
   var REVIEW_CATEGORY_TRANSLATION = 'TRANSLATION';
   var REVIEW_CATEGORY_VOICEOVER = 'VOICEOVER';
   var REVIEW_CATEGORY_QUESTION = 'QUESTION';
 
->>>>>>> upstream/develop
   var configTab = element(by.css('.protractor-test-admin-config-tab'));
   var saveAllConfigs = element(by.css('.protractor-test-save-all-configs'));
   var configProperties = element.all(by.css(
@@ -525,6 +522,8 @@ var AdminPage = function() {
     await action.sendKeys('Add reviewer name', addReviewerName, name);
     await action.sendKeys('Select reviewer role', selectReviewerRole, newRole);
     await action.click('Add Reviewer button', addReviewerFormSubmitButton);
+  };
+
   var _assignReviewer = async function(
       username, reviewCategory, languageDescription = null) {
     await _switchToRolesTab();
