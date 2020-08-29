@@ -998,9 +998,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 if filepath.endswith('.constants.ts') and (
                         is_corresponding_angularjs_filepath):
                     if filepath.endswith('app.constants.ts'):
-                        angular_constants_nodes = (
-                            parsed_nodes[5].expression.right.arguments[1]
-                            .properties)
+                        for node in parsed_nodes:
+                            try:
+                                angular_constants_nodes = (
+                                    node.expression.right.arguments[1]
+                                    .properties)
+                            except Exception:
+                                continue
                         for angular_constant_node in angular_constants_nodes:
                             angular_constants_list.append(
                                 angular_constant_node.key.name)
