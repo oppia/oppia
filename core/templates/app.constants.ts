@@ -31,7 +31,7 @@ export const AppConstants = {
     I18N_LIBRARY_ALL_CATEGORIES: 'All Categories',
     I18N_TOPNAV_SIGN_IN: 'Sign in',
     I18N_SPLASH_PAGE_TITLE:
-      'Oppia | Free, Online and Interactive Lessons for' + ' Anyone',
+      'Oppia | Free, Online and Interactive Lessons for Anyone',
     I18N_SIGNUP_REGISTRATION: 'Registration',
     I18N_SIGNUP_LOADING: 'Loading',
   },

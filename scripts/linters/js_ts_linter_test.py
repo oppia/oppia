@@ -49,6 +49,10 @@ FILE_CACHE = NAME_SPACE.files
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 VALID_JS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.js')
 VALID_TS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.ts')
+VALID_APP_CONSTANTS_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'valid_app.constants.ts')
+VALID_APP_CONSTANTS_AJS_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'valid_app.constants.ajs.ts')
 VALID_CONSTANT_OUTSIDE_CLASS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid_constant_outside_class.constants.ts')
 VALID_CONSTANT_OUTSIDE_CLASS_AJS_FILEPATH = os.path.join(
@@ -382,6 +386,33 @@ class JsTsLintTests(test_utils.LinterTestBase):
         with self.print_swap, compile_all_ts_files_swap:
             js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_CONSTANT_OUTSIDE_CLASS_FILEPATH], FILE_CACHE,
+                True).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
+        self.assert_same_list_elements(
+            ['SUCCESS  Constants declaration check passed'],
+            self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 0)
+
+    def test_check_app_constants_declaration(self):
+        def mock_compile_all_ts_files():
+            cmd = (
+                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
+                '%s -target %s -typeRoots %s %s %s typings/*') % (
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
+                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
+                    'true', 'es5', './node_modules/@types',
+                    VALID_APP_CONSTANTS_AJS_FILEPATH,
+                    VALID_APP_CONSTANTS_FILEPATH)
+            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+
+        compile_all_ts_files_swap = self.swap(
+            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
+
+        with self.print_swap, compile_all_ts_files_swap:
+            js_ts_linter.JsTsLintChecksManager(
+                [], [VALID_APP_CONSTANTS_FILEPATH], FILE_CACHE,
                 True).perform_all_lint_checks()
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)

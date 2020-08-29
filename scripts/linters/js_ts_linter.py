@@ -997,21 +997,31 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 # *.constants.ajs.ts file are in sync.
                 if filepath.endswith('.constants.ts') and (
                         is_corresponding_angularjs_filepath):
-                    # Ignore if file contains only type definitions for
-                    # constants.
-                    for node in parsed_nodes:
-                        if 'declarations' in node.keys():
-                            try:
-                                angular_constants_nodes = (
-                                    node.declarations[0].init.callee.body.body)
-                            except Exception:
+                    if filepath.endswith('app.constants.ts'):
+                        angular_constants_nodes = (
+                            parsed_nodes[5].expression.right.arguments[1]
+                            .properties)
+                        for angular_constant_node in angular_constants_nodes:
+                            angular_constants_list.append(
+                                angular_constant_node.key.name)
+                    else:
+                        # Ignore if file contains only type definitions for
+                        # constants.
+                        for node in parsed_nodes:
+                            if 'declarations' in node.keys():
+                                try:
+                                    angular_constants_nodes = (
+                                        node.declarations[0].init.callee.body
+                                        .body)
+                                except Exception:
+                                    continue
+                        for angular_constant_node in angular_constants_nodes:
+                            if not angular_constant_node.expression:
                                 continue
-                    for angular_constant_node in angular_constants_nodes:
-                        if not angular_constant_node.expression:
-                            continue
-                        angular_constant_name = (
-                            angular_constant_node.expression.left.property.name)
-                        angular_constants_list.append(angular_constant_name)
+                            angular_constant_name = (
+                                angular_constant_node.expression.left
+                                .property.name)
+                            angular_constants_list.append(angular_constant_name)
 
                     angular_constants_set = set(angular_constants_list)
                     if len(angular_constants_set) != len(
