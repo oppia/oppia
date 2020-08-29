@@ -91,11 +91,17 @@ class SuggestionHandler(base.BaseHandler):
     def post(self):
         change_dict = self.payload.get('change')
         target_id = self.payload.get('target_id')
-        state_dict = change_dict['question_dict']['question_state_data']
-        state = state_domain.State.from_dict(state_dict)
-        html_list = state.get_all_html_content_strings()
+        target_type = self.payload.get('target_type')
+        html_list = []
+        if target_type == suggestion_models.TARGET_TYPE_SKILL:
+            state_dict = change_dict['question_dict']['question_state_data']
+            state = state_domain.State.from_dict(state_dict)
+            html_list = state.get_all_html_content_strings()
         filenames = (
             html_cleaner.get_image_filenames_from_html_strings(html_list))
+        if len(filenames) > 0:
+            suggestion_image_entity_type = (
+                fs_services.get_entity_type_for_suggestion_target(target_type))
         for filename in filenames:
             image = self.request.get(filename)
             if not image:
@@ -116,13 +122,13 @@ class SuggestionHandler(base.BaseHandler):
             image_is_compressible = (
                 file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
             fs_services.save_original_and_compressed_versions_of_image(
-                filename, feconf.ENTITY_TYPE_SUGGESTION,
-                target_id, image, 'image', image_is_compressible)
+                filename, suggestion_image_entity_type, target_id, image,
+                'image', image_is_compressible)
 
         try:
             suggestion_services.create_suggestion(
                 self.payload.get('suggestion_type'),
-                self.payload.get('target_type'), target_id,
+                target_type, target_id,
                 self.payload.get('target_version_at_submission'),
                 self.user_id, change_dict, self.payload.get('description'))
         except utils.ValidationError as e:

@@ -685,9 +685,10 @@ class SuggestionAddQuestion(BaseSuggestion):
         html_list = self.get_all_html_content_strings()
         filenames = (
             html_cleaner.get_image_filenames_from_html_strings(html_list))
+        entity_type = fs_services.get_entity_type_for_suggestion_target(
+            self.target_type)
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_SUGGESTION, self.target_id))
+            fs_domain.GcsFileSystem(entity_type, self.target_id))
         for filename in filenames:
             image = fs.get('%s/%s' % ('image', filename))
             file_format = (

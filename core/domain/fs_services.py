@@ -23,7 +23,10 @@ import json
 
 from core.domain import fs_domain
 from core.domain import image_services
+from core.platform import models
 import feconf
+
+(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
 def save_original_and_compressed_versions_of_image(
@@ -148,3 +151,21 @@ def get_entity_file_system_class():
         class. GcsFileSystem class.
     """
     return fs_domain.GcsFileSystem
+
+
+def get_entity_type_for_suggestion_target(suggestion_target_type):
+    """Returns the entity type for a particular suggestion target type.
+
+    Args:
+        suggestion_target_type: str. The entity type of the target of the
+            suggestion.
+
+    Returns:
+        str. The the entity type for the given suggestion target type.
+    """
+    if suggestion_target_type == suggestion_models.TARGET_TYPE_SKILL:
+        return feconf.ENTITY_TYPE_QUESTION_SUGGESTION
+    elif suggestion_target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
+        return feconf.ENTITY_TYPE_EXPLORATION_SUGGESTION
+    else:
+        raise Exception('Invalid suggestion target type.')

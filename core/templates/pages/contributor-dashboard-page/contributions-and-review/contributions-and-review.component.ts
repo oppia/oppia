@@ -236,7 +236,7 @@ angular.module('oppia').component('contributionsAndReview', {
             ctrl.contributions[suggestionId].details);
           var skillId = suggestion.change.skill_id;
           ContextService.setCustomEntityContext(
-            ENTITY_TYPE.SUGGESTION, skillId);
+            ENTITY_TYPE.QUESTION_SUGGESTION, skillId);
           SkillBackendApiService.fetchSkill(skillId).then((skillDict) => {
             var misconceptionsBySkill = {};
             var skill = skillDict.skill;
