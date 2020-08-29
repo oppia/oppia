@@ -540,21 +540,10 @@ class DeployTests(test_utils.GenericTestBase):
                 deploy.preprocess_release('oppiaserver', 'deploy_dir')
 
     def test_constants_and_app_dev_are_updated_correctly(self):
-        check_function_calls = {
-            'add_redishost_gets_called': False
-        }
-        expected_check_function_calls = {
-            'add_redishost_gets_called': True
-        }
-        def mock_add_redishost():
-            check_function_calls['add_redishost_gets_called'] = True
-
         constants_swap = self.swap(
             common, 'CONSTANTS_FILE_PATH', VALID_CONSTANTS)
         app_dev_swap = self.swap(
             deploy, 'APP_DEV_YAML_PATH', VALID_APP_DEV_YAML_PATH)
-        redishost_swap = self.swap(
-            update_configs, 'add_redishost', mock_add_redishost)
         files_swap = self.swap(deploy, 'FILES_AT_ROOT', [])
         images_dir_swap = self.swap(deploy, 'IMAGE_DIRS', [])
 
@@ -573,14 +562,12 @@ class DeployTests(test_utils.GenericTestBase):
 
         try:
             with self.exists_swap, constants_swap, files_swap, images_dir_swap:
-                with self.listdir_swap, app_dev_swap, redishost_swap:
+                with self.listdir_swap, app_dev_swap:
                     deploy.preprocess_release('oppiaserver', 'deploy_dir')
             with python_utils.open_file(VALID_CONSTANTS, 'r') as f:
                 self.assertEqual(f.read(), expected_common_content)
             with python_utils.open_file(VALID_APP_DEV_YAML_PATH, 'r') as f:
                 self.assertEqual(f.read(), expected_app_dev_content)
-            self.assertEqual(
-                check_function_calls, expected_check_function_calls)
         finally:
             with python_utils.open_file(VALID_CONSTANTS, 'w') as f:
                 f.write(original_common_content)

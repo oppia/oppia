@@ -178,8 +178,6 @@ def preprocess_release(app_name, deploy_data_path):
         os.path.join(APP_DEV_YAML_PATH), 'w') as app_dev_file:
         app_dev_file.write(updated_app_dev_content)
 
-    update_configs.add_redishost()
-
 
 def check_errors_in_a_page(url_to_check, msg_to_confirm):
     """Prompts user to check errors in a page.
@@ -567,6 +565,8 @@ def execute_deployment():
                         'MAILGUN_API_KEY = None' in feconf_contents):
                     raise Exception(
                         'The mailgun API key must be added before deployment.')
+
+        update_configs.add_redishost()
 
         if not os.path.exists(THIRD_PARTY_DIR):
             raise Exception(
