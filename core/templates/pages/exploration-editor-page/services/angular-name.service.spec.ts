@@ -21,7 +21,7 @@ import { AngularNameService } from
 
 describe('Angular names service', () => {
   describe('angular name service', () => {
-    let ans: AngularNameService;
+    let ans: AngularNameService = null;
 
     beforeEach(() => {
       ans = new AngularNameService();
