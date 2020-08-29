@@ -134,11 +134,13 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'\bypassSecurityTrust'),
+        'regexp': re.compile(r'bypassSecurityTrust'),
         'message': 'The use of bypassSecurityTrust is not allowed.',
-        'excluded_files': (warranted_angular_security_bypasses
+        'excluded_files': (
+            warranted_angular_security_bypasses
             .EXCULDED_BYPASS_SECURTIY_TRUST_FILES),
-        'excluded_dir': (warranted_angular_security_bypasses
+        'excluded_dirs': (
+            warranted_angular_security_bypasses
             .EXCULDED_BYPASS_SECURTIY_TRUST_DIRECTORIES)
     },
     {

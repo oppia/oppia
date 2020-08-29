@@ -1,4 +1,4 @@
-	# coding: utf-8
+# coding: utf-8
 #
 # Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
