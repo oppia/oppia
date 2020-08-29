@@ -28,8 +28,8 @@ import { StateCardObjectFactory } from
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 
 describe('Exploration Player Suggestion Modal Controller', function() {
+  var $flushPendingTasks = null;
   var $scope = null;
-  var $timeout = null;
   var $uibModalInstance = null;
   var ContextService = null;
   var ExplorationEngineService = null;
@@ -55,8 +55,8 @@ describe('Exploration Player Suggestion Modal Controller', function() {
   });
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
+    $flushPendingTasks = $injector.get('$flushPendingTasks');
     var $rootScope = $injector.get('$rootScope');
-    $timeout = $injector.get('$timeout');
     ContextService = $injector.get('ContextService');
     spyOn(ContextService, 'getExplorationId').and.returnValue('exp1');
 
@@ -93,22 +93,24 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     });
   }));
 
-  it('should evaluate initialized properties', function() {
-    expect($scope.originalHtml).toBe('Content html');
-    expect($scope.description).toBe('');
-    expect($scope.suggestionData).toEqual({
-      suggestionHtml: 'Content html'
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.originalHtml).toBe('Content html');
+      expect($scope.description).toBe('');
+      expect($scope.suggestionData).toEqual({
+        suggestionHtml: 'Content html'
+      });
+      expect($scope.showEditor).toBe(false);
     });
-    expect($scope.showEditor).toBe(false);
-  });
 
-  it('should show editor after 500 milliseconds', function() {
+  it('should show editor when flushing timeout task', function() {
     expect($scope.showEditor).toBe(false);
-    $timeout.flush(500);
+    $flushPendingTasks();
     expect($scope.showEditor).toBe(true);
   });
 
-  it('should cancel suggestion', function() {
+  it('should cancel suggestion in suggestion modal when clicking cancel' +
+    ' suggestion button', function() {
     spyOn(suggestionModalService, 'cancelSuggestion').and.callThrough();
     $scope.cancelSuggestion();
 
@@ -116,7 +118,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
       $uibModalInstance);
   });
 
-  it('should submit suggestion', function() {
+  it('should submit a suggestion when closing the modal', function() {
     spyOn(ExplorationEngineService, 'getExplorationId').and.returnValue('exp1');
     spyOn(ExplorationEngineService, 'getExplorationVersion').and.returnValue(
       '1');

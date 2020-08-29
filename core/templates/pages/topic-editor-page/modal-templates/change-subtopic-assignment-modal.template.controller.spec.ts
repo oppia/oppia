@@ -35,10 +35,11 @@ describe('Change subtopic assignment modal', function() {
     });
   }));
 
-  it('should init the variables', function() {
-    expect($scope.subtopics).toEqual(subtopics);
-    expect($scope.selectedSubtopicId).toEqual(null);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.subtopics).toEqual(subtopics);
+      expect($scope.selectedSubtopicId).toEqual(null);
+    });
 
   it('should change the selected subtopic index', function() {
     $scope.changeSelectedSubtopic(10);
