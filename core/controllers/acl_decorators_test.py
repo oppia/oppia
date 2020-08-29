@@ -2614,7 +2614,8 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
         self.question_id = question_services.get_new_question_id()
         self.question = self.save_new_question(
             self.question_id, self.admin_id,
-            self._create_valid_question_data('ABC'), [self.skill_id])
+            self._create_valid_question_data('ABC'), [self.skill_id],
+            ['skill-1', 'skill-2'])
         question_services.create_new_question_skill_link(
             self.admin_id, self.question_id, self.skill_id, 0.5)
 
@@ -2990,7 +2991,8 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         self.question_id = 'question_id'
         self.save_new_question(
             self.question_id, self.owner_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC'), ['skill_1'],
+            ['skill-1', 'skill-2'])
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -3064,7 +3066,8 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
         ))
         self.save_new_question(
             self.question_id, self.owner_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC'), ['skill_1'],
+            ['skill-1', 'skill-2'])
 
     def test_can_play_question_with_valid_question_id(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -3107,7 +3110,8 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
         self.question_id = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id, self.owner_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC'), ['skill_1'],
+            ['skill-1', 'skill-2'])
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -3199,7 +3203,8 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.question_id = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id, self.owner_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC'), ['skill_1'],
+            ['skill-1', 'skill-2'])
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(

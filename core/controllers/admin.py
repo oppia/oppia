@@ -364,7 +364,7 @@ class AdminHandler(base.BaseHandler):
         question = question_domain.Question(
             question_id, state,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids)
+            constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids, [])
         return question
 
     def _create_dummy_skill(self, skill_id, skill_description, explanation):

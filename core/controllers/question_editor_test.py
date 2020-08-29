@@ -67,7 +67,7 @@ class BaseQuestionEditorControllerTests(test_utils.GenericTestBase):
             self.question_id,
             self.editor_id,
             self._create_valid_question_data('ABC'),
-            [self.skill_id])
+            [self.skill_id], ['skill-1', 'skill-2'])
 
 
 class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
@@ -383,7 +383,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         self.question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'), [self.skill_id])
+            self._create_valid_question_data('ABC'), [self.skill_id],
+            ['skill-1', 'skill-2'])
 
     def test_put_with_non_admin_or_topic_manager_disallows_access(self):
         self.login(self.NEW_USER_EMAIL)

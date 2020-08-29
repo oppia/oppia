@@ -710,7 +710,8 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             self.QUESTION_1_ID,
             self.user_1_id,
             self._create_valid_question_data('ABC'),
-            [self.SKILL_1_ID]
+            [self.SKILL_1_ID],
+            ['skill-1', 'skill-2']
         )
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
@@ -844,7 +845,8 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             self.QUESTION_2_ID,
             self.user_1_id,
             self._create_valid_question_data('ABC'),
-            [self.SKILL_1_ID]
+            [self.SKILL_1_ID],
+            ['skill-1', 'skill-2']
         )
 
         wipeout_service.delete_user(
@@ -894,7 +896,8 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             self.QUESTION_2_ID,
             self.user_2_id,
             self._create_valid_question_data('ABC'),
-            [self.SKILL_1_ID]
+            [self.SKILL_1_ID],
+            ['skill-1', 'skill-2']
         )
 
         wipeout_service.delete_user(
@@ -1063,13 +1066,15 @@ class WipeoutServiceVerifyDeleteQuestionModelsTests(test_utils.GenericTestBase):
             self.QUESTION_1_ID,
             self.user_1_id,
             self._create_valid_question_data('ABC'),
-            [self.SKILL_1_ID]
+            [self.SKILL_1_ID],
+            ['skill-1', 'skill-2']
         )
         self.save_new_question(
             self.QUESTION_2_ID,
             self.user_2_id,
             self._create_valid_question_data('ABC'),
-            [self.SKILL_1_ID]
+            [self.SKILL_1_ID],
+            ['skill-1', 'skill-2']
         )
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)

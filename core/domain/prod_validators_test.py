@@ -2362,7 +2362,8 @@ class SkillOpportunityModelValidatorTests(test_utils.AuditJobsTestBase):
         self.QUESTION_ID = question_services.get_new_question_id()
         self.save_new_question(
             self.QUESTION_ID, self.owner_id,
-            self._create_valid_question_data('ABC'), ['0'])
+            self._create_valid_question_data('ABC'), ['0'],
+            ['skill-1', 'skill-2'])
         question_services.create_new_question_skill_link(
             self.owner_id, self.QUESTION_ID, '0', 0.3)
 

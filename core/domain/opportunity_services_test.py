@@ -455,7 +455,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     def test_create_skill_opportunity_counts_existing_linked_questions(self):
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), [self.SKILL_ID])
+            self._create_valid_question_data('ABC'), [self.SKILL_ID],
+            ['skill-1', 'skill-2'])
         question_services.create_new_question_skill_link(
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
 
@@ -640,7 +641,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), [self.SKILL_ID])
+            self._create_valid_question_data('ABC'), [self.SKILL_ID],
+            ['skill-1', 'skill-2'])
 
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
@@ -653,7 +655,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.SKILL_ID, 'description')
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), [self.SKILL_ID])
+            self._create_valid_question_data('ABC'), [self.SKILL_ID],
+            ['skill-1', 'skill-2'])
 
         question_services.create_new_question_skill_link(
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
@@ -668,7 +671,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.SKILL_ID, 'description')
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), ['skill_2'])
+            self._create_valid_question_data('ABC'), ['skill_2'],
+            ['skill-1', 'skill-2'])
 
         question_services.link_multiple_skills_for_question(
             self.USER_ID, self.QUESTION_ID, [self.SKILL_ID], [0.3])
@@ -683,7 +687,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.SKILL_ID, 'description')
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), [self.SKILL_ID])
+            self._create_valid_question_data('ABC'), [self.SKILL_ID],
+            ['skill-1', 'skill-2'])
 
         question_services.delete_question(self.USER_ID, self.QUESTION_ID)
 
@@ -698,7 +703,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.SKILL_ID, 'description')
         self.save_new_question(
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), ['skill_2'])
+            self._create_valid_question_data('ABC'), ['skill_2'],
+            ['skill-1', 'skill-2'])
         question_services.create_new_question_skill_link(
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
 

@@ -290,7 +290,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_state_data = self._create_valid_question_data('ABC')
         self.question = question_domain.Question(
             'question_id', question_state_data,
-            feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1, ['skill1'])
+            feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1, ['skill1'],
+            ['skillId-123'])
 
     def test_to_and_from_dict(self):
         """Test to verify to_dict and from_dict methods
@@ -305,7 +306,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'language_code': 'en',
             'version': 1,
-            'linked_skill_ids': ['skill1']
+            'linked_skill_ids': ['skill1'],
+            'not_applicable_misconception_ids': ['skill1-123']
         }
 
         observed_object = question_domain.Question.from_dict(question_dict)
@@ -450,6 +452,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(['skill_id1'], self.question.linked_skill_ids)
 
+    def test_update_not_applicable_misconception_ids(self):
+        """Test to verify update_not_applicable_misconception_ids method of the
+        Question domain object.
+        """
+        self.question.update_not_applicable_misconception_ids(
+            ['skillid-misconceptionid'])
+        self.assertEqual(
+            ['skillid-misconceptionid'],
+            self.question.not_applicable_misconception_ids)
+
     def test_update_question_state_data(self):
         """Test to verify update_question_state_data method of the Question
         domain object.
@@ -478,6 +490,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             question_content='<p>question content</p>',
             question_model_created_on=self.fake_date_created,
             question_model_last_updated=self.fake_date_updated,
+            misconception_ids=['skill1-1', 'skill2-2']
         )
 
     def test_to_dict(self):
@@ -491,6 +504,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
                 self.fake_date_updated),
             'created_on_msec': utils.get_time_in_millisecs(
                 self.fake_date_created),
+            'misconception_ids': ['skill1-1', 'skill2-2']
         }
 
         self.assertEqual(expected_object_dict, self.observed_object.to_dict())
