@@ -1223,7 +1223,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                     'language_code': 'en',
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
-                    'linked_skill_ids': ['skill_1']
+                    'linked_skill_ids': ['skill_1'],
+                    'inapplicable_misconception_ids': ['skillid-1']
                 },
                 'skill_id': 'skill_1',
                 'skill_difficulty': 0.3,
@@ -1829,7 +1830,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                     'language_code': 'en',
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
-                    'linked_skill_ids': ['skill_1']
+                    'linked_skill_ids': ['skill_1'],
+                    'in_applicable_misconception_ids': ['skillid-1']
                 },
                 'skill_id': 'skill_1',
                 'skill_difficulty': 0.3,
