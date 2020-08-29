@@ -24,6 +24,12 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
+import { StateCustomizationArgsService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { StateInteractionIdService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solution.service';
@@ -36,12 +42,6 @@ import { AnswerGroupsCacheService } from
 
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { StateCustomizationArgsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { StateInteractionIdService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
 import { StateEditorRefreshService } from

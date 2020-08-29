@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for topic editor page component.
  */
 
+import { EventEmitter } from '@angular/core';
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('pages/topic-editor-page/topic-editor-page.component.ts');
-
-import { EventEmitter } from '@angular/core';
 
 describe('Topic editor page', function() {
   var ctrl = null;

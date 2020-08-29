@@ -32,8 +32,8 @@ import { ParamChangesObjectFactory } from
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { VoiceoverObjectFactory } from

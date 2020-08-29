@@ -16,12 +16,8 @@
  * @fileoverview Unit tests for item selection input validation service.
  */
 
-
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-
-/* eslint-disable max-len */
-/* eslint-enable max-len */
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -34,6 +30,7 @@ import { AppConstants } from 'app.constants';
 import { ItemSelectionInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { ItemSelectionInputValidationService } from
+  // eslint-disable-next-line max-len
   'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
 
 describe('ItemSelectionInputValidationService', () => {

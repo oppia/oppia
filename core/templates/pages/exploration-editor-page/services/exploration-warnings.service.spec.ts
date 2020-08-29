@@ -46,10 +46,6 @@ import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
-/* eslint-disable max-len */
-/* eslint-enable max-len */
-/* eslint-disable max-len */
-/* eslint-enable max-len */
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { VoiceoverObjectFactory } from
@@ -65,6 +61,7 @@ import { StateTopAnswersStats } from
 
 import { fakeAsync } from '@angular/core/testing';
 import { StateEditorService } from
+  // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';

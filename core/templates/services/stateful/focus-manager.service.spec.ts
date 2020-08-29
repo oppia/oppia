@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the FocusManagerService.
  */
 
+import { Subscription } from 'rxjs';
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -26,7 +28,6 @@ require('services/id-generation.service.ts');
 require('services/contextual/device-info.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
-import { Subscription } from 'rxjs';
 
 describe('Focus Manager Service', function() {
   var FocusManagerService;

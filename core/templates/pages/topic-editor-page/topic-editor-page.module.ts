@@ -32,29 +32,18 @@ angular.module('oppia', [
 ]);
 
 
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
-import { QuestionsListConstants } from
-  'components/question-directives/questions-list/questions-list.constants';
-import { ServicesConstants } from 'services/services.constants';
+
 import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
+
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { TopicEditorPageConstants } from
-  'pages/topic-editor-page/topic-editor-page.constants';
-import { PracticeTabComponent } from
-  'pages/topic-viewer-page/practice-tab/practice-tab.component';
-import { StoriesListComponent } from
-  'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
-import { SubtopicsListComponent } from
-  'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
 
 @NgModule({
   imports: [
@@ -103,8 +92,22 @@ import uiValidate from 'angular-ui-validate';
 import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { QuestionsListConstants } from
+  'components/question-directives/questions-list/questions-list.constants';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants';
+import { TopicEditorPageConstants } from
+  'pages/topic-editor-page/topic-editor-page.constants';
+import { PracticeTabComponent } from
+  'pages/topic-viewer-page/practice-tab/practice-tab.component';
+import { StoriesListComponent } from
+  'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
+import { SubtopicsListComponent } from
+  'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
+
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { ServicesConstants } from 'services/services.constants';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

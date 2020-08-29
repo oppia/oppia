@@ -32,6 +32,7 @@ import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeModule } from '@angular/upgrade/static';
 import uiValidate from 'angular-ui-validate';
 
 angular.module('oppia', [
@@ -39,7 +40,6 @@ angular.module('oppia', [
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
-
 
 import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from
@@ -97,7 +97,6 @@ class TopicViewerPageModule {
   ngDoBootstrap() {}
 }
 
-import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

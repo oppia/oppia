@@ -20,7 +20,6 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 import 'angular-ui-sortable';
-import uiValidate from 'angular-ui-validate';
 import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';
 import 'third-party-imports/ng-audio.import';
@@ -36,31 +35,10 @@ angular.module('oppia', [
   'ui.sortable', 'ui.tree', uiValidate,
 ]);
 
-import { downgradeComponent } from '@angular/upgrade/static';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-
-import { AppConstants } from 'app.constants';
-import { CkEditorCopyToolbarComponent } from
-  /* eslint-disable max-len */
-  'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
-import { ClassifiersExtensionConstants } from
-  'classifiers/classifiers-extension.constants';
-import { CollectionSummaryTileConstants } from
-  'components/summary-tile/collection-summary-tile.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
-
-import { ServicesConstants } from 'services/services.constants';
-import { StateEditorConstants } from
-  'components/state-editor/state-editor.constants';
 
 import { StatisticsDomainConstants } from
   'domain/statistics/statistics-domain.constants';
@@ -69,8 +47,6 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { ExplorationEditorPageConstants } from
-  'pages/exploration-editor-page/exploration-editor-page.constants';
 
 @NgModule({
   imports: [
@@ -111,6 +87,29 @@ class ExplorationEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+
+import { downgradeComponent } from '@angular/upgrade/static';
+import uiValidate from 'angular-ui-validate';
+
+import { AppConstants } from 'app.constants';
+import { ClassifiersExtensionConstants } from
+  'classifiers/classifiers-extension.constants';
+import { CkEditorCopyToolbarComponent } from
+  /* eslint-disable-next-line max-len */
+  'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
+import { SharedComponentsModule } from 'components/shared-component.module';
+import { StateEditorConstants } from
+  'components/state-editor/state-editor.constants';
+import { CollectionSummaryTileConstants } from
+  'components/summary-tile/collection-summary-tile.constants';
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants';
+import { ExplorationEditorPageConstants } from
+  'pages/exploration-editor-page/exploration-editor-page.constants';
+import { RequestInterceptor } from 'services/request-interceptor.service';
+import { ServicesConstants } from 'services/services.constants';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

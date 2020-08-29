@@ -15,9 +15,11 @@
 /**
  * @fileoverview Unit tests for Pencil Code Editor rules.
  */
+
 import { TestBed } from '@angular/core/testing';
 
 import { NormalizeWhitespacePunctuationAndCasePipe } from
+  // eslint-disable-next-line max-len
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';

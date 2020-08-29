@@ -29,6 +29,7 @@ import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeModule } from '@angular/upgrade/static';
 import uiValidate from 'angular-ui-validate';
 import 'third-party-imports/ng-audio.import';
 import 'third-party-imports/ui-tree.import';
@@ -85,8 +86,6 @@ class ReviewTestPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
   ngDoBootstrap() {}
 }
-
-import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

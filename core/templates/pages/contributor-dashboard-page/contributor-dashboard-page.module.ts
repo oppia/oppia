@@ -28,6 +28,11 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { downgradeModule } from '@angular/upgrade/static';
 import uiValidate from 'angular-ui-validate';
+import { AppConstants } from 'app.constants';
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
+import { SharedComponentsModule } from 'components/shared-component.module';
+
 import ngInfiniteScroll from 'ng-infinite-scroll';
 import 'third-party-imports/ui-tree.import';
 
@@ -40,11 +45,6 @@ angular.module('oppia', [
 import { ContributorDashboardConstants } from
   'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-
-import { AppConstants } from 'app.constants';
 
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';

@@ -37,7 +37,10 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeModule } from '@angular/upgrade/static';
+import uiValidate from 'angular-ui-validate';
 import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
@@ -51,14 +54,6 @@ import { CollectionHistoryTabComponent } from
 import { CollectionDetailsEditor } from
   // eslint-disable-next-line max-len
   'pages/collection-editor-page/settings-tab/collection-details-editor.directive';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-
-
-
-
-
-import { ServicesConstants } from 'services/services.constants';
-
 import { CollectionPermissionsCard } from
   // eslint-disable-next-line max-len
   'pages/collection-editor-page/settings-tab/collection-permissions-card.directive';
@@ -67,6 +62,9 @@ import { CollectionSettingsTabComponent } from
 import { CollectionStatisticsTabComponent } from
   // eslint-disable-next-line max-len
   'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
+import { RequestInterceptor } from 'services/request-interceptor.service';
+
+import { ServicesConstants } from 'services/services.constants';
 
 @NgModule({
   imports: [
@@ -106,10 +104,6 @@ class CollectionEditorPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
   ngDoBootstrap() {}
 }
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-import uiValidate from 'angular-ui-validate';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

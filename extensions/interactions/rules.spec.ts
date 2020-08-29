@@ -28,8 +28,10 @@ import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 
 import { AlgebraicExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
   'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 import { DragAndDropSortInputRulesService } from
+  // eslint-disable-next-line max-len
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
@@ -40,12 +42,15 @@ import { GraphUtilsService } from
 import { InteractiveMapRulesService } from
   'interactions/InteractiveMap/directives/interactive-map-rules.service';
 import { ItemSelectionInputRulesService } from
+  // eslint-disable-next-line max-len
   'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { LogicProofRulesService } from
   'interactions/LogicProof/directives/logic-proof-rules.service';
 import { MathEquationInputRulesService } from
+  // eslint-disable-next-line max-len
   'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import { MultipleChoiceInputRulesService } from
+  // eslint-disable-next-line max-len
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { MusicNotesInputRulesService } from
   'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
@@ -55,10 +60,12 @@ import { NumberWithUnitsRulesService } from
 
 
 import { NumericExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
   'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import { NumericInputRulesService } from
   'interactions/NumericInput/directives/numeric-input-rules.service';
 import { RatioExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
   'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
 
 

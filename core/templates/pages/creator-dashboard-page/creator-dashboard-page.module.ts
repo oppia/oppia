@@ -29,6 +29,7 @@ import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeModule } from '@angular/upgrade/static';
 import uiValidate from 'angular-ui-validate';
 import 'third-party-imports/ui-tree.import';
 
@@ -51,9 +52,6 @@ import { InteractionsExtensionsConstants } from
 import { CreatorDashboardConstants } from
   'pages/creator-dashboard-page/creator-dashboard-page.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-
-
-
 import { ServicesConstants } from 'services/services.constants';
 
 @NgModule({
@@ -88,7 +86,6 @@ class CreatorDashboardPageModule {
   ngDoBootstrap() {}
 }
 
-import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

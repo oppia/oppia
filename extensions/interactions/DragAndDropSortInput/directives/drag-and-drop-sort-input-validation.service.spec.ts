@@ -16,12 +16,9 @@
  * @fileoverview Unit tests for drag and drop sort input validation service.
  */
 
-
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 
-/* eslint-disable max-len */
-/* eslint-enable max-len */
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from
@@ -36,6 +33,7 @@ import { AppConstants } from 'app.constants';
 import { DragAndDropSortInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { DragAndDropSortInputValidationService } from
+  // eslint-disable-next-line max-len
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
 
 describe('DragAndDropSortInputValidationService', () => {

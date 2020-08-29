@@ -32,22 +32,17 @@ angular.module('oppia', [
 ]);
 
 
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
-import { QuestionsListConstants } from
-  'components/question-directives/questions-list/questions-list.constants';
-import { ServicesConstants } from 'services/services.constants';
+
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
+
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { SkillEditorPageConstants } from
-  'pages/skill-editor-page/skill-editor-page.constants';
 
 @NgModule({
   imports: [
@@ -89,8 +84,15 @@ import uiValidate from 'angular-ui-validate';
 import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { QuestionsListConstants } from
+  'components/question-directives/questions-list/questions-list.constants';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants';
+import { SkillEditorPageConstants } from
+  'pages/skill-editor-page/skill-editor-page.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { ServicesConstants } from 'services/services.constants';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

@@ -35,12 +35,16 @@ import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
 
 import { TopicsAndSkillsDashboardDomainConstants } from
+  // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
 
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeModule } from '@angular/upgrade/static';
+import uiValidate from 'angular-ui-validate';
 import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
@@ -49,13 +53,13 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 
-
 import { TopicsAndSkillsDashboardPageConstants } from
+  // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { ServicesConstants } from 'services/services.constants';
 
-/* eslint-disable max-len */
+/*  */
 /* eslint-enable max-len */
 
 @NgModule({
@@ -90,10 +94,6 @@ class TopicsAndSkillsDashboardPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
   ngDoBootstrap() {}
 }
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-import uiValidate from 'angular-ui-validate';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

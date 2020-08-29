@@ -20,8 +20,6 @@
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 
-/* eslint-disable max-len */
-/* eslint-enable max-len */
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -35,6 +33,7 @@ import { AppConstants } from 'app.constants';
 import { MultipleChoiceInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { MultipleChoiceInputValidationService } from
+  // eslint-disable-next-line max-len
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
 import { MultipleChoiceRuleInputs } from 'interactions/rule-input-defs';
 

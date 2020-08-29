@@ -28,12 +28,11 @@ angular.module('oppia', [
 ]);
 
 
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { StoryViewerDomainConstants } from
   'domain/story_viewer/story-viewer-domain.constants';
+
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule, StaticProvider } from '@angular/core';
@@ -76,6 +75,8 @@ import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {

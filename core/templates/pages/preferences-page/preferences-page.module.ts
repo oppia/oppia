@@ -34,6 +34,7 @@ import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeModule } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
@@ -41,8 +42,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-
-
 
 @NgModule({
   imports: [
@@ -71,8 +70,6 @@ class PreferencesPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
   ngDoBootstrap() {}
 }
-
-import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

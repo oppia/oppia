@@ -20,8 +20,6 @@
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 
-/* eslint-disable max-len*/
-/* eslint-enable max-len*/
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -33,6 +31,7 @@ import { AppConstants } from 'app.constants';
 import { ImageClickInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { ImageClickInputValidationService } from
+  // eslint-disable-next-line max-len
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { ImageClickRuleInputs } from 'interactions/rule-input-defs';
 

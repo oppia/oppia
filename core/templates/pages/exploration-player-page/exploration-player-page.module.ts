@@ -35,24 +35,16 @@ angular.module('oppia', [
 ]);
 
 
-import { ClassifiersExtensionConstants } from
-  'classifiers/classifiers-extension.constants';
-import { CollectionSummaryTileConstants } from
-  'components/summary-tile/collection-summary-tile.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
-import { ServicesConstants } from 'services/services.constants';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
+
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { ExplorationPlayerConstants } from
-  'pages/exploration-player-page/exploration-player-page.constants';
 
 @NgModule({
   imports: [
@@ -93,10 +85,19 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { downgradeModule } from '@angular/upgrade/static';
 import uiValidate from 'angular-ui-validate';
 import { AppConstants } from 'app.constants';
+import { ClassifiersExtensionConstants } from
+  'classifiers/classifiers-extension.constants';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { CollectionSummaryTileConstants } from
+  'components/summary-tile/collection-summary-tile.constants';
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants';
+import { ExplorationPlayerConstants } from
+  'pages/exploration-player-page/exploration-player-page.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { ServicesConstants } from 'services/services.constants';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
