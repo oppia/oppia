@@ -20,8 +20,9 @@ import 'mousetrap';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { KeyboardShortcutHelpModalComponent } from
+  // eslint-disable-next-line max-len
   'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component.ts';
-import { NgbModal, NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 class MockActiveModal {
@@ -139,10 +140,9 @@ describe('Keyboard Shortcuts', () => {
   it('should move the focus to the corresponding element' +
     ' when the action key is pressed', () => {
     openQuickReferenceSpy = spyOn(
-      keyboardShortcutService, 'openQuickReference').and.callThrough();;
-    spyOn(ngbModal,'open');
-    spyOn(ngbModal,'dismissAll');
-
+      keyboardShortcutService, 'openQuickReference').and.callThrough();
+    spyOn(ngbModal, 'open');
+    spyOn(ngbModal, 'dismissAll');
     
     keyboardShortcutService.bindLibraryPageShortcuts();
 
