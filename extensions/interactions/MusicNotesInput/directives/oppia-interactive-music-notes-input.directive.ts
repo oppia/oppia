@@ -33,6 +33,9 @@ require('services/alerts.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require(
   'interactions/interaction-attributes-extractor.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
+
+import { Subscription } from 'rxjs';
 
 interface MusicNote {
   baseNoteMidiNumber: number;
@@ -55,6 +58,7 @@ interface InteractiveMusicNotesInputCustomScope extends ng.IScope {
   _removeNotesFromNoteSequenceWithId?: ((noteId: string) => void);
   _sortNoteSequence?: (() => void);
   clearSequence?: (() => void);
+  directiveSubscriptions?: Subscription;
   generateNoteId?: (() => string);
   getLastAnswer?: (() => string);
   init?: (() => void);
@@ -73,15 +77,16 @@ interface InteractiveMusicNotesInputCustomScope extends ng.IScope {
   topPositionForCenterOfTopStaffLine?: number;
 }
 
+
 angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
   '$timeout', 'AlertsService', 'CurrentInteractionService',
   'InteractionAttributesExtractorService', 'MusicNotesInputRulesService',
-  'MusicPhrasePlayerService', 'EVENT_NEW_CARD_AVAILABLE',
+  'MusicPhrasePlayerService', 'PlayerPositionService',
   'NOTE_NAMES_TO_MIDI_VALUES',
   function(
       $timeout, AlertsService, CurrentInteractionService,
       InteractionAttributesExtractorService, MusicNotesInputRulesService,
-      MusicPhrasePlayerService, EVENT_NEW_CARD_AVAILABLE,
+      MusicPhrasePlayerService, PlayerPositionService,
       NOTE_NAMES_TO_MIDI_VALUES) {
     return {
       restrict: 'E',
@@ -99,7 +104,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         };
 
         scope.SOUNDFONT_URL =
-        '/third_party/static/midi-js-a8a842/examples/soundfont/';
+        '/third_party/static/midi-js-c26ebb/examples/soundfont/';
 
         const {
           sequenceToGuess,
@@ -115,11 +120,15 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           initialSequence :
           scope.getLastAnswer();
 
-        scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-          scope.interactionIsActive = false;
-          scope.initialSequence = scope.getLastAnswer();
-          scope.reinitStaff();
-        });
+        scope.directiveSubscriptions = new Subscription();
+
+        scope.directiveSubscriptions.add(
+          PlayerPositionService.onNewCardAvailable.subscribe(() => {
+            scope.interactionIsActive = false;
+            scope.initialSequence = scope.getLastAnswer();
+            scope.reinitStaff();
+          })
+        );
 
         /**
          * A note Object has a baseNoteMidiNumber and an offset property. For
@@ -555,9 +564,10 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         //   than b.
         var compareNoteStarts = function(a, b) {
           if (a.note.noteStart && b.note.noteStart) {
-            return (a.note.noteStart.num * b.note.noteStart.den -
-                    a.note.noteStart.den * b.note.noteStart.num) /
-                   (a.note.noteStart.den * b.note.noteStart.den);
+            return (
+              a.note.noteStart.num * b.note.noteStart.den -
+              a.note.noteStart.den * b.note.noteStart.num) /
+              (a.note.noteStart.den * b.note.noteStart.den);
           }
         };
 
@@ -634,15 +644,16 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           var lastHorizontalPositionOffset = element.find(
             '.oppia-music-input-note-choices div:first-child').position().left;
           var leftOffset =
-            lastHorizontalPositionOffset - ((MAXIMUM_NOTES_POSSIBLE - 1) *
-                            scope.HORIZONTAL_GRID_SPACING);
+            lastHorizontalPositionOffset - (
+              (MAXIMUM_NOTES_POSSIBLE - 1) * scope.HORIZONTAL_GRID_SPACING);
           return leftOffset + (
             noteStartAsFloat * scope.HORIZONTAL_GRID_SPACING);
         };
 
         var isCloneOffStaff = function(helperClone) {
-          return (!(helperClone.position().top > scope.staffTop &&
-                  helperClone.position().top < scope.staffBottom));
+          return (!(
+            helperClone.position().top > scope.staffTop &&
+            helperClone.position().top < scope.staffBottom));
         };
 
         var isLedgerLineNote = function(lineValue) {
@@ -717,8 +728,8 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           var correspondingNoteName =
             _getCorrespondingNoteName(note.baseNoteMidiNumber);
 
-          var accidental = (note.offset === 1 ? '#' :
-            note.offset === 0 ? '' : 'b');
+          var accidental = (
+            note.offset === 1 ? '#' : note.offset === 0 ? '' : 'b');
 
           return {
             readableNoteName:
@@ -885,6 +896,10 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         // and then initializes the view after staff has loaded.
         $(document).ready(function() {
           scope.reinitStaff();
+        });
+
+        scope.$on('$destroy', function() {
+          scope.directiveSubscriptions.unsubscribe();
         });
       }
     };

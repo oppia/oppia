@@ -220,7 +220,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
           };
 
           ctrl.getExplorationTitlePosition = function(index) {
-            if (index % 2 === 0 ) {
+            if (index % 2 === 0) {
               return '8px';
             } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
               return '30px';
@@ -310,7 +310,6 @@ angular.module('oppia').directive('collectionPlayerPage', [
               ctrl.collectionId).then(
               function(collection) {
                 ctrl.collection = collection;
-                $rootScope.$broadcast('collectionLoaded');
 
                 PageTitleService.setPageTitle(
                   ctrl.collection.getTitle() + ' - Oppia');

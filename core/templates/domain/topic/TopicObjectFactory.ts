@@ -260,6 +260,9 @@ export class Topic {
           ' does not have any skill IDs linked.');
       }
     }
+    if (!this._subtopics.length) {
+      issues.push('Topic should have at least 1 subtopic.');
+    }
     return issues;
   }
 
@@ -380,7 +383,8 @@ export class Topic {
     this._canonicalStoryReferences.splice(toIndex, 0, canonicalStoryToMove);
   }
 
-  rearrangeSkillInSubtopic(subtopicId, fromIndex, toIndex) {
+  rearrangeSkillInSubtopic(
+      subtopicId: number, fromIndex: number, toIndex: number): void {
     const subtopic = this.getSubtopicById(subtopicId);
     const skillToMove = cloneDeep(
       subtopic.getSkillSummaries()[fromIndex]);
@@ -388,7 +392,7 @@ export class Topic {
     subtopic._skillSummaries.splice(toIndex, 0, skillToMove);
   }
 
-  rearrangeSubtopic(fromIndex, toIndex) {
+  rearrangeSubtopic(fromIndex: number, toIndex: number): void {
     const subtopicToMove = cloneDeep(this._subtopics[fromIndex]);
     this._subtopics.splice(fromIndex, 1);
     this._subtopics.splice(toIndex, 0, subtopicToMove);

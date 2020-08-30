@@ -179,9 +179,9 @@ describe('Exploration Summary Backend Api Service', () => {
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith(
-      Error('Summaries fetched are null for explorationIds: ' +
-      explorationIds));
-  }));
+      Error(
+        'Summaries fetched are null for explorationIds: ' + explorationIds));
+  });
 
   it('should use reject handler when loading public exploration summaries' +
     ' from backend fails', fakeAsync(() => {

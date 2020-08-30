@@ -139,19 +139,19 @@ var TopicsAndSkillsDashboardPage = function() {
   // Only use this if the skills count is not zero. This is supposed to be used
   // for actions being performed on the skills like deleting, assigning etc.
   this.waitForSkillsToLoad = async function() {
-    await waitFor.visibilityOf(skillsTable,
-      'Skills table taking too long to appear.');
-    await waitFor.invisibilityOf(noSkillsPresentMessage,
-      'Skills list taking too long to appear.');
+    await waitFor.visibilityOf(
+      skillsTable, 'Skills table taking too long to appear.');
+    await waitFor.invisibilityOf(
+      noSkillsPresentMessage, 'Skills list taking too long to appear.');
   };
 
   // Only use this if the topics count is not zero. This is supposed to be used
   // for actions being performed on the topics like editing, deleting etc.
   this.waitForTopicsToLoad = async function() {
-    await waitFor.visibilityOf(topicsTable,
-      'Topics table taking too long to appear');
-    await waitFor.visibilityOf(topicsListItems.first(),
-      'Topics list taking too long to appear');
+    await waitFor.visibilityOf(
+      topicsTable, 'Topics table taking too long to appear');
+    await waitFor.visibilityOf(
+      topicsListItems.first(), 'Topics list taking too long to appear');
   };
 
   this.mergeSkillWithIndexToSkillWithIndex = async function(
@@ -361,8 +361,9 @@ var TopicsAndSkillsDashboardPage = function() {
     var editor = element(by.css('.protractor-test-concept-card-text'));
     await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
-
-    await (await browser.switchTo().activeElement()).sendKeys(reviewMaterial);
+    var skillReviewMaterialInput = editor.element(by.css('.oppia-rte'));
+    await action.click('Skill review material input', skillReviewMaterialInput);
+    await skillReviewMaterialInput.sendKeys(reviewMaterial);
 
     await waitFor.elementToBeClickable(
       confirmSkillCreationButton,

@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for ExplorationGraphModalController.
  */
 
+import { TestBed } from '@angular/core/testing';
+
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
+
 describe('Exploration Graph Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -26,7 +31,10 @@ describe('Exploration Graph Modal Controller', function() {
   var graphData = {};
   var stateName = 'Introduction';
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+  }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     GraphDataService = $injector.get('GraphDataService');
@@ -46,13 +54,14 @@ describe('Exploration Graph Modal Controller', function() {
     });
   }));
 
-  it('should evaluate scope variable values correctly', function() {
-    expect($scope.currentStateName).toBe(stateName);
-    expect($scope.graphData).toEqual(graphData);
-    expect($scope.isEditable).toBe(isEditable);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.currentStateName).toBe(stateName);
+      expect($scope.graphData).toEqual(graphData);
+      expect($scope.isEditable).toBe(isEditable);
+    });
 
-  it('should delete state', function() {
+  it('should delete state when closing the modal', function() {
     var stateName = 'State Name';
     $scope.deleteState(stateName);
 
@@ -62,7 +71,7 @@ describe('Exploration Graph Modal Controller', function() {
     });
   });
 
-  it('should select state', function() {
+  it('should select state when closing the modal', function() {
     var stateName = 'State Name';
     $scope.selectState(stateName);
 

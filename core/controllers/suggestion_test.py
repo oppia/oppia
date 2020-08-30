@@ -504,15 +504,29 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id))['suggestions'][0]
 
-        csrf_token = self.get_new_csrf_token()
-        self.put_json('%s/exploration/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_accept['target_id'],
-            suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted'
-            }, csrf_token=csrf_token)
+        # By default, when a suggestion is accepted and the recording of scores
+        # is enabled, the score of the author of that suggestion is increased
+        # by 1. Therefore, by setting that increment to the minimum score
+        # required to review, we can ensure that the author of this suggestion
+        # has a high enough score to review suggestions in this category. This
+        # will be used to test whether the author can review a suggestion in
+        # the same category because of the author's high score in a later test.
+        enable_recording_of_scores_swap = self.swap(
+            feconf, 'ENABLE_RECORDING_OF_SCORES', True)
+        increment_score_of_author_swap = self.swap(
+            suggestion_models, 'INCREMENT_SCORE_OF_AUTHOR_BY',
+            feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
+
+        with enable_recording_of_scores_swap, increment_score_of_author_swap:
+            csrf_token = self.get_new_csrf_token()
+            self.put_json('%s/exploration/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'Accepted'
+                }, csrf_token=csrf_token)
         suggestion_post_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
@@ -563,9 +577,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=401)
 
         # Testing users with scores above threshold can accept.
+        # The score of this author was increased to the review threshold amount
+        # when the editor accepted a suggestion that was authored by this user.
         self.login(self.AUTHOR_EMAIL)
-        suggestion_services.increment_score_for_user(
-            self.author_id, 'content.Algebra', 15)
 
         csrf_token = self.get_new_csrf_token()
         self.put_json('%s/exploration/%s/%s' % (
@@ -649,7 +663,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), ('target_id', self.EXP_ID)])[0]
         suggestion_services.reject_suggestion(
-            suggestion, self.reviewer_id, 'reject message')
+            suggestion.suggestion_id, self.reviewer_id, 'reject message')
         self.logout()
 
         self.login(self.AUTHOR_EMAIL)
@@ -1095,8 +1109,10 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
-
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
         self.EXP_ID = 'exp1'
@@ -1110,13 +1126,24 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_3'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A story', 'Description', self.TOPIC_ID, 'story-a')
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
 
         story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
@@ -1266,7 +1293,13 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
-
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.TOPIC_ID = 'topic'
@@ -1282,13 +1315,24 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_3'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A story', 'Description', self.TOPIC_ID, 'story-b')
         story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
 
         story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
@@ -1305,14 +1349,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.save_new_skill(
             self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
-        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
-
-        self.set_admins([self.ADMIN_USERNAME])
-        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         user_services.allow_user_to_review_question(self.reviewer_id)
         user_services.allow_user_to_review_translation_in_language(

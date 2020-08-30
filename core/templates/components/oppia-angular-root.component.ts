@@ -254,6 +254,7 @@ import { ExpressionSyntaxTreeService } from
   'expressions/expression-syntax-tree.service';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
+import { ExternalSaveService } from 'services/external-save.service.ts';
 import { ExtractImageFilenamesFromStateService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
@@ -370,12 +371,6 @@ import { MathEquationInputRulesService } from
 import { MathEquationInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MathEquationInput/directives/math-equation-input-validation.service';
-import { MathExpressionInputRulesService } from
-  // eslint-disable-next-line max-len
-  'interactions/MathExpressionInput/directives/math-expression-input-rules.service';
-import { MathExpressionInputValidationService } from
-  // eslint-disable-next-line max-len
-  'interactions/MathExpressionInput/directives/math-expression-input-validation.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
 import { MessengerService } from 'services/messenger.service';
 import { MetaTagCustomizationService } from
@@ -488,6 +483,11 @@ import { QuestionSummaryObjectFactory } from
   'domain/question/QuestionSummaryObjectFactory';
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
+import { RatioExpressionInputRulesService } from
+  'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
+import { RatioExpressionInputValidationService } from
+  'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
+import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
 import { ReadOnlyStoryNodeObjectFactory } from
@@ -557,6 +557,8 @@ import { StateContentService } from
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -812,6 +814,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static explorationTaskObjectFactory: ExplorationTaskObjectFactory;
   static expressionSyntaxTreeService: ExpressionSyntaxTreeService;
   static extensionTagAssemblerService: ExtensionTagAssemblerService;
+  static externalSaveService: ExternalSaveService;
   static extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService;
   static featuredTranslationLanguageObjectFactory: FeaturedTranslationLanguageObjectFactory;
   static featureStatusSummaryObjectFactory: FeatureStatusSummaryObjectFactory;
@@ -871,8 +874,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static lostChangeObjectFactory: LostChangeObjectFactory;
   static mathEquationInputRulesService: MathEquationInputRulesService;
   static mathEquationInputValidationService: MathEquationInputValidationService;
-  static mathExpressionInputRulesService: MathExpressionInputRulesService;
-  static mathExpressionInputValidationService: MathExpressionInputValidationService;
   static mathInteractionsService: MathInteractionsService;
   static messengerService: MessengerService;
   static metaTagCustomizationService: MetaTagCustomizationService;
@@ -928,6 +929,9 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static questionSummaryForOneSkillObjectFactory: QuestionSummaryForOneSkillObjectFactory;
   static questionSummaryObjectFactory: QuestionSummaryObjectFactory;
   static readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService;
+  static ratioExpressionInputRulesService: RatioExpressionInputRulesService;
+  static ratioExpressionInputValidationService: RatioExpressionInputValidationService;
+  static ratioObjectFactory: RatioObjectFactory;
   static ratingComputationService: RatingComputationService;
   static readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory;
   static readOnlySubtopicPageObjectFactory: ReadOnlySubtopicPageObjectFactory;
@@ -964,6 +968,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static stateClassifierMappingService: StateClassifierMappingService;
   static stateContentService: StateContentService;
   static stateCustomizationArgsService: StateCustomizationArgsService;
+  static stateEditorRefreshService: StateEditorRefreshService;
   static stateEditorService: StateEditorService;
   static keyboardShortcutService: KeyboardShortcutService;
   static stateGraphLayoutService: StateGraphLayoutService;
@@ -1141,6 +1146,7 @@ private explorationStatsService: ExplorationStatsService,
 private explorationTaskObjectFactory: ExplorationTaskObjectFactory,
 private expressionSyntaxTreeService: ExpressionSyntaxTreeService,
 private extensionTagAssemblerService: ExtensionTagAssemblerService,
+private externalSaveService: ExternalSaveService,
 private extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService,
 private featuredTranslationLanguageObjectFactory: FeaturedTranslationLanguageObjectFactory,
 private featureStatusSummaryObjectFactory: FeatureStatusSummaryObjectFactory,
@@ -1200,8 +1206,6 @@ private logicProofValidationService: LogicProofValidationService,
 private lostChangeObjectFactory: LostChangeObjectFactory,
 private mathEquationInputRulesService: MathEquationInputRulesService,
 private mathEquationInputValidationService: MathEquationInputValidationService,
-private mathExpressionInputRulesService: MathExpressionInputRulesService,
-private mathExpressionInputValidationService: MathExpressionInputValidationService,
 private mathInteractionsService: MathInteractionsService,
 private messengerService: MessengerService,
 private metaTagCustomizationService: MetaTagCustomizationService,
@@ -1257,6 +1261,9 @@ private questionBackendApiService: QuestionBackendApiService,
 private questionSummaryForOneSkillObjectFactory: QuestionSummaryForOneSkillObjectFactory,
 private questionSummaryObjectFactory: QuestionSummaryObjectFactory,
 private readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService,
+private ratioExpressionInputRulesService: RatioExpressionInputRulesService,
+private ratioExpressionInputValidationService: RatioExpressionInputValidationService,
+private ratioObjectFactory: RatioObjectFactory,
 private ratingComputationService: RatingComputationService,
 private readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory,
 private readOnlySubtopicPageObjectFactory: ReadOnlySubtopicPageObjectFactory,
@@ -1293,6 +1300,7 @@ private stateCardObjectFactory: StateCardObjectFactory,
 private stateClassifierMappingService: StateClassifierMappingService,
 private stateContentService: StateContentService,
 private stateCustomizationArgsService: StateCustomizationArgsService,
+private stateEditorRefreshService: StateEditorRefreshService,
 private stateEditorService: StateEditorService,
 private keyboardShortcutService: KeyboardShortcutService,
 private stateGraphLayoutService: StateGraphLayoutService,
@@ -1370,7 +1378,7 @@ private writtenTranslationObjectFactory: WrittenTranslationObjectFactory,
 private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
   ) {}
 
-  public ngAfterViewInit() {
+  public ngAfterViewInit(): void {
     OppiaAngularRootComponent.adminBackendApiService = this.adminBackendApiService;
     OppiaAngularRootComponent.adminDataService = this.adminDataService;
     OppiaAngularRootComponent.adminRouterService = this.adminRouterService;
@@ -1471,6 +1479,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.explorationTaskObjectFactory = this.explorationTaskObjectFactory;
     OppiaAngularRootComponent.expressionSyntaxTreeService = this.expressionSyntaxTreeService;
     OppiaAngularRootComponent.extensionTagAssemblerService = this.extensionTagAssemblerService;
+    OppiaAngularRootComponent.externalSaveService = this.externalSaveService;
     OppiaAngularRootComponent.extractImageFilenamesFromStateService = this.extractImageFilenamesFromStateService;
     OppiaAngularRootComponent.featuredTranslationLanguageObjectFactory = this.featuredTranslationLanguageObjectFactory;
     OppiaAngularRootComponent.featureStatusSummaryObjectFactory = this.featureStatusSummaryObjectFactory;
@@ -1530,8 +1539,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.lostChangeObjectFactory = this.lostChangeObjectFactory;
     OppiaAngularRootComponent.mathEquationInputRulesService = this.mathEquationInputRulesService;
     OppiaAngularRootComponent.mathEquationInputValidationService = this.mathEquationInputValidationService;
-    OppiaAngularRootComponent.mathExpressionInputRulesService = this.mathExpressionInputRulesService;
-    OppiaAngularRootComponent.mathExpressionInputValidationService = this.mathExpressionInputValidationService;
     OppiaAngularRootComponent.mathInteractionsService = this.mathInteractionsService;
     OppiaAngularRootComponent.messengerService = this.messengerService;
     OppiaAngularRootComponent.metaTagCustomizationService = this.metaTagCustomizationService;
@@ -1587,6 +1594,9 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.questionSummaryForOneSkillObjectFactory = this.questionSummaryForOneSkillObjectFactory;
     OppiaAngularRootComponent.questionSummaryObjectFactory = this.questionSummaryObjectFactory;
     OppiaAngularRootComponent.readOnlyCollectionBackendApiService = this.readOnlyCollectionBackendApiService;
+    OppiaAngularRootComponent.ratioExpressionInputRulesService = this.ratioExpressionInputRulesService;
+    OppiaAngularRootComponent.ratioExpressionInputValidationService = this.ratioExpressionInputValidationService;
+    OppiaAngularRootComponent.ratioObjectFactory = this.ratioObjectFactory;
     OppiaAngularRootComponent.ratingComputationService = this.ratingComputationService;
     OppiaAngularRootComponent.readOnlyStoryNodeObjectFactory = this.readOnlyStoryNodeObjectFactory;
     OppiaAngularRootComponent.readOnlySubtopicPageObjectFactory = this.readOnlySubtopicPageObjectFactory;
@@ -1623,6 +1633,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.stateClassifierMappingService = this.stateClassifierMappingService;
     OppiaAngularRootComponent.stateContentService = this.stateContentService;
     OppiaAngularRootComponent.stateCustomizationArgsService = this.stateCustomizationArgsService;
+    OppiaAngularRootComponent.stateEditorRefreshService = this.stateEditorRefreshService;
     OppiaAngularRootComponent.stateEditorService = this.stateEditorService;
     OppiaAngularRootComponent.keyboardShortcutService = this.keyboardShortcutService;
     OppiaAngularRootComponent.stateGraphLayoutService = this.stateGraphLayoutService;

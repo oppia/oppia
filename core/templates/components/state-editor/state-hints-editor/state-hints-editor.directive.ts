@@ -50,6 +50,7 @@ require('services/context.service.ts');
 require('services/editability.service.ts');
 require('services/generate-content-id.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/external-save.service.ts');
 
 angular.module('oppia').directive('stateHintsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -66,14 +67,16 @@ angular.module('oppia').directive('stateHintsEditor', [
         'state-hints-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter', 'AlertsService',
-        'EditabilityService', 'StateEditorService', 'StateHintsService',
+        'EditabilityService', 'ExternalSaveService',
+        'StateEditorService', 'StateHintsService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
         'StateSolutionService',
         'UrlInterpolationService', 'WindowDimensionsService',
         'INTERACTION_SPECS',
         function(
             $scope, $rootScope, $uibModal, $filter, AlertsService,
-            EditabilityService, StateEditorService, StateHintsService,
+            EditabilityService, ExternalSaveService,
+            StateEditorService, StateHintsService,
             StateInteractionIdService, StateNextContentIdIndexService,
             StateSolutionService,
             UrlInterpolationService, WindowDimensionsService,
@@ -130,7 +133,7 @@ angular.module('oppia').directive('stateHintsEditor', [
               return;
             }
             AlertsService.clearWarnings();
-            $rootScope.$broadcast('externalSave');
+            ExternalSaveService.onExternalSave.emit();
 
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -138,6 +141,7 @@ angular.module('oppia').directive('stateHintsEditor', [
                 'modal-templates/add-hint-modal.template.html'),
               backdrop: 'static',
               resolve: {},
+              windowClass: 'add-hint-modal',
               controller: 'AddHintModalController'
             }).result.then(function(result) {
               StateHintsService.displayed.push(result.hint);
@@ -240,7 +244,7 @@ angular.module('oppia').directive('stateHintsEditor', [
               revert: 100,
               tolerance: 'pointer',
               start: function(e, ui) {
-                $rootScope.$broadcast('externalSave');
+                ExternalSaveService.onExternalSave.emit();
                 StateHintsService.setActiveHintIndex(null);
                 ui.placeholder.height(ui.item.height());
               },

@@ -818,7 +818,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
             if line != b'':
                 blank_line_counter = 0
 
-
     def check_docstring_structure(self, node):
         """Checks whether the docstring has the correct structure i.e.
         do not have space at the beginning and have a period at the end of
@@ -1605,65 +1604,6 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
             self.add_message('single-space-after-yield', node=node)
 
 
-class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
-    """Checks if there are excessive newlines between method definitions."""
-
-    __implements__ = interfaces.IRawChecker
-
-    name = 'excessive-new-lines'
-    priority = -1
-    msgs = {
-        'C0011': (
-            'Excessive new lines between function definations.',
-            'excessive-new-lines',
-            'Remove extra newlines.'
-        )
-    }
-
-    def process_module(self, node):
-        """Process a module to ensure that method definitions are not seperated
-        by more than two blank lines.
-
-        Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
-        """
-        in_multi_line_comment = False
-        multi_line_indicator = b'"""'
-        file_content = read_from_node(node)
-        file_length = len(file_content)
-        blank_line_counter = 0
-
-        for line_num in python_utils.RANGE(file_length):
-            line = file_content[line_num].strip()
-
-            # Single multi-line comment, ignore it.
-            if line.count(multi_line_indicator) == 2:
-                continue
-
-            # Flip multi-line boolean depending on whether or not we see
-            # the multi-line indicator. Possible for multiline comment to
-            # be somewhere other than the start of a line (e.g. func arg),
-            # so we can't look at start of or end of a line, which is why
-            # the case where two indicators in a single line is handled
-            # separately (i.e. one line comment with multi-line strings).
-            if multi_line_indicator in line:
-                in_multi_line_comment = not in_multi_line_comment
-
-            # Ignore anything inside a multi-line comment.
-            if in_multi_line_comment:
-                continue
-
-            if file_content[line_num] == b'\n':
-                blank_line_counter += 1
-            else:
-                blank_line_counter = 0
-
-            if line_num + 1 < file_length and blank_line_counter > 2:
-                line = file_content[line_num + 1].strip()
-                if line.startswith(b'def') or line.startswith(b'@'):
-                    self.add_message('excessive-new-lines', line=line_num + 1)
-
-
 class DivisionOperatorChecker(checkers.BaseChecker):
     """Checks if division operator is used."""
 
@@ -1816,7 +1756,7 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
     (missing-docstring) for missing file overviews.
     """
 
-    __implements__ = interfaces.IRawChecker
+    __implements__ = interfaces.IAstroidChecker
     name = 'space_between_imports_and_file-overview'
     priority = -1
     msgs = {
@@ -1832,45 +1772,37 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
         )
     }
 
-    def process_module(self, node):
-        """Process a module to ensure that there is a blank line below
+    def visit_module(self, node):
+        """Visit a module to ensure that there is a blank line below
         file overview docstring.
 
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-
-        multi_line_indicator = b'"""'
-        file_content = read_from_node(node)
-        file_length = len(file_content)
-        triple_quote_counter = 0
-        empty_line_counter = 0
-        for line_num in python_utils.RANGE(file_length):
-            line = file_content[line_num].strip()
-            # Single line comment, ignore it.
-            if line.startswith(b'#'):
-                continue
-            triple_quote_counter += line.count(multi_line_indicator)
-
-            if line.endswith(b'"""') and triple_quote_counter == 2:
-                closing_line_index_of_fileoverview = line_num
+        # Check if the given node has docstring.
+        if node.doc is None:
+            return
+        line_number = node.fromlineno
+        # Iterate till the start of docstring.
+        while True:
+            line = linecache.getline(node.root().file, line_number).strip()
+            if line.startswith((b'\'', b'"')):
                 break
+            else:
+                line_number += 1
 
-        if triple_quote_counter == 2:
-            empty_line_check_index = closing_line_index_of_fileoverview
-            if empty_line_check_index < file_length - 1:
-                while file_content[empty_line_check_index + 1] == b'\n':
-                    empty_line_counter += 1
-                    empty_line_check_index += 1
-
-            if empty_line_counter > 1:
-                self.add_message(
-                    'only-a-single-empty-line-should-be-provided',
-                    line=closing_line_index_of_fileoverview + 1)
-            elif empty_line_counter == 0:
-                self.add_message(
-                    'no-empty-line-provided-below-fileoverview',
-                    line=closing_line_index_of_fileoverview + 1)
+        doc_length = len(node.doc.split(b'\n'))
+        line_number += doc_length
+        first_line_after_doc = linecache.getline(
+            node.root().file, line_number).strip()
+        second_line_after_doc = linecache.getline(
+            node.root().file, line_number + 1).strip()
+        if first_line_after_doc != b'':
+            self.add_message(
+                'no-empty-line-provided-below-fileoverview', node=node)
+        elif second_line_after_doc == b'':
+            self.add_message(
+                'only-a-single-empty-line-should-be-provided', node=node)
 
 
 class SingleLinePragmaChecker(checkers.BaseChecker):
@@ -1932,7 +1864,6 @@ def register(linter):
     linter.register_checker(RestrictedImportChecker(linter))
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
     linter.register_checker(SingleSpaceAfterYieldChecker(linter))
-    linter.register_checker(ExcessiveEmptyLinesChecker(linter))
     linter.register_checker(DivisionOperatorChecker(linter))
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
