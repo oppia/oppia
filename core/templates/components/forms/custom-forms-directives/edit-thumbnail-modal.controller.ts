@@ -28,7 +28,8 @@ angular.module('oppia').controller('EditThumbnailModalController', [
   'dimensions', 'getPreviewDescription', 'getPreviewDescriptionBgColor',
   'getPreviewFooter', 'getPreviewTitle', 'openInUploadMode',
   'tempBgColor', 'uploadedImage', 'uploadedImageMimeType',
-  function($controller, $scope, $timeout, $uibModalInstance,
+  function(
+      $controller, $scope, $timeout, $uibModalInstance,
       ImageUploadHelperService, allowedBgColors, aspectRatio,
       dimensions, getPreviewDescription, getPreviewDescriptionBgColor,
       getPreviewFooter, getPreviewTitle, openInUploadMode,
