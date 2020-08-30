@@ -38,8 +38,10 @@
       </div>
 
       <div class="oppia-exp-summary-tiles-container" ng-if="$ctrl.pageMode === $ctrl.LIBRARY_PAGE_MODES.INDEX">
-        <img ng-src="<[$ctrl.bannerImageFileUrl]>" align="center"
-             width="100%" alt="">
+        <img ng-src="<[$ctrl.bannerImageFileUrl]>"
+             align="center"
+             width="100%"
+             alt="page banner">
         <div class="text-center w-100">
           <h1 class="oppia-library-h1 protractor-test-library-main-header" translate="I18N_LIBRARY_MAIN_HEADER"></h1>
           <h2 class="oppia-library-h2" translate="I18N_LIBRARY_SUB_HEADER"></h2>
@@ -56,7 +58,14 @@
             <p class="oppia-classroom-p" translate="I18N_CLASSROOM_CALLOUT_PARAGRAPH_1"></p>
             <a class="btn oppia-dashboard-intro-button oppia-transition-200" translate="I18N_CLASSROOM_CALLOUT_BUTTON" ng-href="/learn/math" href="/learn/math"></a>
           </div>
-          <img src="/assets/images/landing/math/fractions/matthew_paper.png" alt="">
+          <picture>
+            <source type="image/webp"
+                    ng-srcset="<[$ctrl.getStaticImageUrl('/landing/math/fractions/matthew_paper.webp')]>">
+            <source type="image/png"
+                    ng-srcset="<[$ctrl.getStaticImageUrl('/landing/math/fractions/matthew_paper.png')]>">
+            <img ng-src="<[$ctrl.getStaticImageUrl('/assets/images/landing/math/fractions/matthew_paper.png')]>"
+                 alt="math classroom illustration">
+          </picture>
         </div>
 
         <div ng-if="$ctrl.libraryGroups.length === 0"

@@ -59,7 +59,7 @@ def cleanup():
 
 
 def run_lighthouse_checks():
-    """Runs the lighthhouse checks through the lighthouserc.json config."""
+    """Runs the lighthhouse checks through the .lighthouserc.js config."""
 
     node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')

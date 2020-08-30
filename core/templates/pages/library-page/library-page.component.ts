@@ -202,6 +202,10 @@ angular.module('oppia').component('libraryPage', {
         ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
           '/library/' + ctrl.bannerImageFilename);
 
+        ctrl.getStaticImageUrl = function(imagePath) {
+          return UrlInterpolationService.getStaticImageUrl(imagePath);
+        };
+
         let service = ctrl.classroomBackendApiService;
         service.fetchClassroomPromosAreEnabledStatusAsync().then(
           function(classroomPromosAreEnabled) {
