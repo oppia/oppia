@@ -368,6 +368,18 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected all answer groups to have destination as None.')
 
+    def test_validation_for_inapplicable_misconception_ids(self):
+        """Test to verify that the validation fails when
+        inapplicable_misconception_ids field is invalid.
+        """
+        self.question.inapplicable_misconception_ids = ['Test', 1]
+        self._assert_validation_error(
+            'Expected inapplicable_misconception_ids to be a list of strings')
+
+        self.question.inapplicable_misconception_ids = ['skill-1', 'skill-1']
+        self._assert_validation_error(
+            'inapplicable_misconception_ids has duplicate values')
+
     def test_strict_validation_passes(self):
         """Test to verify validate method of a finalized Question domain object
         with correct input.
@@ -537,6 +549,13 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected last updated to be a datetime, received 1'):
+            self.observed_object.validate()
+
+    def test_validation_with_invalid_misconception_ids(self):
+        self.observed_object.misconception_ids = 1
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected misconception ids to be a list, received 1'):
             self.observed_object.validate()
 
 
