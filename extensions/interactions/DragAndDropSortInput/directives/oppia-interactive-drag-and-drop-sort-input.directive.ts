@@ -40,9 +40,9 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
         './drag-and-drop-sort-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'UrlService', 'CurrentInteractionService',
+        '$attrs', 'CurrentInteractionService',
         function(
-            $attrs, UrlService, CurrentInteractionService) {
+            $attrs, CurrentInteractionService) {
           var ctrl = this;
           var answers = [];
           ctrl.submitAnswer = function() {

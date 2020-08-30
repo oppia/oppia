@@ -37,11 +37,11 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
       template: require('./numeric-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'CurrentInteractionService', 'FocusManagerService',
-        'NumericInputRulesService', 'NumericInputValidationService',
+        '$attrs', 'CurrentInteractionService', 'NumericInputRulesService',
+        'NumericInputValidationService',
         function(
-            $attrs, CurrentInteractionService, FocusManagerService,
-            NumericInputRulesService, NumericInputValidationService) {
+            $attrs, CurrentInteractionService, NumericInputRulesService,
+            NumericInputValidationService) {
           var ctrl = this;
           ctrl.errorString = '';
           var isAnswerValid = function() {

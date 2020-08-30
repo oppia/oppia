@@ -50,13 +50,11 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
       template: require('./pencil-code-editor-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', '$element', '$uibModal',
-        'FocusManagerService', 'PencilCodeEditorRulesService',
-        'CurrentInteractionService',
+        '$attrs', '$element', '$uibModal', 'FocusManagerService',
+        'PencilCodeEditorRulesService', 'CurrentInteractionService',
         function(
-            $scope, $attrs, $element, $uibModal,
-            FocusManagerService, PencilCodeEditorRulesService,
-            CurrentInteractionService) {
+            $attrs, $element, $uibModal, FocusManagerService,
+            PencilCodeEditorRulesService, CurrentInteractionService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var iframeDiv, pce;

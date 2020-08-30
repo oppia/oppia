@@ -44,12 +44,10 @@ angular.module('oppia').component('skillPreviewTab', {
   controllerAs: '$ctrl',
   controller: [
     '$scope', 'ContextService', 'QuestionBackendApiService',
-    'QuestionObjectFactory', 'QuestionPlayerEngineService',
-    'SkillEditorStateService', 'StateCardObjectFactory', 'UrlService',
+    'QuestionPlayerEngineService', 'SkillEditorStateService', 'UrlService',
     function(
         $scope, ContextService, QuestionBackendApiService,
-        QuestionObjectFactory, QuestionPlayerEngineService,
-        SkillEditorStateService, StateCardObjectFactory, UrlService) {
+        QuestionPlayerEngineService, SkillEditorStateService, UrlService) {
       var ctrl = this;
       var QUESTION_COUNT = 20;
       const INTERACTION_TYPES = {

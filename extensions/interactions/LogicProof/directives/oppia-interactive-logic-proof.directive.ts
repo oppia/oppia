@@ -53,11 +53,9 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', '$timeout', '$uibModal', 'LogicProofRulesService',
-        'WindowDimensionsService', 'UrlService',
         'CurrentInteractionService',
         function(
             $scope, $attrs, $timeout, $uibModal, LogicProofRulesService,
-            WindowDimensionsService, UrlService,
             CurrentInteractionService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();

@@ -47,11 +47,9 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
       template: require('./code-repl-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'WindowDimensionsService',
-        'CurrentInteractionService',
+        '$scope', '$attrs', 'CurrentInteractionService',
         function(
-            $scope, $attrs, WindowDimensionsService,
-            CurrentInteractionService) {
+            $scope, $attrs, CurrentInteractionService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.initCodeEditor = function(editor) {

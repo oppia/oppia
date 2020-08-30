@@ -35,13 +35,13 @@ angular.module('oppia').directive('oppiaInteractiveEndExploration', [
       template: require('./end-exploration-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$attrs', '$q', 'UrlService',
+        '$http', '$attrs', 'UrlService',
         'ContextService', 'ReadOnlyCollectionBackendApiService',
         'PAGE_CONTEXT', 'EXPLORATION_EDITOR_TAB_CONTEXT',
         'InteractionAttributesExtractorService',
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
         function(
-            $http, $attrs, $q, UrlService,
+            $http, $attrs, UrlService,
             ContextService, ReadOnlyCollectionBackendApiService,
             PAGE_CONTEXT, EXPLORATION_EDITOR_TAB_CONTEXT,
             InteractionAttributesExtractorService,

@@ -39,11 +39,9 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', '$uibModal', 'NumberWithUnitsObjectFactory',
-        'NumberWithUnitsRulesService', 'NUMBER_WITH_UNITS_PARSING_ERRORS',
-        'CurrentInteractionService', function(
+        'NumberWithUnitsRulesService', 'CurrentInteractionService', function(
             $scope, $attrs, $uibModal, NumberWithUnitsObjectFactory,
-            NumberWithUnitsRulesService, NUMBER_WITH_UNITS_PARSING_ERRORS,
-            CurrentInteractionService) {
+            NumberWithUnitsRulesService, CurrentInteractionService) {
           var ctrl = this;
           var errorMessage = '';
           // Label for errors caused whilst parsing number with units.

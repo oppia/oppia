@@ -45,20 +45,9 @@ angular.module('oppia').directive('questionsTab', [
         '/pages/skill-editor-page/questions-tab/' +
         'skill-questions-tab.directive.html'),
       controller: [
-        '$scope', '$http', '$q', '$uibModal', '$window', 'AlertsService',
-        'SkillEditorStateService', 'UrlService',
-        'EditableQuestionBackendApiService', 'SkillBackendApiService',
-        'MisconceptionObjectFactory', 'QuestionObjectFactory',
-        'QuestionsListService',
-        'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
-        'NUM_QUESTIONS_PER_PAGE', function(
-            $scope, $http, $q, $uibModal, $window, AlertsService,
-            SkillEditorStateService, UrlService,
-            EditableQuestionBackendApiService, SkillBackendApiService,
-            MisconceptionObjectFactory, QuestionObjectFactory,
-            QuestionsListService,
-            StateEditorService, QuestionUndoRedoService, UndoRedoService,
-            NUM_QUESTIONS_PER_PAGE) {
+        '$scope', 'SkillEditorStateService', 'QuestionsListService',
+        function(
+            $scope, SkillEditorStateService, QuestionsListService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _init = function() {
