@@ -35,6 +35,7 @@ var login = async function(email, isSuperAdmin = false) {
     await (await driver.findElement(protractor.By.name('admin'))).click();
   }
   await (await driver.findElement(protractor.By.id('submit-login'))).click();
+  await waitFor.pageToFullyLoad();
 };
 
 var logout = async function() {
