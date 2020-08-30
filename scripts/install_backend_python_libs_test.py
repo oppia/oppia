@@ -19,16 +19,16 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.tests import test_utils
 import os
-from pip._internal.utils import misc
 import shutil
 import subprocess
-import sys
 
+from core.tests import test_utils
+from pip._internal.utils import misc
 import python_utils
 from scripts import common
 from scripts import install_backend_python_libs
+
 
 class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     """Test the script for installing backend python libs."""
@@ -40,7 +40,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         THIRD_PARTY_DATA_FILE_PATH, 'requirements_test.txt')
 
     def test_adding_library_to_requirements_returns_correct_mismatches(self):
-        def _mock_get_requirements_file_contents():
+        def mock_get_requirements_file_contents():
             return {
                 u'html5lib': u'1.0.1',
                 u'six': u'1.15.0',
@@ -48,7 +48,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 u'webencodings': u'0.5.1',
                 u'flask': u'1.0.1'
             }
-        def _mock_get_directory_file_contents():
+        def mock_get_directory_file_contents():
             return {
                 u'html5lib': u'1.0.1',
                 u'six': u'1.15.0',
@@ -58,10 +58,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         swap_get_requirements_file_contents = self.swap(
             install_backend_python_libs, '_get_requirements_file_contents',
-            _mock_get_requirements_file_contents)
+            mock_get_requirements_file_contents)
         swap_get_directory_file_contents = self.swap(
             install_backend_python_libs, '_get_third_party_directory_contents',
-            _mock_get_directory_file_contents)
+            mock_get_directory_file_contents)
         with swap_get_requirements_file_contents, (
             swap_get_directory_file_contents):
             self.assertEqual(
@@ -70,15 +70,16 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 },
                 install_backend_python_libs.get_mismatches())
 
-    def test_removing_library_from_requirements_returns_correct_mismatches(self):
-        def _mock_get_requirements_file_contents():
+    def test_removing_library_from_requirements_returns_correct_mismatches(
+            self):
+        def mock_get_requirements_file_contents():
             return {
                 u'html5lib': u'1.0.1',
                 u'six': u'1.15.0',
                 u'redis': u'3.5.3',
                 u'webencodings': u'0.5.1'
             }
-        def _mock_get_directory_file_contents():
+        def mock_get_directory_file_contents():
             return {
                 u'html5lib': u'1.0.1',
                 u'six': u'1.15.0',
@@ -89,10 +90,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         swap_get_requirements_file_contents = self.swap(
             install_backend_python_libs, '_get_requirements_file_contents',
-            _mock_get_requirements_file_contents)
+            mock_get_requirements_file_contents)
         swap_get_directory_file_contents = self.swap(
             install_backend_python_libs, '_get_third_party_directory_contents',
-            _mock_get_directory_file_contents)
+            mock_get_directory_file_contents)
         with swap_get_requirements_file_contents, (
             swap_get_directory_file_contents):
             self.assertEqual(
@@ -102,7 +103,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 install_backend_python_libs.get_mismatches())
 
     def test_multiple_discrepancies_returns_correct_mismatches(self):
-        def _mock_get_requirements_file_contents():
+        def mock_get_requirements_file_contents():
             return {
                 u'html5lib': u'1.0.1',
                 u'six': u'1.13.0',
@@ -110,7 +111,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 u'webencodings': u'0.5.2',
                 u'bleach': u'3.1.5'
             }
-        def _mock_get_directory_file_contents():
+        def mock_get_directory_file_contents():
             return {
                 u'html5lib': u'1.0.1',
                 u'six': u'1.15.0',
@@ -121,10 +122,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         swap_get_requirements_file_contents = self.swap(
             install_backend_python_libs, '_get_requirements_file_contents',
-            _mock_get_requirements_file_contents)
+            mock_get_requirements_file_contents)
         swap_get_directory_file_contents = self.swap(
             install_backend_python_libs, '_get_third_party_directory_contents',
-            _mock_get_directory_file_contents)
+            mock_get_directory_file_contents)
         with swap_get_requirements_file_contents, (
             swap_get_directory_file_contents):
             self.assertEqual(
@@ -135,7 +136,6 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     u'webencodings': (u'0.5.2', u'0.5.0')
                 },
                 install_backend_python_libs.get_mismatches())
-
 
     def test_rectify_party_directory_handles_library_upgrade(self):
         cmd_token_list = []
@@ -149,7 +149,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         swap_check_call = self.swap(subprocess, 'check_call', mock_check_call)
         with swap_check_call:
-            install_backend_python_libs._rectify_third_party_directory(
+            install_backend_python_libs._rectify_third_party_directory( # pylint: disable=protected-access
                 mismatches)
 
         self.assertEqual(
@@ -172,7 +172,6 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             ]
         )
 
-
     def test_rectify_party_directory_handles_library_downgrade(self):
         cmd_token_list = []
         def mock_check_call(cmd_tokens):
@@ -181,7 +180,6 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         metadata_removal_list = []
         def mock_remove_metadata(library, directory_version):
             metadata_removal_list.append((library, directory_version))
-
 
         mismatches = {
             u'flask': (u'1.1.1', u'10.0.1'),
@@ -193,7 +191,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         swap_check_call = self.swap(subprocess, 'check_call', mock_check_call)
         with swap_check_call, swap_metadata_removal:
-            install_backend_python_libs._rectify_third_party_directory(
+            install_backend_python_libs._rectify_third_party_directory( # pylint: disable=protected-access
                 mismatches)
 
         self.assertEqual(
@@ -236,7 +234,6 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_remove_dir(directory):
             removed_dirs.append(directory)
 
-
         mismatches = {
             u'flask': (None, u'10.0.1'),
             u'six': (None, u'10.13.0')
@@ -245,7 +242,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         swap_check_call = self.swap(subprocess, 'check_call', mock_check_call)
         with swap_check_call, swap_remove_dir:
-            install_backend_python_libs._rectify_third_party_directory(
+            install_backend_python_libs._rectify_third_party_directory( # pylint: disable=protected-access
                 mismatches)
 
         self.assertEqual(
@@ -289,7 +286,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         swap_check_call = self.swap(subprocess, 'check_call', mock_check_call)
         with swap_check_call:
-            install_backend_python_libs._rectify_third_party_directory(
+            install_backend_python_libs._rectify_third_party_directory( # pylint: disable=protected-access
                 mismatches)
 
         self.assertEqual(
@@ -336,7 +333,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         swap_check_call = self.swap(subprocess, 'check_call', mock_check_call)
         with swap_check_call, swap_remove_dir:
-            install_backend_python_libs._rectify_third_party_directory(
+            install_backend_python_libs._rectify_third_party_directory( # pylint: disable=protected-access
                 mismatches)
 
         self.assertEqual(
@@ -359,7 +356,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         )
 
     def test_get_third_party_directory_contents(self):
-        def mock_get_installed_distributions(skip, paths):
+        def mock_get_installed_distributions(skip, paths): # pylint: disable=unused-argument
             return [
                 'GoogleAppEnginePipeline 1.9.22.1',
                 'html5lib 1.0.1',
@@ -373,8 +370,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         with swap_get_installed_distributions:
             directory_contents = (
-                install_backend_python_libs.
-                    _get_third_party_directory_contents())
+                install_backend_python_libs. # pylint: disable=protected-access
+                _get_third_party_directory_contents())
 
         self.assertEqual(
             directory_contents,
@@ -384,7 +381,6 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 'mox': '0.5.3'
             })
 
-
     def test_get_requirements_file_contents(self):
         swap_requirements = self.swap(
             common, 'REQUIREMENTS_FILE_PATH',
@@ -392,7 +388,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         with swap_requirements:
             requirements_contents = (
-                install_backend_python_libs._get_requirements_file_contents())
+                install_backend_python_libs._get_requirements_file_contents()) # pylint: disable=protected-access
 
         self.assertEqual(
             requirements_contents,
@@ -430,23 +426,21 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         paths_to_delete = []
         def mock_rm(path):
             paths_to_delete.append(
-                path[len(common.THIRD_PARTY_PYTHON_LIBS_DIR) + 1: ])
+                path[len(common.THIRD_PARTY_PYTHON_LIBS_DIR) + 1:])
 
         swap_rm_tree = self.swap(shutil, 'rmtree', mock_rm)
         swap_os_rm = self.swap(os, 'remove', mock_rm)
         swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
+        swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
 
         libraries_to_remove = [
             ('webencodings', '0.5.1'),
             ('google-cloud-datastore', '1.15.0')
         ]
-        with swap_rm_tree, swap_os_rm, swap_list_dir:
+        with swap_rm_tree, swap_os_rm, swap_list_dir, swap_is_dir:
             for library, version in libraries_to_remove:
-                install_backend_python_libs._remove_metadata(library, version)
-        # test = os.path.join(
-        #     common.THIRD_PARTY_PYTHON_LIBS_DIR, 'webencodings-0.5.1.dist-info/'
-        # )
-        # print(test[len(common.THIRD_PARTY_PYTHON_LIBS_DIR):])
+                install_backend_python_libs._remove_metadata(library, version) # pylint: disable=protected-access
+
         self.assertEqual(
             paths_to_delete,
             [
