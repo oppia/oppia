@@ -877,26 +877,6 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                 ]
             )
 
-            # Load golden zip file.
-            golden_zip_filepath = os.path.join(
-                feconf.TESTS_DATA_DIR,
-                'oppia_takeout_data.zip')
-            with python_utils.open_file(
-                golden_zip_filepath, 'rb', encoding=None) as f:
-                golden_zipfile = f.read()
-            zf_gold = zipfile.ZipFile(
-                python_utils.string_io(buffer_value=golden_zipfile))
-
-            self.assertEqual(
-                zf_saved.open('oppia_takeout_data.json').read(),
-                zf_gold.open('oppia_takeout_data.json').read()
-            )
-            self.assertEqual(
-                zf_saved.open(
-                    'images/user_settings_profile_picture.png').read(),
-                zf_gold.open('images/user_settings_profile_picture.png').read()
-            )
-
     def test_export_account_handler_disabled_logged_in(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', False):
             self.get_json('/export-account-handler', expected_status_int=404)
