@@ -18,6 +18,7 @@
 
 require('components/forms/custom-forms-directives/image-uploader.directive.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require('objects/templates/svg-filename-editor.constants.ajs.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('services/alerts.service.ts');
 require('services/assets-backend-api.service.ts');
@@ -40,21 +41,15 @@ angular.module('oppia').component('svgFilenameEditor', {
     'AssetsBackendApiService', 'ContextService', 'CsrfTokenService',
     'DeviceInfoService', 'ImageLocalStorageService', 'ImagePreloaderService',
     'ImageUploadHelperService', 'UrlInterpolationService',
-    'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+    'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE', 'MAX_SVG_DIAGRAM_HEIGHT',
+    'MIN_SVG_DIAGRAM_HEIGHT', 'MAX_SVG_DIAGRAM_WIDTH', 'MIN_SVG_DIAGRAM_WIDTH',
     function($http, $q, $sce, $scope, AlertsService,
         AssetsBackendApiService, ContextService, CsrfTokenService,
         DeviceInfoService, ImageLocalStorageService, ImagePreloaderService,
         ImageUploadHelperService, UrlInterpolationService,
-        IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+        IMAGE_SAVE_DESTINATION_LOCAL_STORAGE, MAX_SVG_DIAGRAM_HEIGHT,
+        MIN_SVG_DIAGRAM_HEIGHT, MAX_SVG_DIAGRAM_WIDTH, MIN_SVG_DIAGRAM_WIDTH) {
       const ctrl = this;
-      // These max width and height paramameters were determined by manual
-      // testing and reference from OUTPUT_IMAGE_MAX_WIDTH_PX in
-      // filepath-editor file so that the created diagram fits the card
-      // content.
-      var MAX_DIAGRAM_WIDTH = 490;
-      var MAX_DIAGRAM_HEIGHT = 550;
-      var MIN_DIAGRAM_WIDTH = 30;
-      var MIN_DIAGRAM_HEIGHT = 30;
       // These constants are used to identify the tool that is currently being
       // used so that other tools can be disabled accordingly.
       const STATUS_EDITING = 'editing';
@@ -169,19 +164,19 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.defaultRadius = 30;
 
       ctrl.onWidthInputBlur = function() {
-        if (ctrl.diagramWidth > MAX_DIAGRAM_WIDTH) {
-          ctrl.diagramWidth = MAX_DIAGRAM_WIDTH;
-        } else if (ctrl.diagramWidth < MIN_DIAGRAM_WIDTH) {
-          ctrl.diagramWidth = MIN_DIAGRAM_WIDTH;
+        if (ctrl.diagramWidth > MAX_SVG_DIAGRAM_WIDTH) {
+          ctrl.diagramWidth = MAX_SVG_DIAGRAM_WIDTH;
+        } else if (ctrl.diagramWidth < MIN_SVG_DIAGRAM_WIDTH) {
+          ctrl.diagramWidth = MIN_SVG_DIAGRAM_WIDTH;
         }
         ctrl.currentDiagramWidth = ctrl.diagramWidth;
       };
 
       ctrl.onHeightInputBlur = function() {
-        if (ctrl.diagramHeight > MAX_DIAGRAM_HEIGHT) {
-          ctrl.diagramHeight = MAX_DIAGRAM_HEIGHT;
-        } else if (ctrl.diagramHeight < MIN_DIAGRAM_HEIGHT) {
-          ctrl.diagramHeight = MIN_DIAGRAM_HEIGHT;
+        if (ctrl.diagramHeight > MAX_SVG_DIAGRAM_HEIGHT) {
+          ctrl.diagramHeight = MAX_SVG_DIAGRAM_HEIGHT;
+        } else if (ctrl.diagramHeight < MIN_SVG_DIAGRAM_HEIGHT) {
+          ctrl.diagramHeight = MIN_SVG_DIAGRAM_HEIGHT;
         }
         ctrl.currentDiagramHeight = ctrl.diagramHeight;
       };

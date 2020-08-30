@@ -18,6 +18,7 @@
 
 import { fabric } from 'fabric';
 import { AppConstants } from 'app.constants';
+import { SvgFilenameEditorConstants } from './svg-filename-editor.constants';
 
 var initializeMockDocument = function(svgFilenameCtrl) {
   var mockDocument = document.createElement('div');
@@ -47,7 +48,7 @@ var initializeMockDocument = function(svgFilenameCtrl) {
   $document.find('body').append(mockDocument.outerHTML);
 };
 
-describe('SvgFilenameEditor', function() {
+fdescribe('SvgFilenameEditor', function() {
   var alertSpy = null;
   var contextService = null;
   var CsrfService = null;
@@ -246,22 +247,22 @@ describe('SvgFilenameEditor', function() {
 
   it('should reset to maximum and minimum dimension limits correctly',
     function() {
-      var MAX_DIAGRAM_WIDTH = 490;
-      var MAX_DIAGRAM_HEIGHT = 550;
-      var MIN_DIAGRAM_WIDTH = 30;
-      var MIN_DIAGRAM_HEIGHT = 30;
       svgFilenameCtrl.diagramWidth = 600;
       svgFilenameCtrl.diagramHeight = 600;
       svgFilenameCtrl.onWidthInputBlur();
-      expect(svgFilenameCtrl.currentDiagramWidth).toBe(MAX_DIAGRAM_WIDTH);
+      expect(svgFilenameCtrl.currentDiagramWidth).toBe(
+        SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_WIDTH);
       svgFilenameCtrl.onHeightInputBlur();
-      expect(svgFilenameCtrl.currentDiagramHeight).toBe(MAX_DIAGRAM_HEIGHT);
+      expect(svgFilenameCtrl.currentDiagramHeight).toBe(
+        SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_HEIGHT);
       svgFilenameCtrl.diagramWidth = 0;
       svgFilenameCtrl.diagramHeight = 0;
       svgFilenameCtrl.onWidthInputBlur();
-      expect(svgFilenameCtrl.currentDiagramWidth).toBe(MIN_DIAGRAM_WIDTH);
+      expect(svgFilenameCtrl.currentDiagramWidth).toBe(
+        SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_WIDTH);
       svgFilenameCtrl.onHeightInputBlur();
-      expect(svgFilenameCtrl.currentDiagramHeight).toBe(MIN_DIAGRAM_HEIGHT);
+      expect(svgFilenameCtrl.currentDiagramHeight).toBe(
+        SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_HEIGHT);
     });
 
   it('should check if diagram is created', function() {
@@ -578,7 +579,7 @@ describe('SvgFilenameEditor', function() {
 });
 
 
-describe('SvgFilenameEditor initialized with value attribute',
+fdescribe('SvgFilenameEditor initialized with value attribute',
   function() {
     var svgFilenameCtrl = null;
     var $httpBackend = null;
@@ -631,7 +632,7 @@ describe('SvgFilenameEditor initialized with value attribute',
   }
 );
 
-describe('SvgFilenameEditor with image save destination as ' +
+fdescribe('SvgFilenameEditor with image save destination as ' +
   'local storage', function() {
   var contextService = null;
   var svgFilenameCtrl = null;
@@ -755,7 +756,7 @@ describe('SvgFilenameEditor with image save destination as ' +
 });
 
 
-describe('should fail svg tag validation', function() {
+fdescribe('should fail svg tag validation', function() {
   var svgFilenameCtrl = null;
   var mockImageUploadHelperService = {
     getInvalidSvgTagsAndAttrs: function(dataURI) {
@@ -786,7 +787,7 @@ describe('should fail svg tag validation', function() {
   });
 });
 
-describe('should fail svg attribute validation', function() {
+fdescribe('should fail svg attribute validation', function() {
   var svgFilenameCtrl = null;
   var mockImageUploadHelperService = {
     getInvalidSvgTagsAndAttrs: function(dataURI) {
