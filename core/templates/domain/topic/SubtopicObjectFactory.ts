@@ -84,7 +84,7 @@ export class Subtopic {
     return this._title;
   }
 
-  setTitle(title): void {
+  setTitle(title: string): void {
     this._title = title;
   }
 
@@ -92,7 +92,7 @@ export class Subtopic {
     return this._urlFragment;
   }
 
-  setUrlFragment(urlFragment): void {
+  setUrlFragment(urlFragment: string): void {
     this._urlFragment = urlFragment;
   }
 
@@ -120,7 +120,7 @@ export class Subtopic {
     return issues;
   }
 
-  prepublishValidate(): Array<string> {
+  prepublishValidate(): string[] {
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Subtopic ' + this._title + ' should have a thumbnail.');
@@ -133,7 +133,7 @@ export class Subtopic {
     return this._skillSummaries.slice();
   }
 
-  getSkillIds(): Array<string> {
+  getSkillIds(): string[] {
     return this._skillIds.slice();
   }
 
@@ -189,7 +189,7 @@ export class SubtopicObjectFactory {
 
   create(
       subtopicBackendDict: SubtopicBackendDict,
-      skillIdToDescriptionMap: SkillIdToDescriptionMap) {
+      skillIdToDescriptionMap: SkillIdToDescriptionMap): Subtopic {
     return new Subtopic(
       subtopicBackendDict.id, subtopicBackendDict.title,
       subtopicBackendDict.skill_ids, skillIdToDescriptionMap,

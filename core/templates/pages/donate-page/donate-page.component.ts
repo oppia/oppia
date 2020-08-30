@@ -19,6 +19,7 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service.ts';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
@@ -26,7 +27,6 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service.ts';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-require('base-components/base-content.directive.ts');
 
 @Component({
   selector: 'donate-page',
@@ -37,18 +37,21 @@ export class DonatePageComponent implements OnInit {
   windowIsNarrow: boolean = false;
   donateImgUrl: string = '';
   constructor(
+    private pageTitleService: PageTitleService,
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionService: WindowDimensionsService,
     private windowRef: WindowRef
   ) {}
-  ngOnInit() {
+  ngOnInit(): void {
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.donateImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/general/opp_donate_text.svg');
+    this.pageTitleService.setPageTitle(
+      'Donate | Make a Positive Impact | Oppia');
   }
 
-  onDonateThroughAmazon() {
+  onDonateThroughAmazon(): boolean {
     this.siteAnalyticsService.registerGoToDonationSiteEvent('Amazon');
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = (
@@ -57,7 +60,7 @@ export class DonatePageComponent implements OnInit {
     return false;
   }
 
-  onDonateThroughPayPal() {
+  onDonateThroughPayPal(): void {
     // Redirection to PayPal will be initiated at the same time as this
     // function is run, but should be slow enough to allow this function
     // time to complete. It is not possible to do $http.post() in

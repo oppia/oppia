@@ -154,7 +154,8 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             node_titles=['Chapter 1'],
             thumbnail_filename='image.svg',
             thumbnail_bg_color='#F8BF74',
-            version=1)
+            version=1,
+            url_fragment='story-summary-frag')
         story_summary_model.put()
         story_summary_by_id = story_models.StorySummaryModel.get_by_id('id')
 
@@ -165,3 +166,5 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
         self.assertEqual(story_summary_by_id.thumbnail_bg_color, '#F8BF74')
         self.assertEqual(story_summary_by_id.thumbnail_filename, 'image.svg')
         self.assertEqual(story_summary_by_id.version, 1)
+        self.assertEqual(
+            story_summary_by_id.url_fragment, 'story-summary-frag')

@@ -322,10 +322,10 @@ describe('Collection editor state service', function() {
 
   it('should initially return an empty collection rights', function() {
     var collectionRights = CollectionEditorStateService.getCollectionRights();
-    expect(collectionRights.getCollectionId()).toBeUndefined();
-    expect(collectionRights.canEdit()).toBeUndefined();
-    expect(collectionRights.canUnpublish()).toBeUndefined();
-    expect(collectionRights.isPrivate()).toBeUndefined();
+    expect(collectionRights.getCollectionId()).toBeNull();
+    expect(collectionRights.canEdit()).toBeNull();
+    expect(collectionRights.canUnpublish()).toBeNull();
+    expect(collectionRights.isPrivate()).toBeNull();
     expect(collectionRights.getOwnerNames()).toEqual([]);
   });
 
@@ -441,10 +441,8 @@ describe('Collection editor state service', function() {
       CollectionEditorStateService.loadCollection(5);
       $rootScope.$apply();
 
-      spyOn($rootScope, '$broadcast').and.callThrough();
       expect(CollectionEditorStateService.saveCollection(
         'Commit message')).toBe(false);
-      expect($rootScope.$broadcast).not.toHaveBeenCalled();
     }
   );
 

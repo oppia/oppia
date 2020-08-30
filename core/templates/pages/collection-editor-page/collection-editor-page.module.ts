@@ -19,14 +19,13 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import 'third-party-imports/angular-js.import';
-import 'third-party-imports/headroom.import';
+import 'angular-ui-sortable';
+import uiValidate from 'angular-ui-validate';
 
 angular.module('oppia', [
-  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', require('angular-cookies'), 'ngJoyRide', 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
+  require('angular-cookies'), 'headroom', 'ngAnimate',
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 
 import { NgModule, StaticProvider } from '@angular/core';
@@ -44,8 +43,6 @@ import { CollectionDomainConstants } from
   'domain/collection/collection-domain.constants';
 import { CollectionEditorPageConstants } from
   'pages/collection-editor-page/collection-editor-page.constants';
-import { EditorDomainConstants } from
-  'domain/editor/editor-domain.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
@@ -89,7 +86,6 @@ import { CollectionStatisticsTabComponent } from
   providers: [
     AppConstants,
     CollectionDomainConstants,
-    EditorDomainConstants,
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,
     ServicesConstants,

@@ -32,9 +32,22 @@ interface LostChangeValues {
   'dest'?: string;
   'feedback'?: SubtitledHtml;
   'rules'?: Object;
+  'html'?: string;
 }
 
-type LostChangeValue = string | LostChangeValues;
+type LostChangeValue = string | string[] | LostChangeValues;
+
+// Properties are optional in 'LostChangeBackendDict' because all of them may
+// not be present in the dict and may change according to the cmd.
+interface LostChangeBackendDict {
+  'cmd': string;
+  'new_state_name'?: string;
+  'old_state_name'?: string;
+  'state_name'?: string;
+  'new_value'?: LostChangeValue;
+  'old_value'?: LostChangeValue;
+  'property_name'?: string;
+}
 
 export class LostChange {
   cmd: string;
@@ -64,16 +77,16 @@ export class LostChange {
   // object, then simply return that object. In case of an array, return
   // the last item.
   getStatePropertyValue(
-      statePropertyValue: Array<string> | Object): string | Object {
+      statePropertyValue: string[] | Object): string | Object {
     return Array.isArray(statePropertyValue) ?
       statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
   }
 
-  isEndingExploration() {
+  isEndingExploration(): boolean {
     return this.oldValue === null && this.newValue === 'EndExploration';
   }
 
-  isAddingInteraction() {
+  isAddingInteraction(): boolean {
     return this.oldValue === null && this.newValue !== 'EndExploration';
   }
 
@@ -85,7 +98,7 @@ export class LostChange {
     return this.utilsService.isEmpty(this.newValue);
   }
 
-  isOutcomeFeedbackEqual() {
+  isOutcomeFeedbackEqual(): boolean {
     if ((<LostChangeValues> this.newValue).outcome &&
       (<LostChangeValues> this.newValue).outcome.feedback &&
       (<LostChangeValues> this.oldValue).outcome &&
@@ -97,7 +110,7 @@ export class LostChange {
     return false;
   }
 
-  isOutcomeDestEqual() {
+  isOutcomeDestEqual(): boolean {
     if ((<LostChangeValues> this.newValue).outcome &&
       (<LostChangeValues> this.oldValue).outcome) {
       return (
@@ -107,12 +120,12 @@ export class LostChange {
     return false;
   }
 
-  isDestEqual() {
+  isDestEqual(): boolean {
     return (<LostChangeValues> this.oldValue).dest ===
       (<LostChangeValues> this.newValue).dest;
   }
 
-  isFeedbackEqual() {
+  isFeedbackEqual(): boolean {
     if ((<LostChangeValues> this.newValue).feedback &&
     (<LostChangeValues> this.oldValue).feedback) {
       return (
@@ -122,7 +135,7 @@ export class LostChange {
     return false;
   }
 
-  isRulesEqual() {
+  isRulesEqual(): boolean {
     return isEqual(
       (<LostChangeValues> this.newValue).rules,
       (<LostChangeValues> this.oldValue).rules);
@@ -172,7 +185,7 @@ export class LostChangeObjectFactory {
    * @param {String} lostChangeDict - the name of the type to fetch.
    * @returns {LostChange} - The associated type, if any.
    */
-  createNew(lostChangeDict) {
+  createNew(lostChangeDict: LostChangeBackendDict): LostChange {
     return new LostChange(
       this.utilsService,
       lostChangeDict.cmd,

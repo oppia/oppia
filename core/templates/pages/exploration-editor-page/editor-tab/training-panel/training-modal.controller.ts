@@ -63,7 +63,8 @@ angular.module('oppia').controller('TrainingModalController', [
   'ExplorationStatesService', 'ExplorationWarningsService', 'GraphDataService',
   'ResponsesService', 'StateEditorService', 'StateInteractionIdService',
   'TrainingDataService', 'finishTrainingCallback', 'unhandledAnswer',
-  function($injector, $scope, $uibModalInstance, AngularNameService,
+  function(
+      $injector, $scope, $uibModalInstance, AngularNameService,
       AnswerClassificationService, AnswerGroupObjectFactory,
       ExplorationStatesService, ExplorationWarningsService, GraphDataService,
       ResponsesService, StateEditorService, StateInteractionIdService,
@@ -106,7 +107,7 @@ angular.module('oppia').controller('TrainingModalController', [
       if (index > ResponsesService.getAnswerGroupCount()) {
         var newOutcome = $scope.classification.newOutcome;
         var newAnswerGroup = AnswerGroupObjectFactory.createNew(
-          [], angular.copy(newOutcome), [unhandledAnswer], null);
+          angular.copy(newOutcome), [unhandledAnswer], null);
         _saveNewAnswerGroup(newAnswerGroup);
         TrainingDataService.associateWithAnswerGroup(
           ResponsesService.getAnswerGroupCount() - 1,

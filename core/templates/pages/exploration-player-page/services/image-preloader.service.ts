@@ -26,7 +26,8 @@ require('services/context.service.ts');
 angular.module('oppia').factory('ImagePreloaderService', [
   '$q', 'AssetsBackendApiService', 'ComputeGraphService',
   'ContextService', 'ExtractImageFilenamesFromStateService', 'ENTITY_TYPE',
-  function($q, AssetsBackendApiService, ComputeGraphService,
+  function(
+      $q, AssetsBackendApiService, ComputeGraphService,
       ContextService, ExtractImageFilenamesFromStateService, ENTITY_TYPE) {
     var MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
 
@@ -253,10 +254,27 @@ angular.module('oppia').factory('ImagePreloaderService', [
       }
     };
 
+    /**
+    * Gets the dimensions of the math SVGs from the SVG filename provided.
+    * @param {string} filename - The string from which the dimensions of the
+    *                           math SVGs should be extracted.
+    */
+    var getDimensionsOfMathSvg = function(filename) {
+      var dimensionsRegex = RegExp(
+        '[^/]+_height_([0-9d]+)_width_([0-9d]+)_vertical_([0-9d]+)\.svg', 'g');
+      var imageDimensions = dimensionsRegex.exec(filename);
+      var dimensions = {
+        height: imageDimensions[1].replace('d', '.'),
+        width: imageDimensions[2].replace('d', '.'),
+        verticalPadding: imageDimensions[3].replace('d', '.')
+      };
+      return dimensions;
+    };
     return {
       init: _init,
       kickOffImagePreloader: _kickOffImagePreloader,
       getDimensionsOfImage: getDimensionsOfImage,
+      getDimensionsOfMathSvg: getDimensionsOfMathSvg,
       onStateChange: _onStateChange,
       isInFailedDownload: _isInFailedDownload,
       isLoadingImageFile: function(filename) {

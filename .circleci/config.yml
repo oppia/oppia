@@ -19,7 +19,10 @@ workflows:
 
     jobs:
       - setup_and_typescript_tests
-      - e2e_non_prod_tests:
+      - e2e_non_prod_miscellaneous_tests:
+          requires:
+            - setup_and_typescript_tests
+      - e2e_non_prod_new_structure_tests:
           requires:
             - setup_and_typescript_tests
       - e2e_navigation_and_misc:
@@ -87,7 +90,7 @@ commands:
               fi
             fi
 
-  check_release_chaneglog_update_branch:
+  check_release_changelog_update_branch:
     description: "Skip job for release changelog update PRs"
     steps:
       - run:
@@ -114,6 +117,10 @@ jobs:
           name: Run typescript tests
           command: |
             python -m scripts.typescript_checks
+      - run:
+          name: Run typescript tests in strict mode
+          command: |
+            python -m scripts.typescript_checks --strict_checks
       - persist_to_workspace:
           root: /home/circleci/
           paths:
@@ -136,12 +143,7 @@ jobs:
           name: Run e2e navigation test
           command: |
             python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
-          # Provide a longer time period for this first test (which omits the
-          # --skip-build flag), since the webpack build process itself can take
-          # up to 10 minutes. If this is not done, then the test may stall due
-          # to lack of test output during this time.
-          no_output_timeout: 20m
-      - check_release_chaneglog_update_branch
+      - check_release_changelog_update_branch
       - run:
           name: Run e2e admin page test
           command: |
@@ -160,7 +162,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - check_release_chaneglog_update_branch
+      - check_release_changelog_update_branch
       - merge_target_branch
       - install_chrome
       - attach_workspace:
@@ -190,7 +192,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - check_release_chaneglog_update_branch
+      - check_release_changelog_update_branch
       - merge_target_branch
       - install_chrome
       - attach_workspace:
@@ -219,11 +221,11 @@ jobs:
   # Non-prod e2e Tests
   # The following tests must be run in a non-production environment because they are uploading files.
   # All other e2e tests should be run in prod mode.
-  e2e_non_prod_tests:
+  e2e_non_prod_miscellaneous_tests:
     <<: *job_defaults
     steps:
       - checkout
-      - check_release_chaneglog_update_branch
+      - check_release_changelog_update_branch
       - merge_target_branch
       - install_chrome
       - attach_workspace:
@@ -233,9 +235,31 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
       - run:
+          name: Run e2e play voiceovers test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers"
+      - run:
+          name: Run e2e file upload extensions test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions"
+      - run:
+          name: Run e2e contributor dashboard test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --contributor_dashboard_enabled
+
+  e2e_non_prod_new_structure_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - check_release_changelog_update_branch
+      - merge_target_branch
+      - install_chrome
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
           name: Run e2e topics and skills dashboard test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --server_log_level=info
+            python -m scripts.run_e2e_tests --skip-install --suite="topicsAndSkillsDashboard" --server_log_level=info
       - run:
           name: Run e2e topics and story editor
           command: |
@@ -248,14 +272,6 @@ jobs:
           name: Run e2e topic and story editor test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures"
-      - run:
-          name: Run e2e play voiceovers test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="playVoiceovers"
-      - run:
-          name: Run e2e file upload extensions test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions"
 
 notify:
   webhooks:

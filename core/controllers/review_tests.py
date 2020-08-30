@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import skill_fetchers
@@ -31,10 +30,6 @@ class ReviewTestsPage(base.BaseHandler):
     @acl_decorators.can_access_story_viewer_page
     def get(self, _):
         """Handles GET requests."""
-
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
-
         self.render_template('review-test-page.mainpage.html')
 
 
@@ -49,9 +44,6 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id):
         """Handles GET requests."""
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
-
         story = story_fetchers.get_story_by_id(story_id)
         latest_completed_node_ids = (
             story_fetchers.get_latest_completed_node_ids(self.user_id, story_id)
@@ -70,7 +62,6 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
         skill_descriptions = {}
         for skill in skills:
             skill_descriptions[skill.id] = skill.description
-
 
         self.values.update({
             'skill_descriptions': skill_descriptions,

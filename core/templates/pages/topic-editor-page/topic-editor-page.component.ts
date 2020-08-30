@@ -25,10 +25,10 @@ require(
 require('directives/angular-html-bind.directive.ts');
 require('services/bottom-navbar-status.service.ts');
 require('pages/topic-editor-page/editor-tab/topic-editor-tab.directive.ts');
-require('pages/topic-editor-page/subtopic-editor/' +
-    'subtopic-preview-tab.component.ts');
-require('pages/topic-editor-page/subtopic-editor/' +
-    'subtopic-editor-tab.component.ts');
+require(
+  'pages/topic-editor-page/subtopic-editor/subtopic-preview-tab.component.ts');
+require(
+  'pages/topic-editor-page/subtopic-editor/subtopic-editor-tab.component.ts');
 require(
   'pages/topic-editor-page/questions-tab/topic-questions-tab.directive.ts');
 
@@ -59,13 +59,12 @@ angular.module('oppia').directive('topicEditorPage', [
         '$scope', '$window', 'AlertsService', 'BottomNavbarStatusService',
         'ContextService', 'PageTitleService', 'EntityCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
-        'UndoRedoService', 'UrlService',
-        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED', 'TOPIC_VIEWER_URL_TEMPLATE',
-        function($scope, $window, AlertsService, BottomNavbarStatusService,
+        'UndoRedoService', 'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE',
+        function(
+            $scope, $window, AlertsService, BottomNavbarStatusService,
             ContextService, PageTitleService, EntityCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
-            UndoRedoService, UrlService,
-            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, TOPIC_VIEWER_URL_TEMPLATE) {
+            UndoRedoService, UrlService, TOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.getActiveTabName = function() {
@@ -194,8 +193,11 @@ angular.module('oppia').directive('topicEditorPage', [
             ctrl.prepublishValidationIssues = [];
             ctrl.warningsAreShown = false;
             BottomNavbarStatusService.markBottomNavbarStatus(true);
-            $scope.$on(
-              EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, setPageTitle);
+            ctrl.directiveSubscriptions.add(
+              UndoRedoService.onUndoRedoChangeApplied().subscribe(
+                () => setPageTitle()
+              )
+            );
           };
 
           ctrl.$onDestroy = function() {

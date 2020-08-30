@@ -77,11 +77,6 @@ describe('Contributor dashboard page', function() {
       $rootScope.$apply();
     });
 
-    it('should get username', function() {
-      expect(ctrl.userIsLoggedIn).toBe(true);
-      expect(ctrl.username).toBe('username1');
-    });
-
     it('should set specific properties after $onInit is called', function() {
       expect(ctrl.languageCode).toBe('hi');
       expect(TranslationLanguageService.setActiveLanguageCode)
@@ -91,7 +86,10 @@ describe('Contributor dashboard page', function() {
         '/assets/images/avatar/oppia_avatar_100px.svg');
     });
 
-    it('should evaluate user\'s backend data', function() {
+    it('should initialize $scope properties after controller is initialized' +
+      ' and get data from backend', function() {
+      expect(ctrl.userIsLoggedIn).toBe(true);
+      expect(ctrl.username).toBe('username1');
       expect(ctrl.userCanReviewTranslationSuggestionsInLanguages).toEqual([
         'English', 'Portuguese', 'Hindi']);
       expect(ctrl.userCanReviewVoiceoverSuggestionsInLanguages).toEqual([
@@ -101,24 +99,26 @@ describe('Contributor dashboard page', function() {
       expect(ctrl.profilePictureDataUrl).toBe(userProfileImage);
     });
 
-    it('should change active tab name', function() {
-      var changedTab = 'translateTextTab';
-      expect(ctrl.activeTabName).toBe('myContributionTab');
-      ctrl.onTabClick(changedTab);
-      expect(ctrl.activeTabName).toBe(changedTab);
-    });
+    it('should change active tab name when clicking on translate text tab',
+      function() {
+        var changedTab = 'translateTextTab';
+        expect(ctrl.activeTabName).toBe('myContributionTab');
+        ctrl.onTabClick(changedTab);
+        expect(ctrl.activeTabName).toBe(changedTab);
+      });
 
-    it('should change language', function() {
-      spyOn(LocalStorageService, 'updateLastSelectedTranslationLanguageCode')
-        .and.callThrough();
+    it('should change active language when clicking on language selector',
+      function() {
+        spyOn(LocalStorageService, 'updateLastSelectedTranslationLanguageCode')
+          .and.callThrough();
 
-      ctrl.onChangeLanguage('hi');
+        ctrl.onChangeLanguage('hi');
 
-      expect(TranslationLanguageService.setActiveLanguageCode)
-        .toHaveBeenCalledWith('hi');
-      expect(LocalStorageService.updateLastSelectedTranslationLanguageCode)
-        .toHaveBeenCalledWith('hi');
-    });
+        expect(TranslationLanguageService.setActiveLanguageCode)
+          .toHaveBeenCalledWith('hi');
+        expect(LocalStorageService.updateLastSelectedTranslationLanguageCode)
+          .toHaveBeenCalledWith('hi');
+      });
 
     it('should show language selector based on active tab', function() {
       var changedTab = 'translateTextTab';
@@ -148,7 +148,7 @@ describe('Contributor dashboard page', function() {
       $rootScope.$apply();
     });
 
-    it('should have no username', function() {
+    it('should have no user data in dashboard page', function() {
       expect(ctrl.userIsLoggedIn).toBe(false);
       expect(ctrl.username).toBe('');
     });

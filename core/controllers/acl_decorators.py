@@ -1243,7 +1243,7 @@ def can_resubmit_suggestion(handler):
     """Decorator to check whether a user can resubmit a suggestion."""
 
     def test_can_resubmit_suggestion(self, suggestion_id, **kwargs):
-        """Checks if the use can edit the given suggestion.
+        """Checks if the user can edit the given suggestion.
 
         Args:
             suggestion_id: str. The ID of the suggestion.
@@ -1617,7 +1617,7 @@ def can_edit_topic(handler):
             raise self.PageNotFoundException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
+        topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1832,7 +1832,7 @@ def can_add_new_story_to_topic(handler):
             raise self.PageNotFoundException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
+        topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1884,7 +1884,7 @@ def can_edit_story(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         topic_id = story.corresponding_topic_id
-        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
+        topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -2061,7 +2061,7 @@ def can_delete_story(handler):
             raise base.UserFacingExceptions.PageNotFoundException
         topic_id = story.corresponding_topic_id
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
+        topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -2376,6 +2376,14 @@ def can_access_topic_viewer_page(handler):
         Raises:
             PageNotFoundException. The given page cannot be found.
         """
+        if topic_url_fragment != topic_url_fragment.lower():
+            _redirect_based_on_return_type(
+                self, '/learn/%s/%s' % (
+                    classroom_url_fragment,
+                    topic_url_fragment.lower()),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
+
         topic = topic_fetchers.get_topic_by_url_fragment(
             topic_url_fragment)
 
@@ -2398,7 +2406,7 @@ def can_access_topic_viewer_page(handler):
             return
 
         topic_id = topic.id
-        topic_rights = topic_services.get_topic_rights(
+        topic_rights = topic_fetchers.get_topic_rights(
             topic_id, strict=False)
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
@@ -2444,6 +2452,15 @@ def can_access_story_viewer_page(handler):
         Raises:
             PageNotFoundException. The given page cannot be found.
         """
+        if story_url_fragment != story_url_fragment.lower():
+            _redirect_based_on_return_type(
+                self, '/learn/%s/%s/story/%s' % (
+                    classroom_url_fragment,
+                    topic_url_fragment,
+                    story_url_fragment.lower()),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
+
         story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
 
         if story is None:
@@ -2483,7 +2500,7 @@ def can_access_story_viewer_page(handler):
                         url_substring),
                     self.GET_HANDLER_ERROR_RETURN_TYPE)
                 return
-            topic_rights = topic_services.get_topic_rights(topic_id)
+            topic_rights = topic_fetchers.get_topic_rights(topic_id)
             topic_is_published = topic_rights.topic_is_published
             all_story_references = topic.get_all_story_references()
             for reference in all_story_references:
@@ -2531,6 +2548,15 @@ def can_access_subtopic_viewer_page(handler):
         Raises:
             PageNotFoundException. The given page cannot be found.
         """
+        if subtopic_url_fragment != subtopic_url_fragment.lower():
+            _redirect_based_on_return_type(
+                self, '/learn/%s/%s/revision/%s' % (
+                    classroom_url_fragment,
+                    topic_url_fragment,
+                    subtopic_url_fragment.lower()),
+                self.GET_HANDLER_ERROR_RETURN_TYPE)
+            return
+
         topic = topic_fetchers.get_topic_by_url_fragment(topic_url_fragment)
         subtopic_id = None
 
@@ -2541,7 +2567,7 @@ def can_access_subtopic_viewer_page(handler):
             return
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
-        topic_rights = topic_services.get_topic_rights(topic.id)
+        topic_rights = topic_fetchers.get_topic_rights(topic.id)
 
         if (
                 (topic_rights is None or not topic_rights.topic_is_published)
@@ -2658,10 +2684,10 @@ def get_decorator_for_accepting_suggestion(decorator):
             if suggestion is None:
                 raise self.PageNotFoundException
 
-            # TODO(#6671): Currently, the check_user_can_review_in_category is
+            # TODO(#6671): Currently, the can_user_review_category is
             # not in use as the suggestion scoring system is not enabled.
             # Remove this check once the new scoring structure gets implemented.
-            if suggestion_services.check_user_can_review_in_category(
+            if suggestion_services.can_user_review_category(
                     self.user_id, suggestion.score_category):
                 return handler(self, target_id, suggestion_id, **kwargs)
 

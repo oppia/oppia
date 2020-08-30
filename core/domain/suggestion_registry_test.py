@@ -48,12 +48,6 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
         super(BaseSuggestionUnitTests, self).setUp()
         self.base_suggestion = MockInvalidSuggestion()
 
-    def test_base_class_init_raises_error(self):
-        with self.assertRaisesRegexp(
-            NotImplementedError,
-            'Subclasses of BaseSuggestion should implement __init__.'):
-            suggestion_registry.BaseSuggestion()
-
     def test_base_class_accept_raises_error(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
@@ -1736,12 +1730,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 0
-                },
-                'rule_type': 'Equals'
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'training_data': [],
             'tagged_skill_misconception_id': None
         }

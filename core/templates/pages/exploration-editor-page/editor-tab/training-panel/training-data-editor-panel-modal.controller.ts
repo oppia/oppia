@@ -25,7 +25,8 @@ angular.module('oppia').controller(
     'StateCustomizationArgsService', 'StateEditorService',
     'StateInteractionIdService', 'TrainingDataService', 'TrainingModalService',
     'EXPLICIT_CLASSIFICATION', 'TRAINING_DATA_CLASSIFICATION',
-    function($filter, $injector, $scope, $uibModalInstance,
+    function(
+        $filter, $injector, $scope, $uibModalInstance,
         AlertsService, AngularNameService, AnswerClassificationService,
         CurrentInteractionService, ExplorationHtmlFormatterService,
         ExplorationStatesService, FocusManagerService, ResponsesService,
@@ -43,7 +44,7 @@ angular.module('oppia').controller(
       $scope.trainingData = [];
       $scope.answerGroupHasNonEmptyRules = (
         ResponsesService.getAnswerGroup(
-          answerGroupIndex).rules.length > 0);
+          answerGroupIndex).getRulesAsList().length > 0);
       $scope.inputTemplate = (
         ExplorationHtmlFormatterService.getInteractionHtml(
           StateInteractionIdService.savedMemento,

@@ -1,7 +1,7 @@
-<div style="height: 100%">
+<div class="h-100">
   <!-- Question Editor -->
   <div ng-if="!questionEditorIsOpen"
-       style="height: 100%"
+       class="h-100"
        ng-attr-title="Edit worked example question">
     <div class="oppia-readonly-rule-tile"
          ng-class="{'oppia-editable-section': isEditable()}">
@@ -48,14 +48,13 @@
           Save
         </button>
       </div>
-      <div style="clear: both;"></div>
+      <div class="oppia-clear"></div>
     </div>
   </div>
 
   <!-- Explanation Editor -->
   <div ng-if="!explanationEditorIsOpen"
-       style="height: 100%;"
-       class="worked-example-explanation-section"
+       class="h-100 worked-example-explanation-section"
        ng-attr-title="Edit worked example explanation">
     <div class="oppia-readonly-rule-tile"
          ng-class="{'oppia-editable-section': isEditable()}">
@@ -102,7 +101,7 @@
           Save
         </button>
       </div>
-      <div style="clear: both;"></div>
+      <div class="oppia-clear"></div>
     </div>
   </div>
 </div>

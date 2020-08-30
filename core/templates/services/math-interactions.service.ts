@@ -84,9 +84,9 @@ export class MathInteractionsService {
     return errorMessage;
   }
 
-  validateExpression(expressionString: string, algebraic = true): boolean {
+  _validateExpression(
+      expressionString: string, validVariablesList: string[]): boolean {
     expressionString = expressionString.replace(/\s/g, '');
-    let expressionObject;
     if (expressionString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
       return false;
@@ -107,33 +107,61 @@ export class MathInteractionsService {
       return false;
     }
     try {
-      expressionObject = nerdamer(expressionString);
+      expressionString = this.insertMultiplicationSigns(expressionString);
+      nerdamer(expressionString);
     } catch (err) {
       this.warningText = this.cleanErrorMessage(err.message, expressionString);
       return false;
-    }
-    if (algebraic && expressionObject.variables().length === 0) {
-      this.warningText = 'It looks like you have entered only ' +
-        'numbers. Make sure to include the necessary variables' +
-        ' mentioned in the question.';
-      return false;
-    }
-    if (!algebraic) {
-      for (let functionName of this.mathFunctionNames) {
-        expressionString = expressionString.replace(
-          new RegExp(functionName, 'g'), '');
-      }
-      if (/[a-zA-Z]/.test(expressionString)) {
-        this.warningText = 'It looks like you have entered some variables. ' +
-          'Please enter numbers only.';
-        return false;
-      }
     }
     this.warningText = '';
     return true;
   }
 
-  validateEquation(equationString: string): boolean {
+  validateAlgebraicExpression(
+      expressionString: string, validVariablesList: string[]): boolean {
+    if (!this._validateExpression(expressionString, validVariablesList)) {
+      return false;
+    }
+
+    let variablesList = nerdamer(this.insertMultiplicationSigns(
+      expressionString)).variables();
+    if (variablesList.length === 0) {
+      this.warningText = 'It looks like you have entered only ' +
+      'numbers. Make sure to include the necessary variables' +
+      ' mentioned in the question.';
+      return false;
+    } else if (validVariablesList.length !== 0) {
+      for (let variable of variablesList) {
+        if (validVariablesList.indexOf(variable) === -1) {
+          this.warningText = (
+            'You have entered an invalid character: ' + variable +
+            '. Please use only the characters ' + validVariablesList.join() +
+            ' in your answer.');
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  validateNumericExpression(expressionString: string): boolean {
+    if (!this._validateExpression(expressionString, [])) {
+      return false;
+    }
+    for (let functionName of this.mathFunctionNames) {
+      expressionString = expressionString.replace(
+        new RegExp(functionName, 'g'), '');
+    }
+    if (/[a-zA-Z]/.test(expressionString)) {
+      this.warningText = 'It looks like you have entered some variables. ' +
+        'Please enter numbers only.';
+      return false;
+    }
+    return true;
+  }
+
+  validateEquation(
+      equationString: string, validVariablesList: string[]): boolean {
     equationString = equationString.replace(/\s/g, '');
     if (equationString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
@@ -155,11 +183,17 @@ export class MathInteractionsService {
       return false;
     }
     let splitString = equationString.split('=');
+    if (splitString.length !== 2) {
+      this.warningText = 'Your equation contains multiple = signs.';
+      return false;
+    }
     let lhsString = splitString[0], rhsString = splitString[1];
-    let lhsIsAlgebraicallyValid = this.validateExpression(lhsString);
-    let rhsIsAlgebraicallyValid = this.validateExpression(rhsString);
-    let lhsIsNumericallyValid = this.validateExpression(lhsString, false);
-    let rhsIsNumericallyValid = this.validateExpression(rhsString, false);
+    let lhsIsAlgebraicallyValid = this.validateAlgebraicExpression(
+      lhsString, validVariablesList);
+    let rhsIsAlgebraicallyValid = this.validateAlgebraicExpression(
+      rhsString, validVariablesList);
+    let lhsIsNumericallyValid = this.validateNumericExpression(lhsString);
+    let rhsIsNumericallyValid = this.validateNumericExpression(rhsString);
 
     // At least one side must be algebraic. Purely numeric equations are
     // considered as invalid.
@@ -175,7 +209,10 @@ export class MathInteractionsService {
     }
     // Neither side is algebraically valid. Calling validation functions again
     // to appropriately update the warningText.
-    this.validateExpression(lhsString);
+    this.validateAlgebraicExpression(lhsString, validVariablesList);
+    if (this.getWarningText().length === 0) {
+      this.validateAlgebraicExpression(rhsString, validVariablesList);
+    }
     return false;
   }
 
@@ -277,8 +314,8 @@ export class MathInteractionsService {
     return modifiedExpressionList.join('');
   }
 
-  getTerms(expressionString: string, splitByAddition = true): Array<string> {
-    let listOfTerms: Array<string> = [];
+  getTerms(expressionString: string, splitByAddition = true): string[] {
+    let listOfTerms: string[] = [];
     let currentTerm: string = '';
     let bracketBalance: number = 0;
     let shouldModifyNextTerm: boolean = false;
@@ -373,6 +410,60 @@ export class MathInteractionsService {
     }
 
     return partsList1.length === 0 && partsList2.length === 0;
+  }
+
+  expressionMatchWithPlaceholders(
+      expressionWithPlaceholders: string, inputExpression: string,
+      placeholders: string[]): boolean {
+    // Check if inputExpression contains any placeholders.
+    for (let variable of nerdamer(inputExpression).variables()) {
+      if (placeholders.includes(variable)) {
+        return false;
+      }
+    }
+
+    // The expressions are first split into terms by addition and subtraction.
+    let termsWithPlaceholders = this.getTerms(expressionWithPlaceholders);
+    let inputTerms = this.getTerms(inputExpression);
+
+    // Each term in the expression containing placeholders is compared with
+    // terms in the input expression. Two terms are said to be matched iff
+    // upon subtracting or dividing them, the resultant contains only
+    // placeholders. This would imply that the input term matches with the
+    // general form(the term with placeholders).
+    for (let i = termsWithPlaceholders.length - 1; i >= 0; i--) {
+      for (let j = 0; j < inputTerms.length; j++) {
+        let termWithPlaceholders = termsWithPlaceholders[i];
+        let termWithoutPlaceholders = inputTerms[j];
+
+        let divisionCondition;
+        // Try catch block is meant to catch division by zero errors.
+        try {
+          let variablesAfterDivision = nerdamer(termWithPlaceholders).divide(
+            termWithoutPlaceholders).variables();
+          divisionCondition = variablesAfterDivision.every(
+            variable => placeholders.includes(variable));
+        } catch (e) {
+          divisionCondition = true;
+        }
+
+        let variablesAfterSubtraction = nerdamer(termWithPlaceholders).subtract(
+          termWithoutPlaceholders).variables();
+        let subtractionCondition = variablesAfterSubtraction.every(
+          variable => placeholders.includes(variable));
+
+        // If only placeholders are left in the term after dividing/subtracting
+        // them, then the terms are said to match.
+        if (divisionCondition || subtractionCondition) {
+          termsWithPlaceholders.splice(i, 1);
+          inputTerms.splice(j, 1);
+          break;
+        }
+      }
+    }
+
+    // Checks if all terms have matched.
+    return termsWithPlaceholders.length + inputTerms.length === 0;
   }
 }
 

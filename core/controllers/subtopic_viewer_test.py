@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
 from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -153,129 +152,105 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
 class SubtopicViewerPageTests(BaseSubtopicViewerControllerTests):
 
     def test_any_user_can_access_subtopic_viewer_page(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_html_response(
-                '/learn/staging/%s/revision/%s' % ('name', 'sub-url-frag-one'))
-
+        self.get_html_response(
+            '/learn/staging/%s/revision/%s' % ('name', 'sub-url-frag-one'))
 
     def test_accessibility_of_subtopic_viewer_page_of_unpublished_topic(
             self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_html_response(
-                '/learn/staging/%s/revision/%s'
-                % ('pvttopic', 'sub-url-frag-one'),
-                expected_status_int=302)
-            self.login(self.ADMIN_EMAIL)
-            self.get_html_response(
-                '/learn/staging/%s/revision/%s'
-                % ('pvttopic', 'sub-url-frag-one'))
-            self.logout()
-
-
-    def test_get_fails_when_new_structures_not_enabled(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            self.get_html_response(
-                '/learn/staging/%s/revision/%s'
-                % ('name', 'sub-url-frag-one'),
-                expected_status_int=404)
+        self.get_html_response(
+            '/learn/staging/%s/revision/%s'
+            % ('pvttopic', 'sub-url-frag-one'),
+            expected_status_int=302)
+        self.login(self.ADMIN_EMAIL)
+        self.get_html_response(
+            '/learn/staging/%s/revision/%s'
+            % ('pvttopic', 'sub-url-frag-one'))
+        self.logout()
 
 
 class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
     def test_get_for_first_subtopic_in_topic(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            json_response = self.get_json(
-                '%s/staging/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'))
-            expected_page_contents_dict = {
-                'recorded_voiceovers': self.recorded_voiceovers_dict,
-                'subtitled_html': {
-                    'content_id': 'content',
-                    'html': '<p>hello world</p>'
-                },
-                'written_translations': self.written_translations_dict
-            }
-            expected_next_subtopic_dict = {
-                'thumbnail_bg_color': None,
-                'skill_ids': ['skill_id_2'],
-                'id': 2,
-                'thumbnail_filename': None,
-                'title': 'Subtopic Title 2',
-                'url_fragment': 'sub-url-frag-two'
-            }
+        json_response = self.get_json(
+            '%s/staging/%s/%s' % (
+                feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'))
+        expected_page_contents_dict = {
+            'recorded_voiceovers': self.recorded_voiceovers_dict,
+            'subtitled_html': {
+                'content_id': 'content',
+                'html': '<p>hello world</p>'
+            },
+            'written_translations': self.written_translations_dict
+        }
+        expected_next_subtopic_dict = {
+            'thumbnail_bg_color': None,
+            'skill_ids': ['skill_id_2'],
+            'id': 2,
+            'thumbnail_filename': None,
+            'title': 'Subtopic Title 2',
+            'url_fragment': 'sub-url-frag-two'
+        }
 
-            expected_dict = {
-                'topic_id': 'topic_id',
-                'page_contents': expected_page_contents_dict,
-                'subtopic_title': 'Subtopic Title',
-                'next_subtopic_dict': expected_next_subtopic_dict
-            }
-            self.assertDictContainsSubset(expected_dict, json_response)
+        expected_dict = {
+            'topic_id': 'topic_id',
+            'page_contents': expected_page_contents_dict,
+            'subtopic_title': 'Subtopic Title',
+            'next_subtopic_dict': expected_next_subtopic_dict
+        }
+        self.assertDictContainsSubset(expected_dict, json_response)
 
     def test_get_for_last_subtopic_in_topic(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            json_response = self.get_json(
-                '%s/staging/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-two'))
-            expected_page_contents_dict = {
-                'recorded_voiceovers': self.recorded_voiceovers_dict,
-                'subtitled_html': {
-                    'content_id': 'content',
-                    'html': '<p>hello world 2</p>'
-                },
-                'written_translations': self.written_translations_dict
-            }
-            expected_next_subtopic_dict = {
-                'thumbnail_bg_color': None,
-                'skill_ids': ['skill_id_1'],
-                'id': 1,
-                'thumbnail_filename': None,
-                'title': 'Subtopic Title',
-                'url_fragment': 'sub-url-frag-one'
-            }
+        json_response = self.get_json(
+            '%s/staging/%s/%s' % (
+                feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-two'))
+        expected_page_contents_dict = {
+            'recorded_voiceovers': self.recorded_voiceovers_dict,
+            'subtitled_html': {
+                'content_id': 'content',
+                'html': '<p>hello world 2</p>'
+            },
+            'written_translations': self.written_translations_dict
+        }
+        expected_next_subtopic_dict = {
+            'thumbnail_bg_color': None,
+            'skill_ids': ['skill_id_1'],
+            'id': 1,
+            'thumbnail_filename': None,
+            'title': 'Subtopic Title',
+            'url_fragment': 'sub-url-frag-one'
+        }
 
-            expected_dict = {
-                'topic_id': 'topic_id',
-                'page_contents': expected_page_contents_dict,
-                'subtopic_title': 'Subtopic Title 2',
-                'next_subtopic_dict': expected_next_subtopic_dict
-            }
-            self.assertDictContainsSubset(expected_dict, json_response)
+        expected_dict = {
+            'topic_id': 'topic_id',
+            'page_contents': expected_page_contents_dict,
+            'subtopic_title': 'Subtopic Title 2',
+            'next_subtopic_dict': expected_next_subtopic_dict
+        }
+        self.assertDictContainsSubset(expected_dict, json_response)
 
     def test_cannot_get_with_unpublished_topic(self):
         topic_services.unpublish_topic(self.topic_id, self.admin_id)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_json(
-                '%s/staging/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'),
-                expected_status_int=404)
+        self.get_json(
+            '%s/staging/%s/%s' % (
+                feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'),
+            expected_status_int=404)
 
     def test_cannot_get_with_invalid_topic_name(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_json(
-                '%s/staging/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'Invalid Name',
-                    'sub-url-frag-one'),
-                expected_status_int=404)
+        self.get_json(
+            '%s/staging/%s/%s' % (
+                feconf.SUBTOPIC_DATA_HANDLER, 'Invalid Name',
+                'sub-url-frag-one'),
+            expected_status_int=404)
 
     def test_cannot_get_with_invalid_subtopic_id(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_json(
-                '%s/staging/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-zero'),
-                expected_status_int=404)
+        self.get_json(
+            '%s/staging/%s/%s' % (
+                feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-zero'),
+            expected_status_int=404)
 
     def test_cannot_get_with_deleted_subtopic_page(self):
         subtopic_page_services.delete_subtopic_page(
             self.admin_id, self.topic_id, 1)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_json(
-                '%s/staging/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'),
-                expected_status_int=404)
-
-    def test_get_fails_when_new_structures_not_enabled(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            self.get_json(
-                '%s/staging/%s/%s' % (
-                    feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'),
-                expected_status_int=404)
+        self.get_json(
+            '%s/staging/%s/%s' % (
+                feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'),
+            expected_status_int=404)

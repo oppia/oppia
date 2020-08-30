@@ -1,0 +1,144 @@
+<div class="oppia-story-viewer-container">
+  <div ng-if="$ctrl.storyIsLoaded">
+    <div class="oppia-story-viewer-inner-container">
+      <div ng-if="$ctrl.storyPlaythroughObject" class="oppia-story-player-tiles-container">
+        <div class="oppia-story-viewer-title">
+          <[$ctrl.storyTitle]>
+        </div>
+        <div class="oppia-story-viewer-description">
+          <[$ctrl.storyDescription]>
+        </div>
+
+        <div ng-if="$ctrl.showChapters()" class="d-md-block oppia-story-viewer-card-container">
+          <a ng-repeat="node in $ctrl.storyPlaythroughObject.getStoryNodes();"
+             ng-href="<[$ctrl.getExplorationUrl(node)]>"
+             ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
+
+            <div>
+              <div ng-style="($index > 0 && !$ctrl.storyPlaythroughObject.getStoryNodes()[$index-1].isCompleted() && {'opacity': '0.5', 'display': 'flex'}) || { 'display': 'flex' }">
+                <div class="oppia-lesson-track">
+                  <svg ng-if="!$last"
+                       width="9px"
+                       height="530px"
+                       xmlns="http://www.w3.org/1600/svg">
+                    <path fill="none"
+                          ng-attr-stroke="{{node.isCompleted() && '#296E5F' || 'rgb(204, 204, 204)' }}"
+                          stroke-dasharray="30,16"
+                          stroke-linecap="round"
+                          stroke-width="9"
+                          d="M5 30 L5 530">
+                    </path>
+                  </svg>
+
+                  <img class="oppia-lesson-icon-completed"
+                       ng-src="<[$ctrl.getStaticImageUrl('/general/collection_paw.svg')]>"
+                       ng-if="node.isCompleted()">
+                  <div ng-if="!node.isCompleted() && (node.getId() === $ctrl.storyPlaythroughObject.getNextPendingNodeId())"
+                       class="oppia-lesson-icon-uncompleted">
+                  </div>
+                  <div ng-if="!node.isCompleted() && (node.getId() !== $ctrl.storyPlaythroughObject.getNextPendingNodeId())"
+                       class="oppia-lesson-icon-uncompleted oppia-lesson-icon-unavailable">
+                  </div>
+                </div>
+
+                <div class="oppia-story-viewer-card">
+                  <span class="oppia-chapter-title" aria-live="assertive">
+                    <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span> {{$index + 1}}: <[node.getTitle()]>
+                  </span>
+
+                  <div class="oppia-story-viewer-card-content">
+                    <svg width="240"
+                         height="180"
+                         xmlns="http://www.w3.org/1600/svg"
+                         xmlns:xlink="http://www.w3.org/1999/xlink"
+                         version="1.1"
+                         style="margin-right: 10px; margin-bottom: 10px;">
+                      <defs>
+                        <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="160" width="240">
+                          <rect width="240"
+                                height="180"
+                                ng-attr-fill="<[$ctrl.pathIconParameters[$index].thumbnailBgColor]>">
+                          </rect>
+
+                          <image x="0"
+                                 y="0"
+                                 height="180"
+                                 width="240"
+                                 ng-attr-xlink:href="<[$ctrl.pathIconParameters[$index].thumbnailIconUrl]>"
+                                 xlink:href="">
+                          </image>
+                        </pattern>
+                      </defs>
+                      <a xlink:href="<[$ctrl.getExplorationUrl(node)]>" ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
+                        <rect width="240"
+                              height="180"
+                              fill="url(#image<[$index]>)"
+                              rx="4">
+                        </rect>
+                      </a>
+                    </svg>
+
+                    <div class="oppia-story-viewer-card-description-box">
+                      <p style="font-size: 20px;"><[node.getDescription()]></p>
+                    </div>
+                  </div>
+
+                  <div class="oppia-story-viewer-mobile-card-content">
+                    <svg width="185"
+                         height="150"
+                         xmlns="http://www.w3.org/1600/svg"
+                         xmlns:xlink="http://www.w3.org/1999/xlink"
+                         version="1.1"
+                        >
+                      <defs>
+                        <pattern id="image2<[$index]>" patternUnits="userSpaceOnUse" height="160" width="240">
+                          <rect width="185"
+                                height="150"
+                                ng-attr-fill="<[$ctrl.pathIconParameters[$index].thumbnailBgColor]>">
+                          </rect>
+
+                          <image x="0"
+                                 y="0"
+                                 width="185"
+                                 height="150"
+                                 ng-attr-xlink:href="<[$ctrl.pathIconParameters[$index].thumbnailIconUrl]>"
+                                 xlink:href="">
+                          </image>
+                        </pattern>
+                      </defs>
+                      <a xlink:href="<[$ctrl.getExplorationUrl(node)]>" ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
+                        <rect width="185"
+                              height="150"
+                              fill="url(#image2<[$index]>)"
+                        ></rect>
+                      </a>
+                    </svg>
+
+                    <div class="oppia-story-viewer-mobile-card-description-box">
+                      <p><[node.getDescription()]></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    <attribution-guide></attribution-guide>
+  </div>
+</div>
+<style>
+  .oppia-story-viewer-container a {
+    text-decoration: none;
+  }
+
+   .oppia-story-viewer-container a:hover, a:hover span {
+    color: #0844aa;
+  }
+
+  .disabled-link {
+    cursor: default;
+    pointer-events: none;
+  }
+</style>

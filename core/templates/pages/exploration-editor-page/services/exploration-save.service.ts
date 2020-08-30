@@ -16,6 +16,8 @@
  * @fileoverview Service for exploration saving & publication functionality.
  */
 
+import { EventEmitter } from '@angular/core';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -66,27 +68,30 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/site-analytics.service.ts');
 require('services/stateful/focus-manager.service.ts');
+require('services/external-save.service.ts');
 
 angular.module('oppia').factory('ExplorationSaveService', [
-  '$log', '$q', '$rootScope', '$timeout', '$uibModal', '$window',
+  '$log', '$q', '$timeout', '$uibModal', '$window',
   'AlertsService', 'AutosaveInfoModalsService', 'ChangeListService',
   'ExplorationCategoryService', 'ExplorationDataService',
   'ExplorationDiffService', 'ExplorationInitStateNameService',
   'ExplorationLanguageCodeService', 'ExplorationObjectiveService',
   'ExplorationRightsService', 'ExplorationStatesService',
   'ExplorationTagsService', 'ExplorationTitleService',
-  'ExplorationWarningsService', 'FocusManagerService', 'RouterService',
+  'ExplorationWarningsService', 'ExternalSaveService',
+  'FocusManagerService', 'RouterService',
   'SiteAnalyticsService', 'StatesObjectFactory', 'UrlInterpolationService',
   'DEFAULT_LANGUAGE_CODE',
   function(
-      $log, $q, $rootScope, $timeout, $uibModal, $window,
+      $log, $q, $timeout, $uibModal, $window,
       AlertsService, AutosaveInfoModalsService, ChangeListService,
       ExplorationCategoryService, ExplorationDataService,
       ExplorationDiffService, ExplorationInitStateNameService,
       ExplorationLanguageCodeService, ExplorationObjectiveService,
       ExplorationRightsService, ExplorationStatesService,
       ExplorationTagsService, ExplorationTitleService,
-      ExplorationWarningsService, FocusManagerService, RouterService,
+      ExplorationWarningsService, ExternalSaveService,
+      FocusManagerService, RouterService,
       SiteAnalyticsService, StatesObjectFactory, UrlInterpolationService,
       DEFAULT_LANGUAGE_CODE) {
     // Whether or not a save action is currently in progress
@@ -98,6 +103,8 @@ angular.module('oppia').factory('ExplorationSaveService', [
     var modalIsOpen = false;
 
     var diffData = null;
+
+    var _initExplorationPageEventEmitter = new EventEmitter();
 
     var isAdditionalMetadataNeeded = function() {
       return (
@@ -190,8 +197,8 @@ angular.module('oppia').factory('ExplorationSaveService', [
           }
           $log.info('Changes to this exploration were saved successfully.');
           ChangeListService.discardAllChanges();
-          $rootScope.$broadcast('initExplorationPage');
-          $rootScope.$broadcast('refreshVersionHistory', {
+          _initExplorationPageEventEmitter.emit();
+          RouterService.onRefreshVersionHistory.emit({
             forceRefresh: true
           });
           AlertsService.addSuccessMessage('Changes saved.');
@@ -210,9 +217,11 @@ angular.module('oppia').factory('ExplorationSaveService', [
         return (
           ChangeListService.isExplorationLockedForEditing() &&
           !saveIsInProgress && (
-            (ExplorationRightsService.isPrivate() &&
+            (
+              ExplorationRightsService.isPrivate() &&
               !ExplorationWarningsService.hasCriticalWarnings()) ||
-            (!ExplorationRightsService.isPrivate() &&
+            (
+              !ExplorationRightsService.isPrivate() &&
               ExplorationWarningsService.countWarnings() === 0)
           )
         );
@@ -228,7 +237,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           AlertsService.clearWarnings();
-          $rootScope.$broadcast('externalSave');
+          ExternalSaveService.onExternalSave.emit();
 
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -242,7 +251,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
           ChangeListService.discardAllChanges();
           AlertsService.addSuccessMessage('Changes discarded.');
-          $rootScope.$broadcast('initExplorationPage');
+          _initExplorationPageEventEmitter.emit();
 
           // The reload is necessary because, otherwise, the
           // exploration-with-draft-changes will be reloaded
@@ -423,6 +432,10 @@ angular.module('oppia').factory('ExplorationSaveService', [
           });
         });
         return whenModalClosed.promise;
+      },
+
+      get onInitExplorationPage() {
+        return _initExplorationPageEventEmitter;
       }
     };
   }

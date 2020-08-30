@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for testInteractionPanel.
  */
 
+import { TestBed } from '@angular/core/testing';
+
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
+
 describe('Test Interaction Panel directive', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -30,6 +35,12 @@ describe('Test Interaction Panel directive', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+  }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
     CurrentInteractionService = $injector.get('CurrentInteractionService');
@@ -52,13 +63,13 @@ describe('Test Interaction Panel directive', function() {
     ctrl.$onInit();
   }));
 
-  it('should evaluate controller properties after its initialization',
+  it('should initialize controller properties after its initialization',
     function() {
       expect($scope.isSubmitButtonDisabled()).toBe(false);
       expect($scope.interactionIsInline).toBe(true);
     });
 
-  it('should submit answer from button', function() {
+  it('should submit answer when clicking on button', function() {
     spyOn(CurrentInteractionService, 'submitAnswer');
     $scope.onSubmitAnswerFromButton();
 

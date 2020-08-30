@@ -25,13 +25,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
+from core.domain import caching_services
 from core.domain import story_domain
 from core.platform import models
 import feconf
+import python_utils
 
 (story_models, user_models) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
-memcache_services = models.Registry.import_memcache_services()
 
 
 def _migrate_story_contents_to_latest_schema(versioned_story_contents):
@@ -63,23 +64,6 @@ def _migrate_story_contents_to_latest_schema(versioned_story_contents):
         story_domain.Story.update_story_contents_from_model(
             versioned_story_contents, story_contents_schema_version)
         story_contents_schema_version += 1
-
-
-# Repository GET methods.
-def get_story_memcache_key(story_id, version=None):
-    """Returns a memcache key for the story.
-
-    Args:
-        story_id: str. ID of the story.
-        version: str. Schema version of the story.
-
-    Returns:
-        str. The memcache key of the story.
-    """
-    if version:
-        return 'story-version:%s:%s' % (story_id, version)
-    else:
-        return 'story:%s' % story_id
 
 
 def get_story_from_model(story_model):
@@ -114,7 +98,8 @@ def get_story_from_model(story_model):
             versioned_story_contents['story_contents']),
         versioned_story_contents['schema_version'],
         story_model.language_code, story_model.corresponding_topic_id,
-        story_model.version, story_model.url_fragment, story_model.created_on,
+        story_model.version, story_model.url_fragment,
+        story_model.meta_tag_content, story_model.created_on,
         story_model.last_updated)
 
 
@@ -158,19 +143,23 @@ def get_story_by_id(story_id, strict=True, version=None):
         Story or None. The domain object representing a story with the
         given id, or None if it does not exist.
     """
-    story_memcache_key = get_story_memcache_key(
-        story_id, version=version)
-    memcached_story = memcache_services.get_multi(
-        [story_memcache_key]).get(story_memcache_key)
+    sub_namespace = python_utils.convert_to_bytes(version) if version else None
+    cached_story = caching_services.get_multi(
+        caching_services.CACHE_NAMESPACE_STORY,
+        sub_namespace,
+        [story_id]).get(story_id)
 
-    if memcached_story is not None:
-        return memcached_story
+    if cached_story is not None:
+        return cached_story
     else:
         story_model = story_models.StoryModel.get(
             story_id, strict=strict, version=version)
         if story_model:
             story = get_story_from_model(story_model)
-            memcache_services.set_multi({story_memcache_key: story})
+            caching_services.set_multi(
+                caching_services.CACHE_NAMESPACE_STORY,
+                sub_namespace,
+                {story_id: story})
             return story
         else:
             return None

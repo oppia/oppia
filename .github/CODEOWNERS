@@ -5,13 +5,26 @@
 # are allowed. For information about supported glob patterns please refer
 # https://docs.python.org/2/library/glob.html.
 
-# IMPORTANT NOTE TO DEVELOPERS:
+# IMPORTANT NOTES FOR DEVELOPERS:
+#
 # - When assigning codeowners for new files, please do so by picking an
 #   appropriate team lead from this page:
-#   https://github.com/oppia/oppia/projects
-# - You do not need to assign yourself as a codeowner (unless you are a project
+#
+#       https://github.com/oppia/oppia/projects
+#
+#   You do not need to assign yourself as a codeowner (unless you are a project
 #   lead listed on the page above).
 
+# IMPORTANT NOTES FOR CODEOWNERS:
+#
+# - If you will be unavailable for more than 24 hours, please replace your
+#   ownership with a delegate, file an issue, and add a todo above the owner
+#   line like so:
+#
+#     TODO(#ISSUE_NUMBER): Revert ownership to @USERNAME after YYYY-MM-DD.
+#
+#   (See #10250 for an example.) Please make sure to restore ownership after
+#   the above date passes.
 
 # Blanket codeowners
 # This is for the case when new files are created in any directories that aren't
@@ -53,6 +66,7 @@
 /core/templates/services/UpgradedServices.ts @bansalnitish @srijanreddy98
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
+/tsconfig-strict.json @nishantwrp @vojtechjelinek
 
 
 # Answer classification team.
@@ -86,12 +100,13 @@
 
 
 # Contributor Dashboard project
-/core/controllers/contributor_dashboard*.py @sagangwee
-/core/domain/opportunity*.py @sagangwee
-/core/domain/voiceover_services*.py @sagangwee
-/core/storage/opportunity/ @sagangwee
-/core/templates/domain/opportunity/ @sagangwee
-/core/templates/pages/contributor-dashboard-page/ @sagangwee
+# TODO(#10250): Revert ownership to @sagangwee after 2020-09-08.
+/core/controllers/contributor_dashboard*.py @DubeySandeep
+/core/domain/opportunity*.py @DubeySandeep
+/core/domain/voiceover_services*.py @DubeySandeep
+/core/storage/opportunity/ @DubeySandeep
+/core/templates/domain/opportunity/ @DubeySandeep
+/core/templates/pages/contributor-dashboard-page/ @DubeySandeep
 
 
 # Core documentation
@@ -128,7 +143,8 @@
 
 
 # Dev workflow team.
-/.circleci/ @BenHenning @vinitamurthi @U8NWXD @kevintab95
+# TODO(#10472): Revert ownership to @vinitamurthi after 2020-09-05.
+/.circleci/ @BenHenning @U8NWXD @kevintab95
 /.eslintignore @bansalnitish @Hudda
 /.eslintrc @bansalnitish @Hudda
 /.htmllintrc @bansalnitish @Hudda
@@ -138,7 +154,7 @@
 /.isort.cfg @bansalnitish @Hudda
 /.pylintrc @bansalnitish @Hudda
 /.stylelintrc @bansalnitish @Hudda
-/.travis.yml @BenHenning @vinitamurthi @U8NWXD @kevintab95
+/.travis.yml @BenHenning @U8NWXD @kevintab95
 /.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @bansalnitish @Hudda
@@ -233,24 +249,23 @@
 
 
 # Global frontend services
-/core/templates/services/promo-bar.service*.ts @ankita240796
-/core/templates/services/html-escaper.service*.ts @ankita240796
-/core/templates/services/debouncer.service*.ts @ankita240796
-/core/templates/services/site-analytics.service*.ts @ankita240796
-/core/templates/services/date-time-format.service*.ts @ankita240796
-/core/templates/services/utils.service*.ts @ankita240796
-/core/templates/services/local-storage.service*.ts @ankita240796
-/core/templates/services/id-generation.service*.ts @ankita240796
 /core/templates/services/alerts.service*.ts @ankita240796
-/core/templates/services/page-title.service*.ts @ankita240796
+/core/templates/services/date-time-format.service*.ts @ankita240796
+/core/templates/services/debouncer.service*.ts @ankita240796
 /core/templates/services/extension-tag-assembler.service*.ts @ankita240796
+/core/templates/services/html-escaper.service*.ts @ankita240796
+/core/templates/services/id-generation.service*.ts @ankita240796
+/core/templates/services/keyboard-shortcut.service*.ts @jimbyo
+/core/templates/services/local-storage.service*.ts @ankita240796
 /core/templates/services/nested-directives*.ts @ankita240796
-/core/templates/services/keyboard-shortcut.service.ts @jimbyo
-/core/templates/services/keyboard-shortcut.service.spec.ts @jimbyo
+/core/templates/services/page-title.service*.ts @ankita240796
+/core/templates/services/promo-bar.service*.ts @ankita240796
+/core/templates/services/site-analytics.service*.ts @ankita240796
+/core/templates/services/utils.service*.ts @ankita240796
 /core/templates/services/stateful/background-mask.service*.ts @ankita240796
 /core/templates/services/stateful/focus-manager.service*.ts @ankita240796
-/core/templates/services/contextual/url.service*.ts @ankita240796
 /core/templates/services/contextual/device-info.service*.ts @ankita240796
+/core/templates/services/contextual/url.service*.ts @ankita240796
 /core/templates/services/contextual/window-dimensions.service*.ts @ankita240796
 /core/templates/services/contextual/window-ref.service*.ts @ankita240796
 
@@ -438,6 +453,7 @@
 /core/templates/services/interaction-rules-registry.service*.ts @bansalnitish
 /core/templates/services/interaction-specs.service*.ts @bansalnitish
 /core/templates/services/translation-file-hash-loader.service.ts @nithusha21
+/redis.conf @seanlip
 /release_constants.py @ankita240796 @nithusha21 @DubeySandeep
 
 
@@ -537,21 +553,19 @@
 /core/templates/pages/OppiaFooterDirective.ts @jameesjohn @vojtechjelinek
 /core/templates/pages/footer_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/pages/header_css_libs.html @jameesjohn @vojtechjelinek
+/core/templates/pages/header_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/services/csrf-token.service*.ts @jameesjohn @vojtechjelinek
 /core/templates/third-party-imports/ @nishantwrp @vojtechjelinek
 /jinja_utils*.py @jameesjohn @vojtechjelinek
-/.lighthouserc.json @jimbyo @jameesjohn @vojtechjelinek
+/.lighthouserc.js @jimbyo @jameesjohn @vojtechjelinek
 /puppeteer-login-script.js @jimbyo
 /scripts/run_lighthouse_tests.py @jameesjohn @vojtechjelinek
-/webpack.common.config.ts @jameesjohn @vojtechjelinek
-/webpack.common.macros.ts @jameesjohn @vojtechjelinek
-/webpack.dev.config.ts @jameesjohn @vojtechjelinek
-/webpack.prod.config.ts @jameesjohn @vojtechjelinek
-/webpack.terser.config.ts @nishantwrp @vojtechjelinek
+/webpack.*.ts @nishantwrp @vojtechjelinek
 
 
 # Typings.
 /typings @ankita240796 @nishantwrp
+/typings/tests/ @shavavo
 
 
 # User Data Takeout.
@@ -570,8 +584,13 @@
 
 
 # Dynamic Feature Gating project
-/core/storage/config/ @BenHenning @vinitamurthi
-/core/domain/platform_parameter*.py @BenHenning @vinitamurthi
+# TODO(#10472): Revert ownership to @vinitamurthi after 2020-09-05.
+/core/controllers/platform_feature*.py @BenHenning 
+/core/domain/platform_feature_services*.py @BenHenning 
+/core/domain/platform_parameter*.py @BenHenning 
+/core/platform_feature*.py @BenHenning 
+/core/storage/config/ @BenHenning 
+/core/templates/domain/platform_feature/ @BenHenning 
 
 
 # Frontend unit tests
@@ -588,6 +607,7 @@
 /core/tests/ @nithusha21
 /assets/ @nithusha21
 /data/ @nithusha21
+/core/templates/karma.module.ts @nishantwrp @vojtechjelinek
 /core/tests/protractor_utils/ @U8NWXD @kevintab95
 /core/tests/protractor_desktop/ @U8NWXD @kevintab95
 /core/tests/protractor/ @U8NWXD @kevintab95
@@ -624,4 +644,5 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796
-/.github/workflows/ @BenHenning @vinitamurthi
+# TODO(#10472): Revert ownership to @vinitamurthi after 2020-09-05.
+/.github/workflows/ @BenHenning

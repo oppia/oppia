@@ -26,15 +26,11 @@ import re
 import zipfile
 
 from core.domain import classifier_services
-from core.domain import config_domain
 from core.domain import draft_upgrade_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
-from core.domain import fs_services
-from core.domain import html_domain
-from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
@@ -116,10 +112,12 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                 category='Architecture', language_code='en')
 
         interaction_answer_groups = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 'abc'},
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{
+                    'x': 'abc'
+                }]
+            },
             'outcome': {
                 'dest': feconf.DEFAULT_INIT_STATE_NAME,
                 'feedback': {
@@ -1049,47 +1047,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_fetchers.get_multiple_explorations_by_version('exp_id_1', [1])
 
 
-    def test_save_multi_exploration_math_rich_text_info_model(self):
-        multiple_explorations_math_rich_text_info = []
-
-        math_rich_text_info1 = (
-            exp_domain.ExplorationMathRichTextInfo(
-                'exp_id1', True, ['abc1', 'xyz1']))
-        multiple_explorations_math_rich_text_info.append(math_rich_text_info1)
-        math_rich_text_info2 = (
-            exp_domain.ExplorationMathRichTextInfo(
-                'exp_id2', True, ['abc2', 'xyz2']))
-        multiple_explorations_math_rich_text_info.append(math_rich_text_info2)
-        math_rich_text_info3 = (
-            exp_domain.ExplorationMathRichTextInfo(
-                'exp_id3', True, ['abc3', 'xyz3']))
-        multiple_explorations_math_rich_text_info.append(math_rich_text_info3)
-
-        exp_services.save_multi_exploration_math_rich_text_info_model(
-            multiple_explorations_math_rich_text_info)
-
-        self.assertEqual(
-            exp_models.ExplorationMathRichTextInfoModel.get_all().count(), 3)
-
-        exp1_math_image_model = (
-            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id1'))
-        self.assertEqual(
-            sorted(exp1_math_image_model.latex_strings_without_svg),
-            sorted(['abc1', 'xyz1']))
-
-        exp2_math_image_model = (
-            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id2'))
-        self.assertEqual(
-            sorted(exp2_math_image_model.latex_strings_without_svg),
-            sorted(['abc2', 'xyz2']))
-
-        exp3_math_image_model = (
-            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id3'))
-        self.assertEqual(
-            sorted(exp3_math_image_model.latex_strings_without_svg),
-            sorted(['abc3', 'xyz3']))
-
-
 class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
 
     def test_loading_and_validation_and_deletion_of_demo_explorations(self):
@@ -1610,13 +1567,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state2.update_interaction_hints(hint_list2)
 
         answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': 1}
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}, {'x': 1}]
+            },
             'outcome': {
                 'dest': 'state1',
                 'feedback': {
@@ -1637,10 +1591,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'outcome': {
                 'dest': 'state3',
                 'feedback': {
@@ -1656,29 +1610,26 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'tagged_skill_misconception_id': None
         }]
         answer_group_list3 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    (
-                        '<p>This is value1 for ItemSelection</p>'
-                        '<oppia-noninteractive-image filepath-with-value='
-                        '"&amp;quot;s3Choice1.png&amp;quot;"'
-                        ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image>')
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    (
-                        '<p>This is value3 for ItemSelection</p>'
-                        '<oppia-noninteractive-image filepath-with-value='
-                        '"&amp;quot;s3Choice3.png&amp;quot;"'
-                        ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image>')
-                ]}
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{
+                    'x': [
+                        '<p>This is value1 for ItemSelection</p><oppia-noni'
+                        'nteractive-image filepath-with-value="&amp;quot;s3'
+                        'Choice1.png&amp;quot;" caption-with-value="&amp;qu'
+                        'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
+                        ';"></oppia-noninteractive-image>'
+                    ]
+                }, {
+                    'x': [
+                        '<p>This is value3 for ItemSelection</p><oppia-noni'
+                        'nteractive-image filepath-with-value="&amp;quot;s3'
+                        'Choice3.png&amp;quot;" caption-with-value="&amp;qu'
+                        'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
+                        ';"></oppia-noninteractive-image>'
+                    ]
+                }]
+            },
             'outcome': {
                 'dest': 'state1',
                 'feedback': {
@@ -2443,10 +2394,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         }]
         # List of answer groups to add into an interaction.
         self.interaction_answer_groups = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0},
-            }],
+            'rule_input_translations': {},
+            'rule_types_to_inputs': {
+                'Equals': [{'x': 0}]
+            },
             'outcome': {
                 'dest': self.init_state_name,
                 'feedback': {
@@ -2777,10 +2728,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         init_state = exploration.init_state
         init_interaction = init_state.interaction
-        rule_specs = init_interaction.answer_groups[0].rule_specs
+        rule_types_to_inputs = init_interaction.answer_groups[
+            0].rule_types_to_inputs
         outcome = init_interaction.answer_groups[0].outcome
-        self.assertEqual(rule_specs[0].rule_type, 'Equals')
-        self.assertEqual(rule_specs[0].inputs, {'x': 0})
+        self.assertEqual(rule_types_to_inputs, {
+            'Equals': [{'x': 0}]
+        })
         self.assertEqual(outcome.feedback.html, '<p>Try again</p>')
         self.assertEqual(outcome.dest, self.init_state_name)
         self.assertEqual(init_interaction.default_outcome.dest, 'State 2')
@@ -2823,31 +2776,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     self.interaction_default_outcome),
                 '')
 
-    def test_update_state_missing_keys(self):
-        """Test that missing keys in interaction_answer_groups produce an
-        error.
-        """
-        del self.interaction_answer_groups[0]['rule_specs'][0]['inputs']
-        with self.assertRaisesRegexp(KeyError, 'inputs'):
-            exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID,
-                _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_INTERACTION_ID, 'NumericInput') +
-                _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
-                    self.interaction_answer_groups) +
-                _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                    self.interaction_default_outcome),
-                '')
-
     def test_update_state_variable_types(self):
         """Test that parameters in rules must have the correct type."""
-        self.interaction_answer_groups[0]['rule_specs'][0][
-            'inputs']['x'] = 'abc'
+        self.interaction_answer_groups[0]['rule_types_to_inputs'][
+            'Equals'][0]['x'] = 'abc'
         with self.assertRaisesRegexp(
             Exception,
             'abc has the wrong type. It should be a NonnegativeInt.'):
@@ -3690,7 +3622,6 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
                         'new_value': 'cat1'})], 'update category')
             self.assertEqual(actual_docs, [updated_exp_doc])
             self.assertEqual(add_docs_counter.times_called, 3)
-
 
     def test_get_number_of_ratings(self):
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
@@ -4901,698 +4832,3 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             param_changes._customization_args,  # pylint: disable=protected-access
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
-
-
-class ExplorationUpdationWithMathSvgsUnitTests(test_utils.GenericTestBase):
-    """Unit tests for function used in generation of SVGs for math rich-text
-    components in explorations.
-    """
-
-    DATETIME = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
-
-    def setUp(self):
-        super(ExplorationUpdationWithMathSvgsUnitTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-        self.set_admins([self.ADMIN_USERNAME])
-
-    def test_get_batch_of_exps_for_latex_svg_generation(self):
-        exp_models.ExplorationMathRichTextInfoModel(
-            id='exp_id1',
-            math_images_generation_required=True,
-            latex_strings_without_svg=['+,+,+,+', '\\frac{x}{y}'],
-            estimated_max_size_of_images_in_bytes=20000).put()
-        exp_models.ExplorationMathRichTextInfoModel(
-            id='exp_id2',
-            math_images_generation_required=True,
-            latex_strings_without_svg=['+,-,-,+', '\\sqrt{x}'],
-            estimated_max_size_of_images_in_bytes=20000).put()
-
-        exp_models.ExplorationMathRichTextInfoModel(
-            id='exp_id3',
-            math_images_generation_required=True,
-            latex_strings_without_svg=['(x-a)(x-b)', '\\frac{x^2}{y^3}'],
-            estimated_max_size_of_images_in_bytes=20000).put()
-        exp_models.ExplorationMathRichTextInfoModel(
-            id='exp_id4',
-            math_images_generation_required=True,
-            latex_strings_without_svg=['(x-a1)(x-b1)', '\\frac{x^3}{y^2}'],
-            estimated_max_size_of_images_in_bytes=30000).put()
-
-        expected_output = {
-            'exp_id1': ['+,+,+,+', '\\frac{x}{y}'],
-            'exp_id2': ['+,-,-,+', '\\sqrt{x}'],
-            'exp_id3': ['(x-a)(x-b)', '\\frac{x^2}{y^3}']
-        }
-        self.set_config_property((
-            config_domain
-            .MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH), 6)
-        self.set_config_property((
-            config_domain
-            .MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH), 4)
-
-        self.assertEqual(
-            exp_services.get_batch_of_exps_for_latex_svg_generation(),
-            expected_output)
-
-        expected_output_when_number_of_svgs_is_limited = {
-            'exp_id1': ['+,+,+,+', '\\frac{x}{y}'],
-            'exp_id2': ['+,-,-,+', '\\sqrt{x}'],
-            'exp_id3': ['(x-a)(x-b)']
-        }
-        self.set_config_property((
-            config_domain
-            .MAX_NUMBER_OF_SVGS_IN_MATH_SVGS_BATCH), 5)
-        self.assertEqual(
-            exp_services.get_batch_of_exps_for_latex_svg_generation(),
-            expected_output_when_number_of_svgs_is_limited)
-
-    def test_get_number_explorations_having_latex_strings_without_svgs(self):
-        exp_models.ExplorationMathRichTextInfoModel(
-            id='exp_id1',
-            math_images_generation_required=True,
-            latex_strings_without_svg=['+,+,+,+', '\\frac{x}{y}'],
-            estimated_max_size_of_images_in_bytes=20000).put()
-        exp_models.ExplorationMathRichTextInfoModel(
-            id='exp_id2',
-            math_images_generation_required=True,
-            latex_strings_without_svg=['+,-,-,+', '\\sqrt{x}'],
-            estimated_max_size_of_images_in_bytes=20000).put()
-
-        exp_models.ExplorationMathRichTextInfoModel(
-            id='exp_id3',
-            math_images_generation_required=False,
-            latex_strings_without_svg=['(x-a)(x-b)', '\\frac{x^2}{y^3}'],
-            estimated_max_size_of_images_in_bytes=20000).put()
-        exp_models.ExplorationMathRichTextInfoModel(
-            id='exp_id4',
-            math_images_generation_required=True,
-            latex_strings_without_svg=['(x-a1)(x-b1)', '\\frac{x^3}{y^2}'],
-            estimated_max_size_of_images_in_bytes=30000).put()
-        self.assertEqual(
-            exp_services.
-            get_number_explorations_having_latex_strings_without_svgs(), 3)
-
-    def test_generate_html_change_list_for_state(self):
-        old_html = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
-            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>'
-        )
-        new_html = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
-            'quot;svg_filename&amp;quot;: &amp;quot;file1.svg&amp;quot;}">'
-            '</oppia-noninteractive-math>'
-        )
-        old_written_translations_dict = {
-            'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'html': old_html,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'html': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'html': old_html,
-                        'needs_update': False
-                    },
-                    'en': {
-                        'html': 'hello!',
-                        'needs_update': False
-                    }
-                }
-            }
-        }
-        new_written_translations_dict = {
-            'translations_mapping': {
-                'content1': {
-                    'en': {
-                        'html': new_html,
-                        'needs_update': True
-                    },
-                    'hi': {
-                        'html': 'Hey!',
-                        'needs_update': False
-                    }
-                },
-                'feedback_1': {
-                    'hi': {
-                        'html': new_html,
-                        'needs_update': False
-                    },
-                    'en': {
-                        'html': 'hello!',
-                        'needs_update': False
-                    }
-                }
-            }
-        }
-        old_answer_group_dict = {
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': old_html
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
-        new_answer_group_dict = {
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': new_html
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
-        old_state_dict = {
-            'content': {
-                'content_id': 'content', 'html': old_html
-            },
-            'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
-            'solicit_answer_details': False,
-            'classifier_model_id': None,
-            'interaction': {
-                'answer_groups': [old_answer_group_dict],
-                'default_outcome': {
-                    'param_changes': [],
-                    'feedback': {
-                        'content_id': 'default_outcome',
-                        'html': old_html
-                    },
-                    'dest': 'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {
-                    'choices': {
-                        'value': [
-                            old_html,
-                            '<p>2</p>',
-                            '<p>3</p>',
-                            '<p>4</p>'
-                        ]
-                    }
-                },
-                'confirmed_unclassified_answers': [],
-                'id': 'DragAndDropSortInput',
-                'hints': [
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_1',
-                            'html': old_html
-                        }
-                    },
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_2',
-                            'html': old_html
-                        }
-                    }
-                ],
-                'solution': {
-                    'answer_is_exclusive': True,
-                    'correct_answer': [
-                        [old_html],
-                        ['<p>2</p>'],
-                        ['<p>3</p>'],
-                        ['<p>4</p>']
-                    ],
-                    'explanation': {
-                        'content_id': 'solution',
-                        'html': old_html
-                    }
-                }
-
-            },
-            'written_translations': (
-                old_written_translations_dict)
-        }
-        new_state_dict = {
-            'content': {
-                'content_id': 'content', 'html': new_html
-            },
-            'param_changes': [],
-            'content_ids_to_audio_translations': {'content': {}},
-            'solicit_answer_details': False,
-            'classifier_model_id': None,
-            'interaction': {
-                'answer_groups': [new_answer_group_dict],
-                'default_outcome': {
-                    'param_changes': [],
-                    'feedback': {
-                        'content_id': 'default_outcome',
-                        'html': new_html
-                    },
-                    'dest': 'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {
-                    'choices': {
-                        'value': [
-                            new_html,
-                            '<p>2</p>',
-                            '<p>3</p>',
-                            '<p>4</p>'
-                        ]
-                    }
-                },
-                'confirmed_unclassified_answers': [],
-                'id': 'DragAndDropSortInput',
-                'hints': [
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_1',
-                            'html': new_html
-                        }
-                    },
-                    {
-                        'hint_content': {
-                            'content_id': 'hint_2',
-                            'html': new_html
-                        }
-                    }
-                ],
-                'solution': {
-                    'answer_is_exclusive': True,
-                    'correct_answer': [
-                        [new_html],
-                        ['<p>2</p>'],
-                        ['<p>3</p>'],
-                        ['<p>4</p>']
-                    ],
-                    'explanation': {
-                        'content_id': 'solution',
-                        'html': new_html
-                    }
-                }
-
-            },
-            'written_translations': (
-                new_written_translations_dict)
-        }
-        state_name = 'state1'
-        expected_change_list = [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': state_name,
-                'property_name': exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS,
-                'new_value': new_written_translations_dict
-            }).to_dict(),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': state_name,
-                'property_name': (
-                    exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
-                'new_value': new_state_dict['interaction']['default_outcome']
-            }).to_dict(),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
-                'new_value': new_state_dict['interaction']['hints']
-            }).to_dict(),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
-                'new_value': new_state_dict['interaction']['solution']
-            }).to_dict(),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': state_name,
-                'property_name': (
-                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
-                'new_value': new_state_dict['interaction']['answer_groups']
-            }).to_dict(),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': state_name,
-                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                'new_value': new_state_dict['content']
-            }).to_dict(),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': state_name,
-                'property_name': (
-                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
-                'new_value': new_state_dict['interaction']['customization_args']
-            }).to_dict()]
-        change_lists = exp_services.generate_html_change_list_for_state(
-            state_name, new_state_dict, old_state_dict)
-        change_dict_lists = [
-            change_list.to_dict() for change_list in change_lists]
-        self.assertEqual(
-            sorted(change_dict_lists), sorted(expected_change_list))
-
-    def test_exploration_is_updated_with_math_svgs_when_image_data_is_valid(
-            self):
-        exploration1 = exp_domain.Exploration.create_default_exploration(
-            'exp_id1', title='title1', category='category')
-        exploration1.add_states(['FirstState'])
-        exploration1_state = exploration1.states['FirstState']
-
-        valid_html_content1 = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}&amp;quot'
-            ';, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"'
-            '></oppia-noninteractive-math>'
-        )
-        valid_html_content2 = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
-            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>'
-        )
-        content_dict = {
-            'content_id': 'content',
-            'html': valid_html_content1
-        }
-        customization_args_dict = {
-            'choices': {
-                'value': [{
-                    'content_id': 'ca_choices_0',
-                    'html': valid_html_content1
-                }, {
-                    'content_id': 'ca_choices_1',
-                    'html': '<p>2</p>'
-                }, {
-                    'content_id': 'ca_choices_2',
-                    'html': '<p>3</p>'
-                }, {
-                    'content_id': 'ca_choices_3',
-                    'html': valid_html_content2
-                }]
-            },
-            'allowMultipleItemsInSamePosition': {'value': True}
-        }
-
-        exploration1_state.update_content(
-            state_domain.SubtitledHtml.from_dict(content_dict))
-        exploration1_state.update_interaction_id('DragAndDropSortInput')
-        exploration1_state.update_interaction_customization_args(
-            customization_args_dict)
-        exploration1_state.update_next_content_id_index(4)
-
-        exp_services.save_new_exploration(self.admin_id, exploration1)
-        exp_models.ExplorationMathRichTextInfoModel(
-            id='exp_id1',
-            math_images_generation_required=True,
-            latex_strings_without_svg=['+,+,+,+', '\\frac{x}{y}'],
-            estimated_max_size_of_images_in_bytes=20000).put()
-
-        svg_file_1 = (
-            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
-            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
-            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
-            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
-            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
-            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
-            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
-            ' 52 289Z"/></g></svg>'
-        )
-        svg_file_2 = (
-            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
-            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
-            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
-            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
-            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
-            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
-            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
-            ' 52 289Z"/></g></svg>'
-        )
-
-        latex_string_svg_image_data1 = (
-            html_domain.LatexStringSvgImageData(
-                svg_file_1, html_domain.LatexStringSvgImageDimensions(
-                    '1d429', '1d33', '0d241')))
-        latex_string_svg_image_data2 = (
-            html_domain.LatexStringSvgImageData(
-                svg_file_2, html_domain.LatexStringSvgImageDimensions(
-                    '1d525', '3d33', '0d241')))
-
-        image_data = {
-            '+,+,+,+': latex_string_svg_image_data1,
-            '\\frac{x}{y}': latex_string_svg_image_data2
-        }
-        exp_services.update_exploration_with_math_svgs(
-            'exp_id1', image_data)
-        update_exploration = exp_fetchers.get_exploration_by_id('exp_id1')
-        updated_html_string = ''
-        for state in update_exploration.states.values():
-            updated_html_string += (
-                ''.join(state.get_all_html_content_strings()))
-        filenames = (
-            html_validation_service.
-            extract_svg_filenames_in_math_rte_components(updated_html_string))
-
-        self.assertEqual(len(filenames), 3)
-        for filename in filenames:
-            file_system_class = (
-                fs_services.get_entity_file_system_class())
-            fs = fs_domain.AbstractFileSystem(file_system_class(
-                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1'))
-            filepath = 'image/%s' % filename
-            self.assertTrue(fs.isfile(filepath))
-        exploration_math_rich_text_info_model = (
-            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id1'))
-        self.assertFalse(
-            exploration_math_rich_text_info_model.
-            math_images_generation_required)
-
-    def test_exploration_is_updated_with_math_svgs_when_num_of_svgs_is_limited(
-            self):
-        exploration1 = exp_domain.Exploration.create_default_exploration(
-            'exp_id1', title='title1', category='category')
-        exploration1.add_states(['FirstState'])
-        exploration1_state = exploration1.states['FirstState']
-
-        valid_html_content1 = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}&amp;quot'
-            ';, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"'
-            '></oppia-noninteractive-math>'
-        )
-        valid_html_content2 = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
-            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>'
-        )
-        valid_html_content3 = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;-,+,+,-&amp;quot;, &amp;'
-            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>'
-        )
-        content_dict = {
-            'content_id': 'content',
-            'html': valid_html_content1
-        }
-        customization_args_dict = {
-            'choices': {
-                'value': [{
-                    'content_id': 'ca_choices_0',
-                    'html': valid_html_content2
-                }, {
-                    'content_id': 'ca_choices_1',
-                    'html': valid_html_content2
-                }, {
-                    'content_id': 'ca_choices_2',
-                    'html': '<p>3</p>'
-                }, {
-                    'content_id': 'ca_choices_3',
-                    'html': valid_html_content3
-                }]
-            },
-            'allowMultipleItemsInSamePosition': {'value': True}
-        }
-
-        exploration1_state.update_content(
-            state_domain.SubtitledHtml.from_dict(content_dict))
-        exploration1_state.update_interaction_id('DragAndDropSortInput')
-        exploration1_state.update_interaction_customization_args(
-            customization_args_dict)
-        exploration1_state.update_next_content_id_index(4)
-
-        exp_services.save_new_exploration(self.admin_id, exploration1)
-        exp_models.ExplorationMathRichTextInfoModel(
-            id='exp_id1',
-            math_images_generation_required=True,
-            latex_strings_without_svg=['+,+,+,+', '\\frac{x}{y}', '-,+,+,-'],
-            estimated_max_size_of_images_in_bytes=20000).put()
-
-        svg_file_1 = (
-            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
-            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
-            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
-            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
-            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
-            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
-            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
-            ' 52 289Z"/></g></svg>'
-        )
-        svg_file_2 = (
-            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
-            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
-            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
-            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
-            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
-            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
-            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
-            ' 52 289Z"/></g></svg>'
-        )
-
-        latex_string_svg_image_data1 = (
-            html_domain.LatexStringSvgImageData(
-                svg_file_1, html_domain.LatexStringSvgImageDimensions(
-                    '1d429', '1d33', '0d241')))
-        latex_string_svg_image_data2 = (
-            html_domain.LatexStringSvgImageData(
-                svg_file_2, html_domain.LatexStringSvgImageDimensions(
-                    '1d525', '3d33', '0d241')))
-
-        image_data = {
-            '+,+,+,+': latex_string_svg_image_data1,
-            '\\frac{x}{y}': latex_string_svg_image_data2
-        }
-        exp_services.update_exploration_with_math_svgs(
-            'exp_id1', image_data)
-        update_exploration = exp_fetchers.get_exploration_by_id('exp_id1')
-        updated_html_string = ''
-        for state in update_exploration.states.values():
-            updated_html_string += (
-                ''.join(state.get_all_html_content_strings()))
-        filenames = (
-            html_validation_service.
-            extract_svg_filenames_in_math_rte_components(updated_html_string))
-
-        self.assertEqual(len(filenames), 3)
-        for filename in filenames:
-            file_system_class = (
-                fs_services.get_entity_file_system_class())
-            fs = fs_domain.AbstractFileSystem(file_system_class(
-                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id1'))
-            filepath = 'image/%s' % filename
-            self.assertTrue(fs.isfile(filepath))
-        exploration_math_rich_text_info_model = (
-            exp_models.ExplorationMathRichTextInfoModel.get_by_id('exp_id1'))
-        self.assertTrue(
-            exploration_math_rich_text_info_model.
-            math_images_generation_required)
-
-    def test_updation_fails_when_svg_file_is_invalid(self):
-        exploration1 = exp_domain.Exploration.create_default_exploration(
-            'exp_id1', title='title1', category='category')
-        exploration1.add_states(['FirstState'])
-        exploration1_state = exploration1.states['FirstState']
-
-        valid_html_content1 = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}&amp;quot'
-            ';, &amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"'
-            '></oppia-noninteractive-math>'
-        )
-        valid_html_content2 = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
-            'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-            '-noninteractive-math>'
-        )
-        content_dict = {
-            'content_id': 'content',
-            'html': valid_html_content1
-        }
-        customization_args_dict = {
-            'choices': {
-                'value': [{
-                    'content_id': 'ca_choices_0',
-                    'html': valid_html_content1
-                }, {
-                    'content_id': 'ca_choices_1',
-                    'html': '<p>2</p>'
-                }, {
-                    'content_id': 'ca_choices_2',
-                    'html': '<p>3</p>'
-                }, {
-                    'content_id': 'ca_choices_3',
-                    'html': valid_html_content2
-                }]
-            },
-            'allowMultipleItemsInSamePosition': {'value': True}
-        }
-
-        exploration1_state.update_content(
-            state_domain.SubtitledHtml.from_dict(content_dict))
-        exploration1_state.update_interaction_id('DragAndDropSortInput')
-        exploration1_state.update_interaction_customization_args(
-            customization_args_dict)
-        exploration1_state.update_next_content_id_index(4)
-
-        exp_services.save_new_exploration(self.admin_id, exploration1)
-        svg_file_1 = (
-            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
-            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
-            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
-            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
-            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
-            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
-            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
-            ' 52 289Z"/></g></svg>'
-        )
-        invalid_svg_file = (
-            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
-            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
-            'ical-align: -0.241ex;"><invalid tag stroke="currentColor" fill="c'
-            'urrentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)">'
-            '<path stroke-width="1" d="M52 289Q59 331 106 386T222 442Q257 442'
-            ' 2864Q412 404 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 3'
-            '8T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153H489Q504 15'
-            '3 504 145284 52 289Z"/></g></svg>'
-        )
-
-        latex_string_svg_image_data1 = (
-            html_domain.LatexStringSvgImageData(
-                svg_file_1, html_domain.LatexStringSvgImageDimensions(
-                    '1d429', '1d33', '0d241')))
-        latex_string_svg_image_data2 = (
-            html_domain.LatexStringSvgImageData(
-                invalid_svg_file, html_domain.LatexStringSvgImageDimensions(
-                    '1d525', '3d33', '0d241')))
-
-        image_data = {
-            '+,+,+,+': latex_string_svg_image_data1,
-            '\\frac{x}{y}': latex_string_svg_image_data2
-        }
-        with self.assertRaisesRegexp(
-            Exception,
-            'Image not recognized SVG image provided for latex \\\\frac{x}{y}'
-            ' failed validation'):
-            exp_services.update_exploration_with_math_svgs(
-                'exp_id1', image_data)

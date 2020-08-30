@@ -39,7 +39,7 @@ export class SVMPredictionService {
   constructor(
       private predictionResultObjectFactory: PredictionResultObjectFactory) {}
   kernel(
-      kernelParams: KernelParams, supportVectors: Array<number[]>,
+      kernelParams: KernelParams, supportVectors: number[][],
       input: number[]): number[] {
     var kernel = kernelParams.kernel;
     var kvalues = [];

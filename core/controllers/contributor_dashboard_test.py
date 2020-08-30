@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -71,7 +72,16 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         topic = topic_domain.Topic.create_default_topic(
             '0', 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_3'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic('0', self.admin_id)
 
         self.skill_id_0 = 'skill_id_0'
         self.skill_id_1 = 'skill_id_1'
@@ -108,6 +118,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             story_services.save_new_story(self.owner_id, story)
             topic_services.add_canonical_story(
                 self.owner_id, topic.id, story.id)
+            topic_services.publish_story(
+                topic.id, story.id, self.admin_id)
             story_services.update_story(
                 self.owner_id, story.id, [story_domain.StoryChange({
                     'cmd': 'add_story_node',
@@ -131,7 +143,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'topic_name': 'topic',
             'story_title': 'title 0',
             'chapter_title': 'Node1',
-            'content_count': 4,
+            'content_count': 2,
             'translation_counts': {}
         }
 
@@ -140,7 +152,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'topic_name': 'topic',
             'story_title': 'title 1',
             'chapter_title': 'Node1',
-            'content_count': 4,
+            'content_count': 2,
             'translation_counts': {}
         }
 
@@ -329,9 +341,13 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(TranslatableTextHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_admins([self.ADMIN_USERNAME])
 
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -346,7 +362,16 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
 
         topic = topic_domain.Topic.create_default_topic(
             '0', 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(topic.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -361,6 +386,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             story_services.save_new_story(self.owner_id, story)
             topic_services.add_canonical_story(
                 self.owner_id, topic.id, story.id)
+            topic_services.publish_story(topic.id, story.id, self.admin_id)
             story_services.update_story(
                 self.owner_id, story.id, [story_domain.StoryChange({
                     'cmd': 'add_story_node',

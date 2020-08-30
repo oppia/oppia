@@ -75,7 +75,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           param_changes: [],
           interaction: {
             answer_groups: [{
-              rule_specs: [],
+              rule_input_translations: {},
+              rule_types_to_inputs: {},
               outcome: {
                 dest: 'Hola',
                 feedback: {
@@ -123,13 +124,15 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               html: ''
             },
           },
-          rule_specs: [{
-            type: '',
-            inputs: {
-              x: ['c', 'd', 'e'],
-              y: ['a', 'b', 'c']
-            }
-          }],
+          rule_input_translations: {},
+          rule_types_to_inputs: {
+            '': [
+              {
+                x: ['c', 'd', 'e'],
+                y: ['a', 'b', 'c']
+              }
+            ]
+          },
           training_data: ['Answer1', 'Answer2']
         }],
         default_outcome: {
@@ -168,15 +171,16 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         });
     }));
 
-    it('should evaluate scope variables values correctly', function() {
-      expect($scope.stateName).toBe('Hola');
-      expect($scope.stateContent).toBe('This is Hola State');
-      expect($scope.answerGroupHasNonEmptyRules).toBe(true);
-      expect($scope.inputTemplate).toBe(
-        '<oppia-interactive-text-input last-answer="null"' +
-        ' label-for-focus-target="testInteractionInput">' +
-        '</oppia-interactive-text-input>');
-    });
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.stateName).toBe('Hola');
+        expect($scope.stateContent).toBe('This is Hola State');
+        expect($scope.answerGroupHasNonEmptyRules).toBe(true);
+        expect($scope.inputTemplate).toBe(
+          '<oppia-interactive-text-input last-answer="null"' +
+          ' label-for-focus-target="testInteractionInput">' +
+          '</oppia-interactive-text-input>');
+      });
 
     it('should call init when controller is initialized', function() {
       expect($scope.trainingData).toEqual([{
@@ -276,7 +280,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           param_changes: [],
           interaction: {
             answer_groups: [{
-              rule_specs: [],
+              rule_input_translations: {},
+              rule_types_to_inputs: {},
               outcome: {
                 dest: 'Hola',
                 feedback: {
@@ -324,7 +329,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               html: ''
             },
           },
-          rule_specs: [],
+          rule_input_translations: {},
+          rule_types_to_inputs: {},
           training_data: ['Answer1', 'Answer2']
         }],
         default_outcome: {
@@ -406,7 +412,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           param_changes: [],
           interaction: {
             answer_groups: [{
-              rule_specs: [],
+              rule_input_translations: {},
+              rule_types_to_inputs: {},
               outcome: {
                 dest: 'Hola',
                 feedback: {
@@ -454,7 +461,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               html: ''
             },
           },
-          rule_specs: [],
+          rule_input_translations: {},
+          rule_types_to_inputs: {},
           training_data: ['Answer1']
         }],
         default_outcome: {
