@@ -46,10 +46,8 @@ describe('PlatformFeatureService', () => {
 
   let apiSpy: jasmine.Spy;
 
-  // TODO(#9154): Remove the following resetting code when migration is
-  // complete.
-  // Currently these properties are static, which are not automatically cleared
-  // after each test, so we need to manually clear the state of
+  // These properties are static, which are not automatically cleared after
+  // each test, so we need to manually clear the state of
   // PlatformFeatureService.
   const clearStaticProperties = () => {
     PlatformFeatureService.featureStatusSummary = null;
