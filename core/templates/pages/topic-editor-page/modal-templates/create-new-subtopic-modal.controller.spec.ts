@@ -59,7 +59,8 @@ describe('Create new subtopic modal', function() {
     function() {
       ctrl.init();
       expect(ctrl.topic).toEqual(topic);
-      expect(ctrl.SUBTOPIC_PAGE_SCHEMA).toEqual({type: 'html',
+      expect(ctrl.SUBTOPIC_PAGE_SCHEMA).toEqual({
+        type: 'html',
         ui_config: {
           rows: 100
         }});
@@ -82,7 +83,8 @@ describe('Create new subtopic modal', function() {
 
   it('should show error message if subtopic name is invalid', function() {
     expect(ctrl.errorMsg).toEqual(null);
-    spyOn(SubtopicValidationService,
+    spyOn(
+      SubtopicValidationService,
       'checkValidSubtopicName').and.returnValue(false);
     ctrl.subtopicTitle = 'Subtopic1';
     ctrl.save();
@@ -93,7 +95,8 @@ describe('Create new subtopic modal', function() {
 
   it('should show reset the error message ', function() {
     expect(ctrl.errorMsg).toEqual(null);
-    spyOn(SubtopicValidationService,
+    spyOn(
+      SubtopicValidationService,
       'checkValidSubtopicName').and.returnValue(false);
     ctrl.subtopicTitle = 'Subtopic1';
     ctrl.save();

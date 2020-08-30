@@ -82,9 +82,9 @@ describe('Topic editor tab directive', function() {
       getEntityId: () => 'dkfn32sxssasd'
     };
     var MockImageUploadHelperService = {
-      getTrustedResourceUrlForThumbnailFilename: (filename,
-          entityType,
-          entityId) => (entityType + '/' + entityId + '/' + filename)
+      getTrustedResourceUrlForThumbnailFilename: (
+          filename, entityType, entityId) => (
+        entityType + '/' + entityId + '/' + filename)
     };
     SkillCreationService = $injector.get('SkillCreationService');
     TopicUpdateService = $injector.get('TopicUpdateService');
@@ -140,8 +140,8 @@ describe('Topic editor tab directive', function() {
     topic.setUrlFragment('topic-url-fragment');
     TopicEditorStateService.setTopic(topic);
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
-    spyOnProperty(TopicEditorStateService,
-      'onStorySummariesInitialized').and.returnValue(
+    spyOnProperty(
+      TopicEditorStateService, 'onStorySummariesInitialized').and.returnValue(
       mockStorySummariesInitializedEventEmitter);
     ctrl.$onInit();
   }));

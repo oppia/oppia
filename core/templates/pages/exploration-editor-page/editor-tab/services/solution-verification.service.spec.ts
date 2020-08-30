@@ -234,17 +234,17 @@ describe('Solution Verification Service', function() {
     siis.savedMemento = 'TextInput';
     ess.saveSolution('First State', sof.createNew(false, 'abc', 'nothing'));
 
-    expect(
-      svs.verifySolution('First State', state.interaction,
-        ess.getState('First State').interaction.solution.correctAnswer)
+    expect(svs.verifySolution(
+      'First State', state.interaction,
+      ess.getState('First State').interaction.solution.correctAnswer)
     ).toBe(true);
 
     see.setInQuestionMode(true);
     state.interaction.answerGroups[0].outcome.dest = 'First State';
     state.interaction.answerGroups[0].outcome.labelledAsCorrect = true;
-    expect(
-      svs.verifySolution('First State', state.interaction,
-        ess.getState('First State').interaction.solution.correctAnswer)
+    expect(svs.verifySolution(
+      'First State', state.interaction,
+      ess.getState('First State').interaction.solution.correctAnswer)
     ).toBe(true);
   });
 
@@ -259,9 +259,9 @@ describe('Solution Verification Service', function() {
     siis.savedMemento = 'TextInput';
     ess.saveSolution('First State', sof.createNew(false, 'xyz', 'nothing'));
 
-    expect(
-      svs.verifySolution('First State', state.interaction,
-        ess.getState('First State').interaction.solution.correctAnswer)
+    expect(svs.verifySolution(
+      'First State', state.interaction,
+      ess.getState('First State').interaction.solution.correctAnswer)
     ).toBe(false);
   });
 });

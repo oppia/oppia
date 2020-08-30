@@ -51,8 +51,8 @@ describe('Unresolved Answers Overview Component', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     mockExternalSaveEventEmitter = new EventEmitter();
-    $provide.value('StateEditorRefreshService',
-      TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
