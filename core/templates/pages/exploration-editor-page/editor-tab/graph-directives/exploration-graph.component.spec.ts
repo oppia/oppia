@@ -53,14 +53,14 @@ describe('Exploration Graph Component', function() {
     });
   }));
 
-  it('should evaluate when exploration states service is initialized to' +
-    ' show graph', function() {
-    expect(ctrl.isGraphShown()).toBe(false);
-    explorationStatesService.init({});
-    expect(ctrl.isGraphShown()).toBe(true);
-  });
+  it('should show graph when exploration states service is initialized',
+    function() {
+      expect(ctrl.isGraphShown()).toBe(false);
+      explorationStatesService.init({});
+      expect(ctrl.isGraphShown()).toBe(true);
+    });
 
-  it('should evaluate active state name', function() {
+  it('should get name from the active state', function() {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
       'Introduction');
     expect(ctrl.getActiveStateName()).toBe('Introduction');
@@ -68,10 +68,11 @@ describe('Exploration Graph Component', function() {
 
   it('should get null graph data from graph data service when it is not' +
     ' recomputed', function() {
+    expect(ctrl.isGraphShown()).toBe(false);
     expect(ctrl.getGraphData()).toBe(null);
   });
 
-  it('should evaluate when exploration graph is editable', function() {
+  it('should evaluate if exploration graph is editable', function() {
     var isEditableSpy = spyOn(editabilityService, 'isEditable');
     isEditableSpy.and.returnValue(true);
     expect(ctrl.isEditable()).toBe(true);
@@ -79,34 +80,32 @@ describe('Exploration Graph Component', function() {
     expect(ctrl.isEditable()).toBe(false);
   });
 
-  it('should open state graph modal using $uibModal open method',
-    function() {
-      var modalOpenSpy = spyOn($uibModal, 'open').and.callThrough();
+  it('should open state graph modal', function() {
+    var modalOpenSpy = spyOn($uibModal, 'open').and.callThrough();
 
-      ctrl.openStateGraphModal();
-      $rootScope.$apply();
+    ctrl.openStateGraphModal();
+    $rootScope.$apply();
 
-      expect(modalOpenSpy).toHaveBeenCalled();
+    expect(modalOpenSpy).toHaveBeenCalled();
+  });
+
+  it('should delete state when closing state graph modal', function() {
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.resolve({
+        action: 'delete',
+        stateName: 'Introduction'
+      })
     });
+    spyOn(explorationStatesService, 'deleteState');
 
-  it('should open state graph modal and close it with delete action',
-    function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve({
-          action: 'delete',
-          stateName: 'Introduction'
-        })
-      });
-      spyOn(explorationStatesService, 'deleteState');
+    ctrl.openStateGraphModal();
+    $rootScope.$apply();
 
-      ctrl.openStateGraphModal();
-      $rootScope.$apply();
+    expect(explorationStatesService.deleteState).toHaveBeenCalledWith(
+      'Introduction');
+  });
 
-      expect(explorationStatesService.deleteState).toHaveBeenCalledWith(
-        'Introduction');
-    });
-
-  it('should open state graph modal and close it with navigate action',
+  it('should navigate to main tab when closing state graph modal',
     function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve({
@@ -123,7 +122,7 @@ describe('Exploration Graph Component', function() {
         'Introduction');
     });
 
-  it('should open state graph modal and close it with an invalid action',
+  it('should handle invalid actions when state graph modal is opened',
     function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve({
@@ -140,7 +139,7 @@ describe('Exploration Graph Component', function() {
         'Invalid closeDict action: add');
     });
 
-  it('should open state graph modal and dismiss it', function() {
+  it('should dismiss state graph modal', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });
