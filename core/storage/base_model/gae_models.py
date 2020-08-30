@@ -1081,7 +1081,7 @@ class BaseSnapshotMetadataModel(BaseModel):
     commit_cmds = ndb.JsonProperty(indexed=False)
     # The user ids that are in some field in commit_cmds.
     commit_cmds_user_ids = ndb.StringProperty(repeated=True, indexed=True)
-    # The user ids that are enclosed inside content field in the relevant
+    # The user ids that are enclosed inside 'content' field in the relevant
     # snapshot content model.
     content_user_ids = ndb.StringProperty(repeated=True, indexed=True)
 
