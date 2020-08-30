@@ -28,7 +28,7 @@ from core.domain import html_cleaner
 from core.domain import image_validation_services
 from core.domain import opportunity_services
 from core.domain import skill_fetchers
-from core.domain import state_domain
+from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
@@ -92,13 +92,31 @@ class SuggestionHandler(base.BaseHandler):
         change_dict = self.payload.get('change')
         target_id = self.payload.get('target_id')
         target_type = self.payload.get('target_type')
-        html_list = []
-        if target_type == suggestion_models.TARGET_TYPE_SKILL:
-            state_dict = change_dict['question_dict']['question_state_data']
-            state = state_domain.State.from_dict(state_dict)
-            html_list = state.get_all_html_content_strings()
+        target_version_at_submission = self.payload.get(
+            'target_version_at_submission')
+        suggestion_type = self.payload.get('suggestion_type')
+        description = self.payload.get('description')
+
+        suggestion_domain_class = (
+            suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
+                suggestion_type])
+        # While creating the below domain object fields suggestion_id and
+        # score_category is kept None because values for these fields are
+        # created in the create_suggestion() method. Also the domain object
+        # created below will only be used for extracting the HTML from the
+        # suggestions and these fields are not required for HTML extraction.
+        suggestion = suggestion_domain_class(
+            None, target_id, target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, self.user_id, None, change_dict,
+            None)
+        html_list = suggestion.get_all_html_content_strings()
         filenames = (
             html_cleaner.get_image_filenames_from_html_strings(html_list))
+        # In the case of edit state content suggestion the images are already
+        # saved to GCS and we don't need to save them in this controller.
+        if suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
+            filenames = []
         if len(filenames) > 0:
             suggestion_image_entity_type = (
                 fs_services.get_entity_type_for_suggestion_target(target_type))
@@ -127,10 +145,9 @@ class SuggestionHandler(base.BaseHandler):
 
         try:
             suggestion_services.create_suggestion(
-                self.payload.get('suggestion_type'),
-                target_type, target_id,
-                self.payload.get('target_version_at_submission'),
-                self.user_id, change_dict, self.payload.get('description'))
+                suggestion_type, target_type, target_id,
+                target_version_at_submission, self.user_id, change_dict,
+                description)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
         self.render_json(self.values)

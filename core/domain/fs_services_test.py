@@ -49,10 +49,10 @@ class FileSystemServicesTests(test_utils.GenericTestBase):
     def test_get_entity_type_for_suggestion_target(self):
         self.assertEqual(
             fs_services.get_entity_type_for_suggestion_target('skill'),
-            'question_suggestion')
+            'question_suggestions')
         self.assertEqual(
             fs_services.get_entity_type_for_suggestion_target('exploration'),
-            'exploration_suggestion')
+            'exploration_suggestions')
         with self.assertRaisesRegexp(
             Exception, 'Invalid suggestion target type.'):
             fs_services.get_entity_type_for_suggestion_target('invalid')
