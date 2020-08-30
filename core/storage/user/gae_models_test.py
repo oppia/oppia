@@ -2293,11 +2293,6 @@ class UserAuthModelTests(test_utils.GenericTestBase):
             pin=self.USER_PIN
         ).put()
 
-    def test_get_export_policy_is_not_applicable(self):
-        self.assertEqual(
-            user_models.UserAuthModel.get_export_policy(),
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-
     def test_get_deletion_policy_is_delete(self):
         self.assertEqual(
             user_models.UserAuthModel.get_deletion_policy(),

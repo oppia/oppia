@@ -96,17 +96,17 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     def get_export_policy():
         """Model contains user data."""
         return {
-            entity_type: base_models.EXPORT_POLICY.EXPORTED,
-            entity_id: base_models.EXPORT_POLICY.EXPORTED,
-            original_author_id: base_models.EXPORT_POLICY.EXPORTED,
-            status: base_models.EXPORT_POLICY.EXPORTED,
-            subject: base_models.EXPORT_POLICY.EXPORTED,
-            summary: base_models.EXPORT_POLICY.EXPORTED,
-            has_suggestion: base_models.EXPORT_POLICY.EXPORTED,
-            message_count: base_models.EXPORT_POLICY.EXPORTED,
-            last_nonempty_message_text:
+            'entity_type': base_models.EXPORT_POLICY.EXPORTED,
+            'entity_id': base_models.EXPORT_POLICY.EXPORTED,
+            'original_author_id': base_models.EXPORT_POLICY.EXPORTED,
+            'status': base_models.EXPORT_POLICY.EXPORTED,
+            'subject': base_models.EXPORT_POLICY.EXPORTED,
+            'summary': base_models.EXPORT_POLICY.EXPORTED,
+            'has_suggestion': base_models.EXPORT_POLICY.EXPORTED,
+            'message_count': base_models.EXPORT_POLICY.EXPORTED,
+            'last_nonempty_message_text':
                 base_models.EXPORT_POLICY.EXPORTED,
-            last_nonempty_message_author_id:
+            'last_nonempty_message_author_id':
                 base_models.EXPORT_POLICY.EXPORTED
         }
 
@@ -258,13 +258,13 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     def get_export_policy():
         """Model contains user data."""
         return {
-            thread_id: base_models.EXPORT_POLICY.EXPORTED,
-            message_id: base_models.EXPORT_POLICY.EXPORTED,
-            author_id: base_models.EXPORT_POLICY.EXPORTED,
-            updated_status: base_models.EXPORT_POLICY.EXPORTED,
-            updated_subject: base_models.EXPORT_POLICY.EXPORTED,
-            text: base_models.EXPORT_POLICY.EXPORTED,
-            received_via_email: base_models.EXPORT_POLICY.EXPORTED
+            'thread_id': base_models.EXPORT_POLICY.EXPORTED,
+            'message_id': base_models.EXPORT_POLICY.EXPORTED,
+            'author_id': base_models.EXPORT_POLICY.EXPORTED,
+            'updated_status': base_models.EXPORT_POLICY.EXPORTED,
+            'updated_subject': base_models.EXPORT_POLICY.EXPORTED,
+            'text': base_models.EXPORT_POLICY.EXPORTED,
+            'received_via_email': base_models.EXPORT_POLICY.EXPORTED
         }
 
     @classmethod
@@ -541,9 +541,9 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     def get_export_policy():
         """Model contains user data."""
         return {
-            user_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            thread_id: base_models.EXPORT_POLICY.EXPORTED,
-            message_ids_read_by_user:
+            'user_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'thread_id': base_models.EXPORT_POLICY.EXPORTED,
+            'message_ids_read_by_user':
                 base_models.EXPORT_POLICY.EXPORTED
         }
 
@@ -691,8 +691,8 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
     def get_export_policy():
         """Model does not contain user data."""
         return {
-            num_open_threads: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            num_total_threads: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'num_open_threads': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'num_total_threads': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
     @classmethod
@@ -757,8 +757,8 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
     def get_export_policy():
         """Model does not contain user data."""
         return {
-            feedback_message_references: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            retries: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'feedback_message_references': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'retries': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
     @classmethod

@@ -163,16 +163,16 @@ class GeneralSuggestionModel(base_models.BaseModel):
     def get_export_policy():
         """Model contains user data."""
         return {
-            suggestion_type: base_models.EXPORT_POLICY.EXPORTED,
-            target_type: base_models.EXPORT_POLICY.EXPORTED,
-            target_id: base_models.EXPORT_POLICY.EXPORTED,
-            target_version_at_submission:
+            'suggestion_type': base_models.EXPORT_POLICY.EXPORTED,
+            'target_type': base_models.EXPORT_POLICY.EXPORTED,
+            'target_id': base_models.EXPORT_POLICY.EXPORTED,
+            'target_version_at_submission':
                 base_models.EXPORT_POLICY.EXPORTED,
-            status: base_models.EXPORT_POLICY.EXPORTED,
-            author_id: base_models.EXPORT_POLICY.EXPORTED,
-            final_reviewer_id: base_models.EXPORT_POLICY.EXPORTED,
-            change_cmd: base_models.EXPORT_POLICY.EXPORTED,
-            score_category: base_models.EXPORT_POLICY.EXPORTED
+            'status': base_models.EXPORT_POLICY.EXPORTED,
+            'author_id': base_models.EXPORT_POLICY.EXPORTED,
+            'final_reviewer_id': base_models.EXPORT_POLICY.EXPORTED,
+            'change_cmd': base_models.EXPORT_POLICY.EXPORTED,
+            'score_category': base_models.EXPORT_POLICY.EXPORTED
         }
 
     @classmethod
@@ -506,15 +506,15 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     def get_export_policy():
         """Model contains user data."""
         return {
-            target_type: base_models.EXPORT_POLICY.EXPORTED,
-            target_id: base_models.EXPORT_POLICY.EXPORTED,
-            language_code: base_models.EXPORT_POLICY.EXPORTED,
-            status: base_models.EXPORT_POLICY.EXPORTED,
-            content: base_models.EXPORT_POLICY.EXPORTED,
-            filename: base_models.EXPORT_POLICY.EXPORTED,
-            author_id: base_models.EXPORT_POLICY.EXPORTED,
-            final_reviewer_id: base_models.EXPORT_POLICY.EXPORTED,
-            rejection_message: base_models.EXPORT_POLICY.EXPORTED
+            'target_type': base_models.EXPORT_POLICY.EXPORTED,
+            'target_id': base_models.EXPORT_POLICY.EXPORTED,
+            'language_code': base_models.EXPORT_POLICY.EXPORTED,
+            'status': base_models.EXPORT_POLICY.EXPORTED,
+            'content': base_models.EXPORT_POLICY.EXPORTED,
+            'filename': base_models.EXPORT_POLICY.EXPORTED,
+            'author_id': base_models.EXPORT_POLICY.EXPORTED,
+            'final_reviewer_id': base_models.EXPORT_POLICY.EXPORTED,
+            'rejection_message': base_models.EXPORT_POLICY.EXPORTED
         }
 
     @classmethod

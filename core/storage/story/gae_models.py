@@ -123,17 +123,17 @@ class StoryModel(base_models.VersionedModel):
     def get_export_policy():
         """Model does not contain user data."""
         return {
-            title: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            thumbnail_filename: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            thumbnail_bg_color: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            description: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            notes: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            language_code: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            story_contents: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            story_contents_schema_version:
+            'title': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'description': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'notes': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'language_code': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'story_contents': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'story_contents_schema_version':
                 base_models.EXPORT_POLICY.NOT_EXPORTED,
-            corresponding_topic_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            url_fragment: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'corresponding_topic_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'url_fragment': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
     @classmethod
@@ -192,7 +192,7 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         entities is not related to personal user data.
         """
         return {
-            story_id: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'story_id': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
 
@@ -257,14 +257,14 @@ class StorySummaryModel(base_models.BaseModel):
     def get_export_policy():
         """Model does not contain user data."""
         return {
-            title: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            language_code: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            description: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            story_model_last_updated: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            story_model_created_on: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            node_titles: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            thumbnail_filename: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            thumbnail_bg_color: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            version: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            url_fragment: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'title': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'language_code': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'description': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'story_model_last_updated': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'story_model_created_on': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'node_titles': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'version': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'url_fragment': base_models.EXPORT_POLICY.NOT_EXPORTED
         }

@@ -50,7 +50,7 @@ class ExplorationRecommendationsModel(
     def get_export_policy():
         """Model does not contain user data."""
         return {
-            recommended_exploration_ids: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'recommended_exploration_ids': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
     @classmethod
@@ -94,5 +94,5 @@ class TopicSimilaritiesModel(base_models.BaseModel):
     def get_export_policy():
         """Model does not contain user data."""
         return {
-            content: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'content': base_models.EXPORT_POLICY.NOT_EXPORTED
         }

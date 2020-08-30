@@ -1083,10 +1083,10 @@ class BaseSnapshotMetadataModel(BaseModel):
     def get_export_policy():
         """Snapshot Metadata is relevant to the user for Takeout."""
         return {
-            committer_id: NOT_EXPORTED,
-            commit_type: EXPORTED,
-            commit_message: EXPORTED,
-            commit_cmds: NOT_EXPORTED
+            'committer_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'commit_type': base_models.EXPORT_POLICY.EXPORTED,
+            'commit_message': base_models.EXPORT_POLICY.EXPORTED,
+            'commit_cmds': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
     @classmethod
@@ -1179,7 +1179,7 @@ class BaseSnapshotContentModel(BaseModel):
         Takeout.
         """
         return {
-            content: NOT_EXPORTED
+            'content': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
     @classmethod

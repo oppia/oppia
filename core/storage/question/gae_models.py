@@ -76,11 +76,11 @@ class QuestionModel(base_models.VersionedModel):
     def get_export_policy():
         """Model does not contain user data."""
         return {
-            question_state_data: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            question_state_data_schema_version:
+            'question_state_data': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'question_state_data_schema_version':
                 base_models.EXPORT_POLICY.NOT_EXPORTED,
-            language_code: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            linked_skill_ids: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'language_code': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'linked_skill_ids': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
     @classmethod
@@ -212,9 +212,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     def get_export_policy():
         """Model does not contain user data."""
         return {
-            question_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            skill_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            skill_difficulty: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'question_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'skill_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'skill_difficulty': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
     @classmethod
@@ -639,7 +639,7 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         entities is not related to personal user data.
         """
         return {
-            question_id: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'question_id': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
     @classmethod
@@ -698,9 +698,9 @@ class QuestionSummaryModel(base_models.BaseModel):
         need to be defined here.
         """
         return {
-            question_model_last_updated: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            question_model_created_on: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            question_content: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'question_model_last_updated': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'question_model_created_on': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'question_content': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
     @classmethod

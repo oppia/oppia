@@ -144,20 +144,20 @@ class SkillModel(base_models.VersionedModel):
     def get_export_policy():
         """Model does not contain user data."""
         return {
-            description: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            misconceptions_schema_version:
+            'description': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'misconceptions_schema_version':
                 base_models.EXPORT_POLICY.NOT_EXPORTED,
-            rubric_schema_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            misconceptions: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            rubrics: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            language_code: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            skill_contents_schema_version:
+            'rubric_schema_version': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'misconceptions': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'rubrics': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'language_code': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'skill_contents_schema_version':
                 base_models.EXPORT_POLICY.NOT_EXPORTED,
-            skill_contents: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            prerequisite_skill_ids: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            next_misconception_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            superseding_skill_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            all_questions_merged: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'skill_contents': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'prerequisite_skill_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'next_misconception_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'superseding_skill_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'all_questions_merged': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
 
@@ -200,7 +200,7 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         entities is not related to personal user data.
         """
         return {
-            skill_id: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'skill_id': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
 
@@ -257,13 +257,13 @@ class SkillSummaryModel(base_models.BaseModel):
     def get_export_policy():
         """Model does not contain user data."""
         return {
-            description: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            misconception_count: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            worked_examples_count: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            language_code: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            skill_model_last_updated: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            skill_model_created_on: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            version: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'description': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'misconception_count': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'worked_examples_count': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'language_code': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'skill_model_last_updated': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'skill_model_created_on': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'version': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
     @classmethod

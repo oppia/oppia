@@ -155,11 +155,11 @@ class StorageModelsTest(test_utils.GenericTestBase):
             export_policy = model.get_export_policy()
             if model in models_with_export:
                 self.assertEqual(
-                    base_models.EXPORT_POLICY.CONTAINS_USER_DATA,
-                    export_policy
+                    dir(model),
+                    []
                 )
             else:
                 self.assertEqual(
-                    base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                    export_policy
+                    dir(model),
+                    []
                 )

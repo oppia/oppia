@@ -87,15 +87,15 @@ class CollectionModel(base_models.VersionedModel):
     def get_export_policy():
         """Model does not contain user data."""
         return {
-            title: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            category: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            objective: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            language_code: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            tags: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            schema_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            nodes: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            collection_contents: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            nodes: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'title': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'category': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'objective': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'language_code': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'tags': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'schema_version': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'nodes': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'collection_contents': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'nodes': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
     @classmethod
@@ -251,13 +251,13 @@ class CollectionRightsModel(base_models.VersionedModel):
     def get_export_policy():
         """Model contains user data."""
         return {
-            owner_ids: base_models.EXPORT_POLICY.EXPORTED,
-            editor_ids: base_models.EXPORT_POLICY.EXPORTED,
-            voice_artist_ids: base_models.EXPORT_POLICY.EXPORTED,
-            viewer_ids: base_models.EXPORT_POLICY.EXPORTED,
-            community_owned: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            viewable_if_private: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            first_published_msec: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'voice_artist_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'viewer_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'community_owned': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'viewable_if_private': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'first_published_msec': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
     @staticmethod
@@ -424,7 +424,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         Takeout.
         """
         return {
-            collection_id: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'collection_id': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
     @classmethod
@@ -571,23 +571,23 @@ class CollectionSummaryModel(base_models.BaseModel):
         function.
         """
         return {
-            title: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            category: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            objective: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            language_code: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            tags: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            ratings: base_models.EXPORT_POLICY.NOT_EXPORTED
-            collection_model_last_updated:
+            'title': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'category': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'objective': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'language_code': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'tags': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'ratings': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'collection_model_last_updated':
                 base_models.EXPORT_POLICY.NOT_EXPORTED,
-            collection_model_created_on: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            status: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            community_owned: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            owner_ids: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            viewer_ids: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            contributor_ids: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            contributors_summary: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            version: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            node_count: base_models.EXPORT_POLICY.NOT_EXPORTED
+            'collection_model_created_on': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'status': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'community_owned': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'owner_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'viewer_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'contributor_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'contributors_summary': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'version': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'node_count': base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
     @classmethod
