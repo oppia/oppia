@@ -345,6 +345,23 @@ export interface PencilCodeEditorCustomizationArgs {
   };
 }
 
+export interface RatioExpressionInputCustomizationArgsBackendDict {
+  placeholder: {
+    value: SubtitledUnicodeBackendDict;
+  };
+  numberOfTerms: {
+    value: number;
+  };
+}
+export interface RatioExpressionInputCustomizationArgs {
+  placeholder: {
+    value: SubtitledUnicode;
+  };
+  numberOfTerms: {
+    value: number;
+  };
+}
+
 
 export interface SetInputCustomizationArgsBackendDict {
   buttonText: {
@@ -407,6 +424,7 @@ export type InteractionCustomizationArgsBackendDict = (
   NumericExpressionInputCustomizationArgsBackendDict |
   NumericInputCustomizationArgsBackendDict |
   PencilCodeEditorCustomizationArgsBackendDict |
+  RatioExpressionInputCustomizationArgsBackendDict |
   SetInputCustomizationArgsBackendDict |
   TextInputCustomizationArgsBackendDict);
 
@@ -429,5 +447,6 @@ export type InteractionCustomizationArgs = (
   NumericExpressionInputCustomizationArgs |
   NumericInputCustomizationArgs |
   PencilCodeEditorCustomizationArgs |
+  RatioExpressionInputCustomizationArgs |
   SetInputCustomizationArgs |
   TextInputCustomizationArgs);
