@@ -48,7 +48,7 @@ var initializeMockDocument = function(svgFilenameCtrl) {
   $document.find('body').append(mockDocument.outerHTML);
 };
 
-fdescribe('SvgFilenameEditor', function() {
+describe('SvgFilenameEditor', function() {
   var alertSpy = null;
   var contextService = null;
   var CsrfService = null;
@@ -579,7 +579,7 @@ fdescribe('SvgFilenameEditor', function() {
 });
 
 
-fdescribe('SvgFilenameEditor initialized with value attribute',
+describe('SvgFilenameEditor initialized with value attribute',
   function() {
     var svgFilenameCtrl = null;
     var $httpBackend = null;
@@ -632,7 +632,7 @@ fdescribe('SvgFilenameEditor initialized with value attribute',
   }
 );
 
-fdescribe('SvgFilenameEditor with image save destination as ' +
+describe('SvgFilenameEditor with image save destination as ' +
   'local storage', function() {
   var contextService = null;
   var svgFilenameCtrl = null;
@@ -756,7 +756,7 @@ fdescribe('SvgFilenameEditor with image save destination as ' +
 });
 
 
-fdescribe('should fail svg tag validation', function() {
+describe('should fail svg tag validation', function() {
   var svgFilenameCtrl = null;
   var mockImageUploadHelperService = {
     getInvalidSvgTagsAndAttrs: function(dataURI) {
@@ -787,7 +787,7 @@ fdescribe('should fail svg tag validation', function() {
   });
 });
 
-fdescribe('should fail svg attribute validation', function() {
+describe('should fail svg attribute validation', function() {
   var svgFilenameCtrl = null;
   var mockImageUploadHelperService = {
     getInvalidSvgTagsAndAttrs: function(dataURI) {
