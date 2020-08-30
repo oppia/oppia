@@ -155,7 +155,23 @@ class TopicModel(base_models.VersionedModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            name: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            canonical_name: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            abbreviated_name: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            thumbnail_filename: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            thumbnail_bg_color: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            description: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            canonical_story_references: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            additional_story_references: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            story_reference_schema_version:
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
+            uncategorized_skill_ids: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            subtopics: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            subtopic_schema_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            next_subtopic_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            language_code: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -196,7 +212,9 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            topic_id: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class TopicSummaryModel(base_models.BaseModel):
@@ -267,7 +285,22 @@ class TopicSummaryModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            name: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            canonical_name: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            language_code: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            description: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            topic_model_last_updated: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            topic_model_created_on: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            canonical_story_count: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            additional_story_count: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            total_skill_count: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            uncategorized_skill_count: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            subtopic_count: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            thumbnail_filename: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            thumbnail_bg_color: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            version: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -351,7 +384,13 @@ class SubtopicPageModel(base_models.VersionedModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            topic_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            page_contents: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            page_contents_schema_version:
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
+            language_code: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -394,7 +433,9 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            subtopic_page_id: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -504,7 +545,10 @@ class TopicRightsModel(base_models.VersionedModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            manager_ids: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            topic_is_published: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @classmethod
     def export_data(cls, user_id):

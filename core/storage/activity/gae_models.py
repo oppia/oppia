@@ -45,7 +45,7 @@ class ActivityReferencesModel(base_models.BaseModel):
     def get_export_policy():
         """Model does not contain user data."""
         return {
-            'activity_references': None
+            activity_references: base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 
     @classmethod

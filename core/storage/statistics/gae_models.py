@@ -119,7 +119,12 @@ class StateCounterModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            first_entry_count: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            subsequent_entries_count: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            resolved_answer_count: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            active_answer_count: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
@@ -180,7 +185,15 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            exp_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exp_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            state_name: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            session_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            time_spent_in_state_secs: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            is_feedback_useful: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            event_schema_version: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
@@ -236,7 +249,13 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            exp_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exp_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            state_name: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            session_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            event_schema_version: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class SolutionHitEventLogEntryModel(base_models.BaseModel):
@@ -294,7 +313,14 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            exp_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exp_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            state_name: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            session_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            time_spent_in_state_secs: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            event_schema_version: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class StartExplorationEventLogEntryModel(base_models.BaseModel):
@@ -405,7 +431,17 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            event_type: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exploration_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exploration_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            state_name: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            session_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            client_time_spent_in_secs: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            params: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            play_type: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            event_schema_version: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
@@ -529,7 +565,17 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            event_type: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exploration_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exploration_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            state_name: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            session_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            client_time_spent_in_secs: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            params: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            play_type: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            event_schema_version: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
@@ -647,7 +693,17 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            event_type: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exploration_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exploration_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            state_name: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            session_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            client_time_spent_in_secs: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            params: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            play_type: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            event_schema_version: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class RateExplorationEventLogEntryModel(base_models.BaseModel):
@@ -724,7 +780,13 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            event_type: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exploration_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            rating: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            old_rating: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            event_schema_version: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class StateHitEventLogEntryModel(base_models.BaseModel):
@@ -831,7 +893,16 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            event_type: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exploration_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exploration_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            state_name: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            session_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            params: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            play_type: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            event_schema_version: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class StateCompleteEventLogEntryModel(base_models.BaseModel):
@@ -889,7 +960,14 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            exp_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exp_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            state_name: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            session_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            time_spent_in_state_secs: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            event_schema_version: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
@@ -950,7 +1028,15 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            event_type: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            refresher_exp_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exp_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            state_name: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            session_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            time_spent_in_state_secs: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            event_schema_version: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class ExplorationStatsModel(base_models.BaseModel):
@@ -1139,7 +1225,17 @@ class ExplorationStatsModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            exp_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exp_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            num_starts_v1: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            num_starts_v2: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            num_actual_starts_v1: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            num_actual_starts_v2: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            num_completions_v1: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            num_completions_v2: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            state_stats_mapping: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class ExplorationIssuesModel(base_models.BaseModel):
@@ -1218,7 +1314,11 @@ class ExplorationIssuesModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            exp_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exp_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            unresolved_issues: base_models.EXPORT_POLICY.NOT_EXPORTED,
+        }
 
 
 class PlaythroughModel(base_models.BaseModel):
@@ -1322,7 +1422,13 @@ class PlaythroughModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            exp_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exp_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            issue_type: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            issue_customization_args: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            actions: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class LearnerAnswerDetailsModel(base_models.BaseModel):
@@ -1478,7 +1584,16 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            state_reference: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            entity_type: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            interaction_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            learner_answer_info_list: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            learner_answer_info_schema_version:
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
+            accumulated_answer_info_json_size_bytes:
+                base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
@@ -1568,7 +1683,13 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            exploration_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            num_starts: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            num_completions: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            state_hit_counts: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class StateAnswersModel(base_models.BaseModel):
@@ -1920,7 +2041,18 @@ class StateAnswersModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            exploration_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exploration_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            state_name: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            shard_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            interaction_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            shard_count: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            accumulated_answer_json_size_bytes:
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
+            submitted_answer_list: base_models.EXPORT_POLICY.NOT_EXPORTED
+            schema_version: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
@@ -2040,4 +2172,12 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            exploration_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exploration_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            state_name: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            interaction_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            calculation_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            calculation_output_type: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            calculation_output: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }

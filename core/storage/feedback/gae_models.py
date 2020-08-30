@@ -95,7 +95,20 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            entity_type: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            entity_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            original_author_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            status: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            subject: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            summary: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            has_suggestion: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            message_count: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            last_nonempty_message_text:
+                base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            last_nonempty_message_author_id:
+                base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -244,7 +257,15 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            thread_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            message_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            author_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            updated_status: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            updated_subject: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            text: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            received_via_email: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -519,7 +540,12 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            user_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            thread_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            message_ids_read_by_user:
+                base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY
+        }
 
 
     @classmethod
@@ -664,7 +690,10 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            num_open_threads: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            num_total_threads: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
@@ -727,7 +756,10 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            feedback_message_references: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            retries: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

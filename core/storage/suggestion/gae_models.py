@@ -162,7 +162,18 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            suggestion_type: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            target_type: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            target_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            target_version_at_submission:
+                base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            status: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            author_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            final_reviewer_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            change_cmd: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            score_category: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -494,7 +505,17 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            target_type: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            target_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            language_code: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            status: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            content: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            filename: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            author_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            final_reviewer_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            rejection_message: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY
+        }
 
     @classmethod
     def export_data(cls, user_id):

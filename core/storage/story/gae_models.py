@@ -122,7 +122,19 @@ class StoryModel(base_models.VersionedModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            title: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            thumbnail_filename: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            thumbnail_bg_color: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            description: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            notes: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            language_code: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            story_contents: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            story_contents_schema_version:
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
+            corresponding_topic_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            url_fragment: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @classmethod
     def get_by_url_fragment(cls, url_fragment):
@@ -179,7 +191,9 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            story_id: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class StorySummaryModel(base_models.BaseModel):
@@ -242,4 +256,15 @@ class StorySummaryModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            title: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            language_code: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            description: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            story_model_last_updated: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            story_model_created_on: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            node_titles: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            thumbnail_filename: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            thumbnail_bg_color: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            url_fragment: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }

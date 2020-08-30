@@ -58,10 +58,10 @@ class RoleQueryAuditModel(base_models.BaseModel):
     def get_export_policy():
         """Model does not contain user data."""
         return {
-            'user_id': None,
-            'intent:' None,
-            'role': None,
-            'username': None
+            'user_id': NOT_EXPORTED,
+            'intent:' NOT_EXPORTED,
+            'role': NOT_EXPORTED,
+            'username': NOT_EXPORTED
         }
 
     @classmethod
@@ -102,9 +102,9 @@ class UsernameChangeAuditModel(base_models.BaseModel):
     def get_export_policy():
         """Model does not contain user data."""
         return {
-            'committer_id': None,
-            'old_username': None,
-            'new_username': None
+            'committer_id': NOT_EXPORTED,
+            'old_username': NOT_EXPORTED,
+            'new_username': NOT_EXPORTED
         }
 
     @classmethod

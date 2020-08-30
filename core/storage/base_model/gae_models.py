@@ -47,8 +47,9 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
 )
 
 EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
-    'CONTAINS_USER_DATA',
-    'NOT_APPLICABLE',
+    'EXPORTED_DIRECTLY',
+    'EXPORTED_INDIRECTLY',
+    'NOT_EXPORTED'
 )
 
 # Constant used when retrieving big number of models.
@@ -1083,10 +1084,10 @@ class BaseSnapshotMetadataModel(BaseModel):
     def get_export_policy():
         """Snapshot Metadata is relevant to the user for Takeout."""
         return {
-            'committer_id': None,
-            'commit_type': 'commit_type',
-            'commit_message': 'commit_message'
-            'commit_cmds': 'commit_cmds'
+            committer_id: EXPORTED_INDIRECTLY,
+            commit_type: EXPORTED_DIRECTLY,
+            commit_message: EXPORTED_DIRECTLY,
+            commit_cmds: NOT_EXPORTED
         }
 
     @classmethod
@@ -1179,7 +1180,7 @@ class BaseSnapshotContentModel(BaseModel):
         Takeout.
         """
         return {
-            'content': None
+            content: NOT_EXPORTED
         }
 
     @classmethod

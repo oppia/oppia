@@ -57,7 +57,9 @@ class ConfigPropertyModel(base_models.VersionedModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            value: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     def commit(self, committer_id, commit_cmds):
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
@@ -98,7 +100,10 @@ class PlatformParameterModel(base_models.VersionedModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            rules: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            rule_schema_version: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @classmethod
     def create(cls, param_name, rule_dicts, rule_schema_version):

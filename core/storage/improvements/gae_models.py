@@ -135,7 +135,19 @@ class TaskEntryModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """TaskEntryModel contains the user ID that acted on a task."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            composite_entity_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            entity_type: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            entity_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            entity_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            task_type: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            target_type: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            target_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            issue_description: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            status: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            resolver_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            resolved_on: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @staticmethod
     def export_data(user_id):

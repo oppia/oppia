@@ -132,7 +132,40 @@ class UserSettingsModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            gae_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            email: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            role: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            last_agreed_to_terms: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            last_logged_in: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            display_alias: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            user_bio: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            profile_picture_data_url:
+                base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            subject_interests: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            preferred_language_codes:
+                base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            preferred_site_language_code:
+                base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            preferred_audio_language_code:
+                base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            username: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            normalized_username: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            last_started_state_editor_tutorial:
+                base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            last_started_state_translation_tutorial:
+                base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            last_edited_an_exploration:
+                base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            last_created_an_exploration:
+                base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            default_dashboard: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            creator_dashboard_display_pref:
+                base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            first_contribution_msec:
+                base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            gae_user_id: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -314,7 +347,10 @@ class CompletedActivitiesModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            exploration_ids: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            collection_ids: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY
+        }
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -383,7 +419,10 @@ class IncompleteActivitiesModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            exploration_ids: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            collection_ids: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY
+        }
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -457,7 +496,12 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            user_id: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            exploration_id: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            last_played_exp_version: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            last_played_state_name: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY
+        }
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -577,7 +621,10 @@ class LearnerPlaylistModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            exploration_ids: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            collection_ids: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY
+        }
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -650,7 +697,12 @@ class UserContributionsModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            created_exploration_ids:
+                base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            edited_exploration_ids:
+                base_models.EXPORT_POLICY.EXPORTED_DIRECTLY
+        }
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -748,7 +800,15 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            site_updates: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            editor_role_notifications:
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
+            feedback_message_notifications:
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
+            subscription_notifications:
+                base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class UserSubscriptionsModel(base_models.BaseModel):
@@ -783,7 +843,15 @@ class UserSubscriptionsModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            activity_ids: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            collection_ids: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            general_feedback_thread_ids:
+                base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            creator_ids: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            last_checked: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY,
+            feedback_thread_ids: base_models.EXPORT_POLICY.EXPORTED_DIRECTLY
+        }
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -893,7 +961,9 @@ class UserSubscribersModel(base_models.BaseModel):
         """This model is not included because it contains data about other
         users.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            subscriber_ids: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
@@ -940,7 +1010,10 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            output: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            job_queued_msec: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
 
 class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):

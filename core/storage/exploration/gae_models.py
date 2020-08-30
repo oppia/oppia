@@ -111,7 +111,26 @@ class ExplorationModel(base_models.VersionedModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            title: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            category: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            objective: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            language_code: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            tags: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            blurb: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            author_notes: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            states_schema_version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            init_state_name: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            states: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            param_specs: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            param_changes: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            auto_tts_enabled: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            correctness_feedback_enabled:
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
+            skill_tags: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            default_skin: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            skin_customizations: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -223,7 +242,9 @@ class ExplorationContextModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            story_id: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
@@ -275,7 +296,14 @@ class ExplorationMathRichTextInfoModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            math_images_generation_required:
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
+            estimated_max_size_of_images_in_bytes:
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
+            latex_strings_without_svg:
+                base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
@@ -358,7 +386,16 @@ class ExplorationRightsModel(base_models.VersionedModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            owner_ids: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            editor_ids: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            voice_artist_ids: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            viewer_ids: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            community_owned: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            cloned_from: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            viewable_if_private: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            first_published_msec: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @staticmethod
     def convert_to_valid_dict(model_dict):
@@ -535,7 +572,9 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            exploration_id: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @classmethod
     def get_multi(cls, exp_id, exp_versions):
@@ -818,4 +857,28 @@ class ExpSummaryModel(base_models.BaseModel):
         ExplorationModel and thus does not need a separate export_data
         function.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            title: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            category: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            objective: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            language_code: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            language_code: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            tags: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            ratings: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            scaled_average_rating: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exploration_model_last_updated:
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
+            exploration_model_created_on:
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
+            first_published_msec: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            status: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            community_owned: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            owner_ids: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            editor_ids: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            voice_artist_ids: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            viewer_ids: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            contributor_ids: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            contributors_summary: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            version: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            translator_ids: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }

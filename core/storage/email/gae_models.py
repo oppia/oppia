@@ -90,7 +90,17 @@ class SentEmailModel(base_models.BaseModel):
         """Users already have access to this data since emails were sent
         to them.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            recipient_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            recipient_email: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            sender_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            sender_email: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            intent: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            subject: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            html_body: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            sent_datetime: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            email_hash: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -307,7 +317,15 @@ class BulkEmailModel(base_models.BaseModel):
         """Users already have access to this data since the emails were sent
         to them.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            recipient_ids: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            sender_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            sender_email: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            intent: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            subject: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            html_body: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            sent_datetime: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -374,7 +392,11 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return {
+            user_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            thread_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            reply_to_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

@@ -75,7 +75,13 @@ class QuestionModel(base_models.VersionedModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            question_state_data: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            question_state_data_schema_version:
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
+            language_code: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            linked_skill_ids: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -205,7 +211,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            question_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            skill_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            skill_difficulty: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
@@ -628,7 +638,9 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            question_id: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @classmethod
     def _get_instance_id(cls, question_id, question_version):
@@ -685,7 +697,11 @@ class QuestionSummaryModel(base_models.BaseModel):
         export_data function, and thus a new export_data function does not
         need to be defined here.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return {
+            question_model_last_updated: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            question_model_created_on: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            question_content: base_models.EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
