@@ -21,7 +21,6 @@ import { Injectable } from '@angular/core';
 
 import { ExplorationSummaryBackendApiService } from
   'domain/summary/exploration-summary-backend-api.service.ts';
-import { boolean } from 'mathjs';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +31,7 @@ export class ExplorationIdValidationService {
     private explorationSummartBackendApiService:
       ExplorationSummaryBackendApiService) {}
 
-  isExpPublished(explorationId: string) {
+  isExpPublished(explorationId: string): Promise<boolean> {
     return this.explorationSummartBackendApiService.
       loadPublicExplorationSummaries([explorationId]).then(
         function(summaries: string[]) {

@@ -83,7 +83,8 @@ describe('Exploration Summary Backend Api Service', () => {
       explorationIds).then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(requestUrl);
-    req.flush({error: 'Error Communicating with Server'},
+    req.flush(
+      {error: 'Error Communicating with Server'},
       {status: 400, statusText: ''});
     flushMicrotasks();
 
