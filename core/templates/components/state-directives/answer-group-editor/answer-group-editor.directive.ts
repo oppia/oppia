@@ -46,7 +46,6 @@ require('services/context.service.ts');
 require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
-import { AlertsService } from 'services/alerts.service';
 
 angular.module('oppia').directive('answerGroupEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -296,7 +295,7 @@ angular.module('oppia').directive('answerGroupEditor', [
             // ad hoc.
             ctrl.directiveSubscriptions.add(
               ExternalSaveService.onExternalSave.subscribe(() => {
-                if(ctrl.isRuleEditorOpen()) {
+                if (ctrl.isRuleEditorOpen()) {
                   if (StateEditorService.checkCurrentRuleInputIsValid()) {
                     ctrl.saveRules();
                   } else {
