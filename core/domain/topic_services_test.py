@@ -706,6 +706,17 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
             'old_value': '',
             'new_value': '#C6DCDA'
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_META_TAG_CONTENT,
+            'old_value': '',
+            'new_value': 'topic meta tag content'
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': (
+                topic_domain.TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED),
+            'old_value': False,
+            'new_value': True
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
@@ -718,6 +729,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic.thumbnail_bg_color, '#C6DCDA')
         self.assertEqual(topic.version, 3)
+        self.assertEqual(topic.practice_tab_is_displayed, True)
+        self.assertEqual(topic.meta_tag_content, 'topic meta tag content')
         self.assertEqual(topic_summary.version, 3)
         self.assertEqual(topic_summary.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')

@@ -38,8 +38,9 @@ interface ExplorationLanguageInfo {
   providedIn: 'root'
 })
 export class AudioTranslationLanguageService {
-  constructor(private browserCheckerService: BrowserCheckerService,
-              private languageUtilService: LanguageUtilService) {}
+  constructor(
+    private browserCheckerService: BrowserCheckerService,
+    private languageUtilService: LanguageUtilService) {}
 
   _currentAudioLanguageCode: string = null;
   _allAudioLanguageCodesInExploration: string[] = null;
@@ -140,7 +141,8 @@ export class AudioTranslationLanguageService {
       preferredAudioLanguageCode: string,
       explorationLanguageCode: string,
       automaticTextToSpeechEnabled: boolean): void {
-    this._init(allAudioLanguageCodesInExploration, preferredAudioLanguageCode,
+    this._init(
+      allAudioLanguageCodesInExploration, preferredAudioLanguageCode,
       explorationLanguageCode, automaticTextToSpeechEnabled);
   }
 

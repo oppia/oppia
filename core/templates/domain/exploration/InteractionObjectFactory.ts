@@ -149,8 +149,8 @@ export class Interaction {
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
         result = value.toBackendDict();
       } else if (value instanceof Array) {
-        result = value.map(element =>
-          traverseSchemaAndConvertSubtitledToDicts(element));
+        result = value.map(
+          element => traverseSchemaAndConvertSubtitledToDicts(element));
       } else if (value instanceof Object) {
         result = {};
         Object.keys(value).forEach(key => {
@@ -194,8 +194,8 @@ export class Interaction {
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
         contentIds.push(value.getContentId());
       } else if (value instanceof Array) {
-        value.forEach(element =>
-          traverseValueAndRetrieveContentIdsFromSubtitled(element));
+        value.forEach(
+          element => traverseValueAndRetrieveContentIdsFromSubtitled(element));
       } else if (value instanceof Object) {
         Object.keys(value).forEach(key => {
           traverseValueAndRetrieveContentIdsFromSubtitled(value[key]);
@@ -203,8 +203,8 @@ export class Interaction {
       }
     };
 
-    Object.keys(customizationArgs).forEach(caName =>
-      traverseValueAndRetrieveContentIdsFromSubtitled(
+    Object.keys(customizationArgs).forEach(
+      caName => traverseValueAndRetrieveContentIdsFromSubtitled(
         customizationArgs[caName].value)
     );
 
@@ -262,8 +262,9 @@ export class InteractionObjectFactory {
     return {
       allowMultipleItemsInSamePosition,
       choices: {
-        value: choices.value.map(subtitledHtmlDict =>
-          this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
+        value: choices.value.map(
+          subtitledHtmlDict =>
+            this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
       }
     };
   }
@@ -294,8 +295,9 @@ export class InteractionObjectFactory {
       minAllowableSelectionCount,
       maxAllowableSelectionCount,
       choices: {
-        value: choices.value.map(subtitledHtmlDict =>
-          this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
+        value: choices.value.map(
+          subtitledHtmlDict =>
+            this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
       }
     };
   }
@@ -309,8 +311,9 @@ export class InteractionObjectFactory {
     return {
       showChoicesInShuffledOrder,
       choices: {
-        value: choices.value.map(subtitledHtmlDict =>
-          this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
+        value: choices.value.map(
+          subtitledHtmlDict =>
+            this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
       }
     };
   }
