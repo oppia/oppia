@@ -21,12 +21,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.tests import test_utils
 import os
+from pip._internal.utils import misc
+import shutil
 import subprocess
 import sys
 
 import python_utils
-from scripts import install_backend_python_libs
 from scripts import common
+from scripts import install_backend_python_libs
 
 class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     """Test the methods for installing backend python libs."""
@@ -34,17 +36,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     THIRD_PARTY_DATA_FILE_PATH = os.path.join(
         common.CURR_DIR, 'core', 'tests', 'data', 'third_party')
 
-    TEST_REQUIREMENTS_IN_FILE_PATH = os.path.join(
-        THIRD_PARTY_DATA_FILE_PATH, 'requirements.in')
-
-    TEST_GENERATED_REQUIREMENTS_TXT_FILE_PATH = os.path.join(
-        THIRD_PARTY_DATA_FILE_PATH, 'requirements.txt')
-
     TEST_REQUIREMENTS_TXT_FILE_PATH = os.path.join(
         THIRD_PARTY_DATA_FILE_PATH, 'requirements_test.txt')
-
-    CORRECT_TEST_REQUIREMENTS_FILE_PATH = os.path.join(
-        THIRD_PARTY_DATA_FILE_PATH, 'requirements_compiled.txt')
 
     def test_adding_library_to_requirements_returns_correct_mismatches(self):
         def _mock_get_requirements_file_contents():
@@ -165,12 +158,14 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 [
                     'pip', 'install', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies',
                     '%s==%s' % ('flask', '1.1.1'),
                     '--upgrade'
                 ],
                 [
                     'pip', 'install', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies',
                     '%s==%s' % ('six', '1.15.0'),
                     '--upgrade'
                 ]
@@ -215,12 +210,14 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 [
                     'pip', 'install', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies',
                     '%s==%s' % ('flask', '1.1.1'),
                     '--upgrade'
                 ],
                 [
                     'pip', 'install', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies',
                     '%s==%s' % ('six', '1.15.0'),
                     '--upgrade'
                 ]
@@ -244,7 +241,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             u'flask': (None, u'10.0.1'),
             u'six': (None, u'10.13.0')
         }
-        swap_remove_dir = self.swap(os, 'rmdir', mock_remove_dir)
+        swap_remove_dir = self.swap(shutil, 'rmtree', mock_remove_dir)
 
         swap_check_call = self.swap(subprocess, 'check_call', mock_check_call)
         with swap_check_call, swap_remove_dir:
@@ -265,11 +262,13 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 [
                     'pip', 'install', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies',
                     '-r', common.REQUIREMENTS_FILE_PATH
                 ],
                 [
                     'pip', 'install', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies',
                     '-r', common.REQUIREMENTS_FILE_PATH
                 ]
             ]
@@ -299,14 +298,62 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 [
                     'pip', 'install', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies',
                     '%s==%s' % ('flask', '1.1.1'),
                     '--upgrade'
                 ],
                 [
                     'pip', 'install', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies',
                     '%s==%s' % ('six', '1.15.0'),
                     '--upgrade'
+                ]
+            ]
+        )
+
+    def test_rectify_party_directory_handles_more_than_five_mismatches(self):
+        """Test that the function reinstalls all of the libraries from scratch
+        when 5 or more mismatches are found.
+        """
+        cmd_token_list = []
+        def mock_check_call(cmd_tokens):
+            cmd_token_list.append(cmd_tokens)
+
+        removed_dirs = []
+        def mock_remove_dir(directory):
+            removed_dirs.append(directory)
+
+        mismatches = {
+            u'flask': (u'1.1.1', None),
+            u'six': (u'1.15.0', None),
+            u'simplejson': (None, u'3.16.0'),
+            u'bleach': (u'3.1.4', u'3.1.5'),
+            u'callbacks': (u'0.3.0', u'0.2.0'),
+        }
+
+        swap_remove_dir = self.swap(shutil, 'rmtree', mock_remove_dir)
+
+        swap_check_call = self.swap(subprocess, 'check_call', mock_check_call)
+        with swap_check_call, swap_remove_dir:
+            install_backend_python_libs._rectify_third_party_directory(
+                mismatches)
+
+        self.assertEqual(
+            removed_dirs,
+            [
+                common.THIRD_PARTY_PYTHON_LIBS_DIR
+            ]
+        )
+
+        self.assertEqual(
+            cmd_token_list,
+            [
+                [
+                    'pip', 'install', '--target',
+                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies', '-r',
+                    common.REQUIREMENTS_FILE_PATH
                 ]
             ]
         )
@@ -320,7 +367,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             ]
 
         swap_get_installed_distributions = self.swap(
-            install_backend_python_libs,
+            misc,
             'get_installed_distributions',
             mock_get_installed_distributions)
 
@@ -364,4 +411,136 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 u'googleappenginepipeline': u'1.9.22.1'
             })
 
+    def test_remove_metadata(self):
+        files_in_directory = [
+            'webencodings-0.5.1.dist-info/',
+            'webencodings',
+            'redis',
+            'redis-3.5.3.dist-info/',
+            'google_cloud_datastore-1.15.0-py3.8-nspkg.pth',
+            'google_cloud_datastore-1.15.0.dist-info/',
+            'google'
+        ]
+        def mock_list_dir(path):  # pylint: disable=unused-argument
+            return files_in_directory
 
+        def mock_is_dir(path):
+            return path.endswith('/')
+
+        paths_to_delete = []
+        def mock_rm(path):
+            paths_to_delete.append(
+                path[len(common.THIRD_PARTY_PYTHON_LIBS_DIR) + 1: ])
+
+        swap_rm_tree = self.swap(shutil, 'rmtree', mock_rm)
+        swap_os_rm = self.swap(os, 'remove', mock_rm)
+        swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
+
+        libraries_to_remove = [
+            ('webencodings', '0.5.1'),
+            ('google-cloud-datastore', '1.15.0')
+        ]
+        with swap_rm_tree, swap_os_rm, swap_list_dir:
+            for library, version in libraries_to_remove:
+                install_backend_python_libs._remove_metadata(library, version)
+        # test = os.path.join(
+        #     common.THIRD_PARTY_PYTHON_LIBS_DIR, 'webencodings-0.5.1.dist-info/'
+        # )
+        # print(test[len(common.THIRD_PARTY_PYTHON_LIBS_DIR):])
+        self.assertEqual(
+            paths_to_delete,
+            [
+                'webencodings-0.5.1.dist-info/',
+                'google_cloud_datastore-1.15.0-py3.8-nspkg.pth',
+                'google_cloud_datastore-1.15.0.dist-info/',
+            ])
+
+    def test_main_with_library_mismatches_calls_correct_functions(self):
+        check_function_calls = {
+            'subprocess_call_is_called': False,
+            '_rectify_third_party_directory': False
+        }
+        expected_check_function_calls = {
+            'subprocess_call_is_called': True,
+            '_rectify_third_party_directory': True
+        }
+
+        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            check_function_calls['subprocess_call_is_called'] = True
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
+
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    """Return required method."""
+                    return '', ''
+
+            return Ret()
+
+        def mock_get_mismatches():
+            return {
+                'library': ('version', 'version')
+            }
+
+        def mock_rectify_third_party_directory(mismatches): # pylint: disable=unused-argument
+            check_function_calls['_rectify_third_party_directory'] = True
+
+        swap_get_mismatches = self.swap(
+            install_backend_python_libs, 'get_mismatches',
+            mock_get_mismatches)
+
+        swap_rectify_third_party_directory = self.swap(
+            install_backend_python_libs, '_rectify_third_party_directory',
+            mock_rectify_third_party_directory)
+
+        swap_call = self.swap(subprocess, 'check_call', mock_call)
+
+        with swap_call, swap_get_mismatches, swap_rectify_third_party_directory:
+            install_backend_python_libs.main()
+
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_main_without_library_mismatches_calls_correct_functions(self):
+        check_function_calls = {
+            'subprocess_call_is_called': False
+        }
+        expected_check_function_calls = {
+            'subprocess_call_is_called': True
+        }
+        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            check_function_calls['subprocess_call_is_called'] = True
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
+
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    """Return required method."""
+                    return '', ''
+
+            return Ret()
+
+        def mock_get_mismatches():
+            return {}
+
+        print_statements = []
+
+        def mock_print(s):
+            print_statements.append(s)
+
+        swap_get_mismatches = self.swap(
+            install_backend_python_libs, 'get_mismatches',
+            mock_get_mismatches)
+        swap_call = self.swap(subprocess, 'check_call', mock_call)
+        swap_print = self.swap(python_utils, 'PRINT', mock_print)
+        with swap_call, swap_get_mismatches, swap_print:
+            install_backend_python_libs.main()
+
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+        self.assertEqual(
+            print_statements,
+            [
+                'Regenerating "requirements.txt" file...',
+                'Third party python libraries already installed correctly.'
+            ])

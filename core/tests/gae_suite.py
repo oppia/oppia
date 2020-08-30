@@ -46,7 +46,7 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(OPPIA_TOOLS_DIR, 'psutil-5.7.0'),
     os.path.join(OPPIA_TOOLS_DIR, 'PyGithub-1.45'),
     CURR_DIR,
-    THIRD_PARTY_DIR
+    os.path.join(THIRD_PARTY_DIR, 'python_libs')
 ]
 
 _PARSER = argparse.ArgumentParser()

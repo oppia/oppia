@@ -72,7 +72,7 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(
         common.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common.PYGITHUB_VERSION),
     common.CURR_DIR,
-    common.THIRD_PARTY_DIR
+    common.THIRD_PARTY_PYTHON_LIBS_DIR
 ]
 
 COVERAGE_DIR = os.path.join(

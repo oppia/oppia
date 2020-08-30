@@ -409,7 +409,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 def __init__(self):
                     self.returncode = 0
                 def communicate(self):
-                    """Return required meathod."""
+                    """Return required method."""
                     return '', ''
 
             # The first subprocess.call() in install_redis_cli needs to throw an

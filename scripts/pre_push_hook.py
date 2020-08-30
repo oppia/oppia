@@ -506,7 +506,7 @@ def main(args=None):
     #         '   `requirements.in` file is not up-to-date.',
     #         '2. Regenerate the third_party/python_libs directory. (Selecting this\n'
     #         '   option will run scripts.install_third_party to regenerate the\n'
-    #         '   third_party/python_utils folder.)\n\n'])
+    #         '   third_party/python_utils folder with the correct dependencies.)\n\n'])
 
     #     choice = python_utils.INPUT('Choose an option or Ctrl-C to exit: ')
     #     if choice == '2':

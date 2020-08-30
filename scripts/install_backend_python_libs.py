@@ -19,12 +19,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import os
-from pip._internal.utils.misc import get_installed_distributions
-from pkg_resources import parse_version
+from pip._internal.utils import misc
+import pkg_resources
 import shutil
 import subprocess
 import sys
-
 
 import python_utils
 from scripts import common
@@ -55,7 +54,7 @@ def _get_requirements_file_contents():
 
 
 def _get_third_party_directory_contents():
-    installed_distributions = get_installed_distributions(
+    installed_distributions = misc.get_installed_distributions(
         skip=[], paths=[common.THIRD_PARTY_PYTHON_LIBS_DIR])
     directory_contents = collections.defaultdict()
     for d in installed_distributions:
@@ -77,7 +76,7 @@ def get_mismatches():
         if library in directory_contents:
             # Library and version match.
             if directory_contents[library] == requirements_contents[library]:
-                 continue
+                continue
             # Library matches but version doesn't match.
             else:
                 mismatches[library] = (
@@ -99,11 +98,12 @@ def _remove_metadata(library, version):
     # start with.
     possible_filename_start_strings = [
         '%s-%s' % (library, version),
-        '%s-%s' % (library.replace('-', '_'), version) #some metadata folders replace the hyphens with underscores
+        # Some metadata folders replace the hyphens with underscores.
+        '%s-%s' % (library.replace('-', '_'), version)
     ]
     for f in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
         if (f.startswith(possible_filename_start_strings[0]) or
-            f.startswith(possible_filename_start_strings[0])):
+                f.startswith(possible_filename_start_strings[1])):
             to_delete_path = os.path.join(
                 common.THIRD_PARTY_PYTHON_LIBS_DIR, f)
             if os.path.isdir(to_delete_path):
@@ -113,10 +113,9 @@ def _remove_metadata(library, version):
 
 
 def _rectify_third_party_directory(mismatches):
-
-    # pip install using requirements.txt is optimized so handling 5
-    # mismatches is slower than reinstalling the python libraries from
-    # scratch.
+    # Handling 5 or more mismatches requires 5 or more individual `pip install`
+    # commands which is slower than just reinstalling all of the libraries using
+    # `pip install -r requirements.txt`.
     if len(mismatches) >= 5:
         if os.path.isdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
             shutil.rmtree(common.THIRD_PARTY_PYTHON_LIBS_DIR)
@@ -127,14 +126,15 @@ def _rectify_third_party_directory(mismatches):
             common.REQUIREMENTS_FILE_PATH
         ])
         return
+
     for library, versions in mismatches.items():
         requirements_version = (
-            parse_version(versions[0]) if versions[0] else None)
+            pkg_resources.parse_version(versions[0]) if versions[0] else None)
         directory_version = (
-            parse_version(versions[1]) if versions[1] else None)
+            pkg_resources.parse_version(versions[1]) if versions[1] else None)
 
-        # 1. Library is installed in the directory but not listed in
-        #    requirements
+        # Library is installed in the directory but not listed in
+        # requirements.
         if not requirements_version:
             shutil.rmtree(common.THIRD_PARTY_PYTHON_LIBS_DIR)
             subprocess.check_call([
@@ -143,10 +143,12 @@ def _rectify_third_party_directory(mismatches):
                 '--no-dependencies', '-r',
                 common.REQUIREMENTS_FILE_PATH
             ])
-        # 1. Library exists in requirements but not in the directory.
-        #    or upgrade the library version to 'requirements_version'.
+
+        # Library exists in requirements but not in the directory or the
+        # currently installed library version is not up-to-date with the
+        # required 'requirements.txt' version.
         elif (not directory_version or
-            requirements_version > directory_version):
+              requirements_version > directory_version):
             subprocess.check_call([
                 'pip', 'install', '--target',
                 common.THIRD_PARTY_PYTHON_LIBS_DIR,
@@ -156,7 +158,8 @@ def _rectify_third_party_directory(mismatches):
                     python_utils.convert_to_bytes(requirements_version)),
                 '--upgrade'
             ])
-        # 1. Downgrade the library version to 'requirements_version'.
+        # The currently installed library version is higher than the required
+        # 'requirements.txt' version.
         elif requirements_version < directory_version:
             subprocess.check_call([
                 'pip', 'install', '--target',

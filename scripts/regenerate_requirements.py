@@ -12,7 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Script to generate a deterministic compiled requirements file."""
+"""Script to generate a deterministic compiled requirements file.
+
+This needs to be a separate script because the cli used to compile the
+requirements file stops python execution after completion. If this functionality
+is included in the 'install_backend_python_libs' script, the execution of the
+installation will also exit as soon as the cli finishes running.
+"""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
