@@ -28,7 +28,6 @@ import inspect
 import itertools
 import json
 import os
-import time
 import unittest
 
 from constants import constants
@@ -2267,104 +2266,6 @@ tags: []
             raise
         finally:
             setattr(obj, attr, original)
-            if not error_occurred:
-                self.assertEqual(wrapper.called, called, msg=msg)
-                self.assertFalse(expected_args, msg=msg)
-                self.assertFalse(expected_kwargs, msg=msg)
-            self.longMessage = False
-
-    @contextlib.contextmanager
-    def login_context(self, email, is_super_admin=False):
-        """Log in with the given email under the context of a 'with' statement.
-
-        Args:
-            email: str. An email associated to a user account.
-            is_super_admin: bool. Whether the user is a super admin.
-
-        Yields:
-            str. The id of the user associated to the given email, who is now
-            'logged in'.
-        """
-        initial_user_env = {
-            'USER_EMAIL': os.environ['USER_EMAIL'],
-            'USER_ID': os.environ['USER_ID'],
-            'USER_IS_ADMIN': os.environ['USER_IS_ADMIN']
-        }
-        self.login(email, is_super_admin=is_super_admin)
-        try:
-            yield self.get_user_id_from_email(email)
-        finally:
-            self.logout()
-            os.environ.update(initial_user_env)
-
-    def assertRaises(self, exc, fun, *args, **kwds):
-        raise NotImplementedError(
-            'self.assertRaises should not be used in these tests. Please use '
-            'self.assertRaisesRegexp instead.')
-
-    def assertRaisesRegexp(  # pylint: disable=keyword-arg-before-vararg
-            self, expected_exception, expected_regexp, callable_obj=None,
-            *args, **kwargs):
-        if expected_regexp == '':
-            raise Exception(
-                'Please provide a sufficiently strong regexp string to '
-                'validate that the correct error is being raised.')
-
-        return super(TestBase, self).assertRaisesRegexp(
-            expected_exception, expected_regexp,
-            callable_obj=callable_obj, *args, **kwargs)
-
-
-class AppEngineTestBase(TestBase):
-    """Base class for tests requiring App Engine services."""
-
-    # We can't instantiate the stub in setUp because the overrided
-    # method run() executes before setUp() and run() requires the memory
-    # cache stub.
-    memory_cache_services_stub = MemoryCacheServicesStub()
-
-    def _delete_all_models(self):
-        """Deletes all models from the NDB datastore."""
-        from google.appengine.ext import ndb
-        ndb.delete_multi(ndb.Query().iter(keys_only=True))
-
-    def setUp(self):
-        empty_environ()
-        self.memory_cache_services_stub.flush_cache()
-
-        from google.appengine.datastore import datastore_stub_util
-        from google.appengine.ext import testbed
-
-        self.testbed = testbed.Testbed()
-        self.testbed.activate()
-
-        # Configure datastore policy to emulate instantaneously and globally
-        # consistent HRD.
-        policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(
-            probability=1)
-
-        # Declare any relevant App Engine service stubs here.
-        self.testbed.init_user_stub()
-        self.testbed.init_app_identity_stub()
-        self.testbed.init_memcache_stub()
-        self.testbed.init_datastore_v3_stub(consistency_policy=policy)
-        self.testbed.init_blobstore_stub()
-        self.testbed.init_urlfetch_stub()
-        self.testbed.init_files_stub()
-        self.testbed.init_search_stub()
-
-        # The root path tells the testbed where to find the queue.yaml file.
-        self.testbed.init_taskqueue_stub(root_path=os.getcwd())
-        self.taskqueue_stub = self.testbed.get_stub(
-            testbed.TASKQUEUE_SERVICE_NAME)
-
-        # Set the timezone to be UTC.
-        # Retrieve the current timezone, accounting for daylight savings
-        # as necessary.
-        self.initial_timezone = time.tzname[time.daylight]
-        os.environ['TZ'] = 'UTC'
-        time.tzset()
-
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
 
@@ -2407,11 +2308,6 @@ class AppEngineTestBase(TestBase):
     def tearDown(self):
         self.logout()
         self._delete_all_models()
-
-        # Set the timezone back to the original timezone.
-        os.environ['TZ'] = self.initial_timezone
-        time.tzset()
-
         self.testbed.deactivate()
 
     def _get_all_queue_names(self):
