@@ -191,7 +191,9 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         subtopic_schema_version=topic.subtopic_schema_version,
         story_reference_schema_version=topic.story_reference_schema_version,
         next_subtopic_id=topic.next_subtopic_id,
-        subtopics=[subtopic.to_dict() for subtopic in topic.subtopics]
+        subtopics=[subtopic.to_dict() for subtopic in topic.subtopics],
+        meta_tag_content=topic.meta_tag_content,
+        practice_tab_is_displayed=topic.practice_tab_is_displayed
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
@@ -374,6 +376,12 @@ def apply_change_list(topic_id, change_list):
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
                     topic.update_thumbnail_bg_color(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_META_TAG_CONTENT):
+                    topic.update_meta_tag_content(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED):
+                    topic.update_practice_tab_is_displayed(change.new_value)
             elif (change.cmd ==
                   subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
                 subtopic_page_id = (
@@ -500,6 +508,8 @@ def _save_topic(committer_id, topic, commit_message, change_list):
         topic.story_reference_schema_version)
     topic_model.next_subtopic_id = topic.next_subtopic_id
     topic_model.language_code = topic.language_code
+    topic_model.meta_tag_content = topic.meta_tag_content
+    topic_model.practice_tab_is_displayed = topic.practice_tab_is_displayed
     change_dicts = [change.to_dict() for change in change_list]
     topic_model.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(

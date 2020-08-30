@@ -10,7 +10,7 @@
             </a>
           </div>
         </li>
-        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}" ng-show="$ctrl.trainTabShouldBeDisplayed">
+        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}">
           <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('practice')">
             <img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/train_icon_24px.svg')]>">
             <a class="tab-title"
@@ -40,9 +40,14 @@
       </stories-list>
     </div>
     <div ng-if="$ctrl.activeTab === 'practice'">
-      <practice-tab [subtopics-list]="$ctrl.subtopics"
+      <practice-tab ng-show="$ctrl.practiceTabIsDisplayed"
+                    [subtopics-list]="$ctrl.subtopics"
                     [topic-name]="$ctrl.topicName">
       </practice-tab>
+      <md-card ng-show="!$ctrl.practiceTabIsDisplayed" class="oppia-page-card practice-tab-not-available-card">
+        <h2 class="tab-title">Coming Soon!</h2>
+        <div class="practice-tab-not-available-text">Come back later when practice questions are available for this topic.</div>
+      </md-card>
     </div>
     <div ng-if="$ctrl.activeTab === 'subtopics'">
       <subtopics-list [classroom-url-fragment]="$ctrl.classroomUrlFragment"
@@ -163,6 +168,15 @@
     margin-top: 5vh;
     padding-bottom: 7.5vh;
     width: 704px;
+  }
+
+  .topic-viewer-page-content .practice-tab-not-available-card {
+    width: 40vw;
+  }
+
+  .topic-viewer-page-content .practice-tab-not-available-text {
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 18px;
   }
 
   @media(max-width: 1024px) {
