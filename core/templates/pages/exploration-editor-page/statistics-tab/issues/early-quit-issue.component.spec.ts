@@ -68,14 +68,14 @@ describe('Early Quit Issue Component', function() {
     ctrl.$onInit();
   }));
 
-  it('should evaluate controller properties after its initialization',
+  it('should initialize controller properties after its initialization',
     function() {
       expect($scope.currentIssueIdentifier).toBe(2);
       expect($scope.issueStatement).toBe(
         'Several learners exited the exploration in less than a minute.');
       expect($scope.suggestions).toEqual([
-        ('Review the cards up to and including "State1" for errors, ' +
-          'ambiguities, or insufficient motivation.'),
+        'Review the cards up to and including "State1" for errors, ' +
+        'ambiguities, or insufficient motivation.',
       ]);
       expect($scope.playthroughIds).toEqual(['1', '2', '3']);
     });

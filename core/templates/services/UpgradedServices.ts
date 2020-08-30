@@ -296,7 +296,6 @@ import { ItemSelectionInputRulesService } from
 import { ItemSelectionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
-import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
@@ -443,6 +442,10 @@ import { QuestionSummaryObjectFactory } from
   'domain/question/QuestionSummaryObjectFactory';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
+import { RatioExpressionInputValidationService } from
+  // eslint-disable-next-line max-len
+  'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
+import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { ReadOnlyStoryNodeObjectFactory } from
@@ -800,7 +803,6 @@ export class UpgradedServices {
     upgradedServices['JobDataObjectFactory'] = new JobDataObjectFactory();
     upgradedServices['JobStatusSummaryObjectFactory'] =
       new JobStatusSummaryObjectFactory();
-    upgradedServices['KeyboardShortcutService'] = new KeyboardShortcutService();
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
     upgradedServices['LearnerAnswerDetailsObjectFactory'] =
@@ -857,6 +859,7 @@ export class UpgradedServices {
       new QuestionSummaryObjectFactory();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
+    upgradedServices['RatioObjectFactory'] = new RatioObjectFactory();
     upgradedServices['ReviewTestEngineService'] = new ReviewTestEngineService();
     upgradedServices['ReviewTestObjectFactory'] = new ReviewTestObjectFactory();
     upgradedServices['RubricObjectFactory'] =
@@ -1092,6 +1095,10 @@ export class UpgradedServices {
     upgradedServices['ReadOnlyStoryNodeObjectFactory'] =
         new ReadOnlyStoryNodeObjectFactory(
           upgradedServices['LearnerExplorationSummaryObjectFactory']);
+    upgradedServices['RatioExpressionInputValidationService'] =
+          new RatioExpressionInputValidationService(
+            upgradedServices['RatioObjectFactory'],
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['RecordedVoiceoversObjectFactory'] =
       new RecordedVoiceoversObjectFactory(
         upgradedServices['VoiceoverObjectFactory']);
@@ -1315,6 +1322,7 @@ export class UpgradedServices {
         upgradedServices['NumericExpressionInputRulesService'],
         upgradedServices['NumericInputRulesService'],
         upgradedServices['PencilCodeEditorRulesService'],
+        upgradedServices['RatioExpressionInputRulesService'],
         upgradedServices['SetInputRulesService'],
         upgradedServices['TextInputRulesService']);
     upgradedServices['AudioTranslationLanguageService'] =

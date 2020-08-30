@@ -150,9 +150,14 @@ def add_mailgun_api_key():
     """Adds mailgun api key to feconf.py."""
     mailgun_api_key = getpass.getpass(
         prompt=('Enter mailgun api key from the release process doc.'))
+    mailgun_api_key = mailgun_api_key.strip()
 
-    if re.match('^key-[a-z0-9]{32}$', mailgun_api_key) is None:
-        raise Exception('Invalid mailgun api key.')
+    while re.match('^key-[a-z0-9]{32}$', mailgun_api_key) is None:
+        mailgun_api_key = getpass.getpass(
+            prompt=(
+                'You have entered an invalid mailgun api '
+                'key: %s, please retry.' % mailgun_api_key))
+        mailgun_api_key = mailgun_api_key.strip()
 
     feconf_lines = []
     with python_utils.open_file(LOCAL_FECONF_PATH, 'r') as f:
@@ -165,6 +170,37 @@ def add_mailgun_api_key():
             if line == 'MAILGUN_API_KEY = None\n':
                 line = line.replace('None', '\'%s\'' % mailgun_api_key)
             f.write(line)
+
+
+def add_redishost():
+    """Adds redishost key to feconf.py."""
+    redishost = getpass.getpass(
+        prompt=('Enter REDISHOST from the release process doc.'))
+    redishost = redishost.strip()
+
+    while re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', redishost) is None:
+        redishost = getpass.getpass(
+            prompt=(
+                'You have entered an invalid IP Address: %s, '
+                'please retry.' % redishost))
+        redishost = redishost.strip()
+
+    feconf_lines = []
+    with python_utils.open_file(LOCAL_FECONF_PATH, 'r') as f:
+        feconf_lines = f.readlines()
+
+    assert 'REDISHOST = \'localhost\'\n' in feconf_lines, 'Missing REDISHOST'
+
+    with python_utils.open_file(LOCAL_FECONF_PATH, 'w') as f:
+        for line in feconf_lines:
+            if line == 'REDISHOST = \'localhost\'\n':
+                line = line.replace('localhost', redishost)
+            f.write(line)
+
+    with python_utils.open_file(LOCAL_FECONF_PATH, 'r') as f:
+        updated_feconf_lines = f.readlines()
+    assert 'REDISHOST = \'%s\'\n' % redishost in (
+        updated_feconf_lines), 'REDISHOST not updated correctly in feconf.py'
 
 
 def main(personal_access_token):
@@ -201,6 +237,6 @@ def main(personal_access_token):
     common.ask_user_to_confirm(
         'Done! Please check feconf.py and assets/constants.ts to ensure that '
         'the changes made are correct. Specifically verify that the '
-        'MAILGUN_API_KEY is updated correctly and other config changes '
-        'are corresponding to %s and %s.\n' % (
+        'MAILGUN_API_KEY and REDISHOST are updated correctly and '
+        'other config changes are corresponding to %s and %s.\n' % (
             FECONF_CONFIG_PATH, CONSTANTS_CONFIG_PATH))

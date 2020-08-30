@@ -67,6 +67,8 @@ FRONTEND_TEST_CMDS = [
 TRAVIS_CI_PROTRACTOR_CHECK_CMDS = [
     PYTHON_CMD, '-m', 'scripts.check_e2e_tests_are_captured_in_ci']
 TYPESCRIPT_CHECKS_CMDS = [PYTHON_CMD, '-m', 'scripts.typescript_checks']
+STRICT_TYPESCRIPT_CHECKS_CMDS = [
+    PYTHON_CMD, '-m', 'scripts.typescript_checks', '--strict_checks']
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
@@ -451,6 +453,16 @@ def main(args=None):
             if typescript_checks_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing typescript checks.')
+                sys.exit(1)
+
+            strict_typescript_checks_status = 0
+            if does_diff_include_ts_files(files_to_lint):
+                strict_typescript_checks_status = run_script_and_get_returncode(
+                    STRICT_TYPESCRIPT_CHECKS_CMDS)
+            if strict_typescript_checks_status != 0:
+                python_utils.PRINT(
+                    'Push aborted due to failing typescript checks in '
+                    'strict mode.')
                 sys.exit(1)
 
             frontend_status = 0

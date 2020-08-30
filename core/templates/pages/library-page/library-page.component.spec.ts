@@ -16,15 +16,16 @@
  * @fileoverview Unit tests for the component of the library page.
  */
 
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
 import { TestBed } from '@angular/core/testing';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { PageTitleService } from 'services/page-title.service';
 import { of } from 'rxjs';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-import 'mousetrap';
 
 describe('Library controller', function() {
   var ctrl = null;
@@ -51,6 +52,11 @@ describe('Library controller', function() {
     i18nLanguageCodeService = TestBed.get(I18nLanguageCodeService);
     pageTitleService = TestBed.get(PageTitleService);
   });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'KeyboardShortcutService', TestBed.get(KeyboardShortcutService));
+  }));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('WindowDimensionsService', {
@@ -137,8 +143,10 @@ describe('Library controller', function() {
       });
       spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
         classroomBackendApiService);
-      spyOn(classroomBackendApiService, 'fetchClassroomPageIsShownStatusAsync')
-        .and.returnValue($q.resolve(true));
+      spyOn(
+        classroomBackendApiService,
+        'fetchClassroomPromosAreEnabledStatusAsync').and.returnValue(
+        $q.resolve(true));
       ctrl.$onInit();
       $scope.$apply();
       $httpBackend.flush(2);
@@ -150,7 +158,7 @@ describe('Library controller', function() {
           .toContain(ctrl.bannerImageFilename);
         expect(ctrl.bannerImageFileUrl).toBe(
           '/assets/images/library/' + ctrl.bannerImageFilename);
-        expect(ctrl.CLASSROOM_PAGE_IS_SHOWN).toBe(true);
+        expect(ctrl.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
         expect(logErrorSpy.calls.allArgs()).toContain(
           ['INVALID URL PATH: /invalid']);
         expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
@@ -179,59 +187,6 @@ describe('Library controller', function() {
       ctrl.clearActiveGroup();
       expect(ctrl.activeGroupIndex).toBe(null);
     });
-
-    it('should focus on search input element when using shortcut /',
-      function() {
-        var focusSpy = jasmine.createSpy('focus', () => {});
-        spyOn(document, 'querySelector')
-          .withArgs('.protractor-test-search-input').and
-          .callFake(function() {
-            return {
-              focus: focusSpy
-            };
-          });
-        Mousetrap.trigger('/');
-
-        expect(focusSpy).toHaveBeenCalled();
-      });
-
-    it('should focus on category bar element when using shortcut c',
-      function() {
-        var focusSpy = jasmine.createSpy('focus', () => {});
-        spyOn(document, 'getElementById').withArgs('categoryBar').and
-        // This throws "Argument of type '() => { focus: Spy<() => void>; }'
-        // is not assignable to parameter of type
-        // '(elementId: string) => HTMLElement'. This is because getElementById
-        // method return more than just focus property.
-        // @ts-expect-error
-          .callFake(function(elementId) {
-            return {
-              focus: focusSpy
-            };
-          });
-        Mousetrap.trigger('c');
-
-        expect(focusSpy).toHaveBeenCalled();
-      });
-
-    it('should focus on skip to main content id element when using shortcut s',
-      function() {
-        var focusSpy = jasmine.createSpy('focus', () => {});
-        spyOn(document, 'getElementById').withArgs('skipToMainContentId').and
-        // This throws "Argument of type '() => { focus: Spy<() => void>; }'
-        // is not assignable to parameter of type
-        // '(elementId: string) => HTMLElement'. This is because getElementById
-        // method return more than just focus property.
-        // @ts-expect-error
-          .callFake(function() {
-            return {
-              focus: focusSpy
-            };
-          });
-        Mousetrap.trigger('s');
-
-        expect(focusSpy).toHaveBeenCalled();
-      });
 
     it('should change left most card index carousel after carousel is' +
       ' initialized', function() {
@@ -437,8 +392,10 @@ describe('Library controller', function() {
       });
       spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
         classroomBackendApiService);
-      spyOn(classroomBackendApiService, 'fetchClassroomPageIsShownStatusAsync')
-        .and.returnValue($q.resolve(true));
+      spyOn(
+        classroomBackendApiService,
+        'fetchClassroomPromosAreEnabledStatusAsync').and.returnValue(
+        $q.resolve(true));
       ctrl.$onInit();
       $scope.$apply();
       $httpBackend.flush();
@@ -450,7 +407,7 @@ describe('Library controller', function() {
           .toContain(ctrl.bannerImageFilename);
         expect(ctrl.bannerImageFileUrl).toBe(
           '/assets/images/library/' + ctrl.bannerImageFilename);
-        expect(ctrl.CLASSROOM_PAGE_IS_SHOWN).toBe(true);
+        expect(ctrl.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
         expect(logErrorSpy.calls.allArgs()).toContain(
           ['INVALID URL PATH: /invalid']);
         expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
@@ -540,8 +497,10 @@ describe('Library controller', function() {
       });
       spyOnProperty(ctrl, 'classroomBackendApiService').and.returnValue(
         classroomBackendApiService);
-      spyOn(classroomBackendApiService, 'fetchClassroomPageIsShownStatusAsync')
-        .and.returnValue($q.resolve(true));
+      spyOn(
+        classroomBackendApiService,
+        'fetchClassroomPromosAreEnabledStatusAsync').and.returnValue(
+        $q.resolve(true));
       ctrl.$onInit();
       $scope.$apply();
       $httpBackend.flush();
@@ -553,7 +512,7 @@ describe('Library controller', function() {
           .toContain(ctrl.bannerImageFilename);
         expect(ctrl.bannerImageFileUrl).toBe(
           '/assets/images/library/' + ctrl.bannerImageFilename);
-        expect(ctrl.CLASSROOM_PAGE_IS_SHOWN).toBe(true);
+        expect(ctrl.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
         expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
           'Find explorations to learn from - Oppia');
         expect(ctrl.activitiesOwned).toBe(undefined);
@@ -561,5 +520,15 @@ describe('Library controller', function() {
         expect(ctrl.groupHeaderI18nId).toEqual('');
         expect(ctrl.tileDisplayCount).toBe(0);
       });
+
+    it(
+      'should get complete image path corresponding to a given relative path',
+      function() {
+        var imagePath = '/path/to/image.png';
+        expect(
+          ctrl.getStaticImageUrl(imagePath)
+        ).toBe('/assets/images/path/to/image.png');
+      }
+    );
   });
 });

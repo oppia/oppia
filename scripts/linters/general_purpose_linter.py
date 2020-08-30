@@ -243,6 +243,18 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'if you\'re having trouble declaring types.'),
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'\$broadcast'),
+        'message': (
+            'Please do not use $broadcast/$on for propagating events. '
+            'Use @Input/@Output instead.'),
+        'excluded_files': (
+            'core/templates/pages/exploration-editor-page/translation-tab/'
+            'audio-translation-bar/audio-translation-bar.directive.spec.ts',
+            'core/templates/pages/library-page/search-bar/'
+            'search-bar.component.spec.ts'),
+        'excluded_dirs': ()
     }
 ]
 

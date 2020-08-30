@@ -74,7 +74,8 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         notes=story.notes,
         story_contents=story.story_contents.to_dict(),
         corresponding_topic_id=story.corresponding_topic_id,
-        url_fragment=story.url_fragment
+        url_fragment=story.url_fragment,
+        meta_tag_content=story.meta_tag_content
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
@@ -185,6 +186,9 @@ def apply_change_list(story_id, change_list):
                 elif (change.property_name ==
                       story_domain.STORY_PROPERTY_URL_FRAGMENT):
                     story.update_url_fragment(change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_PROPERTY_META_TAG_CONTENT):
+                    story.update_meta_tag_content(change.new_value)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         story_domain.INITIAL_NODE_ID):
@@ -426,6 +430,7 @@ def _save_story(
     story_model.corresponding_topic_id = story.corresponding_topic_id
     story_model.version = story.version
     story_model.url_fragment = story.url_fragment
+    story_model.meta_tag_content = story.meta_tag_content
     change_dicts = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(

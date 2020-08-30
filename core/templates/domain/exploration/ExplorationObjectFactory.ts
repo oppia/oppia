@@ -225,11 +225,12 @@ export class Exploration {
   providedIn: 'root'
 })
 export class ExplorationObjectFactory {
-  constructor(private logger: LoggerService,
-              private paramChangesObjectFactory: ParamChangesObjectFactory,
-              private paramSpecsObjectFactory: ParamSpecsObjectFactory,
-              private statesObjectFactory: StatesObjectFactory,
-              private urlInterpolationService: UrlInterpolationService) {}
+  constructor(
+    private logger: LoggerService,
+    private paramChangesObjectFactory: ParamChangesObjectFactory,
+    private paramSpecsObjectFactory: ParamSpecsObjectFactory,
+    private statesObjectFactory: StatesObjectFactory,
+    private urlInterpolationService: UrlInterpolationService) {}
 
   createFromBackendDict(
       explorationBackendDict: ExplorationBackendDict): Exploration {
