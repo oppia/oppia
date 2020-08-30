@@ -49,10 +49,12 @@ describe('NumberWithUnitsObjectFactory', () => {
         [{exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'kg'},
           {exponent: 1, unit: 'N'}, {exponent: 1, unit: 'm'},
           {exponent: -2, unit: 's'}]);
-      expect(uof.fromStringToList('kg per kg^2 K mol per (N m s^2) K s'
-      )).toEqual([{exponent: -1, unit: 'kg'}, {exponent: 2, unit: 'K'},
-        {exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'N'},
-        {exponent: -1, unit: 'm'}, {exponent: -1, unit: 's'}]);
+      expect(uof.fromStringToList(
+        'kg per kg^2 K mol per (N m s^2) K s'
+      )).toEqual(
+        [{exponent: -1, unit: 'kg'}, {exponent: 2, unit: 'K'},
+          {exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'N'},
+          {exponent: -1, unit: 'm'}, {exponent: -1, unit: 's'}]);
     });
 
     it('should convert units from list to string format', () => {
@@ -69,35 +71,41 @@ describe('NumberWithUnitsObjectFactory', () => {
     });
 
     it('should convert units from string to lexical format', () => {
-      expect(uof.stringToLexical('kg per kg^2 K mol / (N m s^2) K s'
+      expect(uof.stringToLexical(
+        'kg per kg^2 K mol / (N m s^2) K s'
       )).toEqual(
         ['kg', '/', 'kg^2', '*', 'K', '*', 'mol', '/', '(', 'N', '*', 'm', '*',
           's^2', ')', 'K', '*', 's']);
-      expect(uof.stringToLexical('kg (K mol) m/s^2 r t / (l/ n) / o'
+      expect(uof.stringToLexical(
+        'kg (K mol) m/s^2 r t / (l/ n) / o'
       )).toEqual(
         ['kg', '(', 'K', '*', 'mol', ')', 'm', '/', 's^2', '*', 'r', '*', 't',
           '/', '(', 'l', '/', 'n', ')', '/', 'o']);
-      expect(uof.stringToLexical('mol per (kg per (N m per s^2)*K)'
+      expect(uof.stringToLexical(
+        'mol per (kg per (N m per s^2)*K)'
       )).toEqual(
         ['mol', '/', '(', 'kg', '/', '(', 'N', '*', 'm', '/', 's^2', ')', '*',
           'K', ')']);
     });
 
     it('should convert number with units object to a string', () => {
-      expect(new NumberWithUnits('real', 2.02, new Fraction(false, 0, 0, 1
-      ), uof.fromRawInputString('m / s^2')).toString()).toBe('2.02 m s^-2');
-      expect(new NumberWithUnits('real', 2.02, new Fraction(false, 0, 0, 1
-      ), uof.fromRawInputString('Rs')).toString()).toBe('Rs 2.02');
-      expect(new NumberWithUnits('real', 2, new Fraction(false, 0, 0, 1
-      ), uof.fromRawInputString('')).toString()).toBe('2');
-      expect(new NumberWithUnits('fraction', 0, new Fraction(true, 0, 4, 3
-      ), uof.fromRawInputString('m / s^2')).toString()).toBe('-4/3 m s^-2');
+      expect(new NumberWithUnits('real', 2.02, new Fraction(
+        false, 0, 0, 1), uof.fromRawInputString(
+        'm / s^2')).toString()).toBe('2.02 m s^-2');
+      expect(new NumberWithUnits('real', 2.02, new Fraction(
+        false, 0, 0, 1), uof.fromRawInputString(
+        'Rs')).toString()).toBe('Rs 2.02');
+      expect(new NumberWithUnits('real', 2, new Fraction(
+        false, 0, 0, 1), uof.fromRawInputString('')).toString()).toBe('2');
       expect(new NumberWithUnits('fraction', 0, new Fraction(
-        false, 0, 4, 3), uof.fromRawInputString('$ per hour')).toString(
-      )).toBe('$ 4/3 hour^-1');
+        true, 0, 4, 3), uof.fromRawInputString(
+        'm / s^2')).toString()).toBe('-4/3 m s^-2');
+      expect(new NumberWithUnits('fraction', 0, new Fraction(
+        false, 0, 4, 3), uof.fromRawInputString(
+        '$ per hour')).toString()).toBe('$ 4/3 hour^-1');
       expect(new NumberWithUnits('real', 40, new Fraction(
-        false, 0, 0, 1), uof.fromRawInputString('Rs per hour')).toString(
-      )).toBe('Rs 40 hour^-1');
+        false, 0, 0, 1), uof.fromRawInputString(
+        'Rs per hour')).toString()).toBe('Rs 40 hour^-1');
     });
 
     it('should parse valid units strings', () => {
@@ -167,8 +175,9 @@ describe('NumberWithUnitsObjectFactory', () => {
       }).toThrowError('SyntaxError: Unexpected "*" in "m**2" at index 2');
       expect(() => {
         nwuof.fromRawInputString('2 kg / m^(2)');
-      }).toThrowError('SyntaxError: In "kg / m^(2)", "^" must be ' +
-      'followed by a floating-point number');
+      }).toThrowError(
+        'SyntaxError: In "kg / m^(2)", "^" must be ' +
+        'followed by a floating-point number');
     });
   });
 });

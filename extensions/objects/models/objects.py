@@ -1195,6 +1195,24 @@ class PositionOfTerms(BaseObject):
     }
 
 
+class RatioExpression(BaseObject):
+    """Class for ratio expression. Stores a list of non-negative
+    integers representing a valid ratio expression.
+    """
+
+    description = 'A list of integers for ratio expression.'
+    default_value = [1, 1]
+
+    SCHEMA = {
+        'type': 'list',
+        'items': PositiveInt.SCHEMA,
+        'validators': [{
+            'id': 'has_length_at_least',
+            'min_value': 2
+        }]
+    }
+
+
 class CustomOskLetters(BaseObject):
     """Class for custom OSK letters. These are the letters that will be
     displayed to the learner for AlgebraicExpressionInput and MathEquationInput
