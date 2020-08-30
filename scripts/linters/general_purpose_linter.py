@@ -140,10 +140,10 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
                    'and similar functions in Angular.',
         'excluded_files': (
             warranted_angular_security_bypasses
-            .EXCULDED_BYPASS_SECURTIY_TRUST_FILES),
+            .EXCLUDED_BYPASS_SECURITY_TRUST_FILES),
         'excluded_dirs': (
             warranted_angular_security_bypasses
-            .EXCULDED_BYPASS_SECURTIY_TRUST_DIRECTORIES)
+            .EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES)
     },
     {
         'regexp': re.compile(r'\b(ddescribe|fdescribe)\('),
