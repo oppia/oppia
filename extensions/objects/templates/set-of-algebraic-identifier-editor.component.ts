@@ -37,7 +37,7 @@ angular.module('oppia').component('setOfAlgebraicIdentifierEditor', {
           'independently and won\'t allow reordering of terms ' +
           'around the = sign.');
 
-        let customOskLetters = GuppyInitializationService.getCustomOskLetters()
+        let customOskLetters = GuppyInitializationService.getCustomOskLetters();
 
         let choices = (
           customOskLetters ? customOskLetters :
