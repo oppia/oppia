@@ -194,11 +194,12 @@ angular.module('oppia').factory('ExplorationStatesService', [
           propertyRef = propertyRef[key];
         });
       } catch (e) {
-        var additionalInfo = ('\nUndefined states error debug logs:' +
+        var additionalInfo = (
+          '\nUndefined states error debug logs:' +
           '\nRequested state name: ' + stateName +
           '\nExploration ID: ' + ContextService.getExplorationId() +
           '\nChange list: ' + JSON.stringify(
-          ChangeListService.getChangeList()) +
+            ChangeListService.getChangeList()) +
           '\nAll states names: ' + _states.getStateNames());
         e.message += additionalInfo;
         throw e;

@@ -79,15 +79,17 @@ describe('Rule spec services', function() {
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value('RatioObjectFactory', new RatioObjectFactory());
     $provide.value('SetInputRulesService', new SetInputRulesService());
-    $provide.value('AlgebraicExpressionInputRulesService',
+    $provide.value(
+      'AlgebraicExpressionInputRulesService',
       new AlgebraicExpressionInputRulesService());
-    $provide.value('RatioExpressionInputRulesService',
+    $provide.value(
+      'RatioExpressionInputRulesService',
       new RatioExpressionInputRulesService(new RatioObjectFactory()));
     $provide.value(
       'DragAndDropSortInputRulesService',
       new DragAndDropSortInputRulesService());
-    $provide.value('MathEquationInputRulesService',
-      new MathEquationInputRulesService());
+    $provide.value(
+      'MathEquationInputRulesService', new MathEquationInputRulesService());
     $provide.value(
       'MultipleChoiceInputRulesService', new MultipleChoiceInputRulesService());
     $provide.value('NumericInputRulesService', new NumericInputRulesService());
@@ -104,7 +106,8 @@ describe('Rule spec services', function() {
         new NumberWithUnitsObjectFactory(
           new UnitsObjectFactory(), new FractionObjectFactory(),
         ), new UtilsService()));
-    $provide.value('NumericExpressionInputRulesService',
+    $provide.value(
+      'NumericExpressionInputRulesService',
       new NumericExpressionInputRulesService());
     $provide.value(
       'FractionInputRulesService', new FractionInputRulesService(

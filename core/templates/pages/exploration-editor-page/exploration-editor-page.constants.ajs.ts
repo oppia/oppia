@@ -56,7 +56,8 @@ angular.module('oppia').constant(
   'DEFAULT_AUDIO_LANGUAGE',
   ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE);
 
-angular.module('oppia').constant('INFO_MESSAGE_SOLUTION_IS_VALID',
+angular.module('oppia').constant(
+  'INFO_MESSAGE_SOLUTION_IS_VALID',
   ExplorationEditorPageConstants.INFO_MESSAGE_SOLUTION_IS_VALID);
 
 angular.module('oppia').constant(

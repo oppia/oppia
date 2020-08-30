@@ -45,8 +45,9 @@ angular.module('oppia').controller('CreateNewTopicModalController', [
       topicPropertiesConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
 
     $scope.isValid = function() {
-      return Boolean($scope.newlyCreatedTopic.isValid() &&
-          ImageLocalStorageService.getStoredImagesData().length > 0);
+      return Boolean(
+        $scope.newlyCreatedTopic.isValid() &&
+        ImageLocalStorageService.getStoredImagesData().length > 0);
     };
 
     ContextService.setImageSaveDestinationToLocalStorage();

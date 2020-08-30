@@ -32,7 +32,8 @@ angular.module('oppia').component('oppiaNoninteractiveSvgdiagram', {
     '$attrs', 'AssetsBackendApiService', 'ContextService',
     'HtmlEscaperService', 'ImageLocalStorageService',
     'ImagePreloaderService', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
-    function($attrs, AssetsBackendApiService, ContextService,
+    function(
+        $attrs, AssetsBackendApiService, ContextService,
         HtmlEscaperService, ImageLocalStorageService,
         ImagePreloaderService, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
       var ctrl = this;

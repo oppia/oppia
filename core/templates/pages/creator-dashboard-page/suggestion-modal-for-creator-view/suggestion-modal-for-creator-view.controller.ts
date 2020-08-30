@@ -102,7 +102,8 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
     $scope.isResubmitButtonDisabled = function() {
       return !(
         $scope.summaryMessage &&
-        ($scope.suggestionData.newSuggestionHtml.trim() !==
+        (
+          $scope.suggestionData.newSuggestionHtml.trim() !==
           newContent.html.trim()));
     };
 

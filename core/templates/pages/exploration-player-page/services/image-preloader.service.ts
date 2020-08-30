@@ -26,7 +26,8 @@ require('services/context.service.ts');
 angular.module('oppia').factory('ImagePreloaderService', [
   '$q', 'AssetsBackendApiService', 'ComputeGraphService',
   'ContextService', 'ExtractImageFilenamesFromStateService', 'ENTITY_TYPE',
-  function($q, AssetsBackendApiService, ComputeGraphService,
+  function(
+      $q, AssetsBackendApiService, ComputeGraphService,
       ContextService, ExtractImageFilenamesFromStateService, ENTITY_TYPE) {
     var MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
 

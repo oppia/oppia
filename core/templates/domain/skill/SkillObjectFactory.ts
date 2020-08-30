@@ -56,7 +56,8 @@ export class Skill {
   _prerequisiteSkillIds: string[];
   SKILL_DIFFICULTIES: string[] = constants.SKILL_DIFFICULTIES;
 
-  constructor(id: string, description: string, misconceptions: Misconception[],
+  constructor(
+      id: string, description: string, misconceptions: Misconception[],
       rubrics: Rubric[], conceptCard: ConceptCard, languageCode: string,
       version: number, nextMisconceptionId: number, supersedingSkillId: string,
       allQuestionsMerged: boolean, prerequisiteSkillIds: string[]) {
@@ -242,13 +243,15 @@ export class Skill {
   providedIn: 'root'
 })
 export class SkillObjectFactory {
-  constructor(private conceptCardObjectFactory: ConceptCardObjectFactory,
+  constructor(
+    private conceptCardObjectFactory: ConceptCardObjectFactory,
     private misconceptionObjectFactory: MisconceptionObjectFactory,
     private rubricObjectFactory: RubricObjectFactory,
     private validatorService: ValidatorsService) {
   }
   createInterstitialSkill(): Skill {
-    return new Skill(null, 'Skill description loading',
+    return new Skill(
+      null, 'Skill description loading',
       [], [], this.conceptCardObjectFactory.createInterstitialConceptCard(),
       'en', 1, 0, null, false, []);
   }

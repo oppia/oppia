@@ -93,8 +93,9 @@ describe('Read only topic object Factory', () => {
     () => {
       expect(_sampleReadOnlyTopic.getUncategorizedSkillsSummaries()[0].getId())
         .toEqual('skill_id_1');
-      expect(_sampleReadOnlyTopic.getUncategorizedSkillsSummaries()[0]
-        .getDescription()).toEqual('Skill Description 1');
+      expect(
+        _sampleReadOnlyTopic.getUncategorizedSkillsSummaries()[0]
+          .getDescription()).toEqual('Skill Description 1');
     });
 
   it('should return correct values of subtopic object', () => {
@@ -103,8 +104,9 @@ describe('Read only topic object Factory', () => {
       'subtopic_name');
     expect(_sampleReadOnlyTopic.getSubtopics()[0]._skillSummaries[0].getId())
       .toEqual('skill_id_2');
-    expect(_sampleReadOnlyTopic.getSubtopics()[0]._skillSummaries[0]
-      .getDescription()).toEqual('Skill Description 2');
+    expect(
+      _sampleReadOnlyTopic.getSubtopics()[0]._skillSummaries[0]
+        .getDescription()).toEqual('Skill Description 2');
   });
 
   it('should return correct values of skill descriptions', () => {
@@ -119,8 +121,9 @@ describe('Read only topic object Factory', () => {
       .toEqual('0');
     expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getTitle())
       .toEqual('Story Title');
-    expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0]
-      .getDescription()).toEqual('Story Description');
+    expect(
+      _sampleReadOnlyTopic.getCanonicalStorySummaries()[0]
+        .getDescription()).toEqual('Story Description');
     expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getNodeTitles())
       .toEqual(['Chapter 1']);
     expect(
@@ -133,10 +136,12 @@ describe('Read only topic object Factory', () => {
       .toEqual('1');
     expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0].getTitle())
       .toEqual('Story Title');
-    expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0]
-      .getDescription()).toEqual('Story Description');
-    expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0]
-      .getNodeTitles()).toEqual(['Chapter 1']);
+    expect(
+      _sampleReadOnlyTopic.getAdditionalStorySummaries()[0]
+        .getDescription()).toEqual('Story Description');
+    expect(
+      _sampleReadOnlyTopic.getAdditionalStorySummaries()[0]
+        .getNodeTitles()).toEqual(['Chapter 1']);
     expect(
       _sampleReadOnlyTopic.getAdditionalStorySummaries()[0].isNodeCompleted(
         'Chapter 1')).toEqual(true);

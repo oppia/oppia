@@ -58,10 +58,10 @@ describe('LocalStorageService', () => {
     });
 
     it('should correctly save the draft', () => {
-      localStorageService.saveExplorationDraft(explorationIdOne,
-        changeList, draftChangeListIdOne);
-      localStorageService.saveExplorationDraft(explorationIdTwo,
-        changeList, draftChangeListIdTwo);
+      localStorageService.saveExplorationDraft(
+        explorationIdOne, changeList, draftChangeListIdOne);
+      localStorageService.saveExplorationDraft(
+        explorationIdTwo, changeList, draftChangeListIdTwo);
       expect(localStorageService.getExplorationDraft(
         explorationIdOne)).toEqual(draftOne);
       expect(localStorageService.getExplorationDraft(
@@ -69,8 +69,8 @@ describe('LocalStorageService', () => {
     });
 
     it('should correctly change and save a draft', () => {
-      localStorageService.saveExplorationDraft(explorationIdOne,
-        changeList, draftChangeListIdOne);
+      localStorageService.saveExplorationDraft(
+        explorationIdOne, changeList, draftChangeListIdOne);
       expect(localStorageService.getExplorationDraft(
         explorationIdOne)).toEqual(draftOne);
 
@@ -80,15 +80,15 @@ describe('LocalStorageService', () => {
           draftChanges: changeList,
           draftChangeListId: draftChangeListIdOneChanged
         });
-      localStorageService.saveExplorationDraft(explorationIdOne,
-        changeList, draftChangeListIdOneChanged);
+      localStorageService.saveExplorationDraft(
+        explorationIdOne, changeList, draftChangeListIdOneChanged);
       expect(localStorageService.getExplorationDraft(
         explorationIdOne)).toEqual(draftOneChanged);
     });
 
     it('should correctly remove the draft', () => {
-      localStorageService.saveExplorationDraft(explorationIdTwo,
-        changeList, draftChangeListIdTwo);
+      localStorageService.saveExplorationDraft(
+        explorationIdTwo, changeList, draftChangeListIdTwo);
       localStorageService.removeExplorationDraft(explorationIdTwo);
       expect(localStorageService.getExplorationDraft(
         explorationIdTwo)).toBeNull();

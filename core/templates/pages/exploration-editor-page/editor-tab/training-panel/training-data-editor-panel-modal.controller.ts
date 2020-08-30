@@ -25,7 +25,8 @@ angular.module('oppia').controller(
     'StateCustomizationArgsService', 'StateEditorService',
     'StateInteractionIdService', 'TrainingDataService', 'TrainingModalService',
     'EXPLICIT_CLASSIFICATION', 'TRAINING_DATA_CLASSIFICATION',
-    function($filter, $injector, $scope, $uibModalInstance,
+    function(
+        $filter, $injector, $scope, $uibModalInstance,
         AlertsService, AngularNameService, AnswerClassificationService,
         CurrentInteractionService, ExplorationHtmlFormatterService,
         ExplorationStatesService, FocusManagerService, ResponsesService,

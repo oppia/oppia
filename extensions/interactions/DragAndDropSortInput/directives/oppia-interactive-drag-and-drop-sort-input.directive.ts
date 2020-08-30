@@ -29,7 +29,8 @@ require('services/contextual/url.service.ts');
 angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
   'DragAndDropSortInputRulesService',
   'InteractionAttributesExtractorService',
-  function(DragAndDropSortInputRulesService,
+  function(
+      DragAndDropSortInputRulesService,
       InteractionAttributesExtractorService) {
     return {
       restrict: 'E',

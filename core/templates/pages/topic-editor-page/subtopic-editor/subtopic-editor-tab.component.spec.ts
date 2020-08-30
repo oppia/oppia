@@ -104,7 +104,8 @@ describe('Subtopic editor tab', function() {
       return subtopic;
     };
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
-    spyOn(TopicEditorStateService,
+    spyOn(
+      TopicEditorStateService,
       'getSubtopicPage').and.returnValue(subtopicPage);
     spyOn(TopicEditorRoutingService, 'getSubtopicIdFromUrl')
       .and.returnValue('1');

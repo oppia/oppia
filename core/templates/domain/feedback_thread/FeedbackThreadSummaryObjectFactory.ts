@@ -98,7 +98,8 @@ export class FeedbackThreadSummaryObjectFactory {
       authorLastMessage: string, authorSecondLastMessage: string,
       explorationTitle: string, explorationId: string,
       threadId: string): FeedbackThreadSummary {
-    return new FeedbackThreadSummary(status, originalAuthorId, lastUpdatedMsecs,
+    return new FeedbackThreadSummary(
+      status, originalAuthorId, lastUpdatedMsecs,
       lastMessageText, totalMessageCount, lastMessageIsRead,
       secondLastMessageIsRead, authorLastMessage, authorSecondLastMessage,
       explorationTitle, explorationId, threadId);

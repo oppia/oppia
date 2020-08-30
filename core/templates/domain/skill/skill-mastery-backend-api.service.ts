@@ -39,7 +39,8 @@ export class SkillMasteryBackendApiService {
     private httpClient: HttpClient,
     private skillMasteryObjectFactory: SkillMasteryObjectFactory) {}
 
-  _fetchSkillMasteryDegrees(skillIds: string[],
+  _fetchSkillMasteryDegrees(
+      skillIds: string[],
       successCallback: (value: SkillMastery) => void,
       errorCallback: (reason: string) => void): void {
     this.httpClient.get<SkillMasteryBackendResponse>(
@@ -61,7 +62,8 @@ export class SkillMasteryBackendApiService {
     });
   }
 
-  _updateSkillMasteryDegrees(masteryPerSkillMapping: {[key: string]: number},
+  _updateSkillMasteryDegrees(
+      masteryPerSkillMapping: {[key: string]: number},
       successCallback: () => void,
       errorCallback: (reason: string) => void): void {
     let putData = {

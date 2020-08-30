@@ -141,12 +141,12 @@ describe('State Translation Editor Component', function() {
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
-    $provide.value('StateEditorRefreshService',
-      TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('StateRecordedVoiceoversService', TestBed.get(
       StateRecordedVoiceoversService));
-    $provide.value('StateWrittenTranslationsService',
-      stateWrittenTranslationsService);
+    $provide.value(
+      'StateWrittenTranslationsService', stateWrittenTranslationsService);
   }));
 
   describe('when has written translation', function() {
@@ -168,10 +168,11 @@ describe('State Translation Editor Component', function() {
       spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
         () => {});
 
-      spyOnProperty(translationLanguageService,
-        'onActiveLanguageChanged').and.returnValue(
+      spyOnProperty(
+        translationLanguageService, 'onActiveLanguageChanged').and.returnValue(
         mockActiveLanguageChangedEventEmitter);
-      spyOnProperty(translationTabActiveContentIdService,
+      spyOnProperty(
+        translationTabActiveContentIdService,
         'onActiveContentIdChanged').and.returnValue(
         mockActiveLanguageChangedEventEmitter);
 

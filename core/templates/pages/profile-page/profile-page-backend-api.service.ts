@@ -65,10 +65,11 @@ export class ProfilePageBackendApiService {
         ProfilePageDomainConstants.PROFILE_DATA_URL,
         {username: this.urlService.getUsernameFromProfileUrl()}
       )
-    ).toPromise().then(userProfileDict => this.userProfileObjectFactory
-      .createFromBackendDict(userProfileDict), errorResponse => {
-      throw new Error(errorResponse.error.error);
-    });
+    ).toPromise().then(
+      userProfileDict => this.userProfileObjectFactory
+        .createFromBackendDict(userProfileDict), errorResponse => {
+        throw new Error(errorResponse.error.error);
+      });
   }
 
   /**

@@ -99,8 +99,9 @@ describe('Written Translations Object Factory', () => {
 
     writtenTranslationsBackendDict.addWrittenTranslation(
       'content_1', 'en', 'html', 'English HTML');
-    expect(writtenTranslationsBackendDict
-      .getTranslationsLanguageCodes('content_1')).toEqual(['hi-en', 'en']);
+    expect(
+      writtenTranslationsBackendDict
+        .getTranslationsLanguageCodes('content_1')).toEqual(['hi-en', 'en']);
   });
 
   it('should update the html language code of a written translations object',

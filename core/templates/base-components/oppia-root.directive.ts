@@ -21,8 +21,8 @@
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-angular.module('oppia').directive('oppiaRoot', ['$translate',
-  function($translate) {
+angular.module('oppia').directive('oppiaRoot', [
+  '$translate', function($translate) {
     return {
       template: require('./oppia-root.directive.html'),
       scope: {},

@@ -102,7 +102,8 @@ angular.module('oppia').directive('versionDiffVisualization', [
               nodesData[stateId].originalStateName) {
             oldStateName = nodesData[stateId].originalStateName;
           }
-          ctrl.showStateDiffModal(nodesData[stateId].newestStateName,
+          ctrl.showStateDiffModal(
+            nodesData[stateId].newestStateName,
             oldStateName, nodesData[stateId].stateProperty);
         };
 

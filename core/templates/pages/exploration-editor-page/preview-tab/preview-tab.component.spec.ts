@@ -105,10 +105,12 @@ describe('Preview Tab Component', function() {
         .returnValue(parameters);
       spyOn(editableExplorationBackendApiService, 'fetchApplyDraftExploration')
         .and.returnValue($q.resolve(exploration));
-      spyOnProperty(explorationEngineService,
+      spyOnProperty(
+        explorationEngineService,
         'onUpdateActiveStateIfInEditor').and.returnValue(
         mockUpdateActiveStateIfInEditorEventEmitter);
-      spyOnProperty(explorationPlayerStateService,
+      spyOnProperty(
+        explorationPlayerStateService,
         'onPlayerStateChange').and.returnValue(
         mockPlayerStateChangeEventEmitter);
       $scope = $rootScope.$new();

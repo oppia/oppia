@@ -21,8 +21,8 @@ import { TestBed } from '@angular/core/testing';
 
 import { UrlService } from 'services/contextual/url.service';
 
-
-require('pages/story-viewer-page/navbar-pre-logo-action/' +
+require(
+  'pages/story-viewer-page/navbar-pre-logo-action/' +
   'story-viewer-navbar-pre-logo-action.component.ts');
 
 describe('story viewer pre logo action', function() {

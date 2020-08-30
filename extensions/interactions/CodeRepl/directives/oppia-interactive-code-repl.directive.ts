@@ -171,7 +171,8 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
                 markOptions);
 
               for (var i = 0; i < postCodeNumLines; i++) {
-                editor.addLineClass(preCodeNumLines + userCodeNumLines + i,
+                editor.addLineClass(
+                  preCodeNumLines + userCodeNumLines + i,
                   'text', 'code-repl-noneditable-line');
               }
             }

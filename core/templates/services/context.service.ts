@@ -146,10 +146,11 @@ export class ContextService {
   }
 
   isInExplorationContext(): boolean {
-    return (this.getPageContext() ===
-        ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR ||
-        this.getPageContext() ===
-        ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
+    return (
+      this.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR ||
+      this.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
   }
 
   // This function is used in cases where the URL does not specify the
@@ -242,10 +243,11 @@ export class ContextService {
   // Following method helps to know whether exploration editor is
   // in main editing mode or preview mode.
   isInExplorationEditorMode(): boolean {
-    return (this.getPageContext() ===
-        ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR &&
-        this.getEditorTabContext() === (
-          ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR));
+    return (
+      this.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR &&
+      this.getEditorTabContext() === (
+        ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR));
   }
 
   isInQuestionPlayerMode(): boolean {

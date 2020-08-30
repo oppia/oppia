@@ -115,8 +115,8 @@ describe('RatioExpressionInputValidationService', () => {
     answerGroups[0].updateRuleTypesToInputs(
       [isEquivalent, equals]);
 
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because' +
@@ -134,8 +134,8 @@ describe('RatioExpressionInputValidationService', () => {
     answerGroups[0].updateRuleTypesToInputs(
       [isEquivalent, isEquivalentNonSimplified]);
 
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because' +
@@ -159,8 +159,8 @@ describe('RatioExpressionInputValidationService', () => {
     answerGroups[0].updateRuleTypesToInputs(
       [hasNumberOfTermsEqualTo, equals, equalFourTerms]);
 
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 3 from answer group 1 will never be matched because' +
@@ -184,8 +184,8 @@ describe('RatioExpressionInputValidationService', () => {
     // The second rule will never get matched.
     answerGroups[0].updateRuleTypesToInputs(
       [equalsTwoTerms, equals, hasNumberOfTermsEqualToLength2]);
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 1 from answer group 1 will never be matched because' +

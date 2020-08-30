@@ -48,7 +48,8 @@ angular.module('oppia').directive('baseContent', [
         'BottomNavbarStatusService', 'KeyboardShortcutService',
         'LoaderService', 'PageTitleService', 'SidebarStatusService',
         'UrlService',
-        function($rootScope, $scope, $window, BackgroundMaskService,
+        function(
+            $rootScope, $scope, $window, BackgroundMaskService,
             BottomNavbarStatusService, KeyboardShortcutService,
             LoaderService, PageTitleService, SidebarStatusService,
             UrlService) {

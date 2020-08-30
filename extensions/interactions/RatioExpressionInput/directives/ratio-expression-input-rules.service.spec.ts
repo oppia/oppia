@@ -35,58 +35,41 @@ describe('Ratio expression input rules service', () => {
   it('should have a correct Equals rule', () => {
     inputList = [1, 2, 3];
 
-    expect(reirs.Equals([1, 2, 3],
-      {x: inputList})).toBeTrue();
-    expect(reirs.Equals([3, 2, 1],
-      {x: inputList})).toBeFalse();
-    expect(reirs.Equals([1, 2],
-      {x: inputList})).toBeFalse();
-    expect(reirs.Equals([1, 2, 3, 4],
-      {x: inputList})).toBeFalse();
-    expect(reirs.Equals([2, 4, 6],
-      {x: inputList})).toBeFalse();
+    expect(reirs.Equals([1, 2, 3], {x: inputList})).toBeTrue();
+    expect(reirs.Equals([3, 2, 1], {x: inputList})).toBeFalse();
+    expect(reirs.Equals([1, 2], {x: inputList})).toBeFalse();
+    expect(reirs.Equals([1, 2, 3, 4], {x: inputList})).toBeFalse();
+    expect(reirs.Equals([2, 4, 6], {x: inputList})).toBeFalse();
   });
 
   it('should have a correct HasNumberOfTermsEqualTo rule', () => {
     let inputNumber = 3;
 
-    expect(reirs.HasNumberOfTermsEqualTo([1, 2, 3],
-      {y: inputNumber})).toBeTrue();
-    expect(reirs.HasNumberOfTermsEqualTo([3, 2, 1],
-      {y: inputNumber})).toBeTrue();
-    expect(reirs.HasNumberOfTermsEqualTo([1, 2],
-      {y: inputNumber})).toBeFalse();
-    expect(reirs.HasNumberOfTermsEqualTo([1, 2, 3, 4],
-      {y: inputNumber})).toBeFalse();
+    expect(reirs.HasNumberOfTermsEqualTo(
+      [1, 2, 3], {y: inputNumber})).toBeTrue();
+    expect(reirs.HasNumberOfTermsEqualTo(
+      [3, 2, 1], {y: inputNumber})).toBeTrue();
+    expect(reirs.HasNumberOfTermsEqualTo([1, 2], {y: inputNumber})).toBeFalse();
+    expect(reirs.HasNumberOfTermsEqualTo(
+      [1, 2, 3, 4], {y: inputNumber})).toBeFalse();
   });
 
   it('should have a correct IsEquivalent rule', () => {
     inputList = [2, 4, 6];
 
-    expect(reirs.IsEquivalent([1, 2, 3],
-      {x: inputList})).toBeTrue();
-    expect(reirs.IsEquivalent([1, 2],
-      {x: inputList})).toBeFalse();
-    expect(reirs.IsEquivalent([1, 2, 3, 4],
-      {x: inputList})).toBeFalse();
-    expect(reirs.IsEquivalent([2, 4, 3],
-      {x: inputList})).toBeFalse();
-    expect(reirs.IsEquivalent([3, 6, 9],
-      {x: inputList})).toBeTrue();
-    expect(reirs.IsEquivalent([4, 8, 12],
-      {x: inputList})).toBeTrue();
+    expect(reirs.IsEquivalent([1, 2, 3], {x: inputList})).toBeTrue();
+    expect(reirs.IsEquivalent([1, 2], {x: inputList})).toBeFalse();
+    expect(reirs.IsEquivalent([1, 2, 3, 4], {x: inputList})).toBeFalse();
+    expect(reirs.IsEquivalent([2, 4, 3], {x: inputList})).toBeFalse();
+    expect(reirs.IsEquivalent([3, 6, 9], {x: inputList})).toBeTrue();
+    expect(reirs.IsEquivalent([4, 8, 12], {x: inputList})).toBeTrue();
 
     inputList = [2, 3, 5];
 
-    expect(reirs.IsEquivalent([2, 3, 5],
-      {x: inputList})).toBeTrue();
-    expect(reirs.IsEquivalent([2, 4, 6],
-      {x: inputList})).toBeFalse();
-    expect(reirs.IsEquivalent([1, 2],
-      {x: inputList})).toBeFalse();
-    expect(reirs.IsEquivalent([1, 2, 3, 4],
-      {x: inputList})).toBeFalse();
-    expect(reirs.IsEquivalent([2, 4, 3],
-      {x: inputList})).toBeFalse();
+    expect(reirs.IsEquivalent([2, 3, 5], {x: inputList})).toBeTrue();
+    expect(reirs.IsEquivalent([2, 4, 6], {x: inputList})).toBeFalse();
+    expect(reirs.IsEquivalent([1, 2], {x: inputList})).toBeFalse();
+    expect(reirs.IsEquivalent([1, 2, 3, 4], {x: inputList})).toBeFalse();
+    expect(reirs.IsEquivalent([2, 4, 3], {x: inputList})).toBeFalse();
   });
 });

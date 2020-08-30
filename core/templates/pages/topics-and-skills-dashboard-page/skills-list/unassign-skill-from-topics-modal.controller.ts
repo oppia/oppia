@@ -27,7 +27,8 @@ require(
 angular.module('oppia').controller('UnassignSkillFromTopicModalController', [
   '$controller', '$scope', '$uibModalInstance',
   'TopicsAndSkillsDashboardBackendApiService', 'skillId',
-  function($controller, $scope, $uibModalInstance,
+  function(
+      $controller, $scope, $uibModalInstance,
       TopicsAndSkillsDashboardBackendApiService, skillId) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,

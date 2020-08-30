@@ -27,7 +27,8 @@ require('pages/admin-page/admin-page.constants.ajs.ts');
 angular.module('oppia').directive('adminDevModeActivitiesTab', [
   '$http', '$rootScope', '$window', 'AdminDataService',
   'AdminTaskManagerService', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
-  function($http, $rootScope, $window, AdminDataService,
+  function(
+      $http, $rootScope, $window, AdminDataService,
       AdminTaskManagerService, UrlInterpolationService, ADMIN_HANDLER_URL) {
     return {
       restrict: 'E',

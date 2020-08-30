@@ -161,9 +161,9 @@ var logicProofTeacher2 = (function() {
    *         antecendents or variables) that it will not be possible to deduce
    *         from what the student is required to write.
    */
-  var buildLineTemplate = function(nameString, readerViewString,
-      antecedentsString, resultsString, variablesString, errorStrings,
-      language, vocabulary) {
+  var buildLineTemplate = function(
+      nameString, readerViewString, antecedentsString, resultsString,
+      variablesString, errorStrings, language, vocabulary) {
     var possibleReaderViews = logicProofShared.parseLineString(
       readerViewString, language.operators, vocabulary, true);
     if (possibleReaderViews.length > 1) {
@@ -267,7 +267,8 @@ var logicProofTeacher2 = (function() {
     for (var i = 0; i < message.length; i++) {
       if (message[i].format === 'expression') {
         if (message[i].content.type === 'element') {
-          output += (message[i].content.hasOwnProperty('kind') ?
+          output += (
+            message[i].content.hasOwnProperty('kind') ?
             '{{' + displayExpressionTemplate(message[i].content, operators) +
               '|variable}}' :
             '{{' + displayExpressionTemplate(message[i].content, operators) +

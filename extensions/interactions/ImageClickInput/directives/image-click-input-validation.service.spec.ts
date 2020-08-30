@@ -187,8 +187,9 @@ describe('ImageClickInputValidationService', () => {
   });
 
   it('should expect rule types to reference valid region labels', () => {
-    (<ImageClickRuleInputs>
-      goodAnswerGroups[0].ruleTypesToInputs.IsInRegion[0]).x = 'FakeLabel';
+    (
+      <ImageClickRuleInputs>
+        goodAnswerGroups[0].ruleTypesToInputs.IsInRegion[0]).x = 'FakeLabel';
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);

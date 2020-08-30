@@ -164,8 +164,8 @@ angular.module('oppia').component('historyTab', {
 
         ctrl.explorationVersionMetadata = (
           ctrl.totalExplorationVersionMetadata.filter((metadata) => {
-            return (metadata &&
-              metadata.committerId.trim().toLowerCase().includes(
+            return (
+              metadata && metadata.committerId.trim().toLowerCase().includes(
                 ctrl.username.trim().toLowerCase()));
           }));
         ctrl.versionNumbersToDisplay = ctrl.explorationVersionMetadata.length;
@@ -186,8 +186,8 @@ angular.module('oppia').component('historyTab', {
         ctrl.compareVersionMetadata.laterVersion =
           ctrl.totalExplorationVersionMetadata[laterComparedVersion - 1];
 
-        CompareVersionsService.getDiffGraphData(earlierComparedVersion,
-          laterComparedVersion).then(
+        CompareVersionsService.getDiffGraphData(
+          earlierComparedVersion, laterComparedVersion).then(
           function(response) {
             $log.info('Retrieved version comparison data');
             $log.info(response);

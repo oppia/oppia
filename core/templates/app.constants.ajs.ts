@@ -33,7 +33,8 @@ for (var constantName in constants) {
 angular.module('oppia').constant(
   'DEFAULT_TRANSLATIONS', AppConstants.DEFAULT_TRANSLATIONS);
 
-angular.module('oppia').constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+angular.module('oppia').constant(
+  'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
   AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT);
 
 angular.module('oppia').constant(

@@ -79,7 +79,8 @@ require(
   'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
 require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
-require('components/question-directives/question-player/' +
+require(
+  'components/question-directives/question-player/' +
   'question-player.constants.ajs.ts');
 require(
   'components/question-directives/question-player/' +
@@ -227,7 +228,8 @@ angular.module('oppia').directive('questionPlayer', [
           };
 
           ctrl.showActionButtonsFooter = function() {
-            return (ctrl.questionPlayerConfig.resultActionButtons &&
+            return (
+              ctrl.questionPlayerConfig.resultActionButtons &&
               ctrl.questionPlayerConfig.resultActionButtons.length > 0);
           };
 
@@ -315,7 +317,8 @@ angular.module('oppia').directive('questionPlayer', [
           };
 
           var isInPassOrFailMode = function() {
-            return (ctrl.questionPlayerConfig.questionPlayerMode &&
+            return (
+              ctrl.questionPlayerConfig.questionPlayerMode &&
               ctrl.questionPlayerConfig.questionPlayerMode.modeType ===
               QUESTION_PLAYER_MODE.PASS_FAIL_MODE);
           };
@@ -558,8 +561,8 @@ angular.module('oppia').directive('questionPlayer', [
             ctrl.directiveSubscriptions.add(
               QuestionPlayerStateService.onQuestionSessionCompleted.subscribe(
                 (result) => {
-                  $location.hash(HASH_PARAM +
-                    encodeURIComponent(JSON.stringify(result)));
+                  $location.hash(
+                    HASH_PARAM + encodeURIComponent(JSON.stringify(result)));
                 })
             );
 

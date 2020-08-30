@@ -38,9 +38,10 @@ export interface InterpolationValuesType {
   providedIn: 'root'
 })
 export class UrlInterpolationService {
-  constructor(private alertsService: AlertsService,
-              private urlService: UrlService,
-              private utilsService: UtilsService) {}
+  constructor(
+    private alertsService: AlertsService,
+    private urlService: UrlService,
+    private utilsService: UtilsService) {}
 
   validateResourcePath(resourcePath: string): void {
     if (!resourcePath) {
@@ -63,8 +64,9 @@ export class UrlInterpolationService {
     if (!Constants.DEV_MODE) {
       if (hashes[resourcePath]) {
         let index = resourcePath.lastIndexOf('.');
-        return (resourcePath.slice(0, index) + '.' + hashes[resourcePath] +
-            resourcePath.slice(index));
+        return (
+          resourcePath.slice(0, index) + '.' + hashes[resourcePath] +
+          resourcePath.slice(index));
       }
     }
     return resourcePath;
@@ -163,8 +165,9 @@ export class UrlInterpolationService {
     while (match) {
       let currentVarName = match[1];
       if (!escapedInterpolationValues.hasOwnProperty(currentVarName)) {
-        this.alertsService.fatalWarning('Expected variable \'' +
-            currentVarName + '\' when interpolating URL.');
+        this.alertsService.fatalWarning(
+          'Expected variable \'' + currentVarName +
+          '\' when interpolating URL.');
         return null;
       }
       filledUrl = filledUrl.replace(
@@ -220,8 +223,8 @@ export class UrlInterpolationService {
       this.alertsService.fatalWarning(
         'Empty interactionId passed in getInteractionThumbnailImageUrl.');
     }
-    return this.getExtensionResourceUrl('/interactions/' + interactionId +
-        '/static/' + interactionId + '.png');
+    return this.getExtensionResourceUrl(
+      '/interactions/' + interactionId + '/static/' + interactionId + '.png');
   }
 
   /**

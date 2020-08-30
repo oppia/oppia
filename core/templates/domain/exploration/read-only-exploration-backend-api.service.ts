@@ -25,7 +25,8 @@ require(
 angular.module('oppia').factory('ReadOnlyExplorationBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'EXPLORATION_DATA_URL_TEMPLATE', 'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService,
+  function(
+      $http, $q, UrlInterpolationService,
       EXPLORATION_DATA_URL_TEMPLATE, EXPLORATION_VERSION_DATA_URL_TEMPLATE) {
     // Maps previously loaded explorations to their IDs.
     var _explorationCache = [];

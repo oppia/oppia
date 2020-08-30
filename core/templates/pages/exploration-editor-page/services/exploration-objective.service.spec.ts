@@ -21,8 +21,8 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('pages/exploration-editor-page/' +
-  'services/exploration-objective.service.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-objective.service.ts');
 
 describe('Exploration Objective Service', function() {
   let eos = null;

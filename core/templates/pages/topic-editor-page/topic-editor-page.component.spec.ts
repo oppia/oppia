@@ -63,11 +63,11 @@ describe('Topic editor page', function() {
       topicInitializedEventEmitter.emit();
       topicReinitializedEventEmitter.emit();
     });
-    spyOnProperty(TopicEditorStateService,
-      'onTopicInitialized').and.returnValue(
+    spyOnProperty(
+      TopicEditorStateService, 'onTopicInitialized').and.returnValue(
       topicInitializedEventEmitter);
-    spyOnProperty(TopicEditorStateService,
-      'onTopicReinitialized').and.returnValue(
+    spyOnProperty(
+      TopicEditorStateService, 'onTopicReinitialized').and.returnValue(
       topicReinitializedEventEmitter);
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();

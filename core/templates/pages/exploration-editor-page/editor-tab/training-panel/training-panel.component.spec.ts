@@ -132,8 +132,8 @@ describe('Training Panel Component', function() {
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
     $provide.value(
       'StateCustomizationArgsService', stateCustomizationArgsService);
-    $provide.value('StateEditorRefreshService',
-      TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('StateInteractionIdService', stateInteractionIdService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
   }));

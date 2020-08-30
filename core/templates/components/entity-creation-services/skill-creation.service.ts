@@ -18,7 +18,8 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/skill/skill-creation-backend-api.service.ts');
-require('domain/topics_and_skills_dashboard/' +
+require(
+  'domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-backend-api.service.ts');
 require('services/alerts.service.ts');
 require('services/image-local-storage.service.ts');

@@ -65,7 +65,8 @@ angular.module('oppia').component('translationTab', {
     'StateTutorialFirstTimeService', 'StateWrittenTranslationsService',
     'TranslationTabActiveModeService', 'UrlInterpolationService',
     'UserExplorationPermissionsService',
-    function($scope, $templateCache, $uibModal,
+    function(
+        $scope, $templateCache, $uibModal,
         ContextService, EditabilityService, ExplorationStatesService,
         LoaderService, RouterService, SiteAnalyticsService,
         StateEditorService, StateRecordedVoiceoversService,
@@ -93,8 +94,8 @@ angular.module('oppia').component('translationTab', {
         StateRecordedVoiceoversService.init(
           stateName, ExplorationStatesService.getRecordedVoiceoversMemento(
             stateName));
-        StateWrittenTranslationsService.init(stateName,
-          ExplorationStatesService.getWrittenTranslationsMemento(
+        StateWrittenTranslationsService.init(
+          stateName, ExplorationStatesService.getWrittenTranslationsMemento(
             stateName));
         $scope.showTranslationTabSubDirectives = true;
         TranslationTabActiveModeService.activateVoiceoverMode();
@@ -177,7 +178,8 @@ angular.module('oppia').component('translationTab', {
           type: 'element',
           selector: _ID_TUTORIAL_TRANSLATION_LANGUAGE,
           heading: 'Choose Language',
-          text: ('Start your translation by choosing the language that ' +
+          text: (
+            'Start your translation by choosing the language that ' +
             'you want to translate to.'),
           placement: 'bottom'
         }, {
@@ -194,10 +196,11 @@ angular.module('oppia').component('translationTab', {
           type: 'element',
           selector: _ID_TUTORIAL_TRANSLATION_OVERVIEW,
           heading: 'Choose a Card to Translate',
-          text: ('Then, choose a card from the exploration overview by ' +
-          'clicking on the card. The selected card will have ' +
-          'a bolded border. Cards that have missing translations are ' +
-          'coloured yellow or red, and these are good places to start.'),
+          text: (
+            'Then, choose a card from the exploration overview by ' +
+            'clicking on the card. The selected card will have ' +
+            'a bolded border. Cards that have missing translations are ' +
+            'coloured yellow or red, and these are good places to start.'),
           placement: 'left'
         }, {
           type: 'function',
@@ -229,7 +232,8 @@ angular.module('oppia').component('translationTab', {
         }, {
           type: 'title',
           heading: 'Recording Audio',
-          text: ('<p>To create audio translations in Oppia, ' +
+          text: (
+            '<p>To create audio translations in Oppia, ' +
             'simply follow these 3 steps:</p>' +
             '<ol>' +
             '  <li>' +
@@ -264,7 +268,8 @@ angular.module('oppia').component('translationTab', {
         }, {
           type: 'title',
           heading: 'Re-record/Re-upload audio',
-          text: ('<p>The audio recording also has options related ' +
+          text: (
+            '<p>The audio recording also has options related ' +
             'to updating and deleting translations.</p>' +
             '<ul>' +
             '  <li>' +
@@ -312,8 +317,8 @@ angular.module('oppia').component('translationTab', {
             'Thank you for making this lesson more accessible ' +
             'for non-native speakers!')
         }];
-        $templateCache.put('ng-joyride-title-tplv1.html',
-          ngJoyrideTemplate);
+        $templateCache.put(
+          'ng-joyride-title-tplv1.html', ngJoyrideTemplate);
         UserExplorationPermissionsService.getPermissionsAsync()
           .then(function(explorationPermissions) {
             permissions = explorationPermissions;

@@ -32,8 +32,8 @@ import {
   providedIn: 'root'
 })
 export class GraphInputRulesService {
-  constructor(private gus: GraphUtilsService,
-    private utilsService: UtilsService) {}
+  constructor(
+    private gus: GraphUtilsService, private utilsService: UtilsService) {}
   /**
    * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is strongly connected.

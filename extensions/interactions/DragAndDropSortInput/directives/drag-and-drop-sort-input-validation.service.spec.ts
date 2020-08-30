@@ -273,8 +273,8 @@ describe('DragAndDropSortInputValidationService', () => {
     answerGroups[0].updateRuleTypesToInputs(
       [equalsListWithValuesRule, equalsListWithAllowedValuesRule]);
 
-    var warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched ' +
@@ -288,8 +288,8 @@ describe('DragAndDropSortInputValidationService', () => {
     answerGroups[1].updateRuleTypesToInputs(
       [equalsListWithAllowedValuesRule]);
 
-    var warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 1 from answer group 2 will never be matched ' +

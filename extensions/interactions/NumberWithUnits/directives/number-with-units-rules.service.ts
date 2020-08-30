@@ -32,7 +32,8 @@ import { NumberWithUnitsRuleInputs } from 'interactions/rule-input-defs';
   providedIn: 'root'
 })
 export class NumberWithUnitsRulesService {
-  constructor(private unitsObjectFactory: NumberWithUnitsObjectFactory,
+  constructor(
+    private unitsObjectFactory: NumberWithUnitsObjectFactory,
     private utilsService: UtilsService) {
     try {
       this.unitsObjectFactory.createCurrencyUnits();

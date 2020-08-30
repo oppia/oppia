@@ -21,8 +21,8 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('pages/exploration-editor-page/' +
-  'services/user-email-preferences.service.ts');
+require(
+  'pages/exploration-editor-page/services/user-email-preferences.service.ts');
 
 describe('User Email Preferences Service', function() {
   var UserEmailPreferencesService = null;

@@ -40,8 +40,9 @@ describe('RatioExpression', function() {
   it('should initialize ctrl.warningText with non-integer ratio', function() {
     RationExpressionCtrl.isValidRatio('1:1:2.3');
     expect(RationExpressionCtrl.warningText)
-      .toBe('For this question, each element in your ratio should be a ' +
-      'whole number (not a fraction or a decimal).');
+      .toBe(
+        'For this question, each element in your ratio should be a ' +
+        'whole number (not a fraction or a decimal).');
   });
 
   it('should initialize ctrl.warningText with invalid ratio', function() {
@@ -53,8 +54,9 @@ describe('RatioExpression', function() {
   it('should initialize ctrl.warningText with invalid character', function() {
     RationExpressionCtrl.isValidRatio('abc');
     expect(RationExpressionCtrl.warningText)
-      .toBe('Please write a ratio that consists of digits separated by colons' +
-      '(e.g. 1:2 or 1:2:3).');
+      .toBe(
+        'Please write a ratio that consists of digits separated by colons' +
+        '(e.g. 1:2 or 1:2:3).');
   });
 
   it('should initialize ctrl.warningText with empty ratio', function() {

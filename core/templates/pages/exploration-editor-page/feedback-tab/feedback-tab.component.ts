@@ -16,7 +16,8 @@
  * @fileoverview Component for the exploration editor feedback tab.
  */
 
-require('pages/exploration-editor-page/feedback-tab/templates/' +
+require(
+  'pages/exploration-editor-page/feedback-tab/templates/' +
   'create-feedback-thread-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');

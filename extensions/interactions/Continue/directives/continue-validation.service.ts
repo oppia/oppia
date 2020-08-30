@@ -61,7 +61,8 @@ export class ContinueValidationService {
     if (answerGroups.length > 0) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: ('Only the default outcome is necessary for a continue' +
+        message: (
+          'Only the default outcome is necessary for a continue' +
           ' interaction.')
       });
     }
@@ -69,8 +70,8 @@ export class ContinueValidationService {
     if (!defaultOutcome || defaultOutcome.isConfusing(stateName)) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: ('Please specify what Oppia should do after the button' +
-          ' is clicked.')
+        message: (
+          'Please specify what Oppia should do after the button is clicked.')
       });
     }
 
@@ -78,5 +79,5 @@ export class ContinueValidationService {
   }
 }
 
-angular.module('oppia').factory(
-  'ContinueValidationService', downgradeInjectable(ContinueValidationService));
+angular.module('oppia').factory('ContinueValidationService',
+  downgradeInjectable(ContinueValidationService));

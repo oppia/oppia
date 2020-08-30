@@ -48,8 +48,8 @@ describe('Voiceover player', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
 
-    await users.createUser('testVoiceovers@voiceovers.com',
-      'testVoiceovers');
+    await users.createUser(
+      'testVoiceovers@voiceovers.com', 'testVoiceovers');
     await users.login('testVoiceovers@voiceovers.com');
     await workflow.createExploration();
     await explorationEditorMainTab.exitTutorial();

@@ -54,8 +54,8 @@ describe('Library controller', function() {
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('KeyboardShortcutService',
-      TestBed.get(KeyboardShortcutService));
+    $provide.value(
+      'KeyboardShortcutService', TestBed.get(KeyboardShortcutService));
   }));
 
   beforeEach(angular.mock.module('oppia', function($provide) {

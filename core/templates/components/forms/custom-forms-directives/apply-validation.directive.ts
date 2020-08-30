@@ -67,8 +67,7 @@ angular.module('oppia').directive('applyValidation', [
 
             var customValidator = function(viewValue) {
               ctrl.$setValidity(
-                frontendName, $filter(frontendName)(viewValue,
-                  filterArgs));
+                frontendName, $filter(frontendName)(viewValue, filterArgs));
               return viewValue;
             };
 

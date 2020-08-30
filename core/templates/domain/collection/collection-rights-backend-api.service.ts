@@ -41,7 +41,8 @@ export class CollectionRightsBackendApiService {
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) { }
 
-  private _fetchCollectionRights(collectionId: string,
+  private _fetchCollectionRights(
+      collectionId: string,
       successCallback: (value: CollectionRights) => void,
       errorCallback: (reason: string) => void): void {
     let collectionRightsUrl = this.urlInterpolationService
@@ -66,7 +67,8 @@ export class CollectionRightsBackendApiService {
       });
   }
 
-  private _setCollectionStatus(collectionId: string,
+  private _setCollectionStatus(
+      collectionId: string,
       collectionVersion: number,
       isPublic: boolean,
       successCallback: (value: CollectionRights) => void,
@@ -134,8 +136,8 @@ export class CollectionRightsBackendApiService {
           resolve(this.collectionRightsCache[collectionId]);
         }
       } else {
-        this._fetchCollectionRights(collectionId,
-          (collectionRights) => {
+        this._fetchCollectionRights(
+          collectionId, (collectionRights) => {
             // Save the fetched collection rights to avoid future fetches.
             this.collectionRightsCache[collectionId] = collectionRights;
             if (resolve) {
@@ -159,7 +161,8 @@ export class CollectionRightsBackendApiService {
    * Replaces the current collection rights in the cache given by the
    * specified collection ID with a new collection rights object.
    */
-  cacheCollectionRights(collectionId: string,
+  cacheCollectionRights(
+      collectionId: string,
       collectionRights: CollectionRights): void {
     this.collectionRightsCache[collectionId] = collectionRights;
   }
@@ -167,7 +170,8 @@ export class CollectionRightsBackendApiService {
    * Updates a collection's rights to be have public learner access, given
    * its ID and version.
    */
-  setCollectionPublic(collectionId: string,
+  setCollectionPublic(
+      collectionId: string,
       collectionVersion: number): Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
       this._setCollectionStatus(
@@ -179,7 +183,8 @@ export class CollectionRightsBackendApiService {
    * Updates a collection's rights to be have private learner access,
    * given its ID and version.
    */
-  setCollectionPrivate(collectionId: string,
+  setCollectionPrivate(
+      collectionId: string,
       collectionVersion: number): Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
       this._setCollectionStatus(
@@ -188,6 +193,5 @@ export class CollectionRightsBackendApiService {
   }
 }
 
-angular.module('oppia')
-  .factory('CollectionRightsBackendApiService',
-    downgradeInjectable(CollectionRightsBackendApiService));
+angular.module('oppia').factory('CollectionRightsBackendApiService',
+  downgradeInjectable(CollectionRightsBackendApiService));

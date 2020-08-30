@@ -27,8 +27,9 @@ describe('I18nLanguageCodeService', () => {
   let testSubscriptions: Subscription;
   beforeEach(() => {
     testSubscriptions = new Subscription();
-    testSubscriptions.add(i18nLanguageCodeService.onI18nLanguageCodeChange
-      .subscribe(code => languageCode = code));
+    testSubscriptions.add(
+      i18nLanguageCodeService.onI18nLanguageCodeChange
+        .subscribe(code => languageCode = code));
   });
 
   afterEach(() => {

@@ -44,7 +44,8 @@ export class PretestQuestionBackendApiService {
     private http: HttpClient
   ) {}
 
-  _fetchPretestQuestions(explorationId: string, storyUrlFragment: string,
+  _fetchPretestQuestions(
+      explorationId: string, storyUrlFragment: string,
       successCallback: (value: QuestionBackendDict[]) => void,
       errorCallback: (reason: string) => void): void {
     if (
@@ -75,7 +76,8 @@ export class PretestQuestionBackendApiService {
     });
   }
 
-  fetchPretestQuestions(explorationId: string,
+  fetchPretestQuestions(
+      explorationId: string,
       storyUrlFragment: string): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {
       this._fetchPretestQuestions(

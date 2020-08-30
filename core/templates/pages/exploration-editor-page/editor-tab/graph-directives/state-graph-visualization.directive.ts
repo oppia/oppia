@@ -89,7 +89,8 @@ angular.module('oppia').directive('stateGraphVisualization', [
         'ExplorationWarningsService', 'RouterService',
         'StateGraphLayoutService', 'TranslationStatusService',
         'WindowDimensionsService', 'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
-        function($element, $filter, $scope, $timeout,
+        function(
+            $element, $filter, $scope, $timeout,
             ExplorationWarningsService, RouterService,
             StateGraphLayoutService, TranslationStatusService,
             WindowDimensionsService, MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
@@ -126,8 +127,8 @@ angular.module('oppia').directive('stateGraphVisualization', [
               var dimensions = getElementDimensions();
 
               d3.select($element.find('rect.pannable-rect')[0])
-                .call(d3.zoom().scaleExtent([1, 1])
-                  .on('zoom', function() {
+                .call(
+                  d3.zoom().scaleExtent([1, 1]).on('zoom', function() {
                     if (graphBounds.right - graphBounds.left < dimensions.w) {
                       (d3.event).transform.x = 0;
                     } else {
@@ -359,10 +360,10 @@ angular.module('oppia').directive('stateGraphVisualization', [
               nodeData[nodeId].nodeClass = (
                 currentNodeIsTerminal ? 'terminal-node' :
                 nodeId === $scope.currentStateId() ? 'current-node' :
-                nodeId === initStateId ? 'init-node' :
-                !(nodeData[nodeId].reachable &&
+                nodeId === initStateId ? 'init-node' : !(
+                  nodeData[nodeId].reachable &&
                   nodeData[nodeId].reachableFromEnd) ? 'bad-node' :
-                'normal-node');
+                  'normal-node');
 
               nodeData[nodeId].canDelete = (nodeId !== initStateId);
               $scope.nodeList.push(nodeData[nodeId]);

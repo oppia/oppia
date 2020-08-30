@@ -32,7 +32,8 @@ angular.module('oppia').controller(
     'SkillBackendApiService', 'SkillDifficultyObjectFactory',
     'SkillObjectFactory', 'skillId', 'DEFAULT_SKILL_DIFFICULTY',
     'MODE_SELECT_DIFFICULTY',
-    function($controller, $scope, $uibModalInstance, AlertsService,
+    function(
+        $controller, $scope, $uibModalInstance, AlertsService,
         SkillBackendApiService, SkillDifficultyObjectFactory,
         SkillObjectFactory, skillId, DEFAULT_SKILL_DIFFICULTY,
         MODE_SELECT_DIFFICULTY) {

@@ -46,7 +46,8 @@ describe('Editor Navbar Breadcrumb directive', function() {
 
     ExplorationTitleService.init('Exploration Title Example Very Long');
 
-    spyOnProperty(ExplorationPropertyService,
+    spyOnProperty(
+      ExplorationPropertyService,
       'onExplorationPropertyChanged').and.returnValue(
       mockExplorationPropertyChangedEventEmitter);
 

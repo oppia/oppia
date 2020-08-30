@@ -72,16 +72,17 @@ export class SpeechSynthesisChunkerService {
       utterance: SpeechSynthesisUtterance, offset: number,
       callback: () => void): void {
     var newUtterance;
-    var text = (offset !== undefined ?
-      utterance.text.substring(offset) : utterance.text);
+    var text = (
+    offset !== undefined ? utterance.text.substring(offset) : utterance.text);
 
     // This regex pattern finds the next string at most 160
     // characters in length that ends on a punctuation mark in
     // PUNCTUATION_MARKS_TO_END_CHUNKS.
-    var delimitChunkRegex = new RegExp('^[\\s\\S]{' +
-      Math.floor(this.CHUNK_LENGTH / 4) + ',' + this.CHUNK_LENGTH + '}[' +
-      this.PUNCTUATION_MARKS_TO_END_CHUNKS + ']{1}|^[\\s\\S]{1,' +
-      this.CHUNK_LENGTH + '}$|^[\\s\\S]{1,' + this.CHUNK_LENGTH + '} ');
+    var delimitChunkRegex = new RegExp(
+      '^[\\s\\S]{' + Math.floor(this.CHUNK_LENGTH / 4) + ',' +
+      this.CHUNK_LENGTH + '}[' + this.PUNCTUATION_MARKS_TO_END_CHUNKS +
+      ']{1}|^[\\s\\S]{1,' + this.CHUNK_LENGTH + '}$|^[\\s\\S]{1,' +
+      this.CHUNK_LENGTH + '} ');
     var chunkArray = text.match(delimitChunkRegex);
 
     if (chunkArray === null ||
@@ -141,8 +142,8 @@ export class SpeechSynthesisChunkerService {
       // respectively.
       .replace(/(.*)\^(\{*[0-9].+|[0-14-9]\}*)/g, '$1 to the power of $2')
       // Handle simple fractions.
-      .replace(/f\sr\sa\sc\s\{\s*(.+)\s*\}\s\{\s*(.+)\s*\}/g,
-        '$1/$2')
+      .replace(
+        /f\sr\sa\sc\s\{\s*(.+)\s*\}\s\{\s*(.+)\s*\}/g, '$1/$2')
       // If a fraction contains a variable, then say (numerator) 'over'
       // (denominator).
       .replace(/(\d*\D+)\/(\d*\D*)|(\d*\D*)\/(\d*\D+)/g, '$1 over $2')

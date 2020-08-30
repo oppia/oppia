@@ -52,10 +52,12 @@ describe('Question opportunities component', function() {
       SkillOpportunityObjectFactory);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ContributionOpportunitiesBackendApiService',
-      TestBed.get(ContributionOpportunitiesBackendApiService));
-  }));
+  beforeEach(angular.mock.module(
+    'oppia', function($provide) {
+      $provide.value(
+        'ContributionOpportunitiesBackendApiService',
+        TestBed.get(ContributionOpportunitiesBackendApiService));
+    }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');

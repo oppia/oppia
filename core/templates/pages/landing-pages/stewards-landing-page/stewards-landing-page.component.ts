@@ -87,8 +87,8 @@ angular.module('oppia').component('stewardsLandingPage', {
       };
 
       ctrl.getStaticSubjectImageUrl = function(subjectName) {
-        return UrlInterpolationService.getStaticImageUrl('/subjects/' +
-          subjectName + '.svg');
+        return UrlInterpolationService.getStaticImageUrl(
+          '/subjects/' + subjectName + '.svg');
       };
 
       ctrl.onClickButton = function(buttonDefinition) {

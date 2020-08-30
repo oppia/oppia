@@ -203,7 +203,8 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
     };
 
     $scope.isSaveInteractionButtonEnabled = function() {
-      return !!($scope.hasCustomizationArgs &&
+      return !!(
+        $scope.hasCustomizationArgs &&
         $scope.StateInteractionIdService.displayed &&
         $scope.form.schemaForm.$valid &&
         ($scope.getCustomizationArgsWarningsList().length === 0));

@@ -63,13 +63,13 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('displays learners subscriptions', async function() {
-    await users.createUser('learner1@learnerDashboard.com',
-      'learner1learnerDashboard');
+    await users.createUser(
+      'learner1@learnerDashboard.com', 'learner1learnerDashboard');
     var creator1Id = 'creatorName';
     await users.createUser(creator1Id + '@learnerDashboard.com', creator1Id);
     var creator2Id = 'collectionAdm';
-    await users.createUser(creator2Id + '@learnerDashboard.com',
-      creator2Id);
+    await users.createUser(
+      creator2Id + '@learnerDashboard.com', creator2Id);
     await users.login(creator1Id + '@learnerDashboard.com');
     await workflow.createAndPublishExploration(
       'Activations',
@@ -107,8 +107,8 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('displays learner feedback threads', async function() {
-    await users.createUser('learner2@learnerDashboard.com',
-      'learner2learnerDashboard');
+    await users.createUser(
+      'learner2@learnerDashboard.com', 'learner2learnerDashboard');
     await users.createUser(
       'feedbackAdm@learnerDashboard.com', 'feedbackAdmlearnerDashboard');
     await users.login('feedbackAdm@learnerDashboard.com');

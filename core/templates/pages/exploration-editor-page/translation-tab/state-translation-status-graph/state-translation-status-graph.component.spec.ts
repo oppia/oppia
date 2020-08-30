@@ -55,8 +55,8 @@ describe('State Translation Status Graph Component', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AlertsService', TestBed.get(AlertsService));
-    $provide.value('StateEditorRefreshService',
-      TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value(
       'StateRecordedVoiceoversService',
       TestBed.get(StateRecordedVoiceoversService));

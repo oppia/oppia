@@ -53,18 +53,18 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
     };
 
     var renderEarlyQuitIssueSuggestions = function(stateName) {
-      var suggestions = [
-        ('Review the cards up to and including "' + stateName +
-          '" for errors, ' + 'ambiguities, or insufficient motivation.'),
+      var suggestions = [(
+        'Review the cards up to and including "' + stateName +
+        '" for errors, ' + 'ambiguities, or insufficient motivation.'),
       ];
       return suggestions;
     };
 
     var renderMultipleIncorrectIssueSuggestions = function(stateName) {
-      var suggestions = [
-        ('Check the wording of the card "' + stateName + '" to ensure it is ' +
-          'not confusing.'),
-        ('Consider addressing the answers submitted in the sample ' +
+      var suggestions = [(
+        'Check the wording of the card "' + stateName + '" to ensure it is ' +
+        'not confusing.'), (
+        'Consider addressing the answers submitted in the sample ' +
           'playthroughs explicitly using answer groups.'),
       ];
       return suggestions;
@@ -72,10 +72,10 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
 
     var renderCyclicTransitionsIssueSuggestions = function(stateNames) {
       var finalIndex = stateNames.length - 1;
-      var suggestions = [
-        ('Check that the concept presented in "' + stateNames[0] + '" has ' +
-          'been reinforced sufficiently by the time the learner gets to "' +
-          stateNames[finalIndex] + '".'),
+      var suggestions = [(
+        'Check that the concept presented in "' + stateNames[0] + '" has ' +
+        'been reinforced sufficiently by the time the learner gets to "' +
+        stateNames[finalIndex] + '".'),
       ];
       return suggestions;
     };

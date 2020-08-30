@@ -35,7 +35,8 @@ angular.module('oppia').directive('learnerAnswerInfoCard', [
       controller: [
         'ExplorationEngineService', 'ExplorationHtmlFormatterService',
         'LearnerAnswerInfoService', 'PlayerTranscriptService',
-        function(ExplorationEngineService, ExplorationHtmlFormatterService,
+        function(
+            ExplorationEngineService, ExplorationHtmlFormatterService,
             LearnerAnswerInfoService, PlayerTranscriptService) {
           var ctrl = this;
           var interaction = ExplorationEngineService.getState().interaction;

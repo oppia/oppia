@@ -44,9 +44,9 @@ describe('Preview Thumbnail Directive', function() {
       getEntityId: () => '1'
     };
     var MockImageUploadHelperService = {
-      getTrustedResourceUrlForThumbnailFilename: (filename,
-          entityType,
-          entityId) => (entityType + '/' + entityId + '/' + filename)
+      getTrustedResourceUrlForThumbnailFilename: (
+          filename, entityType, entityId) => (
+        entityType + '/' + entityId + '/' + filename)
     };
 
     ctrl = $componentController('previewThumbnail', {

@@ -23,7 +23,8 @@ angular.module('oppia').controller('SelectSkillModalController', [
   '$controller', '$scope', '$uibModalInstance', 'allowSkillsFromOtherTopics',
   'categorizedSkills', 'skillsInSameTopicCount', 'sortedSkillSummaries',
   'untriagedSkillSummaries',
-  function($controller, $scope, $uibModalInstance, allowSkillsFromOtherTopics,
+  function(
+      $controller, $scope, $uibModalInstance, allowSkillsFromOtherTopics,
       categorizedSkills, skillsInSameTopicCount, sortedSkillSummaries,
       untriagedSkillSummaries) {
     $controller('ConfirmOrCancelModalController', {

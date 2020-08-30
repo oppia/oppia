@@ -24,7 +24,8 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
   'EDITABLE_STORY_DATA_URL_TEMPLATE', 'STORY_PUBLISH_URL_TEMPLATE',
   'STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE',
   'VALIDATE_EXPLORATIONS_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService,
+  function(
+      $http, $q, UrlInterpolationService,
       EDITABLE_STORY_DATA_URL_TEMPLATE, STORY_PUBLISH_URL_TEMPLATE,
       STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE,
       VALIDATE_EXPLORATIONS_URL_TEMPLATE) {

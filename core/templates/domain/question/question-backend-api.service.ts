@@ -92,7 +92,8 @@ export class QuestionBackendApiService {
     });
   }
 
-  private _fetchTotalQuestionCountForSkillIds(skillIds: string[],
+  private _fetchTotalQuestionCountForSkillIds(
+      skillIds: string[],
       successCallback: (value: number) => void,
       errorCallback: (reason: string) => void): void {
     var questionsCountUrl = this.urlInterpolationService.interpolateUrl(

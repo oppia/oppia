@@ -123,8 +123,9 @@ describe('Full exploration editor', function() {
     await users.createUser(
       'creator2@editorAndPlayer.com', 'creator2EditorAndPlayer');
     await users.login('creator2@editorAndPlayer.com');
-    await workflow.createAndPublishExploration('Adding Fractions',
-      'Mathematics', 'Let us learn how to add fractions', 'English');
+    await workflow.createAndPublishExploration(
+      'Adding Fractions', 'Mathematics', 'Let us learn how to add fractions',
+      'English');
     await users.logout();
 
     await users.createUser('learner2@editorAndPlayer.com', 'learner2');
@@ -465,8 +466,8 @@ describe('Full exploration editor', function() {
 
   it('should play the recommended exploration successfully', async function() {
     await users.createUser('user9@editorAndPlayer.com', 'user9editorAndPlayer');
-    await users.createUser('user10@editorAndPlayer.com',
-      'user10editorAndPlayer');
+    await users.createUser(
+      'user10@editorAndPlayer.com', 'user10editorAndPlayer');
     await users.login('user9@editorAndPlayer.com');
     // Publish new exploration.
     await workflow.createExploration();

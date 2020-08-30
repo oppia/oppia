@@ -37,7 +37,8 @@ describe('Voiceover opportunities component', function() {
   var activeLanguageChangedEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ContributionOpportunitiesBackendApiService',
+    $provide.value(
+      'ContributionOpportunitiesBackendApiService',
       TestBed.get(ContributionOpportunitiesBackendApiService));
     $provide.value('LanguageUtilService', TestBed.get(LanguageUtilService));
   }));

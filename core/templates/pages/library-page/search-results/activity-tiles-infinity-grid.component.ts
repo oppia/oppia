@@ -25,10 +25,9 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('activityTilesInfinityGrid', {
   template: require('./activity-tiles-infinity-grid.component.html'),
   controller: [
-    '$scope', 'LoaderService', 'SearchService',
-    'WindowDimensionsService',
-    function($scope, LoaderService, SearchService,
-        WindowDimensionsService) {
+    '$scope', 'LoaderService', 'SearchService', 'WindowDimensionsService',
+    function(
+        $scope, LoaderService, SearchService, WindowDimensionsService) {
       var ctrl = this;
       ctrl.loadingMessage = '';
       ctrl.directiveSubscriptions = new Subscription();
@@ -48,8 +47,9 @@ angular.module('oppia').component('activityTilesInfinityGrid', {
         }
       };
       ctrl.$onInit = function() {
-        ctrl.directiveSubscriptions.add(LoaderService.onLoadingMessageChange
-          .subscribe((message: string) => this.loadingMessage = message));
+        ctrl.directiveSubscriptions.add(
+          LoaderService.onLoadingMessageChange.subscribe(
+            (message: string) => this.loadingMessage = message));
         // Called when the first batch of search results is retrieved from
         // the server.
         ctrl.directiveSubscriptions.add(

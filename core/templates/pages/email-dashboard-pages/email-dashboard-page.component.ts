@@ -23,10 +23,9 @@ require('services/user.service.ts');
 angular.module('oppia').component('emailDashboardPage', {
   template: require('./email-dashboard-page.component.html'),
   controller: [
-    '$rootScope', 'EmailDashboardDataService', 'LoaderService',
-    'UserService',
-    function($rootScope, EmailDashboardDataService, LoaderService,
-        UserService) {
+    '$rootScope', 'EmailDashboardDataService', 'LoaderService', 'UserService',
+    function(
+        $rootScope, EmailDashboardDataService, LoaderService, UserService) {
       var ctrl = this;
       ctrl.resetForm = function() {
         ctrl.hasNotLoggedInForNDays = null;
