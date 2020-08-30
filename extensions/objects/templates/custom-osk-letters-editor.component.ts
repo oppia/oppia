@@ -62,7 +62,7 @@ angular.module('oppia').component('customOskLettersEditor', {
         } else {
           ctrl.value.splice(index, 1);
         }
-        GuppyInitializationService.customOskLetters = ctrl.value;
+        GuppyInitializationService.setCustomOskLetters(ctrl.value);
       };
 
       ctrl.getRemainingLettersCount = function() {

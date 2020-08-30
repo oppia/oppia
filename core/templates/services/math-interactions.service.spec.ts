@@ -106,6 +106,18 @@ describe('MathInteractionsService', () => {
       'characters x,y,z in your answer.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
+      'ae^2 + 4b', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'You have entered an invalid character: e. Please use only the ' +
+      'characters a,b in your answer.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'xyz + pi', ['x', 'y', 'z'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'You have entered an invalid character: pi. Please use only the ' +
+      'characters x,y,z in your answer.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
       'aalpha/2beta', ['alpha', 'beta', 'gamma'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'You have entered an invalid character: a. Please use only the ' +

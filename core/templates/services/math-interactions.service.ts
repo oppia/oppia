@@ -123,8 +123,15 @@ export class MathInteractionsService {
       return false;
     }
 
-    let variablesList = nerdamer(this.insertMultiplicationSigns(
-      expressionString)).variables();
+    expressionString = this.insertMultiplicationSigns(expressionString);
+    let variablesList = nerdamer(expressionString).variables();
+    // Explicitly checking for presence of constants (pi and e).
+    if (expressionString.match(/(^|\W)e($|\W)/g)) {
+      variablesList.push('e');
+    }
+    if (expressionString.match(/(^|\W)pi($|\W)/g)) {
+      variablesList.push('pi');
+    }
     if (variablesList.length === 0) {
       this.warningText = 'It looks like you have entered only ' +
       'numbers. Make sure to include the necessary variables' +
