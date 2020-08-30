@@ -26,7 +26,8 @@ require('services/stateful/focus-manager.service.ts');
 angular.module('oppia').controller('FlagExplorationModalController', [
   '$controller', '$scope', '$uibModalInstance', 'FocusManagerService',
   'PlayerPositionService',
-  function($controller, $scope, $uibModalInstance, FocusManagerService,
+  function(
+      $controller, $scope, $uibModalInstance, FocusManagerService,
       PlayerPositionService) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,

@@ -190,8 +190,9 @@ angular.module('oppia').directive('questionEditor', [
             var writtenTranslations = state.writtenTranslations;
             var updateQuestion = _updateQuestion;
 
-            const shouldPrompt = contentIds.some(contentId =>
-              recordedVoiceovers.hasUnflaggedVoiceovers(contentId));
+            const shouldPrompt = contentIds.some(
+              contentId =>
+                recordedVoiceovers.hasUnflaggedVoiceovers(contentId));
             if (shouldPrompt) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

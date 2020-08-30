@@ -33,8 +33,8 @@ export interface QuestionBackendDict {
 angular.module('oppia').factory('QuestionObjectFactory', [
   'StateObjectFactory', 'DEFAULT_LANGUAGE_CODE', 'INTERACTION_SPECS',
   function(StateObjectFactory, DEFAULT_LANGUAGE_CODE, INTERACTION_SPECS) {
-    var Question = function(id, stateData, languageCode, version,
-        linkedSkillIds) {
+    var Question = function(
+        id, stateData, languageCode, version, linkedSkillIds) {
       this._id = id;
       this._stateData = stateData;
       this._languageCode = languageCode;
