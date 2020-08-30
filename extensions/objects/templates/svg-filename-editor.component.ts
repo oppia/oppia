@@ -416,8 +416,8 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       var loadGroupedObject = function(objId, obj, groupedObjects) {
-        // Checks the first five characters of the id to identify the
-        // svg objects that are grouped together.
+        // Checks if the id starts with 'group' to identify whether the
+        // svg objects are grouped together.
         if (objId.startsWith('group')) {
           // The objId is of the form "group" + number.
           var groupId = parseInt(objId.slice(5));
@@ -1007,6 +1007,24 @@ angular.module('oppia').component('svgFilenameEditor', {
         return Boolean(ctrl.drawMode === DRAW_MODE_PIECHART);
       };
 
+      var loadSvgFile = function(objects) {
+        if (ctrl.loadType === 'group') {
+          objects.forEach(function(obj) {
+            obj.set({
+              id: 'group' + ctrl.groupCount
+            });
+            obj.toSVG = ctrl.createCustomToSVG(
+              obj.toSVG, obj.type, obj.id);
+          });
+          ctrl.canvas.add(new fabric.Group(objects));
+          ctrl.groupCount += 1;
+        } else {
+          objects.forEach(function(obj) {
+            ctrl.canvas.add(obj);
+          });
+        }
+      };
+
       ctrl.uploadSvgFile = function() {
         if (ctrl.drawMode === DRAW_MODE_NONE) {
           ctrl.canvas.discardActiveObject();
@@ -1015,23 +1033,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.drawMode = DRAW_MODE_NONE;
           if (ctrl.uploadedSvgDataUrl !== null) {
             var svgString = atob(ctrl.uploadedSvgDataUrl.split(',')[1]);
-            fabric.loadSVGFromString(svgString, function(objects) {
-              if (ctrl.loadType === 'group') {
-                objects.forEach(function(obj) {
-                  obj.set({
-                    id: 'group' + ctrl.groupCount
-                  });
-                  obj.toSVG = ctrl.createCustomToSVG(
-                    obj.toSVG, obj.type, obj.id);
-                });
-                ctrl.canvas.add(new fabric.Group(objects));
-                ctrl.groupCount += 1;
-              } else {
-                objects.forEach(function(obj) {
-                  ctrl.canvas.add(obj);
-                });
-              }
-            });
+            fabric.loadSVGFromString(svgString, loadSvgFile);
           }
           ctrl.canvas.renderAll();
           ctrl.uploadedSvgDataUrl = null;
