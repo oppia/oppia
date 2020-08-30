@@ -470,6 +470,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         // The text moves to the right everytime the svg is
         // rendered so this is to ensure that the text doesn't
         // render outside the canvas.
+        // https://github.com/fabricjs/fabric.js/issues/1280
         if (text.left > CANVAS_WIDTH) {
           text.set({
             left: CANVAS_WIDTH
