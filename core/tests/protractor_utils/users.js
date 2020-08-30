@@ -35,7 +35,6 @@ var login = async function(email, isSuperAdmin = false) {
     await (await driver.findElement(protractor.By.name('admin'))).click();
   }
   await (await driver.findElement(protractor.By.id('submit-login'))).click();
-  await waitFor.pageToFullyLoad();
 };
 
 var logout = async function() {
@@ -54,6 +53,7 @@ var _completeSignup = async function(username) {
   await browser.waitForAngularEnabled(false);
   await browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
   await browser.waitForAngularEnabled(true);
+  await waitFor.pageToFullyLoad();
   var usernameInput = element(by.css('.protractor-test-username-input'));
   var agreeToTermsCheckbox = element(
     by.css('.protractor-test-agree-to-terms-checkbox'));
