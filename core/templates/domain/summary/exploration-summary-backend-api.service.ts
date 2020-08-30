@@ -34,10 +34,10 @@ export class ExplorationSummaryBackendApiService {
     private alertsService: AlertsService,
     private validatorsService: ValidatorsService) {}
 
-  _fetchExpSummaries(explorationIds: Array<string>,
+  _fetchExpSummaries(explorationIds: string[],
       includePrivateExplorations: boolean,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: Array<string>) => void): void {
+      errorCallback: (reason?: string[]) => void): void {
     if (!explorationIds.every(expId =>
       this.validatorsService.isValidExplorationId(expId, true))) {
       this.alertsService.addWarning('Please enter a valid exploration ID.');
@@ -58,7 +58,7 @@ export class ExplorationSummaryBackendApiService {
         include_private_explorations: JSON.stringify(
           includePrivateExplorations)
       }
-    }).toPromise().then((response: Array<Object>) => {
+    }).toPromise().then((response: Object[]) => {
       var summaries = angular.copy(response);
       try {
         if (successCallback) {
@@ -67,7 +67,7 @@ export class ExplorationSummaryBackendApiService {
               'Summaries fetched are null for explorationIds: ' + explorationIds
             );
             throw new Error(summariesError);
-          } else if ( typeof (summaries) === 'string') {
+          } else if (typeof (summaries) === 'string') {
             var fetchingError =
             'Error on loading public exploration summaries.';
             throw new Error(fetchingError);
@@ -87,14 +87,14 @@ export class ExplorationSummaryBackendApiService {
   }
 
   loadPublicAndPrivateExplorationSummaries(
-      explorationIds: Array<string>): Promise<Object> {
+      explorationIds: string[]): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchExpSummaries(explorationIds, true, resolve, reject);
     });
   }
 
   loadPublicExplorationSummaries(
-      explorationIds: Array<string>): Promise<Object> {
+      explorationIds: string[]): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchExpSummaries(explorationIds, false, resolve, reject);
     });
