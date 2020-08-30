@@ -72,7 +72,7 @@ angular.module('oppia').component('customOskLettersEditor', {
       ctrl.isCustomizationArgOpen = function() {
         return document.getElementsByClassName(
           'custom-letters-div').length !== 0;
-      }
+      };
 
       ctrl.keyDownCallBack = function(e) {
         if (ctrl.isCustomizationArgOpen()) {
