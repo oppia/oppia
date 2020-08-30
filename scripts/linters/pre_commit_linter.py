@@ -118,6 +118,8 @@ _PATHS_TO_INSERT = [
         _PARENT_DIR, 'oppia_tools', 'Pillow-%s' % common.PILLOW_VERSION),
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'psutil-%s' % common.PSUTIL_VERSION),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools', 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
     os.path.join('third_party', 'backports.functools_lru_cache-1.6.1'),
     os.path.join('third_party', 'beautifulsoup4-4.9.1'),
     os.path.join('third_party', 'bleach-3.1.5'),

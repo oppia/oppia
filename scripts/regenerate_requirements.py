@@ -28,13 +28,20 @@ import os
 import sys
 import re
 
-
-sys.path.insert(0, os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION))
-
 def main():
+    # This code is copied from the pip-compile script. We cannot use the
+    # pip-compile script because we installed pip-tools to our own local
+    # oppia_tools directory.
+    #
+    # In a normal installation, piptools adds the pip-compile script to the
+    # user's bin directory and the pip-tools libraries to one of the default
+    # python system path directories so that the pip-compile script can import
+    # scripts.compile correctly. However, since we are installing piptools to a
+    # local directory, the pip-compile script will not be able to find the
+    # pip tools python packages. Therefore, we need to write our own and
+    # manually add our local pip-tools directory to the system path in order to
+    # import their libraries correctly.
     from piptools.scripts import compile
-
     sys.argv[0] = re.sub(
         r'(-script\.pyw|\.exe)?$', '',
         common.PRE_COMPILED_REQUIREMENTS_FILE_PATH)

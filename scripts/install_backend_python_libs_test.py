@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/install_backend_python_libs.py."""
+"""Unit tests for 'scripts/install_backend_python_libs.py'."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -31,7 +31,7 @@ from scripts import common
 from scripts import install_backend_python_libs
 
 class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
-    """Test the methods for installing backend python libs."""
+    """Test the script for installing backend python libs."""
 
     THIRD_PARTY_DATA_FILE_PATH = os.path.join(
         common.CURR_DIR, 'core', 'tests', 'data', 'third_party')

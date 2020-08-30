@@ -28,17 +28,16 @@ import sys
 import python_utils
 from scripts import common
 
-
-THIRD_PARTY_DIR = os.path.join('.', 'third_party')
-THIRD_PARTY_STATIC_DIR = os.path.join(THIRD_PARTY_DIR, 'static')
-
-PIP_TOOLS_DIR = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION)
-
 # TODO: WHy we don't care about the pip version on the developers local machine?
 
-
 def _get_requirements_file_contents():
+    """Returns a dictionary containing all of the required library names with
+    their corresponding version strings listed in the 'requirements.txt' file.
+
+    Returns:
+        dict(string, string). Dictionary with the name of the library as the key
+        and the version string of that library as the value.
+    """
     requirements_contents = collections.defaultdict()
     with python_utils.open_file(common.REQUIREMENTS_FILE_PATH, 'r') as f:
         lines = f.readlines()
@@ -54,6 +53,13 @@ def _get_requirements_file_contents():
 
 
 def _get_third_party_directory_contents():
+    """Returns a dictionary representing all of the libraries with their
+    corresponding versions installed in the 'third_party/python_libs' directory.
+
+    Returns:
+        dict(string, string). Dictionary with the name of the library installed
+        as the key and the version string of that library as the value.
+    """
     installed_distributions = misc.get_installed_distributions(
         skip=[], paths=[common.THIRD_PARTY_PYTHON_LIBS_DIR])
     directory_contents = collections.defaultdict()
@@ -67,6 +73,32 @@ def _get_third_party_directory_contents():
 
 
 def get_mismatches():
+    """Returns a dictionary containing mismatches between the 'requirements.txt'
+    file and the 'third_party/python_libs' directory. Mismatches are defined as
+    the following inconsistencies:
+        1. A library exists in the requirements file but is not installed in the
+           'third_party/python_libs' directory.
+        2. A library is installed in the 'third_party/python_libs'
+           directory but it is not listed in the requirements file.
+        3. The library version installed is not as recent as the library version
+           listed in the requirements file.
+        4. The library version installed is more recent than the library version
+           listed in the requirements file.
+
+    Returns:
+        dict(string, tuple(string|None, string|None)). Dictionary with the
+        library names as keys and a tuple for values. The 1st element of the
+        tuple is the version string of the library required by the
+        requirements.txt file while the 2nd element is the version string of
+        the library currently in the 'third_party/python_libs' directory. If
+        the library doesn't exist, the tuple element will be None.
+        For example, the following dictionary signifies that 'requirements.txt'
+        requires flask with version 1.0.1 while the 'third_party/python_libs'
+        directory contains flask 1.1.1 (or mismatch 4 above):
+            {
+              flask: ('1.0.1', '1.1.1')
+            }
+    """
     requirements_contents = _get_requirements_file_contents()
     directory_contents = _get_third_party_directory_contents()
 
@@ -94,6 +126,14 @@ def get_mismatches():
 
 
 def _remove_metadata(library, version):
+    """Removes the residual metadata files pertaining to a specific library that
+    was reinstalled with a new version. The reason we need this function is
+    because `pip install --upgrade` upgrades the library to the new version but
+    does not remove the metadata that was installed with the previous version.
+    These metadata files confuse the pip function that extracts all of the
+    information about currently installed libraries and will cause this install
+    script to not behave correctly.
+    """
     # The possible strings that a metadata directory or file name can
     # start with.
     possible_filename_start_strings = [
@@ -113,6 +153,24 @@ def _remove_metadata(library, version):
 
 
 def _rectify_third_party_directory(mismatches):
+    """Rectifies the 'third_party/python_libs' directory to reflect the current
+    'requirements.txt' file. It takes a list of mismatches and corrects those
+    mismatches by installing or uninstalling the packages.
+
+    Args:
+        mismatches: dict(string, tuple(string|None, string|None)). Dictionary
+        with the library names as keys and a tuple for values. The 1st element
+        of the tuple is the version string of the library required by the
+        requirements.txt file while the 2nd element is the version string of the
+        library currently in the  'third_party/python_libs' directory. If the
+        library doesn't exist, the tuple element will be None.
+        For example, this dictionary signifies that 'requirements.txt'
+        requires flask with version 1.0.1 while the 'third_party/python_libs'
+        directory contains flask 1.1.1:
+            {
+              flask: ('1.0.1', '1.1.1')
+            }
+    """
     # Handling 5 or more mismatches requires 5 or more individual `pip install`
     # commands which is slower than just reinstalling all of the libraries using
     # `pip install -r requirements.txt`.
@@ -175,9 +233,13 @@ def _rectify_third_party_directory(mismatches):
 
 
 def main():
-    sys.path.insert(0, os.path.join(
-        common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION))
     python_utils.PRINT('Regenerating "requirements.txt" file...')
+    # Calls the script to regenerate requirements. The reason we cannot call the
+    # regenerate requirements functionality inline is because the python script
+    # that regenerates the file is a cli. Once the cli finishes execution, it
+    # forces itself and any python scripts in the current callstack to exit.
+    # Therefore, in order to continue execution after the requirements file is
+    # generated, we must call it as a separate process.
     subprocess.check_call(
         ['python', '-m', 'scripts.regenerate_requirements'],
         stdin=subprocess.PIPE,

@@ -411,7 +411,6 @@ def main(args=None):
     unused_parsed_args = _PARSER.parse_args(args=args)
     install_backend_python_libs.main()
     download_manifest_files(MANIFEST_FILE_PATH)
-
     install_redis_cli()
 
 
