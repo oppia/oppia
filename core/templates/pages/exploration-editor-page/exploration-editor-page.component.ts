@@ -497,9 +497,9 @@ angular.module('oppia').component('explorationEditorPage', {
           windowClass: 'oppia-help-modal'
         }).result.then(mode => {
           if (mode === EDITOR_TUTORIAL_MODE) {
-            $rootScope.$broadcast('openEditorTutorial');
+            StateTutorialFirstTimeService.onOpenEditorTutorial.emit();
           } else if (mode === TRANSLATION_TUTORIAL_MODE) {
-            $rootScope.$broadcast('openTranslationTutorial');
+            StateTutorialFirstTimeService.onOpenTranslationTutorial.emit();
           }
         }, () => {
           // Note to developers:

@@ -78,9 +78,10 @@ describe('Classroom page functionality', function() {
       await classroomPage.get('math');
       await classroomPage.expectNumberOfTopicsToBe(0);
       await topicsAndSkillsDashboardPage.get();
-      (await
-      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-        'Skill 1', 'Concept card explanation', false));
+      (
+        await
+        topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+          'Skill 1', 'Concept card explanation', false));
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
       await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);

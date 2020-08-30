@@ -25,10 +25,10 @@ require(
 require('directives/angular-html-bind.directive.ts');
 require('services/bottom-navbar-status.service.ts');
 require('pages/topic-editor-page/editor-tab/topic-editor-tab.directive.ts');
-require('pages/topic-editor-page/subtopic-editor/' +
-    'subtopic-preview-tab.component.ts');
-require('pages/topic-editor-page/subtopic-editor/' +
-    'subtopic-editor-tab.component.ts');
+require(
+  'pages/topic-editor-page/subtopic-editor/subtopic-preview-tab.component.ts');
+require(
+  'pages/topic-editor-page/subtopic-editor/subtopic-editor-tab.component.ts');
 require(
   'pages/topic-editor-page/questions-tab/topic-questions-tab.directive.ts');
 
@@ -60,7 +60,8 @@ angular.module('oppia').directive('topicEditorPage', [
         'ContextService', 'PageTitleService', 'EntityCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'UndoRedoService', 'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE',
-        function($scope, $window, AlertsService, BottomNavbarStatusService,
+        function(
+            $scope, $window, AlertsService, BottomNavbarStatusService,
             ContextService, PageTitleService, EntityCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
             UndoRedoService, UrlService, TOPIC_VIEWER_URL_TEMPLATE) {

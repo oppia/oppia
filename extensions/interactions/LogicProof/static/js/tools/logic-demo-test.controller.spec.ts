@@ -56,10 +56,10 @@ describe('Logic demo test', function() {
       var line = 1;
       $scope.displayMessage(message, line);
 
-      expect($scope.proofError).toBe(' \n' +
-      'This is a mocked message to test the display message method' +
-      ' through \nunit tests and check if this message is going to be break' +
-      ' into lines \nthat has up to 70 lines.\n');
+      expect($scope.proofError).toBe(
+        ' \n' + 'This is a mocked message to test the display message method' +
+        ' through \nunit tests and check if this message is going to be break' +
+        ' into lines \nthat has up to 70 lines.\n');
     });
 
   it('should edit a proof', function() {
@@ -90,8 +90,8 @@ describe('Logic demo test', function() {
       ' have Q\u2227P\n');
     $scope.editProof();
 
-    expect($scope.proofError).toBe(' \n' +
-      'Checking if submit proof function will throw an error if' +
+    expect($scope.proofError).toBe(
+      ' \n' + 'Checking if submit proof function will throw an error if' +
       ' checkProof \nthrow an error as well and then this message' +
       ' should be formatted.\n');
 
@@ -125,8 +125,8 @@ describe('Logic demo test', function() {
     ));
 
     $scope.submitProof();
-    expect($scope.proofError).toBe(' \n' +
-      'Checking if submit proof function will throw an error if' +
+    expect($scope.proofError).toBe(
+      ' \n' + 'Checking if submit proof function will throw an error if' +
       ' checkProof \nthrow an error as well and then this message' +
       ' should be formatted.\n');
     expect($scope.checkSuccess).toBe(false);
