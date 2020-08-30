@@ -10,7 +10,8 @@
     "angular",
     "html",
     "unused-imports",
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "oppia"
   ],
   "overrides": [{
     // We exclude test files from dependency injection format checks because
@@ -21,6 +22,7 @@
     }
   }],
   "rules": {
+    "oppia/break-after-parens": "error",
     "angular/di": [
       "error",
       "array"

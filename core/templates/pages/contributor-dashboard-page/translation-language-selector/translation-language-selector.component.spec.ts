@@ -97,8 +97,9 @@ describe('Translation language selector', () => {
   }));
 
   it('should correctly initialize dropdown activeLanguageCode', () => {
-    const dropdown = (fixture.nativeElement
-      .querySelector('.oppia-translation-language-selector-inner-container'));
+    const dropdown = (
+      fixture.nativeElement.querySelector(
+        '.oppia-translation-language-selector-inner-container'));
 
     expect(dropdown.firstChild.textContent.trim()).toBe('English');
   });

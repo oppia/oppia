@@ -41,7 +41,8 @@ angular.module('oppia').component('svgFilenameEditor', {
     'DeviceInfoService', 'ImageLocalStorageService', 'ImagePreloaderService',
     'ImageUploadHelperService', 'UrlInterpolationService',
     'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
-    function($http, $q, $sce, $scope, AlertsService,
+    function(
+        $http, $q, $sce, $scope, AlertsService,
         AssetsBackendApiService, ContextService, CsrfTokenService,
         DeviceInfoService, ImageLocalStorageService, ImagePreloaderService,
         ImageUploadHelperService, UrlInterpolationService,
