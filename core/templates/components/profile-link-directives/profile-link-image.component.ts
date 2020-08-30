@@ -55,10 +55,9 @@ export class ProfileLinkImageComponent implements OnInit {
     // image if user is not logged in or has not uploaded a profile
     // picture, or the player is in preview mode.
     this.profileLinkImageBackendApiService.fetchProfilePictureData(
-      this.profileImageUrl).then((profilePicture) => {
+      this.profileImageUrl).then((base64ProfilePicture: string) => {
       this.profilePicture = (
-        profilePicture ||
-        DEFAULT_PROFILE_IMAGE_PATH);
+        base64ProfilePicture || DEFAULT_PROFILE_IMAGE_PATH);
     });
   }
 }

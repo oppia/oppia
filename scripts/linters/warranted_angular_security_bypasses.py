@@ -19,11 +19,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # isort:skip pylint: disable=import-only-modules
 
-# Contains the tuples of all files that bypasses angular's security mechanisms.
+# Contains the tuples of all files that bypasses angular's SECURITY mechanisms.
 # Please keep the list in alphabetical order.
-# NOTE TO DEVELOPERS: do not add any new files to the tuples without asking
-#  @seanlip first. You will have to explain the usage in the pr and the pr may
-#  have a longer review time. This is becasue the reviewers will have to ensure
+# NOTE TO DEVELOPERS: DO NOT ADD ANY NEW FILES TO THE TUPLES WIHTOUT ASKING
+#  @seanlip FIRST. You will have to explain the usage in the PR and the PR may
+#  have a longer review time. This is because the reviewers will have to ensure
 #  that the introduction of bypassSecurityTrust was the only option.
 
 EXCULDED_BYPASS_SECURTIY_TRUST_FILES = ()

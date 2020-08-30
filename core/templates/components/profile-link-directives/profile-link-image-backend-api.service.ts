@@ -36,6 +36,8 @@ export class ProfileLinkImageBackendApiService {
 
   fetchProfilePictureData(profileImageUrl: string): Promise<string> {
     return this.http.get<ProfileDict>(profileImageUrl).pipe(
+      // A URL encoded base64 image was treated as unsafe by Angular.
+      // So decoding the image here.
       map(response => decodeURIComponent(
         response.profile_picture_data_url_for_username))).toPromise();
   }
