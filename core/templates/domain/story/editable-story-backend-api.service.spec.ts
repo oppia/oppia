@@ -23,7 +23,6 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/editable-story-backend-api.service.ts');
 require('services/csrf-token.service.ts');
 
