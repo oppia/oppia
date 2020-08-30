@@ -323,5 +323,9 @@ export class PlatformFeatureService {
   }
 }
 
+export const platformFeatureInitFactory = (service: PlatformFeatureService) => {
+  return (): Promise<void> => service.initialize();
+};
+
 angular.module('oppia').factory(
   'PlatformFeatureService', downgradeInjectable(PlatformFeatureService));
