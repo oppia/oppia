@@ -26,9 +26,4 @@ interface Window {
     $: JQueryStatic;
     Base64Binary: Base64Binary;
     jQuery: JQueryStatic;
-    Zone: {
-      root: {
-        run: (fn: () => void) => void;
-      }
-    };
 }

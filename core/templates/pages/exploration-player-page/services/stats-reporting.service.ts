@@ -19,7 +19,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { ContextService } from 'services/context.service';
 import { MessengerService } from 'services/messenger.service';
 import { PlaythroughService } from 'services/playthrough.service';
@@ -39,8 +38,7 @@ export class StatsReportingService {
       private playthroughService: PlaythroughService,
       private siteAnalyticsService: SiteAnalyticsService,
       private statsReportingBackendApiService: StatsReportingBackendApiService,
-      private stopwatchObjectFactory: StopwatchObjectFactory,
-      private window: WindowRef) {
+      private stopwatchObjectFactory: StopwatchObjectFactory) {
     StatsReportingService.editorPreviewMode = (
       this.contextService.isInExplorationEditorPage());
     StatsReportingService.questionPlayerMode = (
@@ -96,12 +94,9 @@ export class StatsReportingService {
   }
 
   private startStatsTimer(): void {
-    const rootZone = this.window.nativeWindow.Zone.root;
     if (!StatsReportingService.editorPreviewMode &&
       !StatsReportingService.questionPlayerMode) {
-      rootZone.run(() => {
-        setInterval(() => this.postStatsToBackend(), 300000);
-      });
+      setInterval(() => this.postStatsToBackend(), 300000);
     }
   }
 

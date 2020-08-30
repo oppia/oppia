@@ -47,9 +47,6 @@ angular.module('oppia').directive('oppiaRoot', ['$translate',
 
             // The next line allows the transcluded content to start executing.
             $scope.initialized = true;
-            // $scope.$apply statement is needed here since the $scope.onInit
-            // method is triggered when a promise resolves.
-            $scope.$apply();
           };
         }]
     };
