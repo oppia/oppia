@@ -51,8 +51,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         self.question = self.save_new_question(
             self.QUESTION_ID, self.albert_id,
-            self._create_valid_question_data('ABC'), [self.skill_id],
-            ['skill-1', 'skill-2'])
+            self._create_valid_question_data('ABC'), [self.skill_id])
 
     def test_migration_job_does_not_convert_up_to_date_question(self):
         """Tests that the question migration job does not convert a
@@ -126,8 +125,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         """
         # Generate question with old(v27) state data.
         self.save_new_question_with_state_data_schema_v27(
-            self.QUESTION_ID, self.albert_id, [self.skill_id],
-            ['skill-1', 'skill-2'])
+            self.QUESTION_ID, self.albert_id, [self.skill_id])
         question = (
             question_services.get_question_by_id(self.QUESTION_ID))
         self.assertEqual(

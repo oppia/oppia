@@ -287,8 +287,7 @@ class TopicPageDataHandlerTests(
             question_id = question_services.get_new_question_id()
             self.save_new_question(
                 question_id, self.admin_id,
-                self._create_valid_question_data(index), [self.skill_id_1],
-                ['skill-1', 'skill-2'])
+                self._create_valid_question_data(index), [self.skill_id_1])
             question_services.create_new_question_skill_link(
                 self.admin_id, question_id, self.skill_id_1, 0.5)
         json_response = self.get_json(
@@ -338,8 +337,7 @@ class TopicPageDataHandlerTests(
             question_id = question_services.get_new_question_id()
             self.save_new_question(
                 question_id, self.admin_id,
-                self._create_valid_question_data(index), [self.skill_id_1],
-                ['skill-1', 'skill-2'])
+                self._create_valid_question_data(index), [self.skill_id_1])
             question_services.create_new_question_skill_link(
                 self.admin_id, question_id, self.skill_id_1, 0.5)
         json_response = self.get_json(
@@ -395,8 +393,7 @@ class TopicPageDataHandlerTests(
                 question_id = question_services.get_new_question_id()
                 self.save_new_question(
                     question_id, self.admin_id,
-                    self._create_valid_question_data(j), [skill_ids[i]],
-                    ['skill-1', 'skill-2'])
+                    self._create_valid_question_data(j), [skill_ids[i]])
                 question_services.create_new_question_skill_link(
                     self.admin_id, question_id, skill_ids[i], 0.5)
 
@@ -444,8 +441,7 @@ class TopicPageDataHandlerTests(
                 question_id = question_services.get_new_question_id()
                 self.save_new_question(
                     question_id, self.admin_id,
-                    self._create_valid_question_data(j), [skill_ids[i]],
-                    ['skill-1', 'skill-2'])
+                    self._create_valid_question_data(j), [skill_ids[i]])
                 question_services.create_new_question_skill_link(
                     self.admin_id, question_id, skill_ids[i], 0.5)
 
@@ -495,8 +491,7 @@ class TopicPageDataHandlerTests(
                 question_id = question_services.get_new_question_id()
                 self.save_new_question(
                     question_id, self.admin_id,
-                    self._create_valid_question_data(j), [skill_ids[i]],
-                    ['skill-1', 'skill-2'])
+                    self._create_valid_question_data(j), [skill_ids[i]])
                 question_services.create_new_question_skill_link(
                     self.admin_id, question_id, skill_ids[i], 0.5)
 

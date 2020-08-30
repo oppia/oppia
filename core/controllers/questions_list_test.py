@@ -70,7 +70,7 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
             self.save_new_question(
                 question_id, self.admin_id,
                 self._create_valid_question_data('ABC'),
-                [self.skill_id, self.skill_id_2], ['skill-1', 'skill-2'])
+                [self.skill_id, self.skill_id_2])
             question_services.create_new_question_skill_link(
                 self.admin_id, question_id, self.skill_id, 0.5)
             question_services.create_new_question_skill_link(
@@ -155,12 +155,12 @@ class QuestionCountDataHandlerTests(BaseQuestionsListControllerTests):
         self.save_new_question(
             question_id, self.admin_id,
             self._create_valid_question_data('ABC'),
-            [self.skill_id], ['skill-1', 'skill-2'])
+            [self.skill_id])
 
         self.save_new_question(
             question_id_1, self.admin_id,
             self._create_valid_question_data('ABC2'),
-            [self.skill_id_2], ['skill-1', 'skill-2'])
+            [self.skill_id_2])
 
         question_services.create_new_question_skill_link(
             self.admin_id, question_id, self.skill_id, 0.5)

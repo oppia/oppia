@@ -45,8 +45,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         question_state_data = self._create_valid_question_data('ABC')
         linked_skill_ids = ['skill_id1', 'skill_id2']
         self.save_new_question(
-            'question_id1', 'owner_id', question_state_data, linked_skill_ids,
-            ['skill-1', 'skill-2'])
+            'question_id1', 'owner_id', question_state_data, linked_skill_ids)
         self.assertTrue(
             question_models.QuestionModel
             .has_reference_to_user_id('owner_id'))
@@ -104,11 +103,11 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.save_new_question(
             'question_id1', 'owner_id',
             question_state_data,
-            linked_skill_ids, ['skill-1', 'skill-2'])
+            linked_skill_ids)
         self.save_new_question(
             'question_id2', 'owner_id',
             question_state_data,
-            linked_skill_ids, ['skill-1', 'skill-2'])
+            linked_skill_ids)
         question_ids = ['question_id1', 'question_id2']
 
         self.assertItemsEqual(
