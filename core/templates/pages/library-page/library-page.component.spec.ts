@@ -54,8 +54,8 @@ describe('Library controller', function() {
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('KeyboardShortcutService',
-      TestBed.get(KeyboardShortcutService));
+    $provide.value(
+      'KeyboardShortcutService', TestBed.get(KeyboardShortcutService));
   }));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -520,5 +520,15 @@ describe('Library controller', function() {
         expect(ctrl.groupHeaderI18nId).toEqual('');
         expect(ctrl.tileDisplayCount).toBe(0);
       });
+
+    it(
+      'should get complete image path corresponding to a given relative path',
+      function() {
+        var imagePath = '/path/to/image.png';
+        expect(
+          ctrl.getStaticImageUrl(imagePath)
+        ).toBe('/assets/images/path/to/image.png');
+      }
+    );
   });
 });
