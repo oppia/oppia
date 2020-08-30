@@ -38,8 +38,8 @@ require('pages/admin-page/services/admin-router.service.ts');
 require('services/csrf-token.service.ts');
 require('services/utils.service.ts');
 
-angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
-  function(UrlInterpolationService) {
+angular.module('oppia').directive('adminPage', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -50,7 +50,8 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
       controller: [
         '$http', '$location', '$rootScope', '$scope', 'AdminDataService',
         'AdminRouterService', 'CsrfTokenService', 'DEV_MODE',
-        function($http, $location, $rootScope, $scope, AdminDataService,
+        function(
+            $http, $location, $rootScope, $scope, AdminDataService,
             AdminRouterService, CsrfTokenService, DEV_MODE) {
           var ctrl = this;
           ctrl.isActivitiesTabOpen = function() {

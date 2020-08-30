@@ -197,6 +197,11 @@ def add_redishost():
                 line = line.replace('localhost', redishost)
             f.write(line)
 
+    with python_utils.open_file(LOCAL_FECONF_PATH, 'r') as f:
+        updated_feconf_lines = f.readlines()
+    assert 'REDISHOST = \'%s\'\n' % redishost in (
+        updated_feconf_lines), 'REDISHOST not updated correctly in feconf.py'
+
 
 def main(personal_access_token):
     """Updates the files corresponding to LOCAL_FECONF_PATH and

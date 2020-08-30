@@ -148,8 +148,7 @@ var ListEditor = function(elem) {
   return {
     editItem: async function(index, objectType) {
       var item = await elem.element(
-        await by.repeater('item in localValue track by $index'
-        ).row(index));
+        await by.repeater('item in localValue track by $index').row(index));
       var editor = getEditor(objectType);
       return await editor(item);
     },

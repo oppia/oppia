@@ -125,10 +125,10 @@ describe('Settings Tab Component', function() {
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
-    $provide.value('StateEditorRefreshService',
-      TestBed.get(StateEditorRefreshService));
-    $provide.value('StateInteractionIdService',
-      TestBed.get(StateInteractionIdService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
     $provide.value('ExplorationDataService', {
       explorationId: explorationId,
@@ -190,7 +190,6 @@ describe('Settings Tab Component', function() {
       $scope.$apply();
     }));
 
-
     beforeEach(() => {
       testSubscriptipns = new Subscription();
       refreshGraphSpy = jasmine.createSpy('refreshGraph');
@@ -202,8 +201,7 @@ describe('Settings Tab Component', function() {
       testSubscriptipns.unsubscribe();
     });
 
-
-    it('should evaluate controller properties after its initialization',
+    it('should initialize controller properties after its initialization',
       function() {
         expect(ctrl.isRolesFormOpen).toBe(false);
         expect(ctrl.canDelete).toBe(true);
@@ -230,7 +228,7 @@ describe('Settings Tab Component', function() {
       expect(ctrl.hasPageLoaded).toBe(true);
     });
 
-    it('should get explore page url', function() {
+    it('should get explore page url based on the exploration id', function() {
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
         location: {
           protocol: 'https:',
@@ -629,7 +627,6 @@ describe('Settings Tab Component', function() {
       $scope.$apply();
     }));
 
-
     beforeEach(() => {
       testSubscriptipns = new Subscription();
       refreshGraphSpy = jasmine.createSpy('refreshGraph');
@@ -640,7 +637,6 @@ describe('Settings Tab Component', function() {
     afterEach(() => {
       testSubscriptipns.unsubscribe();
     });
-
 
     it('should not toggle the preview cards', function() {
       expect(ctrl.basicSettingIsShown).toEqual(true);

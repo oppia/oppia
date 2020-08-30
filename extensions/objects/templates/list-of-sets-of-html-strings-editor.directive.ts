@@ -100,7 +100,8 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
           }
           for (var i = 1; i < selectedRankList.length; i++) {
             if (selectedRankList[i] - selectedRankList[i - 1] > 1) {
-              errorMessage = ('Please assign some choice at position ' +
+              errorMessage = (
+                'Please assign some choice at position ' +
                 String(selectedRankList[i - 1] + 1) + '.');
               ctrl.validOrdering = false;
               return;
