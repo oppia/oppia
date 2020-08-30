@@ -240,7 +240,7 @@ class CronJobTests(test_utils.GenericTestBase):
             observed_log_messages,
             [
                 '1 MR jobs cleaned up.',
-                'Deletion jobs for auxiliary entities kicked off.',
+                'Deletion jobs for auxiliary MapReduce entities kicked off.',
                 'Deletion jobs for JobModels entities kicked off.'
             ]
         )
@@ -262,12 +262,13 @@ class CronJobTests(test_utils.GenericTestBase):
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        job_id = cron_services.JobCleanupManager.create_new()
-        cron_services.JobCleanupManager.enqueue(job_id)
+        job_id = cron_services.MapReduceStateModelsCleanupManager.create_new()
+        cron_services.MapReduceStateModelsCleanupManager.enqueue(job_id)
         self.run_but_do_not_flush_pending_tasks()
 
         self.assertEqual(
-            cron_services.JobCleanupManager.get_status_code(job_id),
+            cron_services.MapReduceStateModelsCleanupManager
+            .get_status_code(job_id),
             jobs.STATUS_CODE_STARTED)
 
         with self.testapp_swap, logging_swap:
@@ -309,7 +310,7 @@ class CronJobTests(test_utils.GenericTestBase):
             observed_log_messages,
             [
                 '0 MR jobs cleaned up.',
-                'Deletion jobs for auxiliary entities kicked off.',
+                'Deletion jobs for auxiliary MapReduce entities kicked off.',
                 'A previous JobModels cleanup job is still running.'
             ]
         )

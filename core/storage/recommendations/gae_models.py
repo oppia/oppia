@@ -38,6 +38,10 @@ class ExplorationRecommendationsModel(
     # Ids of recommended explorations.
     recommended_exploration_ids = ndb.StringProperty(
         repeated=True, indexed=True)
+    # Length of the recommended_exploration_ids. This is needed so that we can
+    # write queries for models that have non-empty recommended_exploration_ids.
+    recommended_exploration_ids_length = ndb.ComputedProperty(
+        lambda self: len(self.recommended_exploration_ids))
 
     @staticmethod
     def get_deletion_policy():

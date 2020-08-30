@@ -28,6 +28,8 @@ from core.platform import models
 import feconf
 import python_utils
 
+from google.appengine.ext import ndb
+
 (exp_models, recommendations_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
 
@@ -355,36 +357,31 @@ def get_exploration_recommendations(exp_id):
 
 
 def delete_explorations_from_recommendations(exp_ids):
-    """Delete explorations from recommendations. Both delete the recommendations
-    for explorations and delete the explorations from other explorations
-    recommendations.
+    """Deletes explorations from recommendations.
+
+    This deletes both the recommendations for the given explorations, as well as
+    the given explorations from other explorations' recommendations.
 
     Args:
         exp_ids: list(str). List of exploration IDs for which to delete
             the recommendations.
     """
-    recommendations_class = (
+    recs_model_class = (
         recommendations_models.ExplorationRecommendationsModel)
-    recommendation_models = recommendations_class.get_multi(exp_ids)
+    recommendation_models = recs_model_class.get_multi(exp_ids)
     existing_recommendation_models = [
         model for model in recommendation_models if model is not None]
-    recommendations_class.delete_multi(existing_recommendation_models)
+    recs_model_class.delete_multi(existing_recommendation_models)
 
-    mentioned_recommendation_models = recommendations_class.query(
-        recommendations_class.recommended_exploration_ids.IN(exp_ids)
+    recommending_models = recs_model_class.query(
+        ndb.AND(
+            recs_model_class.recommended_exploration_ids_length > 0,
+            recs_model_class.recommended_exploration_ids.IN(exp_ids)
+        )
     ).fetch()
 
-    for mentioned_recommendation_model in mentioned_recommendation_models:
+    for recommending_model in recommending_models:
         for exp_id in exp_ids:
-            mentioned_recommendation_model.recommended_exploration_ids.remove(
-                exp_id)
+            recommending_model.recommended_exploration_ids.remove(exp_id)
 
-    recommendations_class.put_multi(mentioned_recommendation_models)
-
-
-def delete_all_exploration_recommendations():
-    """Delete explorations from recommendations. Both delete the recommendations
-    for explorations and delete the explorations from other explorations
-    recommendations.
-    """
-    recommendations_models.ExplorationRecommendationsModel.delete_all()
+    recs_model_class.put_multi(recommending_models)

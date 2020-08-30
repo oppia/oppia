@@ -289,15 +289,6 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(result, [None, None, None])
 
-    def test_delete_all(self):
-        base_models.BaseModel().put()
-        base_models.BaseModel().put()
-        base_models.BaseModel().put()
-
-        base_models.BaseModel.delete_all()
-
-        self.assertEqual(base_models.BaseModel.get_all().fetch(), [])
-
     def test_get_new_id_method_returns_unique_ids(self):
         ids = set([])
         for _ in python_utils.RANGE(100):

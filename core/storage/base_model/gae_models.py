@@ -293,12 +293,6 @@ class BaseModel(ndb.Model):
         super(BaseModel, self).key.delete()
 
     @classmethod
-    def delete_all(cls):
-        """Deletes all the ndb.Model instances."""
-        keys = cls.query().fetch(keys_only=True)
-        ndb.delete_multi(keys)
-
-    @classmethod
     def get_all(cls, include_deleted=False):
         """Gets iterable of all entities of this class.
 

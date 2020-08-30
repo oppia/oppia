@@ -26,7 +26,6 @@ from core.domain import activity_jobs_one_off
 from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import recommendations_jobs_one_off
-from core.domain import recommendations_services
 from core.domain import user_jobs_one_off
 from core.domain import wipeout_jobs_one_off
 from core.platform import models
@@ -119,7 +118,6 @@ class CronExplorationRecommendationsHandler(base.BaseHandler):
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
-        recommendations_services.delete_all_exploration_recommendations()
         job_class = (
             recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob)
         job_class.enqueue(job_class.create_new())
@@ -206,15 +204,16 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
         logging.warning('%s MR jobs cleaned up.' % num_cleaned)
 
         if job_models.JobModel.do_unfinished_jobs_exist(
-                cron_services.JobCleanupManager.__name__):
+                cron_services.MapReduceStateModelsCleanupManager.__name__):
             logging.warning('A previous cleanup job is still running.')
         else:
-            cron_services.JobCleanupManager.enqueue(
-                cron_services.JobCleanupManager.create_new(),
+            cron_services.MapReduceStateModelsCleanupManager.enqueue(
+                cron_services.MapReduceStateModelsCleanupManager.create_new(),
                 additional_job_params={
                     jobs.MAPPER_PARAM_MAX_START_TIME_MSEC: max_start_time_msec
                 })
-            logging.warning('Deletion jobs for auxiliary entities kicked off.')
+            logging.warning(
+                'Deletion jobs for auxiliary MapReduce entities kicked off.')
 
         if job_models.JobModel.do_unfinished_jobs_exist(
                 cron_services.JobModelsCleanupManager.__name__):

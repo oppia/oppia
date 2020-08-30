@@ -99,3 +99,27 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         recommendations_services.set_exploration_recommendations(
             key, recommended_exploration_ids)
+
+
+class DeleteRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job that deletes all instances of
+    ExplorationRecommendationsModel.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(DeleteRecommendationsOneOffJob, cls).enqueue(
+            job_id, shard_count=128)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [recommendations_models.ExplorationRecommendationsModel]
+
+    @staticmethod
+    def map(model):
+        model.delete()
+        yield ('DELETED', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

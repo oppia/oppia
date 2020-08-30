@@ -56,7 +56,7 @@ def get_stuck_jobs(recency_msecs):
     return stuck_jobs
 
 
-class JobCleanupManager(jobs.BaseMapReduceOneOffJobManager):
+class MapReduceStateModelsCleanupManager(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for cleaning up old auxiliary entities for MR jobs."""
 
     @classmethod
@@ -80,8 +80,9 @@ class JobCleanupManager(jobs.BaseMapReduceOneOffJobManager):
             tuple(str, int). Describes the action taken for the item, and the
             number of items this action was applied to.
         """
-        max_start_time_msec = JobCleanupManager.get_mapper_param(
-            jobs.MAPPER_PARAM_MAX_START_TIME_MSEC)
+        max_start_time_msec = (
+            MapReduceStateModelsCleanupManager.get_mapper_param(
+                jobs.MAPPER_PARAM_MAX_START_TIME_MSEC))
 
         if isinstance(item, mapreduce_model.MapreduceState):
             if (item.result_status == 'success' and

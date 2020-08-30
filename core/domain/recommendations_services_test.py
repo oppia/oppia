@@ -355,12 +355,3 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             [], recommendations_1.recommended_exploration_ids)
         self.assertEqual(
             ['exp_id_1'], recommendations_2.recommended_exploration_ids)
-
-    def test_delete_all_recommendations(self):
-        recommendations_services.delete_all_exploration_recommendations()
-        self.assertEqual(
-            [],
-            recommendations_models.ExplorationRecommendationsModel.get_all(
-                include_deleted=True
-            ).fetch()
-        )
