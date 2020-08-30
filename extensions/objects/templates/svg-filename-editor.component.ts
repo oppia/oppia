@@ -55,6 +55,8 @@ angular.module('oppia').component('svgFilenameEditor', {
       var MAX_DIAGRAM_HEIGHT = 550;
       var MIN_DIAGRAM_WIDTH = 30;
       var MIN_DIAGRAM_HEIGHT = 30;
+      // These constants are used to identify the tool that is currently being
+      // used so that other tools can be disabled accordingly.
       const STATUS_EDITING = 'editing';
       const STATUS_SAVED = 'saved';
       const DRAW_MODE_POLY = 'polygon';
@@ -72,6 +74,8 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.drawMode = DRAW_MODE_NONE;
       ctrl.polygonMode = CLOSED_POLYGON_MODE;
       ctrl.isTouchDevice = DeviceInfoService.hasTouchEvents();
+      // The polyOptions is used to store the points of the polygon in the
+      // open and closed polygon tool.
       ctrl.polyOptions = {
         x: 0,
         y: 0,
@@ -80,9 +84,11 @@ angular.module('oppia').component('svgFilenameEditor', {
         lineCounter: 0,
         shape: null
       };
+      // These sizes are used in the strokeWidth options dropdown.
       ctrl.sizes = [
         '1px', '2px', '3px', '5px', '9px', '10px', '12px',
         '14px', '18px', '24px', '30px', '36px'];
+      // These fonts are used in the font family options dropdown.
       ctrl.fontFamily = [
         'Arial',
         'Helvetica',
@@ -102,8 +108,10 @@ angular.module('oppia').component('svgFilenameEditor', {
       // Dynamically assign a unique id to each lc editor to avoid clashes
       // when there are multiple RTEs in the same page.
       var randomId = Math.floor(Math.random() * 100000).toString();
+      // This is used to identify the fabric js canvas element in the editor.
       ctrl.canvasID = 'canvas' + randomId;
-      ctrl.canvasElement = null;
+      // These are used to store the objects returned from the vanilla
+      // color picker.
       ctrl.fillPicker = null;
       ctrl.strokePicker = null;
       ctrl.bgPicker = null;
@@ -111,7 +119,10 @@ angular.module('oppia').component('svgFilenameEditor', {
       ctrl.currentDiagramWidth = 450;
       ctrl.diagramHeight = 350;
       ctrl.currentDiagramHeight = 350;
+      // The data variable is used to store the saved svg data
+      // and the filename.
       ctrl.data = {};
+      // The diagramStatus stores the mode of the tool that is being used.
       ctrl.diagramStatus = STATUS_EDITING;
       ctrl.displayFontStyles = false;
       ctrl.objectUndoStack = [];
@@ -405,25 +416,30 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       var loadGroupedObject = function(objId, obj, groupedObjects) {
-        // Checks the first five characters of the id.
-        if (objId.slice(0, 5) === 'group') {
-          if (groupedObjects.length <= objId.slice(5)) {
+        // Checks the first five characters of the id to identify the
+        // svg objects that are grouped together.
+        if (objId.startsWith('group')) {
+          // The objId is of the form "group" + number.
+          var groupId = parseInt(objId.slice(5));
+          // Checks whether the object belongs to an already existing group
+          // or not.
+          if (groupedObjects.length <= groupId) {
             groupedObjects.push([]);
           }
           obj.toSVG = ctrl.createCustomToSVG(
             obj.toSVG, obj.type, obj.id);
-          groupedObjects[objId.slice(5)].push(obj);
+          groupedObjects[groupId].push(obj);
         }
         return groupedObjects;
       };
 
       var loadTextObject = function(element, obj) {
-        var childrens = [].slice.call(element.childNodes);
+        var childNodes = [].slice.call(element.childNodes);
         var value = '';
         var coloredTextIndex = [];
         // It extracts the text from the tspan tags and appends
         // with a \n tag to ensure that the texts are subsequent lines.
-        childrens.forEach(function(el, index) {
+        childNodes.forEach(function(el, index) {
           if (el.nodeName === 'tspan') {
             value += el.childNodes[0].nodeValue;
             if (el.style.fill !== '') {
@@ -437,7 +453,7 @@ angular.module('oppia').component('svgFilenameEditor', {
                 stroke: el.style.stroke,
                 strokeWidth: el.style.strokeWidth
               });
-            } else if (index < childrens.length - 1) {
+            } else if (index < childNodes.length - 1) {
               value += '\n';
             }
           }
@@ -533,16 +549,18 @@ angular.module('oppia').component('svgFilenameEditor', {
       var getStrokeWidth = function() {
         var size = ctrl.fabricjsOptions.size;
         // Removes the word "px" from the end of the string.
-        return parseInt(size.substring(0, size.length - 2));
+        return parseInt(size);
       };
 
       ctrl.createRect = function() {
         ctrl.canvas.discardActiveObject();
+        var defaultWidth = 60;
+        var defaultHeight = 70;
         var rect = new fabric.Rect({
           top: ctrl.defaultTopCoordinate,
           left: ctrl.defaultLeftCoordinate,
-          width: 60,
-          height: 70,
+          width: defaultWidth,
+          height: defaultHeight,
           fill: ctrl.fabricjsOptions.fill,
           stroke: ctrl.fabricjsOptions.stroke,
           strokeWidth: getStrokeWidth(),
@@ -553,8 +571,15 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       ctrl.createLine = function() {
         ctrl.canvas.discardActiveObject();
+        var defaultBottomCoordinate = 100;
+        var defaultRightCoordinate = 100;
         var line = new fabric.Line(
-          [ctrl.defaultTopCoordinate, ctrl.defaultLeftCoordinate, 100, 100], {
+          [
+            ctrl.defaultTopCoordinate,
+            ctrl.defaultLeftCoordinate,
+            defaultBottomCoordinate,
+            defaultRightCoordinate
+          ], {
             stroke: ctrl.fabricjsOptions.stroke,
             strokeWidth: getStrokeWidth(),
             strokeUniform: true
@@ -578,10 +603,13 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       ctrl.createText = function() {
         ctrl.canvas.discardActiveObject();
+        // This is necessary to prevent the text from being too small.
+        // This can be changed later in the editor.
+        var defaultTextSize = '18px';
         ctrl.fillPicker.setOptions({
           color: 'rgba(0,0,0,1)'
         });
-        ctrl.fabricjsOptions.size = '18px';
+        ctrl.fabricjsOptions.size = defaultTextSize;
         var text = new fabric.Textbox('Enter Text', {
           top: ctrl.defaultTopCoordinate,
           left: ctrl.defaultLeftCoordinate,
@@ -624,6 +652,8 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       var makePolygon = function() {
+        // The startPt is the initial point in the polygon and it is also the
+        // last point if the polygon is closed.
         var startPt = ctrl.polyOptions.bboxPoints[0];
         if (ctrl.polygonMode === CLOSED_POLYGON_MODE) {
           ctrl.polyOptions.bboxPoints.push(
@@ -640,6 +670,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       var createPolyShape = function() {
+        // This function removes the individual lines and draws the polygon.
         ctrl.polyOptions.lines.forEach(function(value) {
           ctrl.canvas.remove(value);
         });
@@ -648,6 +679,9 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.canvas.add(ctrl.polyOptions.shape);
         }
         ctrl.canvas.hoverCursor = 'move';
+        // While drawing the polygon the objects are treated as nonselectable
+        // and once the polygon is created the objects are converted into
+        // selectable.
         ctrl.canvas.forEachObject(function(object) {
           object.selectable = true;
         });
@@ -721,7 +755,14 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       var drawQuadraticCurve = function() {
-        var curve = new fabric.Path('M 40 40 Q 95, 100, 150, 40', {
+        var defaultCurve = 'M 40 40 Q 95, 100, 150, 40';
+        var defaultP1TopCoordinate = 95;
+        var defaultP1LeftCoordinate = 100;
+        var defaultP0TopCoordinate = 40;
+        var defaultP0LeftCoordinate = 40;
+        var defaultP2TopCoordinate = 150;
+        var defaultP2LeftCoordinate = 40;
+        var curve = new fabric.Path(defaultCurve, {
           stroke: ctrl.fabricjsOptions.stroke,
           fill: ctrl.fabricjsOptions.fill,
           strokeWidth: getStrokeWidth(),
@@ -730,7 +771,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
         ctrl.canvas.add(curve);
 
-        var p1 = createBezierControlPoints(95, 100);
+        var p1 = createBezierControlPoints(
+          defaultP1TopCoordinate, defaultP1LeftCoordinate);
         p1.name = 'p1';
         p1.set({
           radius: 12,
@@ -739,11 +781,13 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
         ctrl.canvas.add(p1);
 
-        var p0 = createBezierControlPoints(40, 40);
+        var p0 = createBezierControlPoints(
+          defaultP0TopCoordinate, defaultP0LeftCoordinate);
         p0.name = 'p0';
         ctrl.canvas.add(p0);
 
-        var p2 = createBezierControlPoints(150, 40);
+        var p2 = createBezierControlPoints(
+          defaultP2TopCoordinate, defaultP2LeftCoordinate);
         p2.name = 'p2';
         ctrl.canvas.add(p2);
       };
@@ -802,9 +846,10 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       ctrl.onAddItem = function() {
         if (ctrl.pieChartDataInput.length < ctrl.pieChartDataLimit) {
+          var defaultData = 10;
           var dataInput = {
             name: 'Data name',
-            data: 10,
+            data: defaultData,
             color: '#000000',
             angle: 0
           };
@@ -1156,6 +1201,8 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.onFillChange = function() {
+        // This if condition fetches the bezier curve and then changes
+        // the fill color.
         if (ctrl.drawMode === DRAW_MODE_BEZIER) {
           getQuadraticBezierCurve().set({
             fill: ctrl.fabricjsOptions.fill
@@ -1212,11 +1259,14 @@ angular.module('oppia').component('svgFilenameEditor', {
         // This if condition is required to ensure that the size change is
         // applied only to the curve and not to all the control points.
         if (ctrl.drawMode === DRAW_MODE_BEZIER) {
-          ctrl.canvas.getObjects().slice(-2).forEach(function(object) {
-            object.set({
-              radius: getStrokeWidth() + 2
+          var numberOfEdgeControlPoints = 2;
+          // This only changes the radius of the edge control points.
+          ctrl.canvas.getObjects().slice(-numberOfEdgeControlPoints).forEach(
+            function(object) {
+              object.set({
+                radius: getStrokeWidth() + 2
+              });
             });
-          });
           getQuadraticBezierCurve().set({
             strokeWidth: getStrokeWidth()
           });
@@ -1265,7 +1315,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.bgPicker = picker;
         }
         picker.onOpen = function() {
-          // This DOM manipulation is necessary because this is not
+          // This DOM manipulation is necessary because the color picker is not
           // configurable in the third-party module.
           var alphaSliders = document.querySelectorAll(
             '.picker_alpha .picker_selector');
@@ -1301,6 +1351,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
 
         ctrl.canvas.on('mouse:down', function(options) {
+          // This event is used to detect the mouse clicks when drawing
+          // the polygon.
           if (ctrl.drawMode === DRAW_MODE_POLY) {
             setPolyStartingPoint(options);
             var x = ctrl.polyOptions.x;
@@ -1339,6 +1391,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
 
         ctrl.canvas.on('mouse:move', function(options) {
+          // This event is used to detect the mouse movement while
+          // drawing the polygon.
           if (
             ctrl.polyOptions.lines.length !== 0 &&
             ctrl.drawMode === DRAW_MODE_POLY &&
@@ -1353,6 +1407,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
 
         ctrl.canvas.on('object:moving', function(e) {
+          // This event is used to detect the movement in the control
+          // points when drawing the bezier curve.
           if (ctrl.drawMode === DRAW_MODE_BEZIER) {
             var pt = e.target;
             var curve = getQuadraticBezierCurve();
@@ -1393,6 +1449,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
 
         ctrl.canvas.on('object:scaling', function() {
+          // This if condition is to prevent the textbox from scalling.
           if (ctrl.canvas.getActiveObject().get('type') === 'textbox') {
             var text = ctrl.canvas.getActiveObject();
             var scaleX = text.get('scaleX');
