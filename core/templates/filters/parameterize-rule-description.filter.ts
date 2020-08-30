@@ -28,7 +28,8 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
   '$filter', 'INTERACTION_SPECS', 'FractionObjectFactory',
   'NumberWithUnitsObjectFactory', 'POSITION_OF_TERMS_MAPPING',
   'RatioObjectFactory',
-  function($filter, INTERACTION_SPECS, FractionObjectFactory,
+  function(
+      $filter, INTERACTION_SPECS, FractionObjectFactory,
       NumberWithUnitsObjectFactory, POSITION_OF_TERMS_MAPPING,
       RatioObjectFactory) {
     return function(rule, interactionId, choices) {

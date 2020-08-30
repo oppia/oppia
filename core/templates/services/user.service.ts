@@ -22,7 +22,8 @@ require('services/contextual/url.service.ts');
 angular.module('oppia').factory('UserService', [
   '$http', '$q', '$window', 'UrlInterpolationService', 'UrlService',
   'UserInfoObjectFactory', 'DEFAULT_PROFILE_IMAGE_PATH',
-  function($http, $q, $window, UrlInterpolationService, UrlService,
+  function(
+      $http, $q, $window, UrlInterpolationService, UrlService,
       UserInfoObjectFactory, DEFAULT_PROFILE_IMAGE_PATH) {
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
     var USER_CONTRIBUTION_RIGHTS_DATA_URL = '/usercontributionrightsdatahandler'; // eslint-disable-line max-len

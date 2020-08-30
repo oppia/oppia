@@ -34,7 +34,8 @@ angular.module('oppia').component('testInteractionPanel', {
     '$scope', 'ExplorationStatesService',
     'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
     'CurrentInteractionService',
-    function($scope, ExplorationStatesService,
+    function(
+        $scope, ExplorationStatesService,
         INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE,
         CurrentInteractionService) {
       var ctrl = this;

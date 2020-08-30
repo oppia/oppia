@@ -197,8 +197,8 @@ describe('Topic rights backend API service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('PUT', '/rightshandler/send_topic_publish_mail/' +
-      topicId).respond(200);
+    $httpBackend.expect(
+      'PUT', '/rightshandler/send_topic_publish_mail/' + topicId).respond(200);
     TopicRightsBackendApiService.sendMail(topicId).then(
       successHandler, failHandler);
     $httpBackend.flush();
@@ -211,8 +211,8 @@ describe('Topic rights backend API service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('PUT', '/rightshandler/send_topic_publish_mail/' +
-      topicId).respond(404);
+    $httpBackend.expect(
+      'PUT', '/rightshandler/send_topic_publish_mail/' + topicId).respond(404);
     TopicRightsBackendApiService.sendMail(topicId).then(
       successHandler, failHandler);
     $httpBackend.flush();
