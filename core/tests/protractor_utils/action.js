@@ -32,6 +32,13 @@ var click = async function(elementName, clickableElement) {
   await clickableElement.click();
 };
 
+var select = async function(selectorName, selectorElement, optionToSelect) {
+  await click(selectorName, selectorElement);
+  var optionElement = selectorElement.element(
+    by.cssContainingText('option', optionToSelect));
+  await optionElement.click();
+};
+
 var select2 = async function(selectorName, selectorElement, optionToSelect) {
   await click(selectorName, selectorElement);
   var select2Results = element(by.css('.select2-results'));
@@ -49,5 +56,6 @@ var sendKeys = async function(inputName, inputElement, keys) {
 
 exports.clear = clear;
 exports.click = click;
+exports.select = select;
 exports.select2 = select2;
 exports.sendKeys = sendKeys;

@@ -564,9 +564,10 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         //   than b.
         var compareNoteStarts = function(a, b) {
           if (a.note.noteStart && b.note.noteStart) {
-            return (a.note.noteStart.num * b.note.noteStart.den -
-                    a.note.noteStart.den * b.note.noteStart.num) /
-                   (a.note.noteStart.den * b.note.noteStart.den);
+            return (
+              a.note.noteStart.num * b.note.noteStart.den -
+              a.note.noteStart.den * b.note.noteStart.num) /
+              (a.note.noteStart.den * b.note.noteStart.den);
           }
         };
 
@@ -643,15 +644,16 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           var lastHorizontalPositionOffset = element.find(
             '.oppia-music-input-note-choices div:first-child').position().left;
           var leftOffset =
-            lastHorizontalPositionOffset - ((MAXIMUM_NOTES_POSSIBLE - 1) *
-                            scope.HORIZONTAL_GRID_SPACING);
+            lastHorizontalPositionOffset - (
+              (MAXIMUM_NOTES_POSSIBLE - 1) * scope.HORIZONTAL_GRID_SPACING);
           return leftOffset + (
             noteStartAsFloat * scope.HORIZONTAL_GRID_SPACING);
         };
 
         var isCloneOffStaff = function(helperClone) {
-          return (!(helperClone.position().top > scope.staffTop &&
-                  helperClone.position().top < scope.staffBottom));
+          return (!(
+            helperClone.position().top > scope.staffTop &&
+            helperClone.position().top < scope.staffBottom));
         };
 
         var isLedgerLineNote = function(lineValue) {
@@ -726,8 +728,8 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           var correspondingNoteName =
             _getCorrespondingNoteName(note.baseNoteMidiNumber);
 
-          var accidental = (note.offset === 1 ? '#' :
-            note.offset === 0 ? '' : 'b');
+          var accidental = (
+            note.offset === 1 ? '#' : note.offset === 0 ? '' : 'b');
 
           return {
             readableNoteName:

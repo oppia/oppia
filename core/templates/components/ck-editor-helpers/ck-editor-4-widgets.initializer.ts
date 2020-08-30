@@ -26,7 +26,8 @@ require('services/context.service.ts');
 angular.module('oppia').run([
   '$compile', '$rootScope', '$timeout', 'RteHelperService',
   'HtmlEscaperService', 'ContextService',
-  function($compile, $rootScope, $timeout, RteHelperService,
+  function(
+      $compile, $rootScope, $timeout, RteHelperService,
       HtmlEscaperService, ContextService) {
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
@@ -160,7 +161,8 @@ angular.module('oppia').run([
              * true iff "element" is an instance of this widget.
              */
             upcast: function(element) {
-              return (element.name !== 'p' &&
+              return (
+                element.name !== 'p' &&
                       element.children.length > 0 &&
                       (
                         <CKEDITOR.htmlParser.element>element.children[0]
