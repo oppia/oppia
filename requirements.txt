@@ -32,3 +32,9 @@ webencodings==0.5.1       # via -r requirements.in, bleach, html5lib
 # please change the `requirements.in` file and run the script
 # `scripts/install_third_party` again to see your changes
 # reflected in this file.
+
+# Developers: Please do not add to this auto-generated file. If
+# you want to add, remove, upgrade, or downgrade libraries,
+# please change the `requirements.in` file and run the script
+# `scripts/install_third_party` again to see your changes
+# reflected in this file.

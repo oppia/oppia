@@ -259,7 +259,7 @@ def main():
             '# you want to add, remove, upgrade, or downgrade libraries,\n'
             '# please change the `requirements.in` file and run the script\n'
             '# `scripts/install_third_party` again to see your changes\n'
-            '# reflected in this file.')
+            '# reflected in this file.\n')
 
     mismatches = get_mismatches()
     if mismatches:
