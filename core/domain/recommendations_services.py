@@ -28,8 +28,6 @@ from core.platform import models
 import feconf
 import python_utils
 
-from google.appengine.ext import ndb
-
 (exp_models, recommendations_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
 
@@ -373,15 +371,17 @@ def delete_explorations_from_recommendations(exp_ids):
         model for model in recommendation_models if model is not None]
     recs_model_class.delete_multi(existing_recommendation_models)
 
-    recommending_models = recs_model_class.query(
-        ndb.AND(
-            recs_model_class.recommended_exploration_ids_length > 0,
-            recs_model_class.recommended_exploration_ids.IN(exp_ids)
-        )
-    ).fetch()
+    all_recommending_models = {}
+    for exp_id in exp_ids:
+        recommending_models = recs_model_class.query(
+            recs_model_class.recommended_exploration_ids == exp_id
+        ).fetch()
+        for recommending_model in recommending_models:
+            all_recommending_models[recommending_model.id] = (
+                recommending_model)
 
-    for recommending_model in recommending_models:
+    for recommending_model in all_recommending_models.values():
         for exp_id in exp_ids:
             recommending_model.recommended_exploration_ids.remove(exp_id)
 
-    recs_model_class.put_multi(recommending_models)
+    recs_model_class.put_multi(list(all_recommending_models.values()))
