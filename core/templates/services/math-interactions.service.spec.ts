@@ -102,26 +102,26 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateAlgebraicExpression(
       'xy+c/2', ['x', 'y', 'z'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'You have entered an invalid character: c. Please use only the ' +
-      'characters x,y,z in your answer.');
+      'You have entered an invalid variable: c. Please use only the ' +
+      'variables x,y,z in your answer.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       'ae^2 + 4b', ['a', 'b'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'You have entered an invalid character: e. Please use only the ' +
-      'characters a,b in your answer.');
+      'You have entered an invalid variable: e. Please use only the ' +
+      'variables a,b in your answer.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       'xyz + pi', ['x', 'y', 'z'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'You have entered an invalid character: pi. Please use only the ' +
-      'characters x,y,z in your answer.');
+      'You have entered an invalid variable: pi. Please use only the ' +
+      'variables x,y,z in your answer.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       'aalpha/2beta', ['alpha', 'beta', 'gamma'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'You have entered an invalid character: a. Please use only the ' +
-      'characters alpha,beta,gamma in your answer.');
+      'You have entered an invalid variable: a. Please use only the ' +
+      'variables alpha,beta,gamma in your answer.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       '(x^3.5)^/2', ['x'])).toBeFalse();
@@ -170,7 +170,7 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateAlgebraicExpression(
       'a_2 + 3', ['a'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your answer contains an invalid character: "_".');
+      'Your answer contains an invalid variable: "_".');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       '3.4.5 + 45/a', ['a'])).toBeFalse();
@@ -307,14 +307,14 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateEquation(
       'y=mx+b', ['x', 'y', 'm', 'c'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'You have entered an invalid character: b. Please use only the ' +
-      'characters x,y,m,c in your answer.');
+      'You have entered an invalid variable: b. Please use only the ' +
+      'variables x,y,m,c in your answer.');
 
     expect(mathInteractionsService.validateEquation(
       'alpha(x^2)=beta/2', ['alpha', 'beta', 'gamma'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'You have entered an invalid character: x. Please use only the ' +
-      'characters alpha,beta,gamma in your answer.');
+      'You have entered an invalid variable: x. Please use only the ' +
+      'variables alpha,beta,gamma in your answer.');
   });
 
   it('should insert missing multiplication signs', function() {

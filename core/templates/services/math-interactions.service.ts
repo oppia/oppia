@@ -141,8 +141,8 @@ export class MathInteractionsService {
       for (let variable of variablesList) {
         if (validVariablesList.indexOf(variable) === -1) {
           this.warningText = (
-            'You have entered an invalid character: ' + variable +
-            '. Please use only the characters ' + validVariablesList.join() +
+            'You have entered an invalid variable: ' + variable +
+            '. Please use only the variables ' + validVariablesList.join() +
             ' in your answer.');
           return false;
         }
