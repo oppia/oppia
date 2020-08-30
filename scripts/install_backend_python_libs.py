@@ -19,16 +19,15 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import os
-from pip._internal.utils import misc
-import pkg_resources
 import shutil
 import subprocess
-import sys
 
+from pip._internal.utils import misc
 import python_utils
 from scripts import common
 
-# TODO: WHy we don't care about the pip version on the developers local machine?
+import pkg_resources
+
 
 def _get_requirements_file_contents():
     """Returns a dictionary containing all of the required library names with
@@ -159,17 +158,17 @@ def _rectify_third_party_directory(mismatches):
 
     Args:
         mismatches: dict(string, tuple(string|None, string|None)). Dictionary
-        with the library names as keys and a tuple for values. The 1st element
-        of the tuple is the version string of the library required by the
-        requirements.txt file while the 2nd element is the version string of the
-        library currently in the  'third_party/python_libs' directory. If the
-        library doesn't exist, the tuple element will be None.
-        For example, this dictionary signifies that 'requirements.txt'
-        requires flask with version 1.0.1 while the 'third_party/python_libs'
-        directory contains flask 1.1.1:
-            {
-              flask: ('1.0.1', '1.1.1')
-            }
+            with the library names as keys and a tuple for values. The 1st
+            element of the tuple is the version string of the library required
+            by the requirements.txt file while the 2nd element is the version
+            string of the library currently in the  'third_party/python_libs'
+            directory. If the library doesn't exist, the tuple element will be
+            None. For example, this dictionary signifies that 'requirements.txt'
+            requires flask with version 1.0.1 while the
+            'third_party/python_libs' directory contains flask 1.1.1:
+                {
+                  flask: ('1.0.1', '1.1.1')
+                }
     """
     # Handling 5 or more mismatches requires 5 or more individual `pip install`
     # commands which is slower than just reinstalling all of the libraries using
@@ -233,6 +232,11 @@ def _rectify_third_party_directory(mismatches):
 
 
 def main():
+    """Compares the state of the current 'third_party/python_libs' directory to
+    the required libraries listed in the 'requirements.txt' file. If there are
+    mismatches, regenerate the 'requirements.txt' file and correct the
+    mismatches.
+    """
     python_utils.PRINT('Regenerating "requirements.txt" file...')
     # Calls the script to regenerate requirements. The reason we cannot call the
     # regenerate requirements functionality inline is because the python script
@@ -251,6 +255,7 @@ def main():
     else:
         python_utils.PRINT(
             'Third party python libraries already installed correctly.')
+
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when install_third_party_libs.py is used as a script.

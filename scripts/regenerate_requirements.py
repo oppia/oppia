@@ -23,12 +23,23 @@ installation will also exit as soon as the cli finishes running.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from scripts import common
 import os
-import sys
 import re
+import sys
+
+from scripts import common
+
+PIP_TOOLS_PATH = os.path.join(
+    common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION)
+sys.path.insert(0, PIP_TOOLS_PATH)
+from piptools.scripts import compile  # isort:skip pylint: disable=redefined-builtin, wrong-import-position, wrong-import-order
+
 
 def main():
+    """Regenerates the 'requirements.txt' file using the 'requirements.in'
+    file to produce a deterministic list of all the dependencies that should be
+    in the 'third_party/python_libs' folder.
+    """
     # This code is copied from the pip-compile script. We cannot use the
     # pip-compile script because we installed pip-tools to our own local
     # oppia_tools directory.
@@ -41,10 +52,12 @@ def main():
     # pip tools python packages. Therefore, we need to write our own and
     # manually add our local pip-tools directory to the system path in order to
     # import their libraries correctly.
-    from piptools.scripts import compile
     sys.argv[0] = re.sub(
         r'(-script\.pyw|\.exe)?$', '',
         common.PRE_COMPILED_REQUIREMENTS_FILE_PATH)
     compile.cli() # pylint: disable=no-value-for-parameter
 
-main()
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when install_third_party_libs.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
+    main()
