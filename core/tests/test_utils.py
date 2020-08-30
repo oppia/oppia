@@ -78,7 +78,6 @@ memory_cache_services = models.Registry.import_cache_services()
 # Prefix to append to all lines printed by tests to the console.
 # We are using the b' prefix as all the stdouts are in bytes.
 LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
-EMPTY_LIST = []
 
 
 def empty_environ():
