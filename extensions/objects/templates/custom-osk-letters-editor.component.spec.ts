@@ -30,6 +30,7 @@ describe('OnScreenKeyboard', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $window = $injector.get('$window');
     ctrl = $componentController('customOskLettersEditor');
+    spyOn(ctrl, 'isCustomizationArgOpen').and.returnValue(true);
     ctrl.$onInit();
     ctrl.value = [];
   }));
