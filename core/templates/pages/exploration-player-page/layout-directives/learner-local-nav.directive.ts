@@ -54,15 +54,13 @@ angular.module('oppia').directive('learnerLocalNav', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$uibModal', 'AlertsService', 'LoaderService',
-        'ExplorationEngineService', 'ExplorationPlayerStateService',
-        'FocusManagerService', 'ReadOnlyExplorationBackendApiService',
+        'ExplorationEngineService', 'ReadOnlyExplorationBackendApiService',
         'SuggestionModalForExplorationPlayerService',
         'UrlInterpolationService', 'UserService', 'FEEDBACK_POPOVER_PATH',
         'FLAG_EXPLORATION_URL_TEMPLATE',
         function(
             $http, $uibModal, AlertsService, LoaderService,
-            ExplorationEngineService, ExplorationPlayerStateService,
-            FocusManagerService, ReadOnlyExplorationBackendApiService,
+            ExplorationEngineService, ReadOnlyExplorationBackendApiService,
             SuggestionModalForExplorationPlayerService,
             UrlInterpolationService, UserService, FEEDBACK_POPOVER_PATH,
             FLAG_EXPLORATION_URL_TEMPLATE) {

@@ -136,7 +136,7 @@ angular.module('oppia').directive('audioTranslationBar', [
         '/pages/exploration-editor-page/translation-tab/' +
         'audio-translation-bar/audio-translation-bar.directive.html'),
       controller: [
-        '$filter', '$interval', '$rootScope', '$scope', '$uibModal', '$window',
+        '$filter', '$interval', '$scope', '$uibModal', '$window',
         'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
         'ContextService', 'EditabilityService',
         'ExternalSaveService', 'ExplorationStatesService',
@@ -146,7 +146,7 @@ angular.module('oppia').directive('audioTranslationBar', [
         'TranslationTabActiveContentIdService', 'VoiceoverRecordingService',
         'RECORDING_TIME_LIMIT',
         function(
-            $filter, $interval, $rootScope, $scope, $uibModal, $window,
+            $filter, $interval, $scope, $uibModal, $window,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService,
             ExternalSaveService, ExplorationStatesService,

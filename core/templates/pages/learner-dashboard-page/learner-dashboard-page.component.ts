@@ -57,7 +57,6 @@ angular.module('oppia').component('learnerDashboardPage', {
     'LEARNER_DASHBOARD_SECTION_I18N_IDS',
     'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'ThreadStatusDisplayService',
     'DateTimeFormatService', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
-    'FeedbackThreadSummaryObjectFactory',
     'FeedbackMessageSummaryObjectFactory',
     'SuggestionModalForLearnerDashboardService', 'UserService',
     function(
@@ -69,7 +68,6 @@ angular.module('oppia').component('learnerDashboardPage', {
         LEARNER_DASHBOARD_SECTION_I18N_IDS,
         LEARNER_DASHBOARD_SUBSECTION_I18N_IDS, ThreadStatusDisplayService,
         DateTimeFormatService, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
-        FeedbackThreadSummaryObjectFactory,
         FeedbackMessageSummaryObjectFactory,
         SuggestionModalForLearnerDashboardService, UserService) {
       var ctrl = this;

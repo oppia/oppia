@@ -38,16 +38,10 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('subtopicPreviewTab', {
   template: require('./subtopic-preview-tab.component.html'),
   controller: [
-    '$location', '$scope', '$uibModal', 'SubtopicPageObjectFactory',
-    'EntityCreationService', 'TopicEditorStateService',
-    'TopicEditorRoutingService', 'TopicUpdateService',
-    'UndoRedoService', 'UrlInterpolationService', 'UrlService',
+    '$scope', 'TopicEditorStateService', 'TopicEditorRoutingService',
     'WindowDimensionsService',
     function(
-        $location, $scope, $uibModal, SubtopicPageObjectFactory,
-        EntityCreationService, TopicEditorStateService,
-        TopicEditorRoutingService, TopicUpdateService,
-        UndoRedoService, UrlInterpolationService, UrlService,
+        $scope, TopicEditorStateService, TopicEditorRoutingService,
         WindowDimensionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();

@@ -69,16 +69,14 @@ angular.module('oppia').directive('storyNodeEditor', [
         '$scope', '$uibModal', 'AlertsService',
         'PageTitleService',
         'StoryEditorStateService', 'ExplorationIdValidationService',
-        'TopicsAndSkillsDashboardBackendApiService',
-        'TopicEditorRoutingService', 'StoryUpdateService', 'UndoRedoService',
+        'TopicsAndSkillsDashboardBackendApiService', 'StoryUpdateService',
         'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_TITLE',
         'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
         function(
             $scope, $uibModal, AlertsService,
             PageTitleService,
             StoryEditorStateService, ExplorationIdValidationService,
-            TopicsAndSkillsDashboardBackendApiService,
-            TopicEditorRoutingService, StoryUpdateService, UndoRedoService,
+            TopicsAndSkillsDashboardBackendApiService, StoryUpdateService,
             WindowDimensionsService, MAX_CHARS_IN_CHAPTER_TITLE,
             MAX_CHARS_IN_CHAPTER_DESCRIPTION) {
           var ctrl = this;

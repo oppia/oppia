@@ -55,13 +55,11 @@ angular.module('oppia').directive('ruleEditor', [
         '/components/state-directives/rule-editor/rule-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', 'StateEditorService',
-        'ValidatorsService', 'INTERACTION_SPECS',
-        'ResponsesService', 'StateInteractionIdService',
+        '$timeout', 'INTERACTION_SPECS', 'ResponsesService',
+        'StateInteractionIdService',
         function(
-            $scope, $timeout, StateEditorService,
-            ValidatorsService, INTERACTION_SPECS,
-            ResponsesService, StateInteractionIdService) {
+            $timeout, INTERACTION_SPECS, ResponsesService,
+            StateInteractionIdService) {
           var ctrl = this;
           // This returns the rule description string.
           var computeRuleDescriptionFragments = function() {

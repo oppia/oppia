@@ -38,12 +38,10 @@ angular.module('oppia').directive('topicEditorStoriesList', [
         '/pages/topic-editor-page/editor-tab/' +
         'topic-editor-stories-list.directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', '$window',
-        'EditableTopicBackendApiService', 'UrlService', 'UndoRedoService',
+        '$scope', '$uibModal', '$window', 'UrlService', 'UndoRedoService',
         'UrlInterpolationService', 'TopicUpdateService',
         function(
-            $scope, $rootScope, $uibModal, $window,
-            EditableTopicBackendApiService, UrlService, UndoRedoService,
+            $scope, $uibModal, $window, UrlService, UndoRedoService,
             UrlInterpolationService, TopicUpdateService) {
           var ctrl = this;
           var topicId = UrlService.getTopicIdFromUrl();

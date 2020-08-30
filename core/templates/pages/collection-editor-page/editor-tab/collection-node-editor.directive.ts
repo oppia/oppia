@@ -41,10 +41,10 @@ angular.module('oppia').directive('collectionNodeEditor', [
       controllerAs: '$ctrl',
       controller: [
         'CollectionEditorStateService', 'CollectionLinearizerService',
-        'CollectionUpdateService', 'AlertsService',
+        'AlertsService',
         function(
             CollectionEditorStateService, CollectionLinearizerService,
-            CollectionUpdateService, AlertsService) {
+            AlertsService) {
           var ctrl = this;
           // Deletes this collection node from the frontend collection
           // object and also updates the changelist.

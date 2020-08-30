@@ -40,12 +40,12 @@ angular.module('oppia').directive('collectionDetailsEditor', [
       template: require('./collection-details-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
+        'CollectionEditorStateService', 'CollectionUpdateService',
         'CollectionValidationService', 'AlertsService', 'ALL_CATEGORIES',
         'SUPPORTED_CONTENT_LANGUAGES', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
         'TAG_REGEX',
         function(
-            $scope, CollectionEditorStateService, CollectionUpdateService,
+            CollectionEditorStateService, CollectionUpdateService,
             CollectionValidationService, AlertsService, ALL_CATEGORIES,
             SUPPORTED_CONTENT_LANGUAGES, COLLECTION_TITLE_INPUT_FOCUS_LABEL,
             TAG_REGEX) {

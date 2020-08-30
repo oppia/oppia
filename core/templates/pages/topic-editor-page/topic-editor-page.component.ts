@@ -56,15 +56,13 @@ angular.module('oppia').directive('topicEditorPage', [
         '/pages/topic-editor-page/topic-editor-page.component.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$window', 'AlertsService', 'BottomNavbarStatusService',
-        'ContextService', 'PageTitleService', 'EntityCreationService',
+        'BottomNavbarStatusService', 'ContextService', 'PageTitleService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
-        'UndoRedoService', 'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE',
+        'UndoRedoService', 'UrlService',
         function(
-            $scope, $window, AlertsService, BottomNavbarStatusService,
-            ContextService, PageTitleService, EntityCreationService,
+            BottomNavbarStatusService, ContextService, PageTitleService,
             TopicEditorRoutingService, TopicEditorStateService,
-            UndoRedoService, UrlService, TOPIC_VIEWER_URL_TEMPLATE) {
+            UndoRedoService, UrlService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.getActiveTabName = function() {

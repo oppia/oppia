@@ -70,7 +70,7 @@ angular.module('oppia').component('stateTranslation', {
   },
   template: require('./state-translation.component.html'),
   controller: [
-    '$filter', '$rootScope', '$scope', 'CkEditorCopyContentService',
+    '$filter', '$scope', 'CkEditorCopyContentService',
     'ExplorationCorrectnessFeedbackService',
     'ExplorationHtmlFormatterService', 'ExplorationLanguageCodeService',
     'ExplorationStatesService', 'RouterService', 'StateEditorService',
@@ -82,7 +82,7 @@ angular.module('oppia').component('stateTranslation', {
     'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
     'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
     function(
-        $filter, $rootScope, $scope, CkEditorCopyContentService,
+        $filter, $scope, CkEditorCopyContentService,
         ExplorationCorrectnessFeedbackService,
         ExplorationHtmlFormatterService, ExplorationLanguageCodeService,
         ExplorationStatesService, RouterService, StateEditorService,

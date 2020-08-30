@@ -49,17 +49,13 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
         'hint-and-solution-buttons.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$rootScope', 'HintsAndSolutionManagerService',
-        'PlayerTranscriptService', 'ExplorationPlayerStateService',
-        'HintAndSolutionModalService', 'DeviceInfoService', 'ContextService',
-        'PlayerPositionService', 'INTERACTION_SPECS',
-        'StatsReportingService',
+        'HintsAndSolutionManagerService', 'PlayerTranscriptService',
+        'ExplorationPlayerStateService', 'HintAndSolutionModalService',
+        'ContextService', 'PlayerPositionService', 'StatsReportingService',
         function(
-            $scope, $rootScope, HintsAndSolutionManagerService,
-            PlayerTranscriptService, ExplorationPlayerStateService,
-            HintAndSolutionModalService, DeviceInfoService, ContextService,
-            PlayerPositionService, INTERACTION_SPECS,
-            StatsReportingService) {
+            HintsAndSolutionManagerService, PlayerTranscriptService,
+            ExplorationPlayerStateService, HintAndSolutionModalService,
+            ContextService, PlayerPositionService, StatsReportingService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           StatsReportingService = (

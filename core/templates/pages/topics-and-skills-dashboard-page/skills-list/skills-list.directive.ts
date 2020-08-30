@@ -74,11 +74,11 @@ angular.module('oppia').directive('skillsList', [
         'skills-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$uibModal', '$rootScope', '$timeout',
+        '$scope', '$uibModal', '$timeout',
         'EditableTopicBackendApiService', 'SkillBackendApiService',
         'TopicsAndSkillsDashboardBackendApiService',
         function(
-            $scope, $uibModal, $rootScope, $timeout,
+            $scope, $uibModal, $timeout,
             EditableTopicBackendApiService, SkillBackendApiService,
             TopicsAndSkillsDashboardBackendApiService) {
           var ctrl = this;

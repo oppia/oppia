@@ -56,13 +56,13 @@ angular.module('oppia').directive('storyEditor', [
         'UndoRedoService', 'StoryEditorNavigationService',
         'WindowDimensionsService', 'WindowRef', '$uibModal',
         'AlertsService', 'MAX_CHARS_IN_STORY_TITLE',
-        'MAX_CHARS_IN_CHAPTER_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
+        'MAX_CHARS_IN_STORY_URL_FRAGMENT',
         function(
             $scope, $rootScope, StoryEditorStateService, StoryUpdateService,
             UndoRedoService, StoryEditorNavigationService,
             WindowDimensionsService, WindowRef, $uibModal,
             AlertsService, MAX_CHARS_IN_STORY_TITLE,
-            MAX_CHARS_IN_CHAPTER_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
+            MAX_CHARS_IN_STORY_URL_FRAGMENT) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;

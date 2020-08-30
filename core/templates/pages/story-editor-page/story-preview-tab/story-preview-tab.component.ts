@@ -30,11 +30,9 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('storyPreviewTab', {
   template: require('./story-preview-tab.component.html'),
   controller: [
-    '$scope', 'AssetsBackendApiService', 'StoryEditorNavigationService',
-    'StoryEditorStateService', 'UrlService',
+    'AssetsBackendApiService', 'StoryEditorStateService', 'UrlService',
     function(
-        $scope, AssetsBackendApiService, StoryEditorNavigationService,
-        StoryEditorStateService, UrlService) {
+        AssetsBackendApiService, StoryEditorStateService, UrlService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.initEditor = function() {

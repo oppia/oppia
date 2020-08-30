@@ -78,14 +78,12 @@ angular.module('oppia').directive('answerGroupEditor', [
         'answer-group-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
-        'AlertsService', 'ContextService', 'ExternalSaveService',
+        'StateInteractionIdService', 'AlertsService', 'ExternalSaveService',
         'INTERACTION_SPECS', 'StateEditorService', 'RuleObjectFactory',
         'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
         'ResponsesService',
         function(
-            $scope, $rootScope, $uibModal, StateInteractionIdService,
-            AlertsService, ContextService, ExternalSaveService,
+            StateInteractionIdService, AlertsService, ExternalSaveService,
             INTERACTION_SPECS, StateEditorService, RuleObjectFactory,
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
             ResponsesService) {

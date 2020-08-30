@@ -42,12 +42,12 @@ angular.module('oppia').directive('feedbackPopup', [
       scope: {},
       template: require('./feedback-popup.directive.html'),
       controller: [
-        '$scope', '$element', '$filter', '$http', '$log', '$timeout',
-        'AlertsService', 'BackgroundMaskService', 'FocusManagerService',
+        '$scope', '$element', '$http', '$log', '$timeout',
+        'BackgroundMaskService', 'FocusManagerService',
         'PlayerPositionService', 'UserService', 'WindowDimensionsService',
         function(
-            $scope, $element, $filter, $http, $log, $timeout,
-            AlertsService, BackgroundMaskService, FocusManagerService,
+            $scope, $element, $http, $log, $timeout,
+            BackgroundMaskService, FocusManagerService,
             PlayerPositionService, UserService, WindowDimensionsService) {
           var ctrl = this;
           var feedbackUrl = (

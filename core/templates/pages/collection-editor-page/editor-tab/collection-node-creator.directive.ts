@@ -41,17 +41,15 @@ angular.module('oppia').directive('collectionNodeCreator', [
         'collection-node-creator.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$window', '$filter', 'AlertsService',
-        'ValidatorsService', 'CollectionEditorStateService',
-        'CollectionLinearizerService', 'CollectionUpdateService',
-        'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
+        '$http', '$filter', 'AlertsService', 'ValidatorsService',
+        'CollectionEditorStateService', 'CollectionLinearizerService',
+        'ExplorationSummaryBackendApiService',
         'SearchExplorationsBackendApiService', 'SiteAnalyticsService',
         'INVALID_NAME_CHARS',
         function(
-            $http, $window, $filter, AlertsService,
-            ValidatorsService, CollectionEditorStateService,
-            CollectionLinearizerService, CollectionUpdateService,
-            CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
+            $http, $filter, AlertsService, ValidatorsService,
+            CollectionEditorStateService, CollectionLinearizerService,
+            ExplorationSummaryBackendApiService,
             SearchExplorationsBackendApiService, SiteAnalyticsService,
             INVALID_NAME_CHARS) {
           var ctrl = this;

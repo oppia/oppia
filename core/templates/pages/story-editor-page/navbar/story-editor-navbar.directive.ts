@@ -41,13 +41,13 @@ angular.module('oppia').directive('storyEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/navbar/story-editor-navbar.directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', 'AlertsService',
-        'EditableStoryBackendApiService', 'UndoRedoService',
-        'StoryEditorStateService', 'StoryEditorNavigationService', 'UrlService',
+        '$scope', '$uibModal', 'EditableStoryBackendApiService',
+        'UndoRedoService', 'StoryEditorStateService',
+        'StoryEditorNavigationService',
         function(
-            $scope, $rootScope, $uibModal, AlertsService,
-            EditableStoryBackendApiService, UndoRedoService,
-            StoryEditorStateService, StoryEditorNavigationService, UrlService) {
+            $scope, $uibModal, EditableStoryBackendApiService,
+            UndoRedoService, StoryEditorStateService,
+            StoryEditorNavigationService) {
           var ctrl = this;
           var EDITOR = 'Editor';
           var PREVIEW = 'Preview';

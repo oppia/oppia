@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint check to ensure that there is a break after parenthesis
- * in case of multiline hanging indentation.
+ * @fileoverview Lint check to ensure for unused dependency.
  */
 
 'use strict';
@@ -23,7 +22,7 @@ module.exports = {
   meta: {
     type: 'layout',
     docs: {
-      description: 'There should not be any unused directive',
+      description: 'There should not be any unused directive.',
       category: 'Stylistic Issues',
       recommended: true
     },

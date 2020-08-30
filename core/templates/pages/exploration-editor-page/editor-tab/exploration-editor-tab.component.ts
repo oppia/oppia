@@ -60,14 +60,14 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('explorationEditorTab', {
   template: require('./exploration-editor-tab.component.html'),
   controller: [
-    '$rootScope', '$scope', '$uibModal', 'LoaderService',
+    '$scope', '$uibModal', 'LoaderService',
     'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
     'ExplorationInitStateNameService', 'ExplorationStatesService',
     'ExplorationWarningsService', 'GraphDataService', 'RouterService',
     'StateEditorRefreshService', 'StateEditorService',
     'UrlInterpolationService',
     function(
-        $rootScope, $scope, $uibModal, LoaderService,
+        $scope, $uibModal, LoaderService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
         ExplorationInitStateNameService, ExplorationStatesService,
         ExplorationWarningsService, GraphDataService, RouterService,
