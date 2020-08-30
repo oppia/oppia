@@ -105,6 +105,12 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'TOPIC_PROPERTY_LANGUAGE_CODE',
   TopicDomainConstants.TOPIC_PROPERTY_LANGUAGE_CODE);
+angular.module('oppia').constant(
+  'TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED',
+  TopicDomainConstants.TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED);
+angular.module('oppia').constant(
+  'TOPIC_PROPERTY_META_TAG_CONTENT',
+  TopicDomainConstants.TOPIC_PROPERTY_META_TAG_CONTENT);
 
 angular.module('oppia').constant(
   'SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME',

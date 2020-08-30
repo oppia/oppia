@@ -47,7 +47,8 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
         self.save_new_topic(
             'topic_id', 'owner_id', name='name', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=0)
+            subtopics=[], next_subtopic_id=0, practice_tab_is_displayed=False,
+            meta_tag_content='topic meta tag content')
         self.assertTrue(
             topic_models.TopicModel.has_reference_to_user_id('owner_id'))
         self.assertFalse(

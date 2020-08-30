@@ -88,13 +88,8 @@ angular.module('oppia').component('topicViewerPage', {
             ctrl.skillDescriptions = readOnlyTopic.getSkillDescriptions();
             ctrl.topicIsLoading = false;
             LoaderService.hideLoadingScreen();
-            ctrl.trainTabShouldBeDisplayed = (
-              readOnlyTopic.getTrainTabShouldBeDisplayed());
-            if (
-              !ctrl.trainTabShouldBeDisplayed &&
-              ctrl.activeTab === 'practice') {
-              ctrl.setActiveTab('story');
-            }
+            ctrl.practiceTabIsDisplayed = (
+              readOnlyTopic.getPracticeTabIsDisplayed());
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the controller is migrated to angular.
             $rootScope.$apply();

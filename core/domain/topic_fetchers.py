@@ -151,6 +151,7 @@ def get_topic_from_model(topic_model):
         topic_model.next_subtopic_id,
         topic_model.language_code,
         topic_model.version, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
+        topic_model.meta_tag_content, topic_model.practice_tab_is_displayed,
         topic_model.created_on, topic_model.last_updated)
 
 

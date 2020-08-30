@@ -295,6 +295,22 @@ class UtilsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, '0 must be a string.'):
             utils.require_valid_name(name, 'name_type')
 
+    def test_require_valid_meta_tag_content(self):
+        meta_tag_content = 'name'
+        utils.require_valid_meta_tag_content(meta_tag_content)
+
+        non_string_meta_tag_content = 0
+        invalid_type_error = (
+            'Expected meta tag content to be a string, received 0')
+        with self.assertRaisesRegexp(Exception, invalid_type_error):
+            utils.require_valid_meta_tag_content(non_string_meta_tag_content)
+        lengthy_meta_tag_content = 'a' * 200
+        max_length_error = (
+            'Meta tag content should not be longer than %s characters.'
+            % constants.MAX_CHARS_IN_META_TAG_CONTENT)
+        with self.assertRaisesRegexp(Exception, max_length_error):
+            utils.require_valid_meta_tag_content(lengthy_meta_tag_content)
+
     def test_require_valid_url_fragment(self):
         name = 'name'
         utils.require_valid_url_fragment(name, 'name-type', 20)

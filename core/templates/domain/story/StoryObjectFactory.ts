@@ -40,6 +40,7 @@ interface StoryBackendDict {
   'thumbnail_filename': string;
   'thumbnail_bg_color': string;
   'url_fragment': string;
+  'meta_tag_content': string;
 }
 
 export class Story {
@@ -54,11 +55,12 @@ export class Story {
   _thumbnailFilename: string;
   _thumbnailBgColor: string;
   _urlFragment: string;
+  _metaTagContent: string;
   constructor(
       id: string, title: string, description: string, notes: string,
       storyContents: StoryContents, languageCode: string, version: number,
       correspondingTopicId: string, thumbnailBgColor: string,
-      thumbnailFilename: string, urlFragment: string) {
+      thumbnailFilename: string, urlFragment: string, metaTagContent: string) {
     this._id = id;
     this._title = title;
     this._description = description;
@@ -70,6 +72,7 @@ export class Story {
     this._thumbnailBgColor = thumbnailBgColor;
     this._thumbnailFilename = thumbnailFilename;
     this._urlFragment = urlFragment;
+    this._metaTagContent = metaTagContent;
   }
 
   getId(): string {
@@ -106,6 +109,14 @@ export class Story {
 
   setLanguageCode(languageCode: string): void {
     this._languageCode = languageCode;
+  }
+
+  getMetaTagContent(): string {
+    return this._metaTagContent;
+  }
+
+  setMetaTagContent(metaTagContent: string): void {
+    this._metaTagContent = metaTagContent;
   }
 
   getVersion(): number {
@@ -174,9 +185,17 @@ export class Story {
   }
 
   prepublishValidate(): string[] {
+    const metaTagContentCharLimit = constants.MAX_CHARS_IN_META_TAG_CONTENT;
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Story should have a thumbnail.');
+    }
+    if (!this._metaTagContent) {
+      issues.push('Story should have meta tag content.');
+    } else if (this._metaTagContent.length > metaTagContentCharLimit) {
+      issues.push(
+        'Story meta tag content should not be longer than ' +
+        `${metaTagContentCharLimit} characters.`);
     }
     return issues;
   }
@@ -196,6 +215,7 @@ export class Story {
     this._thumbnailFilename = otherStory.getThumbnailFilename();
     this._thumbnailBgColor = otherStory.getThumbnailBgColor();
     this._urlFragment = otherStory.getUrlFragment();
+    this.setMetaTagContent(otherStory.getMetaTagContent());
   }
 }
 
@@ -214,7 +234,7 @@ export class StoryObjectFactory {
       storyBackendDict.version, storyBackendDict.corresponding_topic_id,
       storyBackendDict.thumbnail_bg_color,
       storyBackendDict.thumbnail_filename,
-      storyBackendDict.url_fragment
+      storyBackendDict.url_fragment, storyBackendDict.meta_tag_content
     );
   }
 
@@ -223,7 +243,7 @@ export class StoryObjectFactory {
   createInterstitialStory(): Story {
     return new Story(
       null, 'Story title loading', 'Story description loading',
-      'Story notes loading', null, 'en', 1, null, null, null, null);
+      'Story notes loading', null, 'en', 1, null, null, null, null, '');
   }
 }
 

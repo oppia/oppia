@@ -9,7 +9,8 @@
       </div>
       <mat-card-content>
         <div *ngFor="let subtopic of availableSubtopics; let i = index">
-          <mat-checkbox color = "primary" class="practice-tab-mat-checkbox" [(ngModel)]="selectedSubtopicIndices[i]">
+          <mat-checkbox color="primary" class="practice-tab-mat-checkbox" [(ngModel)]="selectedSubtopicIndices[i]"
+                        (change)="checkIfQuestionsExist(selectedSubtopicIndices)">
             {{ subtopic.getTitle() }}
           </mat-checkbox>
         </div>
@@ -19,6 +20,11 @@
           <button mat-raised-button [disabled]="isStartButtonDisabled()" (click)="openNewPracticeSession()" class="practice-session-button">
             <span class="font-heavy" [innerHTML]="'I18N_TOPIC_VIEWER_START_PRACTICE' | translate"></span>
           </button>
+        </div>
+        <div class="mt-3" *ngIf="!questionsAreAvailable && isAtLeastOneSubtopicSelected()">
+          <em class="text-danger">
+            There are no questions created yet for the selected subtopic(s).
+          </em>
         </div>
       </mat-card-actions>
     </mat-card>

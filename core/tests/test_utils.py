@@ -1653,7 +1653,7 @@ tags: []
             self, story_id, owner_id, corresponding_topic_id,
             title='Title', description='Description', notes='Notes',
             language_code=constants.DEFAULT_LANGUAGE_CODE,
-            url_fragment='title'):
+            url_fragment='title', meta_tag_content='story meta tag content'):
         """Creates an Oppia Story and saves it.
 
         NOTE: Callers are responsible for ensuring that the
@@ -1672,6 +1672,7 @@ tags: []
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
             url_fragment: str. The url fragment of the story.
+            meta_tag_content: str. The meta tag content of the story.
 
         Returns:
             Story. A newly-created story.
@@ -1683,6 +1684,7 @@ tags: []
         story.notes = notes
         story.language_code = language_code
         story.url_fragment = url_fragment
+        story.meta_tag_content = meta_tag_content
         story_services.save_new_story(owner_id, story)
         return story
 
@@ -1691,7 +1693,8 @@ tags: []
             owner_id, title, description,
             notes, corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
-            url_fragment='story-frag'):
+            url_fragment='story-frag',
+            meta_tag_content='story meta tag content'):
         """Saves a new story with a default version 1 story contents
         data dictionary.
 
@@ -1719,6 +1722,7 @@ tags: []
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
             url_fragment: str. The URL fragment for the story.
+            meta_tag_content: str. The meta tag content of the story.
         """
         story_model = story_models.StoryModel(
             id=story_id,
@@ -1731,7 +1735,8 @@ tags: []
             notes=notes,
             corresponding_topic_id=corresponding_topic_id,
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT,
-            url_fragment=url_fragment
+            url_fragment=url_fragment,
+            meta_tag_content=meta_tag_content
         )
         commit_message = (
             'New story created with title \'%s\'.' % title)
@@ -1750,7 +1755,9 @@ tags: []
             description='description', canonical_story_ids=None,
             additional_story_ids=None, uncategorized_skill_ids=None,
             subtopics=None, next_subtopic_id=0,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            meta_tag_content='topic meta tag content',
+            practice_tab_is_displayed=False):
         """Creates an Oppia Topic and saves it.
 
         Args:
@@ -1774,6 +1781,9 @@ tags: []
             next_subtopic_id: int. The id for the next subtopic.
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
+            meta_tag_content: str. The meta tag content for the topic.
+            practice_tab_is_displayed: bool. Whether the practice tab should be
+                displayed.
 
         Returns:
             Topic. A newly-created topic.
@@ -1794,7 +1804,8 @@ tags: []
             description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
-            language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
+            meta_tag_content, practice_tab_is_displayed
         )
         topic_services.save_new_topic(owner_id, topic)
         return topic
@@ -1805,7 +1816,9 @@ tags: []
             thumbnail_bg_color, canonical_story_references,
             additional_story_references,
             uncategorized_skill_ids, next_subtopic_id,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            meta_tag_content='topic meta tag content',
+            practice_tab_is_displayed=False):
         """Saves a new topic with a default version 1 subtopic
         data dictionary.
 
@@ -1840,6 +1853,9 @@ tags: []
             next_subtopic_id: int. The id for the next subtopic.
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
+            meta_tag_content: str. The meta tag content for the topic.
+            practice_tab_is_displayed: bool. Whether the practice tab should be
+                displayed.
         """
         topic_rights_model = topic_models.TopicRightsModel(
             id=topic_id,
@@ -1863,7 +1879,9 @@ tags: []
             story_reference_schema_version=(
                 feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
             next_subtopic_id=next_subtopic_id,
-            subtopics=[self.VERSION_1_SUBTOPIC_DICT]
+            subtopics=[self.VERSION_1_SUBTOPIC_DICT],
+            meta_tag_content=meta_tag_content,
+            practice_tab_is_displayed=practice_tab_is_displayed
         )
         commit_message = (
             'New topic created with name \'%s\'.' % name)

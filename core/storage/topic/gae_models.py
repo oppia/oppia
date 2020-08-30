@@ -86,6 +86,11 @@ class TopicModel(base_models.VersionedModel):
     language_code = ndb.StringProperty(required=True, indexed=True)
     # The url fragment of the topic.
     url_fragment = ndb.StringProperty(required=True, indexed=True)
+    # Whether to show practice tab in the Topic viewer page.
+    practice_tab_is_displayed = ndb.BooleanProperty(
+        required=True, default=False)
+    # The content of the meta tag in the Topic viewer page.
+    meta_tag_content = ndb.StringProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy():

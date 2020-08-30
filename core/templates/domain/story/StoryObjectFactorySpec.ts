@@ -56,7 +56,8 @@ describe('Story object factory', () => {
         next_node_id: 'node_3'
       },
       language_code: 'en',
-      url_fragment: 'story-title'
+      url_fragment: 'story-title',
+      meta_tag_content: 'story meta tag content'
     };
     _sampleStory = storyObjectFactory.createFromBackendDict(
       // This throws "Argument of type '{ id: string; ... }'
@@ -87,10 +88,18 @@ describe('Story object factory', () => {
   });
 
   it('should correctly prepublish validate a story', () => {
+    _sampleStory.setMetaTagContent('a'.repeat(200));
     expect(_sampleStory.prepublishValidate()).toEqual([
-      'Story should have a thumbnail.']);
+      'Story should have a thumbnail.',
+      'Story meta tag content should not be longer than 160 characters.'
+    ]);
     _sampleStory.setThumbnailFilename('image.png');
     _sampleStory.setThumbnailBgColor('#F8BF74');
+    _sampleStory.setMetaTagContent('');
+    expect(_sampleStory.prepublishValidate()).toEqual([
+      'Story should have meta tag content.'
+    ]);
+    _sampleStory.setMetaTagContent('abc');
     expect(_sampleStory.prepublishValidate()).toEqual([]);
   });
 
@@ -151,7 +160,8 @@ describe('Story object factory', () => {
       language_code: 'en',
       thumbnail_filename: 'img.png',
       thumbnail_bg_color: '#a33f40',
-      url_fragment: 'story'
+      url_fragment: 'story',
+      meta_tag_content: 'story meta tag content'
     });
 
     expect(_sampleStory).not.toBe(secondStory);

@@ -66,6 +66,10 @@ var StoryEditorPage = function() {
   var chapterEditOptions = element.all(by.css('.protractor-test-edit-options'));
   var backToStoryEditorButton = element(
     by.css('.protractor-test-back-to-story-editor-button'));
+  var storyMetaTagContentField = element(
+    by.css('.protractor-test-story-meta-tag-content-field'));
+  var storyMetaTagContentLabel = element(
+    by.css('.protractor-test-story-meta-tag-content-label'));
 
   /*
    * CHAPTER
@@ -432,6 +436,12 @@ var StoryEditorPage = function() {
 
   this.deletePrerequisiteSkillByIndex = async function(index) {
     await deletePrerequisiteSkillButton.get(index).click();
+  };
+
+  this.updateMetaTagContent = async function(newMetaTagContent) {
+    await action.sendKeys(
+      'Update Meta Tag Content', storyMetaTagContentField, newMetaTagContent);
+    await action.click('Meta Tag Content label', storyMetaTagContentLabel);
   };
 
   this.expectAcquiredSkillDescriptionCardCount = async function(number) {

@@ -647,6 +647,22 @@ def require_valid_thumbnail_filename(thumbnail_filename):
                 thumbnail_filename)
 
 
+def require_valid_meta_tag_content(meta_tag_content):
+    """Generic meta tag content validation.
+
+        Args:
+            meta_tag_content: str. The meta tag content to validate.
+        """
+    if not isinstance(meta_tag_content, python_utils.BASESTRING):
+        raise ValidationError(
+            'Expected meta tag content to be a string, received %s'
+            % meta_tag_content)
+    if len(meta_tag_content) > constants.MAX_CHARS_IN_META_TAG_CONTENT:
+        raise ValidationError(
+            'Meta tag content should not be longer than %s characters.'
+            % constants.MAX_CHARS_IN_META_TAG_CONTENT)
+
+
 def capitalize_string(input_string):
     """Converts the first character of a string to its uppercase equivalent (if
     it's a letter), and returns the result.

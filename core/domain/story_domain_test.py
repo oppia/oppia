@@ -356,7 +356,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'corresponding_topic_id': topic_id,
             'version': 0,
-            'url_fragment': 'story-frag-default'
+            'url_fragment': 'story-frag-default',
+            'meta_tag_content': ''
         }
         self.assertEqual(story.to_dict(), expected_story_dict)
 

@@ -50,6 +50,14 @@
                 What does this story contain?
               </span>
             </div>
+            <div class="story-meta-tag-content" ng-class="{'has-error': editableMetaTagContent.length === 0}">
+              <label for="storyMetaTagContent" class="form-heading protractor-test-story-meta-tag-content-label">Meta Tag Content</label>
+              <textarea type="text" class="form-control protractor-test-story-meta-tag-content-field"
+                        ng-model="editableMetaTagContent"
+                        ng-blur="updateStoryMetaTagContent(editableMetaTagContent)"
+                        placeholder="Enter the meta tag content for the story">
+              </textarea>
+            </div>
             <div class="story-url-fragment">
               <label for="storyUrlFragment" class="form-heading">Url Fragment*</label>
               <input id="storyUrlFragment" type="text" class="form-control protractor-test-story-url-fragment-field"
@@ -292,8 +300,14 @@
     margin-top: 1.5vh;
   }
 
-  story-editor .story-description textarea {
+  story-editor .story-description textarea,
+  story-editor .story-meta-tag-content textarea {
     height: 10vh;
+  }
+
+  story-editor .story-meta-tag-content {
+    margin-bottom: 25px;
+    margin-top: 32px;
   }
 
   story-editor .parent-container {
