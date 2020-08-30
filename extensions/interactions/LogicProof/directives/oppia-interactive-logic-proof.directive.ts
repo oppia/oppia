@@ -64,7 +64,8 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
           // NOTE: for information on integrating angular and code-mirror see
           // http://github.com/angular-ui/ui-codemirror
           ctrl.codeEditor = function(editor) {
-            var proofString = (ctrl.interactionIsActive ?
+            var proofString = (
+              ctrl.interactionIsActive ?
               ctrl.localQuestionData.default_proof_string :
               ctrl.getLastAnswer().proof_string);
             editor.setValue(proofString);

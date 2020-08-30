@@ -92,10 +92,10 @@ export class ContributionOpportunitiesBackendApiService {
   private _getExplorationOpportunityFromDict(
       opportunityDict: ExplorationOpportunitySummaryBackendDict):
       ExplorationOpportunitySummary {
-    return new ExplorationOpportunitySummary(opportunityDict.id,
-      opportunityDict.topic_name, opportunityDict.story_title,
-      opportunityDict.chapter_title, opportunityDict.content_count,
-      opportunityDict.translation_counts);
+    return new ExplorationOpportunitySummary(
+      opportunityDict.id, opportunityDict.topic_name,
+      opportunityDict.story_title, opportunityDict.chapter_title,
+      opportunityDict.content_count, opportunityDict.translation_counts);
   }
 
   private _getSkillOpportunityFromDict(
@@ -189,8 +189,8 @@ export class ContributionOpportunitiesBackendApiService {
         .get<FeaturedTranslationLanguagesBackendDict>(
           '/retrivefeaturedtranslationlanguages').toPromise();
 
-      return response.featured_translation_languages.map(backendDict =>
-        this.featuredTranslationLanguageObjectFactory
+      return response.featured_translation_languages.map(
+        backendDict => this.featuredTranslationLanguageObjectFactory
           .createFromBackendDict(backendDict));
     } catch {
       return [];

@@ -329,8 +329,8 @@ export class ExplorationDiffService {
       v2States: StateObjectsDict,
       newestStateIds: StateIds): StateLink[] {
     let links = [];
-    let adjMatrixV1 = this._getAdjMatrix(v1States, originalStateIds,
-      this._maxId);
+    let adjMatrixV1 = this._getAdjMatrix(
+      v1States, originalStateIds, this._maxId);
     let adjMatrixV2 = this._getAdjMatrix(v2States, newestStateIds, this._maxId);
 
     for (let i = 1; i <= this._maxId; i++) {
