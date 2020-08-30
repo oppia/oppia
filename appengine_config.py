@@ -40,4 +40,4 @@ if os.path.isdir(OPPIA_TOOLS_PATH):
         raise Exception('Invalid path for oppia_tools library: %s' % PIL_PATH)
     sys.path.insert(0, PIL_PATH)
 
-vendor.add(os.path.join(ROOT_PATH, 'third_party'))
+vendor.add(os.path.join(ROOT_PATH, 'third_party', 'python_libs'))

@@ -459,6 +459,18 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             '_rectify_third_party_directory': True
         }
 
+        temp_file = os.path.join(self.THIRD_PARTY_DATA_FILE_PATH, 'temp')
+        swap_requirements = self.swap(
+            common, 'REQUIREMENTS_FILE_PATH', temp_file)
+        expected_lines = [
+            '\n',
+            '# Developers: Please do not add to this auto-generated file. If\n',
+            '# you want to add, remove, upgrade, or downgrade libraries,\n',
+            '# please change the `requirements.in` file and run the script\n',
+            '# `scripts/install_third_party` again to see your changes\n',
+            '# reflected in this file.'
+        ]
+
         def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             check_function_calls['subprocess_call_is_called'] = True
             class Ret(python_utils.OBJECT):
@@ -483,17 +495,20 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         swap_get_mismatches = self.swap(
             install_backend_python_libs, 'get_mismatches',
             mock_get_mismatches)
-
         swap_rectify_third_party_directory = self.swap(
             install_backend_python_libs, '_rectify_third_party_directory',
             mock_rectify_third_party_directory)
-
         swap_call = self.swap(subprocess, 'check_call', mock_call)
-
         with swap_call, swap_get_mismatches, swap_rectify_third_party_directory:
-            install_backend_python_libs.main()
+            with swap_requirements:
+                install_backend_python_libs.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
+
+        with python_utils.open_file(temp_file, 'r') as f:
+            self.assertEqual(expected_lines, f.readlines())
+        # Revert the file.
+        os.remove(temp_file)
 
     def test_main_without_library_mismatches_calls_correct_functions(self):
         check_function_calls = {
