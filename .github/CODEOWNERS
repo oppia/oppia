@@ -585,12 +585,12 @@
 
 # Dynamic Feature Gating project
 # TODO(#10472): Revert ownership to @vinitamurthi after 2020-09-05.
-/core/controllers/platform_feature*.py @BenHenning 
-/core/domain/platform_feature_services*.py @BenHenning 
-/core/domain/platform_parameter*.py @BenHenning 
-/core/platform_feature*.py @BenHenning 
-/core/storage/config/ @BenHenning 
-/core/templates/domain/platform_feature/ @BenHenning 
+/core/controllers/platform_feature*.py @BenHenning
+/core/domain/platform_feature_services*.py @BenHenning
+/core/domain/platform_parameter*.py @BenHenning
+/core/platform_feature*.py @BenHenning
+/core/storage/config/ @BenHenning
+/core/templates/domain/platform_feature/ @BenHenning
 
 
 # Frontend unit tests
@@ -639,6 +639,8 @@
 /export/ @seanlip
 /manifest.json @vojtechjelinek
 /package.json @vojtechjelinek
+/requirements.txt @seanlip
+/requirements.in @seanlip
 /yarn.lock @vojtechjelinek
 /scripts/install_third_party_libs.py @vojtechjelinek
 /.github/ @DubeySandeep

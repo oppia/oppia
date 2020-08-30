@@ -411,6 +411,48 @@ def does_diff_include_travis_yml_or_js_files(diff_files):
     return False
 
 
+def check_for_backend_python_library_inconsistencies():
+    """Checks the state of the 'third_party/python_libs' folder and compares it
+    to the required libraries specified in 'requirements.txt'.
+    If any inconsistencies are found, the script presents options to the
+    developer to fix the conflicts.
+    """
+    mismatches = install_backend_python_libs.get_mismatches()
+
+    if mismatches:
+        python_utils.PRINT(
+            'Your currently installed python libraries do not match the\n'
+            'libraries listed in your "requirements.txt" file. Here is a\n'
+            'full list of library/version discrepancies:\n')
+
+        python_utils.PRINT(
+            '{:<35} |{:<25}|{:<25}'.format(
+                'Library', 'Requirements Version',
+                'Currently Installed Version'))
+        for library, versions in mismatches.items():
+            python_utils.PRINT('{:<35} |{:<25}|{:<25}'.format(
+                library, versions[0], versions[1]))
+        python_utils.PRINT('\n')
+        common.print_each_string_after_two_new_lines([
+            'Please choose one of the following options to rectify your local\n'
+            ' dev environment: ',
+            '1. Update the `requirements.in` file yourself to reflect which\n'
+            '   libraries should be installed. Choose this option if your \n'
+            '   current branch involves manual changes to Python dependencies\n'
+            '   and your `requirements.in` file is not up-to-date.',
+            '2. Regenerate the third_party/python_libs directory. (Selecting\n'
+            '   this option will run scripts.install_third_party to\n'
+            '   regenerate the third_party/python_utils folder with\n'
+            '   the correct dependencies.)\n\n'])
+
+        choice = python_utils.INPUT('Choose an option or Ctrl-C to exit: ')
+        if choice == '2':
+            install_backend_python_libs.main()
+    else:
+        python_utils.PRINT(
+            'No inconsistencies found in backend python libraries.')
+
+
 def main(args=None):
     """Main method for pre-push hook that executes the Python/JS linters on all
     files that deviate from develop.
@@ -483,36 +525,7 @@ def main(args=None):
                     'Push aborted due to failing e2e test configuration check.')
                 sys.exit(1)
 
-    # Check the state of the 'third_party/python_libs' folder and compares it to
-    # the required libraries specified in 'requirements.txt'.
-    # Presents options to the developer if any inconsistencies are found to
-    # fix the conflicts.
-    mismatches = install_backend_python_libs.get_mismatches()
-
-    if mismatches:
-        python_utils.PRINT(
-            '{:<35} |{:<25}|{:<25}'.format(
-                'Library','Requirements Version',
-                'Currently Installed Version'))
-        for library, versions in mismatches.items():
-            python_utils.PRINT('{:<35} |{:<25}|{:<25}'.format(
-                library, versions[0], versions[1]))
-        python_utils.PRINT()
-        common.print_each_string_after_two_new_lines([
-            'Please choose one of the following options to rectify your local\n'
-            ' dev environment: ',
-            '1. Update the `requirements.in` file yourself to reflect which\n'
-            '   libraries should be installed. Choose this option if your \n'
-            '   current branch involves manual changes to Python dependencies\n'
-            '   and your `requirements.in` file is not up-to-date.',
-            '2. Regenerate the third_party/python_libs directory. (Selecting\n'
-            '   this option will run scripts.install_third_party to\n'
-            '   regenerate the third_party/python_utils folder with\n'
-            '   the correct dependencies.)\n\n'])
-
-        choice = python_utils.INPUT('Choose an option or Ctrl-C to exit: ')
-        if choice == '2':
-            install_backend_python_libs.main()
+    check_for_backend_python_library_inconsistencies()
 
     return
 
