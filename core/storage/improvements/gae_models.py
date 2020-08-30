@@ -145,7 +145,7 @@ class TaskEntryModel(base_models.BaseModel):
             target_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
             issue_description: base_models.EXPORT_POLICY.NOT_EXPORTED,
             status: base_models.EXPORT_POLICY.NOT_EXPORTED,
-            resolver_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            resolver_id: base_models.EXPORT_POLICY.EXPORTED,
             resolved_on: base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 

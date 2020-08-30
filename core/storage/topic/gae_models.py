@@ -546,7 +546,7 @@ class TopicRightsModel(base_models.VersionedModel):
     def get_export_policy():
         """Model contains user data."""
         return {
-            manager_ids: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            manager_ids: base_models.EXPORT_POLICY.EXPORTED,
             topic_is_published: base_models.EXPORT_POLICY.NOT_EXPORTED
         }
 

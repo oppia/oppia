@@ -96,18 +96,18 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     def get_export_policy():
         """Model contains user data."""
         return {
-            entity_type: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            entity_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            original_author_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            status: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            subject: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            summary: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            has_suggestion: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            message_count: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            entity_type: base_models.EXPORT_POLICY.EXPORTED,
+            entity_id: base_models.EXPORT_POLICY.EXPORTED,
+            original_author_id: base_models.EXPORT_POLICY.EXPORTED,
+            status: base_models.EXPORT_POLICY.EXPORTED,
+            subject: base_models.EXPORT_POLICY.EXPORTED,
+            summary: base_models.EXPORT_POLICY.EXPORTED,
+            has_suggestion: base_models.EXPORT_POLICY.EXPORTED,
+            message_count: base_models.EXPORT_POLICY.EXPORTED,
             last_nonempty_message_text:
-                base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+                base_models.EXPORT_POLICY.EXPORTED,
             last_nonempty_message_author_id:
-                base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY
+                base_models.EXPORT_POLICY.EXPORTED
         }
 
     @classmethod
@@ -258,13 +258,13 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     def get_export_policy():
         """Model contains user data."""
         return {
-            thread_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            message_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            author_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            updated_status: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            updated_subject: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            text: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            received_via_email: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY
+            thread_id: base_models.EXPORT_POLICY.EXPORTED,
+            message_id: base_models.EXPORT_POLICY.EXPORTED,
+            author_id: base_models.EXPORT_POLICY.EXPORTED,
+            updated_status: base_models.EXPORT_POLICY.EXPORTED,
+            updated_subject: base_models.EXPORT_POLICY.EXPORTED,
+            text: base_models.EXPORT_POLICY.EXPORTED,
+            received_via_email: base_models.EXPORT_POLICY.EXPORTED
         }
 
     @classmethod
@@ -541,10 +541,10 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     def get_export_policy():
         """Model contains user data."""
         return {
-            user_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            thread_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            user_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            thread_id: base_models.EXPORT_POLICY.EXPORTED,
             message_ids_read_by_user:
-                base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY
+                base_models.EXPORT_POLICY.EXPORTED
         }
 
 

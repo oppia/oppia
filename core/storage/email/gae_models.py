@@ -393,9 +393,9 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     def get_export_policy():
         """Model contains user data."""
         return {
-            user_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            thread_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            reply_to_id: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY
+            user_id: base_models.EXPORT_POLICY.NOT_EXPORTED,
+            thread_id: base_models.EXPORT_POLICY.EXPORTED,
+            reply_to_id: base_models.EXPORT_POLICY.EXPORTED
         }
 
     @classmethod

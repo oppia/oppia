@@ -387,10 +387,10 @@ class ExplorationRightsModel(base_models.VersionedModel):
     def get_export_policy():
         """Model contains user data."""
         return {
-            owner_ids: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            editor_ids: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            voice_artist_ids: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
-            viewer_ids: base_models.EXPORT_POLICY.EXPORTED_INDIRECTLY,
+            owner_ids: base_models.EXPORT_POLICY.EXPORTED,
+            editor_ids: base_models.EXPORT_POLICY.EXPORTED,
+            voice_artist_ids: base_models.EXPORT_POLICY.EXPORTED,
+            viewer_ids: base_models.EXPORT_POLICY.EXPORTED,
             community_owned: base_models.EXPORT_POLICY.NOT_EXPORTED,
             cloned_from: base_models.EXPORT_POLICY.NOT_EXPORTED,
             viewable_if_private: base_models.EXPORT_POLICY.NOT_EXPORTED,
