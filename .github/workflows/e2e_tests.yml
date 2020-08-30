@@ -24,9 +24,6 @@ jobs:
       - name: Install third party
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_third_party_libs
-      - name: Set Environment Variable
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: echo "::set-env name=DISPLAY:::99.0"
       - name: Run Contributor Dashboard E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a python -m scripts.run_e2e_tests --suite="contributorDashboard"  --contributor_dashboard_enabled
