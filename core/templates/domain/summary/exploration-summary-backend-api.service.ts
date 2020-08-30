@@ -34,7 +34,8 @@ export class ExplorationSummaryBackendApiService {
     private alertsService: AlertsService,
     private validatorsService: ValidatorsService) {}
 
-  _fetchExpSummaries(explorationIds: string[],
+  _fetchExpSummaries(
+      explorationIds: string[],
       includePrivateExplorations: boolean,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: string[]) => void): void {

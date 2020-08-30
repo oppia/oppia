@@ -50,9 +50,11 @@ describe('Create New Chapter Modal Controller', function() {
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ExplorationIdValidationService',
+    $provide.value(
+      'ExplorationIdValidationService',
       TestBed.get(ExplorationIdValidationService));
-    $provide.value('ExplorationSummaryBackendApiService',
+    $provide.value(
+      'ExplorationSummaryBackendApiService',
       TestBed.get(ExplorationSummaryBackendApiService));
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
