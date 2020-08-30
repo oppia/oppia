@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { KeyboardShortcutHelpModalComponent } from
-  'components/keyboard-shortcut-help/keyboard-shortcut-help.component.ts';
+  'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component.ts';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
 

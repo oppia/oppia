@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for embed exploration modal.
+ * @fileoverview Controller for keyboard shortcut help modal.
  */
 
 import { Component, OnInit } from '@angular/core';

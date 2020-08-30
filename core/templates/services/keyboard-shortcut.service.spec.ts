@@ -17,10 +17,18 @@
  */
 import 'mousetrap';
 
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { KeyboardShortcutHelpModalComponent } from
+  'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component.ts';
+import { NgbModal, NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
+class MockActiveModal {
+  dismiss(): void {
+    return;
+  }
+}
 describe('Keyboard Shortcuts', () => {
   var skipButton = document.createElement('button');
   var nextButton = document.createElement('button');
@@ -28,7 +36,7 @@ describe('Keyboard Shortcuts', () => {
   var backButton = document.createElement('button');
   var searchBar = document.createElement('input');
   var categoryBar = document.createElement('select');
-  var ngbModal: NgbModal;
+
   var openQuickReferenceSpy;
 
   var mockWindow = {
@@ -37,11 +45,37 @@ describe('Keyboard Shortcuts', () => {
     }
   };
 
-  const windowRef = new WindowRef();
-  const keyboardShortcutService = new KeyboardShortcutService(
-    windowRef,
-    ngbModal
-  );
+  var windowRef;
+  var keyboardShortcutService;
+  var component: KeyboardShortcutHelpModalComponent;
+  var fixture: ComponentFixture<KeyboardShortcutHelpModalComponent>;
+  var ngbActiveModal: NgbActiveModal;
+  var ngbModal: NgbModal;
+
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [KeyboardShortcutHelpModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        }
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(async() => {
+    fixture = TestBed.createComponent(KeyboardShortcutHelpModalComponent);
+    ngbModal = TestBed.get(NgbModal);
+    ngbActiveModal = TestBed.get(NgbActiveModal);
+    component = fixture.componentInstance;
+    windowRef = new WindowRef();
+    keyboardShortcutService = new KeyboardShortcutService(
+      windowRef,
+      ngbModal
+    );
+  });
 
   beforeAll(() => {
     skipButton.setAttribute('id', 'skipToMainContentId');
@@ -55,14 +89,12 @@ describe('Keyboard Shortcuts', () => {
     document.body.append(backButton);
     document.body.append(searchBar);
     document.body.append(categoryBar);
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue(mockWindow);
-    openQuickReferenceSpy = spyOn(
-      keyboardShortcutService, 'openQuickReference');
   });
 
 
   it('should navigate to the corresponding page' +
     ' when the navigation key is pressed', () => {
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue(mockWindow);
     keyboardShortcutService.bindNavigationShortcuts();
 
     mockWindow.location.href = '';
@@ -106,6 +138,12 @@ describe('Keyboard Shortcuts', () => {
 
   it('should move the focus to the corresponding element' +
     ' when the action key is pressed', () => {
+    openQuickReferenceSpy = spyOn(
+      keyboardShortcutService, 'openQuickReference').and.callThrough();;
+    spyOn(ngbModal,'open');
+    spyOn(ngbModal,'dismissAll');
+
+    
     keyboardShortcutService.bindLibraryPageShortcuts();
 
     Mousetrap.trigger('s');
