@@ -48,12 +48,6 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
         super(BaseSuggestionUnitTests, self).setUp()
         self.base_suggestion = MockInvalidSuggestion()
 
-    def test_base_class_init_raises_error(self):
-        with self.assertRaisesRegexp(
-            NotImplementedError,
-            'Subclasses of BaseSuggestion should implement __init__.'):
-            suggestion_registry.BaseSuggestion()
-
     def test_base_class_accept_raises_error(self):
         with self.assertRaisesRegexp(
             NotImplementedError,

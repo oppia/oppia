@@ -276,11 +276,39 @@ class LearnerPlaylist(python_utils.OBJECT):
 class UserContributionScoring(python_utils.OBJECT):
     """Domain object for UserContributionScoringModel."""
 
-    def __init__(self, user_id, score_category, score, has_email_been_sent):
+    def __init__(self, user_id, score_category, score, onboarding_email_sent):
         self.user_id = user_id
         self.score_category = score_category
         self.score = score
-        self.has_email_been_sent = has_email_been_sent
+        self.onboarding_email_sent = onboarding_email_sent
+
+    def increment_score(self, increment_by):
+        """Increments the score of the user in the category by the given amount.
+
+        In the first version of the scoring system, the increment_by quantity
+        will be +1, i.e, each user gains a point for a successful contribution
+        and doesn't lose score in any way.
+
+        Args:
+            increment_by: float. The amount to increase the score of the user
+                by.
+        """
+        self.score += increment_by
+
+    def can_user_review_category(self):
+        """Checks if user can review suggestions in category score_category.
+        If the user has score above the minimum required score, then the user
+        is allowed to review.
+
+        Returns:
+            bool. Whether the user can review suggestions under category
+            score_category.
+        """
+        return self.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+
+    def mark_onboarding_email_as_sent(self):
+        """Marks the email as sent."""
+        self.onboarding_email_sent = True
 
 
 class UserContributionRights(python_utils.OBJECT):

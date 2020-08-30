@@ -37,8 +37,11 @@ import feconf
 import python_utils
 import utils
 
-(suggestion_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.suggestion, models.NAMES.feedback])
+(suggestion_models, feedback_models, user_models) = (
+    models.Registry.import_models(
+        [models.NAMES.suggestion, models.NAMES.feedback, models.NAMES.user]
+    )
+)
 
 
 class SuggestionServicesUnitTests(test_utils.GenericTestBase):
@@ -49,6 +52,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion_models.SCORE_CATEGORY_DELIMITER + 'Algebra')
 
     target_id = 'exp1'
+    target_id_2 = 'exp2'
+    target_id_3 = 'exp3'
     target_version_at_submission = 1
     change = {
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -70,6 +75,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     EMPTY_COMMIT_MESSAGE = ' '
 
     suggestion_id = THREAD_ID
+    suggestion_id_2 = 'exploration.exp2.thread_2'
+    suggestion_id_3 = 'exploration.exp3.thread_3'
 
     def setUp(self):
         super(SuggestionServicesUnitTests, self).setUp()
@@ -84,8 +91,52 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.target_id, self.author_id, category='Algebra')
 
-    def mock_generate_new_thread_id(self, unused_entity_type, unused_entity_id):
-        return self.THREAD_ID
+    def assert_suggestion_status(self, suggestion_id, status):
+        """Assert the status of the suggestion with suggestion_id."""
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        self.assertEqual(suggestion.status, status)
+
+    def mock_accept_suggestion(
+            self, suggestion_id, reviewer_id, commit_message, review_message):
+        """Sets up the appropriate mocks to successfully call
+        accept_suggestion.
+        """
+        with self.swap(
+            exp_services, 'update_exploration', self.mock_update_exploration):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                with self.swap(
+                    suggestion_registry.SuggestionEditStateContent,
+                    'pre_accept_validate',
+                    self.mock_pre_accept_validate_does_nothing):
+                    with self.swap(
+                        suggestion_registry.SuggestionEditStateContent,
+                        'get_change_list_for_accepting_suggestion',
+                        self.mock_get_change_list_does_nothing):
+                        suggestion_services.accept_suggestion(
+                            suggestion_id, reviewer_id,
+                            commit_message, review_message)
+
+    def mock_create_suggestion(self, target_id):
+        """Sets up the appropriate mocks to successfully call
+        create_suggestion.
+        """
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.mock_generate_new_thread_id):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    target_id, self.target_version_at_submission,
+                    self.author_id, self.change, 'test description')
+
+    def mock_generate_new_thread_id(self, entity_type, exp_id):
+        thread_id = 'thread_%s' % exp_id[-1]
+        return '.'.join([entity_type, exp_id, thread_id])
 
     class MockExploration(python_utils.OBJECT):
         """Mocks an exploration. To be used only for testing."""
@@ -97,7 +148,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
     # All mock explorations created for testing.
     explorations = [
-        MockExploration('exp1', {'state_1': {}, 'state_2': {}})
+        MockExploration('exp1', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp2', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp3', {'state_1': {}, 'state_2': {}})
     ]
 
     def mock_get_exploration_by_id(self, exp_id):
@@ -136,22 +189,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             },
             'score_category': self.score_category
         }
-        with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id', self.mock_generate_new_thread_id):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description')
+        self.mock_create_suggestion(self.target_id)
 
-            observed_suggestion = suggestion_services.get_suggestion_by_id(
-                self.suggestion_id)
-            self.assertDictContainsSubset(
-                expected_suggestion_dict, observed_suggestion.to_dict())
+        observed_suggestion = suggestion_services.get_suggestion_by_id(
+            self.suggestion_id)
+        self.assertDictContainsSubset(
+            expected_suggestion_dict, observed_suggestion.to_dict())
 
     def test_cannot_create_suggestion_with_invalid_suggestion_type(self):
         with self.assertRaisesRegexp(Exception, 'Invalid suggestion type'):
@@ -189,7 +232,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 self.target_id, self.target_version_at_submission,
                 self.author_id, add_translation_change_dict, 'test description')
 
-    def test_get_all_stale_suggestions(self):
+    def test_get_all_stale_suggestion_ids(self):
         suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -199,28 +242,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(
             suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS', 0):
             self.assertEqual(
-                len(suggestion_services.get_all_stale_suggestions()), 1)
+                len(suggestion_services.get_all_stale_suggestion_ids()), 1)
 
         with self.swap(
             suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS',
             7 * 24 * 60 * 60 * 1000):
             self.assertEqual(
-                len(suggestion_services.get_all_stale_suggestions()), 0)
-
-    def test_cannot_mark_review_completed_with_invalid_status(self):
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description')
-
-        suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id), (
-                'target_id', self.target_id)])[0]
-
-        with self.assertRaisesRegexp(Exception, 'Invalid status after review.'):
-            suggestion_services.mark_review_completed(
-                suggestion, 'invalid_status', self.reviewer_id)
+                len(suggestion_services.get_all_stale_suggestion_ids()), 0)
 
     def mock_update_exploration(
             self, unused_user_id, unused_exploration_id, unused_change_list,
@@ -240,50 +268,19 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (
                 'target_id', self.target_id)])[0]
+        self.assert_suggestion_status(
+            suggestion.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
         with self.assertRaisesRegexp(
             Exception, 'Review message cannot be empty.'):
             suggestion_services.reject_suggestion(
-                suggestion, self.reviewer_id, '')
+                suggestion.suggestion_id, self.reviewer_id, '')
 
-    def test_email_is_not_sent_to_unregistered_user(self):
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description')
-
-        suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id), (
-                'target_id', self.target_id)])[0]
-
-        self.assertFalse(
-            suggestion_services.check_if_email_has_been_sent_to_user(
-                'unregistered_user_id', suggestion.score_category))
-
-    def test_cannot_mark_email_has_been_sent_to_user_with_no_user_scoring_model(
-            self):
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id, self.target_version_at_submission,
-            self.author_id, self.change, 'test description')
-
-        suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id), (
-                'target_id', self.target_id)])[0]
-
-        with self.assertRaisesRegexp(
-            Exception, 'Expected user scoring model to exist for user'):
-            suggestion_services.mark_email_has_been_sent_to_user(
-                'unregistered_user_id', suggestion.score_category)
+        # Assert that the suggestion was not rejected.
+        self.assert_suggestion_status(
+            suggestion.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
     def test_accept_suggestion_and_send_email_to_author(self):
-        enable_recording_of_scores_swap = self.swap(
-            feconf, 'ENABLE_RECORDING_OF_SCORES', True)
-        send_suggestion_review_related_emails_swap = self.swap(
-            feconf, 'SEND_SUGGESTION_REVIEW_RELATED_EMAILS', True)
-
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'state 1',
@@ -309,72 +306,138 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (
                 'target_id', self.target_id)])[0]
-        self.assertEqual(
-            suggestion.status, suggestion_models.STATUS_IN_REVIEW)
-        self.assertFalse(
-            suggestion_services.check_if_email_has_been_sent_to_user(
-                self.author_id, suggestion.score_category))
+        self.assert_suggestion_status(
+            suggestion.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
+        # Create a user scoring model to verify that the
+        # score and onboarding_email_sent fields have changed after the
+        # suggestion has been accepted.
+        user_models.UserContributionScoringModel.create(
+            self.author_id, suggestion.score_category, 0)
 
-        suggestion_services.increment_score_for_user(
-            self.author_id, suggestion.score_category, 10)
+        # An email is sent to users the first time that they pass the score
+        # required to review a suggestion category. By default, when a
+        # suggestion is accepted and the recording of scores is enabled, the
+        # score of the author of that suggestion is increased by 1. Therefore,
+        # by setting that increment to minimum score required to review, we can
+        # ensure that the email is sent.
+        with self.swap(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
+            with self.swap(
+                feconf, 'SEND_SUGGESTION_REVIEW_RELATED_EMAILS', True):
+                with self.swap(
+                    suggestion_models, 'INCREMENT_SCORE_OF_AUTHOR_BY',
+                    feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW):
+                    suggestion_services.accept_suggestion(
+                        suggestion.suggestion_id, self.reviewer_id,
+                        self.COMMIT_MESSAGE, 'review message')
 
-        with enable_recording_of_scores_swap, (
-            send_suggestion_review_related_emails_swap):
-            suggestion_services.accept_suggestion(
-                suggestion, self.reviewer_id, self.COMMIT_MESSAGE,
-                'review message')
-
+        # Assert that the suggestion is now accepted.
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), (
                 'target_id', self.target_id)])[0]
+        self.assert_suggestion_status(
+            suggestion.suggestion_id, suggestion_models.STATUS_ACCEPTED)
+        # Assert that the email was sent and that the score increased by the
+        # correct amount.
+        user_scoring_model = user_models.UserContributionScoringModel.get(
+            self.author_id, suggestion.score_category
+        )
+        self.assertTrue(user_scoring_model.onboarding_email_sent)
         self.assertEqual(
-            suggestion.status, suggestion_models.STATUS_ACCEPTED)
-        self.assertTrue(
-            suggestion_services.check_if_email_has_been_sent_to_user(
-                self.author_id, suggestion.score_category))
+            user_scoring_model.score, feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
+
+    def test_accept_suggestion_does_not_send_email_if_users_score_is_too_low(
+            self):
+        self.mock_create_suggestion(self.target_id)
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
+        # Create the user scoring model to verify the score and
+        # that the onboarding_email_sent field does not change after the
+        # suggestion is accepted.
+        user_models.UserContributionScoringModel.create(
+            self.author_id, self.score_category, 0)
+
+        # An email is sent to users the first time that they pass the score
+        # required to review a suggestion category. By default, when a
+        # suggestion is accepted and the recording of scores is enabled, the
+        # score of the author of that suggestion is increased by 1. This is
+        # less than the minimum score required to review so an email should not
+        # be sent.
+        with self.swap(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
+            with self.swap(
+                feconf, 'SEND_SUGGESTION_REVIEW_RELATED_EMAILS', True):
+                self.mock_accept_suggestion(
+                    self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
+                    'review message')
+
+        # Assert that the suggestion is now accepted.
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
+
+        user_scoring_model = user_models.UserContributionScoringModel.get(
+            self.author_id, self.score_category
+        )
+        # Assert that the users score was updated correctly.
+        self.assertEqual(
+            user_scoring_model.score,
+            suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
+        # Assert that their score is not high enough to review the category.
+        self.assertLess(
+            user_scoring_model.score,
+            feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
+        # Assert that the onboarding new reviewer email was not sent.
+        self.assertFalse(user_scoring_model.onboarding_email_sent)
+
+    def test_accept_suggestion_creates_user_scoring_model_if_it_does_not_exist(
+            self):
+        self.mock_create_suggestion(self.target_id)
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
+
+        # Verify that a user scoring model does not exist.
+        self.assertIsNone(user_models.UserContributionScoringModel.get(
+            self.author_id, self.score_category))
+
+        with self.swap(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
+            self.mock_accept_suggestion(
+                self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
+                'review message')
+
+        # Verify that a user scoring model now exists.
+        self.assertIsNotNone(user_models.UserContributionScoringModel.get(
+            self.author_id, self.score_category))
 
     def test_accept_suggestion_successfully(self):
-        with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id', self.mock_generate_new_thread_id):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description')
+        self.mock_create_suggestion(self.target_id)
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
+        self.mock_accept_suggestion(
+            self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
+            'review message')
+
+        # Assert that the suggestion is now accepted.
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
+        self.assertEqual(
+            suggestion.final_reviewer_id, self.reviewer_id)
 
-        with self.swap(
-            exp_services, 'update_exploration', self.mock_update_exploration):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                with self.swap(
-                    suggestion_registry.SuggestionEditStateContent,
-                    'pre_accept_validate',
-                    self.mock_pre_accept_validate_does_nothing):
-                    with self.swap(
-                        suggestion_registry.SuggestionEditStateContent,
-                        'get_change_list_for_accepting_suggestion',
-                        self.mock_get_change_list_does_nothing):
-                        suggestion_services.accept_suggestion(
-                            suggestion, self.reviewer_id,
-                            self.COMMIT_MESSAGE, 'review message')
-            suggestion = suggestion_services.get_suggestion_by_id(
-                self.suggestion_id)
-            self.assertEqual(
-                suggestion.status, suggestion_models.STATUS_ACCEPTED)
-            self.assertEqual(
-                suggestion.final_reviewer_id, self.reviewer_id)
-            thread_messages = feedback_services.get_messages(self.THREAD_ID)
-            last_message = thread_messages[len(thread_messages) - 1]
-            self.assertEqual(
-                last_message.text, 'review message')
+        thread_messages = feedback_services.get_messages(self.THREAD_ID)
+        last_message = thread_messages[len(thread_messages) - 1]
+        self.assertEqual(
+            last_message.text, 'review message')
+
+    def test_accept_suggestion_raises_exception_if_suggestion_does_not_exist(
+            self):
+        expected_exception_regexp = (
+            'You cannot accept the suggestion with id %s because it does not '
+            'exist.' % (self.suggestion_id)
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+            self.mock_accept_suggestion(
+                self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
+                'review message')
 
     def test_accept_suggestion_with_invalid_math_fails(self):
         """Test that the method for accepting suggestions raises error when
@@ -403,90 +466,65 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
                     self.author_id, change_dict, 'test description')
-
-        suggestion = suggestion_services.get_suggestion_by_id(
-            self.suggestion_id)
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
         expected_exception_regexp = (
             'Invalid math tags found in the suggestion with id %s.' % (
-                suggestion.suggestion_id)
-        )
-        with self.swap(
-            exp_services, 'update_exploration', self.mock_update_exploration):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                with self.swap(
-                    suggestion_registry.SuggestionEditStateContent,
-                    'pre_accept_validate',
-                    self.mock_pre_accept_validate_does_nothing):
-                    with self.swap(
-                        suggestion_registry.SuggestionEditStateContent,
-                        'get_change_list_for_accepting_suggestion',
-                        self.mock_get_change_list_does_nothing):
-                        with self.assertRaisesRegexp(
-                            Exception, expected_exception_regexp):
-                            suggestion_services.accept_suggestion(
-                                suggestion, self.reviewer_id,
-                                self.COMMIT_MESSAGE, 'review message')
-
-    def test_accept_suggestion_handled_suggestion_failure(self):
-        with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id', self.mock_generate_new_thread_id):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description')
-
-        suggestion = suggestion_services.get_suggestion_by_id(
-            self.suggestion_id)
-
-        suggestion.status = suggestion_models.STATUS_ACCEPTED
-        suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
-        expected_exception_regexp = (
-            'The suggestion with id %s has already been accepted/rejected.' % (
-                suggestion.suggestion_id)
+                self.suggestion_id)
         )
         with self.assertRaisesRegexp(Exception, expected_exception_regexp):
-            suggestion_services.accept_suggestion(
-                suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
-        suggestion = suggestion_services.get_suggestion_by_id(
-            self.suggestion_id)
+            self.mock_accept_suggestion(
+                self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
+                'review message')
 
-        self.assertEqual(
-            suggestion.status, suggestion_models.STATUS_ACCEPTED)
-        suggestion.status = suggestion_models.STATUS_REJECTED
-        suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
+        # Assert that the status of the suggestion hasn't changed.
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
+
+    def test_accept_suggestion_raises_exception_if_suggestion_already_accepted(
+            self):
+        self.mock_create_suggestion(self.target_id)
+        # Accept the suggestion.
+        self.mock_accept_suggestion(
+            self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, None)
+        # Assert that the suggestion has been accepted.
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
 
         expected_exception_regexp = (
             'The suggestion with id %s has already been accepted/rejected.' % (
-                suggestion.suggestion_id)
+                self.suggestion_id)
         )
         with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.accept_suggestion(
-                suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
-        suggestion = suggestion_services.get_suggestion_by_id(
-            self.suggestion_id)
-        self.assertEqual(
-            suggestion.status, suggestion_models.STATUS_REJECTED)
+                self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, None)
+
+    def test_accept_suggestion_raises_exception_if_suggestion_already_rejected(
+            self):
+        self.mock_create_suggestion(self.target_id)
+        # Reject the suggestion.
+        suggestion_services.reject_suggestion(
+            self.suggestion_id, self.reviewer_id, 'reject review message'
+        )
+        # Assert that the suggestion has been rejected.
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_REJECTED)
+
+        expected_exception_regexp = (
+            'The suggestion with id %s has already been accepted/rejected.' % (
+                self.suggestion_id)
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+            suggestion_services.accept_suggestion(
+                self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, None)
+
+        # Assert that the suggestion is still rejected.
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_REJECTED)
 
     def test_accept_suggestion_invalid_suggestion_failure(self):
-        with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id', self.mock_generate_new_thread_id):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description')
+        self.mock_create_suggestion(self.target_id)
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
@@ -498,50 +536,34 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                                    'invalid_score_category'):
             suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
 
-        suggestion = suggestion_services.get_suggestion_by_id(
-            self.suggestion_id)
-
     def test_accept_suggestion_no_commit_message_failure(self):
-        with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id', self.mock_generate_new_thread_id):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description')
-        suggestion = suggestion_services.get_suggestion_by_id(
-            self.suggestion_id)
+        self.mock_create_suggestion(self.target_id)
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
         with self.assertRaisesRegexp(
             Exception, 'Commit message cannot be empty.'):
             suggestion_services.accept_suggestion(
-                suggestion, self.reviewer_id, self.EMPTY_COMMIT_MESSAGE, None)
+                self.suggestion_id, self.reviewer_id,
+                self.EMPTY_COMMIT_MESSAGE, None)
+
+        # Assert that the status of the suggestion didn't change.
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
     def test_reject_suggestion_successfully(self):
-        with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id', self.mock_generate_new_thread_id):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description')
+        self.mock_create_suggestion(self.target_id)
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
-        suggestion = suggestion_services.get_suggestion_by_id(
-            self.suggestion_id)
         suggestion_services.reject_suggestion(
-            suggestion, self.reviewer_id, 'reject review message')
+            self.suggestion_id, self.reviewer_id, 'reject review message')
+
+        # Assert that the suggestion has been rejected.
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_REJECTED)
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
-        self.assertEqual(
-            suggestion.status, suggestion_models.STATUS_REJECTED)
         self.assertEqual(
             suggestion.final_reviewer_id, self.reviewer_id)
 
@@ -549,146 +571,181 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(last_message.text, 'reject review message')
 
-    def test_reject_suggestion_handled_suggestion_failure(self):
-        with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id', self.mock_generate_new_thread_id):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description')
-        suggestion = suggestion_services.get_suggestion_by_id(
-            self.suggestion_id)
+    def test_reject_suggestions_successfully(self):
+        # Create the first suggestion to be rejected.
+        self.mock_create_suggestion(self.target_id_2)
+        self.assert_suggestion_status(
+            self.suggestion_id_2, suggestion_models.STATUS_IN_REVIEW)
+        # Create another suggestion to be rejected.
+        self.mock_create_suggestion(self.target_id_3)
+        self.assert_suggestion_status(
+            self.suggestion_id_3, suggestion_models.STATUS_IN_REVIEW)
+        suggestion_ids = [self.suggestion_id_2, self.suggestion_id_3]
 
-        suggestion.status = suggestion_models.STATUS_ACCEPTED
-        suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
+        suggestion_services.reject_suggestions(
+            suggestion_ids, self.reviewer_id, 'reject review message')
+
+        for suggestion_id in suggestion_ids:
+            # Assert that the statuses changed to rejected.
+            self.assert_suggestion_status(
+                suggestion_id, suggestion_models.STATUS_REJECTED)
+            # Assert that the final reviewer id was updated.
+            suggestion = suggestion_services.get_suggestion_by_id(
+                suggestion_id)
+            self.assertEqual(
+                suggestion.final_reviewer_id, self.reviewer_id)
+            # Assert that the messages were updated.
+            thread_messages = feedback_services.get_messages(suggestion_id)
+            last_message = thread_messages[len(thread_messages) - 1]
+            self.assertEqual(
+                last_message.text, 'reject review message')
+
+    def test_reject_suggestion_raises_exception_if_suggestion_does_not_exist(
+            self):
         expected_exception_regexp = (
-            'The suggestion with id %s has already been accepted/rejected.' % (
-                suggestion.suggestion_id)
+            'You cannot reject the suggestion with id %s because it does not '
+            'exist.' % (self.suggestion_id)
         )
         with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.reject_suggestion(
-                suggestion, self.reviewer_id, 'reject review message')
+                self.suggestion_id, self.reviewer_id, 'review message')
 
-        suggestion = suggestion_services.get_suggestion_by_id(
-            self.suggestion_id)
-        self.assertEqual(
-            suggestion.status, suggestion_models.STATUS_ACCEPTED)
+    def test_reject_suggestion_raises_exception_if_suggestion_already_accepted(
+            self):
+        self.mock_create_suggestion(self.target_id)
+        # Accept the suggestion.
+        self.mock_accept_suggestion(
+            self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, None)
+        # Assert that the suggestion has been accepted.
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
 
-        suggestion.status = suggestion_models.STATUS_REJECTED
-        suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
-
+        # Rejecting the suggestion should not work because the suggestion has
+        # already been accepted.
         expected_exception_regexp = (
             'The suggestion with id %s has already been accepted/rejected.' % (
-                suggestion.suggestion_id)
+                self.suggestion_id)
         )
         with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.reject_suggestion(
-                suggestion, self.reviewer_id, 'reject review message')
-        suggestion = suggestion_services.get_suggestion_by_id(
-            self.suggestion_id)
-        self.assertEqual(
-            suggestion.status, suggestion_models.STATUS_REJECTED)
+                self.suggestion_id, self.reviewer_id, 'reject review message')
+
+        # Assert that the suggestion's status did not change.
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
+
+    def test_reject_suggestion_raises_exception_if_suggestion_already_rejected(
+            self):
+        self.mock_create_suggestion(self.target_id)
+        # Reject the suggestion.
+        suggestion_services.reject_suggestion(
+            self.suggestion_id, self.reviewer_id, 'reject review message')
+        # Assert that the suggestion has been rejected.
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_REJECTED)
+
+        # Rejecting the suggestion should not work because the suggestion has
+        # already been rejected.
+        expected_exception_regexp = (
+            'The suggestion with id %s has already been accepted/rejected.' % (
+                self.suggestion_id)
+        )
+        with self.assertRaisesRegexp(Exception, expected_exception_regexp):
+            suggestion_services.reject_suggestion(
+                self.suggestion_id, self.reviewer_id, 'reject review message')
 
     def test_resubmit_rejected_suggestion_success(self):
-        with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id', self.mock_generate_new_thread_id):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description')
-        suggestion = suggestion_services.get_suggestion_by_id(
-            self.suggestion_id)
+        self.mock_create_suggestion(self.target_id)
+        # Reject the suggestion.
         suggestion_services.reject_suggestion(
-            suggestion, self.reviewer_id, 'reject review message')
-        suggestion = suggestion_services.get_suggestion_by_id(
-            self.suggestion_id)
+            self.suggestion_id, self.reviewer_id, 'reject review message')
+        # Assert that the suggestion has been rejected.
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_REJECTED)
+        # Create the new change for the resubmitted suggestion.
+        resubmit_change_content = state_domain.SubtitledHtml(
+            'content', '<p>resubmit change content html</p>').to_dict()
+        resubmit_change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'state_1',
+                'new_value': resubmit_change_content,
+                'old_value': self.change['new_value']
+            }
+        )
+
+        # Resubmit rejected suggestion.
         suggestion_services.resubmit_rejected_suggestion(
-            suggestion, 'resubmit summary message', self.author_id)
+            self.suggestion_id, 'resubmit summary message', self.author_id,
+            resubmit_change)
+
+        # The suggestion's status should now be in review instead of rejected.
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
+        # The suggestion's change should be updated.
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
         self.assertEqual(
-            suggestion.status, suggestion_models.STATUS_IN_REVIEW)
+            suggestion.change.new_value['html'],
+            resubmit_change_content['html'])
 
-    def test_resubmit_rejected_suggestion_failure(self):
-        with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id', self.mock_generate_new_thread_id):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description')
-        suggestion = suggestion_services.get_suggestion_by_id(
-            self.suggestion_id)
+    def test_resubmit_rejected_suggestion_raises_exception_for_empty_message(
+            self):
+        self.mock_create_suggestion(self.target_id)
+
+        # Can't resubmit a rejected suggestion if the summary message is empty.
         with self.assertRaisesRegexp(
             Exception, 'Summary message cannot be empty.'):
             suggestion_services.resubmit_rejected_suggestion(
-                suggestion, '', self.author_id)
+                self.suggestion_id, '', self.author_id, {})
+
+    def test_resubmit_rejected_suggestion_raises_exception_for_unhandled_input(
+            self):
+        self.mock_create_suggestion(self.target_id)
+
+        # Can't resubmit a rejected suggestion if the suggestion hasn't been
+        # rejected yet.
         expected_exception_regexp = (
             'The suggestion with id %s is not yet handled.' % (
-                suggestion.suggestion_id)
+                self.suggestion_id)
         )
         with self.assertRaisesRegexp(Exception, expected_exception_regexp):
             suggestion_services.resubmit_rejected_suggestion(
-                suggestion, 'resubmit summary message', self.author_id)
+                self.suggestion_id, 'resubmit summary message',
+                self.author_id, {}
+            )
 
-    def test_resubmit_accepted_suggestion_failure(self):
-        with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id', self.mock_generate_new_thread_id):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description')
-                suggestion = suggestion_services.get_suggestion_by_id(
-                    self.suggestion_id)
-                with self.swap(
-                    suggestion_registry.SuggestionEditStateContent,
-                    'accept', self.mock_accept_does_nothing):
-                    suggestion_services.accept_suggestion(
-                        suggestion, self.reviewer_id,
-                        self.COMMIT_MESSAGE, 'review message')
-                suggestion = suggestion_services.get_suggestion_by_id(
-                    self.suggestion_id)
-                expected_exception_regexp = (
-                    'The suggestion with id %s was accepted. Only rejected '
-                    'suggestions can be resubmitted.' % (
-                        suggestion.suggestion_id)
-                )
-                with self.assertRaisesRegexp(
-                    Exception, expected_exception_regexp):
-                    suggestion_services.resubmit_rejected_suggestion(
-                        suggestion, 'resubmit summary message', self.author_id)
+    def test_resubmit_rejected_suggestion_raises_excep_for_accepted_suggestion(
+            self):
+        self.mock_create_suggestion(self.target_id)
+        # Accept the suggestion.
+        self.mock_accept_suggestion(
+            self.suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
+            'review message')
+        # Verfiy that the suggestion has been accepted.
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
+
+        # Can't resubmit the suggestion if it's already accepted.
+        expected_exception_regexp = (
+            'The suggestion with id %s was accepted. Only rejected '
+            'suggestions can be resubmitted.' % (
+                self.suggestion_id)
+        )
+        with self.assertRaisesRegexp(
+            Exception, expected_exception_regexp):
+            suggestion_services.resubmit_rejected_suggestion(
+                self.suggestion_id, 'resubmit summary message',
+                self.author_id, {}
+            )
+
+        # Verfiy that the suggestion is still accepted.
+        self.assert_suggestion_status(
+            self.suggestion_id, suggestion_models.STATUS_ACCEPTED)
 
     def test_check_can_resubmit_suggestion(self):
-        with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id', self.mock_generate_new_thread_id):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id, self.target_version_at_submission,
-                    self.author_id, self.change, 'test description')
+        self.mock_create_suggestion(self.target_id)
         can_resubmit = suggestion_services.check_can_resubmit_suggestion(
             self.suggestion_id, self.author_id)
         self.assertEqual(can_resubmit, True)
@@ -848,7 +905,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Not allowed to query on field invalid_field'):
             suggestion_services.query_suggestions(queries)
 
-    def test_get_translation_suggestions_with_exp_ids_with_one_exp(self):
+    def test_get_translation_suggestion_ids_with_exp_ids_with_one_exp(self):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_TRANSLATION,
             'state_name': 'state_1',
@@ -874,10 +931,12 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Assert that there is one translation suggestion with the given
         # exploration id found.
         self.assertEqual(
-            len(suggestion_services.get_translation_suggestions_with_exp_ids(
-                [self.target_id_1])), 1)
+            len(
+                suggestion_services
+                .get_translation_suggestion_ids_with_exp_ids(
+                    [self.target_id_1])), 1)
 
-    def test_get_translation_suggestions_with_exp_ids_with_multiple_exps(
+    def test_get_translation_suggestion_ids_with_exp_ids_with_multiple_exps(
             self):
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_TRANSLATION,
@@ -917,32 +976,46 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Assert that there are two translation suggestions with the given
         # exploration ids found.
         self.assertEqual(
-            len(suggestion_services.get_translation_suggestions_with_exp_ids(
-                [self.target_id_2, self.target_id_3])), 2)
+            len(
+                suggestion_services
+                .get_translation_suggestion_ids_with_exp_ids(
+                    [self.target_id_2, self.target_id_3])), 2)
 
-    def test_get_translation_suggestions_with_exp_ids_with_invalid_exp(
+    def test_get_translation_suggestion_ids_with_exp_ids_with_invalid_exp(
             self):
         # Assert that there are no translation suggestions with an invalid
         # exploration id found.
         self.assertEqual(
-            len(suggestion_services.get_translation_suggestions_with_exp_ids(
-                ['invalid_exp_id'])), 0)
+            len(
+                suggestion_services
+                .get_translation_suggestion_ids_with_exp_ids(
+                    ['invalid_exp_id'])), 0)
 
-    def test_get_translation_suggestions_with_exp_ids_with_empty_exp_list(
+    def test_get_translation_suggestion_ids_with_exp_ids_with_empty_exp_list(
             self):
         # Assert that there are no translation suggestions found when we
         # use an empty exp_ids list.
         self.assertEqual(
-            len(suggestion_services.get_translation_suggestions_with_exp_ids(
-                [])), 0)
+            len(
+                suggestion_services
+                .get_translation_suggestion_ids_with_exp_ids([])), 0)
 
     def test_query_suggestions_that_can_be_reviewed_by_user(self):
-        suggestion_services.create_new_user_contribution_scoring_model(
+        # User scoring models for user1.
+        user_models.UserContributionScoringModel.create(
             'user1', 'category1', 15)
-        suggestion_services.create_new_user_contribution_scoring_model(
+        user_models.UserContributionScoringModel.create(
             'user1', 'category2', 15)
-        suggestion_services.create_new_user_contribution_scoring_model(
+        user_models.UserContributionScoringModel.create(
             'user1', 'category3', 5)
+        # User scoring models for user2.
+        user_models.UserContributionScoringModel.create(
+            'user2', 'category1', 5)
+        user_models.UserContributionScoringModel.create(
+            'user2', 'category2', 5)
+        user_models.UserContributionScoringModel.create(
+            'user2', 'category3', 5)
+
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -958,6 +1031,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change, 'category3', 'exploration.exp1.thread_3')
+        # This suggestion does not count as a suggestion that can be reviewed
+        # by a user because it has already been rejected.
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
@@ -968,6 +1043,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change, 'category2', 'exploration.exp1.thread_5')
+
         self.assertEqual(len(
             suggestion_services
             .get_all_suggestions_that_can_be_reviewed_by_user('user1')), 3)
@@ -1136,10 +1212,9 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.author_id, self.change, 'test description')
 
         suggestion_id = self.THREAD_ID
-        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         suggestion_services.accept_suggestion(
-            suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
+            suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE, None)
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
@@ -1147,6 +1222,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             exploration.states['State 1'].content.html,
             '<p>new content</p>')
 
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
 
     def test_create_and_reject_suggestion(self):
@@ -1160,10 +1236,9 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.author_id, self.change, 'test description')
 
         suggestion_id = self.THREAD_ID
-        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         suggestion_services.reject_suggestion(
-            suggestion, self.reviewer_id, 'Reject message')
+            suggestion_id, self.reviewer_id, 'Reject message')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         thread_messages = feedback_services.get_messages(self.THREAD_ID)
@@ -1188,10 +1263,9 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.author_id, self.change, 'test description')
 
         suggestion_id = self.THREAD_ID
-        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         suggestion_services.accept_suggestion(
-            suggestion, self.reviewer_id, self.COMMIT_MESSAGE,
+            suggestion_id, self.reviewer_id, self.COMMIT_MESSAGE,
             'Accept message')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
@@ -1204,6 +1278,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             exploration.states['State 1'].content.html,
             '<p>new content</p>')
 
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
 
     def test_delete_skill_rejects_question_suggestion(self):
@@ -1295,77 +1370,65 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserContributionScoringUnitTests, self).setUp()
-        suggestion_services.create_new_user_contribution_scoring_model(
-            'user1', 'category1', 0)
-        suggestion_services.create_new_user_contribution_scoring_model(
-            'user1', 'category2', 0)
-        suggestion_services.create_new_user_contribution_scoring_model(
-            'user2', 'category1', 0)
-
-        self.signup('user_a@example.com', 'userA')
-        self.signup('user_b@example.com', 'userB')
-        self.signup('user_c@example.com', 'userC')
-        self.user_a_id = self.get_user_id_from_email('user_a@example.com')
-        self.user_b_id = self.get_user_id_from_email('user_b@example.com')
-        self.user_c_id = self.get_user_id_from_email('user_c@example.com')
-
-    def test_update_score_for_user(self):
-        suggestion_services.increment_score_for_user('user1', 'category1', 1)
-        suggestion_services.increment_score_for_user('user2', 'category1', 5)
-        suggestion_services.increment_score_for_user('user1', 'category2', 15.2)
-        suggestion_services.increment_score_for_user('user2', 'category2', 2)
-        suggestion_services.increment_score_for_user('user1', 'category1', -1)
-
-        scores1 = suggestion_services.get_all_scores_of_user('user1')
-        self.assertEqual(scores1['category1'], 0)
-        self.assertEqual(scores1['category2'], 15.2)
-
-        scores2 = suggestion_services.get_all_scores_of_user('user2')
-        self.assertEqual(scores2['category1'], 5)
-        self.assertEqual(scores2['category2'], 2)
-
-        scores3 = suggestion_services.get_all_scores_of_user('invalid_user')
-        self.assertDictEqual(scores3, {})
+        self.signup('user1@example.com', 'user1')
+        self.signup('user2@example.com', 'user2')
+        self.user_1_id = self.get_user_id_from_email('user1@example.com')
+        self.user_2_id = self.get_user_id_from_email('user2@example.com')
 
     def test_get_all_user_ids_who_are_allowed_to_review(self):
-        suggestion_services.increment_score_for_user('user1', 'category1', 1)
-        suggestion_services.increment_score_for_user('user2', 'category1', 5)
-        suggestion_services.increment_score_for_user('user1', 'category2', 15.2)
-        suggestion_services.increment_score_for_user('user2', 'category2', 2)
-        with self.swap(feconf, 'MINIMUM_SCORE_REQUIRED_TO_REVIEW', 10):
-            user_ids = (
-                suggestion_services.get_all_user_ids_who_are_allowed_to_review(
-                    'category1'))
-            self.assertEqual(user_ids, [])
-            user_ids = (
-                suggestion_services.get_all_user_ids_who_are_allowed_to_review(
-                    'category2'))
-            self.assertEqual(user_ids, ['user1'])
+        user_models.UserContributionScoringModel.create(
+            self.user_1_id, 'category1', 0)
+        user_models.UserContributionScoringModel.create(
+            self.user_1_id, 'category2',
+            feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
+        user_models.UserContributionScoringModel.create(
+            self.user_2_id, 'category1', 0)
+        user_models.UserContributionScoringModel.create(
+            self.user_2_id, 'category2', 0)
 
-            self.assertTrue(
-                suggestion_services.check_user_can_review_in_category(
-                    'user1', 'category2'))
-            self.assertFalse(
-                suggestion_services.check_user_can_review_in_category(
-                    'user2', 'category1'))
-            self.assertFalse(
-                suggestion_services.check_user_can_review_in_category(
-                    'user_1', 'category_new'))
-            self.assertFalse(
-                suggestion_services.check_user_can_review_in_category(
-                    'invalid_user', 'category1'))
+        user_ids = (
+            suggestion_services.get_all_user_ids_who_are_allowed_to_review(
+                'category1'))
+        self.assertEqual(user_ids, [])
+        user_ids = (
+            suggestion_services.get_all_user_ids_who_are_allowed_to_review(
+                'category2'))
+        self.assertEqual(user_ids, [self.user_1_id])
 
-    def test_check_if_email_has_been_sent_to_user(self):
-        suggestion_services.create_new_user_contribution_scoring_model(
-            self.user_a_id, 'category_a', 15)
-        self.assertFalse(
-            suggestion_services.check_if_email_has_been_sent_to_user(
-                self.user_a_id, 'category_a'))
-        suggestion_services.mark_email_has_been_sent_to_user(
-            self.user_a_id, 'category_a')
-        self.assertTrue(
-            suggestion_services.check_if_email_has_been_sent_to_user(
-                self.user_a_id, 'category_a'))
+        self.assertFalse(suggestion_services.can_user_review_category(
+            self.user_1_id, 'category1'))
+        self.assertTrue(suggestion_services.can_user_review_category(
+            self.user_1_id, 'category2'))
+        self.assertFalse(suggestion_services.can_user_review_category(
+            self.user_2_id, 'category1'))
+        self.assertFalse(suggestion_services.can_user_review_category(
+            self.user_2_id, 'category1'))
+
+    def test_get_all_scores_of_the_user_with_multiple_scores(self):
+        user_models.UserContributionScoringModel.create(
+            self.user_1_id, 'category1', 1)
+        user_models.UserContributionScoringModel.create(
+            self.user_1_id, 'category2', 2)
+        user_models.UserContributionScoringModel.create(
+            self.user_1_id, 'category3', 3)
+
+        expected_scores_dict = {}
+        for index in python_utils.RANGE(1, 4):
+            key = 'category%s' % python_utils.UNICODE(index)
+            expected_scores_dict[key] = index
+
+        scores_dict = suggestion_services.get_all_scores_of_user(
+            self.user_1_id)
+
+        self.assertEqual(len(scores_dict), 3)
+        self.assertDictEqual(scores_dict, expected_scores_dict)
+
+    def test_get_all_scores_of_the_user_when_no_scores_exist(self):
+        scores_dict = suggestion_services.get_all_scores_of_user(
+            self.user_1_id)
+
+        self.assertEqual(len(scores_dict), 0)
+        self.assertDictEqual(scores_dict, {})
 
 
 class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
