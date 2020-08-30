@@ -19,7 +19,7 @@
 import { GuppyInitializationService } from
   'services/guppy-initialization.service.ts';
 
-describe('OnScreenKeyboard', function() {
+fdescribe('OnScreenKeyboard', function() {
   let ctrl = null, $window = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -30,7 +30,10 @@ describe('OnScreenKeyboard', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $window = $injector.get('$window');
     ctrl = $componentController('customOskLettersEditor');
-    spyOn(ctrl, 'isCustomizationArgOpen').and.returnValue(true);
+    let mockDiv = document.createElement('div');
+    mockDiv.setAttribute('class', 'custom-letters-div');
+    let $document = angular.element(document);
+    $document.find('body').append(mockDiv.outerHTML);
     ctrl.$onInit();
     ctrl.value = [];
   }));
