@@ -22,7 +22,6 @@
 // CollectionChange domain objects.
 
 
-
 import { RecordedVoiceOverBackendDict } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { SubtitledHtmlBackendDict } from

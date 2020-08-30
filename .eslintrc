@@ -147,6 +147,9 @@
     "no-multi-str": [
       "error"
     ],
+    "no-multiple-empty-lines": [
+      "error"
+    ],
     "no-prototype-builtins": "off",
     "no-redeclare": [
       "off"

@@ -635,8 +635,6 @@ import { BottomNavbarStatusService } from
   'services/bottom-navbar-status.service';
 
 
-
-
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 
 
@@ -664,10 +662,6 @@ import { DebouncerService } from 'services/debouncer.service';
 
 
 import { EditabilityService } from 'services/editability.service';
-
-
-
-
 
 
 import { ExplorationFeaturesBackendApiService } from
@@ -698,8 +692,6 @@ import { ExtensionTagAssemblerService } from
 import { ExternalSaveService } from 'services/external-save.service.ts';
 
 
-
-
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 
@@ -719,8 +711,6 @@ import { IdGenerationService } from 'services/id-generation.service';
 import { ImprovementsService } from 'services/improvements.service';
 
 
-
-
 import { InteractionRulesRegistryService } from
   'services/interaction-rules-registry.service';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
@@ -738,17 +728,7 @@ import { MathInteractionsService } from 'services/math-interactions.service';
 import { MessengerService } from 'services/messenger.service';
 
 
-
-
-
-
-
-
 import { PageTitleService } from 'services/page-title.service';
-
-
-
-
 
 
 import { PlaythroughIssuesBackendApiService } from
@@ -756,14 +736,6 @@ import { PlaythroughIssuesBackendApiService } from
 
 
 import { PlaythroughService } from 'services/playthrough.service';
-
-
-
-
-
-
-
-
 
 
 import { SchemaDefaultValueService } from
@@ -774,8 +746,6 @@ import { SchemaUndefinedLastElementService } from
   'services/schema-undefined-last-element.service';
 
 
-
-
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 
@@ -783,12 +753,8 @@ import { SpeechSynthesisChunkerService } from
   'services/speech-synthesis-chunker.service';
 
 
-
-
 import { StateInteractionStatsService } from
   'services/state-interaction-stats.service';
-
-
 
 
 import { StateTopAnswersStatsBackendApiService } from
@@ -799,10 +765,6 @@ import { StateTopAnswersStatsService } from
   'services/state-top-answers-stats.service';
 
 
-
-
-
-
 import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
@@ -811,18 +773,9 @@ import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionsService } from 'services/suggestions.service';
 
 
-
-
-
-
-
-
 import { TranslateService } from 'services/translate.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
-
-
-
 
 
 @Component({

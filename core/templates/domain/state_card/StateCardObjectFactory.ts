@@ -37,8 +37,6 @@ import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 
 
-
-
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 export interface InputResponsePair {

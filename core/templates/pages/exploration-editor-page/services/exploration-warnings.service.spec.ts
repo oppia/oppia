@@ -17,7 +17,6 @@
  */
 
 
-
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // exploration-editor-tab.directive.ts is upgraded to Angular 8.
 import { AnswerClassificationResultObjectFactory } from

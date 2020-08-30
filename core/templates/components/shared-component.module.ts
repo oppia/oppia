@@ -56,9 +56,6 @@ import { SubtopicSummaryTileDirective } from
   './summary-tile/subtopic-summary-tile.directive';
 
 
-
-
-
 @NgModule({
   imports: [CommonModule, MaterialModule, NgbModalModule, FormsModule],
 

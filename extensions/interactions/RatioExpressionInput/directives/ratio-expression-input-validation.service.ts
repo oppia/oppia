@@ -38,7 +38,6 @@ import { RatioExpressionInputRulesService } from
   './ratio-expression-input-rules.service';
 
 
-
 @Injectable({
   providedIn: 'root'
 })

@@ -27,7 +27,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 
 
-
 @Injectable({
   providedIn: 'root'
 })

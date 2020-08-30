@@ -33,7 +33,6 @@ import { InteractiveMapCustomizationArgs } from
   'interactions/customization-args-defs';
 
 
-
 @Injectable({
   providedIn: 'root'
 })

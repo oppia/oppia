@@ -42,7 +42,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 
 
-
 @NgModule({
   imports: [
     BrowserModule,

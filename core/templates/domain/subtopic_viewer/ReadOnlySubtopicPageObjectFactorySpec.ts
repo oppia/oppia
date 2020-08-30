@@ -24,7 +24,6 @@ import { SubtopicPageContentsObjectFactory } from
 import { TestBed } from '@angular/core/testing';
 
 
-
 describe('Subtopic data object factory', () => {
   describe('subtopic data object factory', () => {
     var _sampleSubtopicData = null;

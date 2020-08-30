@@ -32,8 +32,6 @@ import { SubtopicViewerNavbarBreadcrumbComponent } from
   './subtopic-viewer-navbar-breadcrumb.component';
 
 
-
-
 class MockUrlService {
   getTopicUrlFragmentFromLearnerUrl() {
     return 'topic_1';

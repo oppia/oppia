@@ -40,7 +40,6 @@ angular.module('oppia', [
 ]);
 
 
-
 import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';

@@ -28,7 +28,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 
 
-
 interface SubtopicPageBackendDict {
   'id': string;
   'topic_id': string;

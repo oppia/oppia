@@ -27,7 +27,6 @@ var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 
-
 describe('Exploration history', function() {
   var explorationEditorPage = null;
   var explorationPlayerPage = null;

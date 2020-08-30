@@ -17,7 +17,6 @@
  */
 
 
-
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 

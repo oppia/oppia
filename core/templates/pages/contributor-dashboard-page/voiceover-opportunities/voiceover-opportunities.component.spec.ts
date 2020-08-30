@@ -28,7 +28,6 @@ import { ContributionOpportunitiesBackendApiService } from
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 
 
-
 describe('Voiceover opportunities component', function() {
   var ctrl = null;
   var $rootScope = null;

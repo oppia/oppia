@@ -27,7 +27,6 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 
-
 export type PlatformParameterValue = boolean | number | string;
 
 export interface PlatformParameterRuleBackendDict {

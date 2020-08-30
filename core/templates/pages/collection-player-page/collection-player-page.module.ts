@@ -52,8 +52,6 @@ import { CollectionNodeListComponent } from
 import { RequestInterceptor } from 'services/request-interceptor.service';
 
 
-
-
 @NgModule({
   imports: [
     BrowserModule,

@@ -35,7 +35,6 @@ import { NumericExpressionInputRulesService } from
   './numeric-expression-input-rules.service';
 
 
-
 @Injectable({
   providedIn: 'root'
 })

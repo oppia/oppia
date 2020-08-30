@@ -18,7 +18,6 @@
  */
 
 
-
 import { ConceptCard, ConceptCardBackendDict, ConceptCardObjectFactory} from
   'domain/skill/ConceptCardObjectFactory';
 import { SkillDomainConstants } from

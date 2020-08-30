@@ -33,7 +33,6 @@ import { ImageClickInputCustomizationArgs } from
   'interactions/customization-args-defs';
 
 
-
 @Injectable({
   providedIn: 'root'
 })

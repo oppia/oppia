@@ -18,7 +18,6 @@
  */
 
 
-
 import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
 import {

@@ -18,7 +18,6 @@
  */
 
 
-
 import { Interaction } from
   'domain/exploration/InteractionObjectFactory';
 import { ParamChangeBackendDict, ParamChange } from

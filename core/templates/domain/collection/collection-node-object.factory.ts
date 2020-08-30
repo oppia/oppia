@@ -26,8 +26,6 @@ import { AppConstants } from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
 
 
-
-
 export interface CollectionNodeBackendDict {
   'exploration_id': string;
   'exploration_summary': LearnerExplorationSummaryBackendDict;

@@ -33,7 +33,6 @@ import { NumericInputCustomizationArgs } from
   'interactions/customization-args-defs';
 
 
-
 @Injectable({
   providedIn: 'root'
 })

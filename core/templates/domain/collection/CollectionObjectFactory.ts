@@ -18,7 +18,6 @@
  */
 
 
-
 import {
   CollectionNode,
   CollectionNodeBackendDict,

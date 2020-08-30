@@ -20,7 +20,6 @@
  */
 
 
-
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');

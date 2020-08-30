@@ -32,7 +32,6 @@ import { EndExplorationValidationService } from
   'interactions/EndExploration/directives/end-exploration-validation.service';
 
 
-
 describe('EndExplorationValidationService', () => {
   let WARNING_TYPES: WARNING_TYPES_CONSTANT;
   let validatorService: EndExplorationValidationService;

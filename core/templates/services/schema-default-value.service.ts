@@ -30,7 +30,6 @@ import { SchemaConstants } from
 import { LoggerService } from 'services/contextual/logger.service';
 
 
-
 interface BoolSchema {
   type: 'bool';
 }

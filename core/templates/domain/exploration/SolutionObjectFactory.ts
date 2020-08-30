@@ -45,8 +45,6 @@ import { ExplorationHtmlFormatterService } from
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
 
-
-
 export interface ExplanationBackendDict {
   'content_id': string;
   'html': string;

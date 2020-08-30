@@ -29,7 +29,6 @@ import { TopicViewerNavbarBreadcrumbComponent } from
 import { UrlService } from 'services/contextual/url.service';
 
 
-
 describe('Topic viewer navbar breadcrumb component', () => {
   let component: TopicViewerNavbarBreadcrumbComponent;
   let fixture: ComponentFixture<TopicViewerNavbarBreadcrumbComponent>;

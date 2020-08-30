@@ -51,7 +51,6 @@ import { StateEditorRefreshService } from
 import { AlertsService } from 'services/alerts.service';
 
 
-
 describe('Param Changes Editor Component', function() {
   var ctrl = null;
   var $rootScope = null;

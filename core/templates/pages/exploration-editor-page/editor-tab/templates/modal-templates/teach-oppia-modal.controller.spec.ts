@@ -43,7 +43,6 @@ import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 
-
 describe('Teach Oppia Modal Controller', function() {
   var $httpBackend = null;
   var $log = null;

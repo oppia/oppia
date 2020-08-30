@@ -48,8 +48,6 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { AboutPageComponent } from './about-page.component';
 
 
-
-
 @NgModule({
   imports: [
     BrowserModule,

@@ -25,7 +25,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 
 
-
 export interface ExplorationSnapshot {
   'commit_message': string;
   'committer_id': string;
