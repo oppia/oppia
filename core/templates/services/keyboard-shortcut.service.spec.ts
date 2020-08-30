@@ -143,7 +143,7 @@ describe('Keyboard Shortcuts', () => {
       keyboardShortcutService, 'openQuickReference').and.callThrough();
     spyOn(ngbModal, 'open');
     spyOn(ngbModal, 'dismissAll');
-    
+
     keyboardShortcutService.bindLibraryPageShortcuts();
 
     Mousetrap.trigger('s');

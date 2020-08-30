@@ -60,14 +60,14 @@ describe('KeyboardShortcutHelpModalComponent', () => {
 
   it('should load the library page shortcut descriptions', () => {
     const mockLibraryPage = spyOn(
-          urlService, 'getPathname').and.returnValue('/community-library');
+      urlService, 'getPathname').and.returnValue('/community-library');
     component.ngOnInit();
     expect(mockLibraryPage).toHaveBeenCalled();
   });
 
   it('should load the exploration player shortcut descriptions', () => {
     const mockExplorationPlayerPage = spyOn(
-          contextService, 'isInExplorationPlayerPage').and.returnValue(true);
+      contextService, 'isInExplorationPlayerPage').and.returnValue(true);
     component.ngOnInit();
     expect(mockExplorationPlayerPage).toHaveBeenCalled();
   });
