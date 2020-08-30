@@ -201,6 +201,15 @@ class GcsFileSystem(GeneralFileSystem):
         except cloudstorage.NotFoundError:
             raise IOError('Image does not exist: %s' % filepath)
 
+    def copy2(self, source_assets_path, filepath):
+        """Copy images from source_path."""
+        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+        source_file_url = (
+            '/%s/%s/%s' % (bucket_name, source_assets_path, filepath))
+        destination_file_url = (
+            '/%s/%s/%s' % (bucket_name, self._assets_path, filepath))
+        cloudstorage.copy2(source_file_url, destination_file_url)
+
     def listdir(self, dir_name):
         """Lists all files in a directory.
 
@@ -353,3 +362,7 @@ class AbstractFileSystem(python_utils.OBJECT):
         """
         self._check_filepath(dir_name)
         return self._impl.listdir(dir_name)
+
+    def copy(self, assets_path, filepath):
+        """Copy images from source."""
+        self._impl.copy2(assets_path, filepath)

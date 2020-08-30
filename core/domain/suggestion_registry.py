@@ -253,6 +253,12 @@ class BaseSuggestion(python_utils.OBJECT):
             'Subclasses of BaseSuggestion should implement '
             'get_all_html_content_strings.')
 
+    def get_target_entity_html_strings(self):
+        """Gets all html content strings from target entity used in the
+        suggestion.
+        """
+        return []
+
     def convert_html_in_suggestion_change(self, conversion_fn):
         """Checks for HTML fields in a suggestion change and converts it
         according to the conversion function.
@@ -525,6 +531,16 @@ class SuggestionTranslateContent(BaseSuggestion):
             list(str). The list of html content strings.
         """
         return [self.change.translation_html, self.change.content_html]
+
+    def get_target_entity_html_strings(self):
+        """Gets all html content strings from target entity used in the
+        suggestion.
+
+        Returns:
+            list(str). The list of html content strings from target entity used
+            in the suggestion.
+        """
+        return [self.change.content_html]
 
     def convert_html_in_suggestion_change(self, conversion_fn):
         """Checks for HTML fields in a suggestion change and converts it

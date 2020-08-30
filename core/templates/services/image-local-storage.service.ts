@@ -57,6 +57,10 @@ angular.module('oppia').factory('ImageLocalStorageService', [
         storedImageFilenames.push(filename);
       },
 
+      isInStorage: function(filename) {
+        return storedImageFilenames.indexOf(filename) !== -1;
+      },
+
       deleteImage: function(filename) {
         $window.sessionStorage.removeItem(filename);
         var index = storedImageFilenames.indexOf(filename);

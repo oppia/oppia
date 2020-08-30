@@ -31,6 +31,8 @@ require(
 require(
   'pages/contributor-dashboard-page/opportunities-list/' +
   'opportunities-list.component.ts');
+require('components/ck-editor-helpers/ck-editor-copy-toolbar/' +
+  'ck-editor-copy-toolbar.component.ts');
 
 require(
   'pages/contributor-dashboard-page/services/' +

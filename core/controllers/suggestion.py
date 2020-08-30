@@ -28,7 +28,6 @@ from core.domain import html_cleaner
 from core.domain import image_validation_services
 from core.domain import opportunity_services
 from core.domain import skill_fetchers
-from core.domain import state_domain
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
@@ -89,26 +88,40 @@ class SuggestionHandler(base.BaseHandler):
 
     @acl_decorators.can_suggest_changes
     def post(self):
-        change_dict = self.payload.get('change')
-        target_id = self.payload.get('target_id')
-        target_type = self.payload.get('target_type')
-        html_list = []
-        if target_type == suggestion_models.TARGET_TYPE_SKILL:
-            state_dict = change_dict['question_dict']['question_state_data']
-            state = state_domain.State.from_dict(state_dict)
-            html_list = state.get_all_html_content_strings()
-        filenames = (
+
+        try:
+            suggestion = suggestion_services.create_suggestion(
+                self.payload.get('suggestion_type'),
+                self.payload.get('target_type'), self.payload.get('target_id'),
+                self.payload.get('target_version_at_submission'),
+                self.user_id, self.payload.get('change'),
+                self.payload.get('description'))
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
+        html_list = suggestion.get_all_html_content_strings()
+        all_image_filenames = (
             html_cleaner.get_image_filenames_from_html_strings(html_list))
-        if len(filenames) > 0:
-            suggestion_image_entity_type = (
-                fs_services.get_entity_type_for_suggestion_target(target_type))
-        for filename in filenames:
+
+        target_entity_html_list = suggestion.get_target_entity_html_strings()
+        target_image_filenames = (
+            html_cleaner.get_image_filenames_from_html_strings(
+                target_entity_html_list))
+
+        new_image_filenames = utils.compute_list_difference(
+            all_image_filenames, target_image_filenames)
+
+        suggestion_image_entity_type = (
+            fs_services.get_entity_type_for_suggestion_target(
+                suggestion.target_type))
+
+        for filename in new_image_filenames:
             image = self.request.get(filename)
             if not image:
                 logging.error(
                     'Image not provided for file with name %s when the '
                     ' suggestion with target id %s was created.' % (
-                        filename, target_id))
+                        filename, suggestion.target_id))
                 raise self.InvalidInputException(
                     'No image data provided for file with name %s.'
                     % (filename))
@@ -122,18 +135,13 @@ class SuggestionHandler(base.BaseHandler):
             image_is_compressible = (
                 file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
             fs_services.save_original_and_compressed_versions_of_image(
-                filename, suggestion_image_entity_type, target_id, image,
-                'image', image_is_compressible)
+                filename, suggestion_image_entity_type, suggestion.target_id,
+                image, 'image', image_is_compressible)
 
-        try:
-            suggestion_services.create_suggestion(
-                self.payload.get('suggestion_type'),
-                target_type, target_id,
-                self.payload.get('target_version_at_submission'),
-                self.user_id, change_dict, self.payload.get('description'))
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
-        self.render_json(self.values)
+        fs_services.copy_images(
+            suggestion.target_type, suggestion.target_id,
+            suggestion_image_entity_type, suggestion.target_id,
+            target_image_filenames)
 
 
 class SuggestionToExplorationActionHandler(base.BaseHandler):

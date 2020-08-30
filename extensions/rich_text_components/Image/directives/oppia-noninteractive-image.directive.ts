@@ -100,10 +100,13 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
             try {
               if (
                 ContextService.getImageSaveDestination() ===
-                IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+                IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
+                  ImageLocalStorageService.isInStorage(ctrl.filepath))) {
                 ctrl.imageUrl = ImageLocalStorageService.getObjectUrlForImage(
                   ctrl.filepath);
-              } else {
+              }
+
+              if (ctrl.imageUrl === '') {
                 ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
                   ContextService.getEntityType(), ContextService.getEntityId(),
                   ctrl.filepath);

@@ -169,3 +169,17 @@ def get_entity_type_for_suggestion_target(suggestion_target_type):
         return feconf.ENTITY_TYPE_EXPLORATION_SUGGESTION
     else:
         raise Exception('Invalid suggestion target type.')
+
+
+def copy_images(
+        source_entity_type, source_entity_id, destination_entity_type,
+        destination_entity_id, filenames):
+    """Copy images from source to destination."""
+    file_system_class = get_entity_file_system_class()
+    source_fs = fs_domain.AbstractFileSystem(file_system_class(
+        source_entity_type, source_entity_id))
+    destination_fs = fs_domain.AbstractFileSystem(file_system_class(
+        destination_entity_type, destination_entity_id))
+    for filename in filenames:
+        destination_fs.copy(
+            source_fs.impl.assets_path, ('image/%s' % filename))
