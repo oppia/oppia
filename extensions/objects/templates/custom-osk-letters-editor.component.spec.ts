@@ -19,7 +19,7 @@
 import { GuppyInitializationService } from
   'services/guppy-initialization.service.ts';
 
-fdescribe('OnScreenKeyboard', function() {
+describe('OnScreenKeyboard', function() {
   let ctrl = null, $window = null;
 
   beforeEach(angular.mock.module('oppia'));
