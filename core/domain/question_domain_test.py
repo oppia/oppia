@@ -368,14 +368,28 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected all answer groups to have destination as None.')
 
-    def test_validation_for_inapplicable_misconception_ids(self):
+    def test_validate_invalid_list_of_inapplicable_misconception_ids(self):
         """Test to verify that the validation fails when
-        inapplicable_misconception_ids field is invalid.
+        inapplicable_misconception_ids value is an invalid list.
         """
         self.question.inapplicable_misconception_ids = ['Test', 1]
         self._assert_validation_error(
-            'Expected inapplicable_misconception_ids to be a list of strings')
+            'Expected inapplicable_misconception_ids to be a list of strings, '
+            'received \[u\'Test\', 1\]')
 
+    def test_validate_invalid_type_of_inapplicable_misconception_ids(self):
+        """Test to verify that the validation fails when
+        inapplicable_misconception_ids value is an invalid type.
+        """
+        self.question.inapplicable_misconception_ids = 123
+        self._assert_validation_error(
+            'Expected inapplicable_misconception_ids to be a list of strings, '
+            'received 123')
+
+    def test_validate_duplicate_inapplicable_misconception_ids_list(self):
+        """Test to verify that the validation fails when
+        inapplicable_misconception_ids list is has duplicate values.
+        """
         self.question.inapplicable_misconception_ids = ['skill-1', 'skill-1']
         self._assert_validation_error(
             'inapplicable_misconception_ids has duplicate values')
@@ -468,6 +482,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """Test to verify update_inapplicable_misconception_ids method of the
         Question domain object.
         """
+        self.assertEqual(
+            ['skillId-123'],
+            self.question.inapplicable_misconception_ids)
         self.question.update_inapplicable_misconception_ids(
             ['skillid-misconceptionid'])
         self.assertEqual(
@@ -551,11 +568,26 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             'Expected last updated to be a datetime, received 1'):
             self.observed_object.validate()
 
-    def test_validation_with_invalid_misconception_ids(self):
-        self.observed_object.misconception_ids = 1
+    def test_validate_invalid_list_of_misconception_ids(self):
+        """Test to verify that the validation fails when
+        misconception_ids value is an invalid list.
+        """
+        self.observed_object.misconception_ids = ['Test', 1]
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected misconception ids to be a list, received 1'):
+            'Expected misconception ids to be a list of strings, '
+            'received \[u\'Test\', 1\]'):
+            self.observed_object.validate()
+
+    def test_validate_invalid_type_of_misconception_ids(self):
+        """Test to verify that the validation fails when
+        misconception_ids value is an invalid type.
+        """
+        self.observed_object.misconception_ids = 123
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected misconception ids to be a list of strings, '
+            'received 123'):
             self.observed_object.validate()
 
 

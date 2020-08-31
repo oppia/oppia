@@ -1042,10 +1042,12 @@ class QuestionSummary(python_utils.OBJECT):
                 'Expected last updated to be a datetime, received %s' %
                 self.last_updated)
 
-        if not isinstance(self.misconception_ids, list):
+        if not (isinstance(self.misconception_ids, list) and (
+                all(isinstance(elem, python_utils.BASESTRING) for elem in (
+                    self.misconception_ids)))):
             raise utils.ValidationError(
-                'Expected misconception ids to be a list, received %s' %
-                self.misconception_ids)
+                'Expected misconception ids to be a list of '
+                'strings, received %s' % self.misconception_ids)
 
 
 class QuestionSkillLink(python_utils.OBJECT):
