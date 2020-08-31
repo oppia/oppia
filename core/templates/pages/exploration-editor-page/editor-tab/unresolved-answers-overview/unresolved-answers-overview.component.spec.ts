@@ -53,9 +53,6 @@ describe('Unresolved Answers Overview Component', function() {
     mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value(
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
-    $provide.value('ExternalSaveService', {
-      onExternalSave: mockExternalSaveEventEmitter
-    });
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

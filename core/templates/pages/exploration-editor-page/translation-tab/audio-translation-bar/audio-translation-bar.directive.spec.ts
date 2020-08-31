@@ -114,10 +114,6 @@ describe('Audio translation bar directive', function() {
       TestBed.get(TextInputRulesService));
     $provide.value(
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
-    mockExternalSaveEventEmitter = new EventEmitter();
-    $provide.value('ExternalSaveService', {
-      onExternalSave: mockExternalSaveEventEmitter
-    });
     $provide.value('SiteAnalyticsService', TestBed.get(SiteAnalyticsService));
     $provide.value(
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));

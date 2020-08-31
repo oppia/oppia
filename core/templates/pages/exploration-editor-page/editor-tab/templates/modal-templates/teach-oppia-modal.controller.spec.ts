@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for TeachOppiaModalController.
  */
 
-import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
@@ -57,8 +56,6 @@ describe('Teach Oppia Modal Controller', function() {
   var responsesService = null;
   var trainingDataService = null;
   var trainingModalService = null;
-
-  var mockExternalSaveEventEmitter = null;
 
   var explorationId = 'exp1';
   var stateName = 'Introduction';
@@ -147,10 +144,6 @@ describe('Teach Oppia Modal Controller', function() {
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('StateInteractionIdService', stateInteractionIdService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
-    mockExternalSaveEventEmitter = new EventEmitter();
-    $provide.value('ExternalSaveService', {
-      onExternalSave: mockExternalSaveEventEmitter
-    });
   }));
 
   describe('when successfully fetching top unresolved answers', function() {

@@ -98,6 +98,10 @@ describe('Collection validation service', function() {
     return _sampleCollection.addCollectionNode(collectionNode);
   };
 
+  var _getCollectionNode = (explorationId) => {
+    return _sampleCollection.getCollectionNodeByExplorationId(explorationId);
+  };
+
   var _findPrivateValidationIssues = () => {
     return collectionValidationService.findValidationIssuesForPrivateCollection(
       _sampleCollection);
@@ -125,6 +129,8 @@ describe('Collection validation service', function() {
   it('should detect nonexistent/inaccessible explorations', () => {
     expect(_addCollectionNode(
       'exp_id1', DOES_NOT_EXIST, PRIVATE_STATUS)).toBe(true);
+    _getCollectionNode('exp_id0');
+    _getCollectionNode('exp_id1');
 
     var issues = _findPrivateValidationIssues();
     expect(issues).toEqual([
@@ -137,6 +143,9 @@ describe('Collection validation service', function() {
     () => {
       expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBe(true);
       expect(_addCollectionNode('exp_id2', EXISTS, PUBLIC_STATUS)).toBe(true);
+      _getCollectionNode('exp_id0');
+      _getCollectionNode('exp_id1');
+      _getCollectionNode('exp_id2');
 
       var issues = _findPrivateValidationIssues();
       expect(issues).toEqual([]);
@@ -146,6 +155,8 @@ describe('Collection validation service', function() {
   it('should not allow private explorations in a public collection',
     () => {
       expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
+      _getCollectionNode('exp_id1');
+      _getCollectionNode('exp_id0');
 
       var issues = _findPublicValidationIssues();
       expect(issues).toEqual([
@@ -161,6 +172,10 @@ describe('Collection validation service', function() {
   it('should be able to detect multiple validation issues', () => {
     expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
     expect(_addCollectionNode('exp_id2', EXISTS, PRIVATE_STATUS)).toBe(true);
+
+    _getCollectionNode('exp_id0');
+    _getCollectionNode('exp_id1');
+    _getCollectionNode('exp_id2');
 
     var issues = _findPublicValidationIssues();
     expect(issues).toEqual([

@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for TrainingDataEditorPanelService.
  */
 
-import { EventEmitter } from '@angular/core';
-
 describe('Training Data Editor Panel Service', function() {
   var TrainingDataEditorPanelService = null;
   var $uibModal = null;
@@ -26,13 +24,6 @@ describe('Training Data Editor Panel Service', function() {
   var mockExternalSaveEventEmitter = null;
 
   beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    mockExternalSaveEventEmitter = new EventEmitter();
-    $provide.value('ExternalSaveService', {
-      onExternalSave: mockExternalSaveEventEmitter
-    });
-  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     TrainingDataEditorPanelService = $injector.get(

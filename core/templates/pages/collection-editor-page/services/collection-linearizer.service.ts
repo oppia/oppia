@@ -40,6 +40,10 @@ angular.module('oppia').factory('CollectionLinearizerService', [
       return collection.getCollectionNodes();
     };
 
+    var addAfter = function(collection, curExplorationId, newExplorationId) {
+      collection.getCollectionNodeByExplorationId(curExplorationId);
+    };
+
     var findNodeIndex = function(linearNodeList, explorationId) {
       var index = -1;
       for (var i = 0; i < linearNodeList.length; i++) {
@@ -110,8 +114,13 @@ angular.module('oppia').factory('CollectionLinearizerService', [
        */
       appendCollectionNode: function(
           collection, explorationId, summaryBackendObject) {
+        var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
         CollectionUpdateService.addCollectionNode(
           collection, explorationId, summaryBackendObject);
+        if (linearNodeList.length > 0) {
+          var lastNode = linearNodeList[linearNodeList.length - 1];
+          addAfter(collection, lastNode.getExplorationId(), explorationId);
+        }
       },
 
       /**

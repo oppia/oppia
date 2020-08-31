@@ -71,17 +71,6 @@ describe('Exploration Player State Service', () => {
       $provide.constant('EXPLORATION_MODE', {
         OTHER: false
       });
-      $provide.factory(
-        'ReadOnlyExplorationBackendApiService', ['$q', ($q) => {
-          return {
-            loadExploration: () => {
-              return $q.resolve();
-            },
-            loadLatestExploration: () => {
-              return $q.resolve();
-            }
-          };
-        }]);
       $provide.value('StatsReportingService', {
         initSession: $.noop
       });

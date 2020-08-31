@@ -99,12 +99,6 @@ describe('TrainingDataService', function() {
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
     angular.mock.module(function($provide) {
-      $provide.constant('INTERACTION_SPECS', {
-        TextInput: {
-          display_mode: 'inline',
-          is_terminal: false
-        }
-      });
       $provide.value('AngularNameService', new AngularNameService());
       $provide.value(
         'AnswerClassificationResultObjectFactory',

@@ -110,7 +110,7 @@ angular.module('oppia').directive('stateResponses', [
         'state-responses.directive.html'),
       controller: [
         '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
-        'AnswerGroupObjectFactory', 'ContextService',
+        'AnswerGroupObjectFactory',
         'EditabilityService', 'ExternalSaveService', 'ResponsesService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
@@ -122,7 +122,7 @@ angular.module('oppia').directive('stateResponses', [
         'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
         function(
             $filter, $rootScope, $scope, $uibModal, AlertsService,
-            AnswerGroupObjectFactory, ContextService,
+            AnswerGroupObjectFactory,
             EditabilityService, ExternalSaveService, ResponsesService,
             StateCustomizationArgsService, StateEditorService,
             StateInteractionIdService, StateNextContentIdIndexService,
