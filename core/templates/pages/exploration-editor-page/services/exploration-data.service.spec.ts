@@ -253,7 +253,8 @@ describe('Exploration data service', function() {
     var stateName = 'First State';
     var clearWarningsSpy = spyOn(als, 'clearWarnings').and.callThrough();
 
-    $httpBackend.expectPUT('/createhandler/resolved_answers/0/' +
+    $httpBackend.expectPUT(
+      '/createhandler/resolved_answers/0/' +
       encodeURIComponent(stateName)).respond(200);
     eds.resolveAnswers(stateName, []);
     $httpBackend.flush();
