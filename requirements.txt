@@ -27,13 +27,7 @@ six==1.14.0               # via -r requirements.in, bleach, html5lib, mock, pack
 soupsieve==1.9.5          # via -r requirements.in, beautifulsoup4
 webencodings==0.5.1       # via -r requirements.in, bleach, html5lib
 
-# Developers: Please do not add to this auto-generated file. If
-# you want to add, remove, upgrade, or downgrade libraries,
-# please change the `requirements.in` file and run the script
-# `scripts/install_third_party` again to see your changes
-# reflected in this file.
-
-# Developers: Please do not add to this auto-generated file. If
+# Developers: Please do not modify this auto-generated file. If
 # you want to add, remove, upgrade, or downgrade libraries,
 # please change the `requirements.in` file and run the script
 # `scripts/install_third_party` again to see your changes

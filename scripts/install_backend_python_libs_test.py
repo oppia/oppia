@@ -31,7 +31,7 @@ from scripts import install_backend_python_libs
 
 
 class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
-    """Test the script for installing backend python libs."""
+    """Tests for installing backend python libraries."""
 
     THIRD_PARTY_DATA_FILE_PATH = os.path.join(
         common.CURR_DIR, 'core', 'tests', 'data', 'third_party')
@@ -464,7 +464,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             common, 'REQUIREMENTS_FILE_PATH', temp_file)
         expected_lines = [
             '\n',
-            '# Developers: Please do not add to this auto-generated file. If\n',
+            '# Developers: Please do not modify this auto-generated file. If\n',
             '# you want to add, remove, upgrade, or downgrade libraries,\n',
             '# please change the `requirements.in` file and run the script\n',
             '# `scripts/install_third_party` again to see your changes\n',
@@ -551,5 +551,5 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             print_statements,
             [
                 'Regenerating "requirements.txt" file...',
-                'Third party python libraries already installed correctly.'
+                'Third party python libraries are already installed correctly.'
             ])

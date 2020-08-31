@@ -756,4 +756,4 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             self.print_arr,
-            ['No inconsistencies found in backend python libraries.'])
+            ['No inconsistencies found in the backend python libraries.'])

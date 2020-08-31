@@ -14,10 +14,11 @@
 
 """Script to generate a deterministic compiled requirements file.
 
-This needs to be a separate script because the cli used to compile the
-requirements file stops python execution after completion. If this functionality
-is included in the 'install_backend_python_libs' script, the execution of the
-installation will also exit as soon as the cli finishes running.
+This needs to be a separate script because the python function that regenerates
+the requirements file is a cli script. Once the cli finishes execution, it
+forces itself and any python scripts in the current callstack to exit.
+Therefore, in order to allow continued execution after the requirements
+file is generated, we must call the cli in a separate process.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -46,12 +47,13 @@ def main():
     #
     # In a normal installation, piptools adds the pip-compile script to the
     # user's bin directory and the pip-tools libraries to one of the default
-    # python system path directories so that the pip-compile script can import
-    # scripts.compile correctly. However, since we are installing piptools to a
-    # local directory, the pip-compile script will not be able to find the
-    # pip tools python packages. Therefore, we need to write our own and
-    # manually add our local pip-tools directory to the system path in order to
-    # import their libraries correctly.
+    # python system path directories. When the pip-compile script executes, it
+    # can import 'scripts.compile' correctly from the default sys.path. However,
+    # since we are installing piptools to a local directory, the pip-compile
+    # script will not be able to find the pip tools python packages. Therefore,
+    # we need to write our own script and manually add our local pip-tools
+    # directory to the python system path in order to import the required
+    # libraries correctly.
     sys.argv[0] = re.sub(
         r'(-script\.pyw|\.exe)?$', '',
         common.PRE_COMPILED_REQUIREMENTS_FILE_PATH)

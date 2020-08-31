@@ -313,7 +313,6 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'download_and_unzip_files_is_called': True,
             'download_and_untar_files_is_called': True,
             'install_backend_python_libs_is_called': True
-
         }
         def mock_return_json(unused_filepath):
             return {

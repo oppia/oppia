@@ -450,7 +450,7 @@ def check_for_backend_python_library_inconsistencies():
             install_backend_python_libs.main()
     else:
         python_utils.PRINT(
-            'No inconsistencies found in backend python libraries.')
+            'No inconsistencies found in the backend python libraries.')
 
 
 def main(args=None):

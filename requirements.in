@@ -1,6 +1,6 @@
-# Developers who want to install your new library changes directly to
-# third_party/python_libs without running any startup scripts should execute the
-# following command:
+# Developers who want to install new library changes directly to
+# 'third_party/python_libs' without running any startup scripts
+# should execute the following command:
 #   python -m scripts.install_third_party
 backports.functools-lru-cache==1.6.1
 beautifulSoup4==4.9.1
