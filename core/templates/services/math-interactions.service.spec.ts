@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { MathInteractionsService } from 'services/math-interactions.service';
 
-describe('MathInteractionsService', () => {
+fdescribe('MathInteractionsService', () => {
   let mathInteractionsService: MathInteractionsService = null;
 
   beforeEach(() => {
@@ -35,7 +35,7 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
-      'sqrt(alpha)', ['alpha'])).toBeTrue();
+      'sqrt(alpha)', ['α'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
@@ -47,11 +47,11 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
-      '(alpha - beta)^pi', ['alpha', 'beta', 'pi'])).toBeTrue();
+      '(alpha - beta)^pi', ['α', 'β', 'π'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
-      '((-3.4)^(gamma/(y^2)))/2', ['y', 'gamma'])).toBeTrue();
+      '((-3.4)^(gamma/(y^2)))/2', ['y', 'γ'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
@@ -114,14 +114,14 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateAlgebraicExpression(
       'xyz + pi', ['x', 'y', 'z'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'You have entered an invalid variable: pi. Please use only the ' +
+      'You have entered an invalid variable: π. Please use only the ' +
       'variables x,y,z in your answer.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
-      'aalpha/2beta', ['alpha', 'beta', 'gamma'])).toBeFalse();
+      'aalpha/2beta', ['α', 'β', 'γ'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'You have entered an invalid variable: a. Please use only the ' +
-      'variables alpha,beta,gamma in your answer.');
+      'variables α,β,γ in your answer.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       '(x^3.5)^/2', ['x'])).toBeFalse();
@@ -147,7 +147,7 @@ describe('MathInteractionsService', () => {
       ' Please enter an expression instead.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
-      '5 >= 2*alpha', ['alpha'])).toBeFalse();
+      '5 >= 2*alpha', ['α'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered an equation/inequality.' +
       ' Please enter an expression instead.');
@@ -197,7 +197,7 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateEquation(
-      'sqrt(alpha) = -1', ['alpha'])).toBeTrue();
+      'sqrt(alpha) = -1', ['α'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateEquation(
@@ -273,7 +273,7 @@ describe('MathInteractionsService', () => {
       'Please enter an equation instead.');
 
     expect(mathInteractionsService.validateEquation(
-      '5 >= 2*alpha', ['alpha'])).toBeFalse();
+      '5 >= 2*alpha', ['α'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered an inequality. ' +
       'Please enter an equation instead.');
@@ -311,10 +311,10 @@ describe('MathInteractionsService', () => {
       'variables x,y,m,c in your answer.');
 
     expect(mathInteractionsService.validateEquation(
-      'alpha(x^2)=beta/2', ['alpha', 'beta', 'gamma'])).toBeFalse();
+      'alpha(x^2)=beta/2', ['α', 'β', 'γ'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'You have entered an invalid variable: x. Please use only the ' +
-      'variables alpha,beta,gamma in your answer.');
+      'variables α,β,γ in your answer.');
   });
 
   it('should insert missing multiplication signs', function() {
