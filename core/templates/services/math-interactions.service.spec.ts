@@ -170,7 +170,7 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateAlgebraicExpression(
       'a_2 + 3', ['a'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'Your answer contains an invalid variable: "_".');
+      'Your answer contains an invalid character: "_".');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       '3.4.5 + 45/a', ['a'])).toBeFalse();
