@@ -35,6 +35,7 @@ angular.module('oppia').factory('StoryUpdateService', [
   'STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR',
   'STORY_NODE_PROPERTY_THUMBNAIL_FILENAME', 'STORY_NODE_PROPERTY_TITLE',
   'STORY_PROPERTY_DESCRIPTION', 'STORY_PROPERTY_LANGUAGE_CODE',
+  'STORY_PROPERTY_META_TAG_CONTENT',
   'STORY_PROPERTY_NOTES', 'STORY_PROPERTY_THUMBNAIL_BG_COLOR',
   'STORY_PROPERTY_THUMBNAIL_FILENAME', 'STORY_PROPERTY_TITLE',
   'STORY_PROPERTY_URL_FRAGMENT', function(
@@ -49,6 +50,7 @@ angular.module('oppia').factory('StoryUpdateService', [
       STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
       STORY_NODE_PROPERTY_THUMBNAIL_FILENAME, STORY_NODE_PROPERTY_TITLE,
       STORY_PROPERTY_DESCRIPTION, STORY_PROPERTY_LANGUAGE_CODE,
+      STORY_PROPERTY_META_TAG_CONTENT,
       STORY_PROPERTY_NOTES, STORY_PROPERTY_THUMBNAIL_BG_COLOR,
       STORY_PROPERTY_THUMBNAIL_FILENAME, STORY_PROPERTY_TITLE,
       STORY_PROPERTY_URL_FRAGMENT) {
@@ -245,6 +247,25 @@ angular.module('oppia').factory('StoryUpdateService', [
           }, function(changeDict, story) {
             // ---- Undo ----
             story.setLanguageCode(oldLanguageCode);
+          });
+      },
+
+      /**
+       * Changes the meta tag content of a story and records the change in
+       * the undo/redo service.
+       */
+      setStoryMetaTagContent: function(story, metaTagContent) {
+        var oldMetaTagContent = angular.copy(story.getMetaTagContent());
+        _applyStoryPropertyChange(
+          story, STORY_PROPERTY_META_TAG_CONTENT, oldMetaTagContent,
+          metaTagContent,
+          function(changeDict, story) {
+            // ---- Apply ----
+            var metaTagContent = _getNewPropertyValueFromChangeDict(changeDict);
+            story.setMetaTagContent(metaTagContent);
+          }, function(changeDict, story) {
+            // ---- Undo ----
+            story.setMetaTagContent(oldMetaTagContent);
           });
       },
 
