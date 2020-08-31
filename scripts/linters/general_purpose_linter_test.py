@@ -351,14 +351,14 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assertTrue(lint_task_report.failed)
 
     def test_invalid_use_of_broadcast(self):
-        with self.print_swap:
-            general_purpose_linter.GeneralPurposeLinter(
-                [INVALID_BROADCAST_USE_FILEPATH], FILE_CACHE, True
-            ).perform_all_lint_checks()
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_BROADCAST_USE_FILEPATH], FILE_CACHE)
+        lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements([
             'Line 26: Please do not use $broadcast/$on for propagating events. '
-            'Use @Input/@Output instead.'], self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 1)
+            'Use @Input/@Output instead.'], lint_task_report.trimmed_messages)
+        self.assertEqual('Bad pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
 
 
 class PythonLintTests(test_utils.LinterTestBase):
