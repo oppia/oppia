@@ -17,27 +17,26 @@
  * any learner answer info.
  */
 
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { ExplorationDataService } from
   'pages/exploration-editor-page/services/exploration-data.service';
 import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
-import { LearnerAnswerInfo, LearnerAnswerInfoObjectFactory } from
+import { LearnerAnswerInfoObjectFactory } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { LearnerAnswerDetailsBackendApiService } from 
+import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
-@Injectable( {
+@Injectable({
   providedIn: 'root'
 })
 export class LearnerAnswerDetailsDataService {
   constructor(
     private explorationDataService:ExplorationDataService,
-    private http:HttpClient,
-    private learnerAnswerDetailsBackendApiService:LearnerAnswerDetailsBackendApiService,
+    private learnerAnswerDetailsBackendApiService:
+      LearnerAnswerDetailsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
   _expId: string;
@@ -51,10 +50,11 @@ export class LearnerAnswerDetailsDataService {
     return this._data;
   }
   public fetchLearnerAnswerInfoData() {
-    return this.learnerAnswerDetailsBackendApiService._fetchLearnerAnswerInfoData().then(
+    return this.learnerAnswerDetailsBackendApiService
+      ._fetchLearnerAnswerInfoData().then(
       (response)=>{
         this.learnerAnswerInfoData = response.data.learner_answer_info_data;
-        for (let i = 0;i < this.learnerAnswerInfoData.length;i++) {
+        for (let i = 0; i < this.learnerAnswerInfoData.length; i++) {
           const stateName = this.learnerAnswerInfoData[i].state_name;
           const interactionId = this.learnerAnswerInfoData[i].interaction_id;
           const customizationArgs =

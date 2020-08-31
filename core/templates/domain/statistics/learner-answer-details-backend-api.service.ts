@@ -32,7 +32,6 @@ export class LearnerAnswerDetailsBackendApiService {
   constructor(
     private httpClient: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
-  
   LEARNER_ANSWER_INFO_DATA_URL = (
     '/learneranswerinfohandler/learner_answer_details/<entity_type>/' +
     '<entity_id>'
