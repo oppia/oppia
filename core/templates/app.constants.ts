@@ -158,12 +158,10 @@ export class AppConstants {
 
   public static ENTITY_TYPE = {
     EXPLORATION: 'exploration',
-    EXPLORATION_SUGGESTION: 'exploration_suggestions',
     TOPIC: 'topic',
     SKILL: 'skill',
     STORY: 'story',
-    QUESTION: 'question',
-    QUESTION_SUGGESTION: 'question_suggestions'
+    QUESTION: 'question'
   };
 
   public static IMAGE_CONTEXT = {

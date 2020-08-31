@@ -125,8 +125,7 @@ class SuggestionHandler(base.BaseHandler):
                     image_validation_services.validate_image_and_filename(
                         image, filename))
             except utils.ValidationError as e:
-                e = '%s' % (e)
-                raise self.InvalidInputException(e)
+                raise self.InvalidInputException('%s' % (e))
             image_is_compressible = (
                 file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
             fs_services.save_original_and_compressed_versions_of_image(
