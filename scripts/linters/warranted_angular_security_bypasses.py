@@ -17,7 +17,7 @@
 """Tuple of warranted angular safety bypasses in the codebase."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # isort:skip pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # Contains the tuples of all files that bypasses angular's security mechanisms.
 # Please keep the list in alphabetical order.
