@@ -40,7 +40,7 @@ export class SubtopicViewerNavbarPreLogoAction implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService
   ) {}
-  ngOnInit() {
+  ngOnInit(): void {
     this.topicUrlFragment = (
       this.urlService.getTopicUrlFragmentFromLearnerUrl());
     this.topicUrl = this.urlInterpolationService.interpolateUrl(
