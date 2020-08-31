@@ -45,7 +45,8 @@ angular.module('oppia').controller('ExplorationMetadataModalController', [
   'ExplorationStatesService', 'ExplorationTagsService',
   'ExplorationTitleService', 'ALL_CATEGORIES', 'DEFAULT_LANGUAGE_CODE',
   'TAG_REGEX',
-  function($controller, $scope, $timeout, $uibModalInstance,
+  function(
+      $controller, $scope, $timeout, $uibModalInstance,
       AlertsService, ExplorationCategoryService,
       ExplorationLanguageCodeService, ExplorationObjectiveService,
       ExplorationStatesService, ExplorationTagsService,

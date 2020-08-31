@@ -32,7 +32,8 @@ export class Voiceover {
   needsUpdate: boolean;
   durationSecs: number;
 
-  constructor(filename: string, fileSizeBytes: number, needsUpdate: boolean,
+  constructor(
+      filename: string, fileSizeBytes: number, needsUpdate: boolean,
       durationSecs: number) {
     this.filename = filename;
     this.fileSizeBytes = fileSizeBytes;
@@ -67,7 +68,8 @@ export class Voiceover {
   providedIn: 'root'
 })
 export class VoiceoverObjectFactory {
-  createNew(filename: string, fileSizeBytes: number,
+  createNew(
+      filename: string, fileSizeBytes: number,
       durationSecs: number): Voiceover {
     return new Voiceover(filename, fileSizeBytes, false, durationSecs);
   }

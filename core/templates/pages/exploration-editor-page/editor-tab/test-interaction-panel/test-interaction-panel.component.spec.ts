@@ -37,8 +37,8 @@ describe('Test Interaction Panel directive', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('StateEditorRefreshService',
-      TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -63,13 +63,13 @@ describe('Test Interaction Panel directive', function() {
     ctrl.$onInit();
   }));
 
-  it('should evaluate controller properties after its initialization',
+  it('should initialize controller properties after its initialization',
     function() {
       expect($scope.isSubmitButtonDisabled()).toBe(false);
       expect($scope.interactionIsInline).toBe(true);
     });
 
-  it('should submit answer from button', function() {
+  it('should submit answer when clicking on button', function() {
     spyOn(CurrentInteractionService, 'submitAnswer');
     $scope.onSubmitAnswerFromButton();
 

@@ -53,6 +53,8 @@ TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES = 'canonical_story_references'
 TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES = 'additional_story_references'
 TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
 TOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment'
+TOPIC_PROPERTY_META_TAG_CONTENT = 'meta_tag_content'
+TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED = 'practice_tab_is_displayed'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
 SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
@@ -114,7 +116,9 @@ class TopicChange(change_domain.BaseChange):
         TOPIC_PROPERTY_LANGUAGE_CODE,
         TOPIC_PROPERTY_THUMBNAIL_FILENAME,
         TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
-        TOPIC_PROPERTY_URL_FRAGMENT)
+        TOPIC_PROPERTY_URL_FRAGMENT,
+        TOPIC_PROPERTY_META_TAG_CONTENT,
+        TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED)
 
     # The allowed list of subtopic properties which can be used in
     # update_subtopic_property command.
@@ -469,7 +473,8 @@ class Topic(python_utils.OBJECT):
             canonical_story_references, additional_story_references,
             uncategorized_skill_ids, subtopics, subtopic_schema_version,
             next_subtopic_id, language_code, version,
-            story_reference_schema_version, created_on=None,
+            story_reference_schema_version, meta_tag_content,
+            practice_tab_is_displayed, created_on=None,
             last_updated=None):
         """Constructs a Topic domain object.
 
@@ -500,6 +505,9 @@ class Topic(python_utils.OBJECT):
             version: int. The version of the topic.
             story_reference_schema_version: int. The schema version of the
                 story reference object.
+            meta_tag_content: str. The meta tag content in the topic viewer
+                page.
+            practice_tab_is_displayed: bool. Whether the practice tab is shown.
             created_on: datetime.datetime. Date and time when the topic is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -524,6 +532,8 @@ class Topic(python_utils.OBJECT):
         self.last_updated = last_updated
         self.version = version
         self.story_reference_schema_version = story_reference_schema_version
+        self.meta_tag_content = meta_tag_content
+        self.practice_tab_is_displayed = practice_tab_is_displayed
 
     def to_dict(self):
         """Returns a dict representing this Topic domain object.
@@ -556,7 +566,9 @@ class Topic(python_utils.OBJECT):
             'language_code': self.language_code,
             'version': self.version,
             'story_reference_schema_version': (
-                self.story_reference_schema_version)
+                self.story_reference_schema_version),
+            'meta_tag_content': self.meta_tag_content,
+            'practice_tab_is_displayed': self.practice_tab_is_displayed
         }
 
     def serialize(self):
@@ -627,7 +639,10 @@ class Topic(python_utils.OBJECT):
             topic_dict['subtopic_schema_version'],
             topic_dict['next_subtopic_id'],
             topic_dict['language_code'], topic_version,
-            topic_dict['story_reference_schema_version'], topic_created_on,
+            topic_dict['story_reference_schema_version'],
+            topic_dict['meta_tag_content'],
+            topic_dict['practice_tab_is_displayed'],
+            topic_created_on,
             topic_last_updated)
 
         return topic
@@ -952,6 +967,11 @@ class Topic(python_utils.OBJECT):
         self.require_valid_name(self.name)
         self.require_valid_url_fragment(self.url_fragment)
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
+        if not isinstance(self.practice_tab_is_displayed, bool):
+            raise utils.ValidationError(
+                'Practice tab is displayed property should be a boolean.'
+                'Received %s.' % self.practice_tab_is_displayed)
+        utils.require_valid_meta_tag_content(self.meta_tag_content)
         if self.thumbnail_bg_color is not None and not (
                 self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
             raise utils.ValidationError(
@@ -1025,6 +1045,11 @@ class Topic(python_utils.OBJECT):
                         'Subtopic with title %s does not have any skills '
                         'linked.' % subtopic.title)
 
+        if strict:
+            if len(self.subtopics) == 0:
+                raise utils.ValidationError(
+                    'Topic should have at least 1 subtopic.')
+
         if not self.are_subtopic_url_fragments_unique():
             raise utils.ValidationError(
                 'Subtopic url fragments are not unique across '
@@ -1094,7 +1119,7 @@ class Topic(python_utils.OBJECT):
             description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
-            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
+            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False)
 
     @classmethod
     def _convert_subtopic_v2_dict_to_v3_dict(cls, subtopic_dict):
@@ -1250,6 +1275,24 @@ class Topic(python_utils.OBJECT):
             new_language_code: str. The updated language code for the topic.
         """
         self.language_code = new_language_code
+
+    def update_meta_tag_content(self, new_meta_tag_content):
+        """Updates the meta tag content of a topic object.
+
+        Args:
+            new_meta_tag_content: str. The updated meta tag content for the
+                topic.
+        """
+        self.meta_tag_content = new_meta_tag_content
+
+    def update_practice_tab_is_displayed(self, new_practice_tab_is_displayed):
+        """Updates the language code of a topic object.
+
+        Args:
+            new_practice_tab_is_displayed: str. The updated practice tab is
+                displayed property for the topic.
+        """
+        self.practice_tab_is_displayed = new_practice_tab_is_displayed
 
     def add_uncategorized_skill_id(self, new_uncategorized_skill_id):
         """Updates the skill id list of a topic object.
