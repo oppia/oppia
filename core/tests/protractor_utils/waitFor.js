@@ -17,10 +17,12 @@
  * ExpectedConditions.
  */
 
+var Constants = require('./ProtractorConstants');
+
 var until = protractor.ExpectedConditions;
 var fs = require('fs');
 var path = require('path');
-var Constants = require('./ProtractorConstants');
+
 // When running tests on mobile via browserstack, the localhost
 // might take some time to establish a connection with the
 // server since the mobile tests are run on a real
@@ -135,12 +137,12 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
 };
 
 /**
- * @param {string} filename - Name of file to check (not the path of the file)
- * Check if a file has been downloaded
+ * @param {string} filename - Name of file to check (not the path of the file).
+ * Check if a file has been downloaded.
  */
 
 var fileToBeDownloaded = async function(filename) {
-  var name = Constants.DOWNLOAD_PATH + '/' + filename;
+  var name = Constants.CHROME_DOWNLOAD_PATH + '/' + filename;
   browser.driver.wait(function() {
     return fs.existsSync(name);
   }, DEFAULT_WAIT_TIME_MSECS, 'File was not downloaded!');

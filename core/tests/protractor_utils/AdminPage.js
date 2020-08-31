@@ -373,127 +373,139 @@ var AdminPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.uploadTopicSimilarities =
-    async function(relativePathToSimilaritiesFile, isValidFile) {
+  this.expectStatusMessageToBe = async function(text) {
+    await waitFor.visibilityOf(
+      statusMessage, 'Status message taking too long to appear');
+    expect(await statusMessage.getText()).toBe(text);
+  };
+
+  this.uploadTopicSimilarities = async function(
+    relativePathToSimilaritiesFile) {
       var absPath = path.resolve(__dirname, relativePathToSimilaritiesFile);
-      await waitFor.visibilityOf(chooseSimilarityFileInput,
-        'Similarity upload form is not visible');
+      await waitFor.visibilityOf(
+        chooseSimilarityFileInput,
+        'Similarity upload form taking too long to appear');
       await chooseSimilarityFileInput.sendKeys(absPath);
-      await action.click('Upload button', similarityFileUploadButton);
-      if (isValidFile) {
-        var text = 'Topic similarities uploaded successfully.';
-        await waitFor.visibilityOf(statusMessage,
-          'Status message not visible');
-        await waitFor.textToBePresentInElement(statusMessage, text,
-          'Text not showing up in status message');
-      } else {
-        var text = 'Server error: \'ascii\' codec can\'t encode characters' +
-          ' in position 1024-1025: ordinal not in range(128)';
-        await waitFor.visibilityOf(statusMessage,
-          'Status message not visible');
-        await waitFor.textToBePresentInElement(statusMessage, text,
-          'Text not showing up in status message');
-      }
+      await action.click(
+        'Similarity file upload button', similarityFileUploadButton);
     };
 
-  this.expectSimilaritiesToBeUploaded = async function() {
-    await waitFor.elementToBeClickable(similarityDownloadButton,
-      'Similarity upload failed – download similarities button not clickable.');
+  this.expectSimilarityUploadSuccess = async function() {
+    var text = 'Topic similarities uploaded successfully.';
+    await waitFor.visibilityOf(
+      statusMessage, 'Status message not visible');
+    await waitFor.textToBePresentInElement(
+      statusMessage, text, 'Text taking too long to appear in status message');
+  };
+
+  this.expectSimilarityUploadFailure = async function() {
+    var text = 'Server error: \'ascii\' codec can\'t encode characters' +
+      ' in position 1024-1025: ordinal not in range(128)';
+    await waitFor.visibilityOf(
+      statusMessage, 'Status message not visible');
+    await waitFor.textToBePresentInElement(
+      statusMessage, text, 'Text taking too long to appear in status message');
   };
 
   this.downloadSimilarityFile = async function() {
-    await action.click('Download Similarity File Button',
-      similarityDownloadButton);
+    await action.click(
+      'Download Similarity File Button', similarityDownloadButton);
   };
 
   this.clearSearchIndex = async function() {
     await action.click('Clear search index button', searchIndexClearButton);
     await general.acceptAlert();
-    await waitFor.visibilityOf(statusMessage,
-      'Status message not showing up.');
-    await waitFor.textToBePresentInElement(statusMessage,
-      'Index successfully cleared.');
   };
 
   this.flushMigrationBotContributions = async function() {
-    await action.click('Migration bot flush contributions button',
+    await action.click(
+      'Migration bot flush contributions button',
       flushMigrationBotContributionsButton);
     await general.acceptAlert();
-    await waitFor.textToBePresentInElement(statusMessage,
-      'Migration bot contributions successfully flushed.',
-      'Migration bot cuntributions not flushing.');
+    await waitFor.textToBePresentInElement(
+      statusMessage, 'Migration bot contributions successfully flushed.',
+      'Success message for migration bot contributions flushing not visible.');
   };
 
-  this.regenerateContributionsForTopic =
-    async function(topicId, isMeantToSucceed) {
-      await waitFor.visibilityOf(regenerateContributionsTopicIdInput,
-        'Regenerate contributions topic ID input not showing up.');
-      await regenerateContributionsTopicIdInput.sendKeys(topicId);
-      await action.click('Regenerate contributions form submit button',
-        regenerateContributionsSubmitButton);
-      await general.acceptAlert();
-      await waitFor.visibilityOf(regenerateContributionsTopicIdInput,
-        'Regenerate contributions topic ID input not showing up.');
-      await regenerateContributionsTopicIdInput.clear();
-      var text;
-      if (!isMeantToSucceed) {
-        text = 'Server error: Entity for class TopicModel with id ' +
-          topicId + ' not found';
-      } else {
-        text = 'No. of opportunities model created: 0';
-      }
-      await waitFor.visibilityOf(regenerationMessage,
-        'Regeneration message not visible');
-      await waitFor.textToBePresentInElement(regenerationMessage, text);
-    };
+  this.regenerateContributionsForTopic = async function(topicId) {
+    await action.sendKeys(
+      'Regenerate contributions topic ID input',
+      regenerateContributionsTopicIdInput, topicId);
+    await action.click(
+      'Regenerate contributions form submit button',
+      regenerateContributionsSubmitButton);
+    await general.acceptAlert();
+    await waitFor.visibilityOf(
+      regenerateContributionsTopicIdInput,
+      'Regenerate contributions topic ID input taking too long to appear.');
+    await action.clear(
+      'Regenerate contributions topic ID input',
+      regenerateContributionsTopicIdInput);
+  };
+
+  this.expectContributionRegenerationFailure = async function() {
+    var text = 'Server error: Entity for class TopicModel with id ' +
+      topicId + ' not found';
+    await waitFor.visibilityOf(
+      regenerationMessage, 'Regeneration message not visible');
+    await waitFor.textToBePresentInElement(regenerationMessage, text);
+  };
+
+  this.expectContributionRegenerationSuccess = async function() {
+    var text = 'No. of opportunities model created: 0';
+    await waitFor.visibilityOf(
+      regenerationMessage, 'Regeneration message not visible');
+    await waitFor.textToBePresentInElement(regenerationMessage, text);
+  };
 
   this.changeUsername = async function(oldUsername, newUsername) {
-    await waitFor.visibilityOf(oldUsernameInput,
-      'Current username input not visible');
-    await oldUsernameInput.sendKeys(oldUsername);
-    await waitFor.visibilityOf(newUsernameInput,
-      'New username input not visible');
-    await newUsernameInput.sendKeys(newUsername);
-    await waitFor.visibilityOf(usernameChangeSubmitButton,
-      'Change username submit button not visible');
+    await action.sendKeys(
+      'Current username input', oldUsernameInput, oldUsername);
+    await action.sendKeys('New username input', newUsernameInput, newUsername);
     await action.click('Username change submit button',
       usernameChangeSubmitButton);
     var text = 'Successfully renamed ' + oldUsername + ' to ' + newUsername;
-    await waitFor.textToBePresentInElement(statusMessage, text,
-      'Username was not successfully changed');
+    await waitFor.textToBePresentInElement(
+      statusMessage, text, 'Username was not successfully changed');
   };
 
   this.expectUsernameToBeChanged = async function(newUsername) {
     expect(usernameSection.getText()).toEqual(newUsername);
   };
 
-  this.extractData = async function(expID, expVersion,
-      stateName, numberOfAnswers, isMeantToFail) {
-    await browser.refresh();
-    await waitFor.pageToFullyLoad();
-    await action.sendKeys('Extract Data Exploration ID Input',
-      extractDataExplorationIdInput, expID);
-    await action.sendKeys('Extract Data Exploration Version Input',
-      extractDataExplorationVersionInput, expVersion);
-    await action.sendKeys('Extract Data State Name Input',
-      extractDataStateNameInput, stateName);
-    await action.sendKeys('Extract Data Number Of Answers Input',
-      extractDataNumAnswersInput, numberOfAnswers);
-    await action.click('Extract Data Form Submit Button',
-      extractDataFormSubmitButton);
-    if (isMeantToFail) {
-      numExtractionHandles = await browser.driver.getAllWindowHandles();
-      numExtractionHandles = numExtractionHandles.length;
-      await action.click('Extract Data Submit Button',
-        extractDataFormSubmitButton);
+  this.extractData = async function(
+    expID, expVersion, stateName, numberOfAnswers, isMeantToFail) {
+      await browser.refresh();
       await waitFor.pageToFullyLoad();
-    } else {
-      await waitFor.visibilityOf(extractDataStatusMessage,
-        'Data extraction status message not showing up!');
-      await waitFor.textToBePresentInElement(extractDataStatusMessage,
-        'Status: Data extraction query has been submitted. Please wait.');
-    }
-  };
+      await action.sendKeys(
+        'Extract Data Exploration ID Input', extractDataExplorationIdInput,
+        expID);
+      await action.sendKeys(
+        'Extract Data Exploration Version Input',
+        extractDataExplorationVersionInput, expVersion);
+      await action.sendKeys(
+        'Extract Data State Name Input', extractDataStateNameInput,
+        stateName);
+      await action.sendKeys(
+        'Extract Data Number Of Answers Input', extractDataNumAnswersInput,
+        numberOfAnswers);
+      await action.click(
+        'Extract Data Form Submit Button', extractDataFormSubmitButton);
+      if (isMeantToFail) {
+        numExtractionHandles = await browser.driver.getAllWindowHandles();
+        numExtractionHandles = numExtractionHandles.length;
+        await action.click(
+          'Extract Data Submit Button', extractDataFormSubmitButton);
+        await waitFor.pageToFullyLoad();
+      } else {
+        await waitFor.visibilityOf(
+          extractDataStatusMessage,
+          'Data extraction status message taking too long to appear.');
+        await waitFor.textToBePresentInElement(
+          extractDataStatusMessage,
+          'Status: Data extraction query has been submitted. Please wait.');
+      }
+    };
 
   this.expectExtractionFailure = async function() {
     var newNumExtractionHandles = await browser.driver.getAllWindowHandles();

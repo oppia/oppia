@@ -22,15 +22,15 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
-var TopicsAndSkillsDashboardPage =
-  require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
+var TopicsAndSkillsDashboardPage = require(
+  '../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
-var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
-var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
-var LibraryPage =
-  require('../protractor_utils/LibraryPage.js');
+var ExplorationEditorPage = require(
+  '../protractor_utils/ExplorationEditorPage.js');
+var ExplorationPlayerPage = require(
+  '../protractor_utils/ExplorationPlayerPage.js');
+var LibraryPage = require(
+  '../protractor_utils/LibraryPage.js');
 
 describe('Admin misc tab', function() {
   var adminPage = null;
@@ -48,27 +48,7 @@ describe('Admin misc tab', function() {
   const EXPLORATION_NAME = 'AdminMiscTabTestExploration';
   const CORRECT_ANSWER = ['MultipleChoiceInput', 'Correct!'];
 
-  beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
-    topicsAndSkillsDashboardPage = (
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
-    topicEditorPage = new TopicEditorPage.TopicEditorPage();
-    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-    explorationEditorMainTab = explorationEditorPage.getMainTab();
-    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-    libraryPage = new LibraryPage.LibraryPage();
-
-    await users.createAndLoginAdminUser(
-      'miscTabTester@miscTab.com', 'miscTabTester');
-
-    await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME,
-      'admin-misc-tab-test', 'A topic to test the Admin Page\'s Misc Tab',
-      false);
-    var url = await browser.getCurrentUrl();
-    topicId = url.split('/')[4].substring(0, 12);
-
+  var createAndPlayExploration = async function() {
     await workflow.createExploration();
     url = await browser.getCurrentUrl();
     explorationId = url.split('/')[4].substring(0, 12);
@@ -113,6 +93,28 @@ describe('Admin misc tab', function() {
       null, CORRECT_ANSWER);
     await explorationPlayerPage.clickThroughToNextCard();
     await waitFor.pageToFullyLoad();
+  };
+
+  beforeAll(async function() {
+    adminPage = new AdminPage.AdminPage();
+    topicsAndSkillsDashboardPage = (
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
+    topicEditorPage = new TopicEditorPage.TopicEditorPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    libraryPage = new LibraryPage.LibraryPage();
+
+    await users.createAndLoginAdminUser(
+      'miscTabTester@miscTab.com', 'miscTabTester');
+
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(
+      TOPIC_NAME, 'admin-misc-tab-test',
+      'A topic to test the Admin Page\'s Misc Tab', false);
+    var url = await browser.getCurrentUrl();
+    topicId = url.split('/')[4].substring(0, 12);
 
     await adminPage.get();
     await adminPage.getMiscTab();
@@ -120,18 +122,21 @@ describe('Admin misc tab', function() {
 
   it('should upload and download similarity files', async function() {
     await adminPage.uploadTopicSimilarities(
-      '../data/sample_topic_similarities.csv', true);
-    await adminPage.expectSimilaritiesToBeUploaded();
-    await adminPage.uploadTopicSimilarities('../data/cafe.mp3', false);
+      '../data/sample_topic_similarities.csv');
+    await adminPage.expectSimilarityUploadSuccess();
+    await adminPage.uploadTopicSimilarities('../data/cafe.mp3');
+    await adminPage.expectSimilarityUploadFailure();
     // We uploaded an invalid file (cafe.mp3), so we expect the errors below.
-    allowedErrors.push('encode', 'Object', 'resource', 'undefined.',
-      'unhandled', 'communicating', 'itemscope');
+    allowedErrors.push(
+      'encode', 'Object', 'resource', 'undefined.', 'unhandled',
+      'communicating', 'itemscope');
     await adminPage.downloadSimilarityFile();
     await waitFor.fileToBeDownloaded('topic_similarities.csv');
   });
 
   it('should clear the search index', async function() {
     await adminPage.clearSearchIndex();
+    await adminPage.expectStatusMessageToBe('Index successfully cleared.');
   });
 
   it('should flush migration bot contributions', async function() {
@@ -147,19 +152,24 @@ describe('Admin misc tab', function() {
 
   it('should regenerate contribution opportunities for a topic',
     async function() {
-      await adminPage.regenerateContributionsForTopic('0', false);
       // These errors come from supplying '0' as the topic ID (invalid)
-      allowedErrors.push('500', 'id 0', 'Entity', 'Object');
-      await adminPage.regenerateContributionsForTopic(topicId, true);
+      allowedErrors.push('id', 'Entity', 'Object');
+      await adminPage.regenerateContributionsForTopic('0');
+      await adminPage.expectContributionRegenerationFailure();
+      await adminPage.regenerateContributionsForTopic(topicId);
+      await adminPage.expectContributionRegenerationSuccess();
     });
 
-  it('should send a test mail to admin', async function() {
+  it('should try to send a test mail to admin', async function() {
     // Locally, Oppia is unable to send emails, hence we expect errors.
     await adminPage.sendTestEmailToAdminAndExpectError();
     allowedErrors.push('400', 'Object', 'This app cannot send emails.');
   });
 
   it('should extract data', async function() {
+    await createAndPlayExploration();
+    await adminPage.get();
+    await adminPage.getMiscTab();
     await adminPage.extractData(explorationId, '2', 'First', '0', false);
     await adminPage.expectExtractionSuccess();
     await browser.refresh();
@@ -167,10 +177,11 @@ describe('Admin misc tab', function() {
     await adminPage.extractData('0', '0', '0', '0', true);
     // We expect errors because we inputted an invalid exploration ID.
     await adminPage.expectExtractionFailure();
-    allowedErrors.push('rejection');
+    allowedErrors.push('rejection', '400');
   });
 
   afterEach(async function() {
     await general.checkForConsoleErrors(allowedErrors);
+    allowedErrors = [];
   });
 });
