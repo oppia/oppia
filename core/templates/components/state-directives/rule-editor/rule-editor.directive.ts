@@ -265,6 +265,12 @@ angular.module('oppia').directive('ruleEditor', [
               ctrl.onSelectNewRuleType(ctrl.rule.type);
             }
             computeRuleDescriptionFragments();
+
+            $scope.$watch(
+              '$ctrl.ruleEditForm.form.$invalid', function(newValue) {
+                StateEditorService.updateCurrentRuleInputIsValid(!newValue);
+              }
+            );
           };
         }
       ]
