@@ -248,13 +248,13 @@ angular.module('oppia').component('learnerDashboardPage', {
           },
           update: function(e, ui) {
             var insertExpInLearnerPlaylistUrl = (
-              UrlInterpolationService.interpolateUrl(
-                ('/learnerplaylistactivityhandler/<activityType>/' +
+              UrlInterpolationService.interpolateUrl((
+                '/learnerplaylistactivityhandler/<activityType>/' +
                 '<activityId>'), {
-                  activityType: activityType,
-                  activityId: (
-                    ctrl.explorationPlaylist[ui.item.sortable.index].id)
-                }));
+                activityType: activityType,
+                activityId: (
+                  ctrl.explorationPlaylist[ui.item.sortable.index].id)
+              }));
 
             $http.post(insertExpInLearnerPlaylistUrl, {
               index: ui.item.sortable.dropindex

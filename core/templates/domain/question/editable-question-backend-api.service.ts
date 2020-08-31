@@ -179,8 +179,9 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
       createQuestion: function(
           skillIds, skillDifficulties, questionDict, imagesData) {
         return $q(function(resolve, reject) {
-          _createQuestion(skillIds, skillDifficulties,
-            questionDict, imagesData, resolve, reject);
+          _createQuestion(
+            skillIds, skillDifficulties, questionDict, imagesData, resolve,
+            reject);
         });
       },
 

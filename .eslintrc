@@ -10,7 +10,8 @@
     "angular",
     "html",
     "unused-imports",
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "oppia"
   ],
   "overrides": [{
     // We exclude test files from dependency injection format checks because
@@ -21,6 +22,7 @@
     }
   }],
   "rules": {
+    "oppia/break-after-parens": "error",
     "angular/di": [
       "error",
       "array"
@@ -202,6 +204,9 @@
     // The following must be off so that we can enable
     // "@typescript-eslint/semi", which checks semicolons in TS files.
     "semi": "off",
+    // The following must be off so that we can enable
+    // "@typescript-eslint/no-extra-semi".
+    "no-extra-semi": "off",
     "semi-spacing": "error",
     "space-before-blocks": [
       "error",
@@ -277,6 +282,9 @@
     "@typescript-eslint/no-extra-non-null-assertion": ["error"],
     "@typescript-eslint/no-misused-new": ["error"],
     "@typescript-eslint/explicit-module-boundary-types": ["error"],
+    "@typescript-eslint/prefer-as-const": ["error"],
+    "@typescript-eslint/no-array-constructor": ["error"],
+    "@typescript-eslint/no-extra-semi": ["error"],
     "wrap-iife": [
       "error",
       "any"

@@ -84,7 +84,7 @@ describe('Topic viewer page', function() {
         subtopics: [],
         degrees_of_mastery: {},
         skill_descriptions: {},
-        train_tab_should_be_displayed: true
+        practice_tab_is_displayed: true
       }));
     spyOn(TopicViewerBackendApiService, 'fetchTopicData').and.returnValue(
       $q.resolve(topicDataObject));
@@ -108,7 +108,7 @@ describe('Topic viewer page', function() {
     expect(ctrl.subtopics).toEqual([]);
     expect(ctrl.skillDescriptions).toEqual({});
     expect(ctrl.topicIsLoading).toBe(false);
-    expect(ctrl.trainTabShouldBeDisplayed).toBe(true);
+    expect(ctrl.practiceTabIsDisplayed).toBe(true);
   });
 
   it('should set story tab correctly', function() {
@@ -142,48 +142,6 @@ describe('Topic viewer page', function() {
       `/learn/math/${topicName}/practice`);
     ctrl.$onInit();
     expect(ctrl.activeTab).toBe('practice');
-  });
-
-  it('should switch to stories tab if practice tab is hidden', function() {
-    spyOn(UrlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-      topicName);
-    spyOn(UrlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
-      'math');
-    spyOn(UrlService, 'getPathname').and.returnValue(
-      `/learn/math/${topicName}/practice`);
-    var topicDataObject = (
-      ReadOnlyTopicObjectFactory.createFromBackendDict({
-        topic_id: '1',
-        topic_name: 'Topic Name',
-        topic_description: 'Topic Description',
-        canonical_story_dicts: [{
-          id: '2',
-          title: 'Story Title',
-          node_titles: ['Node title 1', 'Node title 2'],
-          thumbnail_filename: '',
-          thumbnail_bg_color: '',
-          description: 'Story Description',
-          story_is_published: true
-        }],
-        additional_story_dicts: [],
-        uncategorized_skill_ids: [],
-        subtopics: [],
-        degrees_of_mastery: {},
-        skill_descriptions: {},
-        train_tab_should_be_displayed: false
-      }));
-    spyOn(TopicViewerBackendApiService, 'fetchTopicData').and.returnValue(
-      $q.resolve(topicDataObject));
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
-
-    ctrl.$onInit();
-
-    expect(ctrl.canonicalStorySummaries).toEqual([]);
-    expect(ctrl.activeTab).toBe('practice');
-    $scope.$apply();
-
-    expect(ctrl.trainTabShouldBeDisplayed).toBe(false);
-    expect(ctrl.activeTab).toBe('story');
   });
 
   it('should use reject handler when fetching subtopic data fails',

@@ -57,7 +57,8 @@ import { AlertsService } from 'services/alerts.service';
 import WaveSurfer from 'wavesurfer.js';
 import $ from 'jquery';
 
-require('pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
+require(
+  'pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
   'audio-translation-bar.directive.ts');
 
 describe('Audio translation bar directive', function() {
@@ -119,18 +120,19 @@ describe('Audio translation bar directive', function() {
       onExternalSave: mockExternalSaveEventEmitter
     });
     $provide.value('SiteAnalyticsService', TestBed.get(SiteAnalyticsService));
-    $provide.value('StateEditorRefreshService',
-      TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('StateEditorService', TestBed.get(StateEditorService));
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
-    $provide.value('StateInteractionIdService',
-      TestBed.get(StateInteractionIdService));
-    $provide.value('StateRecordedVoiceoversService',
-      stateRecordedVoiceoversService);
+    $provide.value(
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+    $provide.value(
+      'StateRecordedVoiceoversService', stateRecordedVoiceoversService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
-    $provide.value('StateWrittenTranslationsService',
+    $provide.value(
+      'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
   }));
 
@@ -165,20 +167,22 @@ describe('Audio translation bar directive', function() {
     spyOn(explorationStatesService, 'saveRecordedVoiceovers').and
       .callFake(function() {});
 
-    spyOnProperty(translationTabActiveContentIdService,
+    spyOnProperty(
+      translationTabActiveContentIdService,
       'onActiveContentIdChanged').and.returnValue(
       mockActiveContentIdChangedEventEmitter);
 
-    spyOnProperty(translationLanguageService,
-      'onActiveLanguageChanged').and.returnValue(
+    spyOnProperty(
+      translationLanguageService, 'onActiveLanguageChanged').and.returnValue(
       mockActiveLanguageChangedEventEmitter);
 
-    spyOnProperty(stateEditorService,
+    spyOnProperty(
+      stateEditorService,
       'onShowTranslationTabBusyModal').and.returnValue(
       mockShowTranslationTabBusyModalEventEmitter);
 
-    stateRecordedVoiceoversService.init(stateName,
-      recordedVoiceoversObjectFactory.createFromBackendDict({
+    stateRecordedVoiceoversService.init(
+      stateName, recordedVoiceoversObjectFactory.createFromBackendDict({
         voiceovers_mapping: {
           content: {
             en: {
@@ -354,8 +358,8 @@ describe('Audio translation bar directive', function() {
   });
 
   it('should toggle audio needs update', function() {
-    spyOn(stateRecordedVoiceoversService.displayed,
-      'toggleNeedsUpdateAttribute');
+    spyOn(
+      stateRecordedVoiceoversService.displayed, 'toggleNeedsUpdateAttribute');
 
     $scope.toggleAudioNeedsUpdate();
     expect(
@@ -735,8 +739,8 @@ describe('Audio translation bar directive', function() {
         .returnValue($q.resolve({
           canVoiceover: true
         }));
-      stateRecordedVoiceoversService.init(stateName,
-        recordedVoiceoversObjectFactory.createFromBackendDict({
+      stateRecordedVoiceoversService.init(
+        stateName, recordedVoiceoversObjectFactory.createFromBackendDict({
           voiceovers_mapping: {
             content: {
               en: {
@@ -781,7 +785,7 @@ describe('Audio translation bar directive', function() {
     });
 
     it('should trigger drop event in translation tab element and open add' +
-      ' audio translation modal with $uibModal', function() {
+      ' audio translation modal', function() {
       translationTabDivMock.triggerHandler('dragover');
 
       spyOn($uibModal, 'open').and.callThrough();

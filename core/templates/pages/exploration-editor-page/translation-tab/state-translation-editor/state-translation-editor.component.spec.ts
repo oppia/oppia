@@ -141,12 +141,12 @@ describe('State Translation Editor Component', function() {
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
-    $provide.value('StateEditorRefreshService',
-      TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('StateRecordedVoiceoversService', TestBed.get(
       StateRecordedVoiceoversService));
-    $provide.value('StateWrittenTranslationsService',
-      stateWrittenTranslationsService);
+    $provide.value(
+      'StateWrittenTranslationsService', stateWrittenTranslationsService);
   }));
 
   describe('when has written translation', function() {
@@ -168,10 +168,11 @@ describe('State Translation Editor Component', function() {
       spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
         () => {});
 
-      spyOnProperty(translationLanguageService,
-        'onActiveLanguageChanged').and.returnValue(
+      spyOnProperty(
+        translationLanguageService, 'onActiveLanguageChanged').and.returnValue(
         mockActiveLanguageChangedEventEmitter);
-      spyOnProperty(translationTabActiveContentIdService,
+      spyOnProperty(
+        translationTabActiveContentIdService,
         'onActiveContentIdChanged').and.returnValue(
         mockActiveLanguageChangedEventEmitter);
 
@@ -201,7 +202,7 @@ describe('State Translation Editor Component', function() {
       ctrl.$onDestroy();
     });
 
-    it('should evaluate $scope properties after controller initialization',
+    it('should initialize $scope properties after controller is initialized',
       function() {
         expect($scope.translationEditorIsOpen).toBe(false);
         expect($scope.activeWrittenTranslation).toEqual(
@@ -409,13 +410,13 @@ describe('State Translation Editor Component', function() {
       ctrl.$onDestroy();
     });
 
-    it('should evaluate $scope properties after controller initialization',
+    it('should initialize $scope properties after controller is initialized',
       function() {
         expect($scope.translationEditorIsOpen).toBe(false);
         expect($scope.activeWrittenTranslation).toBe(null);
       });
 
-    it('should open translation editor when is editable', function() {
+    it('should open translation editor when it is editable', function() {
       $scope.openTranslationEditor();
       expect($scope.translationEditorIsOpen).toBe(true);
       expect($scope.activeWrittenTranslation).toEqual(

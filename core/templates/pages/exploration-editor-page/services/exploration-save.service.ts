@@ -217,9 +217,11 @@ angular.module('oppia').factory('ExplorationSaveService', [
         return (
           ChangeListService.isExplorationLockedForEditing() &&
           !saveIsInProgress && (
-            (ExplorationRightsService.isPrivate() &&
+            (
+              ExplorationRightsService.isPrivate() &&
               !ExplorationWarningsService.hasCriticalWarnings()) ||
-            (!ExplorationRightsService.isPrivate() &&
+            (
+              !ExplorationRightsService.isPrivate() &&
               ExplorationWarningsService.countWarnings() === 0)
           )
         );
