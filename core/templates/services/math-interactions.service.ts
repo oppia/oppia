@@ -135,6 +135,7 @@ export class MathInteractionsService {
     // Replacing greek names with symbols.
     for (let i = 0; i < variablesList.length; i++) {
       if (variablesList[i].length > 1) {
+        // eslint-disable-next-line dot-notation
         variablesList[i] = AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS'][
           variablesList[i]];
       }
