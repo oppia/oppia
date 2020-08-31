@@ -296,7 +296,17 @@ angular.module('oppia').directive('answerGroupEditor', [
             ctrl.directiveSubscriptions.add(
               ExternalSaveService.onExternalSave.subscribe(() => {
                 if (ctrl.isRuleEditorOpen()) {
-                  ctrl.saveRules();
+                  if (StateEditorService.checkCurrentRuleInputIsValid()) {
+                    ctrl.saveRules();
+                  } else {
+                    var messageContent = (
+                      'There was an unsaved rule input which was invalid and ' +
+                      'has been discarded.');
+                    if (!AlertsService.messages.some(messageObject => (
+                      messageObject.content === messageContent))) {
+                      AlertsService.addInfoMessage(messageContent);
+                    }
+                  }
                 }
               })
             );
