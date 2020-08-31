@@ -16,9 +16,12 @@
  * @fileoverview Unit tests for practiceTab.
  */
 
-import { TestBed, async, ComponentFixture } from '@angular/core/testing';
+import { TestBed, async, ComponentFixture, fakeAsync, flushMicrotasks } from
+  '@angular/core/testing';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { PracticeTabComponent } from './practice-tab.component';
+import { QuestionBackendApiService } from
+  'domain/question/question-backend-api.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
@@ -54,20 +57,32 @@ class MockWindowRef {
   }
 }
 
+class MockQuestionBackendApiService {
+  fetchTotalQuestionCountForSkillIds() {
+    return Promise.resolve(1);
+  }
+}
+
 describe('Practice tab component', function() {
   let component: PracticeTabComponent;
   let fixture: ComponentFixture<PracticeTabComponent>;
   let subtopicObjectFactory = null;
   let windowRef: MockWindowRef;
+  let questionBackendApiService: MockQuestionBackendApiService;
 
   beforeEach(async(() => {
     windowRef = new MockWindowRef();
+    questionBackendApiService = new MockQuestionBackendApiService();
     TestBed.configureTestingModule({
       declarations: [PracticeTabComponent, MockTranslatePipe],
       providers: [
         UrlInterpolationService,
         { provide: UrlService, useClass: MockUrlService },
         { provide: WindowRef, useValue: windowRef },
+        {
+          provide: QuestionBackendApiService,
+          useValue: questionBackendApiService
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -114,6 +129,7 @@ describe('Practice tab component', function() {
   it('should have start button enabled when a subtopic is selected',
     function() {
       component.selectedSubtopicIndices[0] = true;
+      component.questionsAreAvailable = true;
       expect(component.isStartButtonDisabled()).toBe(false);
     });
 
@@ -137,4 +153,14 @@ describe('Practice tab component', function() {
     expect(windowRef.nativeWindow.location.href).toBe(
       '/learn/classroom_1/topic_1/practice/session?selected_subtopic_ids=1');
   });
+
+  it('should check if questions exist for the selected subtopics',
+    fakeAsync(() => {
+      component.checkIfQuestionsExist([true]);
+      flushMicrotasks();
+      expect(component.questionsAreAvailable).toBeTrue();
+      component.checkIfQuestionsExist([false]);
+      flushMicrotasks();
+      expect(component.questionsAreAvailable).toBeFalse();
+    }));
 });
