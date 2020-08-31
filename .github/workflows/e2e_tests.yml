@@ -36,6 +36,6 @@ jobs:
       - name: Run Learner Dashboard E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learnerDashboard" --prod_env
-      - name: Run Additional Player Features E2E Test
+      - name: Run Classroom Page E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalPlayerFeatures" --prod_env
+        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="classroomPage" --prod_env
