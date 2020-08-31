@@ -448,8 +448,11 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # We need to re-import appengine_config here to make it look like a
         # local variable so that we can again re-import appengine_config later.
         import appengine_config
+
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception, 'Invalid path for third_party library: invalid_path')
+            Exception,
+            'virtualenv: cannot access invalid_path/python_libs: No such '
+            'virtualenv or site directory')
 
         def mock_os_path_join_for_third_party_lib(*args):
             """Mocks path for third_party libs with an invalid path. This is

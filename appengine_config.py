@@ -23,6 +23,7 @@ import sys
 from google.appengine.ext import vendor
 # Root path of the app.
 ROOT_PATH = os.path.dirname(__file__)
+THIRD_PARTY_PATH = os.path.join(ROOT_PATH, 'third_party')
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 OPPIA_TOOLS_PATH = os.path.join(_PARENT_DIR, 'oppia_tools')
 
@@ -40,4 +41,4 @@ if os.path.isdir(OPPIA_TOOLS_PATH):
         raise Exception('Invalid path for oppia_tools library: %s' % PIL_PATH)
     sys.path.insert(0, PIL_PATH)
 
-vendor.add(os.path.join(ROOT_PATH, 'third_party', 'python_libs'))
+vendor.add(os.path.join(THIRD_PARTY_PATH, 'python_libs'))
