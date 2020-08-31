@@ -87,53 +87,55 @@
       </div>
     </div>
   </md-card>
-  <md-card class="question-data-container question-editor-open-container" ng-if="$ctrl.editorIsOpen">
-    <div class="save-question-container">
-      <div>
-        <div class="list-header">
-          <h3>New Question</h3>
+  <div>
+    <md-card class="question-data-container question-editor-open-container" ng-if="$ctrl.editorIsOpen">
+      <div class="save-question-container">
+        <div>
+          <div class="list-header">
+            <h3>New Question</h3>
+          </div>
+          <div class="checklist-item">
+            <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.linkedSkillsWithDifficulty.length}"><span>1</span></div>
+            <div class="checklist-item-text">Difficulty</div>
+          </div>
+          <div class="checklist-item-separator"></div>
+          <div class="checklist-item">
+            <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().content.getHtml().length}">2</div>
+            <div class="checklist-item-text">Problem</div>
+          </div>
+          <div class="checklist-item-separator"></div>
+          <div class="checklist-item">
+            <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().interaction.id}">3</div>
+            <div class="checklist-item-text">Interaction</div>
+          </div>
+          <div class="checklist-item-separator"></div>
+          <div class="checklist-item">
+            <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().interaction.answerGroups.length}">4</div>
+            <div class="checklist-item-text">Answers and Responses</div>
+          </div>
+          <div class="checklist-item-separator"></div>
+          <div class="checklist-item">
+            <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().interaction.hints.length}">5</div>
+            <div class="checklist-item-text">Hints</div>
+          </div>
+          <div class="checklist-item-separator"></div>
+          <div class="checklist-item">
+            <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().interaction.solution}">6</div>
+            <div class="checklist-item-text">Solution</div>
+          </div>
         </div>
-        <div class="checklist-item">
-          <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.linkedSkillsWithDifficulty.length}"><span>1</span></div>
-          <div class="checklist-item-text">Difficulty</div>
-        </div>
-        <div class="checklist-item-separator"></div>
-        <div class="checklist-item">
-          <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().content.getHtml().length}">2</div>
-          <div class="checklist-item-text">Problem</div>
-        </div>
-        <div class="checklist-item-separator"></div>
-        <div class="checklist-item">
-          <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().interaction.id}">3</div>
-          <div class="checklist-item-text">Interaction</div>
-        </div>
-        <div class="checklist-item-separator"></div>
-        <div class="checklist-item">
-          <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().interaction.answerGroups.length}">4</div>
-          <div class="checklist-item-text">Answers and Responses</div>
-        </div>
-        <div class="checklist-item-separator"></div>
-        <div class="checklist-item">
-          <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().interaction.hints.length}">5</div>
-          <div class="checklist-item-text">Hints</div>
-        </div>
-        <div class="checklist-item-separator"></div>
-        <div class="checklist-item">
-          <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().interaction.solution}">6</div>
-          <div class="checklist-item-text">Solution</div>
+        <div class="save-question-button-container">
+          <button class="btn btn-secondary" ng-click="$ctrl.cancel()">Cancel</button>
+          <button title="To Save please add: interaction, hint, solution and address all misconceptions"
+                  class="btn btn-success add-question-btn protractor-test-save-question-button"
+                  ng-click="$ctrl.saveQuestion()"
+                  ng-disabled="!$ctrl.isQuestionValid()">
+            Save
+          </button>
         </div>
       </div>
-      <div class="save-question-button-container">
-        <button class="btn btn-secondary" ng-click="$ctrl.cancel()">Cancel</button>
-        <button title="To Save please add: interaction, hint, solution and address all misconceptions"
-                class="btn btn-success add-question-btn protractor-test-save-question-button"
-                ng-click="$ctrl.saveQuestion()"
-                ng-disabled="!$ctrl.isQuestionValid()">
-          Save
-        </button>
-      </div>
-    </div>
-  </md-card>
+    </md-card>
+  </div>
   <div class="create-question-container" ng-if="!$ctrl.editorIsOpen">
     <md-card class="oppia-page-card">
       <div>
@@ -211,7 +213,9 @@
     width: 60%;
   }
   questions-list .question-editor-open-container {
-    width: 35%;
+    position: fixed;
+    right: 13%;
+    width: 26%;
   }
   questions-list .checklist-item {
     display: flex;
