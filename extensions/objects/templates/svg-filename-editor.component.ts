@@ -97,7 +97,6 @@ angular.module('oppia').component('svgFilenameEditor', {
         'Impact',
         'Monaco',
         'Optima',
-        'Hoefler Text',
         'Plaster',
         'Engagement'
       ];
