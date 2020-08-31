@@ -21,7 +21,7 @@ import { TestBed, fakeAsync, flushMicrotasks, tick } from
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { PlatformFeatureService } from
+import { PlatformFeatureService, platformFeatureInitFactory } from
   'services/platform-feature.service';
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
@@ -343,5 +343,26 @@ describe('PlatformFeatureService', () => {
           'The platform feature service has not been initialized.');
       })
     );
+  });
+
+  describe('platformFeatureInitFactory', () => {
+    let factoryFn: (service: PlatformFeatureService) => () => Promise<void>;
+
+    beforeEach(() => {
+      factoryFn = platformFeatureInitFactory;
+      platformFeatureService = TestBed.get(PlatformFeatureService);
+    });
+
+    it('should return a function that calls initialize', () => {
+      const mockPromise = Promise.resolve(null);
+      const spy = spyOn(platformFeatureService, 'initialize')
+        .and.returnValue(mockPromise);
+
+      const returnedFn = factoryFn(platformFeatureService);
+      const returnedPromise = returnedFn();
+
+      expect(spy).toHaveBeenCalled();
+      expect(returnedPromise).toBe(mockPromise);
+    });
   });
 });
