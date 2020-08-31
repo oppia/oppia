@@ -303,20 +303,17 @@ class UserAuthDetails(python_utils.OBJECT):
     Attributes:
         user_id: str. The unique ID of the user.
         gae_id: str. The ID of the user retrieved from GAE.
-        pin: str or None. The PIN of the user's profile for android.
         parent_user_id: str or None. For profile users, the user ID of the full
             user associated with that profile. None for full users.
     """
 
     def __init__(
-            self, user_id, gae_id, pin=None, parent_user_id=None,
-            deleted=False):
+            self, user_id, gae_id, parent_user_id=None, deleted=False):
         """Constructs a UserAuthDetails domain object.
 
         Args:
             user_id: str. The unique ID of the user.
             gae_id: str. The ID of the user retrieved from GAE.
-            pin: str or None. The PIN of the user's profile for android.
             parent_user_id: str or None. For profile users, the user ID of the
                 full user associated with that profile. None for full users.
             deleted: bool. Whether the user has requested removal of their
@@ -324,7 +321,6 @@ class UserAuthDetails(python_utils.OBJECT):
         """
         self.user_id = user_id
         self.gae_id = gae_id
-        self.pin = pin
         self.parent_user_id = parent_user_id
         self.deleted = deleted
 
@@ -335,7 +331,6 @@ class UserAuthDetails(python_utils.OBJECT):
         Raises:
             ValidationError. The user_id is not str.
             ValidationError. The gae_id is not str.
-            ValidationError. The pin is not str.
             ValidationError. The parent_user_id is not str.
         """
         if not isinstance(self.user_id, python_utils.BASESTRING):
@@ -351,13 +346,6 @@ class UserAuthDetails(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected gae_id to be a string, received %s' %
                 self.gae_id
-            )
-
-        if (self.pin is not None and
-                not isinstance(self.pin, python_utils.BASESTRING)):
-            raise utils.ValidationError(
-                'Expected PIN to be a string, received %s' %
-                self.pin
             )
 
         if (self.parent_user_id is not None and
@@ -960,7 +948,6 @@ def _save_user_auth_details(user_auth_details):
 
     user_auth_details_dict = {
         'gae_id': user_auth_details.gae_id,
-        'pin': user_auth_details.pin,
         'parent_user_id': user_auth_details.parent_user_id,
         'deleted': user_auth_details.deleted
     }
@@ -990,7 +977,6 @@ def _get_user_auth_details_from_model(user_auth_details_model):
     return UserAuthDetails(
         user_id=user_auth_details_model.id,
         gae_id=user_auth_details_model.gae_id,
-        pin=user_auth_details_model.pin,
         parent_user_id=user_auth_details_model.parent_user_id,
         deleted=user_auth_details_model.deleted
     )

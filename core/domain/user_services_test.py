@@ -1549,13 +1549,6 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
         ):
             self.user_auth_details.validate()
 
-    def test_validate_non_str_pin_id(self):
-        self.user_auth_details.pin = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected PIN to be a string'
-        ):
-            self.user_auth_details.validate()
-
     def test_parent_user_id_gae_id_together_raises_error(self):
         self.user_auth_details.parent_user_id = (
             user_models.UserSettingsModel.get_new_id(''))

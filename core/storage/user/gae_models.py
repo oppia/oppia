@@ -2242,9 +2242,6 @@ class UserAuthDetailsModel(base_models.BaseModel):
     # Authentication detail for sign-in using google id (GAE). Exists only
     # for full users. None for profile users.
     gae_id = ndb.StringProperty(indexed=True)
-    # A code associated with profile and full user on Android to provide a PIN
-    # based authentication within the account.
-    pin = ndb.StringProperty(default=None)
     # For profile users, the user ID of the full user associated with that
     # profile. None for full users. Required for profiles because gae_id
     # attribute is None for them, hence this attribute stores their association

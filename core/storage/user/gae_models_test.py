@@ -2303,11 +2303,7 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
     NONREGISTERED_GAE_ID = 'gae_id_x'
     USER_ID = 'user_id'
     USER_GAE_ID = 'gae_id'
-    USER_PIN = '12345'
     PROFILE_ID = 'profile_id'
-    PROFILE_PIN = '123'
-    PROFILE_2_ID = 'profile2_id'
-    PROFILE_2_PIN = None
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -2316,18 +2312,10 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
         user_models.UserAuthDetailsModel(
             id=self.USER_ID,
             gae_id=self.USER_GAE_ID,
-            pin=self.USER_PIN
         ).put()
         user_models.UserAuthDetailsModel(
             id=self.PROFILE_ID,
             gae_id=None,
-            pin=self.PROFILE_PIN,
-            parent_user_id=self.USER_ID
-        ).put()
-        user_models.UserAuthDetailsModel(
-            id=self.PROFILE_2_ID,
-            gae_id=None,
-            pin=self.PROFILE_2_PIN,
             parent_user_id=self.USER_ID
         ).put()
 
