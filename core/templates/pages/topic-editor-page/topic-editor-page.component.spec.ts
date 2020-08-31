@@ -25,7 +25,7 @@ require('pages/topic-editor-page/topic-editor-page.component.ts');
 
 import { EventEmitter } from '@angular/core';
 
-describe('Topic editor page', function() {
+fdescribe('Topic editor page', function() {
   var ctrl = null;
   var $scope = null;
   var ContextService = null;
@@ -98,5 +98,39 @@ describe('Topic editor page', function() {
   it('should get entity type from context service', function() {
     spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
     expect(ctrl.getEntityType()).toBe('exploration');
+  });
+
+  it('should open subtopic preview tab if active tab is subtopic editor', function() {
+    spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'subtopic_editor');
+    const topicPreviewSpy = spyOn(TopicEditorRoutingService, 'navigateToSubtopicPreviewTab');
+    ctrl.openTopicViewer();
+    expect(topicPreviewSpy).toHaveBeenCalled();
+  });
+
+  it('should open topic preview if active tab is topic editor', function() {
+    spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'topic_editor');
+    const topicPreviewSpy = spyOn(
+      TopicEditorRoutingService, 'navigateToTopicPreviewTab');
+    ctrl.openTopicViewer();
+    expect(topicPreviewSpy).toHaveBeenCalled();
+  });
+
+  it('should open subtopic preview tab if active tab is subtopic editor', function() {
+    spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'subtopic_editor');
+    const topicPreviewSpy = spyOn(TopicEditorRoutingService, 'navigateToSubtopicPreviewTab');
+    ctrl.openTopicViewer();
+    expect(topicPreviewSpy).toHaveBeenCalled();
+  });
+
+  it('should open topic preview if active tab is topic editor', function() {
+    spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'topic_editor');
+    const topicPreviewSpy = spyOn(
+      TopicEditorRoutingService, 'navigateToTopicPreviewTab');
+    ctrl.openTopicViewer();
+    expect(topicPreviewSpy).toHaveBeenCalled();
   });
 });
