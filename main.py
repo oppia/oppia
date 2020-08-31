@@ -760,7 +760,8 @@ URLS = MAPREDUCE_HANDLERS + [
         story_editor.ValidateExplorationsHandler),
 
     get_redirect_route(
-        '/classroom_page_status_handler', classroom.ClassroomPageStatusHandler),
+        '/classroom_promos_status_handler',
+        classroom.ClassroomPromosStatusHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(

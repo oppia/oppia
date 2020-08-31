@@ -35,7 +35,8 @@ describe('Story viewer navbar breadcrumb component', function() {
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'classroom1');
     mockSendStoryDataEventEmitter = new EventEmitter();
-    spyOnProperty(storyViewerBackendApiService,
+    spyOnProperty(
+      storyViewerBackendApiService,
       'onSendStoryData').and.returnValue(mockSendStoryDataEventEmitter);
 
     ctrl = $componentController('storyViewerNavbarBreadcrumb', { });

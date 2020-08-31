@@ -45,7 +45,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         with outDir in typescript_checks.TSCONFIG_FILEPATH.
         """
         with self.popen_swap:
-            typescript_checks.compile_and_check_typescript()
+            typescript_checks.compile_and_check_typescript(
+                typescript_checks.TSCONFIG_FILEPATH)
             out_dir = ''
             with python_utils.open_file(
                 typescript_checks.TSCONFIG_FILEPATH, 'r') as f:
@@ -60,7 +61,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 'in %s: %s' % (
                     MOCK_COMPILED_JS_DIR, typescript_checks.TSCONFIG_FILEPATH,
                     out_dir)):
-                typescript_checks.compile_and_check_typescript()
+                typescript_checks.compile_and_check_typescript(
+                    typescript_checks.TSCONFIG_FILEPATH)
 
     def test_compiled_js_dir_is_deleted_before_compilation(self):
         """Test that compiled_js_dir is deleted before a fresh compilation."""
@@ -76,7 +78,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             if not os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)):
                 os.mkdir(os.path.dirname(MOCK_COMPILED_JS_DIR))
 
-            typescript_checks.compile_and_check_typescript()
+            typescript_checks.compile_and_check_typescript(
+                typescript_checks.TSCONFIG_FILEPATH)
             self.assertFalse(
                 os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
 
@@ -99,14 +102,16 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         with popen_swap, compiled_js_dir_swap, validate_swap:
             if not os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)):
                 os.mkdir(os.path.dirname(MOCK_COMPILED_JS_DIR))
-            typescript_checks.compile_and_check_typescript()
+            typescript_checks.compile_and_check_typescript(
+                typescript_checks.TSCONFIG_FILEPATH)
             self.assertFalse(
                 os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
 
     def test_no_error_is_produced_for_valid_compilation(self):
         """Test that no error is produced if stdout is empty."""
         with self.popen_swap:
-            typescript_checks.compile_and_check_typescript()
+            typescript_checks.compile_and_check_typescript(
+                typescript_checks.TSCONFIG_FILEPATH)
 
     def test_error_is_produced_for_invalid_compilation(self):
         """Test that error is produced if stdout is not empty."""
@@ -116,4 +121,28 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
 
         with self.swap(subprocess, 'Popen', mock_popen_for_errors):
             with self.assertRaisesRegexp(SystemExit, '1'):
-                typescript_checks.compile_and_check_typescript()
+                typescript_checks.compile_and_check_typescript(
+                    typescript_checks.TSCONFIG_FILEPATH)
+
+    def test_config_path_when_no_arg_is_used(self):
+        """Test if the config path is correct when no arg is used."""
+        def mock_compile_and_check_typescript(config_path):
+            self.assertEqual(config_path, typescript_checks.TSCONFIG_FILEPATH)
+        compile_and_check_typescript_swap = self.swap(
+            typescript_checks, 'compile_and_check_typescript',
+            mock_compile_and_check_typescript)
+
+        with compile_and_check_typescript_swap:
+            typescript_checks.main(args=[])
+
+    def test_config_path_when_strict_checks_arg_is_used(self):
+        """Test if the config path is correct when strict checks arg is used."""
+        def mock_compile_and_check_typescript(config_path):
+            self.assertEqual(
+                config_path, typescript_checks.STRICT_TSCONFIG_FILEPATH)
+        compile_and_check_typescript_swap = self.swap(
+            typescript_checks, 'compile_and_check_typescript',
+            mock_compile_and_check_typescript)
+
+        with compile_and_check_typescript_swap:
+            typescript_checks.main(args=['--strict_checks'])

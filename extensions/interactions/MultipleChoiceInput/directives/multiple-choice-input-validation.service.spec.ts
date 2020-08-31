@@ -152,7 +152,8 @@ describe('MultipleChoiceInputValidationService', () => {
 
   it('should validate answer group rules refer to valid choices only once',
     () => {
-      (<MultipleChoiceRuleInputs>
+      (
+      <MultipleChoiceRuleInputs>
         goodAnswerGroups[0].ruleTypesToInputs.Equals[0]).x = 2;
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
@@ -162,8 +163,9 @@ describe('MultipleChoiceInputValidationService', () => {
         message: 'Please ensure rule 1 in group 1 refers to a valid choice.'
       }]);
 
-      (<MultipleChoiceRuleInputs>
-        goodAnswerGroups[0].ruleTypesToInputs.Equals[0]).x = 1;
+      (
+        <MultipleChoiceRuleInputs>
+          goodAnswerGroups[0].ruleTypesToInputs.Equals[0]).x = 1;
       warnings = validatorService.getAllWarnings(
         currentState, customizationArguments, goodAnswerGroups,
         goodDefaultOutcome);

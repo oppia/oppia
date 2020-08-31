@@ -1985,21 +1985,34 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         user_models.UserContributionProficiencyModel.create(
             'user1', 'category1', 1)
         with self.assertRaisesRegexp(
+<<<<<<< HEAD
             Exception, 'There is already a UserContributionProficiencyModel '
             'entry with the given id: category1.user1'):
             user_models.UserContributionProficiencyModel.create(
+=======
+            Exception, 'There is already a UserContributionScoringModel entry '
+            'with the given id: category1.user1'):
+            user_models.UserContributionScoringModel.create(
+>>>>>>> upstream/develop
                 'user1', 'category1', 2)
 
     def test_get_all_users_with_score_above_minimum_for_category(self):
         # User scoring models for category 1.
+<<<<<<< HEAD
         user_models.UserContributionProficiencyModel.create(
             'user1', 'category1', 1)
         user_models.UserContributionProficiencyModel.create(
+=======
+        user_models.UserContributionScoringModel.create(
+            'user1', 'category1', 1)
+        user_models.UserContributionScoringModel.create(
+>>>>>>> upstream/develop
             'user2', 'category1', 21)
         user_models.UserContributionProficiencyModel.create(
             'user3', 'category1', 11)
         user_models.UserContributionProficiencyModel.create(
             'user4', 'category1', 11)
+<<<<<<< HEAD
 
         # User scoring models for category 2.
         user_models.UserContributionProficiencyModel.create(
@@ -2023,28 +2036,66 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertIn(user_models.UserContributionProficiencyModel.get(
             'user3', 'category1'), user_score_models)
         self.assertIn(user_models.UserContributionProficiencyModel.get(
+=======
+
+        # User scoring models for category 2.
+        user_models.UserContributionScoringModel.create(
+            'user1', 'category2', 11)
+        user_models.UserContributionScoringModel.create(
+            'user2', 'category2', 1)
+        user_models.UserContributionScoringModel.create(
+            'user3', 'category2', 1)
+        user_models.UserContributionScoringModel.create(
+            'user4', 'category2', 1)
+
+        # Get the user score models that have a score high enough for review
+        # for category 1.
+        user_score_models = (
+            user_models.UserContributionScoringModel
+            .get_all_users_with_score_above_minimum_for_category('category1'))
+
+        self.assertEqual(len(user_score_models), 3)
+        self.assertIn(user_models.UserContributionScoringModel.get(
+            'user2', 'category1'), user_score_models)
+        self.assertIn(user_models.UserContributionScoringModel.get(
+            'user3', 'category1'), user_score_models)
+        self.assertIn(user_models.UserContributionScoringModel.get(
+>>>>>>> upstream/develop
             'user4', 'category1'), user_score_models)
 
         # Get the user score models that have a score high enough for review
         # for category 2.
         user_score_models = (
+<<<<<<< HEAD
             user_models.UserContributionProficiencyModel
             .get_all_users_with_score_above_minimum_for_category('category2'))
 
         self.assertEqual(len(user_score_models), 1)
         self.assertIn(user_models.UserContributionProficiencyModel.get(
+=======
+            user_models.UserContributionScoringModel
+            .get_all_users_with_score_above_minimum_for_category('category2'))
+
+        self.assertEqual(len(user_score_models), 1)
+        self.assertIn(user_models.UserContributionScoringModel.get(
+>>>>>>> upstream/develop
             'user1', 'category2'), user_score_models)
 
     def test_get_all_users_with_score_above_minimum_for_category_invalid_input(
             self):
         user_score_models = (
+<<<<<<< HEAD
             user_models.UserContributionProficiencyModel
+=======
+            user_models.UserContributionScoringModel
+>>>>>>> upstream/develop
             .get_all_users_with_score_above_minimum_for_category(
                 'invalid_category'))
 
         self.assertEqual(user_score_models, [])
 
     def test_get_all_scores_of_user_with_multiple_scores(self):
+<<<<<<< HEAD
         user_models.UserContributionProficiencyModel.create(
             'user1', 'category1', 1)
         user_models.UserContributionProficiencyModel.create(
@@ -2079,6 +2130,42 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             'user1', 'category3', feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
         )
         user_models.UserContributionProficiencyModel.create(
+=======
+        user_models.UserContributionScoringModel.create(
+            'user1', 'category1', 1)
+        user_models.UserContributionScoringModel.create(
+            'user1', 'category2', 1)
+        user_models.UserContributionScoringModel.create(
+            'user1', 'category3', 1)
+
+        user_score_models = (
+            user_models.UserContributionScoringModel
+            .get_all_scores_of_user('user1'))
+
+        self.assertEqual(len(user_score_models), 3)
+        self.assertIn(user_models.UserContributionScoringModel.get(
+            'user1', 'category1'), user_score_models)
+        self.assertIn(user_models.UserContributionScoringModel.get(
+            'user1', 'category2'), user_score_models)
+        self.assertIn(user_models.UserContributionScoringModel.get(
+            'user1', 'category3'), user_score_models)
+
+    def test_get_all_scores_of_user_with_an_invalid_user_id_is_empty(self):
+        user_score_models = (
+            user_models.UserContributionScoringModel
+            .get_all_scores_of_user('invalid_user_id'))
+
+        self.assertEqual(user_score_models, [])
+
+    def test_get_categories_where_user_can_review(self):
+        user_models.UserContributionScoringModel.create(
+            'user1', 'category1', feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+        )
+        user_models.UserContributionScoringModel.create(
+            'user1', 'category3', feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+        )
+        user_models.UserContributionScoringModel.create(
+>>>>>>> upstream/develop
             'user1', 'category2', 0
         )
 
@@ -2092,7 +2179,11 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
 
     def test_get_categories_where_user_can_review_with_invalid_user_id(self):
         score_categories = (
+<<<<<<< HEAD
             user_models.UserContributionProficiencyModel
+=======
+            user_models.UserContributionScoringModel
+>>>>>>> upstream/develop
             .get_all_categories_where_user_can_review('invalid_user_id'))
 
         self.assertEqual(score_categories, [])

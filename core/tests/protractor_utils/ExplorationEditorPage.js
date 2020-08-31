@@ -116,7 +116,8 @@ var ExplorationEditorPage = function() {
 
   this.publishCardExploration = async function(
       title, objective, category, language, tags) {
-    await waitFor.elementToBeClickable(publishExplorationButton,
+    await waitFor.elementToBeClickable(
+      publishExplorationButton,
       'Publish button taking too long to be clickable.');
     await publishExplorationButton.click();
 
@@ -127,8 +128,8 @@ var ExplorationEditorPage = function() {
     var expTags = element(by.css('.protractor-test-tags'));
     var expInput = expTags.element(by.tagName('input'));
 
-    await waitFor.elementToBeClickable(expTitle,
-      'Exploration Title input is taking too long to appear');
+    await waitFor.elementToBeClickable(
+      expTitle, 'Exploration Title input is taking too long to appear');
     await waitFor.elementToBeClickable(
       element(by.css(
         '.protractor-test-exploration-title-input'))
@@ -156,16 +157,17 @@ var ExplorationEditorPage = function() {
 
     const saveChangesButton = element(by.css(
       '.protractor-test-confirm-pre-publication'));
-    await waitFor.elementToBeClickable(saveChangesButton,
-      'Save changes button taking too long to be clickable');
+    await waitFor.elementToBeClickable(
+      saveChangesButton, 'Save changes button taking too long to be clickable');
     await saveChangesButton.click();
 
-    await waitFor.visibilityOf(element(by.css('.modal-content')),
+    await waitFor.visibilityOf(
+      element(by.css('.modal-content')),
       'Modal Content taking too long to appear');
 
     const confirmPublish = element(by.css('.protractor-test-confirm-publish'));
-    await waitFor.elementToBeClickable(confirmPublish,
-      'Confirm publish button taking too long to appear');
+    await waitFor.elementToBeClickable(
+      confirmPublish, 'Confirm publish button taking too long to appear');
     await confirmPublish.click();
 
     await waitFor.visibilityOf(element(by.css(
@@ -173,11 +175,11 @@ var ExplorationEditorPage = function() {
     'Awesome modal taking too long to appear');
 
     const closeButton = element(by.css('.protractor-test-share-publish-close'));
-    await waitFor.elementToBeClickable(closeButton,
-      'Close button taking too long to be clickable');
+    await waitFor.elementToBeClickable(
+      closeButton, 'Close button taking too long to be clickable');
     await closeButton.click();
-    await waitFor.invisibilityOf(closeButton,
-      'Close button taking too long to disappear');
+    await waitFor.invisibilityOf(
+      closeButton, 'Close button taking too long to disappear');
   };
 
   this.verifyExplorationSettingFields = async function(
@@ -195,8 +197,8 @@ var ExplorationEditorPage = function() {
     const explorationTags = element.all(by.css(
       '.select2-selection__choice'
     ));
-    await waitFor.visibilityOf(explorationTitle,
-      'Exploration Goal taking too long to appear');
+    await waitFor.visibilityOf(
+      explorationTitle, 'Exploration Goal taking too long to appear');
     expect(await explorationTitle.getAttribute('value')).toMatch(title);
     expect(explorationCategory).toMatch(category);
     expect(await explorationObjective.getAttribute('value')).toMatch(objective);
@@ -231,8 +233,10 @@ var ExplorationEditorPage = function() {
     await saveDiscardToggleButton.click();
     await discardChangesButton.click();
     await confirmDiscardChangesButton.click();
-    await waitFor.invisibilityOf(loadingModal,
-      'Loading modal taking too long to disappear');
+    await waitFor.invisibilityOf(
+      loadingModal, 'Loading modal taking too long to disappear');
+    await waitFor.invisibilityOfInfoToast(
+      'Changes take too long to be discarded.');
     // Expect editor page to completely reload.
     await waitFor.pageToFullyLoad();
   };

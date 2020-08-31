@@ -252,6 +252,10 @@ exports.config = {
         '--use-fake-device-for-media-stream',
         '--use-fake-ui-for-media-stream',
         '--use-file-for-fake-audio-capture=data/cafe.mp3',
+        // These arguments are required to run the tests on GitHub
+        // Actions.
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
       ]
     },
     prefs: {

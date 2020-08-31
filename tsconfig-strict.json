@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "downlevelIteration": true,
+    "lib": ["es2017", "dom", "webworker"],
+    "outDir": "local_compiled_js_for_test",
+    "rootDir": ".",
+    "skipLibCheck": true,
+    "target": "es5",
+    "sourceMap": true,
+    "strict": true,
+    "typeRoots": ["./node_modules/@types"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "app.constants": ["core/templates/app.constants"],
+      "app-type.constants": ["core/templates/app-type.constants"],
+      "components/*": ["core/templates/components/*"],
+      "domain/*": ["core/templates/domain/*"],
+      "expressions/*": ["core/templates/expressions/*"],
+      "pages/*": ["core/templates/pages/*"],
+      "services/*": ["core/templates/services/*"],
+      "classifiers/*": ["extensions/classifiers/*"],
+      "interactions/*": ["extensions/interactions/*"],
+      "filters/*": ["core/templates/filters/*"],
+      "static/*": ["third_party/static/*"],
+      "tests/*": ["core/templates/tests/*"]
+    }
+  },
+  "files": [
+    "core/templates/pages/admin-page/services/admin-router.service.ts",
+    "core/templates/pages/admin-page/services/admin-router.service.spec.ts",
+    "core/templates/pages/admin-page/services/admin-task-manager.service.ts",
+    "core/templates/pages/admin-page/services/admin-task-manager.service.spec.ts",
+    "core/templates/pages/exploration-editor-page/services/angular-name.service.ts",
+    "core/templates/pages/exploration-editor-page/services/angular-name.service.spec.ts"
+  ],
+  "include": ["typings/*.ts"]
+}
