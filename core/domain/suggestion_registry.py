@@ -56,6 +56,8 @@ class BaseSuggestion(python_utils.OBJECT):
         score_category: str. The scoring category for the suggestion.
         last_updated: datetime.datetime. Date and time when the suggestion
             was last updated.
+        language_code: str. The ISO 639-1 code for the language of the
+            suggestion.
     """
 
     def __init__(self):
@@ -80,7 +82,8 @@ class BaseSuggestion(python_utils.OBJECT):
             'final_reviewer_id': self.final_reviewer_id,
             'change': self.change.to_dict(),
             'score_category': self.score_category,
-            'last_updated': utils.get_time_in_millisecs(self.last_updated)
+            'last_updated': utils.get_time_in_millisecs(self.last_updated),
+            'language_code': self.language_code
         }
 
     def get_score_type(self):
@@ -291,6 +294,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         self.change = exp_domain.ExplorationChange(change)
         self.score_category = score_category
         self.last_updated = last_updated
+        self.language_code = ""
 
     def validate(self):
         """Validates a suggestion object of type SuggestionEditStateContent.
@@ -324,6 +328,14 @@ class SuggestionEditStateContent(BaseSuggestion):
                 'Expected property_name to be %s, received %s' % (
                     exp_domain.STATE_PROPERTY_CONTENT,
                     self.change.property_name))
+
+        # The language_code field is used for querying purposes. We do not want
+        # to query suggestions of this type by language. Therefore, it is set
+        # to the empty string.
+        if (self.language_code != ''):
+            raise utils.ValidationError(
+                'Expected language_code to be '', received %s' % (
+                    self.language_code))
 
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
@@ -453,6 +465,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         self.change = exp_domain.ExplorationChange(change)
         self.score_category = score_category
         self.last_updated = last_updated
+        self.language_code = self.change.language_code
 
     def validate(self):
         """Validates a suggestion object of type SuggestionTranslateContent.
@@ -487,6 +500,11 @@ class SuggestionTranslateContent(BaseSuggestion):
                 self.change.language_code):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.change.language_code)
+
+        if (self.language_code != self.change.language_code):
+            raise utils.ValidationError(
+                'Expected language_code to be %s, received %s' % (
+                    self.change.language_code, self.language_code))
 
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
@@ -579,6 +597,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.score_category = score_category
         self.last_updated = last_updated
+        self.language_code = self.change.question_dict['language_code']
 
     def validate(self):
         """Validates a suggestion object of type SuggestionAddQuestion.
@@ -613,6 +632,12 @@ class SuggestionAddQuestion(BaseSuggestion):
         if not self.change.question_dict:
             raise utils.ValidationError(
                 'Expected change to contain question_dict')
+
+        if (self.language_code != self.change.question_dict['language_code']):
+            raise utils.ValidationError(
+                'Expected language_code to be %s, received %s' % (
+                    self.change.question_dict['language_code'],
+                    self.language_code))
 
         if not self.change.skill_difficulty:
             raise utils.ValidationError(
