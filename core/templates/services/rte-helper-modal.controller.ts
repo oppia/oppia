@@ -130,7 +130,9 @@ angular.module('oppia').controller('RteHelperModalController', [
         if (resampledFile.size > HUNDRED_KB_IN_BYTES) {
           AlertsService.addInfoMessage(
             'The SVG file generated exceeds 100' +
-            ' KB. Please split the expression into smaller ones.');
+            ' KB. Please split the expression into smaller ones.' +
+            '   Example: x^2 + y^2 + z^2 can be split as \'x^2 + y^2\' ' +
+            'and \'+ z^2\'', 5000);
           $uibModalInstance.dismiss('cancel');
           return;
         }
