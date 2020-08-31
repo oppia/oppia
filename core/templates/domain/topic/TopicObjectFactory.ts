@@ -51,6 +51,8 @@ interface TopicBackendDict {
   'canonical_story_references': StoryReferenceBackendDict[];
   'additional_story_references': StoryReferenceBackendDict[];
   'url_fragment': string;
+  'practice_tab_is_displayed': boolean;
+  'meta_tag_content': string;
 }
 
 const constants = require('constants.ts');
@@ -70,6 +72,8 @@ export class Topic {
   _thumbnailFilename: string;
   _thumbnailBgColor: string;
   _urlFragment: string;
+  _practiceTabIsDisplayed: boolean;
+  _metaTagContent: string;
   skillSummaryObjectFactory: ShortSkillSummaryObjectFactory;
   subtopicObjectFactory: SubtopicObjectFactory;
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
@@ -85,7 +89,9 @@ export class Topic {
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
       skillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
       subtopicObjectFactory: SubtopicObjectFactory,
-      storyReferenceObjectFactory: StoryReferenceObjectFactory) {
+      storyReferenceObjectFactory: StoryReferenceObjectFactory,
+      practiceTabIsDisplayed: boolean,
+      metaTagContent: string) {
     this._id = id;
     this._name = name;
     this._abbreviatedName = abbreviatedName;
@@ -107,6 +113,8 @@ export class Topic {
     this._thumbnailBgColor = thumbnailBgColor;
     this.subtopicObjectFactory = subtopicObjectFactory;
     this.storyReferenceObjectFactory = storyReferenceObjectFactory;
+    this._practiceTabIsDisplayed = practiceTabIsDisplayed;
+    this._metaTagContent = metaTagContent;
   }
 
   // ---- Instance methods ----
@@ -128,6 +136,22 @@ export class Topic {
 
   setAbbreviatedName(abbreviatedName: string): void {
     this._abbreviatedName = abbreviatedName;
+  }
+
+  getPracticeTabIsDisplayed(): boolean {
+    return this._practiceTabIsDisplayed;
+  }
+
+  setPracticeTabIsDisplayed(practiceTabIsDisplayed: boolean): void {
+    this._practiceTabIsDisplayed = practiceTabIsDisplayed;
+  }
+
+  getMetaTagContent(): string {
+    return this._metaTagContent;
+  }
+
+  setMetaTagContent(metaTagContent: string): void {
+    this._metaTagContent = metaTagContent;
   }
 
   getUrlFragment(): string {
@@ -249,6 +273,7 @@ export class Topic {
   }
 
   prepublishValidate(): string[] {
+    const metaTagContentCharLimit = constants.MAX_CHARS_IN_META_TAG_CONTENT;
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Topic should have a thumbnail.');
@@ -259,6 +284,16 @@ export class Topic {
           'Subtopic with title ' + this._subtopics[i].getTitle() +
           ' does not have any skill IDs linked.');
       }
+    }
+    if (!this._metaTagContent) {
+      issues.push('Topic should have meta tag content.');
+    } else if (this._metaTagContent.length > metaTagContentCharLimit) {
+      issues.push(
+        'Topic meta tag content should not be longer than ' +
+        `${metaTagContentCharLimit} characters.`);
+    }
+    if (!this._subtopics.length) {
+      issues.push('Topic should have at least 1 subtopic.');
     }
     return issues;
   }
@@ -490,6 +525,8 @@ export class Topic {
     this.setThumbnailBgColor(otherTopic.getThumbnailBgColor());
     this.setDescription(otherTopic.getDescription());
     this.setLanguageCode(otherTopic.getLanguageCode());
+    this.setPracticeTabIsDisplayed(otherTopic.getPracticeTabIsDisplayed());
+    this.setMetaTagContent(otherTopic.getMetaTagContent());
     this._version = otherTopic.getVersion();
     this._nextSubtopicId = otherTopic.getNextSubtopicId();
     this.clearAdditionalStoryReferences();
@@ -552,7 +589,9 @@ export class TopicObjectFactory {
       subtopics, topicBackendDict.thumbnail_filename,
       topicBackendDict.thumbnail_bg_color,
       skillIdToDescriptionDict, this.skillSummaryObjectFactory,
-      this.subtopicObjectFactory, this.storyReferenceObjectFactory
+      this.subtopicObjectFactory, this.storyReferenceObjectFactory,
+      topicBackendDict.practice_tab_is_displayed,
+      topicBackendDict.meta_tag_content
     );
   }
 
@@ -564,7 +603,7 @@ export class TopicObjectFactory {
       'Url Fragment loading', 'Topic description loading', 'en',
       [], [], [], 1, 1, [], '', '', {},
       this.skillSummaryObjectFactory, this.subtopicObjectFactory,
-      this.storyReferenceObjectFactory
+      this.storyReferenceObjectFactory, false, ''
     );
   }
 }

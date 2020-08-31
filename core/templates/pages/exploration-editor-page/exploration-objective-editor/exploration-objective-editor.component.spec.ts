@@ -36,8 +36,9 @@ describe('Exploration Objective Editor directive', function() {
     });
   }));
 
-  it('should evaluate controller properties', function() {
-    expect($scope.explorationObjectiveService).toEqual(
-      ExplorationObjectiveService);
-  });
+  it('should initialize controller properties after its initialization',
+    function() {
+      expect($scope.explorationObjectiveService).toEqual(
+        ExplorationObjectiveService);
+    });
 });

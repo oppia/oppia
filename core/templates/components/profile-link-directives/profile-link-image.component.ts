@@ -23,10 +23,6 @@ import { UrlInterpolationService } from
 import { ProfileLinkImageBackendApiService } from
   'components/profile-link-directives/profile-link-image-backend-api.service';
 
-interface ProfileDict {
-  'profile_picture_data_url_for_username': string;
-}
-
 @Component({
   selector: 'profile-link-image',
   templateUrl: './profile-link-image.component.html',
@@ -59,10 +55,9 @@ export class ProfileLinkImageComponent implements OnInit {
     // image if user is not logged in or has not uploaded a profile
     // picture, or the player is in preview mode.
     this.profileLinkImageBackendApiService.fetchProfilePictureData(
-      this.profileImageUrl).then((response: ProfileDict) => {
+      this.profileImageUrl).then((base64ProfilePicture: string) => {
       this.profilePicture = (
-        response.profile_picture_data_url_for_username ||
-        DEFAULT_PROFILE_IMAGE_PATH);
+        base64ProfilePicture || DEFAULT_PROFILE_IMAGE_PATH);
     });
   }
 }

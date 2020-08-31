@@ -51,7 +51,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import subtopic_page_domain
-from core.domain import suggestion_services
+from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_query_services
@@ -2125,6 +2125,23 @@ class ExplorationOpportunitySummaryModelValidatorTests(
             self.TOPIC_ID, 'topic', 'abbrev', 'description')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_2'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.TOPIC_ID))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
         topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 
@@ -14956,11 +14973,9 @@ class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
         score_category = 'content.Art'
-        suggestion_services.create_new_user_contribution_scoring_model(
-            self.user_id, score_category, 10)
-        self.model_instance = (
-            user_models.UserContributionScoringModel.get_by_id(
-                id='%s.%s' % (score_category, self.user_id)))
+        self.model_instance = user_models.UserContributionScoringModel.create(
+            self.user_id, score_category, 10
+        )
         self.job_class = (
             prod_validation_jobs_one_off
             .UserContributionScoringModelAuditOneOffJob)

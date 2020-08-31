@@ -106,8 +106,9 @@ angular.module('oppia').component('previewTab', {
       };
 
       ctrl.showParameterSummary = function() {
-        return (ExplorationFeaturesService.areParametersEnabled() &&
-                !angular.equals({}, ctrl.allParams));
+        return (
+          ExplorationFeaturesService.areParametersEnabled() &&
+          !angular.equals({}, ctrl.allParams));
       };
 
       ctrl.showSetParamsModal = function(manualParamChanges, callback) {
