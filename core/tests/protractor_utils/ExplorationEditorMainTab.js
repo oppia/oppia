@@ -354,24 +354,24 @@ var ExplorationEditorMainTab = function() {
        */
       expectFeedbackInstructionToBe: async function(feedbackInstructionsText) {
         // The first rule block's RTE.
-        var feedbackRTE = responseBody(responseNum).
-          element(by.className('oppia-rte-editor'));
-        await waitFor.visibilityOf(feedbackRTE,
-          'Feedback Rich Text Editor not showing up.');
+        var feedbackRTE = responseBody(responseNum).element(
+          by.className('oppia-rte-editor'));
+        await waitFor.visibilityOf(
+          feedbackRTE, 'Feedback Rich Text Editor not showing up.');
         expect(await feedbackRTE.getText()).toEqual(
           feedbackInstructionsText);
       },
       setFeedback: async function(richTextInstructions) {
       // Begin editing feedback.
-        await action.click('openOutcomeFeedBackEditor',
-          openOutcomeFeedBackEditor);
+        await action.click(
+          'openOutcomeFeedBackEditor', openOutcomeFeedBackEditor);
 
         // Set feedback contents.
         await _setOutcomeFeedback(richTextInstructions);
 
         // Save feedback.
-        await action.click('saveOutcomeFeedbackButton',
-          saveOutcomeFeedbackButton);
+        await action.click(
+          'saveOutcomeFeedbackButton', saveOutcomeFeedbackButton);
       },
       // This saves the rule after the destination is selected.
       //  - destinationName: The name of the state to move to, or null to stay
@@ -389,12 +389,12 @@ var ExplorationEditorMainTab = function() {
           destinationName, createNewState, refresherExplorationId);
 
         // Save destination.
-        await action.click('Outcome Destination Editor Save Button',
-          saveOutcomeDestButton);
+        await action.click(
+          'Outcome Destination Editor Save Button', saveOutcomeDestButton);
       },
       markAsCorrect: async function() {
-        await action.click('Answer Correctness Toggle',
-          answerCorrectnessToggle);
+        await action.click(
+          'Answer Correctness Toggle', answerCorrectnessToggle);
       },
       // The current state name must be at the front of the list.
       expectAvailableDestinationsToBe: async function(stateNames) {
@@ -590,8 +590,8 @@ var ExplorationEditorMainTab = function() {
     await action.click('Delete interaction button', deleteInteractionButton);
 
     // Click through the "are you sure?" warning.
-    await action.click('Confirm Delete Interaction button',
-      confirmDeleteInteractionButton);
+    await action.click(
+      'Confirm Delete Interaction button', confirmDeleteInteractionButton);
 
     await waitFor.invisibilityOf(
       confirmDeleteInteractionButton,

@@ -85,8 +85,8 @@ var ExplorationEditorSettingsTab = function() {
 
   this.enableCorrectnessFeedback = async function() {
     expect(await enableCorrectnessFeedbackButton.isDisplayed()).toBe(true);
-    await action.click('Enable Correctness Feedback Button',
-      enableCorrectnessFeedbackButton);
+    await action.click(
+      'Enable Correctness Feedback Button', enableCorrectnessFeedbackButton);
   };
 
   this.expectAvailableFirstStatesToBe = async function(names) {
