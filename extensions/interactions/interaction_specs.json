@@ -983,5 +983,54 @@
       "IsEquivalentTo": "is equivalent to {{f|Fraction}}",
       "HasDenominatorEqualTo": "has denominator equal to {{x|NonnegativeInt}}"
     }
+  },
+  "RatioExpressionInput": {
+    "can_have_solution": true,
+    "show_generic_submit_button": true,
+    "instructions": null,
+    "is_trainable": false,
+    "narrow_instructions": null,
+    "description": "Allow learners to enter ratios.",
+    "needs_summary": false,
+    "name": "Ratio Expression Input",
+    "answer_type": "RatioExpression",
+    "is_linear": false,
+    "display_mode": "inline",
+    "id": "RatioExpressionInput",
+    "customization_arg_specs": [
+      {
+        "description": "Custom placeholder text (optional)",
+        "name": "placeholder",
+        "schema": {
+          "type": "custom",
+          "obj_type": "SubtitledUnicode"
+        },
+        "default_value": {
+          "content_id": null,
+          "unicode_str": ""
+        }
+      },
+      {
+        "description": "The number of elements that the answer must have. If set to 0, a ratio of any length will be accepted.",
+        "name": "numberOfTerms",
+        "schema": {
+          "type": "int",
+          "validators": [
+            {
+              "min_value": 0,
+              "id": "is_at_least"
+            }
+          ]
+        },
+        "default_value": 0
+      }
+    ],
+    "is_terminal": false,
+    "default_outcome_heading": null,
+    "rule_descriptions": {
+      "Equals": "is equal to {{x|RatioExpression}}",
+      "IsEquivalent": "is equivalent to {{x|RatioExpression}}",
+      "HasNumberOfTermsEqualTo": "has number of terms equal to {{y|NonnegativeInt}}"
+    }
   }
 }

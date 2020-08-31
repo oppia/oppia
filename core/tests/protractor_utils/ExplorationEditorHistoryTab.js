@@ -18,6 +18,7 @@
  */
 
 var forms = require('./forms.js');
+var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
 var ExplorationEditorHistoryTab = function() {
@@ -42,8 +43,10 @@ var ExplorationEditorHistoryTab = function() {
     by.css('.protractor-test-close-history-state-modal'));
   var showHistoryGraphButton = element(
     by.css('.protractor-test-show-history-graph'));
-  var revertVersionButton = element.all(
-    by.css('.protractor-test-revert-version'));
+  var revertVersionButton = element(by.css('.protractor-test-revert-version'));
+  var resetGraphButton = element(by.css('.protractor-test-reset-graph'));
+  var historyListOptions = element.all(
+    by.css('.protractor-test-history-list-options'));
   var confirmRevertVersionButton = element(
     by.css('.protractor-test-confirm-revert'));
 
@@ -106,22 +109,8 @@ var ExplorationEditorHistoryTab = function() {
           closeStateHistoryButton,
           'Close State History button takes too long to disappear.');
       },
-      deselectTwoVersions: async function(versionNumber1, versionNumber2) {
-        // Array starts at 0.
-        var totalVersionNumber = await historyCheckboxSelector.count();
-        var v1Position = totalVersionNumber - versionNumber1;
-        var v2Position = totalVersionNumber - versionNumber2;
-
-        var historyCheckboxAtv1 = await historyCheckboxSelector.get(
-          v1Position);
-        var historyCheckboxAtv2 = await historyCheckboxSelector.get(
-          v2Position);
-
-        expect(await historyCheckboxAtv1.isDisplayed()).toBe(true);
-        await historyCheckboxAtv1.click();
-
-        expect(await historyCheckboxAtv2.isDisplayed()).toBe(true);
-        await historyCheckboxAtv2.click();
+      deselectVersion: async function() {
+        await action.click('Reset graph button', resetGraphButton);
       },
       /*
        * This method selects two version's checkboxes to be compared
@@ -131,23 +120,21 @@ var ExplorationEditorHistoryTab = function() {
        */
       selectTwoVersions: async function(versionNumber1, versionNumber2) {
         // Array starts at 0.
-        var totalVersionNumber = await historyCheckboxSelector.count();
-        var v1Position = totalVersionNumber - versionNumber1;
-        var v2Position = totalVersionNumber - versionNumber2;
+        var firstVersionDropdown = element(
+          by.css('.protractor-test-history-version-dropdown-first'));
+        await waitFor.visibilityOf(
+          firstVersionDropdown, 'First version dropdown');
+        await (
+          firstVersionDropdown.element(
+            by.cssContainingText('option', versionNumber1))).click();
 
-        var historyCheckboxAtv1 = await historyCheckboxSelector.get(
-          v1Position);
-        var historyCheckboxAtv2 = await historyCheckboxSelector.get(
-          v2Position);
-
-        expect(await historyCheckboxAtv1.isDisplayed()).toBe(true);
-        await historyCheckboxAtv1.click();
-
-        expect(await historyCheckboxAtv2.isDisplayed()).toBe(true);
-        await historyCheckboxAtv2.click();
-        // Click button to show graph.
-        expect(await showHistoryGraphButton.isDisplayed()).toBe(true);
-        await showHistoryGraphButton.click();
+        var secondVersionDropdown = element(
+          by.css('.protractor-test-history-version-dropdown-second'));
+        await waitFor.visibilityOf(
+          secondVersionDropdown, 'Second version dropdown');
+        await (
+          secondVersionDropdown.element(
+            by.cssContainingText('option', versionNumber2))).click();
       },
       /*
        * This method compares the states in the history graph using each
@@ -262,14 +249,13 @@ var ExplorationEditorHistoryTab = function() {
   // This function assumes that the selected version is valid and found on the
   // first page of the exploration history.
   this.revertToVersion = async function(version) {
-    var versionPosition = null;
-    var versionNumber = await historyCheckboxSelector.count();
     // Note: there is no 'revert' link next to the current version.
-    versionPosition = versionNumber - version - 1;
-    var revertVersionButtonForSelectedPosition = revertVersionButton.get(
-      versionPosition);
-    await revertVersionButtonForSelectedPosition.click();
-    await confirmRevertVersionButton.click();
+    await action.click(
+      'History list options', historyListOptions.get(version - 1));
+    await action.click(
+      'Revert version button', revertVersionButton);
+    await action.click(
+      'Confirm revert button', confirmRevertVersionButton);
   };
 };
 

@@ -22,7 +22,8 @@ angular.module('oppia').controller(
   'RegistrationSessionExpiredModalController', [
     '$scope', '$timeout', '$uibModalInstance', '$window',
     'UserService',
-    function($scope, $timeout, $uibModalInstance, $window,
+    function(
+        $scope, $timeout, $uibModalInstance, $window,
         UserService) {
       $scope.continueRegistration = function() {
         UserService.getLoginUrlAsync().then(

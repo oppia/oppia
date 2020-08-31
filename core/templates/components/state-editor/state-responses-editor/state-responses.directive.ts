@@ -203,8 +203,7 @@ angular.module('oppia').directive('stateResponses', [
                       if (rule.type === 'Equals' ||
                           rule.type === 'ContainsAtLeastOneOf') {
                         handledAnswersArray[choiceIndex] = true;
-                      } else if (rule.type ===
-                        'DoesNotContainAtLeastOneOf') {
+                      } else if (rule.type === 'DoesNotContainAtLeastOneOf') {
                         for (var i = 0; i < handledAnswersArray.length; i++) {
                           if (i !== choiceIndex) {
                             handledAnswersArray[i] = true;
@@ -321,6 +320,7 @@ angular.module('oppia').directive('stateResponses', [
                 currentInteractionId: () => currentInteractionId,
                 stateName: () => stateName,
               },
+              windowClass: 'add-answer-group-modal',
               controller: 'AddAnswerGroupModalController'
             }).result.then(function(result) {
               // Create a new answer group.
@@ -569,7 +569,8 @@ angular.module('oppia').directive('stateResponses', [
               StateInteractionIdService.onInteractionIdChanged.subscribe(
                 (newInteractionId) => {
                   ExternalSaveService.onExternalSave.emit();
-                  ResponsesService.onInteractionIdChanged(newInteractionId,
+                  ResponsesService.onInteractionIdChanged(
+                    newInteractionId,
                     function(newAnswerGroups, newDefaultOutcome) {
                       $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
                       $scope.onSaveInteractionAnswerGroups(newAnswerGroups);

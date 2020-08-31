@@ -36,8 +36,9 @@ angular.module('oppia').directive('topicEditorNavbarBreadcrumb', [
           var ctrl = this;
           $scope.canNavigateToTopicEditorPage = function() {
             const activeTab = TopicEditorRoutingService.getActiveTabName();
-            return (activeTab.startsWith('subtopic') ||
-                TopicEditorRoutingService.getLastTabVisited() === 'subtopic');
+            return (
+              activeTab.startsWith('subtopic') ||
+              TopicEditorRoutingService.getLastTabVisited() === 'subtopic');
           };
           $scope.navigateToMainTab = function() {
             TopicEditorRoutingService.navigateToMainTab();
