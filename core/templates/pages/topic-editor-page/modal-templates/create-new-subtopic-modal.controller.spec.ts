@@ -58,16 +58,18 @@ describe('Create new subtopic modal', function() {
   }));
 
 
-  it('should init the variables', function() {
-    ctrl.init();
-    expect(ctrl.topic).toEqual(topic);
-    expect(ctrl.SUBTOPIC_PAGE_SCHEMA).toEqual({type: 'html',
-      ui_config: {
-        rows: 100
-      }});
-    expect(ctrl.allowedBgColors).toEqual(['#FFFFFF']);
-    expect(ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE).toEqual(64);
-  });
+  it('should initialize controller properties after its initialization',
+    function() {
+      ctrl.init();
+      expect(ctrl.topic).toEqual(topic);
+      expect(ctrl.SUBTOPIC_PAGE_SCHEMA).toEqual({
+        type: 'html',
+        ui_config: {
+          rows: 100
+        }});
+      expect(ctrl.allowedBgColors).toEqual(['#FFFFFF']);
+      expect(ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE).toEqual(64);
+    });
 
   it('should close the modal and save the subtopicId', function() {
     ctrl.subtopicTitle = 'Subtopic1';
@@ -84,7 +86,8 @@ describe('Create new subtopic modal', function() {
 
   it('should show error message if subtopic name is invalid', function() {
     expect(ctrl.errorMsg).toEqual(null);
-    spyOn(SubtopicValidationService,
+    spyOn(
+      SubtopicValidationService,
       'checkValidSubtopicName').and.returnValue(false);
     ctrl.subtopicTitle = 'Subtopic1';
     ctrl.save();
@@ -95,7 +98,8 @@ describe('Create new subtopic modal', function() {
 
   it('should show reset the error message ', function() {
     expect(ctrl.errorMsg).toEqual(null);
-    spyOn(SubtopicValidationService,
+    spyOn(
+      SubtopicValidationService,
       'checkValidSubtopicName').and.returnValue(false);
     ctrl.subtopicTitle = 'Subtopic1';
     ctrl.save();

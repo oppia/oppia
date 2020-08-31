@@ -68,24 +68,25 @@ angular.module('oppia').directive('explorationSummaryTile', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary-tile/exploration-summary-tile.directive.html'),
       link: function(scope, element) {
-        element.find('.exploration-summary-avatars').on('mouseenter',
+        element.find('.exploration-summary-avatars').on(
+          'mouseenter',
           function() {
-            element.find('.mask').attr('class',
-              'exploration-summary-tile-mask mask');
+            element.find('.mask').attr(
+              'class', 'exploration-summary-tile-mask mask');
             // As animation duration time may be 400ms, .stop(true) is used to
             // prevent the effects queue falling behind the mouse movement.
             // .hide(1) and .show(1) used to place the animation in the effects
             // queue.
-            element.find('.avatars-num-minus-one').stop(true).hide(1,
-              function() {
+            element.find('.avatars-num-minus-one').stop(true).hide(
+              1, function() {
                 element.find('.all-avatars').stop(true).slideDown();
               }
             );
           }
         );
 
-        element.find('.exploration-summary-avatars').on('mouseleave',
-          function() {
+        element.find('.exploration-summary-avatars').on(
+          'mouseleave', function() {
             element.find('.mask').attr('class', 'top-section-mask mask');
             element.find('.all-avatars').stop(true).slideUp(400, function() {
               element.find('.avatars-num-minus-one').stop(true).show(1);

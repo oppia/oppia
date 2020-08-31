@@ -131,9 +131,10 @@ export class ExplorationImprovementsBackendApiService {
         }));
     return this.http.get<ExplorationImprovementsConfigBackendDict>(
       explorationImprovementsConfigUrl
-    ).toPromise().then(backendDict =>
-      this.explorationImprovementsConfigObjectFactory.createFromBackendDict(
-        backendDict));
+    ).toPromise().then(
+      backendDict =>
+        this.explorationImprovementsConfigObjectFactory.createFromBackendDict(
+          backendDict));
   }
 }
 

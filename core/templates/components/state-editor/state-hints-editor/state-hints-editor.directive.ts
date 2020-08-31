@@ -141,6 +141,7 @@ angular.module('oppia').directive('stateHintsEditor', [
                 'modal-templates/add-hint-modal.template.html'),
               backdrop: 'static',
               resolve: {},
+              windowClass: 'add-hint-modal',
               controller: 'AddHintModalController'
             }).result.then(function(result) {
               StateHintsService.displayed.push(result.hint);
