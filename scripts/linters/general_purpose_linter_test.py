@@ -76,6 +76,8 @@ INVALID_ESLINT_CAMELCASE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_eslint_camelcase.ts')
 INVALID_ESLINT_ANY_TYPE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_eslint_any_type.ts')
+INVALID_BROADCAST_USE_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_broadcast_use.ts')
 
 # PY filepaths.
 INVALID_ITERKEY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_iterkeys.py')
@@ -347,6 +349,16 @@ class JsTsLintTests(test_utils.LinterTestBase):
             lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
+
+    def test_invalid_use_of_broadcast(self):
+        with self.print_swap:
+            general_purpose_linter.GeneralPurposeLinter(
+                [INVALID_BROADCAST_USE_FILEPATH], FILE_CACHE, True
+            ).perform_all_lint_checks()
+        self.assert_same_list_elements([
+            'Line 26: Please do not use $broadcast/$on for propagating events. '
+            'Use @Input/@Output instead.'], self.linter_stdout)
+        self.assert_failed_messages_count(self.linter_stdout, 1)
 
 
 class PythonLintTests(test_utils.LinterTestBase):
