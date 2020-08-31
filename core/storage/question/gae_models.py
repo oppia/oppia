@@ -677,7 +677,9 @@ class QuestionSummaryModel(base_models.BaseModel):
         indexed=True, required=True)
     # The html content for the question.
     question_content = ndb.TextProperty(indexed=False, required=True)
-    # The misconception ids attached to the question.
+    # The misconception ids addressed in the question. This includes
+    # tagged misconceptions ids as well as inapplicable misconception
+    # ids in the question.
     misconception_ids = ndb.StringProperty(indexed=True, repeated=True)
 
     @staticmethod

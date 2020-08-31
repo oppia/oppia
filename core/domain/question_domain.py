@@ -989,8 +989,9 @@ class QuestionSummary(python_utils.OBJECT):
             question_id: str. The ID of the question.
             question_content: str. The static HTML of the question shown to
                 the learner.
-            misconception_ids: str. The misconception ids attached to
-                the question.
+            misconception_ids: str. The misconception ids addressed in
+                the question. This includes tagged misconceptions ids as well
+                as inapplicable misconception ids in the question.
             question_model_created_on: datetime.datetime. Date and time when
                 the question model is created.
             question_model_last_updated: datetime.datetime. Date and time
