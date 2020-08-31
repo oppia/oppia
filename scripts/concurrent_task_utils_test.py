@@ -89,7 +89,8 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
 
     def test_task_thread_with_success(self):
         task = concurrent_task_utils.TaskThread(
-            test_function('unused_arg'), False, self.semaphore, name='test')
+            test_function('unused_arg'), False, self.semaphore, name='test',
+            report_enabled=True)
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -100,7 +101,8 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
 
     def test_task_thread_with_exception(self):
         task = concurrent_task_utils.TaskThread(
-            test_function, True, self.semaphore, name='test')
+            test_function, True, self.semaphore, name='test',
+            report_enabled=True)
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -122,7 +124,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
 
         task = concurrent_task_utils.TaskThread(
             test_func().test_perform_all_check, True,
-            self.semaphore, name='test')
+            self.semaphore, name='test', report_enabled=True)
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -137,7 +139,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         class HelperTests(python_utils.OBJECT):
             def test_show(self):
                 return concurrent_task_utils.TaskResult(
-                    None, None, None, ['msg'], report_enabled=False)
+                    None, None, None, ['msg'])
             def test_perform_all_check(self):
                 return [self.test_show()]
 
@@ -146,7 +148,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
 
         task = concurrent_task_utils.TaskThread(
             test_func().test_perform_all_check, True,
-            self.semaphore, name='test')
+            self.semaphore, name='test', report_enabled=False)
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:

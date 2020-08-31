@@ -150,6 +150,25 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertEqual('Pylint', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
+    def test_get_trimmed_error_output(self):
+        lint_messages = [
+            '************* Module oppia.scripts.linters.test_files.invalid_'
+            'docstring', '\n',
+            'W: 27, 0: Period is not used at the end of the docstring. '
+            '(no-period-used)', '\n', '\n',
+            '---------------------------------------------------'
+            '---------------', '\n',
+            'Your code has been rated at 8.75/10 '
+            '(previous run: 8.75/10, +0.00)', u'\n', u'\n']
+        trimmed_messages = python_linter.ThirdPartyPythonLintChecksManager(
+            [INVALID_DOCSTRING_FILEPATH]).get_trimmed_error_output(
+                lint_messages)
+        self.assertEqual(
+            trimmed_messages,
+            '************* Module oppia.scripts.linters.test_files.'
+            'invalid_docstring\n\n\nW: 27, 0: Period is not used at '
+            'the end of the docstring. \n\n\n\n\n')
+
     def test_python_utils_file_with_no_files(self):
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
             [PYTHON_UTILS_FILEPATH]

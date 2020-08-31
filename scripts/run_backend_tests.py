@@ -183,7 +183,7 @@ class TestingTaskSpec(python_utils.OBJECT):
         result = run_shell_cmd(exc_list)
 
         return [concurrent_task_utils.TaskResult(
-            None, None, None, [result], report_enabled=False)]
+            None, None, None, [result])]
 
 
 def _get_all_test_targets(test_path=None, include_load_tests=True):
@@ -315,7 +315,8 @@ def main(args=None):
         test = TestingTaskSpec(
             test_target, parsed_args.generate_coverage_report)
         task = concurrent_task_utils.create_task(
-            test.run, parsed_args.verbose, semaphore, name=test_target)
+            test.run, parsed_args.verbose, semaphore, name=test_target,
+            report_enabled=False)
         task_to_taskspec[task] = test
         tasks.append(task)
 

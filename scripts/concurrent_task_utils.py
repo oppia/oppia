@@ -47,9 +47,7 @@ def log(message, show_time=False):
 class TaskResult(python_utils.OBJECT):
     """Task result for concurrent_task_utils."""
 
-    def __init__(
-            self, name, failed, trimmed_messages, messages,
-            report_enabled=True):
+    def __init__(self, name, failed, trimmed_messages, messages):
         """Constructs a TaskResult object.
 
         Args:
@@ -59,13 +57,11 @@ class TaskResult(python_utils.OBJECT):
             trimmed_messages: list(str). List of error messages that are
                 trimmed to keep main part of messages.
             messages: list(str). List of full messages returned by the objects.
-            report_enabled: bool. Decide whether task result will print or not.
         """
         self.name = name
         self.failed = failed
         self.trimmed_messages = trimmed_messages
         self.messages = messages
-        self.report_enabled = report_enabled
 
     def get_report(self):
         """Returns a list of message with pass or fail status for the current
@@ -76,20 +72,19 @@ class TaskResult(python_utils.OBJECT):
             task.
         """
         all_messages = self.messages[:]
-        if self.report_enabled:
-            status_message = (
-                '%s %s check %s' % (
-                    (FAILED_MESSAGE_PREFIX, self.name, 'failed')
-                    if self.failed else (
-                        SUCCESS_MESSAGE_PREFIX, self.name, 'passed')))
-            all_messages.append(status_message)
+        status_message = (
+            '%s %s check %s' % (
+                (FAILED_MESSAGE_PREFIX, self.name, 'failed')
+                if self.failed else (
+                    SUCCESS_MESSAGE_PREFIX, self.name, 'passed')))
+        all_messages.append(status_message)
         return all_messages
 
 
 class TaskThread(threading.Thread):
     """Runs a task in its own thread."""
 
-    def __init__(self, func, verbose, semaphore, name):
+    def __init__(self, func, verbose, semaphore, name, report_enabled):
         super(TaskThread, self).__init__()
         self.func = func
         self.task_results = []
@@ -99,6 +94,7 @@ class TaskThread(threading.Thread):
         self.name = name
         self.semaphore = semaphore
         self.finished = False
+        self.report_enabled = report_enabled
 
     def run(self):
         try:
@@ -107,7 +103,7 @@ class TaskThread(threading.Thread):
                 for task_result in self.task_results:
                     # The following section will print the output of the lint
                     # checks.
-                    if task_result.report_enabled:
+                    if self.report_enabled:
                         log(
                             'Report from %s check\n'
                             '----------------------------------------\n'
@@ -119,7 +115,7 @@ class TaskThread(threading.Thread):
                         log(
                             'LOG %s:\n%s'
                             '----------------------------------------' %
-                            (self.name, task_result.get_report()[0]),
+                            (self.name, task_result.messages[0]),
                             show_time=True)
             log(
                 'FINISHED %s: %.1f secs' % (
@@ -191,7 +187,7 @@ def execute_tasks(tasks, semaphore):
     _check_all_tasks(currently_running_tasks)
 
 
-def create_task(func, verbose, semaphore, name=None):
+def create_task(func, verbose, semaphore, name=None, report_enabled=True):
     """Create a Task in its Thread.
 
     Args:
@@ -200,9 +196,10 @@ def create_task(func, verbose, semaphore, name=None):
         semaphore: threading.Semaphore. The object that controls how many tasks
             can run at any time.
         name: str. Name of the task that is going to be created.
+        report_enabled: bool. Decide whether task result will print or not.
 
     Returns:
         task: TaskThread object. Created task.
     """
-    task = TaskThread(func, verbose, semaphore, name)
+    task = TaskThread(func, verbose, semaphore, name, report_enabled)
     return task

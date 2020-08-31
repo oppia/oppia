@@ -272,7 +272,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         return self.files_to_lint
 
     @staticmethod
-    def _get_trimmed_error_output(lint_messages):
+    def get_trimmed_error_output(lint_messages):
         """Remove extra bits from pylint error messages.
 
         Args:
@@ -348,7 +348,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
                 for message in pylint_report.read():
                     full_error_messages.append(message)
                 pylint_error_messages = (
-                    self._get_trimmed_error_output(pylint_report.read()))
+                    self.get_trimmed_error_output(pylint_report.read()))
                 error_messages.append(pylint_error_messages)
                 errors_found = True
 
@@ -420,7 +420,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
             if pylinter_for_python3.msg_status != 0:
                 pylint_error_messages = (
-                    self._get_trimmed_error_output(pylint_report.read()))
+                    self.get_trimmed_error_output(pylint_report.read()))
                 error_messages.append(pylint_error_messages)
                 full_error_messages.append('Messages for Python 3 support:')
                 for message in pylint_report.read():
