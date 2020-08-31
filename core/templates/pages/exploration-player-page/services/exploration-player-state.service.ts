@@ -110,9 +110,11 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       QuestionPlayerEngineService.init(pretestQuestionDicts, callback);
     };
 
-    var initializeQuestionPlayerServices = function(questionDicts, callback) {
+    var initializeQuestionPlayerServices = function(
+        questionDicts, successCallback, errorCallback) {
       PlayerCorrectnessFeedbackEnabledService.init(true);
-      QuestionPlayerEngineService.init(questionDicts, callback);
+      QuestionPlayerEngineService.init(
+        questionDicts, successCallback, errorCallback);
     };
 
     var setExplorationMode = function() {
@@ -154,7 +156,8 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       });
     };
 
-    var initQuestionPlayer = function(questionPlayerConfig, callback) {
+    var initQuestionPlayer = function(
+        questionPlayerConfig, successCallback, errorCallback) {
       setQuestionPlayerMode();
       QuestionBackendApiService.fetchQuestions(
         questionPlayerConfig.skillList,
@@ -162,7 +165,8 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         questionPlayerConfig.questionsSortedByDifficulty
       ).then(function(questionData) {
         _totalQuestionsReceivedEventEmitter.emit(questionData.length);
-        initializeQuestionPlayerServices(questionData, callback);
+        initializeQuestionPlayerServices(
+          questionData, successCallback, errorCallback);
       });
     };
 
@@ -208,9 +212,10 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
           initExplorationPlayer(callback);
         }
       },
-      initializeQuestionPlayer: function(config, callback) {
+      initializeQuestionPlayer: function(
+          config, successCallback, errorCallback) {
         PlayerTranscriptService.init();
-        initQuestionPlayer(config, callback);
+        initQuestionPlayer(config, successCallback, errorCallback);
       },
       getCurrentEngineService: function() {
         return currentEngineService;

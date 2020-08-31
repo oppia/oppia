@@ -799,6 +799,10 @@ angular.module('oppia').directive('conversationSkin', [
             }
           };
 
+          var showQuestionAreNotAvailable = function() {
+            LoaderService.hideLoadingScreen();
+          };
+
           var _initializeDirectiveComponents = function(
               initialCard, focusLabel) {
             _addNewCard(initialCard);
@@ -843,7 +847,8 @@ angular.module('oppia').directive('conversationSkin', [
             PlayerPositionService.init(_navigateToDisplayedCard);
             if (questionPlayerConfig) {
               ExplorationPlayerStateService.initializeQuestionPlayer(
-                questionPlayerConfig, _initializeDirectiveComponents);
+                questionPlayerConfig, _initializeDirectiveComponents,
+                showQuestionAreNotAvailable);
             } else {
               ExplorationPlayerStateService.initializePlayer(
                 _initializeDirectiveComponents);

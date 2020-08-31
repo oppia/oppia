@@ -55,6 +55,7 @@ describe('Profile Link Backend Api Service', () => {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleData);
+    expect(successHandler).toHaveBeenCalledWith(
+      sampleData.profile_picture_data_url_for_username);
   }));
 });
