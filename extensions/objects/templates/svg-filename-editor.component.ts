@@ -605,7 +605,7 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       ctrl.createText = function() {
         ctrl.canvas.discardActiveObject();
-        // THe defaultTextSize is necessary to prevent the text
+        // The defaultTextSize is necessary to prevent the text
         // from being too small. This can be changed later in the editor.
         var defaultTextSize = '18px';
         ctrl.fillPicker.setOptions({
