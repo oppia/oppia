@@ -1740,16 +1740,15 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         comments_index = -1
 
         for (token_type, _, (line_num, _), _, line) in tokens:
-            if token_type == tokenize.COMMENT:
+            if token_type == tokenize.COMMENT and line.strip().startswith('#'):
                 line = line.strip()
 
-                if line.startswith('#'):
-                    if prev_line_num + 1 == line_num:
-                        comments[comments_index].append((line_num, line))
-                    else:
-                        comments.append([(line_num, line)])
-                        comments_index += 1
-                    prev_line_num = line_num
+                if prev_line_num + 1 == line_num:
+                    comments[comments_index].append((line_num, line))
+                else:
+                    comments.append([(line_num, line)])
+                    comments_index += 1
+                prev_line_num = line_num
 
         for comment in comments:
             space_at_beginning_of_first_comment = True
@@ -1768,6 +1767,10 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             if space_at_beginning_of_last_comment and len(last_comment) > 1:
                 self._check_punctuation(
                     last_comment, last_comment_line_num)
+            if len(comment) <= 2:
+                continue
+            for line_num, line in comment[1:-1]:
+                _ = self._check_space_at_beginning_of_comment(line, line_num)
 
 
 class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
