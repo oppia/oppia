@@ -51,7 +51,6 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import subtopic_page_domain
-from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_query_services
@@ -197,7 +196,9 @@ class MockSummaryModelValidator(
         prod_validation_jobs_one_off.BaseSummaryModelValidator):
 
     @classmethod
-    def _get_external_id_relationships(cls, item):
+    def _get_external_id_relationships(
+            cls, item): # pylint: disable=unused-argument
+        """Mock for _get_external_id_relationships."""
         return []
 
 
@@ -205,7 +206,9 @@ class MockSnapshotContentModelValidator(
         prod_validation_jobs_one_off.BaseSnapshotContentModelValidator):
 
     @classmethod
-    def _get_external_id_relationships(cls, item):
+    def _get_external_id_relationships(
+            cls, item): # pylint: disable=unused-argument
+        """Mock for _get_external_id_relationships."""
         return []
 
 
@@ -214,7 +217,9 @@ class MockSnapshotMetadataModelValidator(
 
     EXTERNAL_MODEL_NAME = 'external model'
     @classmethod
-    def _get_external_id_relationships(cls, item):
+    def _get_external_id_relationships(
+            cls, item): # pylint: disable=unused-argument
+        """Mock for _get_external_id_relationships."""
         return [
             prod_validation_jobs_one_off.ExternalModelFetcherDetails(
                 'external_model_ids', MockModel, [])]
@@ -224,15 +229,19 @@ class MockBaseUserModelValidator(
         prod_validation_jobs_one_off.BaseUserModelValidator):
 
     @classmethod
-    def _get_external_id_relationships(cls, item):
+    def _get_external_id_relationships(
+            cls, item): # pylint: disable=unused-argument
+        """Mock for _get_external_id_relationships."""
         return []
 
     @classmethod
     def _get_custom_validation_functions(cls):
+        """Mock for _get_custom_validation_functions."""
         return [cls._validate_common_properties_do_not_match]
 
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
+        """Mock for _get_external_instance_custom_validation_functions."""
         return [
             cls._validate_explorations_are_public,
             cls._validate_collections_are_public
@@ -14582,7 +14591,8 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output)
 
 
-class UserContributionProficiencyModelValidatorTests(test_utils.GenericTestBase):
+class UserContributionProficiencyModelValidatorTests(
+        test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserContributionProficiencyModelValidatorTests, self).setUp()
