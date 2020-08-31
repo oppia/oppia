@@ -146,17 +146,20 @@ class DeleteRecommendationsOneOffJobTests(
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
-            recommendations_jobs_one_off.DeleteRecommendationsOneOffJob
-            .create_new())
-        recommendations_jobs_one_off.DeleteRecommendationsOneOffJob.enqueue(
-            job_id)
+            recommendations_jobs_one_off
+            .DeleteAllExplorationRecommendationsOneOffJob.create_new())
+        (
+            recommendations_jobs_one_off
+            .DeleteAllExplorationRecommendationsOneOffJob.enqueue(
+                job_id)
+        )
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         stringified_output = (
-            recommendations_jobs_one_off.DeleteRecommendationsOneOffJob
-            .get_output(job_id))
+            recommendations_jobs_one_off
+            .DeleteAllExplorationRecommendationsOneOffJob.get_output(job_id))
         eval_output = [ast.literal_eval(stringified_item) for
                        stringified_item in stringified_output]
         return eval_output

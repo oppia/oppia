@@ -101,14 +101,15 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             key, recommended_exploration_ids)
 
 
-class DeleteRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class DeleteAllExplorationRecommendationsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
     """A one-off job that deletes all instances of
     ExplorationRecommendationsModel.
     """
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
-        super(DeleteRecommendationsOneOffJob, cls).enqueue(
+        super(DeleteAllExplorationRecommendationsOneOffJob, cls).enqueue(
             job_id, shard_count=128)
 
     @classmethod
