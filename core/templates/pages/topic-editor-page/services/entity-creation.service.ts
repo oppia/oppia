@@ -29,11 +29,13 @@ require(
 require('components/entity-creation-services/skill-creation.service.ts');
 require('domain/skill/RubricObjectFactory.ts');
 require('components/rubrics-editor/rubrics-editor.directive.ts');
-require('pages/topics-and-skills-dashboard-page/' +
-    'create-new-skill-modal.controller.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'create-new-skill-modal.controller.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('pages/topic-editor-page/modal-templates/' +
+require(
+  'pages/topic-editor-page/modal-templates/' +
   'create-new-subtopic-modal.controller.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');

@@ -1,11 +1,16 @@
-<div class="oppia-opportunities-list-item">
+<div class="oppia-opportunities-list-item protractor-test-opportunity-list-item">
   <div class="oppia-opportunities-details">
     <div class="oppia-opportunities-subheading oppia-animate-fadein">
-      <span title="<[$ctrl.opportunity.subheading]>" ng-show="!$ctrl.opportunityDataIsLoading"><[$ctrl.opportunity.subheading | wrapTextWithEllipsis : 25]></span>
+      <span title="<[$ctrl.opportunity.subheading]>"
+            class="protractor-test-opportunity-list-item-subheading"
+            ng-show="!$ctrl.opportunityDataIsLoading">  <[$ctrl.opportunity.subheading | wrapTextWithEllipsis : 25]>
+      </span>
       <lazy-loading ng-show="$ctrl.opportunityDataIsLoading"></lazy-loading>
     </div>
     <div class="oppia-opportunities-heading oppia-animate-fadein">
-      <span title="<[$ctrl.opportunity.heading]>" ng-show="!$ctrl.opportunityDataIsLoading"><[$ctrl.opportunity.heading | wrapTextWithEllipsis : $ctrl.opportunityHeadingTruncationLength]></span>
+      <span class="protractor-test-opportunity-list-item-heading" title="<[$ctrl.opportunity.heading]>" ng-show="!$ctrl.opportunityDataIsLoading">
+        <[$ctrl.opportunity.heading | wrapTextWithEllipsis : $ctrl.opportunityHeadingTruncationLength]>
+      </span>
       <lazy-loading ng-show="$ctrl.opportunityDataIsLoading"></lazy-loading>
     </div>
   </div>
@@ -17,17 +22,24 @@
       <lazy-loading ng-show="$ctrl.opportunityDataIsLoading"></lazy-loading>
     </div>
     <div class="oppia-opportunities-progress-label">
-      <span ng-show="!$ctrl.opportunityDataIsLoading">(<[$ctrl.progressPercentage]>)</span>
+      <span class="protractor-test-opportunity-list-item-progress-percentage"
+            ng-show="!$ctrl.opportunityDataIsLoading">
+        (<[$ctrl.progressPercentage]>)
+      </span>
       <lazy-loading ng-show="$ctrl.opportunityDataIsLoading"></lazy-loading>
     </div>
   </div>
   <div class="oppia-opportunities-label-container oppia-animate-fadein"ng-if="$ctrl.isLabelRequired()">
     <div class="oppia-opportunities-label" ng-style="$ctrl.labelStyle" >
-      <span ng-show="!$ctrl.opportunityDataIsLoading"><[$ctrl.labelText]></span>
+      <span class="protractor-test-opportunity-list-item-label" ng-show="!$ctrl.opportunityDataIsLoading"><[$ctrl.labelText]></span>
       <lazy-loading ng-show="$ctrl.opportunityDataIsLoading"></lazy-loading>
     </div>
   </div>
   <div class="oppia-opportunities-button-container oppia-animate-fadein">
-    <button ng-show="!$ctrl.opportunityDataIsLoading" class="oppia-opportunities-button" ng-click="$ctrl.onClickActionButton($ctrl.opportunity.id)"><[$ctrl.opportunity.actionButtonTitle]></button>
+    <button class="oppia-opportunities-button protractor-test-opportunity-list-item-button"
+            ng-show="!$ctrl.opportunityDataIsLoading"
+            ng-click="$ctrl.onClickActionButton($ctrl.opportunity.id)">
+      <[$ctrl.opportunity.actionButtonTitle]>
+    </button>
   </div>
 </div>
