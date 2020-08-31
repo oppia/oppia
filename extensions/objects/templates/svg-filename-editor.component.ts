@@ -103,10 +103,11 @@ angular.module('oppia').component('svgFilenameEditor', {
       // Dynamically assign a unique id to each lc editor to avoid clashes
       // when there are multiple RTEs in the same page.
       var randomId = Math.floor(Math.random() * 100000).toString();
-      // This is used to identify the fabric js canvas element in the editor.
+      // The canvasId is used to identify the fabric js
+      // canvas element in the editor.
       ctrl.canvasID = 'canvas' + randomId;
-      // These are used to store the objects returned from the vanilla
-      // color picker.
+      // The following picker variables are used to store the objects returned
+      // from the vanilla color picker.
       ctrl.fillPicker = null;
       ctrl.strokePicker = null;
       ctrl.bgPicker = null;
@@ -415,7 +416,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         // svg objects are grouped together.
         if (objId.startsWith('group')) {
           // The objId is of the form "group" + number.
-          var groupId = parseInt(objId.slice(5));
+          const GROUP_ID_PREFIX_LENGTH = 5;
+          var groupId = parseInt(objId.slice(GROUP_ID_PREFIX_LENGTH));
           // Checks whether the object belongs to an already existing group
           // or not.
           if (groupedObjects.length <= groupId) {
@@ -432,13 +434,13 @@ angular.module('oppia').component('svgFilenameEditor', {
         var childNodes = [].slice.call(element.childNodes);
         var value = '';
         var coloredTextIndex = [];
-        // It extracts the text from the tspan tags and appends
+        // Extracts the text from the tspan tags and appends
         // with a \n tag to ensure that the texts are subsequent lines.
         childNodes.forEach(function(el, index) {
           if (el.nodeName === 'tspan') {
             value += el.childNodes[0].nodeValue;
             if (el.style.fill !== '') {
-              // This if block fetches the position of the coloured text so
+              // Fetches the position of the coloured text so
               // it can be given color after the text is rendered.
               coloredTextIndex.push({
                 startIndex: (
@@ -466,7 +468,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           type: 'textbox',
           strokeUniform: true,
         });
-        // The text moves to the right everytime the svg is
+        // The text moves to the right every time the svg is
         // rendered so this is to ensure that the text doesn't
         // render outside the canvas.
         // https://github.com/fabricjs/fabric.js/issues/1280
@@ -487,6 +489,11 @@ angular.module('oppia').component('svgFilenameEditor', {
         ctrl.canvas.add(text);
       };
 
+      var isFullRectangle = function(element) {
+        return (
+          element.width.baseVal.valueAsString === '100%' &&
+          element.height.baseVal.valueAsString === '100%');
+      };
 
       ctrl.continueDiagramEditing = function() {
         if (
@@ -509,12 +516,10 @@ angular.module('oppia').component('svgFilenameEditor', {
                   groupedObjects = loadGroupedObject(
                     objId, obj, groupedObjects);
                 } else {
-                  // This if condition is to detect the background color
-                  // which has a rect shape.
+                  // Detects the background color from the rectangle.
                   if (
                     obj.get('type') === 'rect' &&
-                    elements[index].width.baseVal.valueAsString === '100%' &&
-                    elements[index].height.baseVal.valueAsString === '100%') {
+                    isFullRectangle(elements[index])) {
                     ctrl.canvas.setBackgroundColor(obj.get('fill'));
                     ctrl.fabricjsOptions.bg = obj.get('fill');
                     ctrl.bgPicker.setOptions({
@@ -600,8 +605,8 @@ angular.module('oppia').component('svgFilenameEditor', {
 
       ctrl.createText = function() {
         ctrl.canvas.discardActiveObject();
-        // This is necessary to prevent the text from being too small.
-        // This can be changed later in the editor.
+        // THe defaultTextSize is necessary to prevent the text
+        // from being too small. This can be changed later in the editor.
         var defaultTextSize = '18px';
         ctrl.fillPicker.setOptions({
           color: 'rgba(0,0,0,1)'
@@ -915,11 +920,10 @@ angular.module('oppia').component('svgFilenameEditor', {
         var currentAngle = 0;
         var pieSlices = [];
         var legendText = '';
+        const PIE_SLICE_COLOR_INDICATOR = '\u2587';
         for (var i = 0; i < ctrl.pieChartDataInput.length; i++) {
           total += ctrl.pieChartDataInput[i].data;
-          // This symbol is used to indicate the color of the pie slice
-          // it corresponds to.
-          legendText += '\u2587 - ';
+          legendText += (PIE_SLICE_COLOR_INDICATOR + ' - ');
           legendText += (
             ctrl.pieChartDataInput[i].name + ' - ' +
             ctrl.pieChartDataInput[i].data + '\n');
@@ -943,9 +947,10 @@ angular.module('oppia').component('svgFilenameEditor', {
           }
           currentAngle += ctrl.pieChartDataInput[i].angle;
         }
-        // This is to prevent the text from being too small. This can be
-        // changed again using editor.
-        ctrl.fabricjsOptions.size = '18px';
+        // The defaultTextSize is to prevent the text from being too small.
+        // This can be changed again using editor.
+        var defaultTextSize = '18px';
+        ctrl.fabricjsOptions.size = defaultTextSize;
         var text = new fabric.Textbox(legendText, {
           top: 100,
           left: 120,
@@ -956,7 +961,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           fontStyle: ctrl.fabricjsOptions.italic ? 'italic' : 'normal',
           width: 200
         });
-        // The following code is used to give the color to the rectangle which
+        // Gives the color to the pie slice indicator which
         // is used to indentify the pie slice.
         for (var i = 0; i < ctrl.pieChartDataInput.length; i++) {
           text.setSelectionStart(getTextIndex(legendText, i, 0));
@@ -979,7 +984,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.drawMode = DRAW_MODE_PIECHART;
         } else {
           createChart();
-          // This resets the pie chart form.
+          // Resets the pie chart form.
           ctrl.pieChartDataInput = [{
             name: 'Data name 1',
             data: 10,
@@ -1202,8 +1207,7 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.onFillChange = function() {
-        // This if condition fetches the bezier curve and then changes
-        // the fill color.
+        // Fetches the bezier curve and then the fill color.
         if (ctrl.drawMode === DRAW_MODE_BEZIER) {
           getQuadraticBezierCurve().set({
             fill: ctrl.fabricjsOptions.fill
@@ -1257,11 +1261,11 @@ angular.module('oppia').component('svgFilenameEditor', {
       };
 
       ctrl.onSizeChange = function() {
-        // This if condition is required to ensure that the size change is
-        // applied only to the curve and not to all the control points.
+        // Ensures that the size change is applied only to the curve and
+        // not to all the control points.
         if (ctrl.drawMode === DRAW_MODE_BEZIER) {
           var numberOfEdgeControlPoints = 2;
-          // This only changes the radius of the edge control points.
+          // Changes the radius of the edge control points.
           // A size 2 is added so that the control circles is not rendered
           // too small.
           ctrl.canvas.getObjects().slice(-numberOfEdgeControlPoints).forEach(
@@ -1354,8 +1358,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
 
         ctrl.canvas.on('mouse:down', function(options) {
-          // This event is used to detect the mouse clicks when drawing
-          // the polygon.
+          // Used to detect the mouse clicks when drawing the polygon.
           if (ctrl.drawMode === DRAW_MODE_POLY) {
             setPolyStartingPoint(options);
             var x = ctrl.polyOptions.x;
@@ -1363,7 +1366,7 @@ angular.module('oppia').component('svgFilenameEditor', {
             ctrl.polyOptions.bboxPoints.push(new polyPoint(x, y));
             var points = [x, y, x, y];
             var stroke = ctrl.fabricjsOptions.stroke;
-            // This is to ensure that the polygon lines are visible when
+            // Ensures that the polygon lines are visible when
             // creating the polygon.
             stroke = stroke.slice(0, -2) + '1)';
             var line = new fabric.Line(points, {
@@ -1372,8 +1375,7 @@ angular.module('oppia').component('svgFilenameEditor', {
               stroke: stroke,
               strokeLineCap: 'round'
             });
-            // This function is for drawing a polygon in a device with touch
-            // support.
+            // Enables drawing a polygon in a device with touch support.
             if (
               ctrl.polyOptions.lines.length !== 0 &&
               ctrl.drawMode === DRAW_MODE_POLY &&
@@ -1394,8 +1396,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
 
         ctrl.canvas.on('mouse:move', function(options) {
-          // This event is used to detect the mouse movement while
-          // drawing the polygon.
+          // Detects the mouse movement while drawing the polygon.
           if (
             ctrl.polyOptions.lines.length !== 0 &&
             ctrl.drawMode === DRAW_MODE_POLY &&
@@ -1410,8 +1411,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
 
         ctrl.canvas.on('object:moving', function(e) {
-          // This event is used to detect the movement in the control
-          // points when drawing the bezier curve.
+          // Detects the movement in the control points when
+          // drawing the bezier curve.
           if (ctrl.drawMode === DRAW_MODE_BEZIER) {
             var pt = e.target;
             var curve = getQuadraticBezierCurve();
@@ -1430,8 +1431,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
 
         ctrl.canvas.on('object:added', function() {
-          // This if condition is to ensure that the quadratic bezier control
-          // points are not added to the undoStack.
+          // Ensures that the quadratic bezier control points are
+          // not added to the undoStack.
           if (
             ctrl.drawMode === DRAW_MODE_NONE ||
             ctrl.drawMode === DRAW_MODE_PENCIL) {
@@ -1452,7 +1453,7 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
 
         ctrl.canvas.on('object:scaling', function() {
-          // This if condition is to prevent the textbox from scaling.
+          // Prevents the textbox from scaling.
           if (ctrl.canvas.getActiveObject().get('type') === 'textbox') {
             var text = ctrl.canvas.getActiveObject();
             var scaleX = text.get('scaleX');
@@ -1469,8 +1470,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         });
 
         var onSelection = function() {
-          // This if condition is to ensure that the fabricjsOptions doesn't
-          // change when the user selects the quadratic bezier control points.
+          // Ensures that the fabricjsOptions doesn't change when the user
+          // selects the quadratic bezier control points.
           if (
             ctrl.drawMode === DRAW_MODE_NONE ||
             ctrl.drawMode === DRAW_MODE_PENCIL) {

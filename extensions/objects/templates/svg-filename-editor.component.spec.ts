@@ -245,25 +245,33 @@ describe('SvgFilenameEditor', function() {
     expect(svgFilenameCtrl.currentDiagramHeight).toBe(HEIGHT);
   });
 
-  it('should reset to maximum and minimum dimension limits correctly',
-    function() {
-      svgFilenameCtrl.diagramWidth = 600;
-      svgFilenameCtrl.diagramHeight = 600;
-      svgFilenameCtrl.onWidthInputBlur();
-      expect(svgFilenameCtrl.currentDiagramWidth).toBe(
-        SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_WIDTH);
-      svgFilenameCtrl.onHeightInputBlur();
-      expect(svgFilenameCtrl.currentDiagramHeight).toBe(
-        SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_HEIGHT);
-      svgFilenameCtrl.diagramWidth = 0;
-      svgFilenameCtrl.diagramHeight = 0;
-      svgFilenameCtrl.onWidthInputBlur();
-      expect(svgFilenameCtrl.currentDiagramWidth).toBe(
-        SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_WIDTH);
-      svgFilenameCtrl.onHeightInputBlur();
-      expect(svgFilenameCtrl.currentDiagramHeight).toBe(
-        SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_HEIGHT);
-    });
+  it('should reset to maximum width correctly', function() {
+    svgFilenameCtrl.diagramWidth = 600;
+    svgFilenameCtrl.onWidthInputBlur();
+    expect(svgFilenameCtrl.currentDiagramWidth).toBe(
+      SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_WIDTH);
+  });
+
+  it('should reset to maximum height correctly', function() {
+    svgFilenameCtrl.diagramHeight = 600;
+    svgFilenameCtrl.onHeightInputBlur();
+    expect(svgFilenameCtrl.currentDiagramHeight).toBe(
+      SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_HEIGHT);
+  });
+
+  it('should reset to minimum width correctly', function() {
+    svgFilenameCtrl.diagramWidth = 0;
+    svgFilenameCtrl.onWidthInputBlur();
+    expect(svgFilenameCtrl.currentDiagramWidth).toBe(
+      SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_WIDTH);
+  });
+
+  it('should reset to minimum height correctly', function() {
+    svgFilenameCtrl.diagramHeight = 0;
+    svgFilenameCtrl.onHeightInputBlur();
+    expect(svgFilenameCtrl.currentDiagramHeight).toBe(
+      SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_HEIGHT);
+  });
 
   it('should check if diagram is created', function() {
     var rect = new fabric.Rect({
