@@ -46,37 +46,38 @@ export class LearnerAnswerDetailsDataService {
     '/learneranswerinfohandler/learner_answer_details/<entity_type>/' +
     '<entity_id>'
   );
-  public getData() {
+  public getData(): any {
     return this._data;
   }
   public fetchLearnerAnswerInfoData() {
     return this.learnerAnswerDetailsBackendApiService
       ._fetchLearnerAnswerInfoData().then(
-      (response)=>{
-        this.learnerAnswerInfoData = response.data.learner_answer_info_data;
-        for (let i = 0; i < this.learnerAnswerInfoData.length; i++) {
-          const stateName = this.learnerAnswerInfoData[i].state_name;
-          const interactionId = this.learnerAnswerInfoData[i].interaction_id;
-          const customizationArgs =
-          this.learnerAnswerInfoData[i].customization_args;
-          const learnerAnswerInfoDicts = (
-            this.learnerAnswerInfoData[i].learner_answer_info_dicts
-          );
-          const learnerAnswerDetails = (
-            new LearnerAnswerDetailsObjectFactory().createDefaultLearnerAnswerDetails(
-              this._expId, stateName, interactionId, customizationArgs,
-              learnerAnswerInfoDicts.map(
-                new LearnerAnswerInfoObjectFactory().createFromBackendDict
+        (response)=>{
+          this.learnerAnswerInfoData = response.data.learner_answer_info_data;
+          for (let i = 0; i < this.learnerAnswerInfoData.length; i++) {
+            const stateName = this.learnerAnswerInfoData[i].state_name;
+            const interactionId = this.learnerAnswerInfoData[i].interaction_id;
+            const customizationArgs =
+            this.learnerAnswerInfoData[i].customization_args;
+            const learnerAnswerInfoDicts = (
+              this.learnerAnswerInfoData[i].learner_answer_info_dicts
+            );
+            const learnerAnswerDetails = (
+            new LearnerAnswerDetailsObjectFactory()
+              .createDefaultLearnerAnswerDetails(
+                this._expId, stateName, interactionId, customizationArgs,
+                learnerAnswerInfoDicts.map(
+                  new LearnerAnswerInfoObjectFactory().createFromBackendDict
+                )
               )
-            )
-          );
-          this._data.push(learnerAnswerDetails);
+            );
+            this._data.push(learnerAnswerDetails);
+          }
+          return response;
         }
-        return response;
-      }
     );
   }
-  public deleteLearnerAnswerInfo(entityId, stateName, learnerAnswerInfoId) {
+  public deleteLearnerAnswerInfo(entityId: any, stateName: any, learnerAnswerInfoId: any) {
     return this.learnerAnswerDetailsBackendApiService._deleteLearnerAnswerInfo(
       entityId, stateName, learnerAnswerInfoId
     ).toPromise().then((response)=>{

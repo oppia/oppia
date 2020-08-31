@@ -47,7 +47,7 @@ export class LearnerAnswerDetailsBackendApiService {
     return this.httpClient.get(learnerAnswerInfoDataUrl).toPromise();
   }
   _deleteLearnerAnswerInfo(
-      entityId, stateName, learnerAnswerInfoId) {
+      entityId: any, stateName: any, learnerAnswerInfoId: any) {
     const learnerAnswerInfoDataUrl =
       this.urlInterpolationService.interpolateUrl(
         this.LEARNER_ANSWER_INFO_DATA_URL, {
