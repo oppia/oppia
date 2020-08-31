@@ -374,8 +374,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """
         self.question.inapplicable_misconception_ids = ['Test', 1]
         self._assert_validation_error(
-            'Expected inapplicable_misconception_ids to be a list of strings, '
-            'received \[u\'Test\', 1\]')
+            r'Expected inapplicable_misconception_ids to be a list of strings,'
+            r' received \[u\'Test\', 1\]')
 
     def test_validate_invalid_type_of_inapplicable_misconception_ids(self):
         """Test to verify that the validation fails when
@@ -575,8 +575,8 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         self.observed_object.misconception_ids = ['Test', 1]
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected misconception ids to be a list of strings, '
-            'received \[u\'Test\', 1\]'):
+            r'Expected misconception ids to be a list of strings, '
+            r'received \[u\'Test\', 1\]'):
             self.observed_object.validate()
 
     def test_validate_invalid_type_of_misconception_ids(self):
