@@ -126,11 +126,18 @@ export class MathInteractionsService {
     expressionString = this.insertMultiplicationSigns(expressionString);
     let variablesList = nerdamer(expressionString).variables();
     // Explicitly checking for presence of constants (pi and e).
-    if (expressionString.match(/(^|\W)e($|\W)/g)) {
+    if (expressionString.match(/(^|[^a-zA-Z])e($|[^a-zA-Z])/g)) {
       variablesList.push('e');
     }
-    if (expressionString.match(/(^|\W)pi($|\W)/g)) {
+    if (expressionString.match(/(^|[^a-zA-Z])pi($|[^a-zA-Z])/g)) {
       variablesList.push('pi');
+    }
+    // Replacing greek names with symbols.
+    for (let i = 0; i < variablesList.length; i++) {
+      if (variablesList[i].length > 1) {
+        variablesList[i] = AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS'][
+          variablesList[i]];
+      }
     }
     if (variablesList.length === 0) {
       this.warningText = 'It looks like you have entered only ' +
