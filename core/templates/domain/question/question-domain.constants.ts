@@ -25,7 +25,7 @@ export class QuestionDomainConstants {
     '/manage_question_skill_link/<question_id>';
 
   public static PRETEST_QUESTIONS_URL_TEMPLATE =
-    '/pretest_handler/<exploration_id>?story_id=<story_id>';
+    '/pretest_handler/<exploration_id>?story_url_fragment=<story_url_fragment>';
 
   public static QUESTION_PLAYER_URL_TEMPLATE =
     '/question_player_handler?skill_ids=<skill_ids>&question_count' +

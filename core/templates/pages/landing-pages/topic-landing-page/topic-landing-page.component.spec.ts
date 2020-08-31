@@ -129,8 +129,8 @@ describe('Topic Landing Page', () => {
     component.ngOnInit();
     tick(150);
     fixture.detectChanges();
-    expect(pageTitleService.getPageTitle()).toBe('Fractions | ' +
-      'Add, Subtract, Multiply and Divide | Oppia');
+    expect(pageTitleService.getPageTitle()).toBe(
+      'Fractions | Add, Subtract, Multiply and Divide | Oppia');
   }));
 
   it('should return correct lesson quality image src', function() {

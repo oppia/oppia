@@ -41,7 +41,7 @@ require(
   'exploration-objective-editor.component.ts');
 require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
-  'exploration-save-and-publish-buttons.directive.ts');
+  'exploration-save-and-publish-buttons.component.ts');
 require(
   'pages/exploration-editor-page/exploration-title-editor/' +
   'exploration-title-editor.component.ts');
@@ -71,7 +71,7 @@ require(
 require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab.component.ts');
 require(
-  'pages/exploration-editor-page/translation-tab/translation-tab.directive.ts');
+  'pages/exploration-editor-page/translation-tab/translation-tab.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'conversation-skin.directive.ts');
@@ -112,6 +112,7 @@ require(
 require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require('pages/exploration-editor-page/services/exploration-save.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
@@ -119,6 +120,8 @@ require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('pages/exploration-editor-page/services/graph-data.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
+require(
+  'pages/exploration-editor-page/services/state-editor-refresh.service.ts');
 require(
   'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
 require(
@@ -148,14 +151,17 @@ require('services/state-top-answers-stats.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
+require('services/contextual/window-dimensions.service.ts');
+require('services/bottom-navbar-status.service.ts');
 
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$q', '$scope', '$templateCache', '$timeout', '$uibModal',
-    'AutosaveInfoModalsService', 'ChangeListService', 'ContextService',
+    '$q', '$scope', '$rootScope', '$templateCache', '$timeout', '$uibModal',
+    'AutosaveInfoModalsService', 'BottomNavbarStatusService',
+    'ChangeListService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
     'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
@@ -163,18 +169,21 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
     'ExplorationObjectiveService', 'ExplorationParamChangesService',
     'ExplorationParamSpecsService', 'ExplorationPropertyService',
-    'ExplorationRightsService',
+    'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
     'PageTitleService', 'LoaderService', 'ParamChangesObjectFactory',
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
+    'StateEditorRefreshService',
     'StateClassifierMappingService', 'StateEditorService',
     'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
     'ThreadDataService', 'UrlInterpolationService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
+    'WindowDimensionsService',
     function(
-        $q, $scope, $templateCache, $timeout, $uibModal,
-        AutosaveInfoModalsService, ChangeListService, ContextService,
+        $q, $scope, $rootScope, $templateCache, $timeout, $uibModal,
+        AutosaveInfoModalsService, BottomNavbarStatusService,
+        ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
         ExplorationDataService, ExplorationFeaturesBackendApiService,
@@ -182,15 +191,17 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationInitStateNameService, ExplorationLanguageCodeService,
         ExplorationObjectiveService, ExplorationParamChangesService,
         ExplorationParamSpecsService, ExplorationPropertyService,
-        ExplorationRightsService,
+        ExplorationRightsService, ExplorationSaveService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService, GraphDataService,
         PageTitleService, LoaderService, ParamChangesObjectFactory,
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
+        StateEditorRefreshService,
         StateClassifierMappingService, StateEditorService,
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
         ThreadDataService, UrlInterpolationService,
-        UserEmailPreferencesService, UserExplorationPermissionsService) {
+        UserEmailPreferencesService, UserExplorationPermissionsService,
+        WindowDimensionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
@@ -348,13 +359,14 @@ angular.module('oppia').component('explorationEditorPage', {
             return;
           }
           RouterService.onRefreshStatisticsTab.emit();
-          $scope.$broadcast('refreshVersionHistory', {
+
+          RouterService.onRefreshVersionHistory.emit({
             forceRefresh: true
           });
 
           if (ExplorationStatesService.getState(
             StateEditorService.getActiveStateName())) {
-            $scope.$broadcast('refreshStateEditor');
+            StateEditorRefreshService.onRefreshStateEditor.emit();
           }
 
           StateTutorialFirstTimeService.initEditor(
@@ -395,7 +407,7 @@ angular.module('oppia').component('explorationEditorPage', {
           await ExplorationImprovementsService.flushUpdatedTasksToBackend();
 
           ExplorationWarningsService.updateWarnings();
-          $scope.$broadcast('refreshStateEditor');
+          StateEditorRefreshService.onRefreshStateEditor.emit();
         });
       };
 
@@ -451,6 +463,51 @@ angular.module('oppia').component('explorationEditorPage', {
         });
       };
 
+      ctrl.getNavbarText = function() {
+        return 'Exploration Editor';
+      };
+
+      ctrl.countWarnings = () => ExplorationWarningsService.countWarnings();
+      ctrl.getWarnings = () => ExplorationWarningsService.getWarnings();
+      ctrl.hasCriticalWarnings = () => (
+        ExplorationWarningsService.hasCriticalWarnings);
+      ctrl.selectMainTab = () => RouterService.navigateToMainTab();
+      ctrl.selectTranslationTab = (
+        () => RouterService.navigateToTranslationTab());
+      ctrl.selectPreviewTab = () => RouterService.navigateToPreviewTab();
+      ctrl.selectSettingsTab = () => RouterService.navigateToSettingsTab();
+      ctrl.selectStatsTab = () => RouterService.navigateToStatsTab();
+      ctrl.selectImprovementsTab = (
+        () => RouterService.navigateToImprovementsTab());
+      ctrl.selectHistoryTab = () => RouterService.navigateToHistoryTab();
+      ctrl.selectFeedbackTab = () => RouterService.navigateToFeedbackTab();
+      ctrl.getOpenThreadsCount = (
+        () => ThreadDataService.getOpenThreadsCount());
+      ctrl.showUserHelpModal = () => {
+        var explorationId = ContextService.getExplorationId();
+        SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
+        var EDITOR_TUTORIAL_MODE = 'editor';
+        var TRANSLATION_TUTORIAL_MODE = 'translation';
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration-editor-page/modal-templates/' +
+              'help-modal.template.html'),
+          backdrop: true,
+          controller: 'HelpModalController',
+          windowClass: 'oppia-help-modal'
+        }).result.then(mode => {
+          if (mode === EDITOR_TUTORIAL_MODE) {
+            StateTutorialFirstTimeService.onOpenEditorTutorial.emit();
+          } else if (mode === TRANSLATION_TUTORIAL_MODE) {
+            StateTutorialFirstTimeService.onOpenTranslationTutorial.emit();
+          }
+        }, () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        });
+      };
+
       ctrl.$onInit = function() {
         ctrl.directiveSubscriptions.add(
           ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
@@ -459,21 +516,33 @@ angular.module('oppia').component('explorationEditorPage', {
             }
           )
         );
+        ctrl.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
+        BottomNavbarStatusService.markBottomNavbarStatus(true);
+
+        ctrl.directiveSubscriptions.add(
+          ExplorationSaveService.onInitExplorationPage.subscribe(
+            (successCallback) => {
+              ctrl.initExplorationPage().then(successCallback);
+            }
+          )
+        );
         ctrl.directiveSubscriptions.add(
           ExplorationStatesService.onRefreshGraph.subscribe(() => {
             GraphDataService.recompute();
             ExplorationWarningsService.updateWarnings();
           }));
-        $scope.$on('initExplorationPage', (unusedEvtData, successCallback) => {
-          ctrl.initExplorationPage().then(successCallback);
-        });
-        $scope.$on(
-          'enterEditorForTheFirstTime', ctrl.showWelcomeExplorationModal);
+        ctrl.directiveSubscriptions.add(
+          // eslint-disable-next-line max-len
+          StateTutorialFirstTimeService.onEnterEditorForTheFirstTime.subscribe(() => {
+            ctrl.showWelcomeExplorationModal();
+          })
+        );
         ctrl.directiveSubscriptions.add(
           StateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(
             () => {
               ctrl.startTutorial();
-            }));
+            })
+        );
         ctrl.EditabilityService = EditabilityService;
         ctrl.StateEditorService = StateEditorService;
 

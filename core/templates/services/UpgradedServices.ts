@@ -220,6 +220,7 @@ import { ExpressionSyntaxTreeService } from
   'expressions/expression-syntax-tree.service';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
+import { ExternalSaveService } from 'services/external-save.service.ts';
 import { ExtractImageFilenamesFromStateService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
@@ -293,7 +294,6 @@ import { ItemSelectionInputRulesService } from
 import { ItemSelectionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
-import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
@@ -328,12 +328,6 @@ import { MathEquationInputRulesService } from
 import { MathEquationInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/MathEquationInput/directives/math-equation-input-validation.service';
-import { MathExpressionInputRulesService } from
-  // eslint-disable-next-line max-len
-  'interactions/MathExpressionInput/directives/math-expression-input-rules.service';
-import { MathExpressionInputValidationService } from
-  // eslint-disable-next-line max-len
-  'interactions/MathExpressionInput/directives/math-expression-input-validation.service';
 import { MessengerService } from 'services/messenger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
@@ -446,6 +440,10 @@ import { QuestionSummaryObjectFactory } from
   'domain/question/QuestionSummaryObjectFactory';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
+import { RatioExpressionInputValidationService } from
+  // eslint-disable-next-line max-len
+  'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
+import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { ReadOnlyStoryNodeObjectFactory } from
@@ -515,6 +513,8 @@ import { StateContentService } from
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -668,12 +668,15 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 
+interface UpgradedServicesDict {
+  [service: string]: unknown;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class UpgradedServices {
-  getUpgradedServices() {
+  getUpgradedServices(): UpgradedServicesDict {
     var upgradedServices = {};
     /* eslint-disable dot-notation */
 
@@ -762,6 +765,7 @@ export class UpgradedServices {
     upgradedServices['ExplorationOpportunitySummaryObjectFactory'] =
       new ExplorationOpportunitySummaryObjectFactory();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
+    upgradedServices['ExternalSaveService'] = new ExternalSaveService();
     upgradedServices['FeaturedTranslationLanguageObjectFactory'] =
       new FeaturedTranslationLanguageObjectFactory();
     upgradedServices['FeatureStatusSummaryObjectFactory'] =
@@ -797,7 +801,6 @@ export class UpgradedServices {
     upgradedServices['JobDataObjectFactory'] = new JobDataObjectFactory();
     upgradedServices['JobStatusSummaryObjectFactory'] =
       new JobStatusSummaryObjectFactory();
-    upgradedServices['KeyboardShortcutService'] = new KeyboardShortcutService();
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
     upgradedServices['LearnerAnswerDetailsObjectFactory'] =
@@ -816,8 +819,6 @@ export class UpgradedServices {
       new UtilsService);
     upgradedServices['MathEquationInputRulesService'] =
       new MathEquationInputRulesService();
-    upgradedServices['MathExpressionInputRulesService'] =
-      new MathExpressionInputRulesService();
     upgradedServices['MisconceptionObjectFactory'] =
       new MisconceptionObjectFactory();
     upgradedServices['MultipleChoiceInputRulesService'] =
@@ -856,6 +857,7 @@ export class UpgradedServices {
       new QuestionSummaryObjectFactory();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
+    upgradedServices['RatioObjectFactory'] = new RatioObjectFactory();
     upgradedServices['ReviewTestEngineService'] = new ReviewTestEngineService();
     upgradedServices['ReviewTestObjectFactory'] = new ReviewTestObjectFactory();
     upgradedServices['RubricObjectFactory'] =
@@ -879,6 +881,8 @@ export class UpgradedServices {
     upgradedServices['SkillSummaryObjectFactory'] =
       new SkillSummaryObjectFactory();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
+    upgradedServices['StateEditorRefreshService'] =
+      new StateEditorRefreshService();
     upgradedServices['StateGraphLayoutService'] = new StateGraphLayoutService();
     upgradedServices['StateNameService'] = new StateNameService();
     upgradedServices['StateStatsObjectFactory'] = new StateStatsObjectFactory();
@@ -1021,9 +1025,6 @@ export class UpgradedServices {
     upgradedServices['LogicProofValidationService'] =
       new LogicProofValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['MathExpressionInputValidationService'] =
-      new MathExpressionInputValidationService(
-        upgradedServices['baseInteractionValidationService']);
     upgradedServices['MathEquationInputValidationService'] =
       new MathEquationInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -1086,6 +1087,10 @@ export class UpgradedServices {
     upgradedServices['ReadOnlyStoryNodeObjectFactory'] =
         new ReadOnlyStoryNodeObjectFactory(
           upgradedServices['LearnerExplorationSummaryObjectFactory']);
+    upgradedServices['RatioExpressionInputValidationService'] =
+          new RatioExpressionInputValidationService(
+            upgradedServices['RatioObjectFactory'],
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['RecordedVoiceoversObjectFactory'] =
       new RecordedVoiceoversObjectFactory(
         upgradedServices['VoiceoverObjectFactory']);
@@ -1303,13 +1308,13 @@ export class UpgradedServices {
         upgradedServices['ItemSelectionInputRulesService'],
         upgradedServices['LogicProofRulesService'],
         upgradedServices['MathEquationInputRulesService'],
-        upgradedServices['MathExpressionInputRulesService'],
         upgradedServices['MultipleChoiceInputRulesService'],
         upgradedServices['MusicNotesInputRulesService'],
         upgradedServices['NumberWithUnitsRulesService'],
         upgradedServices['NumericExpressionInputRulesService'],
         upgradedServices['NumericInputRulesService'],
         upgradedServices['PencilCodeEditorRulesService'],
+        upgradedServices['RatioExpressionInputRulesService'],
         upgradedServices['SetInputRulesService'],
         upgradedServices['TextInputRulesService']);
     upgradedServices['AudioTranslationLanguageService'] =
@@ -1398,7 +1403,6 @@ export class UpgradedServices {
           upgradedServices['HttpClient'],
           upgradedServices['LearnerDashboardActivityIdsObjectFactory']);
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
-      upgradedServices['ContextService'],
       upgradedServices['PlayerTranscriptService']);
     upgradedServices['PlaythroughBackendApiService'] =
       new PlaythroughBackendApiService(

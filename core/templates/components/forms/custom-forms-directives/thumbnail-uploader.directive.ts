@@ -54,7 +54,8 @@ angular.module('oppia').directive('thumbnailUploader', [
       controller: ['$rootScope', '$scope', '$uibModal',
         'AlertsService', 'ContextService', 'CsrfTokenService',
         'ImageLocalStorageService', 'ImageUploadHelperService',
-        function($rootScope, $scope, $uibModal,
+        function(
+            $rootScope, $scope, $uibModal,
             AlertsService, ContextService, CsrfTokenService,
             ImageLocalStorageService, ImageUploadHelperService) {
           var placeholderImageDataUrl = (
@@ -217,6 +218,7 @@ angular.module('oppia').directive('thumbnailUploader', [
               } else {
                 ImageLocalStorageService.saveImage(
                   filename, data.newThumbnailDataUrl);
+                $scope.localStorageBgcolor = data.newBgColor;
                 ImageLocalStorageService.setThumbnailBgColor(data.newBgColor);
               }
             }, function() {

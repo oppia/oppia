@@ -29,13 +29,13 @@ angular.module('oppia').controller('CreateNewTopicModalController', [
   '$controller', '$rootScope', '$scope', '$uibModalInstance',
   'ContextService', 'ImageLocalStorageService',
   'NewlyCreatedTopicObjectFactory', 'TopicEditorStateService',
-  'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
+  'WindowRef', 'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
   'MAX_CHARS_IN_TOPIC_URL_FRAGMENT',
   function(
       $controller, $rootScope, $scope, $uibModalInstance,
       ContextService, ImageLocalStorageService,
       NewlyCreatedTopicObjectFactory, TopicEditorStateService,
-      MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME,
+      WindowRef, MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME,
       MAX_CHARS_IN_TOPIC_URL_FRAGMENT) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
@@ -45,13 +45,15 @@ angular.module('oppia').controller('CreateNewTopicModalController', [
       topicPropertiesConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
 
     $scope.isValid = function() {
-      return Boolean($scope.newlyCreatedTopic.isValid() &&
-          ImageLocalStorageService.getStoredImagesData().length > 0);
+      return Boolean(
+        $scope.newlyCreatedTopic.isValid() &&
+        ImageLocalStorageService.getStoredImagesData().length > 0);
     };
 
     ContextService.setImageSaveDestinationToLocalStorage();
     $scope.newlyCreatedTopic = (
       NewlyCreatedTopicObjectFactory.createDefault());
+    $scope.hostname = WindowRef.nativeWindow.location.hostname;
     $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
     $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
       MAX_CHARS_IN_TOPIC_DESCRIPTION);

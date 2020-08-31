@@ -27,9 +27,10 @@ from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_domain
-from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_services
+from core.domain import platform_feature_services
+from core.domain import platform_parameter_registry
 from core.domain import question_fetchers
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -40,7 +41,6 @@ from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
-from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -49,7 +49,6 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
-import python_utils
 import utils
 
 (
@@ -341,6 +340,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
 
         topic_id = 'topic'
         story_id = 'story'
@@ -351,13 +351,23 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id, 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
         topic_services.save_new_topic(owner_id, topic)
+        topic_services.publish_topic(topic_id, self.admin_id)
 
         story = story_domain.Story.create_default_story(
             story_id, 'A story', 'Description', topic_id, 'story')
         story_services.save_new_story(owner_id, story)
         topic_services.add_canonical_story(
             owner_id, topic_id, story_id)
+        topic_services.publish_story(topic_id, story_id, self.admin_id)
         story_services.update_story(
             owner_id, story_id, [story_domain.StoryChange({
                 'cmd': 'add_story_node',
@@ -707,6 +717,321 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_get_handler_includes_all_feature_flags(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        feature = platform_parameter_registry.Registry.create_feature_flag(
+            'test_feature_1', 'feature for test.', 'dev')
+
+        feature_list_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+        feature_set_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_NAMES_SET',
+            set([feature.name]))
+        with feature_list_ctx, feature_set_ctx:
+            response_dict = self.get_json('/adminhandler')
+            self.assertEqual(
+                response_dict['feature_flags'], [feature.to_dict()])
+
+        platform_parameter_registry.Registry.parameter_registry.pop(
+            feature.name)
+        self.logout()
+
+    def test_post_with_flag_changes_updates_feature_flags(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        feature = platform_parameter_registry.Registry.create_feature_flag(
+            'test_feature_1', 'feature for test.', 'dev')
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', 'dev']]
+                    }
+                ],
+                'value_when_matched': True
+            }
+        ]
+
+        feature_list_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+        feature_set_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_NAMES_SET',
+            set([feature.name]))
+        with feature_list_ctx, feature_set_ctx:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'update_feature_flag_rules',
+                    'feature_name': feature.name,
+                    'new_rules': new_rule_dicts,
+                    'commit_message': 'test update feature',
+                }, csrf_token=csrf_token)
+
+            rule_dicts = [
+                rule.to_dict() for rule
+                in platform_parameter_registry.Registry.get_platform_parameter(
+                    feature.name).rules
+            ]
+            self.assertEqual(rule_dicts, new_rule_dicts)
+
+        platform_parameter_registry.Registry.parameter_registry.pop(
+            feature.name)
+        self.logout()
+
+    def test_post_flag_changes_correctly_updates_flags_returned_by_getter(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        feature = platform_parameter_registry.Registry.create_feature_flag(
+            'test_feature_1', 'feature for test.', 'dev')
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', 'dev']]
+                    }
+                ],
+                'value_when_matched': True
+            }
+        ]
+
+        feature_list_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+        feature_set_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_NAMES_SET',
+            set([feature.name]))
+        with feature_list_ctx, feature_set_ctx:
+            response_dict = self.get_json('/adminhandler')
+            self.assertEqual(
+                response_dict['feature_flags'], [feature.to_dict()])
+
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'update_feature_flag_rules',
+                    'feature_name': feature.name,
+                    'new_rules': new_rule_dicts,
+                    'commit_message': 'test update feature',
+                }, csrf_token=csrf_token)
+
+            response_dict = self.get_json('/adminhandler')
+            rules = response_dict['feature_flags'][0]['rules']
+            self.assertEqual(rules, new_rule_dicts)
+
+        platform_parameter_registry.Registry.parameter_registry.pop(
+            feature.name)
+        self.logout()
+
+    def test_update_flag_rules_with_invalid_rules_returns_400(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        feature = platform_parameter_registry.Registry.create_feature_flag(
+            'test_feature_1', 'feature for test.', 'dev')
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', 'prod']]
+                    }
+                ],
+                'value_when_matched': True
+            }
+        ]
+
+        feature_list_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+        feature_set_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_NAMES_SET',
+            set([feature.name]))
+        with feature_list_ctx, feature_set_ctx:
+            response = self.post_json(
+                '/adminhandler', {
+                    'action': 'update_feature_flag_rules',
+                    'feature_name': feature.name,
+                    'new_rules': new_rule_dicts,
+                    'commit_message': 'test update feature',
+                },
+                csrf_token=csrf_token,
+                expected_status_int=400
+            )
+            self.assertEqual(
+                response['error'],
+                'Feature in dev stage cannot be enabled in test or production '
+                'environments.')
+
+        platform_parameter_registry.Registry.parameter_registry.pop(
+            feature.name)
+        self.logout()
+
+    def test_update_flag_rules_with_unknown_feature_name_returns_400(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', 'dev']]
+                    }
+                ],
+                'value_when_matched': True
+            }
+        ]
+
+        feature_list_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_LIST', [])
+        feature_set_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_NAMES_SET', set([]))
+        with feature_list_ctx, feature_set_ctx:
+            response = self.post_json(
+                '/adminhandler', {
+                    'action': 'update_feature_flag_rules',
+                    'feature_name': 'test_feature_1',
+                    'new_rules': new_rule_dicts,
+                    'commit_message': 'test update feature',
+                },
+                csrf_token=csrf_token,
+                expected_status_int=400
+            )
+            self.assertEqual(
+                response['error'],
+                'Unknown feature flag: test_feature_1.')
+
+        self.logout()
+
+    def test_update_flag_rules_with_feature_name_of_non_string_type_returns_400(
+            self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'update_feature_flag_rules',
+                'feature_name': 123,
+                'new_rules': [],
+                'commit_message': 'test update feature',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'feature_name should be string, received \'123\'.')
+
+        self.logout()
+
+    def test_update_flag_rules_with_message_of_non_string_type_returns_400(
+            self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'update_feature_flag_rules',
+                'feature_name': 'feature_name',
+                'new_rules': [],
+                'commit_message': 123,
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'commit_message should be string, received \'123\'.')
+
+        self.logout()
+
+    def test_update_flag_rules_with_rules_of_non_list_type_returns_400(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'update_feature_flag_rules',
+                'feature_name': 'feature_name',
+                'new_rules': {},
+                'commit_message': 'test update feature',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'new_rules should be a list of dicts, received \'{}\'.')
+
+        self.logout()
+
+    def test_update_flag_rules_with_rules_of_non_list_of_dict_type_returns_400(
+            self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'update_feature_flag_rules',
+                'feature_name': 'feature_name',
+                'new_rules': [1, 2],
+                'commit_message': 'test update feature',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'new_rules should be a list of dicts, received \'[1, 2]\'.')
+
+        self.logout()
+
+    def test_update_flag_rules_with_unexpected_exception_returns_500(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        feature = platform_parameter_registry.Registry.create_feature_flag(
+            'test_feature_1', 'feature for test.', 'dev')
+        new_rule_dicts = [
+            {
+                'filters': [
+                    {
+                        'type': 'server_mode',
+                        'conditions': [['=', 'dev']]
+                    }
+                ],
+                'value_when_matched': True
+            }
+        ]
+
+        feature_list_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_LIST', [feature.name])
+        feature_set_ctx = self.swap(
+            platform_feature_services, 'ALL_FEATURES_NAMES_SET',
+            set([feature.name]))
+        # Replace the stored instance with None in order to trigger unexpected
+        # exception during update.
+        platform_parameter_registry.Registry.parameter_registry[
+            feature.name] = None
+        with feature_list_ctx, feature_set_ctx:
+            response = self.post_json(
+                '/adminhandler', {
+                    'action': 'update_feature_flag_rules',
+                    'feature_name': feature.name,
+                    'new_rules': new_rule_dicts,
+                    'commit_message': 'test update feature',
+                },
+                csrf_token=csrf_token,
+                expected_status_int=500
+            )
+            self.assertEqual(
+                response['error'],
+                '\'NoneType\' object has no attribute \'serialize\'')
+
+        platform_parameter_registry.Registry.parameter_registry.pop(
+            feature.name)
+        self.logout()
+
 
 class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
     """Test the conditions for generation of dummy explorations."""
@@ -965,467 +1290,6 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response_dict, {username: feconf.ROLE_ID_TOPIC_MANAGER})
 
-        self.logout()
-
-
-class ExplorationsLatexSvgHandlerTest(test_utils.GenericTestBase):
-    """Tests for Saving Math SVGs in explorations."""
-
-    def setUp(self):
-        """Complete the signup process for self.ADMIN_EMAIL."""
-        super(ExplorationsLatexSvgHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
-
-    def test_get_latex_to_svg_mapping(self):
-        user_email = 'user1@example.com'
-        username = 'user1'
-        self.signup(user_email, username)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        multiple_explorations_math_rich_text_info = []
-
-        math_rich_text_info1 = (
-            exp_domain.ExplorationMathRichTextInfo(
-                'exp_id1', True, ['abc1', 'xyz1']))
-        multiple_explorations_math_rich_text_info.append(math_rich_text_info1)
-        math_rich_text_info2 = (
-            exp_domain.ExplorationMathRichTextInfo(
-                'exp_id2', True, ['abc2', 'xyz2']))
-        multiple_explorations_math_rich_text_info.append(math_rich_text_info2)
-        math_rich_text_info3 = (
-            exp_domain.ExplorationMathRichTextInfo(
-                'exp_id3', True, ['abc3', 'xyz3']))
-        multiple_explorations_math_rich_text_info.append(math_rich_text_info3)
-
-        exp_services.save_multi_exploration_math_rich_text_info_model(
-            multiple_explorations_math_rich_text_info)
-
-        response_dict = self.get_json(
-            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
-            params={'item_to_fetch': 'exp_id_to_latex_mapping'})
-        expected_response = {
-            'exp_id1': ['abc1', 'xyz1'],
-            'exp_id2': ['abc2', 'xyz2']
-        }
-        self.assertEqual(
-            response_dict,
-            {'latex_strings_to_exp_id_mapping': expected_response})
-
-    def test_get_when_invalid_item_to_fetch_item_given(self):
-        user_email = 'user1@example.com'
-        username = 'user1'
-        self.signup(user_email, username)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        response_dict = self.get_json(
-            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
-            params={'item_to_fetch': 'invalid'},
-            expected_status_int=400)
-
-        self.assertIn(
-            'Please specify a valid type of item to fetch.',
-            response_dict['error'])
-
-    def test_get_number_explorations_left_to_update(self):
-        user_email = 'user1@example.com'
-        username = 'user1'
-        self.signup(user_email, username)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        multiple_explorations_math_rich_text_info = []
-
-        math_rich_text_info1 = (
-            exp_domain.ExplorationMathRichTextInfo(
-                'exp_id1', True, ['abc1', 'xyz1']))
-        multiple_explorations_math_rich_text_info.append(math_rich_text_info1)
-        math_rich_text_info2 = (
-            exp_domain.ExplorationMathRichTextInfo(
-                'exp_id2', True, ['abc2', 'xyz2']))
-        multiple_explorations_math_rich_text_info.append(math_rich_text_info2)
-        math_rich_text_info3 = (
-            exp_domain.ExplorationMathRichTextInfo(
-                'exp_id3', True, ['abc3', 'xyz3']))
-        multiple_explorations_math_rich_text_info.append(math_rich_text_info3)
-
-        exp_services.save_multi_exploration_math_rich_text_info_model(
-            multiple_explorations_math_rich_text_info)
-
-        response_dict = self.get_json(
-            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
-            params={'item_to_fetch': 'number_of_explorations_left_to_update'})
-        self.assertEqual(
-            response_dict,
-            {'number_of_explorations_left_to_update': '3'})
-
-    def test_post_svgs_when_all_values_are_valid(self):
-        user_email = 'user1@example.com'
-        username = 'user1'
-
-        self.signup(user_email, username)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        editor_id = self.get_user_id_from_email(user_email)
-
-        post_data = {
-            'exp_id1': {
-                '+,+,+,+': {
-                    'latexId': 'latex_id1',
-                    'dimensions': {
-                        'encoded_height_string': '1d429',
-                        'encoded_width_string': '1d33',
-                        'encoded_vertical_padding_string': '0d241'
-                    }
-                },
-                '\\frac{x}{y}': {
-                    'latexId': 'latex_id2',
-                    'dimensions': {
-                        'encoded_height_string': '1d525',
-                        'encoded_width_string': '3d33',
-                        'encoded_vertical_padding_string': '0d241'
-                    }
-                }
-            }
-        }
-        csrf_token = self.get_new_csrf_token()
-        svg_file_1 = (
-            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
-            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
-            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
-            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
-            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
-            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
-            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
-            ' 52 289Z"/></g></svg>'
-        )
-        svg_file_2 = (
-            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
-            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
-            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
-            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
-            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
-            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
-            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
-            ' 52 289Z"/></g></svg>'
-        )
-
-        exploration1 = exp_domain.Exploration.create_default_exploration(
-            'exp_id1', title='title1', category='category')
-
-        exp_services.save_new_exploration(editor_id, exploration1)
-        exp_models.ExplorationMathRichTextInfoModel(
-            id='exp_id1',
-            math_images_generation_required=True,
-            latex_strings_without_svg=['+,+,+,+', '\\frac{x}{y}'],
-            estimated_max_size_of_images_in_bytes=20000).put()
-
-        response_dict = self.post_json(
-            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
-            {'latexMapping': post_data},
-            csrf_token=csrf_token,
-            upload_files=(
-                ('latex_id1', 'latex_id1', svg_file_1),
-                ('latex_id2', 'latex_id2', svg_file_2), ),
-            expected_status_int=200)
-        self.assertEqual(
-            response_dict,
-            {
-                'number_of_explorations_updated': '1',
-                'number_of_explorations_left_to_update': '0'
-            })
-        self.logout()
-
-    def test_post_svgs_when_some_images_are_not_supplied(self):
-        user_email = 'user1@example.com'
-        username = 'user1'
-
-        self.signup(user_email, username)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        editor_id = self.get_user_id_from_email(user_email)
-
-        post_data = {
-            'exp_id1': {
-                '+,+,+,+': {
-                    'latexId': 'latex_id1',
-                    'dimensions': {
-                        'encoded_height_string': '1d429',
-                        'encoded_width_string': '1d33',
-                        'encoded_vertical_padding_string': '0d241'
-                    }
-                },
-                '\\frac{x}{y}': {
-                    'latexId': 'latex_id2',
-                    'dimensions': {
-                        'encoded_height_string': '1d525',
-                        'encoded_width_string': '3d33',
-                        'encoded_vertical_padding_string': '0d241'
-                    }
-                }
-            }
-        }
-        # Check role correctly gets updated.
-        csrf_token = self.get_new_csrf_token()
-        svg_file_1 = (
-            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
-            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
-            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
-            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
-            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
-            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
-            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
-            ' 52 289Z"/></g></svg>'
-        )
-        exploration1 = exp_domain.Exploration.create_default_exploration(
-            'exp_id1', title='title1', category='category')
-
-        exp_services.save_new_exploration(editor_id, exploration1)
-        response_dict = self.post_json(
-            feconf.EXPLORATIONS_LATEX_SVG_HANDLER,
-            {'latexMapping': post_data},
-            csrf_token=csrf_token,
-            upload_files=(
-                ('latex_id1', 'latex_id1', svg_file_1),),
-            expected_status_int=400)
-        self.assertIn(
-            'SVG for LaTeX string \\frac{x}{y} in exploration exp_id1 is not '
-            'supplied.', response_dict['error'])
-        self.logout()
-
-
-class SuggestionsLatexSvgHandlerTest(test_utils.GenericTestBase):
-    """Tests for Saving Math SVGs in suggestions."""
-
-    target_id_1 = 'exp1'
-    target_version_at_submission = 1
-    valid_html_content1 = (
-        '<oppia-noninteractive-math math_content-with-value="{&amp;'
-        'quot;raw_latex&amp;quot;: &amp;quot;-,-,-,-&amp;quot;, &amp;'
-        'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-        '-noninteractive-math>'
-    )
-    valid_html_content2 = (
-        '<oppia-noninteractive-math math_content-with-value="{&amp;'
-        'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
-        'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-        '-noninteractive-math>'
-    )
-    change1 = {
-        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-        'state_name': 'state_1',
-        'new_value': {
-            'content_id': 'content',
-            'html': '<p>Suggestion html</p>'
-        },
-        'old_value': {
-            'content_id': 'content',
-            'html': valid_html_content1
-        }
-    }
-    change2 = {
-        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-        'state_name': 'state_2',
-        'new_value': {
-            'content_id': 'content',
-            'html': '<p>Suggestion html2</p>'
-        },
-        'old_value': {
-            'content_id': 'content',
-            'html': valid_html_content2
-        }
-    }
-
-    class MockExploration(python_utils.OBJECT):
-        """Mocks an exploration. To be used only for testing."""
-
-        def __init__(self, exploration_id, states):
-            self.id = exploration_id
-            self.states = states
-            self.category = 'Algebra'
-
-    # All mock explorations created for testing.
-    explorations = [
-        MockExploration('exp1', {'state_1': {}, 'state_2': {}}),
-        MockExploration('exp2', {'state_1': {}, 'state_2': {}}),
-        MockExploration('exp3', {'state_1': {}, 'state_2': {}}),
-    ]
-
-    def mock_get_exploration_by_id(self, exp_id):
-        for exp in self.explorations:
-            if exp.id == exp_id:
-                return exp
-
-    def setUp(self):
-        """Complete the signup process for self.ADMIN_EMAIL."""
-        super(SuggestionsLatexSvgHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.editor_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        with self.swap(
-            exp_fetchers, 'get_exploration_by_id',
-            self.mock_get_exploration_by_id):
-
-            self.suggestion1 = suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
-                self.target_id_1, self.target_version_at_submission,
-                self.editor_id, self.change1, 'test description')
-
-            self.suggestion2 = suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
-                self.target_id_1, self.target_version_at_submission,
-                self.editor_id, self.change2, 'test description')
-
-    def test_get_latex_to_svg_mapping(self):
-        user_email = 'user1@example.com'
-        username = 'user1'
-        self.signup(user_email, username)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        response_dict = self.get_json(feconf.SUGGESTIONS_LATEX_SVG_HANDLER)
-        expected_response = {
-            self.suggestion1.suggestion_id: ['-,-,-,-'],
-            self.suggestion2.suggestion_id: ['+,+,+,+']
-        }
-        self.assertEqual(
-            response_dict,
-            {'latex_strings_to_suggestion_ids_mapping': expected_response})
-
-    def test_post_svgs_when_all_values_are_valid(self):
-        user_email = 'user1@example.com'
-        username = 'user1'
-
-        self.signup(user_email, username)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        post_data = {
-            self.suggestion1.suggestion_id: {
-                '-,-,-,-': {
-                    'latexId': 'latex_id1',
-                    'dimensions': {
-                        'encoded_height_string': '1d429',
-                        'encoded_width_string': '1d33',
-                        'encoded_vertical_padding_string': '0d241'
-                    }
-                }
-            },
-            self.suggestion2.suggestion_id: {
-                '+,+,+,+': {
-                    'latexId': 'latex_id2',
-                    'dimensions': {
-                        'encoded_height_string': '1d525',
-                        'encoded_width_string': '3d33',
-                        'encoded_vertical_padding_string': '0d241'
-                    }
-                }
-            }
-        }
-        csrf_token = self.get_new_csrf_token()
-        svg_file_1 = (
-            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
-            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
-            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
-            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
-            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
-            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
-            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
-            ' 52 289Z"/></g></svg>'
-        )
-        svg_file_2 = (
-            '<svg xmlns="http://www.w3.org/2000/svg" width="3.33ex" height="1.5'
-            '25ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
-            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
-            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
-            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
-            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
-            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
-            ' 52 289Z"/></g></svg>'
-        )
-
-        response_dict = self.post_json(
-            feconf.SUGGESTIONS_LATEX_SVG_HANDLER,
-            {'latexMapping': post_data},
-            csrf_token=csrf_token,
-            upload_files=(
-                ('latex_id1', 'latex_id1', svg_file_1),
-                ('latex_id2', 'latex_id2', svg_file_2), ),
-            expected_status_int=200)
-        self.assertEqual(
-            response_dict,
-            {
-                'number_of_suggestions_updated': '2'
-            })
-        self.logout()
-
-    def test_post_svgs_when_some_images_are_not_supplied(self):
-        user_email = 'user1@example.com'
-        username = 'user1'
-
-        self.signup(user_email, username)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        post_data = {
-            self.suggestion1.suggestion_id: {
-                '-,-,-,-': {
-                    'latexId': 'latex_id1',
-                    'dimensions': {
-                        'encoded_height_string': '1d429',
-                        'encoded_width_string': '1d33',
-                        'encoded_vertical_padding_string': '0d241'
-                    }
-                }
-            },
-            self.suggestion2.suggestion_id: {
-                '+,+,+,+': {
-                    'latexId': 'latex_id2',
-                    'dimensions': {
-                        'encoded_height_string': '1d525',
-                        'encoded_width_string': '3d33',
-                        'encoded_vertical_padding_string': '0d241'
-                    }
-                }
-            }
-        }
-        csrf_token = self.get_new_csrf_token()
-        svg_file_1 = (
-            '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4'
-            '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="vert'
-            'ical-align: -0.241ex;"><g stroke="currentColor" fill="currentColo'
-            'r" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke'
-            '-width="1" d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404'
-            ' 406 402Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q37'
-            '8 26 414 59T463 140Q466 150 469 151T485 153H489Q504 153 504 145284'
-            ' 52 289Z"/></g></svg>'
-        )
-        response_dict = self.post_json(
-            feconf.SUGGESTIONS_LATEX_SVG_HANDLER,
-            {'latexMapping': post_data},
-            csrf_token=csrf_token,
-            upload_files=(
-                ('latex_id1', 'latex_id1', svg_file_1),),
-            expected_status_int=400)
-        self.assertIn(
-            'SVG for LaTeX string +,+,+,+ in suggestion %s is not '
-            'supplied.' % (self.suggestion2.suggestion_id),
-            response_dict['error'])
-        self.logout()
-
-    def test_post_svgs_when_latex_to_svg_mappings_is_invalid(self):
-        user_email = 'user1@example.com'
-        username = 'user1'
-
-        self.signup(user_email, username)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        post_data = []
-        csrf_token = self.get_new_csrf_token()
-        response_dict = self.post_json(
-            feconf.SUGGESTIONS_LATEX_SVG_HANDLER,
-            {'latexMapping': post_data},
-            csrf_token=csrf_token,
-            expected_status_int=400)
-        self.assertIn(
-            'Expected latex_to_svg_mappings to be a dict.',
-            response_dict['error'])
         self.logout()
 
 
@@ -2378,3 +2242,36 @@ class ContributionReviewerRightsDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(response['error'], 'Missing username param')
         self.logout()
+
+
+class MemoryCacheAdminHandlerTest(test_utils.GenericTestBase):
+    """Tests MemoryCacheAdminHandler."""
+
+    def setUp(self):
+        super(MemoryCacheAdminHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+
+    def test_get_memory_cache_data(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.get_json(
+            '/memorycacheadminhandler')
+        self.assertEqual(
+            response['total_allocation'], 0)
+        self.assertEqual(
+            response['peak_allocation'], 0)
+        self.assertEqual(response['total_keys_stored'], 1)
+
+    def test_flush_memory_cache(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response = self.get_json(
+            '/memorycacheadminhandler')
+        self.assertEqual(response['total_keys_stored'], 1)
+
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/memorycacheadminhandler', {}, csrf_token=csrf_token)
+
+        response = self.get_json(
+            '/memorycacheadminhandler')
+        self.assertEqual(response['total_keys_stored'], 0)

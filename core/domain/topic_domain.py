@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import json
 import re
 
 from constants import constants
@@ -52,6 +53,8 @@ TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES = 'canonical_story_references'
 TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES = 'additional_story_references'
 TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
 TOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment'
+TOPIC_PROPERTY_META_TAG_CONTENT = 'meta_tag_content'
+TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED = 'practice_tab_is_displayed'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
 SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
@@ -113,7 +116,9 @@ class TopicChange(change_domain.BaseChange):
         TOPIC_PROPERTY_LANGUAGE_CODE,
         TOPIC_PROPERTY_THUMBNAIL_FILENAME,
         TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
-        TOPIC_PROPERTY_URL_FRAGMENT)
+        TOPIC_PROPERTY_URL_FRAGMENT,
+        TOPIC_PROPERTY_META_TAG_CONTENT,
+        TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED)
 
     # The allowed list of subtopic properties which can be used in
     # update_subtopic_property command.
@@ -339,7 +344,6 @@ class Subtopic(python_utils.OBJECT):
         self.thumbnail_bg_color = thumbnail_bg_color
         self.url_fragment = url_fragment
 
-
     def to_dict(self):
         """Returns a dict representing this Subtopic domain object.
 
@@ -469,7 +473,8 @@ class Topic(python_utils.OBJECT):
             canonical_story_references, additional_story_references,
             uncategorized_skill_ids, subtopics, subtopic_schema_version,
             next_subtopic_id, language_code, version,
-            story_reference_schema_version, created_on=None,
+            story_reference_schema_version, meta_tag_content,
+            practice_tab_is_displayed, created_on=None,
             last_updated=None):
         """Constructs a Topic domain object.
 
@@ -500,6 +505,9 @@ class Topic(python_utils.OBJECT):
             version: int. The version of the topic.
             story_reference_schema_version: int. The schema version of the
                 story reference object.
+            meta_tag_content: str. The meta tag content in the topic viewer
+                page.
+            practice_tab_is_displayed: bool. Whether the practice tab is shown.
             created_on: datetime.datetime. Date and time when the topic is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -524,6 +532,8 @@ class Topic(python_utils.OBJECT):
         self.last_updated = last_updated
         self.version = version
         self.story_reference_schema_version = story_reference_schema_version
+        self.meta_tag_content = meta_tag_content
+        self.practice_tab_is_displayed = practice_tab_is_displayed
 
     def to_dict(self):
         """Returns a dict representing this Topic domain object.
@@ -556,8 +566,115 @@ class Topic(python_utils.OBJECT):
             'language_code': self.language_code,
             'version': self.version,
             'story_reference_schema_version': (
-                self.story_reference_schema_version)
+                self.story_reference_schema_version),
+            'meta_tag_content': self.meta_tag_content,
+            'practice_tab_is_displayed': self.practice_tab_is_displayed
         }
+
+    def serialize(self):
+        """Returns the object serialized as a JSON string.
+
+        Returns:
+            str. JSON-encoded string encoding all of the information composing
+            the object.
+        """
+        topic_dict = self.to_dict()
+        # The only reason we add the version parameter separately is that our
+        # yaml encoding/decoding of this object does not handle the version
+        # parameter.
+        # NOTE: If this changes in the future (i.e the version parameter is
+        # added as part of the yaml representation of this object), all YAML
+        # files must add a version parameter to their files with the correct
+        # version of this object. The line below must then be moved to
+        # to_dict().
+        topic_dict['version'] = self.version
+
+        if self.created_on:
+            topic_dict['created_on'] = utils.convert_naive_datetime_to_string(
+                self.created_on)
+
+        if self.last_updated:
+            topic_dict['last_updated'] = utils.convert_naive_datetime_to_string(
+                self.last_updated)
+
+        return json.dumps(topic_dict).encode('utf-8')
+
+    @classmethod
+    def from_dict(
+            cls, topic_dict, topic_version=0, topic_created_on=None,
+            topic_last_updated=None):
+        """Returns a Topic domain object from a dictionary.
+
+        Args:
+            topic_dict: dict. The dictionary representation of topic
+                object.
+            topic_version: int. The version of the topic.
+            topic_created_on: datetime.datetime. Date and time when the
+                topic is created.
+            topic_last_updated: datetime.datetime. Date and time when the
+                topic was last updated.
+
+        Returns:
+            Topic. The corresponding Topic domain object.
+        """
+        topic = cls(
+            topic_dict['id'], topic_dict['name'],
+            topic_dict['abbreviated_name'],
+            topic_dict['url_fragment'],
+            topic_dict['thumbnail_filename'],
+            topic_dict['thumbnail_bg_color'], topic_dict['description'],
+            [
+                StoryReference.from_dict(reference_dict)
+                for reference_dict in topic_dict['canonical_story_references']
+            ],
+            [
+                StoryReference.from_dict(reference_dict)
+                for reference_dict in topic_dict['additional_story_references']
+            ],
+            topic_dict['uncategorized_skill_ids'],
+            [
+                Subtopic.from_dict(subtopic_dict)
+                for subtopic_dict in topic_dict['subtopics']
+            ],
+            topic_dict['subtopic_schema_version'],
+            topic_dict['next_subtopic_id'],
+            topic_dict['language_code'], topic_version,
+            topic_dict['story_reference_schema_version'],
+            topic_dict['meta_tag_content'],
+            topic_dict['practice_tab_is_displayed'],
+            topic_created_on,
+            topic_last_updated)
+
+        return topic
+
+    @classmethod
+    def deserialize(cls, json_string):
+        """Returns a Topic domain object decoded from a JSON string.
+
+        Args:
+            json_string: str. A JSON-encoded string that can be
+                decoded into a dictionary representing a Topic. Only call
+                on strings that were created using serialize().
+
+        Returns:
+            Topic. The corresponding Topic domain object.
+        """
+        topic_dict = json.loads(json_string.decode('utf-8'))
+
+        created_on = (
+            utils.convert_string_to_naive_datetime_object(
+                topic_dict['created_on'])
+            if 'created_on' in topic_dict else None)
+        last_updated = (
+            utils.convert_string_to_naive_datetime_object(
+                topic_dict['last_updated'])
+            if 'last_updated' in topic_dict else None)
+        topic = cls.from_dict(
+            topic_dict,
+            topic_version=topic_dict['version'],
+            topic_created_on=created_on,
+            topic_last_updated=last_updated)
+        return topic
 
     @classmethod
     def require_valid_topic_id(cls, topic_id):
@@ -850,6 +967,11 @@ class Topic(python_utils.OBJECT):
         self.require_valid_name(self.name)
         self.require_valid_url_fragment(self.url_fragment)
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
+        if not isinstance(self.practice_tab_is_displayed, bool):
+            raise utils.ValidationError(
+                'Practice tab is displayed property should be a boolean.'
+                'Received %s.' % self.practice_tab_is_displayed)
+        utils.require_valid_meta_tag_content(self.meta_tag_content)
         if self.thumbnail_bg_color is not None and not (
                 self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
             raise utils.ValidationError(
@@ -923,6 +1045,11 @@ class Topic(python_utils.OBJECT):
                         'Subtopic with title %s does not have any skills '
                         'linked.' % subtopic.title)
 
+        if strict:
+            if len(self.subtopics) == 0:
+                raise utils.ValidationError(
+                    'Topic should have at least 1 subtopic.')
+
         if not self.are_subtopic_url_fragments_unique():
             raise utils.ValidationError(
                 'Subtopic url fragments are not unique across '
@@ -992,7 +1119,7 @@ class Topic(python_utils.OBJECT):
             description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
-            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
+            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False)
 
     @classmethod
     def _convert_subtopic_v2_dict_to_v3_dict(cls, subtopic_dict):
@@ -1148,6 +1275,24 @@ class Topic(python_utils.OBJECT):
             new_language_code: str. The updated language code for the topic.
         """
         self.language_code = new_language_code
+
+    def update_meta_tag_content(self, new_meta_tag_content):
+        """Updates the meta tag content of a topic object.
+
+        Args:
+            new_meta_tag_content: str. The updated meta tag content for the
+                topic.
+        """
+        self.meta_tag_content = new_meta_tag_content
+
+    def update_practice_tab_is_displayed(self, new_practice_tab_is_displayed):
+        """Updates the language code of a topic object.
+
+        Args:
+            new_practice_tab_is_displayed: str. The updated practice tab is
+                displayed property for the topic.
+        """
+        self.practice_tab_is_displayed = new_practice_tab_is_displayed
 
     def add_uncategorized_skill_id(self, new_uncategorized_skill_id):
         """Updates the skill id list of a topic object.

@@ -102,25 +102,29 @@ describe('UnitsObjectFactory', () => {
 
   it('should parse valid units strings', () => {
     let UOF = new UnitsObjectFactory();
-    expect(units.fromRawInputString('')
-      .toDict()).toEqual(UOF.fromList([]).toDict());
-    expect(units.fromRawInputString('kg per kg^4 K mol per (N m s^2) K s')
-      .toDict()).toEqual(UOF.fromList([
+    expect(
+      units.fromRawInputString('')
+        .toDict()).toEqual(UOF.fromList([]).toDict());
+    expect(
+      units.fromRawInputString('kg per kg^4 K mol per (N m s^2) K s')
+        .toDict()).toEqual(UOF.fromList([
       { exponent: -3, unit: 'kg' },
       { exponent: 2, unit: 'K' },
       { exponent: 1, unit: 'mol' },
       { exponent: -1, unit: 'N' },
       { exponent: -1, unit: 'm' },
       { exponent: -1, unit: 's' }]).toDict());
-    expect(units.fromRawInputString('cm /(kg / (N m / s^3))')
-      .toDict()).toEqual(UOF.fromList([
+    expect(
+      units.fromRawInputString('cm /(kg / (N m / s^3))')
+        .toDict()).toEqual(UOF.fromList([
       { exponent: 1, unit: 'cm' },
       { exponent: -1, unit: 'kg' },
       { exponent: 1, unit: 'N' },
       { exponent: 1, unit: 'm' },
       { exponent: -3, unit: 's' }]).toDict());
-    expect(units.fromRawInputString('cent per (kg per (N m per s^3) paise)')
-      .toDict()).toEqual(UOF.fromList([
+    expect(
+      units.fromRawInputString('cent per (kg per (N m per s^3) paise)')
+        .toDict()).toEqual(UOF.fromList([
       { exponent: 1, unit: 'cent' },
       { exponent: -1, unit: 'kg' },
       { exponent: 1, unit: 'N' },

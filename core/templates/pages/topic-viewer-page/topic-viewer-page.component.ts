@@ -21,7 +21,6 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
 require('components/skills-mastery-list/skills-mastery-list.directive.ts');
-require('pages/topic-viewer-page/info-tab/topic-info-tab.directive.ts');
 require(
   'pages/topic-viewer-page/stories-list/' +
   'topic-viewer-stories-list.component.ts');
@@ -59,10 +58,8 @@ angular.module('oppia').component('topicViewerPage', {
           ctrl.setActiveTab('subtopics');
         } else if (UrlService.getPathname().endsWith('practice')) {
           ctrl.setActiveTab('practice');
-        } else if (UrlService.getPathname().endsWith('story')) {
-          ctrl.setActiveTab('story');
         } else {
-          ctrl.setActiveTab('info');
+          ctrl.setActiveTab('story');
         }
         ctrl.topicUrlFragment = (
           UrlService.getTopicUrlFragmentFromLearnerUrl());
@@ -76,8 +73,9 @@ angular.module('oppia').component('topicViewerPage', {
           function(readOnlyTopic) {
             ctrl.topicId = readOnlyTopic.getTopicId();
             ctrl.topicName = readOnlyTopic.getTopicName();
-            PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
             ctrl.topicDescription = readOnlyTopic.getTopicDescription();
+            PageTitleService.setPageTitle(
+              `Learn ${ctrl.topicName} | ${ctrl.topicDescription} | Oppia`);
             ctrl.canonicalStorySummaries = (
               readOnlyTopic.getCanonicalStorySummaries());
             ctrl.chapterCount = 0;
@@ -90,13 +88,8 @@ angular.module('oppia').component('topicViewerPage', {
             ctrl.skillDescriptions = readOnlyTopic.getSkillDescriptions();
             ctrl.topicIsLoading = false;
             LoaderService.hideLoadingScreen();
-            ctrl.trainTabShouldBeDisplayed = (
-              readOnlyTopic.getTrainTabShouldBeDisplayed());
-            if (
-              !ctrl.trainTabShouldBeDisplayed &&
-              ctrl.activeTab === 'practice') {
-              ctrl.setActiveTab('info');
-            }
+            ctrl.practiceTabIsDisplayed = (
+              readOnlyTopic.getPracticeTabIsDisplayed());
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the controller is migrated to angular.
             $rootScope.$apply();
