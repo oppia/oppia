@@ -557,7 +557,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
 
         expected_voiceover_application_data = {}
-        expected_contrib_score_data = {}
+        expected_contrib_proficiency_data = {}
         expected_contribution_rights_data = {}
         expected_collection_rights_sm = {}
         expected_collection_sm = {}
@@ -597,7 +597,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_feedback_email_reply_to_id': reply_to_data,
             'general_voiceover_application':
                 expected_voiceover_application_data,
-            'user_proficiency_scoring': expected_contrib_score_data,
+            'user_contribution_proficiency': expected_contrib_proficiency_data,
             'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
                 expected_collection_rights_sm,
@@ -863,7 +863,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'can_review_questions': True
         }
 
-        expected_contrib_score_data = {
+        expected_contrib_proficiency_data = {
             self.SCORE_CATEGORY_1: {
                 'onboarding_email_sent': False,
                 'score': 1.5
@@ -984,7 +984,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_feedback_email_reply_to_id': expected_reply_to_data,
             'general_voiceover_application':
                 expected_voiceover_application_data,
-            'user_proficiency_scoring': expected_contrib_score_data,
+            'user_contribution_proficiency': expected_contrib_proficiency_data,
             'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
                 expected_collection_rights_sm,
