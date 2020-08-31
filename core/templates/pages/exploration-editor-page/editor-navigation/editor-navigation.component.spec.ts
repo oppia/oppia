@@ -113,7 +113,8 @@ describe('Editor Navigation Component', function() {
         }
       };
 
-      spyOnProperty(stateTutorialFirstTimeService,
+      spyOnProperty(
+        stateTutorialFirstTimeService,
         'onOpenPostTutorialHelpPopover').and.returnValue(
         mockOpenPostTutorialHelpPopover);
       $scope = $rootScope.$new();
@@ -205,7 +206,8 @@ describe('Editor Navigation Component', function() {
     });
 
     it('should return if exploration is locked for editing', function() {
-      spyOn(changeListService,
+      spyOn(
+        changeListService,
         'isExplorationLockedForEditing').and.returnValue(true);
       expect($scope.isExplorationLockedForEditing()).toEqual(true);
     });
@@ -258,8 +260,8 @@ describe('Editor Navigation Component', function() {
     });
 
     it('should return the number of changes', function() {
-      spyOn(changeListService,
-        'getChangeList').and.returnValue([]);
+      spyOn(
+        changeListService, 'getChangeList').and.returnValue([]);
       expect($scope.getChangeListLength()).toEqual(0);
     });
 
@@ -369,7 +371,8 @@ describe('Editor Navigation Component', function() {
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
       spyOn(userService, 'getUserInfoAsync').and.returnValue(userInfo);
 
-      spyOnProperty(stateTutorialFirstTimeService,
+      spyOnProperty(
+        stateTutorialFirstTimeService,
         'onOpenPostTutorialHelpPopover').and.returnValue(
         mockOpenPostTutorialHelpPopover);
 
