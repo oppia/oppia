@@ -22,7 +22,9 @@ module.exports = {
   meta: {
     type: 'layout',
     docs: {
-      description: 'There should not be any unused directive.',
+      description: (
+        'There should not be any unused dependency and all dependencies ' +
+        'should be sorted.'),
       category: 'Stylistic Issues',
       recommended: true
     },
