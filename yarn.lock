@@ -3986,8 +3986,11 @@ eslint-plugin-html@^6.0.0:
 
 "eslint-plugin-oppia@file:scripts/linters/custom_eslint_checks":
   version "0.0.0"
-  dependencies:
-    requireindex "~1.1.0"
+
+eslint-plugin-sort-requires@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-sort-requires/-/eslint-plugin-sort-requires-2.1.0.tgz#3efad948dc83798219e809f54067c40e55444861"
+  integrity sha1-PvrZSNyDeYIZ6An1QGfEDlVESGE=
 
 eslint-plugin-unused-imports@^0.1.3:
   version "0.1.3"
@@ -4387,7 +4390,7 @@ extsprintf@^1.2.0:
   resolved "https://registry.yarnpkg.com/extsprintf/-/extsprintf-1.4.0.tgz#e2689f8f356fad62cca65a3a91c5df5f9551692f"
   integrity sha1-4mifjzVvrWLMplo6kcXfX5VRaS8=
 
-fabric@4.1.0:
+fabric@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/fabric/-/fabric-4.1.0.tgz#5585c835198bc8e7707c221a8b7eb1264c2e1e4f"
   integrity sha512-reykTv08IiTHzsr46hv6xSqFuV5jn2itU51DXv5N7iPgmUjbcjjNHNFA/yJJeAxDGOR+5k0N07CfEoL+qVo7oA==
