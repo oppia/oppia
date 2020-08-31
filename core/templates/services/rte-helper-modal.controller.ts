@@ -124,6 +124,14 @@ angular.module('oppia').controller('RteHelperModalController', [
           $uibModalInstance.dismiss('cancel');
           return;
         }
+        var resampledFile = (
+          ImageUploadHelperService.convertImageDataToImageFile(svgFile));
+        const HUNDRED_KB_IN_BYTES = 100 * 1024;
+        if (resampledFile.size > HUNDRED_KB_IN_BYTES) {
+          AlertsService.addWarning('The SVG file generated exceeds 100 KB.');
+          $uibModalInstance.dismiss('cancel');
+          return;
+        }
         if (
           ContextService.getImageSaveDestination() ===
           IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
@@ -137,8 +145,6 @@ angular.module('oppia').controller('RteHelperModalController', [
           $uibModalInstance.close(customizationArgsDict);
           return;
         }
-        var resampledFile = (
-          ImageUploadHelperService.convertImageDataToImageFile(svgFile));
         AssetsBackendApiService.saveMathExpresionImage(
           resampledFile, svgFileName, ContextService.getEntityType(),
           ContextService.getEntityId()).then(function(response) {
