@@ -61,17 +61,20 @@ export class SkillMasteryViewerComponent implements OnInit {
 
   getLearningTips(): string {
     if (this.masteryChange <= 0) {
-      return ('Looks like your mastery of this skill has dropped. ' +
-      'To improve it, try reviewing the concept card below and ' +
-      'then practicing more questions for the skill.');
+      return (
+        'Looks like your mastery of this skill has dropped. ' +
+        'To improve it, try reviewing the concept card below and ' +
+        'then practicing more questions for the skill.');
     }
     if (this.skillMasteryDegree >=
       SkillMasteryListConstants.MASTERY_CUTOFF.GOOD_CUTOFF) {
-      return ('You have mastered this skill very well! ' +
-      'You can work on other skills or learn new skills.');
+      return (
+        'You have mastered this skill very well! ' +
+        'You can work on other skills or learn new skills.');
     }
-    return ('You have made progress! You can increase your ' +
-            'mastery level by doing more practice sessions.');
+    return (
+      'You have made progress! You can increase your ' +
+      'mastery level by doing more practice sessions.');
   }
 }
 

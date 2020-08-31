@@ -2,9 +2,15 @@
   <!-- Question Player -->
   <div class="oppia-question-player" ng-if="!resultsLoaded">
     <div class="oppia-question-player-card">
-      <h3 class="oppia-question-player-header">Question <[$ctrl.currentQuestion]>/<[$ctrl.totalQuestions]></h3>
-      <div class="oppia-question-player-progress">
-        <div class="current-progress" style="width: <[$ctrl.currentProgress]>%"></div>
+      <div ng-show="$ctrl.totalQuestions > 0">
+        <h3 class="oppia-question-player-header">Question <[$ctrl.currentQuestion]>/<[$ctrl.totalQuestions]></h3>
+        <div class="oppia-question-player-progress">
+          <div class="current-progress" style="width: <[$ctrl.currentProgress]>%"></div>
+        </div>
+      </div>
+      <div ng-show="$ctrl.totalQuestions === 0">
+        <h4 class="practice-questions-coming-soon-header">Coming Soon!</h4>
+        <div class="practice-questions-coming-soon-text">There are no questions created yet for the selected subtopic(s). Please check back later!</div>
       </div>
     </div>
     <div class="oppia-question-player-body">
@@ -232,5 +238,19 @@
     justify-content: space-around;
     margin-top: 16px;
     padding: 2px 10px 0;
+  }
+
+  .oppia-question-player-container .practice-questions-coming-soon-header {
+    color: #01645c;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 2em;
+    margin-left: 0;
+    padding-top: 12px;
+    word-break: break-word;
+  }
+
+  .oppia-question-player-container .practice-questions-coming-soon-text {
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 18px;
   }
 </style>

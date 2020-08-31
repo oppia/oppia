@@ -39,6 +39,7 @@ STORY_PROPERTY_DESCRIPTION = 'description'
 STORY_PROPERTY_NOTES = 'notes'
 STORY_PROPERTY_LANGUAGE_CODE = 'language_code'
 STORY_PROPERTY_URL_FRAGMENT = 'url_fragment'
+STORY_PROPERTY_META_TAG_CONTENT = 'meta_tag_content'
 
 STORY_NODE_PROPERTY_DESTINATION_NODE_IDS = 'destination_node_ids'
 STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS = 'acquired_skill_ids'
@@ -103,7 +104,8 @@ class StoryChange(change_domain.BaseChange):
         STORY_PROPERTY_TITLE, STORY_PROPERTY_THUMBNAIL_BG_COLOR,
         STORY_PROPERTY_THUMBNAIL_FILENAME,
         STORY_PROPERTY_DESCRIPTION, STORY_PROPERTY_NOTES,
-        STORY_PROPERTY_LANGUAGE_CODE, STORY_PROPERTY_URL_FRAGMENT)
+        STORY_PROPERTY_LANGUAGE_CODE, STORY_PROPERTY_URL_FRAGMENT,
+        STORY_PROPERTY_META_TAG_CONTENT)
 
     # The allowed list of story node properties which can be used in
     # update_story_node_property command.
@@ -673,8 +675,8 @@ class Story(python_utils.OBJECT):
             self, story_id, title, thumbnail_filename,
             thumbnail_bg_color, description, notes,
             story_contents, story_contents_schema_version, language_code,
-            corresponding_topic_id, version, url_fragment, created_on=None,
-            last_updated=None):
+            corresponding_topic_id, version, url_fragment, meta_tag_content,
+            created_on=None, last_updated=None):
         """Constructs a Story domain object.
 
         Args:
@@ -701,6 +703,8 @@ class Story(python_utils.OBJECT):
             thumbnail_bg_color: str|None. The thumbnail background color of
                 the story.
             url_fragment: str. The url fragment for the story.
+            meta_tag_content: str. The meta tag content in the topic viewer
+                page.
         """
         self.id = story_id
         self.title = title
@@ -716,6 +720,7 @@ class Story(python_utils.OBJECT):
         self.last_updated = last_updated
         self.version = version
         self.url_fragment = url_fragment
+        self.meta_tag_content = meta_tag_content
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
@@ -759,7 +764,7 @@ class Story(python_utils.OBJECT):
             utils.require_valid_url_fragment(
                 self.url_fragment, 'Story Url Fragment',
                 constants.MAX_CHARS_IN_STORY_URL_FRAGMENT)
-
+        utils.require_valid_meta_tag_content(self.meta_tag_content)
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
         if self.thumbnail_bg_color is not None and not (
                 self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
@@ -907,7 +912,8 @@ class Story(python_utils.OBJECT):
             'story_contents': self.story_contents.to_dict(),
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
-            'url_fragment': self.url_fragment
+            'url_fragment': self.url_fragment,
+            'meta_tag_content': self.meta_tag_content
         }
 
     @classmethod
@@ -994,6 +1000,7 @@ class Story(python_utils.OBJECT):
             story_dict['story_contents_schema_version'],
             story_dict['language_code'], story_dict['corresponding_topic_id'],
             story_version, story_dict['url_fragment'],
+            story_dict['meta_tag_content'],
             story_created_on, story_last_updated)
 
         return story
@@ -1025,7 +1032,7 @@ class Story(python_utils.OBJECT):
             feconf.DEFAULT_STORY_NOTES, story_contents,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0,
-            url_fragment)
+            url_fragment, '')
 
     @classmethod
     def _convert_story_contents_v1_dict_to_v2_dict(cls, story_contents_dict):
@@ -1160,6 +1167,15 @@ class Story(python_utils.OBJECT):
             url_fragment: str. The new url fragment of the story.
         """
         self.url_fragment = url_fragment
+
+    def update_meta_tag_content(self, new_meta_tag_content):
+        """Updates the meta tag content of the story.
+
+        Args:
+            new_meta_tag_content: str. The updated meta tag content for the
+                story.
+        """
+        self.meta_tag_content = new_meta_tag_content
 
     def add_node(self, desired_node_id, node_title):
         """Adds a new default node with the id as story_contents.next_node_id.

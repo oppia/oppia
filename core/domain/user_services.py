@@ -1012,6 +1012,16 @@ def _get_user_auth_details_from_model(user_auth_details_model):
 
 
 def _get_pseudonymous_username(pseudonymous_id):
+    """Get the username from pseudonymous ID.
+
+    Args:
+        pseudonymous_id: str. The pseudonymous ID from which to generate
+            the username.
+
+    Returns:
+        str. The pseudonymouse username, strating with 'PseudonymousUser' and
+        ending with six last letters from the pseudonymous_id.
+    """
     return 'PseudonymousUser%s%s' % (
         pseudonymous_id[-6].upper(), pseudonymous_id[-5:])
 

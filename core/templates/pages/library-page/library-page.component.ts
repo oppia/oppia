@@ -70,7 +70,7 @@ angular.module('oppia').component('libraryPage', {
       var MAX_NUM_TILES_PER_ROW = 4;
       var isAnyCarouselCurrentlyScrolling = false;
 
-      ctrl.CLASSROOM_PAGE_IS_SHOWN = false;
+      ctrl.CLASSROOM_PROMOS_ARE_ENABLED = false;
 
       ctrl.setActiveGroup = function(groupIndex) {
         ctrl.activeGroupIndex = groupIndex;
@@ -202,12 +202,14 @@ angular.module('oppia').component('libraryPage', {
         ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
           '/library/' + ctrl.bannerImageFilename);
 
-        var classroomPageIsShownPromise = (
-          ctrl.classroomBackendApiService.fetchClassroomPageIsShownStatusAsync()
-        );
-        classroomPageIsShownPromise.then(
-          function(classroomIsShown) {
-            ctrl.CLASSROOM_PAGE_IS_SHOWN = classroomIsShown;
+        ctrl.getStaticImageUrl = function(imagePath) {
+          return UrlInterpolationService.getStaticImageUrl(imagePath);
+        };
+
+        let service = ctrl.classroomBackendApiService;
+        service.fetchClassroomPromosAreEnabledStatusAsync().then(
+          function(classroomPromosAreEnabled) {
+            ctrl.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
           });
 
         ctrl.activeGroupIndex = null;
@@ -275,13 +277,14 @@ angular.module('oppia').component('libraryPage', {
                           ctrl.activitiesOwned.collections[
                             activitySummaryDict.id] = false;
                         } else {
-                          $log.error('INVALID ACTIVITY TYPE: Activity' +
-                          '(id: ' + activitySummaryDict.id +
-                          ', name: ' + activitySummaryDict.title +
-                          ', type: ' + activitySummaryDict.activity_type +
-                          ') has an invalid activity type, which could ' +
-                          'not be recorded as an exploration or a ' +
-                          'collection.'
+                          $log.error(
+                            'INVALID ACTIVITY TYPE: Activity' +
+                            '(id: ' + activitySummaryDict.id +
+                            ', name: ' + activitySummaryDict.title +
+                            ', type: ' + activitySummaryDict.activity_type +
+                            ') has an invalid activity type, which could ' +
+                            'not be recorded as an exploration or a ' +
+                            'collection.'
                           );
                         }
                       });

@@ -99,7 +99,8 @@ angular.module('oppia').component('stateTranslation', {
       $scope.isVoiceoverModeActive = (
         TranslationTabActiveModeService.isVoiceoverModeActive);
       var isTranslatedTextRequired = function() {
-        return (TranslationTabActiveModeService.isVoiceoverModeActive() &&
+        return (
+          TranslationTabActiveModeService.isVoiceoverModeActive() &&
           TranslationLanguageService.getActiveLanguageCode() !== (
             ExplorationLanguageCodeService.displayed));
       };
@@ -293,8 +294,8 @@ angular.module('oppia').component('stateTranslation', {
             return false;
           }
         } else if (tabId === $scope.TAB_ID_CUSTOMIZATION_ARGS) {
-          return ($scope.interactionCustomizationArgTranslatableContent
-            .length === 0);
+          return (
+            $scope.interactionCustomizationArgTranslatableContent.length === 0);
         }
       };
 
@@ -349,8 +350,9 @@ angular.module('oppia').component('stateTranslation', {
             activeContentId = (
               $scope.stateDefaultOutcome.feedback.getContentId());
           } else {
-            activeContentId = ($scope.stateAnswerGroups[newIndex]
-              .outcome.feedback.getContentId());
+            activeContentId = (
+              $scope.stateAnswerGroups[newIndex]
+                .outcome.feedback.getContentId());
           }
           TranslationTabActiveContentIdService.setActiveContent(
             activeContentId, WRITTEN_TRANSLATION_TYPE_HTML);
@@ -415,14 +417,14 @@ angular.module('oppia').component('stateTranslation', {
               name, content: value
             });
           } else if (value instanceof Array) {
-            value.forEach((element, index) =>
-              traverseValueAndRetrieveSubtitledContent(
+            value.forEach(
+              (element, index) => traverseValueAndRetrieveSubtitledContent(
                 `${name} (${index})`,
                 element)
             );
           } else if (value instanceof Object) {
-            Object.keys(value).forEach(key =>
-              traverseValueAndRetrieveSubtitledContent(
+            Object.keys(value).forEach(
+              key => traverseValueAndRetrieveSubtitledContent(
                 `${name} > ${camelCaseToSentenceCase(key)}`,
                 value[key]
               )
@@ -430,8 +432,8 @@ angular.module('oppia').component('stateTranslation', {
           }
         };
 
-        Object.keys(customizationArgs).forEach(caName =>
-          traverseValueAndRetrieveSubtitledContent(
+        Object.keys(customizationArgs).forEach(
+          caName => traverseValueAndRetrieveSubtitledContent(
             camelCaseToSentenceCase(caName),
             customizationArgs[caName].value));
 

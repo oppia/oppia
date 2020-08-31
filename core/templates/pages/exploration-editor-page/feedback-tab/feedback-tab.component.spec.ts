@@ -50,8 +50,8 @@ describe('Feedback Tab Component', function() {
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('StateEditorRefreshService',
-      TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('StateObjectFactory', TestBed.get(StateObjectFactory));
     $provide.value(
       'SuggestionModalService', TestBed.get(SuggestionModalService));
@@ -92,7 +92,7 @@ describe('Feedback Tab Component', function() {
       }).toThrowError('Trying to display a non-existent thread');
     });
 
-  it('should set active thread successfully', function() {
+  it('should set active thread when it exists', function() {
     var thread = suggestionThreadObjectFactory.createFromBackendDicts({
       status: 'review',
       subject: '',
@@ -150,53 +150,53 @@ describe('Feedback Tab Component', function() {
       expect(ctrl.messageSendingInProgress).toBe(true);
     });
 
-  it('should add new message to a thread successfully and then go back',
-    function() {
-      spyOn(threadDataService, 'getThread').and.returnValue(
-        suggestionThreadObjectFactory.createFromBackendDicts({
-          status: 'Open',
-          subject: '',
-          summary: '',
-          original_author_username: 'Username1',
-          last_updated_msecs: 0,
-          message_count: 1,
-          thread_id: '1',
-        }, {
-          suggestion_type: 'edit_exploration_state_content',
-          suggestion_id: '1',
-          target_type: '',
-          target_id: '',
-          status: '',
-          author_name: '',
-          change: {
-            state_name: '',
-            new_value: '',
-            old_value: '',
-          },
-          last_updated_msecs: 0
-        }));
-      spyOn(threadDataService, 'getMessagesAsync').and.returnValue(
-        $q.resolve());
+  it('should add new message to a thread and then go back to feedback' +
+    ' threads list', function() {
+    spyOn(threadDataService, 'getThread').and.returnValue(
+      suggestionThreadObjectFactory.createFromBackendDicts({
+        status: 'Open',
+        subject: '',
+        summary: '',
+        original_author_username: 'Username1',
+        last_updated_msecs: 0,
+        message_count: 1,
+        thread_id: '1',
+      }, {
+        suggestion_type: 'edit_exploration_state_content',
+        suggestion_id: '1',
+        target_type: '',
+        target_id: '',
+        status: '',
+        author_name: '',
+        change: {
+          state_name: '',
+          new_value: '',
+          old_value: '',
+        },
+        last_updated_msecs: 0
+      }));
+    spyOn(threadDataService, 'getMessagesAsync').and.returnValue(
+      $q.resolve());
 
-      ctrl.setActiveThread('1');
-      $scope.$apply();
+    ctrl.setActiveThread('1');
+    $scope.$apply();
 
-      spyOn(threadDataService, 'addNewMessageAsync').and.returnValue(
-        $q.resolve());
-      ctrl.addNewMessage('1', 'Text', 'Open');
+    spyOn(threadDataService, 'addNewMessageAsync').and.returnValue(
+      $q.resolve());
+    ctrl.addNewMessage('1', 'Text', 'Open');
 
-      expect(ctrl.messageSendingInProgress).toBe(true);
-      $scope.$apply();
+    expect(ctrl.messageSendingInProgress).toBe(true);
+    $scope.$apply();
 
-      expect(ctrl.messageSendingInProgress).toBe(false);
-      expect(ctrl.tmpMessage.status).toBe('Open');
-      expect(ctrl.tmpMessage.text).toBe('');
+    expect(ctrl.messageSendingInProgress).toBe(false);
+    expect(ctrl.tmpMessage.status).toBe('Open');
+    expect(ctrl.tmpMessage.text).toBe('');
 
-      ctrl.onBackButtonClicked();
-      $scope.$apply();
+    ctrl.onBackButtonClicked();
+    $scope.$apply();
 
-      expect(threadDataService.getThread).toHaveBeenCalledWith('1');
-    });
+    expect(threadDataService.getThread).toHaveBeenCalledWith('1');
+  });
 
   it('should use reject handler when trying to add a message in a thread fails',
     function() {
@@ -238,7 +238,8 @@ describe('Feedback Tab Component', function() {
       expect(ctrl.messageSendingInProgress).toBe(false);
     });
 
-  it('should evaluate suggestion button type to be default', function() {
+  it('should evaluate suggestion button type to be default when a feedback' +
+    ' thread is selected', function() {
     var thread = suggestionThreadObjectFactory.createFromBackendDicts({
       status: 'open',
       subject: '',
@@ -270,7 +271,8 @@ describe('Feedback Tab Component', function() {
     expect(ctrl.getSuggestionButtonType()).toBe('default');
   });
 
-  it('should evaluate suggestion button type to be primary', function() {
+  it('should evaluate suggestion button type to be primary when a feedback' +
+    ' thread is selected', function() {
     var thread = suggestionThreadObjectFactory.createFromBackendDicts({
       status: 'review',
       subject: '',
@@ -312,7 +314,7 @@ describe('Feedback Tab Component', function() {
       }).toThrowError('Trying to show suggestion of a non-existent thread');
     });
 
-  it('should open show suggestion modal', function() {
+  it('should open show suggestion modal when active thread exists', function() {
     var getThreadSpy = spyOn(threadDataService, 'getThread');
     getThreadSpy.and.returnValue(
       suggestionThreadObjectFactory.createFromBackendDicts({
@@ -432,17 +434,18 @@ describe('Feedback Tab Component', function() {
       'Not Actionable');
   });
 
-  it('shoud get locale date time string', function() {
-    // This method is being spied to avoid any timezone issues.
-    spyOn(dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString').and
-      .returnValue('11/21/14');
-    // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
-    var NOW_MILLIS = 1416563100000;
-    expect(ctrl.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
-      '11/21/14');
-  });
+  it('should get formatted date string from the timestamp in milliseconds',
+    function() {
+      // This method is being spied to avoid any timezone issues.
+      spyOn(dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString').and
+        .returnValue('11/21/14');
+      // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
+      var NOW_MILLIS = 1416563100000;
+      expect(ctrl.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
+        '11/21/14');
+    });
 
-  it('should evaluate when exploration is editable', function() {
+  it('should evaluate if exploration is editable', function() {
     var isEditableSpy = spyOn(editabilityService, 'isEditable');
 
     isEditableSpy.and.returnValue(true);

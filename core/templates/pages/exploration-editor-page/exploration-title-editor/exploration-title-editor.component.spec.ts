@@ -36,7 +36,8 @@ describe('Exploration Title Editor directive', function() {
     });
   }));
 
-  it('should evaluate controller properties', function() {
-    expect($scope.explorationTitleService).toEqual(ExplorationTitleService);
-  });
+  it('should initialize controller properties after its initialization',
+    function() {
+      expect($scope.explorationTitleService).toEqual(ExplorationTitleService);
+    });
 });
