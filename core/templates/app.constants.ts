@@ -166,6 +166,11 @@ export class AppConstants {
     QUESTION_SUGGESTION: 'question_suggestions'
   };
 
+  public static IMAGE_CONTEXT = {
+    EXPLORATION_SUGGESTIONS: 'exploration_suggestions',
+    QUESTION_SUGGESTIONS: 'question_suggestions'
+  };
+
   public static IMAGE_SAVE_DESTINATION_SERVER = 'imageSaveDestinationServer';
   public static IMAGE_SAVE_DESTINATION_LOCAL_STORAGE =
     'imageSaveDestinationLocalStorage';

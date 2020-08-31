@@ -23,10 +23,8 @@ from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import html_cleaner
-from core.domain import image_validation_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
@@ -704,20 +702,11 @@ class SuggestionAddQuestion(BaseSuggestion):
         html_list = self.get_all_html_content_strings()
         filenames = (
             html_cleaner.get_image_filenames_from_html_strings(html_list))
-        entity_type = fs_services.get_entity_type_for_suggestion_target(
+        image_context = fs_services.get_image_context_for_suggestion_target(
             self.target_type)
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(entity_type, self.target_id))
-        for filename in filenames:
-            image = fs.get('%s/%s' % ('image', filename))
-            file_format = (
-                image_validation_services.validate_image_and_filename(
-                    image, filename))
-            image_is_compressible = (
-                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
-            fs_services.save_original_and_compressed_versions_of_image(
-                filename, feconf.ENTITY_TYPE_QUESTION,
-                question_dict['id'], image, 'image', image_is_compressible)
+        fs_services.copy_images(
+            image_context, self.target_id, feconf.ENTITY_TYPE_QUESTION,
+            self.target_id, filenames)
 
         question_dict['linked_skill_ids'] = [self.change.skill_id]
         question = question_domain.Question.from_dict(question_dict)

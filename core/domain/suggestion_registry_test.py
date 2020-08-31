@@ -1859,9 +1859,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
-        entity_type = fs_services.get_entity_type_for_suggestion_target('skill')
+        image_context = fs_services.get_image_context_for_suggestion_target(
+            'skill')
         fs_services.save_original_and_compressed_versions_of_image(
-            'img.svg', entity_type, 'skill1',
+            'img.svg', image_context, 'skill1',
             raw_image, 'image', False)
         self.save_new_skill('skill1', self.author_id, description='description')
 

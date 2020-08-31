@@ -119,7 +119,8 @@ class SuggestionHandler(base.BaseHandler):
             filenames = []
         if len(filenames) > 0:
             suggestion_image_entity_type = (
-                fs_services.get_entity_type_for_suggestion_target(target_type))
+                fs_services.get_image_context_for_suggestion_target(
+                    target_type))
         for filename in filenames:
             image = self.request.get(filename)
             if not image:
