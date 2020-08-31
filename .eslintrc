@@ -23,6 +23,14 @@
   }],
   "rules": {
     "oppia/break-after-parens": "error",
+    "oppia/file-name": [
+      2,
+      {
+        "typeSeparator":"dot",
+        "nameStyle":"dash",
+        "ignoreTypeSuffix":true
+      }
+    ],
     "angular/di": [
       "error",
       "array"
