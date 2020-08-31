@@ -376,6 +376,7 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
             additional info like IDs.
         """
         # Only commit_cmds of length 2 are processed by this method.
+        assert len(snapshot_model.commit_cmds) == 2
         new_user_ids = [None, None]
         for i, commit_cmd in enumerate(snapshot_model.commit_cmds):
             assignee_id = commit_cmd['assignee_id']
@@ -392,8 +393,9 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
                 new_user_ids[i] = user_settings_model.id
 
         # This loop is used for setting the actual commit_cmds and is separate
-        # because if the second model results in MIGRATION_FAILURE we do not
-        # want to set the first one.
+        # because if the second commit results in MIGRATION_FAILURE we do not
+        # want to set the first one either. We want to either set the correct
+        # user IDs in both commits or we don't want to set it at all.
         for i in python_utils.RANGE(len(snapshot_model.commit_cmds)):
             if new_user_ids[i] is not None:
                 snapshot_model.commit_cmds[i]['assignee_id'] = new_user_ids[i]
