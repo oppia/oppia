@@ -135,7 +135,7 @@ class ExplorationRecommendationsOneOffJobUnitTests(
                     recommendations, [])
 
 
-class DeleteRecommendationsOneOffJobTests(
+class DeleteAllExplorationRecommendationsOneOffJobTests(
         test_utils.GenericTestBase):
     """Test delete exploration recommendations one-off job."""
 
