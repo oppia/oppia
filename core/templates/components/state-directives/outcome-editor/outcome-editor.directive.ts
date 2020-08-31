@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Directives for the outcome editor.
  */
@@ -19,7 +20,8 @@
 require(
   'components/state-directives/outcome-editor/' +
   'outcome-destination-editor.directive.ts');
-require('components/state-directives/outcome-editor/' +
+require(
+  'components/state-directives/outcome-editor/' +
   'outcome-feedback-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 
@@ -30,6 +32,9 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require('services/external-save.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('outcomeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -52,12 +57,15 @@ angular.module('oppia').directive('outcomeEditor', [
         'outcome-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'StateEditorService', 'StateInteractionIdService',
-        'ENABLE_PREREQUISITE_SKILLS', 'INTERACTION_SPECS',
+        '$scope', 'ExternalSaveService', 'StateEditorService',
+        'StateInteractionIdService', 'ENABLE_PREREQUISITE_SKILLS',
+        'INTERACTION_SPECS',
         function(
-            $scope, StateEditorService, StateInteractionIdService,
-            ENABLE_PREREQUISITE_SKILLS, INTERACTION_SPECS) {
+            $scope, ExternalSaveService, StateEditorService,
+            StateInteractionIdService, ENABLE_PREREQUISITE_SKILLS,
+            INTERACTION_SPECS) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           ctrl.isInQuestionMode = function() {
             return StateEditorService.isInQuestionMode();
           };
@@ -147,7 +155,6 @@ angular.module('oppia').directive('outcomeEditor', [
           };
 
           ctrl.saveThisFeedback = function(fromClickSaveFeedbackButton) {
-            $scope.$broadcast('saveOutcomeFeedbackDetails');
             ctrl.feedbackEditorIsOpen = false;
             var contentHasChanged = (
               ctrl.savedOutcome.feedback.getHtml() !==
@@ -166,13 +173,13 @@ angular.module('oppia').directive('outcomeEditor', [
             var feedbackContentId = ctrl.savedOutcome.feedback.getContentId();
             if (fromClickSaveFeedbackButton && contentHasChanged) {
               var contentId = ctrl.savedOutcome.feedback.getContentId();
-              ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(contentId);
+              ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired([contentId]);
             }
             ctrl.getOnSaveFeedbackFn()(ctrl.savedOutcome);
           };
 
           ctrl.saveThisDestination = function() {
-            $scope.$broadcast('saveOutcomeDestDetails');
+            StateEditorService.onSaveOutcomeDestDetails.emit();
             ctrl.destinationEditorIsOpen = false;
             ctrl.savedOutcome.dest = angular.copy(ctrl.outcome.dest);
             if (!ctrl.isSelfLoop(ctrl.outcome)) {
@@ -209,13 +216,15 @@ angular.module('oppia').directive('outcomeEditor', [
           };
 
           ctrl.$onInit = function() {
-            $scope.$on('externalSave', function() {
-              onExternalSave();
-            });
-
-            $scope.$on('onInteractionIdChanged', function() {
-              onExternalSave();
-            });
+            ctrl.directiveSubscriptions.add(
+              ExternalSaveService.onExternalSave.subscribe(
+                () => onExternalSave()
+              )
+            );
+            ctrl.directiveSubscriptions.add(
+              StateInteractionIdService.onInteractionIdChanged.subscribe(
+                () => onExternalSave())
+            );
             ctrl.editOutcomeForm = {};
             ctrl.canAddPrerequisiteSkill = (
               ENABLE_PREREQUISITE_SKILLS &&
@@ -226,6 +235,9 @@ angular.module('oppia').directive('outcomeEditor', [
             // TODO(sll): Investigate whether this line can be removed, due to
             // ctrl.savedOutcome now being set in onExternalSave().
             ctrl.savedOutcome = angular.copy(ctrl.outcome);
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

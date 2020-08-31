@@ -19,11 +19,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
-from core.domain import question_services
 from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
@@ -36,9 +34,6 @@ class TopicViewerPage(base.BaseHandler):
     @acl_decorators.can_access_topic_viewer_page
     def get(self, _):
         """Handles GET requests."""
-
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
 
         self.render_template('topic-viewer-page.mainpage.html')
 
@@ -53,9 +48,6 @@ class TopicPageDataHandler(base.BaseHandler):
     @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name):
         """Handles GET requests."""
-
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
 
         topic = topic_fetchers.get_topic_by_name(topic_name)
         canonical_story_ids = topic.get_canonical_story_ids(
@@ -122,13 +114,6 @@ class TopicPageDataHandler(base.BaseHandler):
             for skill_id in all_skill_ids:
                 degrees_of_mastery[skill_id] = None
 
-        train_tab_should_be_displayed = False
-        if all_skill_ids:
-            questions = question_services.get_questions_by_skill_ids(
-                5, all_skill_ids, False)
-            if len(questions) == 5:
-                train_tab_should_be_displayed = True
-
         self.values.update({
             'topic_id': topic.id,
             'topic_name': topic.name,
@@ -139,6 +124,6 @@ class TopicPageDataHandler(base.BaseHandler):
             'subtopics': subtopics,
             'degrees_of_mastery': degrees_of_mastery,
             'skill_descriptions': skill_descriptions,
-            'train_tab_should_be_displayed': train_tab_should_be_displayed
+            'practice_tab_is_displayed': topic.practice_tab_is_displayed
         })
         self.render_json(self.values)

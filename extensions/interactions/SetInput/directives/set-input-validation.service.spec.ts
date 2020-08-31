@@ -78,14 +78,13 @@ describe('SetInputValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    goodAnswerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
 
-    createAnswerGroupByRules = (rules) => agof.createNew(
-      rules,
-      goodDefaultOutcome,
-      null,
-      null
-    );
+    createAnswerGroupByRules = (rules) => {
+      const answerGroup = agof.createNew(goodDefaultOutcome, null, null);
+      answerGroup.updateRuleTypesToInputs(rules);
+      return answerGroup;
+    };
   });
 
   describe('.getCustomizationArgsWarnings', () => {
@@ -104,6 +103,11 @@ describe('SetInputValidationService', () => {
 
       let warnings = validatorService.getAllWarnings(
         currentState,
+        // This throws "Argument of type '{}' is not assignable to
+        // parameter of type 'SetInputCustomizationArgs'." We are purposely
+        // assigning the wrong type of customization args in order to test
+        // validations.
+        // @ts-expect-error
         badCustomizationArgs,
         goodAnswerGroups,
         goodDefaultOutcome

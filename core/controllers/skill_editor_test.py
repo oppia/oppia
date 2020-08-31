@@ -17,8 +17,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import caching_services
 from core.domain import role_services
-from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
@@ -30,7 +30,6 @@ import feconf
 import utils
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
-memcache_services = models.Registry.import_memcache_services()
 
 
 class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
@@ -59,6 +58,7 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         subtopic.skill_ids = [self.skill_id]
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='name', url_fragment='name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[subtopic], next_subtopic_id=2)
@@ -69,8 +69,8 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         """
         skill_model = skill_models.SkillModel.get(skill_id)
         skill_model.delete(user_id, 'Delete skill model.')
-        skill_memcache_key = skill_fetchers.get_skill_memcache_key(skill_id) # pylint: disable=protected-access
-        memcache_services.delete(skill_memcache_key)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_SKILL, None, [skill_id])
 
     def _mock_update_skill_raise_exception(
             self, unused_committer_id, unused_skill_id, unused_change_list,
@@ -185,6 +185,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='TopicName1',
+            abbreviated_name='topicname', url_fragment='topic-one',
             description='DescriptionTopic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[skill_id],
             subtopics=[], next_subtopic_id=1)
@@ -226,6 +227,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='Maths',
+            abbreviated_name='maths', url_fragment='maths',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[subtopic], next_subtopic_id=2)
@@ -236,6 +238,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='Science',
+            abbreviated_name='science', url_fragment='science',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[subtopic], next_subtopic_id=2)
@@ -273,6 +276,21 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.assertEqual(self.skill_id, json_response['skill']['id'])
         self.assertEqual(
             'New Description', json_response['skill']['description'])
+        self.logout()
+
+    def test_editable_skill_handler_fails_long_commit_message(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        put_payload_copy = self.put_payload.copy()
+        put_payload_copy['commit_message'] = (
+            'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1))
+        json_response = self.put_json(
+            self.url, put_payload_copy, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            json_response['error'],
+            'Commit messages must be at most 1000 characters long.'
+        )
         self.logout()
 
     def test_editable_skill_handler_put_fails(self):
@@ -334,6 +352,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='Topic1',
+            abbreviated_name='topic-one', url_fragment='topic-one',
             description='Description1', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id],

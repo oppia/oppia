@@ -21,7 +21,6 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
 require('components/skills-mastery-list/skills-mastery-list.directive.ts');
-require('pages/topic-viewer-page/info-tab/topic-info-tab.directive.ts');
 require(
   'pages/topic-viewer-page/stories-list/' +
   'topic-viewer-stories-list.component.ts');
@@ -55,18 +54,28 @@ angular.module('oppia').component('topicViewerPage', {
       };
       ctrl.$onInit = function() {
         ctrl.canonicalStorySummaries = [];
-        ctrl.setActiveTab('info');
-        ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
-
-        PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
+        if (UrlService.getPathname().endsWith('revision')) {
+          ctrl.setActiveTab('subtopics');
+        } else if (UrlService.getPathname().endsWith('practice')) {
+          ctrl.setActiveTab('practice');
+        } else {
+          ctrl.setActiveTab('story');
+        }
+        ctrl.topicUrlFragment = (
+          UrlService.getTopicUrlFragmentFromLearnerUrl());
+        ctrl.classroomUrlFragment = (
+          UrlService.getClassroomUrlFragmentFromLearnerUrl());
 
         LoaderService.showLoadingScreen('Loading');
         ctrl.topicIsLoading = true;
-        TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
+        TopicViewerBackendApiService.fetchTopicData(
+          ctrl.topicUrlFragment, ctrl.classroomUrlFragment).then(
           function(readOnlyTopic) {
             ctrl.topicId = readOnlyTopic.getTopicId();
             ctrl.topicName = readOnlyTopic.getTopicName();
             ctrl.topicDescription = readOnlyTopic.getTopicDescription();
+            PageTitleService.setPageTitle(
+              `Learn ${ctrl.topicName} | ${ctrl.topicDescription} | Oppia`);
             ctrl.canonicalStorySummaries = (
               readOnlyTopic.getCanonicalStorySummaries());
             ctrl.chapterCount = 0;
@@ -79,8 +88,8 @@ angular.module('oppia').component('topicViewerPage', {
             ctrl.skillDescriptions = readOnlyTopic.getSkillDescriptions();
             ctrl.topicIsLoading = false;
             LoaderService.hideLoadingScreen();
-            ctrl.trainTabShouldBeDisplayed = (
-              readOnlyTopic.getTrainTabShouldBeDisplayed());
+            ctrl.practiceTabIsDisplayed = (
+              readOnlyTopic.getPracticeTabIsDisplayed());
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the controller is migrated to angular.
             $rootScope.$apply();

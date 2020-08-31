@@ -16,9 +16,11 @@
  * @fileoverview Scripts for the donate page.
  */
 
-// The module needs to be loaded before everything else since it defines the
+// The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/donate-page/donate-page.module.ts');
 require('App.ts');
+require('base-components/base-content.directive.ts');
+require('base-components/oppia-root.directive.ts');
 
 require('pages/OppiaFooterDirective.ts');

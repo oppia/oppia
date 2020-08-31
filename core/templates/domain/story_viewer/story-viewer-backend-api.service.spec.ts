@@ -31,6 +31,7 @@ describe('Story viewer backend API service', () => {
   let httpTestingController: HttpTestingController;
 
   let sampleDataResults = {
+    story_id: 'qwerty',
     story_title: 'Story title',
     story_description: 'Story description',
     story_nodes: [],
@@ -56,10 +57,11 @@ describe('Story viewer backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      storyViewerBackendApiService.fetchStoryData('0').then(
-        successHandler, failHandler);
+      storyViewerBackendApiService.fetchStoryData(
+        'abbrev', 'staging', '0').then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/story_data_handler/0');
+      let req = httpTestingController.expectOne(
+        '/story_data_handler/staging/abbrev/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 

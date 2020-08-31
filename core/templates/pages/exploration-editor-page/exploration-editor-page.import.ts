@@ -17,7 +17,7 @@
  *               help tab in the navbar.
  */
 
-// The module needs to be loaded before everything else since it defines the
+// The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/exploration-editor-page/exploration-editor-page.module.ts');
 require('App.ts');
@@ -31,5 +31,5 @@ require(
   'editor-navigation.component.ts');
 require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
-  'exploration-save-and-publish-buttons.directive.ts');
+  'exploration-save-and-publish-buttons.component.ts');
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');

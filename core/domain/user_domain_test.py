@@ -347,7 +347,6 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         learner_playlist.insert_collection_id_at_given_position(
             'collect_id2', 1)
 
-
         self.assertListEqual(
             learner_playlist.collection_ids,
             ['collect_id0', 'collect_id2', 'collect_id1'])
@@ -396,96 +395,127 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 class UserContributionScoringTests(test_utils.GenericTestBase):
     """Testing domain object for user contribution scoring model."""
 
+    def setUp(self):
+        super(UserContributionScoringTests, self).setUp()
+        self.user_scoring = user_domain.UserContributionScoring(
+            'user_id0', 'category0', 0, False)
+
     def test_initialization(self):
         """Testing init method."""
-        user_contribution_scoring = (user_domain.UserContributionScoring(
-            'user_id0', 'category0', 5, True))
+        self.assertEqual(self.user_scoring.user_id, 'user_id0')
+        self.assertEqual(
+            self.user_scoring.score_category, 'category0')
+        self.assertEqual(self.user_scoring.score, 0)
+        self.assertEqual(
+            self.user_scoring.onboarding_email_sent, False)
 
-        self.assertEqual(user_contribution_scoring.user_id, 'user_id0')
-        self.assertEqual(user_contribution_scoring.score_category, 'category0')
-        self.assertEqual(user_contribution_scoring.score, 5)
-        self.assertEqual(user_contribution_scoring.has_email_been_sent, True)
+    def test_increment_score(self):
+        self.assertEqual(self.user_scoring.score, 0)
+
+        self.user_scoring.increment_score(4)
+        self.assertEqual(self.user_scoring.score, 4)
+
+        self.user_scoring.increment_score(-3)
+        self.assertEqual(self.user_scoring.score, 1)
+
+    def test_can_user_review_category(self):
+        self.assertEqual(self.user_scoring.score, 0)
+        self.assertFalse(self.user_scoring.can_user_review_category())
+
+        self.user_scoring.increment_score(
+            feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
+
+        self.assertTrue(self.user_scoring.can_user_review_category())
+
+    def test_mark_onboarding_email_as_sent(self):
+        self.assertFalse(self.user_scoring.onboarding_email_sent)
+
+        self.user_scoring.mark_onboarding_email_as_sent()
+
+        self.assertTrue(self.user_scoring.onboarding_email_sent)
 
 
-class UserCommunityRightsTests(test_utils.GenericTestBase):
-    """Testing UserCommunityRights domain object."""
+class UserContributionRightsTests(test_utils.GenericTestBase):
+    """Testing UserContributionRights domain object."""
 
     def setUp(self):
-        super(UserCommunityRightsTests, self).setUp()
-        self.user_community_rights = user_domain.UserCommunityRights(
+        super(UserContributionRightsTests, self).setUp()
+        self.user_contribution_rights = user_domain.UserContributionRights(
             'user_id', ['hi'], [], True)
 
     def test_initialization(self):
         """Testing init method."""
 
-        self.assertEqual(self.user_community_rights.id, 'user_id')
+        self.assertEqual(self.user_contribution_rights.id, 'user_id')
         self.assertEqual(
-            self.user_community_rights
+            self.user_contribution_rights
             .can_review_translation_for_language_codes, ['hi'])
         self.assertEqual(
-            self.user_community_rights.can_review_voiceover_for_language_codes,
+            self.user_contribution_rights
+            .can_review_voiceover_for_language_codes,
             [])
-        self.assertEqual(self.user_community_rights.can_review_questions, True)
+        self.assertEqual(
+            self.user_contribution_rights.can_review_questions, True)
 
     def test_can_review_translation_for_language_codes_incorrect_type(self):
-        self.user_community_rights.can_review_translation_for_language_codes = 5
+        self.user_contribution_rights.can_review_translation_for_language_codes = 5 # pylint: disable=line-too-long
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected can_review_translation_for_language_codes to be a list'):
-            self.user_community_rights.validate()
+            self.user_contribution_rights.validate()
 
     def test_can_review_voiceover_for_language_codes_incorrect_type(self):
-        self.user_community_rights.can_review_voiceover_for_language_codes = 5
+        self.user_contribution_rights.can_review_voiceover_for_language_codes = 5 # pylint: disable=line-too-long
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected can_review_voiceover_for_language_codes to be a list'):
-            self.user_community_rights.validate()
+            self.user_contribution_rights.validate()
 
     def test_incorrect_language_code_for_voiceover_raise_error(self):
-        self.user_community_rights.can_review_voiceover_for_language_codes = [
+        self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
             'invalid_lang_code']
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid language_code: invalid_lang_code'):
-            self.user_community_rights.validate()
+            self.user_contribution_rights.validate()
 
     def test_incorrect_language_code_for_translation_raise_error(self):
-        self.user_community_rights.can_review_translation_for_language_codes = [
+        self.user_contribution_rights.can_review_translation_for_language_codes = [ # pylint: disable=line-too-long
             'invalid_lang_code']
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid language_code: invalid_lang_code'):
-            self.user_community_rights.validate()
+            self.user_contribution_rights.validate()
 
     def test_can_review_voiceover_for_language_codes_with_duplicate_values(
             self):
-        self.user_community_rights.can_review_voiceover_for_language_codes = [
+        self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
             'hi']
-        self.user_community_rights.validate()
+        self.user_contribution_rights.validate()
 
-        self.user_community_rights.can_review_voiceover_for_language_codes = [
+        self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
             'hi', 'hi']
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected can_review_voiceover_for_language_codes list not to have '
             'duplicate values'):
-            self.user_community_rights.validate()
+            self.user_contribution_rights.validate()
 
     def test_can_review_translation_for_language_codes_with_duplicate_values(
             self):
-        self.user_community_rights.can_review_translation_for_language_codes = [
+        self.user_contribution_rights.can_review_translation_for_language_codes = [ # pylint: disable=line-too-long
             'hi']
-        self.user_community_rights.validate()
+        self.user_contribution_rights.validate()
 
-        self.user_community_rights.can_review_translation_for_language_codes = [
+        self.user_contribution_rights.can_review_translation_for_language_codes = [ # pylint: disable=line-too-long
             'hi', 'hi']
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected can_review_translation_for_language_codes list not to '
             'have duplicate values'):
-            self.user_community_rights.validate()
+            self.user_contribution_rights.validate()
 
     def test_incorrect_type_for_can_review_questions_raise_error(self):
-        self.user_community_rights.can_review_questions = 5
+        self.user_contribution_rights.can_review_questions = 5
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'Expected can_review_questions to be a boolean value'):
-            self.user_community_rights.validate()
+            self.user_contribution_rights.validate()

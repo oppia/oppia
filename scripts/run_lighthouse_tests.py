@@ -35,15 +35,17 @@ SUBPROCESSES = []
 def cleanup():
     """Deactivates webpages and deletes html lighthouse reports."""
 
-    pattern = 'COMMUNITY_DASHBOARD_ENABLED = .*'
-    replace = 'COMMUNITY_DASHBOARD_ENABLED = False'
+    pattern = 'CONTRIBUTOR_DASHBOARD_ENABLED = .*'
+    replace = 'CONTRIBUTOR_DASHBOARD_ENABLED = False'
     common.inplace_replace_file(FECONF_FILE_PATH, pattern, replace)
 
     pattern = '"ENABLE_ACCOUNT_DELETION": .*'
     replace = '"ENABLE_ACCOUNT_DELETION": false,'
     common.inplace_replace_file(CONSTANTS_FILE_PATH, pattern, replace)
 
-    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_HOME
+    build.set_constants_to_default()
+
+    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
     processes_to_kill = [
         '.*%s.*' % re.escape(google_app_engine_path),
     ]
@@ -52,11 +54,12 @@ def cleanup():
 
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
-    build.set_constants_to_default()
+
+    common.stop_redis_server()
 
 
 def run_lighthouse_checks():
-    """Runs the lighthhouse checks through the lighthouserc.json config."""
+    """Runs the lighthhouse checks through the .lighthouserc.js config."""
 
     node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
@@ -74,8 +77,8 @@ def run_lighthouse_checks():
 def enable_webpages():
     """Enables deactivated webpages for testing."""
 
-    pattern = 'COMMUNITY_DASHBOARD_ENABLED = .*'
-    replace = 'COMMUNITY_DASHBOARD_ENABLED = True'
+    pattern = 'CONTRIBUTOR_DASHBOARD_ENABLED = .*'
+    replace = 'CONTRIBUTOR_DASHBOARD_ENABLED = True'
     common.inplace_replace_file(FECONF_FILE_PATH, pattern, replace)
 
     pattern = '"ENABLE_ACCOUNT_DELETION": .*'
@@ -92,11 +95,9 @@ def start_google_app_engine_server():
         '--clear_datastore=yes --dev_appserver_log_level=critical '
         '--log_level=critical --skip_sdk_update_check=true %s' %
         (
-            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
+            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_SDK_HOME,
             GOOGLE_APP_ENGINE_PORT, app_yaml_filepath
-        ),
-        shell=True)
-
+        ), shell=True)
     SUBPROCESSES.append(p)
 
 
@@ -107,8 +108,11 @@ def main():
     atexit.register(cleanup)
 
     python_utils.PRINT('Building files in production mode.')
-    build.main(args=['--prod_env'])
-    build.modify_constants(prod_env=True)
+    # We are using --source_maps here, so that we have at least one CI check
+    # that builds using source maps in prod env. This is to ensure that
+    # there are no issues while deploying oppia.
+    build.main(args=['--prod_env', '--source_maps'])
+    common.start_redis_server()
     start_google_app_engine_server()
     common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
     run_lighthouse_checks()

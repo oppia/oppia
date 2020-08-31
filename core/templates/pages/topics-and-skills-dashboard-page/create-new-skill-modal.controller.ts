@@ -80,6 +80,18 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
         explanationObject.getHtml());
     };
 
+    $scope.isSkillDescriptionValid = function() {
+      if (
+        !SkillObjectFactory.hasValidDescription(
+          $scope.newSkillDescription)) {
+        $scope.errorMsg = (
+          'Please use a non-empty description consisting of ' +
+            'alphanumeric characters, spaces and/or hyphens.');
+        return false;
+      }
+      return true;
+    };
+
     $scope.createNewSkill = function() {
       if (
         !SkillObjectFactory.hasValidDescription(

@@ -33,6 +33,7 @@ CODEOWNER_FILEPATH = '.github/CODEOWNERS'
 # This list needs to be in sync with the important patterns in the CODEOWNERS
 # file.
 CODEOWNER_IMPORTANT_PATHS = [
+    '/scripts/linters/warranted_angular_security_bypasses.py',
     '/core/controllers/acl_decorators*.py',
     '/core/controllers/base*.py',
     '/core/domain/html*.py',
@@ -196,7 +197,6 @@ def check_codeowner_file(file_cache, verbose_mode_enabled):
     if verbose_mode_enabled:
         python_utils.PRINT('Starting CODEOWNERS file check')
         python_utils.PRINT('----------------------------------------')
-
 
     with linter_utils.redirect_stdout(stdout):
         failed = False

@@ -16,10 +16,11 @@
  * @fileoverview Scripts needed for console_error page.
  */
 
-// The module needs to be loaded before everything else since it defines the
+// The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('tests/console_errors.module.ts');
 
 require('App.ts');
 
 require('base-components/base-content.directive.ts');
+require('base-components/oppia-root.directive.ts');

@@ -26,7 +26,8 @@ angular.module('oppia').directive('topicSummaryTile', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        getTopicSummary: '&topicSummary'
+        getTopicSummary: '&topicSummary',
+        getClassroomUrlFragment: '&classroomUrlFragment'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary-tile/topic-summary-tile.directive.html'),
@@ -42,7 +43,8 @@ angular.module('oppia').directive('topicSummaryTile', [
             $window.open(
               UrlInterpolationService.interpolateUrl(
                 TOPIC_VIEWER_URL_TEMPLATE, {
-                  topic_name: ctrl.getTopicSummary().getName()
+                  topic_url_fragment: ctrl.getTopicSummary().getUrlFragment(),
+                  classroom_url_fragment: ctrl.getClassroomUrlFragment()
                 }), '_self'
             );
           };

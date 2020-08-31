@@ -27,29 +27,30 @@ require('services/alerts.service.ts');
 
 require('pages/collection-editor-page/collection-editor-page.constants.ajs.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('CollectionEditorStateService', [
   '$rootScope', 'AlertsService', 'CollectionObjectFactory',
   'CollectionRightsBackendApiService', 'CollectionRightsObjectFactory',
   'EditableCollectionBackendApiService', 'UndoRedoService',
-  'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
   function(
       $rootScope, AlertsService, CollectionObjectFactory,
       CollectionRightsBackendApiService, CollectionRightsObjectFactory,
-      EditableCollectionBackendApiService, UndoRedoService,
-      EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED) {
+      EditableCollectionBackendApiService, UndoRedoService) {
     var _collection = CollectionObjectFactory.createEmptyCollection();
     var _collectionRights = (
       CollectionRightsObjectFactory.createEmptyCollectionRights());
     var _collectionIsInitialized = false;
     var _collectionIsLoading = false;
     var _collectionIsBeingSaved = false;
+    var _collectionInitializedEventEmitter = new EventEmitter();
 
     var _setCollection = function(collection) {
       _collection.copyFromCollection(collection);
       if (_collectionIsInitialized) {
-        $rootScope.$broadcast(EVENT_COLLECTION_REINITIALIZED);
+        _collectionInitializedEventEmitter.emit();
       } else {
-        $rootScope.$broadcast(EVENT_COLLECTION_INITIALIZED);
+        _collectionInitializedEventEmitter.emit();
         _collectionIsInitialized = true;
       }
     };
@@ -140,8 +141,9 @@ angular.module('oppia').factory('CollectionEditorStateService', [
        * Sets the collection stored within this service, propogating changes to
        * all bindings to the collection returned by getCollection(). The first
        * time this is called it will fire a global event based on the
-       * EVENT_COLLECTION_INITIALIZED constant. All subsequent
-       * calls will similarly fire a EVENT_COLLECTION_REINITIALIZED event.
+       * _collectionInitializedEventEmitter. All subsequent
+       * calls will similarly fire a event based on
+       * _collectionInitializedEventEmitter
        */
       setCollection: function(collection) {
         _setCollection(collection);
@@ -205,6 +207,10 @@ angular.module('oppia').factory('CollectionEditorStateService', [
        */
       isSavingCollection: function() {
         return _collectionIsBeingSaved;
+      },
+
+      get onCollectionInitialized() {
+        return _collectionInitializedEventEmitter;
       }
     };
   }

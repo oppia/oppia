@@ -1,4 +1,4 @@
-<div class="subtopic-card" ng-click="$ctrl.openSubtopicPage()">
+<div class="subtopic-card" ng-click="$ctrl.openSubtopicPage()" ng-class="{'disabled-link': !ctrl.classroomUrlFragment}">
   <div class="subtopic-thumbnail"
        ng-style="{background: $ctrl.subtopic.getThumbnailBgColor()}">
     <img ng-src="<[$ctrl.thumbnailUrl]>"
@@ -23,7 +23,7 @@
 
   subtopic-summary-tile .subtopic-thumbnail {
     border: 1px solid #ffffff;
-    border-radius: 0.4em;
+    border-radius: 0.4em 0.4em 0 0;
     height: 120px;
     text-align: center;
     vertical-align: middle;
@@ -45,7 +45,14 @@
     font-weight: 600;
     height: 100px;
     letter-spacing: 0.5px;
-    padding: 10px 5px 5px 15px;
+    padding: 5px 5px 5px 15px;
+  }
+
+  subtopic-summary-tile .disabled-link,
+  subtopic-summary-tile .disabled-link:hover,
+  subtopic-summary-tile .disabled-link:active {
+    color: #000;
+    cursor: default;
   }
 
   @media(max-width: 1024px) {

@@ -71,8 +71,9 @@ class StoryModel(base_models.VersionedModel):
     # The topic id to which the story belongs.
     corresponding_topic_id = ndb.StringProperty(indexed=True, required=True)
     # The url fragment for the story.
-    # TODO(#10140): Change url_fragment to a required field.
-    url_fragment = ndb.StringProperty(indexed=True)
+    url_fragment = ndb.StringProperty(required=True, indexed=True)
+    # The content of the meta tag in the Story viewer page.
+    meta_tag_content = ndb.StringProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -217,7 +218,7 @@ class StorySummaryModel(base_models.BaseModel):
     thumbnail_bg_color = ndb.StringProperty(indexed=True)
     version = ndb.IntegerProperty(required=True)
     # The url fragment for the story.
-    url_fragment = ndb.StringProperty(indexed=True)
+    url_fragment = ndb.StringProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():

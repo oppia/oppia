@@ -1101,7 +1101,6 @@ class UserStatsModelTest(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-
     def test_export_data_on_existing_user(self):
         """Test if export_data works when user is in data store."""
         user_data = user_models.UserStatsModel.export_data(self.USER_ID_1)
@@ -1898,21 +1897,21 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             user_id=self.USER_1_ID,
             score_category=self.SCORE_CATEGORY_1,
             score=1.5,
-            has_email_been_sent=False
+            onboarding_email_sent=False
         ).put()
         user_models.UserContributionScoringModel(
             id='%s.%s' % (self.SCORE_CATEGORY_2, self.USER_1_ID),
             user_id=self.USER_1_ID,
             score_category=self.SCORE_CATEGORY_2,
             score=2,
-            has_email_been_sent=False
+            onboarding_email_sent=False
         ).put()
         user_models.UserContributionScoringModel(
             id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_2_ID),
             user_id=self.USER_2_ID,
             score_category=self.SCORE_CATEGORY_1,
             score=1.5,
-            has_email_been_sent=False,
+            onboarding_email_sent=False,
             deleted=True
         ).put()
 
@@ -1927,11 +1926,11 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             self.USER_1_ID)
         expected_data = {
             self.SCORE_CATEGORY_1: {
-                'has_email_been_sent': False,
+                'onboarding_email_sent': False,
                 'score': 1.5
             },
             self.SCORE_CATEGORY_2: {
-                'has_email_been_sent': False,
+                'onboarding_email_sent': False,
                 'score': 2
             }
         }
@@ -1984,98 +1983,121 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
     def test_create_entry_already_exists_failure(self):
         user_models.UserContributionScoringModel.create('user1', 'category1', 1)
         with self.assertRaisesRegexp(
-            Exception, 'There is already an entry with the given id:'
-                       ' category1.user1'):
+            Exception, 'There is already a UserContributionScoringModel entry '
+            'with the given id: category1.user1'):
             user_models.UserContributionScoringModel.create(
                 'user1', 'category1', 2)
 
     def test_get_all_users_with_score_above_minimum_for_category(self):
-        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
+        # User scoring models for category 1.
+        user_models.UserContributionScoringModel.create(
+            'user1', 'category1', 1)
         user_models.UserContributionScoringModel.create(
             'user2', 'category1', 21)
         user_models.UserContributionScoringModel.create(
             'user3', 'category1', 11)
         user_models.UserContributionScoringModel.create(
             'user4', 'category1', 11)
+
+        # User scoring models for category 2.
         user_models.UserContributionScoringModel.create(
             'user1', 'category2', 11)
-        user_models.UserContributionScoringModel.create('user2', 'category2', 1)
-        user_models.UserContributionScoringModel.create('user3', 'category2', 1)
-        user_models.UserContributionScoringModel.create('user4', 'category2', 1)
+        user_models.UserContributionScoringModel.create(
+            'user2', 'category2', 1)
+        user_models.UserContributionScoringModel.create(
+            'user3', 'category2', 1)
+        user_models.UserContributionScoringModel.create(
+            'user4', 'category2', 1)
 
-        score_models = (
+        # Get the user score models that have a score high enough for review
+        # for category 1.
+        user_score_models = (
             user_models.UserContributionScoringModel
             .get_all_users_with_score_above_minimum_for_category('category1'))
 
-        self.assertEqual(len(score_models), 3)
-        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
-            'category1.user2'), score_models)
-        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
-            'category1.user3'), score_models)
-        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
-            'category1.user4'), score_models)
+        self.assertEqual(len(user_score_models), 3)
+        self.assertIn(user_models.UserContributionScoringModel.get(
+            'user2', 'category1'), user_score_models)
+        self.assertIn(user_models.UserContributionScoringModel.get(
+            'user3', 'category1'), user_score_models)
+        self.assertIn(user_models.UserContributionScoringModel.get(
+            'user4', 'category1'), user_score_models)
 
-        score_models = (
+        # Get the user score models that have a score high enough for review
+        # for category 2.
+        user_score_models = (
             user_models.UserContributionScoringModel
             .get_all_users_with_score_above_minimum_for_category('category2'))
 
-        self.assertEqual(len(score_models), 1)
-        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
-            'category2.user1'), score_models)
+        self.assertEqual(len(user_score_models), 1)
+        self.assertIn(user_models.UserContributionScoringModel.get(
+            'user1', 'category2'), user_score_models)
 
-    def test_get_score_of_user_for_category(self):
-        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
-
-        score = (
+    def test_get_all_users_with_score_above_minimum_for_category_invalid_input(
+            self):
+        user_score_models = (
             user_models.UserContributionScoringModel
-            .get_score_of_user_for_category('user1', 'category1'))
+            .get_all_users_with_score_above_minimum_for_category(
+                'invalid_category'))
 
-        self.assertEqual(score, 1)
+        self.assertEqual(user_score_models, [])
 
-    def test_increment_score_for_user(self):
-        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
+    def test_get_all_scores_of_user_with_multiple_scores(self):
+        user_models.UserContributionScoringModel.create(
+            'user1', 'category1', 1)
+        user_models.UserContributionScoringModel.create(
+            'user1', 'category2', 1)
+        user_models.UserContributionScoringModel.create(
+            'user1', 'category3', 1)
 
-        user_models.UserContributionScoringModel.increment_score_for_user(
-            'user1', 'category1', 2)
-
-        score = (
-            user_models.UserContributionScoringModel
-            .get_score_of_user_for_category('user1', 'category1'))
-
-        self.assertEqual(score, 3)
-
-    def test_get_all_scores_of_user(self):
-        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
-        user_models.UserContributionScoringModel.create('user1', 'category2', 1)
-        user_models.UserContributionScoringModel.create('user1', 'category3', 1)
-
-        score_models = (
+        user_score_models = (
             user_models.UserContributionScoringModel
             .get_all_scores_of_user('user1'))
-        self.assertEqual(len(score_models), 3)
-        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
-            'category1.user1'), score_models)
-        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
-            'category2.user1'), score_models)
-        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
-            'category3.user1'), score_models)
+
+        self.assertEqual(len(user_score_models), 3)
+        self.assertIn(user_models.UserContributionScoringModel.get(
+            'user1', 'category1'), user_score_models)
+        self.assertIn(user_models.UserContributionScoringModel.get(
+            'user1', 'category2'), user_score_models)
+        self.assertIn(user_models.UserContributionScoringModel.get(
+            'user1', 'category3'), user_score_models)
+
+    def test_get_all_scores_of_user_with_an_invalid_user_id_is_empty(self):
+        user_score_models = (
+            user_models.UserContributionScoringModel
+            .get_all_scores_of_user('invalid_user_id'))
+
+        self.assertEqual(user_score_models, [])
 
     def test_get_categories_where_user_can_review(self):
         user_models.UserContributionScoringModel.create(
-            'user1', 'category1', 15)
-        user_models.UserContributionScoringModel.create('user1', 'category2', 1)
+            'user1', 'category1', feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+        )
         user_models.UserContributionScoringModel.create(
-            'user1', 'category3', 15)
+            'user1', 'category3', feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+        )
+        user_models.UserContributionScoringModel.create(
+            'user1', 'category2', 0
+        )
+
         score_categories = (
             user_models.UserContributionScoringModel
             .get_all_categories_where_user_can_review('user1'))
+
         self.assertIn('category1', score_categories)
         self.assertIn('category3', score_categories)
         self.assertNotIn('category2', score_categories)
 
+    def test_get_categories_where_user_can_review_with_invalid_user_id(self):
+        score_categories = (
+            user_models.UserContributionScoringModel
+            .get_all_categories_where_user_can_review('invalid_user_id'))
 
-class UserCommunityRightsModelTests(test_utils.GenericTestBase):
-    """Tests for UserCommunityRightsModel."""
+        self.assertEqual(score_categories, [])
+
+
+class UserContributionRightsModelTests(test_utils.GenericTestBase):
+    """Tests for UserContributionRightsModel."""
 
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
@@ -2083,60 +2105,60 @@ class UserCommunityRightsModelTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self):
         self.assertEqual(
-            user_models.UserCommunityRightsModel.get_deletion_policy(),
+            user_models.UserContributionRightsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_has_reference_to_user_id(self):
         self.assertFalse(
-            user_models.UserCommunityRightsModel
+            user_models.UserContributionRightsModel
             .has_reference_to_user_id(self.USER_ID_1)
         )
         self.assertFalse(
-            user_models.UserCommunityRightsModel
+            user_models.UserContributionRightsModel
             .has_reference_to_user_id(self.USER_ID_2)
         )
         self.assertFalse(
-            user_models.UserCommunityRightsModel
+            user_models.UserContributionRightsModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
-        user_models.UserCommunityRightsModel(
+        user_models.UserContributionRightsModel(
             id=self.USER_ID_1,
             can_review_translation_for_language_codes=['hi', 'en'],
             can_review_voiceover_for_language_codes=[],
             can_review_questions=False).put()
-        user_models.UserCommunityRightsModel(
+        user_models.UserContributionRightsModel(
             id=self.USER_ID_2,
             can_review_translation_for_language_codes=['hi', 'en'],
             can_review_voiceover_for_language_codes=['hi'],
             can_review_questions=True).put()
 
         self.assertTrue(
-            user_models.UserCommunityRightsModel
+            user_models.UserContributionRightsModel
             .has_reference_to_user_id(self.USER_ID_1)
         )
         self.assertTrue(
-            user_models.UserCommunityRightsModel
+            user_models.UserContributionRightsModel
             .has_reference_to_user_id(self.USER_ID_2)
         )
         self.assertFalse(
-            user_models.UserCommunityRightsModel
+            user_models.UserContributionRightsModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
     def test_export_data_trivial(self):
-        user_data = user_models.UserCommunityRightsModel.export_data(
+        user_data = user_models.UserContributionRightsModel.export_data(
             self.USER_ID_1)
         expected_data = {}
         self.assertEqual(user_data, expected_data)
 
-        user_models.UserCommunityRightsModel(
+        user_models.UserContributionRightsModel(
             id=self.USER_ID_1,
             can_review_translation_for_language_codes=['hi', 'en'],
             can_review_voiceover_for_language_codes=['hi'],
             can_review_questions=True).put()
 
-        user_data = user_models.UserCommunityRightsModel.export_data(
+        user_data = user_models.UserContributionRightsModel.export_data(
             self.USER_ID_1)
         expected_data = {
             'can_review_translation_for_language_codes': ['hi', 'en'],
@@ -2147,23 +2169,23 @@ class UserCommunityRightsModelTests(test_utils.GenericTestBase):
 
     def test_get_translation_reviewer_user_ids(self):
         translation_reviewer_ids = (
-            user_models.UserCommunityRightsModel
+            user_models.UserContributionRightsModel
             .get_translation_reviewer_user_ids('hi'))
         self.assertEqual(len(translation_reviewer_ids), 0)
 
-        user_models.UserCommunityRightsModel(
+        user_models.UserContributionRightsModel(
             id=self.USER_ID_1,
             can_review_translation_for_language_codes=['hi', 'en'],
             can_review_voiceover_for_language_codes=[],
             can_review_questions=False).put()
-        user_models.UserCommunityRightsModel(
+        user_models.UserContributionRightsModel(
             id=self.USER_ID_2,
             can_review_translation_for_language_codes=['hi', 'en'],
             can_review_voiceover_for_language_codes=['hi'],
             can_review_questions=True).put()
 
         translation_reviewer_ids = (
-            user_models.UserCommunityRightsModel
+            user_models.UserContributionRightsModel
             .get_translation_reviewer_user_ids('hi'))
         self.assertEqual(len(translation_reviewer_ids), 2)
         self.assertTrue(self.USER_ID_1 in translation_reviewer_ids)
@@ -2171,23 +2193,23 @@ class UserCommunityRightsModelTests(test_utils.GenericTestBase):
 
     def test_get_voiceover_reviewer_user_ids(self):
         voiceover_reviewer_ids = (
-            user_models.UserCommunityRightsModel
+            user_models.UserContributionRightsModel
             .get_voiceover_reviewer_user_ids('hi'))
         self.assertEqual(len(voiceover_reviewer_ids), 0)
 
-        user_models.UserCommunityRightsModel(
+        user_models.UserContributionRightsModel(
             id=self.USER_ID_1,
             can_review_translation_for_language_codes=['hi', 'en'],
             can_review_voiceover_for_language_codes=[],
             can_review_questions=False).put()
-        user_models.UserCommunityRightsModel(
+        user_models.UserContributionRightsModel(
             id=self.USER_ID_2,
             can_review_translation_for_language_codes=['hi', 'en'],
             can_review_voiceover_for_language_codes=['hi'],
             can_review_questions=True).put()
 
         voiceover_reviewer_ids = (
-            user_models.UserCommunityRightsModel
+            user_models.UserContributionRightsModel
             .get_voiceover_reviewer_user_ids('hi'))
         self.assertEqual(len(voiceover_reviewer_ids), 1)
         self.assertFalse(self.USER_ID_1 in voiceover_reviewer_ids)
@@ -2195,23 +2217,23 @@ class UserCommunityRightsModelTests(test_utils.GenericTestBase):
 
     def test_get_question_reviewer_user_ids(self):
         question_reviewer_ids = (
-            user_models.UserCommunityRightsModel
+            user_models.UserContributionRightsModel
             .get_question_reviewer_user_ids())
         self.assertEqual(len(question_reviewer_ids), 0)
 
-        user_models.UserCommunityRightsModel(
+        user_models.UserContributionRightsModel(
             id=self.USER_ID_1,
             can_review_translation_for_language_codes=['hi', 'en'],
             can_review_voiceover_for_language_codes=[],
             can_review_questions=False).put()
-        user_models.UserCommunityRightsModel(
+        user_models.UserContributionRightsModel(
             id=self.USER_ID_2,
             can_review_translation_for_language_codes=['hi', 'en'],
             can_review_voiceover_for_language_codes=['hi'],
             can_review_questions=True).put()
 
         question_reviewer_ids = (
-            user_models.UserCommunityRightsModel
+            user_models.UserContributionRightsModel
             .get_question_reviewer_user_ids())
         self.assertEqual(len(question_reviewer_ids), 1)
         self.assertFalse(self.USER_ID_1 in question_reviewer_ids)
@@ -2273,80 +2295,116 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
             user_models.PseudonymizedUserModel.get_new_id('exploration')
 
 
-class UserAuthModelTests(test_utils.GenericTestBase):
-    """Tests for UserAuthModel."""
+class UserAuthDetailsModelTests(test_utils.GenericTestBase):
+    """Tests for UserAuthDetailsModel."""
 
-    NONEXISTENT_AUTH_TYPE_NAME = 'id_x'
+    NONEXISTENT_AUTH_METHOD_NAME = 'auth_method_x'
     NONEXISTENT_USER_ID = 'id_x'
     NONREGISTERED_GAE_ID = 'gae_id_x'
     USER_ID = 'user_id'
     USER_GAE_ID = 'gae_id'
-    USER_PIN = '123'
+    USER_PIN = '12345'
+    PROFILE_ID = 'profile_id'
+    PROFILE_PIN = '123'
+    PROFILE_2_ID = 'profile2_id'
+    PROFILE_2_PIN = None
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
-        super(UserAuthModelTests, self).setUp()
+        super(UserAuthDetailsModelTests, self).setUp()
 
-        user_models.UserAuthModel(
+        user_models.UserAuthDetailsModel(
             id=self.USER_ID,
             gae_id=self.USER_GAE_ID,
             pin=self.USER_PIN
         ).put()
+        user_models.UserAuthDetailsModel(
+            id=self.PROFILE_ID,
+            gae_id=None,
+            pin=self.PROFILE_PIN,
+            parent_user_id=self.USER_ID
+        ).put()
+        user_models.UserAuthDetailsModel(
+            id=self.PROFILE_2_ID,
+            gae_id=None,
+            pin=self.PROFILE_2_PIN,
+            parent_user_id=self.USER_ID
+        ).put()
 
     def test_get_export_policy_is_not_applicable(self):
         self.assertEqual(
-            user_models.UserAuthModel.get_export_policy(),
+            user_models.UserAuthDetailsModel.get_export_policy(),
             base_models.EXPORT_POLICY.NOT_APPLICABLE)
 
     def test_get_deletion_policy_is_delete(self):
         self.assertEqual(
-            user_models.UserAuthModel.get_deletion_policy(),
+            user_models.UserAuthDetailsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
-    def test_apply_deletion_policy_registered_user_is_deleted(self):
-        user_models.UserAuthModel.apply_deletion_policy(
-            self.USER_ID)
-        self.assertIsNone(
-            user_models.UserAuthModel.get_by_id(
-                self.USER_ID
-            )
-        )
+    def test_apply_deletion_policy_for_registered_user_deletes_them(self):
+        # Deleting a full user.
+        user_models.UserAuthDetailsModel.apply_deletion_policy(self.USER_ID)
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.USER_ID))
 
-    def test_apply_deletion_policy_nonexistent_user_no_exception_raised(self):
-        user_models.UserAuthModel.apply_deletion_policy(
+        # Deleting a profile user.
+        user_models.UserAuthDetailsModel.apply_deletion_policy(self.PROFILE_ID)
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.PROFILE_ID))
+
+    def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.NONEXISTENT_USER_ID))
+        user_models.UserAuthDetailsModel.apply_deletion_policy(
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_existing_user_id_is_true(self):
+        # For a full user.
         self.assertTrue(
-            user_models.UserAuthModel.has_reference_to_user_id(
+            user_models.UserAuthDetailsModel.has_reference_to_user_id(
                 self.USER_ID)
+        )
+
+        # For a profile user.
+        self.assertTrue(
+            user_models.UserAuthDetailsModel.has_reference_to_user_id(
+                self.PROFILE_ID)
         )
 
     def test_has_reference_to_non_existing_user_id_is_false(self):
         self.assertFalse(
-            user_models.UserAuthModel.has_reference_to_user_id(
+            user_models.UserAuthDetailsModel.has_reference_to_user_id(
                 self.NONEXISTENT_USER_ID)
         )
 
-    def test_get_by_auth_id_with_invalid_auth_type_name_is_none(self):
+    def test_get_by_auth_id_with_invalid_auth_method_name_is_none(self):
+        # For registered gae_id.
         self.assertIsNone(
-            user_models.UserAuthModel.get_by_auth_id(
-                self.NONEXISTENT_AUTH_TYPE_NAME, self.USER_GAE_ID)
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                self.NONEXISTENT_AUTH_METHOD_NAME, self.USER_GAE_ID)
         )
+
+        # For non registered gae_id.
         self.assertIsNone(
-            user_models.UserAuthModel.get_by_auth_id(
-                self.NONEXISTENT_AUTH_TYPE_NAME, self.NONREGISTERED_GAE_ID)
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                self.NONEXISTENT_AUTH_METHOD_NAME, self.NONREGISTERED_GAE_ID)
         )
 
     def test_get_by_auth_id_for_unregistered_auth_id_is_none(self):
         self.assertIsNone(
-            user_models.UserAuthModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, self.NONREGISTERED_GAE_ID)
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.NONREGISTERED_GAE_ID))
+
+    def test_get_by_auth_id_for_correct_user_id_auth_id_mapping(self):
+        self.assertEqual(
+            user_models.UserAuthDetailsModel.get_by_id(self.USER_ID),
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
         )
 
-    def test_get_by_auth_id_for_registered_auth_id_is_correct(self):
-        self.assertEqual(
-            user_models.UserAuthModel.get_by_id(self.USER_ID),
-            user_models.UserAuthModel.get_by_auth_id(
+    def test_get_by_auth_id_registered_auth_id_returns_no_profile_user(self):
+        self.assertNotEqual(
+            user_models.UserAuthDetailsModel.get_by_id(self.PROFILE_ID),
+            user_models.UserAuthDetailsModel.get_by_auth_id(
                 feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
         )

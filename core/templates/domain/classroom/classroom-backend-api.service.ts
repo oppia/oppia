@@ -18,7 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 
 import { ClassroomDomainConstants } from
   'domain/classroom/classroom-domain.constants';
@@ -31,12 +31,12 @@ import { TopicSummaryBackendDict } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-interface ClassroomStatusBackendDict {
-  'classroom_page_is_shown': boolean;
+interface ClassroomPromosStatusBackendDict {
+  'classroom_promos_are_enabled': boolean;
 }
 
 interface ClassroomDataBackendDict {
-  name: string,
+  'name': string,
   'topic_summary_dicts': TopicSummaryBackendDict[],
   'course_details': string,
   'topic_list_intro': string
@@ -53,12 +53,15 @@ export class ClassroomBackendApiService {
     private classroomDataObjectFactory: ClassroomDataObjectFactory
   ) {}
 
-  _fetchClassroomData(classroomName: string,
+  private _initializeTranslationEventEmitter = new EventEmitter<void>();
+
+  _fetchClassroomData(
+      classroomUrlFragment: string,
       successCallback: (value: ClassroomData) => void,
       errorCallback: (reason: string) => void): void {
     let classroomDataUrl = this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE, {
-        classroom_name: classroomName
+        classroom_url_fragment: classroomUrlFragment
       });
 
     this.http.get<ClassroomDataBackendDict>(
@@ -77,15 +80,16 @@ export class ClassroomBackendApiService {
     });
   }
 
-  _fetchClassroomPageIsShownStatus(
+  _fetchClassroomPromosAreEnabledStatus(
       successCallback: (value: boolean) => void,
       errorCallback: (reason: string) => void): void {
-    const classroomStatusHandlerUrl = '/classroom_page_status_handler';
+    const classroomPromosAreEnabledStatusHandlerUrl = (
+      '/classroom_promos_status_handler');
 
-    this.http.get<ClassroomStatusBackendDict>(
-      classroomStatusHandlerUrl).toPromise().then(data => {
+    this.http.get<ClassroomPromosStatusBackendDict>(
+      classroomPromosAreEnabledStatusHandlerUrl).toPromise().then(data => {
       if (successCallback) {
-        successCallback(data.classroom_page_is_shown);
+        successCallback(data.classroom_promos_are_enabled);
       }
     }, errorResponse => {
       if (errorCallback) {
@@ -94,16 +98,22 @@ export class ClassroomBackendApiService {
     });
   }
 
-  fetchClassroomData(classroomName: string): Promise<ClassroomData> {
+  async fetchClassroomDataAsync(
+      classroomUrlFragment: string
+  ): Promise<ClassroomData> {
     return new Promise((resolve, reject) => {
-      this._fetchClassroomData(classroomName, resolve, reject);
+      this._fetchClassroomData(classroomUrlFragment, resolve, reject);
     });
   }
 
-  fetchClassroomPageIsShownStatus(): Promise<boolean> {
+  async fetchClassroomPromosAreEnabledStatusAsync(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._fetchClassroomPageIsShownStatus(resolve, reject);
+      this._fetchClassroomPromosAreEnabledStatus(resolve, reject);
     });
+  }
+
+  get onInitializeTranslation(): EventEmitter<void> {
+    return this._initializeTranslationEventEmitter;
   }
 }
 

@@ -3,6 +3,9 @@
     background: #fff;
     padding: 8px;
   }
+  .oppia-error-message-text {
+    margin-left: 30px;
+  }
 </style>
 
 <div class="graph-input-container">
@@ -17,7 +20,7 @@
              interaction-is-active="$ctrl.interactionIsActive">
   </graph-viz>
   <md-button class="md-raised" ng-click="$ctrl.resetGraph()" ng-disabled="!$ctrl.interactionIsActive" translate="I18N_INTERACTIONS_GRAPH_RESET_BUTTON"></md-button>
-  <span ng-show="$ctrl.errorMessage" style="color: red; margin-left: 30px;" aria-live="assertive">
+  <span ng-show="$ctrl.errorMessage" class="text-danger oppia-error-message-text" aria-live="assertive">
     <[$ctrl.errorMessage | translate]>
   </span>
 </div>

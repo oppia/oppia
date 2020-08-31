@@ -371,7 +371,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             content='<p>Some content</p>',
             rejection_message=None).put()
 
-        user_models.UserCommunityRightsModel(
+        user_models.UserContributionRightsModel(
             id=self.USER_ID_1,
             can_review_translation_for_language_codes=['hi', 'en'],
             can_review_voiceover_for_language_codes=['hi'],
@@ -382,14 +382,14 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             user_id=self.USER_ID_1,
             score_category=self.SCORE_CATEGORY_1,
             score=1.5,
-            has_email_been_sent=False
+            onboarding_email_sent=False
         ).put()
         user_models.UserContributionScoringModel(
             id='%s.%s' % (self.SCORE_CATEGORY_2, self.USER_ID_1),
             user_id=self.USER_ID_1,
             score_category=self.SCORE_CATEGORY_2,
             score=2,
-            has_email_been_sent=False
+            onboarding_email_sent=False
         ).put()
 
         collection_models.CollectionRightsSnapshotMetadataModel(
@@ -558,7 +558,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
         expected_voiceover_application_data = {}
         expected_contrib_score_data = {}
-        expected_community_rights_data = {}
+        expected_contribution_rights_data = {}
         expected_collection_rights_sm = {}
         expected_collection_sm = {}
         expected_skill_sm = {}
@@ -598,7 +598,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_voiceover_application':
                 expected_voiceover_application_data,
             'user_contribution_scoring': expected_contrib_score_data,
-            'user_community_rights': expected_community_rights_data,
+            'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
                 expected_collection_rights_sm,
             'collection_snapshot_metadata':
@@ -857,7 +857,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        expected_community_rights_data = {
+        expected_contribution_rights_data = {
             'can_review_translation_for_language_codes': ['hi', 'en'],
             'can_review_voiceover_for_language_codes': ['hi'],
             'can_review_questions': True
@@ -865,11 +865,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
         expected_contrib_score_data = {
             self.SCORE_CATEGORY_1: {
-                'has_email_been_sent': False,
+                'onboarding_email_sent': False,
                 'score': 1.5
             },
             self.SCORE_CATEGORY_2: {
-                'has_email_been_sent': False,
+                'onboarding_email_sent': False,
                 'score': 2
             }
         }
@@ -877,14 +877,12 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
         expected_collection_sm = {
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
 
@@ -892,28 +890,24 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
         expected_subtopic_page_sm = {
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
         expected_topic_rights_sm = {
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
         expected_topic_sm = {
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
 
@@ -921,21 +915,18 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
         expected_question_sm = {
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
         expected_config_property_sm = {
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
 
@@ -943,29 +934,17 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
 
         expected_exploration_sm = {
             'exp_1-1': {
                 'commit_type': 'create',
-                'commit_cmds': [{
-                    'category': 'A category',
-                    'cmd': 'create_new',
-                    'title': 'A title'
-                }],
                 'commit_message':
                     'New exploration created with title \'A title\'.'
             },
             'exp_1-2': {
                 'commit_type': 'edit',
-                'commit_cmds': [{
-                    'new_value': 'the objective',
-                    'cmd': 'edit_exploration_property',
-                    'old_value': None,
-                    'property_name': 'objective'
-                }],
                 'commit_message': 'Test edit'
             }
         }
@@ -974,7 +953,6 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
                 'commit_message': self.COMMIT_MESSAGE,
-                'commit_cmds': self.COMMIT_CMDS
             }
         }
 
@@ -1007,7 +985,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_voiceover_application':
                 expected_voiceover_application_data,
             'user_contribution_scoring': expected_contrib_score_data,
-            'user_community_rights': expected_community_rights_data,
+            'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
                 expected_collection_rights_sm,
             'collection_snapshot_metadata':

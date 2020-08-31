@@ -1230,8 +1230,8 @@ def send_rejected_voiceover_application_email(
         ' and the reviewer has left a message.'
         '<br><br>Review message: %s<br><br>'
         'You can create a new voiceover application through the'
-        '<a href="https://oppia.org/community-dashboard">'
-        'community dashboard</a> page.<br><br>'
+        '<a href="https://oppia.org/contributor-dashboard">'
+        'contributor dashboard</a> page.<br><br>'
         '- The Oppia Team<br>'
         '<br>%s')
 
@@ -1283,7 +1283,7 @@ def send_account_deleted_email(user_id, user_email):
         recipient_email=user_email)
 
 
-def send_email_to_new_community_reviewer(
+def send_email_to_new_contribution_reviewer(
         user_id, review_category, language_code=None):
     """Sends an email to user who is assigned as a reviewer.
 
@@ -1321,8 +1321,8 @@ def send_email_to_new_community_reviewer(
         'This is to let you know that the Oppia team has added you as a '
         'reviewer for %s. This allows you to %s.<br><br>'
         'You can check the %s waiting for review in the '
-        '<a href="https://www.oppia.org/community-dashboard">'
-        'Community Dashboard</a>.<br><br>'
+        '<a href="https://www.oppia.org/contributor-dashboard">'
+        'Contributor Dashboard</a>.<br><br>'
         'Thanks, and happy contributing!<br><br>'
         'Best wishes,<br>'
         'The Oppia Community')
@@ -1346,7 +1346,7 @@ def send_email_to_new_community_reviewer(
             feconf.NOREPLY_EMAIL_ADDRESS)
 
 
-def send_email_to_removed_community_reviewer(
+def send_email_to_removed_contribution_reviewer(
         user_id, review_category, language_code=None):
     """Sends an email to user who is removed from the reviewer position.
 
@@ -1383,8 +1383,8 @@ def send_email_to_removed_community_reviewer(
         'Hi %s,<br><br>'
         'The Oppia team has removed you from the %s. You won\'t be able to %s '
         'any more, but you can still contribute %s through the '
-        '<a href="https://www.oppia.org/community-dashboard">'
-        'Community Dashboard</a>.<br><br>'
+        '<a href="https://www.oppia.org/contributor-dashboard">'
+        'Contributor Dashboard</a>.<br><br>'
         'Thanks, and happy contributing!<br><br>'
         'Best wishes,<br>'
         'The Oppia Community')

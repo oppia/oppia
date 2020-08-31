@@ -341,6 +341,72 @@ describe('Topic update service', function() {
     }]);
   });
 
+  it('should set/unset changes to a topic\'s meta tag content', function() {
+    expect(_sampleTopic.getMetaTagContent()).toEqual(undefined);
+
+    TopicUpdateService.setMetaTagContent(
+      _sampleTopic, 'new meta tag content');
+    expect(_sampleTopic.getMetaTagContent()).toEqual('new meta tag content');
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getMetaTagContent()).toEqual(undefined);
+  });
+
+  it('should create a proper backend change dict ' +
+    'for changing a topic\'s meta tag content', function() {
+    TopicUpdateService.setMetaTagContent(
+      _sampleTopic, 'new meta tag content');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'meta_tag_content',
+      new_value: 'new meta tag content',
+      old_value: null
+    }]);
+  });
+
+  it('should set/unset changes to a topic\'s practice tab is ' +
+    'displayed property', function() {
+    expect(_sampleTopic.getPracticeTabIsDisplayed()).toBeUndefined();
+
+    TopicUpdateService.setPracticeTabIsDisplayed(_sampleTopic, true);
+    expect(_sampleTopic.getPracticeTabIsDisplayed()).toEqual(true);
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getPracticeTabIsDisplayed()).toBeUndefined();
+  });
+
+  it('should create a proper backend change dict ' +
+    'for changing a topic\'s practice tab is displayed property', function() {
+    TopicUpdateService.setPracticeTabIsDisplayed(_sampleTopic, true);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'practice_tab_is_displayed',
+      new_value: true,
+      old_value: null
+    }]);
+  });
+
+  it('should set/unset changes to a topic\'s url fragment', function() {
+    expect(_sampleTopic.getUrlFragment()).toEqual(undefined);
+
+    TopicUpdateService.setTopicUrlFragment(_sampleTopic, 'new-unique-value');
+    expect(_sampleTopic.getUrlFragment()).toEqual('new-unique-value');
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getUrlFragment()).toEqual(undefined);
+  });
+
+  it('should create a proper backend change dict ' +
+    'for changing a topic\'s url fragment', function() {
+    TopicUpdateService.setTopicUrlFragment(_sampleTopic, 'new-unique-value');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'url_fragment',
+      new_value: 'new-unique-value',
+      old_value: null
+    }]);
+  });
+
   it('should set/unset changes to a topic\'s thumbnail filename', function() {
     expect(_sampleTopic.getThumbnailFilename()).toEqual(undefined);
 

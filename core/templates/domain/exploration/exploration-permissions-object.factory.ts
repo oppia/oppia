@@ -21,13 +21,13 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export interface ExplorationPermissionsBackendDict {
-  'can_unpublish'?: boolean;
-  'can_release_ownership'?: boolean;
-  'can_publish'?: boolean;
-  'can_voiceover'?: boolean;
-  'can_delete'?: boolean;
-  'can_modify_roles'?: boolean;
-  'can_edit'?: boolean;
+  'can_unpublish': boolean;
+  'can_release_ownership': boolean;
+  'can_publish': boolean;
+  'can_voiceover': boolean;
+  'can_delete': boolean;
+  'can_modify_roles': boolean;
+  'can_edit': boolean;
 }
 
 export class ExplorationPermissions {

@@ -60,7 +60,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         expected_topic_dict = {
             'id': self.topic_id,
             'name': 'Name',
-            'abbreviated_name': 'abbrev',
+            'abbreviated_name': 'Name',
+            'url_fragment': 'abbrev',
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
             'description': 'description',
@@ -73,7 +74,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'subtopic_schema_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             'story_reference_schema_version': (
                 feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
-            'version': 0
+            'version': 0,
+            'practice_tab_is_displayed': False,
+            'meta_tag_content': ''
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
 
@@ -488,6 +491,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_strict_validation_error(
             'Subtopic with title Title does not have any skills linked')
 
+        self.topic.subtopics = []
+        self._assert_strict_validation_error(
+            'Topic should have at least 1 subtopic.')
+
     def test_subtopic_title_validation(self):
         self.topic.subtopics[0].title = 1
         self._assert_validation_error('Expected subtopic title to be a string')
@@ -568,6 +575,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Subtopic thumbnail background color is not specified.')
 
+    def test_topic_practice_tab_is_displayed_validation(self):
+        self.topic.practice_tab_is_displayed = 0
+        self._assert_validation_error(
+            'Practice tab is displayed property should be a boolean.'
+            'Received 0.')
+
     def test_subtopic_skill_ids_validation(self):
         self.topic.subtopics[0].skill_ids = 'abc'
         self._assert_validation_error('Expected skill ids to be a list')
@@ -589,6 +602,31 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.name = 'Very long and therefore invalid topic name'
         self._assert_validation_error(
             'Topic name should be at most 39 characters')
+
+    def test_validation_fails_with_invalid_url_fragment(self):
+        self.topic.url_fragment = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Topic URL Fragment field must be a string. Received 0.'):
+            self.topic.validate()
+
+    def test_validation_fails_with_empty_url_fragment(self):
+        self.topic.url_fragment = ''
+        validation_message = 'Topic URL Fragment field should not be empty.'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
+            self.topic.validate()
+
+    def test_validation_fails_with_lengthy_url_fragment(self):
+        self.topic.url_fragment = 'a' * 25
+        url_fragment_char_limit = constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+        validation_message = (
+            'Topic URL Fragment field should not exceed %d characters, '
+            'received %s.' % (
+                url_fragment_char_limit, self.topic.url_fragment))
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
+            self.topic.validate()
 
     def test_subtopic_schema_version_type_validation(self):
         self.topic.subtopic_schema_version = 'invalid_version'
@@ -776,9 +814,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.topic.language_code, 'bn')
 
     def test_update_abbreviated_name(self):
+        self.assertEqual(self.topic.abbreviated_name, 'Name')
+        self.topic.update_abbreviated_name('abbrev')
         self.assertEqual(self.topic.abbreviated_name, 'abbrev')
-        self.topic.update_abbreviated_name('name')
-        self.assertEqual(self.topic.abbreviated_name, 'name')
 
     def test_update_thumbnail_filename(self):
         self.assertEqual(self.topic.thumbnail_filename, None)
@@ -881,6 +919,23 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             Exception,
             'Skill id skill_id_1 is already present in the target subtopic'):
             self.topic.move_skill_id_to_subtopic(1, 2, 'skill_id_1')
+
+    def test_topic_export_import_returns_original_object(self):
+        """Checks that to_dict and from_dict preserves all the data within a
+        Topic during export and import.
+        """
+        topic_dict = self.topic.to_dict()
+        topic_from_dict = topic_domain.Topic.from_dict(topic_dict)
+        self.assertEqual(topic_from_dict.to_dict(), topic_dict)
+
+    def test_serialize_and_deserialize_returns_unchanged_topic(self):
+        """Checks that serializing and then deserializing a default topic
+        works as intended by leaving the topic unchanged.
+        """
+        self.assertEqual(
+            self.topic.to_dict(),
+            topic_domain.Topic.deserialize(
+                self.topic.serialize()).to_dict())
 
 
 class TopicChangeTests(test_utils.GenericTestBase):
@@ -1168,6 +1223,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         current_time = datetime.datetime.utcnow()
         time_in_millisecs = utils.get_time_in_millisecs(current_time)
         self.topic_summary_dict = {
+            'url_fragment': 'url-frag',
             'id': 'topic_id',
             'name': 'name',
             'description': 'topic description',
@@ -1181,12 +1237,12 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': '#C6DCDA',
             'topic_model_created_on': time_in_millisecs,
-            'topic_model_last_updated': time_in_millisecs
+            'topic_model_last_updated': time_in_millisecs,
         }
 
         self.topic_summary = topic_domain.TopicSummary(
             'topic_id', 'name', 'name', 'en', 'topic description',
-            1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', current_time,
+            1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', 'url-frag', current_time,
             current_time)
 
     def _assert_validation_error(self, expected_error_substring):
@@ -1234,6 +1290,31 @@ class TopicSummaryTests(test_utils.GenericTestBase):
     def test_validation_fails_with_empty_name(self):
         self.topic_summary.name = ''
         self._assert_validation_error('Name field should not be empty')
+
+    def test_validation_fails_with_invalid_url_fragment(self):
+        self.topic_summary.url_fragment = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Topic URL Fragment field must be a string. Received 0.'):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_empty_url_fragment(self):
+        self.topic_summary.url_fragment = ''
+        validation_message = 'Topic URL Fragment field should not be empty.'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_lenghty_url_fragment(self):
+        self.topic_summary.url_fragment = 'a' * 25
+        url_fragment_char_limit = constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+        validation_message = (
+            'Topic URL Fragment field should not exceed %d characters, '
+            'received %s.' % (
+                url_fragment_char_limit, self.topic_summary.url_fragment))
+        with self.assertRaisesRegexp(
+            utils.ValidationError, validation_message):
+            self.topic_summary.validate()
 
     def test_validation_fails_with_invalid_description(self):
         self.topic_summary.description = 3

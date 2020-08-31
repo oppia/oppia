@@ -111,10 +111,14 @@ describe('Solution Verification Service', function() {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_specs: [{
-              inputs: {x: 'abc'},
-              rule_type: 'Contains'
-            }]
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Contains: [
+                {
+                  x: 'abc'
+                }
+              ]
+            },
           }],
           customization_args: {
             placeholder: {
@@ -174,7 +178,8 @@ describe('Solution Verification Service', function() {
         interaction: {
           id: 'TextInput',
           answer_groups: [{
-            rule_specs: [],
+            rule_input_translations: {},
+            rule_types_to_inputs: {},
             outcome: {
               dest: 'default',
               feedback: {
@@ -229,17 +234,17 @@ describe('Solution Verification Service', function() {
     siis.savedMemento = 'TextInput';
     ess.saveSolution('First State', sof.createNew(false, 'abc', 'nothing'));
 
-    expect(
-      svs.verifySolution('First State', state.interaction,
-        ess.getState('First State').interaction.solution.correctAnswer)
+    expect(svs.verifySolution(
+      'First State', state.interaction,
+      ess.getState('First State').interaction.solution.correctAnswer)
     ).toBe(true);
 
     see.setInQuestionMode(true);
     state.interaction.answerGroups[0].outcome.dest = 'First State';
     state.interaction.answerGroups[0].outcome.labelledAsCorrect = true;
-    expect(
-      svs.verifySolution('First State', state.interaction,
-        ess.getState('First State').interaction.solution.correctAnswer)
+    expect(svs.verifySolution(
+      'First State', state.interaction,
+      ess.getState('First State').interaction.solution.correctAnswer)
     ).toBe(true);
   });
 
@@ -254,9 +259,9 @@ describe('Solution Verification Service', function() {
     siis.savedMemento = 'TextInput';
     ess.saveSolution('First State', sof.createNew(false, 'xyz', 'nothing'));
 
-    expect(
-      svs.verifySolution('First State', state.interaction,
-        ess.getState('First State').interaction.solution.correctAnswer)
+    expect(svs.verifySolution(
+      'First State', state.interaction,
+      ess.getState('First State').interaction.solution.correctAnswer)
     ).toBe(false);
   });
 });

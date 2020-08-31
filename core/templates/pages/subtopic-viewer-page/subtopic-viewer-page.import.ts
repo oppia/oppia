@@ -16,7 +16,7 @@
  * @fileoverview Directive scripts for the subtopic viewer.
  */
 
-// The module needs to be loaded before everything else since it defines the
+// The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/subtopic-viewer-page/subtopic-viewer-page.module.ts');
 require('App.ts');

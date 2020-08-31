@@ -26,9 +26,10 @@ angular.module('oppia').directive('subtopicSummaryTile', [
       restrict: 'E',
       scope: {},
       bindToController: {
+        classroomUrlFragment: '<',
         subtopic: '<',
         topicId: '<',
-        topicName: '<'
+        topicUrlFragment: '<'
       },
       template: require('./subtopic-summary-tile.directive.html'),
       controllerAs: '$ctrl',
@@ -40,11 +41,17 @@ angular.module('oppia').directive('subtopicSummaryTile', [
             SUBTOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.openSubtopicPage = function() {
+            // This component is being used in the topic editor as well and
+            // we want to disable the linking in this case.
+            if (!ctrl.classroomUrlFragment || !ctrl.topicUrlFragment) {
+              return;
+            }
             $window.open(
               UrlInterpolationService.interpolateUrl(
                 SUBTOPIC_VIEWER_URL_TEMPLATE, {
-                  topic_name: ctrl.topicName,
-                  subtopic_id: ctrl.subtopic.getId().toString()
+                  classroom_url_fragment: ctrl.classroomUrlFragment,
+                  topic_url_fragment: ctrl.topicUrlFragment,
+                  subtopic_url_fragment: ctrl.subtopic.getUrlFragment()
                 }
               ), '_self'
             );
@@ -54,7 +61,7 @@ angular.module('oppia').directive('subtopicSummaryTile', [
             if (ctrl.subtopic.getThumbnailFilename()) {
               ctrl.thumbnailUrl = (
                 AssetsBackendApiService.getThumbnailUrlForPreview(
-                  ENTITY_TYPE.TOPIC, ctrl.getTopicId(),
+                  ENTITY_TYPE.TOPIC, ctrl.topicId,
                   ctrl.subtopic.getThumbnailFilename()));
             } else {
               ctrl.thumbnailUrl = null;
@@ -72,9 +79,10 @@ import { UpgradeComponent } from '@angular/upgrade/static';
   selector: 'subtopic-summary-tile'
 })
 export class SubtopicSummaryTileDirective extends UpgradeComponent {
+  @Input() classroomUrlFragment;
   @Input() subtopic;
   @Input() topicId;
-  @Input() topicName;
+  @Input() topicUrlFragment;
   constructor(elementRef: ElementRef, injector: Injector) {
     super('subtopicSummaryTile', elementRef, injector);
   }

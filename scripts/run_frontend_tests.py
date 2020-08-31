@@ -29,6 +29,12 @@ from . import check_frontend_coverage
 from . import common
 from . import install_third_party_libs
 
+# These is a relative path from the oppia/ folder. They are relative because the
+# dtslint command prepends the current working directory to the path, even if
+# the given path is absolute.
+DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH = os.path.join('typings', 'tests')
+TYPESCRIPT_DIR_RELATIVE_PATH = os.path.join('node_modules', 'typescript', 'lib')
+
 _PARSER = argparse.ArgumentParser(
     description="""
 Run this script from the oppia root folder:
@@ -38,6 +44,11 @@ Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run
 a single test or test suite.
 """)
 
+_PARSER.add_argument(
+    '--dtslint_only',
+    help='optional; if specified, only runs dtslint type tests.',
+    action='store_true'
+)
 _PARSER.add_argument(
     '--skip_install',
     help='optional; if specified, skips installing dependencies',
@@ -54,9 +65,39 @@ _PARSER.add_argument(
 )
 
 
+def run_dtslint_type_tests():
+    """Runs the dtslint type tests in typings/tests."""
+    python_utils.PRINT('Running dtslint type tests.')
+
+    # Pass the local version of typescript. Otherwise, dtslint will download and
+    # install all versions of typescript.
+    cmd = ['./node_modules/dtslint/bin/index.js',
+           DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH,
+           '--localTs',
+           TYPESCRIPT_DIR_RELATIVE_PATH]
+    task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    output_lines = []
+    # Reads and prints realtime output from the subprocess until it terminates.
+    while True:
+        line = task.stdout.readline()
+        # No more output from the subprocess, and the subprocess has ended.
+        if len(line) == 0 and task.poll() is not None:
+            break
+        if line:
+            python_utils.PRINT(line, end='')
+            output_lines.append(line)
+    python_utils.PRINT('Done!')
+    if task.returncode:
+        sys.exit('The dtslint (type tests) failed.')
+
+
 def main(args=None):
     """Runs the frontend tests."""
     parsed_args = _PARSER.parse_args(args=args)
+
+    run_dtslint_type_tests()
+    if parsed_args.dtslint_only:
+        return
 
     if not parsed_args.skip_install:
         install_third_party_libs.main()
@@ -66,7 +107,6 @@ def main(args=None):
         '../karma_coverage_reports',
         'on your filesystem.',
         'Running test in development environment'])
-
 
     if parsed_args.run_minified_tests:
         python_utils.PRINT('Running test in production environment')
@@ -104,7 +144,7 @@ def main(args=None):
         python_utils.PRINT(
             'If you run into the error "Trying to get the Angular injector",'
             ' please see https://github.com/oppia/oppia/wiki/'
-            'Frontend-test-best-practices#fixing-frontend-test-errors'
+            'Frontend-unit-tests-guide#how-to-handle-common-errors'
             ' for details on how to fix it.')
 
     if parsed_args.check_coverage:

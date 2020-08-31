@@ -16,11 +16,11 @@
  * @fileoverview Scripts for the review tests.
  */
 
-// The module needs to be loaded before everything else since it defines the
+// The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/review-test-page/review-test-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('base-components/base-content.directive.ts');
-require('pages/review-test-page/review-test-page.directive.ts');
+require('pages/review-test-page/review-test-page.component.ts');

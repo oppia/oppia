@@ -144,8 +144,13 @@ _PARSER.add_argument(
     choices=['critical', 'error', 'warning', 'info'])
 
 _PARSER.add_argument(
-    '--community_dashboard_enabled', action='store_true',
-    help='Run the test after enabling the community dashboard page.')
+    '--contributor_dashboard_enabled', action='store_true',
+    help='Run the test after enabling the contributor dashboard page.')
+
+_PARSER.add_argument(
+    '--source_maps',
+    help='Build webpack with source maps.',
+    action='store_true')
 
 # This list contains the sub process triggered by this script. This includes
 # the oppia web server.
@@ -168,7 +173,7 @@ def cleanup():
     """Kill the running subprocesses and server fired in this program, set
     constants back to default values.
     """
-    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_HOME
+    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
     webdriver_download_path = '%s/selenium' % WEBDRIVER_HOME_PATH
     if common.is_windows_os():
         # In windows system, the java command line will use absolute path.
@@ -183,6 +188,7 @@ def cleanup():
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
     build.set_constants_to_default()
+    common.stop_redis_server()
 
 
 def is_oppia_server_already_running():
@@ -204,15 +210,18 @@ def is_oppia_server_already_running():
     return running
 
 
-def run_webpack_compilation():
+def run_webpack_compilation(source_maps=False):
     """Runs webpack compilation."""
     max_tries = 5
     webpack_bundles_dir_name = 'webpack_bundles'
     for _ in python_utils.RANGE(max_tries):
         try:
+            webpack_config_file = (
+                build.WEBPACK_DEV_SOURCE_MAPS_CONFIG if source_maps
+                else build.WEBPACK_DEV_CONFIG)
             subprocess.check_call([
                 common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
-                'webpack.dev.config.ts'])
+                webpack_config_file])
         except subprocess.CalledProcessError as error:
             python_utils.PRINT(error.output)
             sys.exit(error.returncode)
@@ -238,18 +247,19 @@ def run_webdriver_manager(parameters):
     p.communicate()
 
 
-def update_community_dashboard_status_in_feconf_file(
-        feconf_file_path, enable_community_dashboard):
-    """Change feconf.py file based on whether the community dashboard is
+def update_contributor_dashboard_status_in_feconf_file(
+        feconf_file_path, enable_contributor_dashboard):
+    """Change feconf.py file based on whether the contributor dashboard is
     enabled.
 
     Args:
         feconf_file_path: str. Path to the feconf.py file.
-        enable_community_dashboard: bool. Represents whether community
+        enable_contributor_dashboard: bool. Represents whether contributor
             dashboard is enabled.
     """
-    pattern = 'COMMUNITY_DASHBOARD_ENABLED = .*'
-    replace = 'COMMUNITY_DASHBOARD_ENABLED = %s' % enable_community_dashboard
+    pattern = 'CONTRIBUTOR_DASHBOARD_ENABLED = .*'
+    replace = 'CONTRIBUTOR_DASHBOARD_ENABLED = %s' % (
+        enable_contributor_dashboard)
     common.inplace_replace_file(feconf_file_path, pattern, replace)
 
 
@@ -261,7 +271,8 @@ def setup_and_install_dependencies(skip_install):
         install_chrome_on_travis.main(args=[])
 
 
-def build_js_files(dev_mode_setting, deparallelize_terser=False):
+def build_js_files(
+        dev_mode_setting, deparallelize_terser=False, source_maps=False):
     """Build the javascript files.
 
     Args:
@@ -269,16 +280,22 @@ def build_js_files(dev_mode_setting, deparallelize_terser=False):
             in dev mode.
         deparallelize_terser: bool. Represents whether to use webpack
             compilation config that disables parallelism on terser plugin.
+        source_maps: bool. Represents whether to use source maps while
+            building webpack.
     """
     if not dev_mode_setting:
         python_utils.PRINT('  Generating files for production mode...')
+        build_args = ['--prod_env']
+
         if deparallelize_terser:
-            build.main(args=['--prod_env', '--deparallelize_terser'])
-        else:
-            build.main(args=['--prod_env'])
+            build_args.append('--deparallelize_terser')
+        if source_maps:
+            build_args.append('--source_maps')
+
+        build.main(args=build_args)
     else:
         build.main(args=[])
-        run_webpack_compilation()
+        run_webpack_compilation(source_maps=source_maps)
 
 
 @contextlib.contextmanager
@@ -421,7 +438,7 @@ def start_google_app_engine_server(dev_mode_setting, log_level):
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=%s '
         '--log_level=%s --skip_sdk_update_check=true %s' % (
-            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
+            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_SDK_HOME,
             GOOGLE_APP_ENGINE_PORT, log_level, log_level, app_yaml_filepath),
         env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH},
         shell=True)
@@ -531,18 +548,20 @@ def main(args=None):
         sys.exit(1)
     setup_and_install_dependencies(parsed_args.skip_install)
 
+    common.start_redis_server()
     atexit.register(cleanup)
 
     dev_mode = not parsed_args.prod_env
 
-    update_community_dashboard_status_in_feconf_file(
-        FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
+    update_contributor_dashboard_status_in_feconf_file(
+        FECONF_FILE_PATH, parsed_args.contributor_dashboard_enabled)
 
     if parsed_args.skip_build:
         build.modify_constants(prod_env=parsed_args.prod_env)
     else:
         build_js_files(
-            dev_mode, deparallelize_terser=parsed_args.deparallelize_terser)
+            dev_mode, deparallelize_terser=parsed_args.deparallelize_terser,
+            source_maps=parsed_args.source_maps)
     version = parsed_args.chrome_driver_version or get_chrome_driver_version()
     python_utils.PRINT('\n\nCHROMEDRIVER VERSION: %s\n\n' % version)
     start_webdriver_manager(version)

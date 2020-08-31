@@ -33,13 +33,13 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
   '$controller', '$scope', '$uibModalInstance', 'EditorFirstTimeEventsService',
   'GenerateContentIdService', 'OutcomeObjectFactory', 'RuleObjectFactory',
   'StateEditorService', 'addState', 'currentInteractionId',
-  'stateName', 'CONTENT_ID_PREFIX_FEEDBACK',
+  'stateName', 'COMPONENT_NAME_FEEDBACK',
   'INTERACTION_SPECS',
   function(
       $controller, $scope, $uibModalInstance, EditorFirstTimeEventsService,
       GenerateContentIdService, OutcomeObjectFactory, RuleObjectFactory,
       StateEditorService, addState, currentInteractionId,
-      stateName, CONTENT_ID_PREFIX_FEEDBACK,
+      stateName, COMPONENT_NAME_FEEDBACK,
       INTERACTION_SPECS) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
@@ -72,7 +72,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
     };
     $scope.tmpRule = RuleObjectFactory.createNew(null, {});
     var feedbackContentId = GenerateContentIdService.getNextStateId(
-      CONTENT_ID_PREFIX_FEEDBACK);
+      COMPONENT_NAME_FEEDBACK);
     $scope.tmpOutcome = OutcomeObjectFactory.createNew(
       $scope.questionModeEnabled ? null : stateName,
       feedbackContentId, '', []);
@@ -87,8 +87,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
     $scope.addAnswerGroupForm = {};
 
     $scope.saveResponse = function(reopen) {
-      $scope.$broadcast('saveOutcomeFeedbackDetails');
-      $scope.$broadcast('saveOutcomeDestDetails');
+      StateEditorService.onSaveOutcomeDestDetails.emit();
 
       EditorFirstTimeEventsService.registerFirstSaveRuleEvent();
       // Close the modal and save it afterwards.

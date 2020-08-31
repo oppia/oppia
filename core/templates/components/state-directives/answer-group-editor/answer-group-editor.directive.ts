@@ -43,6 +43,9 @@ require(
   'state-property.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
+require('services/external-save.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('answerGroupEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -61,7 +64,12 @@ angular.module('oppia').directive('answerGroupEditor', [
         getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
         onSaveTaggedMisconception: '=',
         outcome: '=',
-        rules: '=',
+        // Answer group editor takes in a list of rules. Note that the actual
+        // stored rules are not in this format -- see the AnswerGroup domain
+        // object for the actual format of how rules are stored. AnswerGroup
+        // contains a method updateRuleTypesToInputs() which accepts a list of
+        // rules. This method should be used to update the rule structure.
+        getRules: '&rules',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',
         suppressWarnings: '&'
       },
@@ -71,17 +79,18 @@ angular.module('oppia').directive('answerGroupEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
-        'AlertsService', 'ContextService', 'INTERACTION_SPECS',
-        'StateEditorService', 'RuleObjectFactory',
+        'AlertsService', 'ContextService', 'ExternalSaveService',
+        'INTERACTION_SPECS', 'StateEditorService', 'RuleObjectFactory',
         'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
         'ResponsesService',
         function(
             $scope, $rootScope, $uibModal, StateInteractionIdService,
-            AlertsService, ContextService, INTERACTION_SPECS,
-            StateEditorService, RuleObjectFactory,
+            AlertsService, ContextService, ExternalSaveService,
+            INTERACTION_SPECS, StateEditorService, RuleObjectFactory,
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
             ResponsesService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
 
           ctrl.isInQuestionMode = function() {
             return StateEditorService.isInQuestionMode();
@@ -130,6 +139,7 @@ angular.module('oppia').directive('answerGroupEditor', [
                   getDefaultInputValue('Real')];
               case 'ListOfSetsOfHtmlStrings':
               case 'ListOfUnicodeString':
+              case 'SetOfAlgebraicIdentifier':
               case 'SetOfUnicodeString':
               case 'SetOfHtmlString':
                 return [];
@@ -283,25 +293,46 @@ angular.module('oppia').directive('answerGroupEditor', [
             // choice interaction's customization arguments.
             // TODO(sll): Remove the need for this watcher, or make it less
             // ad hoc.
-            $scope.$on('updateAnswerChoices', function() {
-              ctrl.answerChoices = ctrl.getAnswerChoices();
-            });
-            $scope.$on('externalSave', function() {
-              if (ctrl.isRuleEditorOpen()) {
-                ctrl.saveRules();
-              }
-            });
-            $scope.$on('onInteractionIdChanged', function() {
-              if (ctrl.isRuleEditorOpen()) {
-                ctrl.saveRules();
-              }
-              $scope.$broadcast('updateAnswerGroupInteractionId');
-              ctrl.answerChoices = ctrl.getAnswerChoices();
-            });
+            ctrl.directiveSubscriptions.add(
+              ExternalSaveService.onExternalSave.subscribe(() => {
+                if (ctrl.isRuleEditorOpen()) {
+                  if (StateEditorService.checkCurrentRuleInputIsValid()) {
+                    ctrl.saveRules();
+                  } else {
+                    var messageContent = (
+                      'There was an unsaved rule input which was invalid and ' +
+                      'has been discarded.');
+                    if (!AlertsService.messages.some(messageObject => (
+                      messageObject.content === messageContent))) {
+                      AlertsService.addInfoMessage(messageContent);
+                    }
+                  }
+                }
+              })
+            );
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onUpdateAnswerChoices.subscribe(() => {
+                ctrl.answerChoices = ctrl.getAnswerChoices();
+              })
+            );
+            ctrl.directiveSubscriptions.add(
+              StateInteractionIdService.onInteractionIdChanged.subscribe(
+                () => {
+                  if (ctrl.isRuleEditorOpen()) {
+                    ctrl.saveRules();
+                  }
+                  ctrl.answerChoices = ctrl.getAnswerChoices();
+                }
+              )
+            );
+            ctrl.rules = ctrl.getRules();
             ctrl.rulesMemento = null;
             ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
             ctrl.editAnswerGroupForm = {};
             ctrl.answerChoices = ctrl.getAnswerChoices();
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

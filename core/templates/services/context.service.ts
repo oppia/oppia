@@ -98,8 +98,8 @@ export class ContextService {
           this.pageContext = ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR;
           return ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR;
         } else if (
-          pathnameArray[i] === 'practice_session' ||
-            pathnameArray[i] === 'review_test') {
+          pathnameArray[i] === 'session' ||
+            pathnameArray[i] === 'review-test') {
           this.pageContext = ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER;
           return ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER;
         } else if (pathnameArray[i] === 'collection_editor') {
@@ -146,10 +146,11 @@ export class ContextService {
   }
 
   isInExplorationContext(): boolean {
-    return (this.getPageContext() ===
-        ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR ||
-        this.getPageContext() ===
-        ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
+    return (
+      this.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR ||
+      this.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
   }
 
   // This function is used in cases where the URL does not specify the
@@ -242,10 +243,11 @@ export class ContextService {
   // Following method helps to know whether exploration editor is
   // in main editing mode or preview mode.
   isInExplorationEditorMode(): boolean {
-    return (this.getPageContext() ===
-        ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR &&
-        this.getEditorTabContext() === (
-          ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR));
+    return (
+      this.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR &&
+      this.getEditorTabContext() === (
+        ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR));
   }
 
   isInQuestionPlayerMode(): boolean {

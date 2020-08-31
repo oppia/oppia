@@ -101,7 +101,7 @@ describe('Topic viewer backend API service', () => {
         skill_id_1: 'Skill Description 1',
         skill_id_2: 'Skill Description 2'
       },
-      train_tab_should_be_displayed: false
+      practice_tab_is_displayed: false
     };
 
     sampleDataResultsObjects = readOnlyTopicObjectFactory.createFromBackendDict(
@@ -116,10 +116,10 @@ describe('Topic viewer backend API service', () => {
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
-      topicViewerBackendApiService.fetchTopicData('0').then(
+      topicViewerBackendApiService.fetchTopicData('0', 'staging').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(
-        '/topic_data_handler/0');
+        '/topic_data_handler/staging/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -134,10 +134,10 @@ describe('Topic viewer backend API service', () => {
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
-      topicViewerBackendApiService.fetchTopicData('0').then(
+      topicViewerBackendApiService.fetchTopicData('0', 'staging').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(
-        '/topic_data_handler/0');
+        '/topic_data_handler/staging/0');
       expect(req.request.method).toEqual('GET');
       req.flush({
         error: 'Error fetching topic 0.'

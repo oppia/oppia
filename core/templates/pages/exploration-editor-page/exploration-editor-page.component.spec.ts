@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { StateEditorService } from
@@ -43,7 +44,13 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 
+// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'state-tutorial-first-time.service.ts');
 
 describe('Exploration editor page component', function() {
   var ctrl = null;
@@ -57,11 +64,12 @@ describe('Exploration editor page component', function() {
   var cls = null;
   var cs = null;
   var efbas = null;
-  var eibas = null;
   var eis = null;
   var ers = null;
   var es = null;
+  var eps = null;
   var ess = null;
+  var esaves = null;
   var ets = null;
   var ews = null;
   var gds = null;
@@ -69,9 +77,18 @@ describe('Exploration editor page component', function() {
   var rs = null;
   var sas = null;
   var ses = null;
+  var sts = null;
   var stass = null;
+  var stfts = null;
   var tds = null;
   var ueps = null;
+  var mockEnterEditorForTheFirstTime = null;
+
+  var refreshGraphEmitter = new EventEmitter();
+
+  var mockOpenEditorTutorialEmitter = new EventEmitter();
+
+  var mockInitExplorationPageEmitter = new EventEmitter();
 
   var explorationId = 'exp1';
   var explorationData = {
@@ -186,6 +203,10 @@ describe('Exploration editor page component', function() {
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
+    const ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
     $provide.value('ExplorationDataService', mockExplorationDataService);
   }));
 
@@ -198,11 +219,12 @@ describe('Exploration editor page component', function() {
     cls = $injector.get('ChangeListService');
     cs = $injector.get('ContextService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
-    eibas = $injector.get('ExplorationImprovementsBackendApiService');
     eis = $injector.get('ExplorationImprovementsService');
     ers = $injector.get('ExplorationRightsService');
     es = $injector.get('EditabilityService');
+    eps = $injector.get('ExplorationPropertyService');
     ess = $injector.get('ExplorationStatesService');
+    esaves = $injector.get('ExplorationSaveService');
     ets = $injector.get('ExplorationTitleService');
     ews = $injector.get('ExplorationWarningsService');
     gds = $injector.get('GraphDataService');
@@ -210,7 +232,9 @@ describe('Exploration editor page component', function() {
     rs = $injector.get('RouterService');
     sas = $injector.get('SiteAnalyticsService');
     ses = $injector.get('StateEditorService');
+    sts = $injector.get('StateTutorialFirstTimeService');
     stass = $injector.get('StateTopAnswersStatsService');
+    stfts = $injector.get('StateTutorialFirstTimeService');
     tds = $injector.get('ThreadDataService');
     ueps = $injector.get('UserExplorationPermissionsService');
 
@@ -218,12 +242,18 @@ describe('Exploration editor page component', function() {
     ctrl = $componentController('explorationEditorPage');
   }));
 
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
   describe('when user permission is true and draft changes not valid', () => {
     beforeEach(() => {
       spyOnAllFunctions(sas);
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend')
+        .and.returnValue(Promise.resolve());
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setPageTitle').and.callThrough();
@@ -231,10 +261,22 @@ describe('Exploration editor page component', function() {
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
+      spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
+        mockOpenEditorTutorialEmitter);
 
       explorationData.is_version_of_draft_valid = false;
 
       ctrl.$onInit();
+    });
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
+    it('should start tutorial on event of opening tutorial', () => {
+      spyOn(ctrl, 'startTutorial');
+      mockOpenEditorTutorialEmitter.emit();
+      expect(ctrl.startTutorial).toHaveBeenCalled();
     });
 
     it('should mark exploration as editable and translatable', () => {
@@ -244,6 +286,34 @@ describe('Exploration editor page component', function() {
 
       expect(es.markEditable).toHaveBeenCalled();
       expect(es.markTranslatable).toHaveBeenCalled();
+    });
+
+    it('should return navbar text', () => {
+      expect(ctrl.getNavbarText()).toEqual('Exploration Editor');
+    });
+
+    it('should return warning count, warnings list & critical warning',
+      () => {
+        spyOn(ews, 'countWarnings').and.returnValue(1);
+        expect(ctrl.countWarnings()).toEqual(1);
+        spyOn(ews, 'getWarnings').and.returnValue([]);
+        expect(ctrl.getWarnings()).toEqual([]);
+        // This approach was choosen because spyOn() doesn't work on properties
+        // that doesn't have a get access type.
+        // eslint-disable-next-line max-len
+        // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+        Object.defineProperty(ews, 'hasCriticalWarnings', {
+          get: () => true
+        });
+        spyOnProperty(ews, 'hasCriticalWarnings')
+          .and.returnValue(true);
+
+        expect(ctrl.hasCriticalWarnings()).toEqual(true);
+      });
+
+    it('should return the thread count', () => {
+      spyOn(tds, 'getOpenThreadsCount').and.returnValue(1);
+      expect(ctrl.getOpenThreadsCount()).toEqual(1);
     });
 
     it('should set active state name when active state name does not exist' +
@@ -281,25 +351,91 @@ describe('Exploration editor page component', function() {
 
       expect(rs.navigateToMainTab).toHaveBeenCalled();
     });
+
+    it('should navigate between tabs', () => {
+      spyOn(rs, 'navigateToMainTab').and.stub();
+      ctrl.selectMainTab();
+      expect(rs.navigateToMainTab).toHaveBeenCalled();
+
+      spyOn(rs, 'navigateToTranslationTab').and.stub();
+      ctrl.selectTranslationTab();
+      expect(rs.navigateToTranslationTab).toHaveBeenCalled();
+
+      spyOn(rs, 'navigateToPreviewTab').and.stub();
+      ctrl.selectPreviewTab();
+      expect(rs.navigateToPreviewTab).toHaveBeenCalled();
+
+      spyOn(rs, 'navigateToSettingsTab').and.stub();
+      ctrl.selectSettingsTab();
+      expect(rs.navigateToSettingsTab).toHaveBeenCalled();
+
+      spyOn(rs, 'navigateToStatsTab').and.stub();
+      ctrl.selectStatsTab();
+      expect(rs.navigateToStatsTab).toHaveBeenCalled();
+
+      spyOn(rs, 'navigateToImprovementsTab').and.stub();
+      ctrl.selectImprovementsTab();
+      expect(rs.navigateToImprovementsTab).toHaveBeenCalled();
+
+      spyOn(rs, 'navigateToHistoryTab').and.stub();
+      ctrl.selectHistoryTab();
+      expect(rs.navigateToHistoryTab).toHaveBeenCalled();
+
+      spyOn(rs, 'navigateToFeedbackTab').and.stub();
+      ctrl.selectFeedbackTab();
+      expect(rs.navigateToFeedbackTab).toHaveBeenCalled();
+    });
+
+    it('should show the user help modal for editor tutorial', () => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve('editor')
+      });
+      ctrl.showUserHelpModal();
+      $rootScope.$apply();
+      expect($uibModal.open).toHaveBeenCalled();
+    });
+
+    it('should show the user help modal for editor tutorial', () => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve('translation')
+      });
+      ctrl.showUserHelpModal();
+      $rootScope.$apply();
+      expect($uibModal.open).toHaveBeenCalled();
+    });
   });
 
   describe('when user permission is false and draft changes are true', () => {
+    var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
+
     beforeEach(() => {
       spyOnAllFunctions(sas);
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(ews, 'updateWarnings').and.callThrough();
-      spyOn(gds, 'recompute').and.callThrough();
+      spyOn(eis, 'flushUpdatedTasksToBackend')
+        .and.returnValue(Promise.resolve());
+      spyOnProperty(eps, 'onExplorationPropertyChanged').and.returnValue(
+        mockExplorationPropertyChangedEventEmitter);
+      spyOn(ews, 'updateWarnings');
+      spyOn(gds, 'recompute');
       spyOn(pts, 'setPageTitle').and.callThrough();
       spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
+      spyOnProperty(ess, 'onRefreshGraph').and.returnValue(refreshGraphEmitter);
+      spyOnProperty(esaves, 'onInitExplorationPage').and.returnValue(
+        mockInitExplorationPageEmitter);
+
 
       explorationData.is_version_of_draft_valid = true;
 
       ctrl.$onInit();
+    });
+
+    afterEach(() => {
+      ctrl.$onDestroy();
     });
 
     it('should link exploration to story when initing exploration page', () => {
@@ -338,7 +474,7 @@ describe('Exploration editor page component', function() {
 
     it('should react when exploration property changes', () => {
       ets.init('Exploration Title');
-      $rootScope.$broadcast('explorationPropertyChanged');
+      mockExplorationPropertyChangedEventEmitter.emit();
 
       expect(pts.setPageTitle).toHaveBeenCalledWith(
         'Exploration Title - Oppia Editor');
@@ -346,14 +482,14 @@ describe('Exploration editor page component', function() {
 
     it('should react when untitled exploration property changes', () => {
       ets.init('');
-      $rootScope.$broadcast('explorationPropertyChanged');
+      mockExplorationPropertyChangedEventEmitter.emit();
 
       expect(pts.setPageTitle).toHaveBeenCalledWith(
         'Untitled Exploration - Oppia Editor');
     });
 
     it('should react when refreshing graph', () => {
-      $rootScope.$broadcast('refreshGraph');
+      refreshGraphEmitter.emit();
 
       expect(gds.recompute).toHaveBeenCalled();
       expect(ews.updateWarnings).toHaveBeenCalled();
@@ -363,8 +499,7 @@ describe('Exploration editor page component', function() {
       $scope.$apply();
 
       var successCallback = jasmine.createSpy('success');
-      $rootScope.$broadcast('initExplorationPage', successCallback);
-
+      mockInitExplorationPageEmitter.emit(successCallback);
       // Need to flush and $apply twice to fire the callback. In practice, this
       // will occur seamlessly.
       flushMicrotasks();
@@ -659,10 +794,14 @@ describe('Exploration editor page component', function() {
 
   describe('Initializing improvements tab', () => {
     beforeEach(() => {
+      mockEnterEditorForTheFirstTime = new EventEmitter();
       spyOnAllFunctions(sas);
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures')
         .and.returnValue(Promise.resolve({}));
+      spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend')
+        .and.returnValue(Promise.resolve());
       spyOn(ers, 'isPublic').and.returnValue(true);
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
@@ -672,19 +811,21 @@ describe('Exploration editor page component', function() {
         .and.returnValue(Promise.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue(Promise.resolve({canEdit: true}));
+      spyOnProperty(sts, 'onEnterEditorForTheFirstTime').and.returnValue(
+        mockEnterEditorForTheFirstTime);
 
       explorationData.is_version_of_draft_valid = true;
     });
 
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
     it('should recognize when improvements tab is enabled', fakeAsync(() => {
-      spyOn(eibas, 'getConfigAsync')
-        .and.returnValue(Promise.resolve({improvementsTabIsEnabled: true}));
+      spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
+        Promise.resolve(true));
 
       ctrl.$onInit();
-      // We need to flush and $apply twice to fire the callback under test. In
-      // practice, this will occur seamlessly.
-      flushMicrotasks();
-      $scope.$apply();
       flushMicrotasks();
       $scope.$apply();
 
@@ -692,19 +833,22 @@ describe('Exploration editor page component', function() {
     }));
 
     it('should recognize when improvements tab is disabled', fakeAsync(() => {
-      spyOn(eibas, 'getConfigAsync')
-        .and.returnValue(Promise.resolve({improvementsTabIsEnabled: false}));
+      spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
+        Promise.resolve(false));
 
       ctrl.$onInit();
-      // We need to flush and $apply twice to fire the callback under test. In
-      // practice, this will occur seamlessly.
-      flushMicrotasks();
-      $scope.$apply();
       flushMicrotasks();
       $scope.$apply();
 
       expect(ctrl.isImprovementsTabEnabled()).toBeFalse();
     }));
+
+    it('should react to enterEditorForTheFirstTime event', () => {
+      spyOn(ctrl, 'showWelcomeExplorationModal').and.callThrough();
+      ctrl.$onInit();
+      mockEnterEditorForTheFirstTime.emit();
+      expect(ctrl.showWelcomeExplorationModal).toHaveBeenCalled();
+    });
   });
 
   describe('State-change registration', () => {
@@ -713,6 +857,8 @@ describe('Exploration editor page component', function() {
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend')
+        .and.returnValue(Promise.resolve());
       spyOn(ers, 'isPublic').and.returnValue(true);
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
@@ -726,6 +872,13 @@ describe('Exploration editor page component', function() {
       explorationData.is_version_of_draft_valid = true;
 
       ctrl.$onInit();
+    });
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
+    afterEach(() => {
+      ctrl.$onDestroy();
     });
 
     it('should callback state-added method for stats', fakeAsync(() => {

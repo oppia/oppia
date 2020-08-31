@@ -27,8 +27,9 @@ require('components/entity-creation-services/topic-creation.service.ts');
 require('components/rubrics-editor/rubrics-editor.directive.ts');
 
 require('domain/skill/RubricObjectFactory.ts');
-require('domain/topics_and_skills_dashboard/' +
-    'TopicsAndSkillsDashboardFilterObjectFactory.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'TopicsAndSkillsDashboardFilterObjectFactory.ts');
 require('domain/skill/SkillObjectFactory.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
@@ -53,6 +54,8 @@ require('services/alerts.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/image-local-storage.service.ts');
 
+import { Subscription } from 'rxjs';
+
 
 angular.module('oppia').component('topicsAndSkillsDashboardPage', {
   template: require('./topics-and-skills-dashboard-page.component.html'),
@@ -64,9 +67,6 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
     'SkillObjectFactory', 'TopicCreationService',
     'TopicsAndSkillsDashboardBackendApiService',
     'TopicsAndSkillsDashboardPageService', 'UrlInterpolationService',
-    'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
-    'EVENT_TYPE_SKILL_CREATION_ENABLED',
-    'EVENT_TYPE_TOPIC_CREATION_ENABLED',
     'FATAL_ERROR_CODES', 'SKILL_DIFFICULTIES',
     'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
     'SKILL_STATUS_OPTIONS', 'TOPIC_FILTER_CLASSROOM_ALL',
@@ -79,14 +79,12 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
         SkillObjectFactory, TopicCreationService,
         TopicsAndSkillsDashboardBackendApiService,
         TopicsAndSkillsDashboardPageService, UrlInterpolationService,
-        EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-        EVENT_TYPE_SKILL_CREATION_ENABLED,
-        EVENT_TYPE_TOPIC_CREATION_ENABLED,
         FATAL_ERROR_CODES, SKILL_DIFFICULTIES,
         MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES,
         SKILL_STATUS_OPTIONS, TOPIC_FILTER_CLASSROOM_ALL,
         TOPIC_SORT_OPTIONS, TOPIC_PUBLISHED_OPTIONS) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var TOPIC_CLASSROOM_UNASSIGNED = 'Unassigned';
 
       /**
@@ -121,10 +119,6 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
             }
             ctrl.userCanCreateTopic = response.canCreateTopic;
             ctrl.userCanCreateSkill = response.canCreateSkill;
-            $rootScope.$broadcast(
-              EVENT_TYPE_TOPIC_CREATION_ENABLED, ctrl.userCanCreateTopic);
-            $rootScope.$broadcast(
-              EVENT_TYPE_SKILL_CREATION_ENABLED, ctrl.userCanCreateSkill);
             ctrl.userCanDeleteTopic = response.canDeleteTopic;
             ctrl.userCanDeleteSkill = response.canDeleteSkill;
 
@@ -330,7 +324,8 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
 
       ctrl.getUpperLimitValueForPagination = function() {
         return (
-          Math.min(((ctrl.pageNumber * ctrl.itemsPerPage) +
+          Math.min((
+            (ctrl.pageNumber * ctrl.itemsPerPage) +
             ctrl.itemsPerPage), ctrl.currentCount));
       };
 
@@ -381,16 +376,22 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
           }
           return arr;
         };
-        $scope.$on(
-          EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, function(
-              evt, stayInSameTab) {
-            ctrl._initDashboard(stayInSameTab);
-          }
+        ctrl.directiveSubscriptions.add(
+          TopicsAndSkillsDashboardBackendApiService.
+            onTopicsAndSkillsDashboardReinitialized.subscribe(
+              (stayInSameTab) => {
+                ctrl._initDashboard(stayInSameTab);
+              }
+            )
         );
         // The _initDashboard function is written separately since it is
         // also called in $scope.$on when some external events are
         // triggered.
         ctrl._initDashboard(false);
+      };
+
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

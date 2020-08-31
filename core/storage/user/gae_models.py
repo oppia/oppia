@@ -40,7 +40,6 @@ USER_ID_LENGTH = 36
 
 class UserSettingsModel(base_models.BaseModel):
     """Settings and preferences for a particular user.
-
     Instances of this class are keyed by the user id.
     """
 
@@ -48,6 +47,8 @@ class UserSettingsModel(base_models.BaseModel):
 
     # User id used to identify user by GAE. Is not required for now because we
     # need to perform migration to fill this for existing users.
+    # TODO(#10178): Deprecate gae_id for UserSettingsModel once we have verified
+    # that UserAuthDetailsModels exists for every user.
     gae_id = ndb.StringProperty(required=True, indexed=True)
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)
@@ -214,7 +215,6 @@ class UserSettingsModel(base_models.BaseModel):
     @classmethod
     def get_new_id(cls, unused_entity_name=''):
         """Gets a new id for an entity, based on its name.
-
         The returned id is guaranteed to be unique among all instances of this
         entity.
 
@@ -792,7 +792,8 @@ class UserSubscriptionsModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        # TODO(#9143): Apply deletion policy also to creator_ids.
+        ndb.delete_multi(
+            cls.query(cls.creator_ids == user_id).fetch(keys_only=True))
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -868,7 +869,8 @@ class UserSubscribersModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        # TODO(#9143): Apply deletion policy also to subscriber_ids.
+        ndb.delete_multi(
+            cls.query(cls.subscriber_ids == user_id).fetch(keys_only=True))
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -1839,7 +1841,7 @@ class UserContributionScoringModel(base_models.BaseModel):
     # The score of the user for the above category of suggestions.
     score = ndb.FloatProperty(required=True, indexed=True)
     # Flag to check if email to onboard reviewer has been sent for the category.
-    has_email_been_sent = ndb.BooleanProperty(required=True, default=False)
+    onboarding_email_sent = ndb.BooleanProperty(required=True, default=False)
 
     @staticmethod
     def get_deletion_policy():
@@ -1869,7 +1871,7 @@ class UserContributionScoringModel(base_models.BaseModel):
         for scoring_model in scoring_models:
             user_data[scoring_model.score_category] = {
                 'score': scoring_model.score,
-                'has_email_been_sent': scoring_model.has_email_been_sent
+                'onboarding_email_sent': scoring_model.onboarding_email_sent
             }
         return user_data
 
@@ -1957,30 +1959,35 @@ class UserContributionScoringModel(base_models.BaseModel):
         return '.'.join([score_category, user_id])
 
     @classmethod
-    def get_score_of_user_for_category(cls, user_id, score_category):
-        """Gets the score of the user for the given score category.
+    def get(cls, user_id, score_category):
+        """Gets the user's scoring model corresponding to the score category.
 
         Args:
-            user_id: str. The ID of the user.
-            score_category: str. The category of suggestion to score the user
-                on.
+            user_id: str. The id of the user.
+            score_category: str. The score category of the suggestion.
 
         Returns:
-            float|None. The score of the user in the given category.
+            UserContributionScoringModel|None. A UserContributionScoringModel
+            corresponding to the user score identifier or None if none exist.
         """
         instance_id = cls._get_instance_id(user_id, score_category)
-        model = cls.get_by_id(instance_id)
-
-        return model.score if model else None
+        return cls.get_by_id(instance_id)
 
     @classmethod
-    def create(cls, user_id, score_category, score):
+    def create(
+            cls, user_id, score_category, score, onboarding_email_sent=False):
         """Creates a new UserContributionScoringModel entry.
 
         Args:
             user_id: str. The ID of the user.
-            score_category: str. The category of the suggestion.
+            score_category: str. The score category of the suggestion.
             score: float. The score of the user.
+            onboarding_email_sent: bool. Whether the email to onboard the
+                user as a reviewer has been sent.
+
+        Returns:
+            UserContributionScoringModel. The user scoring model that was
+            created.
 
         Raises:
             Exception. There is already an entry with the given id.
@@ -1989,33 +1996,20 @@ class UserContributionScoringModel(base_models.BaseModel):
 
         if cls.get_by_id(instance_id):
             raise Exception(
-                'There is already an entry with the given id: %s' % instance_id)
+                'There is already a UserContributionScoringModel entry with the'
+                ' given id: %s' % instance_id
+            )
 
-        cls(
+        user_scoring_model = cls(
             id=instance_id, user_id=user_id, score_category=score_category,
-            score=score).put()
-
-    @classmethod
-    def increment_score_for_user(cls, user_id, score_category, increment_by):
-        """Increment the score of the user in the category by the given amount.
-
-        Args:
-            user_id: str. The id of the user.
-            score_category: str. The category of the suggestion.
-            increment_by: float. The amount to increase the score of the user
-                by. May be negative, in which case the score is reduced.
-        """
-        instance_id = cls._get_instance_id(user_id, score_category)
-        model = cls.get_by_id(instance_id)
-        if not model:
-            cls.create(user_id, score_category, increment_by)
-        else:
-            model.score += increment_by
-            model.put()
+            score=score,
+            onboarding_email_sent=onboarding_email_sent)
+        user_scoring_model.put()
+        return user_scoring_model
 
 
-class UserCommunityRightsModel(base_models.BaseModel):
-    """Model for storing user's rights on community dashboard.
+class UserContributionRightsModel(base_models.BaseModel):
+    """Model for storing user's rights in the contributor dashboard.
 
     Instances of this class are keyed by the user id.
     """
@@ -2035,7 +2029,7 @@ class UserCommunityRightsModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether UserCommunityRightsModel exists for the given user.
+        """Check whether UserContributionRightsModel exists for the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -2047,7 +2041,7 @@ class UserCommunityRightsModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
-        """Delete instances of UserCommunityRightsModel for the user.
+        """Delete instances of UserContributionRightsModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
@@ -2056,14 +2050,14 @@ class UserCommunityRightsModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        """(Takeout) Exports the data from UserCommunityRightsModel
+        """(Takeout) Exports the data from UserContributionRightsModel
         into dict format.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. Dictionary of the data from UserCommunityRightsModel.
+            dict. Dictionary of the data from UserContributionRightsModel.
         """
         rights_model = cls.get_by_id(user_id)
 
@@ -2151,10 +2145,23 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     # IDs of all the private collections created by this user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
-    # A dict mapping story IDs to pseudonymous user IDs. For each story, we
-    # use a different pseudonymous user ID. Note that all these pseudonymous
-    # user IDs originate from the same about-to-be-deleted user.
-    story_mappings = ndb.JsonProperty(default={})
+    # A dict mapping model IDs to pseudonymous user IDs. Each type of activity
+    # is grouped under different key (story, skill, question), the keys need to
+    # be from the core.platform.models.NAMES enum. For each activity, we use
+    # a different pseudonymous user ID. Note that all these pseudonymous
+    # user IDs originate from the same about-to-be-deleted user. If a key is
+    # absent from the activity_mappings dict, this means that for this activity
+    # type the mappings are not yet generated.
+    # Example structure: {
+    #     'skill': {'skill_id': 'pseudo_user_id_1'},
+    #     'story': {
+    #         'story_1_id': 'pseudo_user_id_2',
+    #         'story_2_id': 'pseudo_user_id_3',
+    #         'story_3_id': 'pseudo_user_id_4'
+    #     },
+    #     'question': {}
+    # }
+    activity_mappings = ndb.JsonProperty(default={})
 
     @staticmethod
     def get_deletion_policy():
@@ -2226,17 +2233,23 @@ class PseudonymizedUserModel(base_models.BaseModel):
         raise Exception('New id generator is producing too many collisions.')
 
 
-class UserAuthModel(base_models.BaseModel):
+class UserAuthDetailsModel(base_models.BaseModel):
     """Stores the authentication details for a particular user.
 
     Instances of this class are keyed by user id.
     """
 
-    # Authentication detail for sign-in using google id (GAE).
+    # Authentication detail for sign-in using google id (GAE). Exists only
+    # for full users. None for profile users.
     gae_id = ndb.StringProperty(indexed=True)
     # A code associated with profile and full user on Android to provide a PIN
     # based authentication within the account.
     pin = ndb.StringProperty(default=None)
+    # For profile users, the user ID of the full user associated with that
+    # profile. None for full users. Required for profiles because gae_id
+    # attribute is None for them, hence this attribute stores their association
+    # with a full user who do have a gae_id.
+    parent_user_id = ndb.StringProperty(indexed=True, default=None)
 
     @staticmethod
     def get_deletion_policy():
@@ -2255,7 +2268,7 @@ class UserAuthModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
-        """Delete instances of UserAuthModel for the user.
+        """Delete instances of UserAuthDetailsModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
@@ -2264,13 +2277,13 @@ class UserAuthModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether UserAuthModel exists for the given user.
+        """Check whether UserAuthDetailsModel exists for the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
 
         Returns:
-            bool. Whether any UserAuthModel refers to the given user ID.
+            bool. Whether any UserAuthDetailsModel refers to the given user ID.
         """
         return cls.get_by_id(user_id) is not None
 
@@ -2284,7 +2297,7 @@ class UserAuthModel(base_models.BaseModel):
                 authentication service.
 
         Returns:
-            UserAuthModel. The UserAuthModel instance having a
+            UserAuthDetailsModel. The UserAuthDetailsModel instance having a
             particular user mapped to the given auth_id and the auth service
             if there exists one, else None.
         """

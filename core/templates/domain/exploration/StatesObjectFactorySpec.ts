@@ -241,12 +241,14 @@ describe('States Object Factory', () => {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }],
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Equals: [
+                {
+                  x: 10
+                }
+              ]
+            },
           }],
           default_outcome: {
             dest: 'second state',
@@ -295,12 +297,14 @@ describe('States Object Factory', () => {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }],
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Equals: [
+                {
+                  x: 10
+                }
+              ]
+            },
           }],
           default_outcome: {
             dest: 'first state',
@@ -406,12 +410,14 @@ describe('States Object Factory', () => {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_specs: [{
-              inputs: {
-                x: 20
-              },
-              rule_type: 'Equals'
-            }]
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Equals: [
+                {
+                  x: 20
+                }
+              ]
+            }
           }],
           confirmed_unclassified_answers: [],
           customization_args: {
@@ -530,8 +536,8 @@ describe('States Object Factory', () => {
     expect(newStates.getStateNames()).toEqual(['first state', 'new state']);
     expect((Object.keys(newStates.getStateObjects())).length).toBe(2);
 
-    newStates.setState('new state',
-      sof.createFromBackendDict('new state', newState));
+    newStates.setState(
+      'new state', sof.createFromBackendDict('new state', newState));
     expect(newStates.getState('new state')).toEqual(
       sof.createFromBackendDict('new state', newState));
   });
@@ -539,8 +545,8 @@ describe('States Object Factory', () => {
   it('should correctly retrieve the terminal states', () => {
     let newStates = ssof.createFromBackendDict(statesDict);
 
-    newStates.setState('first state',
-      sof.createFromBackendDict('first state', newState));
+    newStates.setState(
+      'first state', sof.createFromBackendDict('first state', newState));
     expect(newStates.getFinalStateNames()).toEqual['new state'];
   });
 
@@ -583,12 +589,14 @@ describe('States Object Factory', () => {
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }],
+            rule_input_translations: {},
+            rule_types_to_inputs: {
+              Equals: [
+                {
+                  x: 10
+                }
+              ]
+            }
           }],
           default_outcome: {
             dest: 'third state',

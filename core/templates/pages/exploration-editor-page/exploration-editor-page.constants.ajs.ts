@@ -27,10 +27,6 @@ angular.module('oppia').constant(
   ExplorationEditorPageConstants.EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
 
 angular.module('oppia').constant(
-  'EVENT_EXPLORATION_PROPERTY_CHANGED',
-  ExplorationEditorPageConstants.EVENT_EXPLORATION_PROPERTY_CHANGED);
-
-angular.module('oppia').constant(
   'PARAM_ACTION_GET', ExplorationEditorPageConstants.PARAM_ACTION_GET);
 
 angular.module('oppia').constant(
@@ -60,7 +56,8 @@ angular.module('oppia').constant(
   'DEFAULT_AUDIO_LANGUAGE',
   ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE);
 
-angular.module('oppia').constant('INFO_MESSAGE_SOLUTION_IS_VALID',
+angular.module('oppia').constant(
+  'INFO_MESSAGE_SOLUTION_IS_VALID',
   ExplorationEditorPageConstants.INFO_MESSAGE_SOLUTION_IS_VALID);
 
 angular.module('oppia').constant(

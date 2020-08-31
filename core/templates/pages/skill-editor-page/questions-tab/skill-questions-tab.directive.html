@@ -1,6 +1,5 @@
-<md-card class="oppia-page-card oppia-long-text" ng-if="!questionEditorIsShown">
+<div ng-if="!questionEditorIsShown">
   <div class="questions">
-    <h3 class="form-heading"> Questions linked to this skill </h3>
     <questions-list all-skill-summaries="[]"
                     skill-descriptions-are-shown="false"
                     select-skill-modal-is-shown="false"
@@ -13,13 +12,11 @@
                     get-grouped-skill-summaries="getGroupedSkillSummaries">
     </questions-list>
   </div>
-</md-card>
+</div>
 
 <style>
   questions-tab .oppia-page-card {
-    margin-left: 10%;
-    margin-top: 2%;
-    width: 80%;
+    margin: 0;
   }
 
   questions-tab .questions {

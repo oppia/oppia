@@ -62,7 +62,8 @@ var pageToFullyLoad = async function() {
   // and browser.waitForAngular's flakiness
   // https://github.com/angular/protractor/issues/2954.
   var loadingMessage = element(by.css('[ng-show="loadingMessage"]'));
-  await browser.driver.wait(until.invisibilityOf(loadingMessage), 15000,
+  await browser.driver.wait(
+    until.invisibilityOf(loadingMessage), 15000,
     'Page takes more than 15 secs to load');
 };
 
@@ -136,8 +137,8 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
  */
 var urlRedirection = async function(url) {
   // Checks that the current URL matches the expected text.
-  await browser.wait(until.urlIs(url), DEFAULT_WAIT_TIME_MSECS,
-    'URL redirection took too long');
+  await browser.wait(
+    until.urlIs(url), DEFAULT_WAIT_TIME_MSECS, 'URL redirection took too long');
 };
 
 var visibilityOfInfoToast = async function(errorMessage) {
@@ -162,7 +163,6 @@ exports.elementToBeClickable = elementToBeClickable;
 exports.invisibilityOf = invisibilityOf;
 exports.pageToFullyLoad = pageToFullyLoad;
 exports.textToBePresentInElement = textToBePresentInElement;
-exports.presenceOf = presenceOf;
 exports.visibilityOf = visibilityOf;
 exports.presenceOf = presenceOf;
 exports.elementAttributeToBe = elementAttributeToBe;

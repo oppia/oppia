@@ -1,24 +1,16 @@
 <div class="oppia-topic-viewer-container" style="position: relative;">
-  <div class="oppia-topic-viewer-tabs-container">
+  <div class="oppia-topic-viewer-tabs-container" headroom>
     <div class="topic-viewer-tabs-list">
       <ul class="topic-viewer-tabs">
-        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'info'}">
-          <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('info')">
-            <img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/info_24px.svg')]>">
-            <a class="tab-title"
-               translate="I18N_TOPIC_VIEWER_INFO">
-            </a>
-          </div>
-        </li>
         <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'story'}">
           <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('story')">
-            <img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/play_icon_24px.svg')]>">
+            <img alt="play story icon" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/play_icon_24px.svg')]>">
             <a class="tab-title"
                translate="I18N_TOPIC_VIEWER_LESSONS">
             </a>
           </div>
         </li>
-        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}" ng-show="$ctrl.trainTabShouldBeDisplayed">
+        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}">
           <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('practice')">
             <img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/train_icon_24px.svg')]>">
             <a class="tab-title"
@@ -39,26 +31,29 @@
   </div>
   <background-banner></background-banner>
   <div class="topic-viewer-page-content" ng-if="!$ctrl.topicIsLoading">
-    <div ng-if="$ctrl.activeTab === 'info'">
-      <topic-info-tab topic-name="$ctrl.topicName"
-                      topic-description="$ctrl.topicDescription"
-                      story-count="$ctrl.canonicalStorySummaries.length"
-                      subtopic-count="$ctrl.subtopics.length"
-                      chapter-count="$ctrl.chapterCount">
-      </topic-info-tab>
-    </div>
     <div ng-if="$ctrl.activeTab === 'story'">
-      <stories-list [canonical-story-summaries]="$ctrl.canonicalStorySummaries"></stories-list>
+      <stories-list [topic-name]="$ctrl.topicName"
+                    [topic-description]="$ctrl.topicDescription"
+                    [canonical-story-summaries]="$ctrl.canonicalStorySummaries"
+                    [classroom-url-fragment]="$ctrl.classroomUrlFragment"
+                    [topic-url-fragment]="$ctrl.topicUrlFragment">
+      </stories-list>
     </div>
     <div ng-if="$ctrl.activeTab === 'practice'">
-      <practice-tab [subtopics-list]="$ctrl.subtopics"
+      <practice-tab ng-show="$ctrl.practiceTabIsDisplayed"
+                    [subtopics-list]="$ctrl.subtopics"
                     [topic-name]="$ctrl.topicName">
       </practice-tab>
+      <md-card ng-show="!$ctrl.practiceTabIsDisplayed" class="oppia-page-card practice-tab-not-available-card">
+        <h2 class="tab-title">Coming Soon!</h2>
+        <div class="practice-tab-not-available-text">Come back later when practice questions are available for this topic.</div>
+      </md-card>
     </div>
     <div ng-if="$ctrl.activeTab === 'subtopics'">
-      <subtopics-list [subtopics-list]="$ctrl.subtopics"
-                      [topic-name]="$ctrl.topicName"
-                      [topic-id]="$ctrl.topicId">
+      <subtopics-list [classroom-url-fragment]="$ctrl.classroomUrlFragment"
+                      [subtopics-list]="$ctrl.subtopics"
+                      [topic-id]="$ctrl.topicId"
+                      [topic-url-fragment]="$ctrl.topicUrlFragment">
       </subtopics-list>
     </div>
   </div>
@@ -81,7 +76,7 @@
   }
 
   .topic-viewer-page-content {
-    margin-top: -200px;
+    margin-top: -100px;
   }
 
   .oppia-navbar {
@@ -97,8 +92,13 @@
     box-shadow: 3px 3px 6px rgba(0,0,0, 0.5);
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     margin: 0 auto;
-    position: relative;
+    position: fixed;
     width: 100%;
+    z-index: 1000;
+  }
+
+  .oppia-topic-viewer-container .headroom--unpinned {
+    transform: translateY(-150%);
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .tab-icon {
@@ -168,6 +168,15 @@
     margin-top: 5vh;
     padding-bottom: 7.5vh;
     width: 704px;
+  }
+
+  .topic-viewer-page-content .practice-tab-not-available-card {
+    width: 40vw;
+  }
+
+  .topic-viewer-page-content .practice-tab-not-available-text {
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 18px;
   }
 
   @media(max-width: 1024px) {

@@ -63,13 +63,15 @@ angular.module('oppia').directive('questionEditor', [
         'AlertsService', 'EditabilityService',
         'EditableQuestionBackendApiService', 'LoaderService',
         'QuestionObjectFactory', 'QuestionUpdateService', 'ResponsesService',
-        'SolutionValidityService', 'StateEditorService', 'INTERACTION_SPECS',
+        'SolutionValidityService', 'StateInteractionIdService',
+        'StateEditorService', 'INTERACTION_SPECS',
         function(
             $scope, $rootScope, $uibModal,
             AlertsService, EditabilityService,
             EditableQuestionBackendApiService, LoaderService,
             QuestionObjectFactory, QuestionUpdateService, ResponsesService,
-            SolutionValidityService, StateEditorService, INTERACTION_SPECS) {
+            SolutionValidityService, StateInteractionIdService,
+            StateEditorService, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.getStateContentPlaceholder = function() {
@@ -182,12 +184,16 @@ angular.module('oppia').directive('questionEditor', [
           };
 
           ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
-              contentId) {
+              contentIds) {
             var state = ctrl.question.getStateData();
             var recordedVoiceovers = state.recordedVoiceovers;
             var writtenTranslations = state.writtenTranslations;
             var updateQuestion = _updateQuestion;
-            if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
+
+            const shouldPrompt = contentIds.some(
+              contentId =>
+                recordedVoiceovers.hasUnflaggedVoiceovers(contentId));
+            if (shouldPrompt) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/components/forms/forms-templates/mark-all-audio-and-' +
@@ -196,10 +202,19 @@ angular.module('oppia').directive('questionEditor', [
                 controller: 'ConfirmOrCancelModalController'
               }).result.then(function() {
                 updateQuestion(function() {
-                  recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
-                    contentId);
-                  writtenTranslations.markAllTranslationsAsNeedingUpdate(
-                    contentId);
+                  contentIds.forEach(contentId => {
+                    if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
+                      recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
+                        contentId);
+                    }
+                    if (
+                      writtenTranslations.hasUnflaggedWrittenTranslations(
+                        contentId)
+                    ) {
+                      writtenTranslations.markAllTranslationsAsNeedingUpdate(
+                        contentId);
+                    }
+                  });
                 });
               }, function() {
                 // This callback is triggered when the Cancel button is
@@ -214,14 +229,17 @@ angular.module('oppia').directive('questionEditor', [
                 () => _init()
               )
             );
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onInteractionEditorInitialized.subscribe(
+                () => _init()
+              )
+            );
+            ctrl.directiveSubscriptions.add(
+              StateInteractionIdService.onInteractionIdChanged.subscribe(
+                () => _init()
+              )
+            );
 
-            $scope.$on('interactionEditorInitialized', function(evt) {
-              _init();
-            });
-
-            $scope.$on('onInteractionIdChanged', function(evt) {
-              _init();
-            });
             if (ctrl.canEditQuestion()) {
               EditabilityService.markEditable();
             } else {

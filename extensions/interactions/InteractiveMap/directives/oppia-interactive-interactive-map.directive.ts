@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-require('interactions/uiLeafletRequires.ts');
+require('third-party-imports/leaflet.import');
 
 require('domain/utilities/browser-checker.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -31,15 +31,18 @@ require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
   'interactions/interaction-attributes-extractor.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
   'InteractionAttributesExtractorService',
-  'InteractiveMapRulesService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE',
+  'InteractiveMapRulesService', 'PlayerPositionService',
+  'UrlInterpolationService',
   function(
       InteractionAttributesExtractorService,
-      InteractiveMapRulesService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE) {
+      InteractiveMapRulesService, PlayerPositionService,
+      UrlInterpolationService,) {
     return {
       restrict: 'E',
       scope: {},
@@ -54,6 +57,7 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
             $attrs, $scope, BrowserCheckerService,
             CurrentInteractionService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var coords = ctrl.coords || [0, 0];
           var zoomLevel = parseInt(ctrl.zoom, 10) || 0;
 
@@ -123,17 +127,17 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
             }
           };
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-              ctrl.interactionIsActive = false;
-              ctrl.setOverlay();
-            });
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onNewCardAvailable.subscribe(
+                () => {
+                  ctrl.interactionIsActive = false;
+                  ctrl.setOverlay();
+                }
+              )
+            );
 
-            $scope.$on('showInteraction', function() {
-              refreshMap();
-            });
-
-            $scope.$on('leafletDirectiveMap.interactiveMap.mouseover',
-              function() {
+            $scope.$on(
+              'leafletDirectiveMap.interactiveMap.mouseover', function() {
                 if (!ctrl.interactionIsActive) {
                   ctrl.setOverlay();
                 }
@@ -145,8 +149,8 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
                   ctrl.hideOverlay();
                 }
               });
-            $scope.$on('leafletDirectiveMap.interactiveMap.click',
-              function(evt, args) {
+            $scope.$on(
+              'leafletDirectiveMap.interactiveMap.click', function(evt, args) {
                 if (ctrl.interactionIsActive) {
                   var newLat = args.leafletEvent.latlng.lat;
                   var newLng = args.leafletEvent.latlng.lng;
@@ -169,6 +173,9 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
             ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
             ctrl.mapMarkers = {};
             refreshMap();
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

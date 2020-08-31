@@ -19,6 +19,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import nerdamer from 'nerdamer';
+
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Warning, baseInteractionValidationService } from
@@ -27,6 +29,7 @@ import { AlgebraicExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { AlgebraicExpressionInputRulesService } from
   './algebraic-expression-input-rules.service';
+import { MathInteractionsService } from 'services/math-interactions.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { AppConstants } from 'app.constants';
@@ -39,13 +42,36 @@ export class AlgebraicExpressionInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
+  getCustomizationArgsWarnings(
+      customizationArgs: AlgebraicExpressionInputCustomizationArgs): Warning[] {
+    let warningsList = [];
+
+    // TODO(#7434): Use dot notation after we find a way to get
+    // rid of the TS2339 error on AppConstants.
+    // eslint-disable-next-line dot-notation
+    let allowedLettersLimit = AppConstants['MAX_CUSTOM_LETTERS_FOR_OSK'];
+    if (customizationArgs.customOskLetters.value.length > allowedLettersLimit) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: (
+          'The number of custom letters cannot be more than ' +
+          allowedLettersLimit + '.')
+      });
+    }
+
+    return warningsList;
+  }
+
   getAllWarnings(
       stateName: string,
       customizationArgs: AlgebraicExpressionInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     let warningsList = [];
-    let algebraicRulesService = (
-      new AlgebraicExpressionInputRulesService());
+    let algebraicRulesService = new AlgebraicExpressionInputRulesService();
+    let mathInteractionsService = new MathInteractionsService();
+
+    warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
 
     warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
@@ -59,12 +85,22 @@ export class AlgebraicExpressionInputValidationService {
     // A MatchesExactlyWith rule will make the following rules of the same rule
     // type and a matching input, invalid.
     let seenRules = [];
+    let seenVariables = [];
 
     for (let i = 0; i < answerGroups.length; i++) {
-      let rules = answerGroups[i].rules;
+      let rules = answerGroups[i].getRulesAsList();
       for (let j = 0; j < rules.length; j++) {
         let currentInput = <string> rules[j].inputs.x;
+        // Explicitly inserting '*' signs wherever necessary.
+        currentInput = mathInteractionsService.insertMultiplicationSigns(
+          currentInput);
         let currentRuleType = <string> rules[j].type;
+
+        for (let variable of nerdamer(currentInput).variables()) {
+          if (seenVariables.indexOf(variable) === -1) {
+            seenVariables.push(variable);
+          }
+        }
 
         for (let seenRule of seenRules) {
           let seenInput = <string> seenRule.inputs.x;
@@ -98,6 +134,36 @@ export class AlgebraicExpressionInputValidationService {
         }
         seenRules.push(rules[j]);
       }
+    }
+
+    // TODO(#7434): Use dot notation after we find a way to get
+    // rid of the TS2339 error on AppConstants.
+    /* eslint-disable dot-notation */
+    let greekLetters = Object.keys(
+      AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS']);
+    let greekSymbols = Object.values(
+      AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS']);
+    /* eslint-enable dot-notation */
+    let missingVariables = [];
+
+    for (let variable of seenVariables) {
+      if (variable.length > 1) {
+        variable = greekSymbols[greekLetters.indexOf(variable)];
+      }
+      if (customizationArgs.customOskLetters.value.indexOf(variable) === -1) {
+        if (missingVariables.indexOf(variable) === -1) {
+          missingVariables.push(variable);
+        }
+      }
+    }
+
+    if (missingVariables.length > 0) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: (
+          'The following variables are present in some of the answer groups ' +
+          'but are missing from the custom letters list: ' + missingVariables)
+      });
     }
 
     return warningsList;

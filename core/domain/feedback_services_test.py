@@ -340,7 +340,6 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             'exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID,
             self.user_id, None, None, 'not used here')
 
-
         thread_ids = subscription_services.get_all_threads_subscribed_to(
             self.user_id)
         thread_ids.append('exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID)
@@ -493,7 +492,6 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
             self.assertEqual(
                 event_handler_call_counter_exploration.times_called, 1)
-
 
         event_handler_call_counter_non_exploration = (
             test_utils.CallCounter(

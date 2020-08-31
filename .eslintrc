@@ -10,7 +10,8 @@
     "angular",
     "html",
     "unused-imports",
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "oppia"
   ],
   "overrides": [{
     // We exclude test files from dependency injection format checks because
@@ -21,6 +22,7 @@
     }
   }],
   "rules": {
+    "oppia/break-after-parens": "error",
     "angular/di": [
       "error",
       "array"
@@ -202,6 +204,10 @@
     // The following must be off so that we can enable
     // "@typescript-eslint/semi", which checks semicolons in TS files.
     "semi": "off",
+    // The following must be off so that we can enable
+    // "@typescript-eslint/no-extra-semi".
+    "no-extra-semi": "off",
+    "semi-spacing": "error",
     "space-before-blocks": [
       "error",
       "always"
@@ -217,6 +223,10 @@
     "spaced-comment": [
       "error",
       "always"
+    ],
+    "space-in-parens": [
+      "error",
+      "never"
     ],
     "space-infix-ops": [
       "error"
@@ -238,6 +248,43 @@
     "unused-imports/no-unused-imports-ts": "error",
     "@typescript-eslint/no-explicit-any": ["error"],
     "@typescript-eslint/semi": ["error"],
+    "@typescript-eslint/ban-types": [
+      "error",
+      {
+        "types": {
+          "String": {
+            "message": "Use string instead.",
+            "fixWith": "string"
+          },
+          "Number": {
+            "message": "Use number instead.",
+            "fixWith": "number"
+          },
+          "Boolean": {
+            "message": "Use boolean instead.",
+            "fixWith": "boolean"
+          }
+        },
+        "extendDefaults": false
+      }
+    ],
+    "@typescript-eslint/array-type": [
+      "error",
+      {
+        "default": "array"
+      }
+    ],
+    "@typescript-eslint/no-non-null-assertion": ["error"],
+    "@typescript-eslint/no-non-null-asserted-optional-chain": ["error"],
+    "@typescript-eslint/prefer-namespace-keyword": ["error"],
+    "@typescript-eslint/triple-slash-reference": ["error"],
+    "@typescript-eslint/adjacent-overload-signatures": ["error"],
+    "@typescript-eslint/no-extra-non-null-assertion": ["error"],
+    "@typescript-eslint/no-misused-new": ["error"],
+    "@typescript-eslint/explicit-module-boundary-types": ["error"],
+    "@typescript-eslint/prefer-as-const": ["error"],
+    "@typescript-eslint/no-array-constructor": ["error"],
+    "@typescript-eslint/no-extra-semi": ["error"],
     "wrap-iife": [
       "error",
       "any"
