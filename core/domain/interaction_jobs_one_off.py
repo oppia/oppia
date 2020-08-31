@@ -25,6 +25,7 @@ from core.domain import exp_fetchers
 from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.platform import models
+import python_utils
 
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
@@ -208,6 +209,39 @@ class InteractionCustomizationArgsValidationOneOffJob(
             yield (
                 'Failed customization args validation for exp '
                 'id %s' % item.id, ', '.join(error_messages))
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
+class ContinueLabelValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks if any exploration's continue button label is longer
+    than 50 characters.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if not item.deleted:
+            exp_status = rights_manager.get_exploration_rights(item.id).status
+            if exp_status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+                return
+            exploration = exp_fetchers.get_exploration_from_model(item)
+            for state_name, state in exploration.states.items():
+                interaction = state.interaction
+                if interaction.id == 'Continue':
+                    button_text = interaction.customization_args['buttonText']
+                    button_text_length = len(button_text.value.unicode_str)
+                    if button_text_length > 50:
+                        yield (
+                            item.id,
+                            'State name: %s, Button label length: %s' % (
+                                state_name.encode('utf-8'),
+                                python_utils.UNICODE(button_text_length)))
 
     @staticmethod
     def reduce(key, values):

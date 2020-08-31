@@ -72,6 +72,7 @@ ONE_OFF_JOB_MANAGERS = [
         .InteractionCustomizationArgsValidationOneOffJob),
     interaction_jobs_one_off.ItemSelectionInteractionOneOffJob,
     interaction_jobs_one_off.MultipleChoiceInteractionOneOffJob,
+    interaction_jobs_one_off.ContinueLabelValidationOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
