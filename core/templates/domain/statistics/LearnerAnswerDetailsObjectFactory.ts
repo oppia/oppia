@@ -66,7 +66,7 @@ export class LearnerAnswerDetails {
   providedIn: 'root'
 })
 export class LearnerAnswerDetailsObjectFactory {
-  static createDefaultLearnerAnswerDetails(
+  createDefaultLearnerAnswerDetails(
       expId: string, stateName: string, interactionId: string,
       customizationArgs: InteractionCustomizationArgs,
       learnerAnswerInfoData: LearnerAnswerInfo[]): LearnerAnswerDetails {

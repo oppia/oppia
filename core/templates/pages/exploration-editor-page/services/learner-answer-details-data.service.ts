@@ -63,10 +63,10 @@ export class LearnerAnswerDetailsDataService {
             this.learnerAnswerInfoData[i].learner_answer_info_dicts
           );
           const learnerAnswerDetails = (
-            LearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails(
+            new LearnerAnswerDetailsObjectFactory().createDefaultLearnerAnswerDetails(
               this._expId, stateName, interactionId, customizationArgs,
               learnerAnswerInfoDicts.map(
-                LearnerAnswerInfoObjectFactory.createFromBackendDict
+                new LearnerAnswerInfoObjectFactory().createFromBackendDict
               )
             )
           );
