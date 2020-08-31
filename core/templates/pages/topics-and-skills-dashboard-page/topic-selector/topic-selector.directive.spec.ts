@@ -12,22 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the topic selector directive.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
-
 describe('Topic selector Directive', function() {
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
   var $scope = null;
   var ctrl = null;
   var $rootScope = null;
@@ -51,7 +42,9 @@ describe('Topic selector Directive', function() {
     totalSkillCount: 0,
     uncategorizedSkillCount: 0,
     urlFragment: 'd',
-    version: 2}, {
+    isSelected: false,
+    version: 2},
+  {
     additionalStoryCount: 0,
     canEditTopic: true,
     canonicalStoryCount: 0,
@@ -68,6 +61,7 @@ describe('Topic selector Directive', function() {
     topicModelLastUpdated: 1598310242544.855,
     totalSkillCount: 0,
     uncategorizedSkillCount: 0,
+    isSelected: false,
     urlFragment: 'd2',
   }];
 
@@ -87,14 +81,17 @@ describe('Topic selector Directive', function() {
     });
   }));
 
-  it('should select and deselect the topics', function() {
+  it('should allow select and deselect the topics', function() {
     ctrl.$onInit();
     $scope.selectOrDeselectTopic(topicSummaries[0].id, 0);
     expect(selectedTopicIds).toEqual([topicSummaries[0].id]);
+    expect(topicSummaries[0].isSelected).toEqual(true);
     $scope.selectOrDeselectTopic(topicSummaries[1].id, 1);
     expect(selectedTopicIds).toEqual(
       [topicSummaries[0].id, topicSummaries[1].id]);
+    expect(topicSummaries[1].isSelected).toEqual(true);
     $scope.selectOrDeselectTopic(topicSummaries[0].id, 0);
     expect(selectedTopicIds).toEqual([topicSummaries[1].id]);
+    expect(topicSummaries[0].isSelected).toEqual(false);
   });
 });
