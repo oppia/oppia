@@ -549,7 +549,6 @@
 /webpack.prod.config.ts @jameesjohn @vojtechjelinek
 /webpack.terser.config.ts @nishantwrp @vojtechjelinek
 
-
 # Typings.
 /typings @ankita240796 @nishantwrp
 
@@ -599,7 +598,6 @@
 /extensions/rich_text_components/protractor.js @U8NWXD @kevintab95
 /extensions/objects/protractor.js @U8NWXD @kevintab95
 
-
 # Critical files.
 #
 # IMPORTANT NOTE: Please ensure that these files are always located at the end
@@ -610,6 +608,7 @@
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
 # in scripts/linters/pre_commit_linter.py in sync with the modifications.
+/scripts/linters/warranted_angular_security_bypasses.py @seanlip
 /core/controllers/acl_decorators*.py @seanlip
 /core/controllers/base*.py @seanlip
 /core/domain/html*.py @seanlip
