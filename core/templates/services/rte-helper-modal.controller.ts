@@ -128,7 +128,9 @@ angular.module('oppia').controller('RteHelperModalController', [
           ImageUploadHelperService.convertImageDataToImageFile(svgFile));
         const HUNDRED_KB_IN_BYTES = 100 * 1024;
         if (resampledFile.size > HUNDRED_KB_IN_BYTES) {
-          AlertsService.addWarning('The SVG file generated exceeds 100 KB.');
+          AlertsService.addInfoMessage(
+            'The SVG file generated exceeds 100' +
+            ' KB. Please split the expression into smaller ones.');
           $uibModalInstance.dismiss('cancel');
           return;
         }
