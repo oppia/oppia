@@ -429,9 +429,9 @@ def check_for_backend_python_library_inconsistencies():
             '{:<35} |{:<25}|{:<25}'.format(
                 'Library', 'Requirements Version',
                 'Currently Installed Version'))
-        for library, versions in mismatches.items():
+        for library_name, version_strings in mismatches.items():
             python_utils.PRINT('{:<35} |{:<25}|{:<25}'.format(
-                library, versions[0], versions[1]))
+                library_name, version_strings[0], version_strings[1]))
         python_utils.PRINT('\n')
         common.print_each_string_after_two_new_lines([
             'Please choose one of the following options to rectify your local\n'

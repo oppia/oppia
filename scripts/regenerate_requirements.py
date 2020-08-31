@@ -15,10 +15,11 @@
 """Script to generate a deterministic compiled requirements file.
 
 This needs to be a separate script because the python function that regenerates
-the requirements file is a cli script. Once the cli finishes execution, it
-forces itself and any python scripts in the current callstack to exit.
+the requirements file is a command-line interface (CLI) script. Once the CLI
+finishes execution, it forces itself and any python scripts in the current
+callstack to exit.
 Therefore, in order to allow continued execution after the requirements
-file is generated, we must call the cli in a separate process.
+file is generated, we must call the CLI in a separate process.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -56,7 +57,7 @@ def main():
     # libraries correctly.
     sys.argv[0] = re.sub(
         r'(-script\.pyw|\.exe)?$', '',
-        common.PRE_COMPILED_REQUIREMENTS_FILE_PATH)
+        common. REQUIREMENTS_FILE_PATH)
     compile.cli() # pylint: disable=no-value-for-parameter
 
 
