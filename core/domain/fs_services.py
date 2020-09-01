@@ -23,7 +23,10 @@ import json
 
 from core.domain import fs_domain
 from core.domain import image_services
+from core.platform import models
 import feconf
+
+(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
 def save_original_and_compressed_versions_of_image(
@@ -148,3 +151,54 @@ def get_entity_file_system_class():
         class. GcsFileSystem class.
     """
     return fs_domain.GcsFileSystem
+
+
+def get_image_context_for_suggestion_target(suggestion_target_type):
+    """Returns the image context for a particular suggestion target type.
+
+    Args:
+        suggestion_target_type: str. The entity type of the target of the
+            suggestion.
+
+    Returns:
+        str. The image context for the given suggestion target type.
+    """
+    if suggestion_target_type == suggestion_models.TARGET_TYPE_SKILL:
+        return feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
+    elif suggestion_target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
+        return feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
+    else:
+        raise Exception('Invalid suggestion target type.')
+
+
+def copy_images(
+        source_entity_type, source_entity_id, destination_entity_type,
+        destination_entity_id, filenames):
+    """Copy images from source to destination.
+
+    Args:
+        source_entity_type: str. The entity type of the source.
+        source_entity_id: str. The type of the source entity.
+        destination_entity_id: str. The id of the destination entity.
+        destination_entity_type: str. The entity type of the destination.
+        filenames: list(str). The list of filenames to copy.
+    """
+    file_system_class = get_entity_file_system_class()
+    source_fs = fs_domain.AbstractFileSystem(file_system_class(
+        source_entity_type, source_entity_id))
+    destination_fs = fs_domain.AbstractFileSystem(file_system_class(
+        destination_entity_type, destination_entity_id))
+    for filename in filenames:
+        filename_wo_filetype = filename[:filename.rfind('.')]
+        filetype = filename[filename.rfind('.') + 1:]
+        compressed_image_filename = '%s_compressed.%s' % (
+            filename_wo_filetype, filetype)
+        micro_image_filename = '%s_micro.%s' % (
+            filename_wo_filetype, filetype)
+        destination_fs.copy(
+            source_fs.impl.assets_path, ('image/%s' % filename))
+        destination_fs.copy(
+            source_fs.impl.assets_path,
+            ('image/%s' % compressed_image_filename))
+        destination_fs.copy(
+            source_fs.impl.assets_path, ('image/%s' % micro_image_filename))

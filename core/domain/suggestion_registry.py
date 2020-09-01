@@ -23,6 +23,8 @@ from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_services
+from core.domain import html_cleaner
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
@@ -649,7 +651,8 @@ class SuggestionAddQuestion(BaseSuggestion):
                 self.change.question_dict['question_state_data']),
             self.change.question_dict['question_state_data_schema_version'],
             self.change.question_dict['language_code'], None,
-            self.change.question_dict['linked_skill_ids'])
+            self.change.question_dict['linked_skill_ids'],
+            self.change.question_dict['inapplicable_misconception_ids'])
         question.partial_validate()
         question_state_data_schema_version = (
             self.change.question_dict['question_state_data_schema_version'])
@@ -697,6 +700,15 @@ class SuggestionAddQuestion(BaseSuggestion):
         question_dict['version'] = 1
         question_dict['id'] = (
             question_services.get_new_question_id())
+        html_list = self.get_all_html_content_strings()
+        filenames = (
+            html_cleaner.get_image_filenames_from_html_strings(html_list))
+        image_context = fs_services.get_image_context_for_suggestion_target(
+            self.target_type)
+        fs_services.copy_images(
+            image_context, self.target_id, feconf.ENTITY_TYPE_QUESTION,
+            self.target_id, filenames)
+
         question_dict['linked_skill_ids'] = [self.change.skill_id]
         question = question_domain.Question.from_dict(question_dict)
         question.validate()
