@@ -2261,7 +2261,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-
         state_dict_with_new_math_schema = {
             'content': {
                 'content_id': 'content', 'html': html_with_new_math_schema

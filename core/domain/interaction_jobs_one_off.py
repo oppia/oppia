@@ -50,19 +50,22 @@ class DragAndDropSortInputInteractionOneOffJob(
         exploration = exp_fetchers.get_exploration_from_model(item)
         validation_errors = []
         for state_name, state in exploration.states.items():
+            choices_length = len(
+                    state.interaction.customization_args['choices'].value)
             if state.interaction.id == 'DragAndDropSortInput':
                 for answer_group_index, answer_group in enumerate(
                         state.interaction.answer_groups):
                     for rule_index, rule_spec in enumerate(
                             answer_group.rule_specs):
-                        if rule_spec.inputs['x'] >= choices_length:
-                            yield (
-                                item.id,
-                                'State name: %s, AnswerGroup: %s,' % (
-                                    state_name.encode('utf-8'),
-                                    answer_group_index) +
-                                ' Rule: %s is invalid.' % (rule_index) +
-                                '(Indices here are 0-indexed.)')
+                        for rule_input in rule_spec.inputs:
+                            value = rule_spec.inputs[rule_input]
+                            if value == '' or value == []:
+                                validation_errors.append(
+                                    'State name: %s, AnswerGroup: %s,' % (
+                                        state_name,
+                                        answer_group_index) +
+                                    ' Rule input %s in rule with index %s'
+                                    ' is empty. ' % (rule_input, rule_index))
         if validation_errors:
             yield (item.id, validation_errors)
 
@@ -95,15 +98,14 @@ class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         state.interaction.answer_groups):
                     for rule_index, rule_spec in enumerate(
                             answer_group.rule_specs):
-                        for rule_input in rule_spec.inputs:
-                            value = rule_spec.inputs[rule_input]
-                            if value == '' or value == []:
-                                validation_errors.append(
-                                    'State name: %s, AnswerGroup: %s,' % (
-                                        state_name,
-                                        answer_group_index) +
-                                    ' Rule input %s in rule with index %s'
-                                    ' is empty. ' % (rule_input, rule_index))
+                        if rule_spec.inputs['x'] >= choices_length:
+                            yield (
+                                item.id,
+                                'State name: %s, AnswerGroup: %s,' % (
+                                    state_name.encode('utf-8'),
+                                    answer_group_index) +
+                                ' Rule: %s is invalid.' % (rule_index) +
+                                '(Indices here are 0-indexed.)')
 
     @staticmethod
     def reduce(key, values):

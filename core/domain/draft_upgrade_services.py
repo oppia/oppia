@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import collections
 import logging
 
 from core.domain import exp_domain
@@ -240,7 +239,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                 # an exploration state of a given version into draft conversion
                 # functions, we throw an Exception to indicate that the
                 # conversion cannot be completed.
-                raise InvalidDraftConversionException('Conversion cannot be completed.')
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod
@@ -275,7 +275,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         'IsMathematicallyEquivalentTo')))
             if interaction_id_change_condition or (
                     answer_groups_change_condition):
-                raise InvalidDraftConversionException('Conversion cannot be completed.')
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
 
         return draft_change_list
 

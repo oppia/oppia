@@ -1928,6 +1928,7 @@ class RuleSpec(python_utils.OBJECT):
 
     def __init__(self, rule_type, inputs):
         """Initializes a RuleSpec domain object.
+
         Args:
             rule_type: str. The rule type, e.g. "CodeContains" or "Equals". A
                 full list of rule types can be found in
@@ -1943,6 +1944,7 @@ class RuleSpec(python_utils.OBJECT):
 
     def to_dict(self):
         """Returns a dict representing this RuleSpec domain object.
+
         Returns:
             dict. A dict, mapping all fields of RuleSpec instance.
         """
@@ -1954,8 +1956,10 @@ class RuleSpec(python_utils.OBJECT):
     @classmethod
     def from_dict(cls, rulespec_dict):
         """Return a RuleSpec domain object from a dict.
+
         Args:
             rulespec_dict: dict. The dict representation of RuleSpec object.
+
         Returns:
             RuleSpec. The corresponding RuleSpec domain object.
         """
@@ -1968,6 +1972,7 @@ class RuleSpec(python_utils.OBJECT):
         """Validates a RuleSpec value object. It ensures the inputs dict does
         not refer to any non-existent parameters and that it contains values
         for all the parameters the rule expects.
+
         Args:
             rule_params_list: list(str, object(*)). A list of parameters used by
                 the rule represented by this RuleSpec instance, to be used to
@@ -1981,6 +1986,7 @@ class RuleSpec(python_utils.OBJECT):
                 ParamSpec value objects with an object type property (obj_type).
                 RuleSpec inputs may have a parameter value which refers to one
                 of these exploration parameters.
+
         Raises:
             ValidationError. One or more attributes of the RuleSpec are
                 invalid.
@@ -2037,10 +2043,12 @@ class RuleSpec(python_utils.OBJECT):
     def convert_html_in_rule_spec(rule_spec_dict, conversion_fn):
         """Checks for HTML fields in a Rule Spec and converts it according
         to the conversion function.
+
         Args:
             rule_spec_dict: dict. The Rule Spec dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
+
         Returns:
             dict. The converted Rule Spec dict.
         """
@@ -2109,7 +2117,6 @@ class RuleSpec(python_utils.OBJECT):
                     raise Exception(
                         'Rule spec should have at least one valid input '
                         'variable with Html in it.')
-
 
         return rule_spec_dict
 
