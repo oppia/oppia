@@ -122,8 +122,9 @@ def get_question_from_model(question_model):
         state_domain.State.from_dict(versioned_question_state['state']),
         versioned_question_state['state_schema_version'],
         question_model.language_code, question_model.version,
-        question_model.linked_skill_ids, question_model.created_on,
-        question_model.last_updated)
+        question_model.linked_skill_ids,
+        question_model.inapplicable_misconception_ids,
+        question_model.created_on, question_model.last_updated)
 
 
 def _migrate_state_schema(versioned_question_state):
