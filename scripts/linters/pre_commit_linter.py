@@ -61,16 +61,13 @@ import threading
 import python_utils
 
 # Install third party dependencies before proceeding.
-from . import app_dev_linter
 from . import codeowner_linter
 from . import css_linter
 from . import general_purpose_linter
 from . import html_linter
 from . import js_ts_linter
-from . import linter_utils
+from . import other_files_linter
 from . import python_linter
-from . import third_party_typings_linter
-from . import webpack_config_linter
 from .. import common
 from .. import concurrent_task_utils
 from .. import install_third_party_libs
@@ -198,13 +195,11 @@ class FileCache(python_utils.OBJECT):
         return self._CACHE_DATA_DICT[key]
 
 
-def _get_linters_for_file_extension(
-        file_extension_to_lint, verbose_mode_enabled=False):
+def _get_linters_for_file_extension(file_extension_to_lint):
     """Return linters for the file extension type.
 
     Args:
         file_extension_to_lint: str. The file extension to be linted.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
         (CustomLintChecks, ThirdPartyLintChecks). A 2-tuple containing objects
@@ -225,45 +220,46 @@ def _get_linters_for_file_extension(
         general_files_to_lint = _FILES['.%s' % file_extension_to_lint]
 
     custom_linter, third_party_linter = general_purpose_linter.get_linters(
-        general_files_to_lint, FILE_CACHE,
-        verbose_mode_enabled=verbose_mode_enabled)
+        general_files_to_lint, FILE_CACHE)
     custom_linters.append(custom_linter)
 
     if file_extension_type_js_ts:
         custom_linter, third_party_linter = js_ts_linter.get_linters(
-            _FILES['.js'], _FILES['.ts'], FILE_CACHE,
-            verbose_mode_enabled=verbose_mode_enabled)
+            _FILES['.js'], _FILES['.ts'], FILE_CACHE)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'html':
         custom_linter, third_party_linter = html_linter.get_linters(
-            _FILES['.html'], FILE_CACHE,
-            verbose_mode_enabled=verbose_mode_enabled)
+            _FILES['.html'], FILE_CACHE)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
         config_path_for_css_in_html = os.path.join(
             parent_dir, 'oppia', '.stylelintrc')
         custom_linter, third_party_linter = css_linter.get_linters(
-            config_path_for_css_in_html, _FILES['.html'],
-            verbose_mode_enabled=verbose_mode_enabled)
+            config_path_for_css_in_html, _FILES['.html'])
         third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'css':
         config_path_for_oppia_css = os.path.join(
             parent_dir, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
         custom_linter, third_party_linter = css_linter.get_linters(
-            config_path_for_oppia_css, _FILES['.css'],
-            verbose_mode_enabled=verbose_mode_enabled)
+            config_path_for_oppia_css, _FILES['.css'])
         third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'py':
         custom_linter, third_party_linter = python_linter.get_linters(
-            _FILES['.py'], FILE_CACHE,
-            verbose_mode_enabled=verbose_mode_enabled)
+            _FILES['.py'], FILE_CACHE)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
+
+    elif file_extension_to_lint == 'other':
+        custom_linter, _ = codeowner_linter.get_linters(FILE_CACHE)
+        custom_linters.append(custom_linter)
+
+        custom_linter, _ = other_files_linter.get_linters(FILE_CACHE)
+        custom_linters.append(custom_linter)
 
     return custom_linters, third_party_linters
 
@@ -428,24 +424,26 @@ def _print_summary_of_error_messages(lint_messages):
         python_utils.PRINT('Please fix the errors below:')
         python_utils.PRINT('----------------------------------------')
         for message in lint_messages:
-            if message.startswith(('SUCCESS', 'FAILED')):
-                continue
-            else:
-                python_utils.PRINT(message)
+            python_utils.PRINT(message)
 
 
-def _get_task_output(lint_messages, task, semaphore):
+def _get_task_output(lint_messages, failed, task):
     """Returns output of running tasks.
 
     Args:
         lint_messages: list(str). List of summary messages of linter output.
+        failed: bool. The boolean to check if lint checks fail or not.
         task: object(TestingTaskSpec). The task object to get output of linter.
-        semaphore: threading.Semaphore. The object that controls how many tasks
-            can run at any time.
+
+    Returns:
+        bool. The boolean to check if the lint checks fail or not.
     """
-    if task.output:
-        lint_messages += task.output
-    semaphore.release()
+    if task.task_results:
+        for task_result in task.task_results:
+            lint_messages += task_result.trimmed_messages
+            if task_result.failed:
+                failed = True
+    return failed
 
 
 def _print_errors_stacktrace(errors_stacktrace):
@@ -512,7 +510,7 @@ def main(args=None):
     third_party_linters = []
     for file_extension_type in file_extension_types:
         custom_linter, third_party_linter = _get_linters_for_file_extension(
-            file_extension_type, verbose_mode_enabled=verbose_mode_enabled)
+            file_extension_type)
         custom_linters += custom_linter
         third_party_linters += third_party_linter
 
@@ -547,38 +545,19 @@ def main(args=None):
         tasks_third_party, third_party_semaphore)
 
     lint_messages = []
-
-    # Prepare semaphore for locking mechanism.
-    semaphore = threading.Semaphore(1)
+    failed = False
 
     for task in tasks_custom:
-        semaphore.acquire()
-        _get_task_output(lint_messages, task, semaphore)
+        failed = _get_task_output(lint_messages, failed, task)
 
     for task in tasks_third_party:
-        semaphore.acquire()
-        _get_task_output(lint_messages, task, semaphore)
-
-    lint_messages += codeowner_linter.check_codeowner_file(
-        FILE_CACHE, verbose_mode_enabled)
-
-    lint_messages += (
-        third_party_typings_linter.check_third_party_libs_type_defs(
-            verbose_mode_enabled))
-
-    lint_messages += app_dev_linter.check_skip_files_in_app_dev_yaml(
-        FILE_CACHE, verbose_mode_enabled)
-
-    lint_messages += webpack_config_linter.check_webpack_config_file(
-        FILE_CACHE, verbose_mode_enabled)
+        failed = _get_task_output(lint_messages, failed, task)
 
     errors_stacktrace = concurrent_task_utils.ALL_ERRORS
     if errors_stacktrace:
         _print_errors_stacktrace(errors_stacktrace)
 
-    if any([
-            message.startswith(linter_utils.FAILED_MESSAGE_PREFIX) for
-            message in lint_messages]) or errors_stacktrace:
+    if failed:
         _print_summary_of_error_messages(lint_messages)
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('Checks Not Passed.')

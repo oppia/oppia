@@ -180,7 +180,10 @@ class TestingTaskSpec(python_utils.OBJECT):
         else:
             exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
-        return run_shell_cmd(exc_list)
+        result = run_shell_cmd(exc_list)
+
+        return [concurrent_task_utils.TaskResult(
+            None, None, None, [result])]
 
 
 def _get_all_test_targets(test_path=None, include_load_tests=True):
@@ -312,7 +315,8 @@ def main(args=None):
         test = TestingTaskSpec(
             test_target, parsed_args.generate_coverage_report)
         task = concurrent_task_utils.create_task(
-            test.run, parsed_args.verbose, semaphore, name=test_target)
+            test.run, parsed_args.verbose, semaphore, name=test_target,
+            report_enabled=False)
         task_to_taskspec[task] = test
         tasks.append(task)
 
@@ -384,7 +388,8 @@ def main(args=None):
         else:
             try:
                 tests_run_regex_match = re.search(
-                    r'Ran ([0-9]+) tests? in ([0-9\.]+)s', task.output)
+                    r'Ran ([0-9]+) tests? in ([0-9\.]+)s',
+                    task.task_results[0].get_report()[0])
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
                 python_utils.PRINT(
@@ -393,7 +398,7 @@ def main(args=None):
             except Exception:
                 python_utils.PRINT(
                     'An unexpected error occurred. '
-                    'Task output:\n%s' % task.output)
+                    'Task output:\n%s' % task.task_results[0].get_report()[0])
 
         total_count += test_count
 

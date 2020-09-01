@@ -53,20 +53,20 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
     def test_all_filepaths_with_success(self):
         filepaths = [VALID_CSS_FILEPATH, INVALID_CSS_FILEPATH]
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-            CONFIG_PATH, filepaths, True)
+            CONFIG_PATH, filepaths)
         returned_filepaths = third_party_linter.all_filepaths
         self.assertEqual(returned_filepaths, filepaths)
 
     def test_perform_all_lint_checks_with_invalid_file(self):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-            CONFIG_PATH, [INVALID_CSS_FILEPATH], True)
-        with self.print_swap:
-            third_party_linter.perform_all_lint_checks()
+            CONFIG_PATH, [INVALID_CSS_FILEPATH])
+        lint_task_report = third_party_linter.lint_css_files()
         self.assert_same_list_elements([
             '19:16',
             'Unexpected whitespace before \":\"   declaration-colon-space-'
-            'before'], self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 1)
+            'before'], lint_task_report.get_report())
+        self.assertEqual('Stylelint', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
 
     def test_perform_all_lint_checks_with_invalid_stylelint_path(self):
         def mock_join(*unused_args):
@@ -75,7 +75,7 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
         join_swap = self.swap(os.path, 'join', mock_join)
 
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-            CONFIG_PATH, [INVALID_CSS_FILEPATH], False)
+            CONFIG_PATH, [INVALID_CSS_FILEPATH])
         with self.print_swap, join_swap, self.assertRaisesRegexp(
             SystemExit, '1'):
             third_party_linter.perform_all_lint_checks()
@@ -93,35 +93,30 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
             subprocess, 'Popen', mock_popen)
 
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-            CONFIG_PATH, [VALID_CSS_FILEPATH], True)
+            CONFIG_PATH, [VALID_CSS_FILEPATH])
         with self.print_swap, popen_swap, self.assertRaisesRegexp(
             SystemExit, '1'):
             third_party_linter.perform_all_lint_checks()
 
     def test_perform_all_lint_checks_with_no_files(self):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-            CONFIG_PATH, [], False)
-        with self.print_swap:
-            third_party_linter.perform_all_lint_checks()
-        self.assert_same_list_elements(
-            ['There are no HTML or CSS files to lint.'],
-            self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 0)
+            CONFIG_PATH, [])
+        lint_task_report = third_party_linter.perform_all_lint_checks()
+        self.assertEqual(
+            'There are no HTML or CSS files to lint.',
+            lint_task_report[0].get_report()[0])
+        self.assertEqual('CSS lint', lint_task_report[0].name)
+        self.assertFalse(lint_task_report[0].failed)
 
     def test_perform_all_lint_checks_with_valid_file(self):
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
-            CONFIG_PATH, [VALID_CSS_FILEPATH], False)
-        with self.print_swap:
-            third_party_linter.perform_all_lint_checks()
-        self.assert_same_list_elements(
-            ['SUCCESS  1 CSS file linted'],
-            self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 0)
+            CONFIG_PATH, [VALID_CSS_FILEPATH])
+        lint_task_report = third_party_linter.perform_all_lint_checks()
+        self.assertTrue(isinstance(lint_task_report, list))
 
     def test_get_linters(self):
         custom_linter, third_party_linter = css_linter.get_linters(
-            CONFIG_PATH, [VALID_CSS_FILEPATH, INVALID_CSS_FILEPATH],
-            verbose_mode_enabled=True)
+            CONFIG_PATH, [VALID_CSS_FILEPATH, INVALID_CSS_FILEPATH])
         self.assertEqual(custom_linter, None)
         self.assertTrue(
             isinstance(
