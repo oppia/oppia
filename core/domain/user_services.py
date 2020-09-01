@@ -82,6 +82,7 @@ class UserSettings(python_utils.OBJECT):
             preferences specified by the user.
         preferred_site_language_code: str or None. System language preference.
         preferred_audio_language_code: str or None. Audio language preference.
+        pin: str or None. The PIN of the user's profile for android.
     """
 
     def __init__(
@@ -94,7 +95,7 @@ class UserSettings(python_utils.OBJECT):
                 constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
             user_bio='', subject_interests=None, first_contribution_msec=None,
             preferred_language_codes=None, preferred_site_language_code=None,
-            preferred_audio_language_code=None, deleted=False):
+            preferred_audio_language_code=None, pin=None, deleted=False):
         """Constructs a UserSettings domain object.
 
         Args:
@@ -132,6 +133,7 @@ class UserSettings(python_utils.OBJECT):
                 preference.
             preferred_audio_language_code: str or None. Default language used
                 for audio translations preference.
+            pin: str or None. The PIN of the user's profile for android.
             deleted: bool. Whether the user has requested removal of their
                 account.
         """
@@ -159,6 +161,7 @@ class UserSettings(python_utils.OBJECT):
             preferred_language_codes if preferred_language_codes else [])
         self.preferred_site_language_code = preferred_site_language_code
         self.preferred_audio_language_code = preferred_audio_language_code
+        self.pin = pin
         self.deleted = deleted
 
     def validate(self):
@@ -186,6 +189,13 @@ class UserSettings(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected gae_id to be a string, received %s' %
                 self.gae_id
+            )
+
+        if (self.pin is not None and
+                not isinstance(self.pin, python_utils.BASESTRING)):
+            raise utils.ValidationError(
+                'Expected PIN to be a string, received %s' %
+                self.pin
             )
 
         if not isinstance(self.email, python_utils.BASESTRING):
@@ -804,6 +814,7 @@ def _save_user_settings(user_settings):
             user_settings.preferred_site_language_code),
         'preferred_audio_language_code': (
             user_settings.preferred_audio_language_code),
+        'pin': user_settings.pin,
         'deleted': user_settings.deleted
     }
 
@@ -858,6 +869,7 @@ def _transform_user_settings(user_settings_model):
             user_settings_model.preferred_site_language_code),
         preferred_audio_language_code=(
             user_settings_model.preferred_audio_language_code),
+        pin=user_settings_model.pin,
         deleted=user_settings_model.deleted
     )
 

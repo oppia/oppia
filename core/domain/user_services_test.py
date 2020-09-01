@@ -1357,6 +1357,13 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
+    def test_validate_non_str_pin_id(self):
+        self.user_settings.pin = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected PIN to be a string'
+        ):
+            self.user_settings.validate()
+
     def test_validate_empty_user_id(self):
         self.user_settings.user_id = ''
         with self.assertRaisesRegexp(

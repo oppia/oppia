@@ -62,6 +62,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     USER_1_ROLE = feconf.ROLE_ID_ADMIN
     USER_1_EMAIL = 'user1@example.com'
     GENERIC_USERNAME = 'user'
+    GENERIC_PIN = '12345'
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
     GENERIC_EPOCH = utils.get_time_in_millisecs(GENERIC_DATE)
     GENERIC_IMAGE_URL = 'www.example.com/example.png'
@@ -327,7 +328,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             preferred_language_codes=self.GENERIC_LANGUAGE_CODES,
             preferred_site_language_code=self.GENERIC_LANGUAGE_CODES[0],
             preferred_audio_language_code=self.GENERIC_LANGUAGE_CODES[0],
-            display_alias=self.GENERIC_DISPLAY_ALIAS
+            display_alias=self.GENERIC_DISPLAY_ALIAS,
+            pin=self.GENERIC_PIN
         ).put()
 
         # Setup for GeneralFeedbackReplyToId.
@@ -537,7 +539,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'preferred_language_codes': [],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
-            'display_alias': None
+            'display_alias': None,
+            'pin': None
         }
         skill_data = {}
         stats_data = {}
@@ -812,7 +815,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
-            'display_alias': self.GENERIC_DISPLAY_ALIAS
+            'display_alias': self.GENERIC_DISPLAY_ALIAS,
+            'pin': self.GENERIC_PIN
         }
 
         expected_reply_to_data = {
@@ -1011,10 +1015,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             self.USER_ID_1)
         observed_data = user_takeout_object.user_data
         observed_images = user_takeout_object.user_images
-        self.assertEqual(observed_data, expected_data)
+        self.assertItemsEqual(observed_data, expected_data)
         observed_json = json.dumps(observed_data)
         expected_json = json.dumps(expected_data)
-        self.assertEqual(json.loads(observed_json), json.loads(expected_json))
+        self.assertItemsEqual(json.loads(observed_json), json.loads(expected_json))
         expected_images = [
             takeout_domain.TakeoutImage(
                 self.GENERIC_IMAGE_URL, 'user_settings_profile_picture.png')
