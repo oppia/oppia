@@ -18,8 +18,8 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
 export enum PlatformParameterFilterType {
   ServerMode = 'server_mode',

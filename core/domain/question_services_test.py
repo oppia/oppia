@@ -71,7 +71,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.question_id = question_services.get_new_question_id()
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC'), ['skill_1'],
+            inapplicable_misconception_ids=['skill-1', 'skill-2'])
 
         self.question_id_1 = question_services.get_new_question_id()
         self.question_1 = self.save_new_question(
@@ -491,6 +492,27 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         question = question_services.get_question_by_id(self.question_id)
         self.assertEqual(question.language_code, 'bn')
+        self.assertEqual(question.version, 2)
+
+    def test_update_inapplicable_misconception_ids(self):
+        self.assertEqual(
+            self.question.inapplicable_misconception_ids,
+            ['skill-1', 'skill-2'])
+        change_dict = {
+            'cmd': 'update_question_property',
+            'property_name': 'inapplicable_misconception_ids',
+            'new_value': ['skill-1'],
+            'old_value': []
+        }
+        change_list = [question_domain.QuestionChange(change_dict)]
+
+        question_services.update_question(
+            self.editor_id, self.question_id, change_list,
+            'updated inapplicable_misconception_ids')
+
+        question = question_services.get_question_by_id(self.question_id)
+        self.assertEqual(
+            question.inapplicable_misconception_ids, ['skill-1'])
         self.assertEqual(question.version, 2)
 
     def test_cannot_update_question_with_invalid_change_list(self):
