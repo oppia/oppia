@@ -18,6 +18,8 @@
 
 'use strict';
 
+const { param } = require("jquery");
+
 module.exports = {
   meta: {
     type: 'layout',
@@ -31,7 +33,8 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      unusedDirective: '{{varName}} is defined but never used.'
+      unusedDirective: '{{varName}} is defined but never used.',
+      sortedDependency: 'Dependencies are not sorted.'
     }
   },
 
@@ -49,6 +52,33 @@ module.exports = {
         return true;
       } else {
         return false;
+      }
+    };
+
+    var checkSortedDependency = function(node, params) {
+      var dollarImports = [];
+      var regularImports = [];
+      var constantImports = [];
+      var re = new RegExp('[a-z]');
+      params.forEach((param) => {
+        if (param.startsWith('$')) {
+          dollarImports.push(param)
+        } else if (re.test(param)) {
+          regularImports.push(param)
+        } else {
+          constantImports.push(param)
+        }
+      });
+      dollarImports.sort();
+      regularImports.sort();
+      constantImports.sort();
+      var sortedImports = dollarImports.concat(regularImports).concat(constantImports)
+      if (sortedImports !== regularImports) {
+        context.report({
+          node,
+          loc: node.loc,
+          messageId: 'sortedDependency'
+        });
       }
     };
 
@@ -72,6 +102,7 @@ module.exports = {
                   tokensList.push(token.value);
                 }
               });
+              checkSortedDependency(node, paramsList);
               paramsList.forEach((param) => {
                 if (isUnused(param, tokensList)) {
                   context.report({
