@@ -99,7 +99,7 @@ class TaskThread(threading.Thread):
     def run(self):
         try:
             self.task_results = self.func()
-            if self.verbose:
+            if not self.verbose:
                 for task_result in self.task_results:
                     # The following section will print the output of the lint
                     # checks.
