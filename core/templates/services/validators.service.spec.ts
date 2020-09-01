@@ -24,26 +24,20 @@ import { ValidatorsService } from 'services/validators.service';
 
 describe('Validators service', () => {
   let vs: ValidatorsService = null;
-  /* eslint-disable dot-notation */
   const INVALID_NAME_CHARS_COPY = (
-    Array.from(AppConstants['INVALID_NAME_CHARS']));
-  /* eslint-enable dot-notation */
+    Array.from(AppConstants.INVALID_NAME_CHARS));
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [AlertsService, NormalizeWhitespacePipe]
     });
     vs = TestBed.get(ValidatorsService);
-    /* eslint-disable dot-notation */
-    AppConstants['INVALID_NAME_CHARS'] = ['#', 'x', 'y', 'z'];
-    /* eslint-enable dot-notation */
+    AppConstants.INVALID_NAME_CHARS = ['#', 'x', 'y', 'z'];
   });
 
 
   afterAll(() => {
-    /* eslint-disable dot-notation */
-    AppConstants['INVALID_NAME_CHARS'] = INVALID_NAME_CHARS_COPY;
-    /* eslint-enable dot-notation */
+    AppConstants.INVALID_NAME_CHARS = INVALID_NAME_CHARS_COPY;
   });
 
   it('should correctly validate entity names', () => {
