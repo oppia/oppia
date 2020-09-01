@@ -187,7 +187,7 @@ describe('Rte Helper Service', function() {
       backendId: 'svgdiagram',
       customizationArgSpecs: [{
         name: 'svg_filename',
-        description: 'The custom svg diagram filename',
+        description: 'The SVG Diagram Editor',
         schema: {
           type: 'custom',
           obj_type: 'SvgFilename'

@@ -59,7 +59,7 @@ const SVGTAGS = {
     '1999/xlink" version="1.1" width="494" height="338" viewBox="0 0 494 338' +
     '"><desc>Created with Fabric.js 4.1.0</desc><defs></defs><rect x="0" y="' +
     '0" width="100%" height="100%" fill="rgba(0,0,0,0)"/><g transform="matri' +
-    'x(1 0 0 1 50 50)" style=""><text font-family="helvetica" font-size="18"' +
+    'x(1 0 0 1 50 50)" style=""><text font-family="Helvetica" font-size="18"' +
     ' font-style="normal" font-weight="normal" style="stroke: none; stroke-w' +
     'idth: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffse' +
     't: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); f' +
@@ -81,7 +81,7 @@ const SVGTAGS = {
     '; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-' +
     'opacity: 0; fill-rule: nonzero; opacity: 1;" transform=" translate(-95,' +
     ' -62.5)" d="M 40 40 Q 95 100 150 40" stroke-linecap="round"/></g><g tra' +
-    'nsform="matrix(1 0 0 1 120 100)" style=""><text font-family="helvetica"' +
+    'nsform="matrix(1 0 0 1 120 100)" style=""><text font-family="Helvetica"' +
     ' font-size="18" font-style="normal" font-weight="normal" style="stroke:' +
     ' none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; s' +
     'troke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill' +

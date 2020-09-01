@@ -18,6 +18,7 @@
 
 import { fabric } from 'fabric';
 import { AppConstants } from 'app.constants';
+import { SvgFilenameEditorConstants } from './svg-filename-editor.constants';
 
 var initializeMockDocument = function(svgFilenameCtrl) {
   var mockDocument = document.createElement('div');
@@ -29,9 +30,15 @@ var initializeMockDocument = function(svgFilenameCtrl) {
     topAlphaDiv.setAttribute('id', 'top-' + colors[i] + '-alpha');
     var bottomAlphaDiv = document.createElement('div');
     bottomAlphaDiv.setAttribute('id', 'bottom-' + colors[i] + '-alpha');
+    var pickerAlpha = document.createElement('div');
+    pickerAlpha.setAttribute('class', 'picker_alpha');
+    var pickerSlider = document.createElement('div');
+    pickerSlider.setAttribute('class', 'picker_selector');
+    pickerAlpha.append(pickerSlider);
     colorDiv.appendChild(topAlphaDiv);
     colorDiv.appendChild(bottomAlphaDiv);
     mockDocument.appendChild(colorDiv);
+    mockDocument.appendChild(pickerAlpha);
   }
   var mockCanvas = document.createElement('canvas');
   mockDocument.setAttribute('id', svgFilenameCtrl.canvasContainerId);
@@ -47,6 +54,8 @@ describe('SvgFilenameEditor', function() {
   var CsrfService = null;
   var svgFilenameCtrl = null;
   var $scope = null;
+  // This sample SVG is generated using different tools present
+  // in the SVG editor.
   var samplesvg = (
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="494" height="368" viewBox="0 0 494 368' +
@@ -222,35 +231,46 @@ describe('SvgFilenameEditor', function() {
     };
     svgFilenameCtrl.fillPicker = mockPicker;
     svgFilenameCtrl.strokePicker = mockPicker;
+    svgFilenameCtrl.bgPicker = mockPicker;
   }));
 
   it('should update diagram size', function() {
     var WIDTH = 100;
     var HEIGHT = 100;
-    var MAX_DIAGRAM_WIDTH = 491;
-    var MAX_DIAGRAM_HEIGHT = 551;
     svgFilenameCtrl.diagramWidth = WIDTH;
     svgFilenameCtrl.diagramHeight = HEIGHT;
     svgFilenameCtrl.onWidthInputBlur();
     expect(svgFilenameCtrl.currentDiagramWidth).toBe(WIDTH);
     svgFilenameCtrl.onHeightInputBlur();
     expect(svgFilenameCtrl.currentDiagramHeight).toBe(HEIGHT);
-    svgFilenameCtrl.diagramWidth = 600;
-    svgFilenameCtrl.diagramHeight = 600;
-    svgFilenameCtrl.onWidthInputBlur();
-    expect(svgFilenameCtrl.currentDiagramWidth).toBe(MAX_DIAGRAM_WIDTH);
-    svgFilenameCtrl.onHeightInputBlur();
-    expect(svgFilenameCtrl.currentDiagramHeight).toBe(MAX_DIAGRAM_HEIGHT);
   });
 
-  it('should return information on diagram size', function() {
-    var maxDiagramWidth = 491;
-    var maxDiagramHeight = 551;
-    var helpText = (
-      'This diagram has a maximum dimension of ' +
-      maxDiagramWidth + 'px X ' + maxDiagramHeight +
-      'px to ensure that it fits in the card.');
-    expect(svgFilenameCtrl.getDiagramSizeInfo()).toBe(helpText);
+  it('should reset to maximum width correctly', function() {
+    svgFilenameCtrl.diagramWidth = 600;
+    svgFilenameCtrl.onWidthInputBlur();
+    expect(svgFilenameCtrl.currentDiagramWidth).toBe(
+      SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_WIDTH);
+  });
+
+  it('should reset to maximum height correctly', function() {
+    svgFilenameCtrl.diagramHeight = 600;
+    svgFilenameCtrl.onHeightInputBlur();
+    expect(svgFilenameCtrl.currentDiagramHeight).toBe(
+      SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_HEIGHT);
+  });
+
+  it('should reset to minimum width correctly', function() {
+    svgFilenameCtrl.diagramWidth = 0;
+    svgFilenameCtrl.onWidthInputBlur();
+    expect(svgFilenameCtrl.currentDiagramWidth).toBe(
+      SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_WIDTH);
+  });
+
+  it('should reset to minimum height correctly', function() {
+    svgFilenameCtrl.diagramHeight = 0;
+    svgFilenameCtrl.onHeightInputBlur();
+    expect(svgFilenameCtrl.currentDiagramHeight).toBe(
+      SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_HEIGHT);
   });
 
   it('should check if diagram is created', function() {

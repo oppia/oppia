@@ -177,7 +177,7 @@ export = {
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "svg_filename",
-      "description": "The custom svg diagram filename",
+      "description": "The SVG Diagram Editor",
       "schema": {
         "type": "custom",
         "obj_type": "SvgFilename"
