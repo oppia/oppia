@@ -304,7 +304,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
-            'linked_skill_ids': ['skill_id']
+            'linked_skill_ids': ['skill_id'],
+            'inapplicable_misconception_ids': ['skillid-1']
         }
 
         exp_id = 'new_exp_id'
@@ -504,15 +505,29 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id))['suggestions'][0]
 
-        csrf_token = self.get_new_csrf_token()
-        self.put_json('%s/exploration/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_accept['target_id'],
-            suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted'
-            }, csrf_token=csrf_token)
+        # By default, when a suggestion is accepted and the recording of scores
+        # is enabled, the score of the author of that suggestion is increased
+        # by 1. Therefore, by setting that increment to the minimum score
+        # required to review, we can ensure that the author of this suggestion
+        # has a high enough score to review suggestions in this category. This
+        # will be used to test whether the author can review a suggestion in
+        # the same category because of the author's high score in a later test.
+        enable_recording_of_scores_swap = self.swap(
+            feconf, 'ENABLE_RECORDING_OF_SCORES', True)
+        increment_score_of_author_swap = self.swap(
+            suggestion_models, 'INCREMENT_SCORE_OF_AUTHOR_BY',
+            feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
+
+        with enable_recording_of_scores_swap, increment_score_of_author_swap:
+            csrf_token = self.get_new_csrf_token()
+            self.put_json('%s/exploration/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'Accepted'
+                }, csrf_token=csrf_token)
         suggestion_post_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
@@ -563,9 +578,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=401)
 
         # Testing users with scores above threshold can accept.
+        # The score of this author was increased to the review threshold amount
+        # when the editor accepted a suggestion that was authored by this user.
         self.login(self.AUTHOR_EMAIL)
-        suggestion_services.increment_score_for_user(
-            self.author_id, 'content.Algebra', 15)
 
         csrf_token = self.get_new_csrf_token()
         self.put_json('%s/exploration/%s/%s' % (
@@ -649,7 +664,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id), ('target_id', self.EXP_ID)])[0]
         suggestion_services.reject_suggestion(
-            suggestion, self.reviewer_id, 'reject message')
+            suggestion.suggestion_id, self.reviewer_id, 'reject message')
         self.logout()
 
         self.login(self.AUTHOR_EMAIL)
@@ -737,7 +752,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
-            'linked_skill_ids': [self.SKILL_ID]
+            'linked_skill_ids': [self.SKILL_ID],
+            'inapplicable_misconception_ids': ['skillid-1']
         }
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -854,7 +870,8 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
-            'linked_skill_ids': [self.skill_id]
+            'linked_skill_ids': [self.skill_id],
+            'inapplicable_misconception_ids': ['skillid-1']
         }
 
         self.login(self.AUTHOR_EMAIL)
@@ -1199,7 +1216,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             'language_code': 'en',
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
-            'linked_skill_ids': [self.SKILL_ID]
+            'linked_skill_ids': [self.SKILL_ID],
+            'inapplicable_misconception_ids': ['skillid-1']
         }
 
         self.post_json(
@@ -1383,7 +1401,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             'language_code': 'en',
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
-            'linked_skill_ids': [self.SKILL_ID]
+            'linked_skill_ids': [self.SKILL_ID],
+            'inapplicable_misconception_ids': ['skillid-1']
         }
 
         self.post_json(

@@ -276,7 +276,8 @@ var logicProofShared = (function() {
         !containsCharacter(POSSIBLE_START_CHARS, character);
     };
     var _absorbsSpacesToTheRight = function(character) {
-      return (containsLogicalCharacter(character, operators, isTemplate) &&
+      return (
+        containsLogicalCharacter(character, operators, isTemplate) &&
         !containsCharacter(POSSIBLE_END_CHARS, character)) ||
         character === ' ';
     };
@@ -903,8 +904,9 @@ var logicProofShared = (function() {
   var getOperatorsFromExpression = function(expression, kinds = null) {
     var output = getOperatorsFromExpressionArray(
       expression.arguments.concat(expression.dummies), kinds);
-    return (output.indexOf(expression.top_operator_name) === -1 &&
-        (kinds === null || kinds.indexOf(expression.top_kind_name) !== -1)) ?
+    return (
+      output.indexOf(expression.top_operator_name) === -1 &&
+      (kinds === null || kinds.indexOf(expression.top_kind_name) !== -1)) ?
       output.concat([expression.top_operator_name]) :
       output;
   };

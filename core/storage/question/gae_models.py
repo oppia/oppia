@@ -66,6 +66,9 @@ class QuestionModel(base_models.VersionedModel):
     # The skill ids linked to this question.
     linked_skill_ids = ndb.StringProperty(
         indexed=True, repeated=True)
+    # The optional misconception ids marked as not relevant to the question.
+    inapplicable_misconception_ids = ndb.StringProperty(
+        indexed=True, repeated=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -144,7 +147,8 @@ class QuestionModel(base_models.VersionedModel):
 
     @classmethod
     def create(
-            cls, question_state_data, language_code, version, linked_skill_ids):
+            cls, question_state_data, language_code, version, linked_skill_ids,
+            inapplicable_misconception_ids):
         """Creates a new QuestionModel entry.
 
         Args:
@@ -154,6 +158,8 @@ class QuestionModel(base_models.VersionedModel):
                 question is written in.
             version: str. The version of the question.
             linked_skill_ids: list(str). The skill ids linked to the question.
+            inapplicable_misconception_ids: list(str). The optional
+                misconception ids marked as not applicable to the question.
 
         Returns:
             QuestionModel. Instance of the new QuestionModel entry.
@@ -167,7 +173,8 @@ class QuestionModel(base_models.VersionedModel):
             question_state_data=question_state_data,
             language_code=language_code,
             version=version,
-            linked_skill_ids=linked_skill_ids)
+            linked_skill_ids=linked_skill_ids,
+            inapplicable_misconception_ids=inapplicable_misconception_ids)
 
         return question_model_instance
 
@@ -670,6 +677,10 @@ class QuestionSummaryModel(base_models.BaseModel):
         indexed=True, required=True)
     # The html content for the question.
     question_content = ndb.TextProperty(indexed=False, required=True)
+    # The misconception ids addressed in the question. This includes
+    # tagged misconceptions ids as well as inapplicable misconception
+    # ids in the question.
+    misconception_ids = ndb.StringProperty(indexed=True, repeated=True)
 
     @staticmethod
     def get_deletion_policy():
