@@ -132,12 +132,13 @@ export class MathInteractionsService {
     if (expressionString.match(/(^|[^a-zA-Z])pi($|[^a-zA-Z])/g)) {
       variablesList.push('pi');
     }
+    const greekNameToSymbolMap: { [greekName: string]: string } = (
+      AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+
     // Replacing greek names with symbols.
     for (let i = 0; i < variablesList.length; i++) {
       if (variablesList[i].length > 1) {
-        // eslint-disable-next-line dot-notation
-        variablesList[i] = AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS'][
-          variablesList[i]];
+        variablesList[i] = greekNameToSymbolMap[validVariablesList[i]];
       }
     }
     if (variablesList.length === 0) {
