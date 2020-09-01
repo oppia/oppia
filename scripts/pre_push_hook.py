@@ -444,16 +444,17 @@ def check_for_backend_python_library_inconsistencies():
             '   this option will run scripts.install_third_party to\n'
             '   regenerate the third_party/python_utils folder with\n'
             '   the correct dependencies.)\n\n'])
-        sys.stdin = python_utils.open_file('/dev/tty', 'r')
+        sys.stdin = open('/dev/tty', 'r')
         while True:
             choice = python_utils.INPUT('Choose an option or Ctrl-C to exit: ')
+            python_utils.PRINT('\n')
             if choice == '2':
                 install_backend_python_libs.main()
                 break
             elif choice == '1':
                 sys.exit(1)
             else:
-                python_utils.PRINT('Please choose between 1 or 2.')
+                python_utils.PRINT('Please choose between 1 or 2.\n')
 
     else:
         python_utils.PRINT(
