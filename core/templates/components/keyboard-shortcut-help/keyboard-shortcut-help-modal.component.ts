@@ -34,28 +34,26 @@ export class KeyboardShortcutHelpModalComponent implements OnInit {
   KEYBOARD_SHORTCUTS = {};
 
   ngOnInit(): void {
-    const help = '?';
-    const search = '/';
-    const help_description = 'Show this help dialog';
-    const search_description = 'Search';
-    const skip_description = 'Select skip to main content button';
-    const category_description = 'Select exploration category';
-    const continue_description = 'Select the continue button';
-    const back_description = 'Select the back button';
+    const helpShortcutDescription = 'Show this help dialog';
+    const searchShortcutDescription= 'Search';
+    const skipShortcutDescription= 'Select skip to main content button';
+    const categoryShortcutDescription= 'Select exploration category';
+    const continueShortcutDescription = 'Select the continue button';
+    const backShortcutDescription = 'Select the back button';
 
     if (this.urlService.getPathname() === '/community-library') {
       this.KEYBOARD_SHORTCUTS = {
-        [help]: help_description,
-        [search]: search_description,
-        s: skip_description,
-        c: category_description,
+        '?': helpShortcutDescription,
+        '/': searchShortcutDescription,
+        s: skipShortcutDescription,
+        c: categoryShortcutDescription,
       };
     } else if (this.contextService.isInExplorationPlayerPage()) {
       this.KEYBOARD_SHORTCUTS = {
-        [help]: help_description,
-        s: skip_description,
-        j: continue_description,
-        k: back_description,
+        '?': helpShortcutDescription,
+        s: skipShortcutDescription,
+        j: continueShortcutDescription,
+        k: backShortcutDescription,
       };
     }
   }
