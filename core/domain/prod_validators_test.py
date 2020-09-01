@@ -52,7 +52,6 @@ from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
-from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_query_services
@@ -9441,7 +9440,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
-                'linked_skill_ids': ['0']
+                'linked_skill_ids': ['0'],
+                'inapplicable_misconception_ids': ['skillid-0']
             },
             'skill_id': '0',
             'skill_difficulty': 0.3,
@@ -14974,11 +14974,9 @@ class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
         score_category = 'content.Art'
-        suggestion_services.create_new_user_contribution_scoring_model(
-            self.user_id, score_category, 10)
-        self.model_instance = (
-            user_models.UserContributionScoringModel.get_by_id(
-                id='%s.%s' % (score_category, self.user_id)))
+        self.model_instance = user_models.UserContributionScoringModel.create(
+            self.user_id, score_category, 10
+        )
         self.job_class = (
             prod_validation_jobs_one_off
             .UserContributionScoringModelAuditOneOffJob)

@@ -24,6 +24,7 @@ from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import html_validation_service
 from core.domain import suggestion_registry
+from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -139,6 +140,27 @@ def get_suggestion_by_id(suggestion_id):
     return get_suggestion_from_model(model) if model else None
 
 
+def get_suggestions_by_ids(suggestion_ids):
+    """Finds suggestions using the given suggestion IDs.
+
+    Args:
+        suggestion_ids: list(str). The IDs of the suggestions.
+
+    Returns:
+        list(Suggestion|None). A list of the corresponding suggestions. The
+        list will contain None elements if no suggestion is found with the
+        corresponding suggestion id.
+    """
+    general_suggestion_models = (
+        suggestion_models.GeneralSuggestionModel.get_multi(suggestion_ids)
+    )
+
+    return [
+        get_suggestion_from_model(suggestion_model) if suggestion_model
+        else None for suggestion_model in general_suggestion_models
+    ]
+
+
 def query_suggestions(query_fields_and_values):
     """Queries for suggestions.
 
@@ -151,45 +173,47 @@ def query_suggestions(query_fields_and_values):
         list(Suggestion). A list of suggestions that match the given query
         values, up to a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
     """
-    return [get_suggestion_from_model(s)
-            for s in suggestion_models.GeneralSuggestionModel.query_suggestions(
-                query_fields_and_values)]
+    return [
+        get_suggestion_from_model(s) for s in
+        suggestion_models.GeneralSuggestionModel.query_suggestions(
+            query_fields_and_values)
+    ]
 
 
-def get_translation_suggestions_with_exp_ids(exp_ids):
-    """Gets all translation suggestions corresponding to explorations with
-    the given exploration ids.
+def get_translation_suggestion_ids_with_exp_ids(exp_ids):
+    """Gets the ids of the translation suggestions corresponding to
+    explorations with the given exploration ids.
 
     Args:
         exp_ids: list(str). List of exploration ids to query for.
 
     Returns:
-        list(Suggestion). A list of translation suggestions that
+        list(str). A list of the ids of translation suggestions that
         correspond to the given exploration ids. Note: it is not
-        guaranteed that the suggestions returned are ordered by the
+        guaranteed that the suggestion ids returned are ordered by the
         exploration ids in exp_ids.
     """
     if len(exp_ids) == 0:
         return []
 
-    return [
-        get_suggestion_from_model(s)
-        for s in suggestion_models.GeneralSuggestionModel
-        .get_translation_suggestions_with_exp_ids(exp_ids)
-    ]
+    return (
+        suggestion_models.GeneralSuggestionModel
+        .get_translation_suggestion_ids_with_exp_ids(exp_ids)
+    )
 
 
-def get_all_stale_suggestions():
-    """Gets a list of suggestions without any activity on them for
-    THRESHOLD_TIME_BEFORE_ACCEPT time.
+def get_all_stale_suggestion_ids():
+    """Gets a list of the suggestion ids corresponding to suggestions that have
+    not had any activity on them for THRESHOLD_TIME_BEFORE_ACCEPT time.
 
     Returns:
-        list(Suggestion). A list of suggestions linked to the entity.
+        list(str). A list of suggestion ids that correspond to stale
+        suggestions.
     """
 
-    return [get_suggestion_from_model(s)
-            for s in suggestion_models.GeneralSuggestionModel
-            .get_all_stale_suggestions()]
+    return (
+        suggestion_models.GeneralSuggestionModel.get_all_stale_suggestion_ids()
+    )
 
 
 def _update_suggestion(suggestion):
@@ -232,40 +256,6 @@ def _update_suggestions(suggestions, update_last_updated_time=True):
         update_last_updated_time=update_last_updated_time)
 
 
-def mark_review_completed(suggestion, status, reviewer_id):
-    """Marks that a review has been completed.
-
-    Args:
-        suggestion: Suggestion. The suggestion to be updated.
-        status: str. The status of the suggestion post review. Possible values
-            are STATUS_ACCEPTED or STATUS_REJECTED.
-        reviewer_id: str. The ID of the user who completed the review.
-    """
-    mark_multiple_reviews_completed([suggestion], status, reviewer_id)
-
-
-def mark_multiple_reviews_completed(
-        suggestions, status, reviewer_id):
-    """Marks that multiple reviews have been completed.
-
-    Args:
-        suggestions: list(Suggestion). The suggestions to be updated.
-        status: str. The status of the suggestions post review. Possible values
-            are STATUS_ACCEPTED or STATUS_REJECTED.
-        reviewer_id: str. The ID of the user who completed the reviews.
-    """
-    if status not in [
-            suggestion_models.STATUS_ACCEPTED,
-            suggestion_models.STATUS_REJECTED]:
-        raise Exception('Invalid status after review.')
-
-    for suggestion in suggestions:
-        suggestion.status = status
-        suggestion.final_reviewer_id = reviewer_id
-
-    _update_suggestions(suggestions)
-
-
 def get_commit_message_for_suggestion(author_username, commit_message):
     """Returns a modified commit message for an accepted suggestion.
 
@@ -283,11 +273,12 @@ def get_commit_message_for_suggestion(author_username, commit_message):
         author_username, commit_message)
 
 
-def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
-    """Accepts the given suggestion after validating it.
+def accept_suggestion(
+        suggestion_id, reviewer_id, commit_message, review_message):
+    """Accepts the suggestion with the given suggestion_id after validating it.
 
     Args:
-        suggestion: Suggestion. The suggestion to be accepted.
+        suggestion_id: str. The id of the suggestion to be accepted.
         reviewer_id: str. The ID of the reviewer accepting the suggestion.
         commit_message: str. The commit message.
         review_message: str. The message provided by the reviewer while
@@ -298,13 +289,21 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
         Exception. The suggestion is not valid.
         Exception. The commit message is empty.
     """
-    if suggestion.is_handled:
-        raise Exception(
-            'The suggestion with id %s has already been accepted/rejected.' % (
-                suggestion.suggestion_id)
-        )
     if not commit_message or not commit_message.strip():
         raise Exception('Commit message cannot be empty.')
+
+    suggestion = get_suggestion_by_id(suggestion_id)
+
+    if suggestion is None:
+        raise Exception(
+            'You cannot accept the suggestion with id %s because it does '
+            'not exist.' % (suggestion_id)
+        )
+    if suggestion.is_handled:
+        raise Exception(
+            'The suggestion with id %s has already been accepted/'
+            'rejected.' % (suggestion_id)
+        )
     suggestion.pre_accept_validate()
     html_string = ''.join(suggestion.get_all_html_content_strings())
     error_list = (
@@ -317,40 +316,56 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
                 suggestion.suggestion_id)
         )
 
+    suggestion.set_suggestion_status_to_accepted()
+    suggestion.set_final_reviewer_id(reviewer_id)
+
     author_name = user_services.get_username(suggestion.author_id)
     commit_message = get_commit_message_for_suggestion(
         author_name, commit_message)
-    mark_review_completed(
-        suggestion, suggestion_models.STATUS_ACCEPTED, reviewer_id)
     suggestion.accept(commit_message)
-    thread_id = suggestion.suggestion_id
+
+    _update_suggestion(suggestion)
+
     feedback_services.create_message(
-        thread_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
+        suggestion_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
         None, review_message)
 
+    # When recording of scores is enabled, the author of the suggestion gets an
+    # increase in their score for the suggestion category.
     if feconf.ENABLE_RECORDING_OF_SCORES:
-        increment_score_for_user(
-            suggestion.author_id, suggestion.score_category,
-            suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY)
+        user_id = suggestion.author_id
+        score_category = suggestion.score_category
+
+        # Get user scoring domain object.
+        user_scoring = _get_user_scoring(user_id, score_category)
+
+        # Increment the score of the author due to their suggestion being
+        # accepted.
+        user_scoring.increment_score(
+            suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY
+        )
+
+        # Emails are sent to onboard new reviewers. These new reviewers are
+        # created when the score of the user passes the minimum score required
+        # to review.
         if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
-            scores = get_all_scores_of_user(suggestion.author_id)
-            if (
-                    suggestion.score_category in scores and
-                    scores[suggestion.score_category] >=
-                    feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW):
-                if not check_if_email_has_been_sent_to_user(
-                        suggestion.author_id, suggestion.score_category):
-                    email_manager.send_mail_to_onboard_new_reviewers(
-                        suggestion.author_id, suggestion.score_category)
-                    mark_email_has_been_sent_to_user(
-                        suggestion.author_id, suggestion.score_category)
+            if user_scoring.can_user_review_category() and (
+                    not user_scoring.onboarding_email_sent):
+                email_manager.send_mail_to_onboard_new_reviewers(
+                    user_id, score_category
+                )
+                user_scoring.mark_onboarding_email_as_sent()
+
+        # Need to update the corresponding user scoring model after we updated
+        # the domain object.
+        _update_user_scoring(user_scoring)
 
 
-def reject_suggestion(suggestion, reviewer_id, review_message):
-    """Rejects the suggestion.
+def reject_suggestion(suggestion_id, reviewer_id, review_message):
+    """Rejects the suggestion with the given suggestion_id.
 
     Args:
-        suggestion: Suggestion. The suggestion to be rejected.
+        suggestion_id: str. The id of the suggestion to be rejected.
         reviewer_id: str. The ID of the reviewer rejecting the suggestion.
         review_message: str. The message provided by the reviewer while
             rejecting the suggestion.
@@ -359,14 +374,14 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
         Exception. The suggestion is already handled.
     """
 
-    reject_suggestions([suggestion], reviewer_id, review_message)
+    reject_suggestions([suggestion_id], reviewer_id, review_message)
 
 
-def reject_suggestions(suggestions, reviewer_id, review_message):
-    """Rejects the suggestions.
+def reject_suggestions(suggestion_ids, reviewer_id, review_message):
+    """Rejects the suggestions with the given suggestion_ids.
 
     Args:
-        suggestions: list(Suggestion). The suggestions to be rejected.
+        suggestion_ids: list(str). The ids of the suggestions to be rejected.
         reviewer_id: str. The ID of the reviewer rejecting the suggestions.
         review_message: str. The message provided by the reviewer while
             rejecting the suggestions.
@@ -374,8 +389,14 @@ def reject_suggestions(suggestions, reviewer_id, review_message):
     Raises:
         Exception. One or more of the suggestions has already been handled.
     """
+    suggestions = get_suggestions_by_ids(suggestion_ids)
 
-    for suggestion in suggestions:
+    for index, suggestion in enumerate(suggestions):
+        if suggestion is None:
+            raise Exception(
+                'You cannot reject the suggestion with id %s because it does '
+                'not exist.' % (suggestion_ids[index])
+            )
         if suggestion.is_handled:
             raise Exception(
                 'The suggestion with id %s has already been accepted/'
@@ -384,13 +405,14 @@ def reject_suggestions(suggestions, reviewer_id, review_message):
     if not review_message:
         raise Exception('Review message cannot be empty.')
 
-    mark_multiple_reviews_completed(
-        suggestions, suggestion_models.STATUS_REJECTED, reviewer_id
-    )
+    for suggestion in suggestions:
+        suggestion.set_suggestion_status_to_rejected()
+        suggestion.set_final_reviewer_id(reviewer_id)
 
-    thread_ids = [suggestion.suggestion_id for suggestion in suggestions]
+    _update_suggestions(suggestions)
+
     feedback_services.create_messages(
-        thread_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
+        suggestion_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
         None, review_message
     )
 
@@ -411,8 +433,10 @@ def auto_reject_question_suggestions_for_skill_id(skill_id):
             ('target_id', skill_id)
         ]
     )
+
+    suggestion_ids = [suggestion.suggestion_id for suggestion in suggestions]
     reject_suggestions(
-        suggestions, feconf.SUGGESTION_BOT_USER_ID,
+        suggestion_ids, feconf.SUGGESTION_BOT_USER_ID,
         suggestion_models.DELETED_SKILL_REJECT_MESSAGE)
 
 
@@ -426,47 +450,49 @@ def auto_reject_translation_suggestions_for_exp_ids(exp_ids):
         exp_ids: list(str). The exploration IDs corresponding to the target IDs
             of the translation suggestions.
     """
-    suggestions = get_translation_suggestions_with_exp_ids(exp_ids)
+    suggestion_ids = get_translation_suggestion_ids_with_exp_ids(exp_ids)
 
     reject_suggestions(
-        suggestions, feconf.SUGGESTION_BOT_USER_ID,
+        suggestion_ids, feconf.SUGGESTION_BOT_USER_ID,
         suggestion_models.INVALID_STORY_REJECT_TRANSLATION_SUGGESTIONS_MSG)
 
 
-def resubmit_rejected_suggestion(suggestion, summary_message, author_id):
-    """Resubmit a rejected suggestion.
+def resubmit_rejected_suggestion(
+        suggestion_id, summary_message, author_id, change):
+    """Resubmit a rejected suggestion with the given suggestion_id.
 
     Args:
-        suggestion: Suggestion. The rejected suggestion.
+        suggestion_id: str. The id of the rejected suggestion.
         summary_message: str. The message provided by the author to
             summarize new suggestion.
         author_id: str. The ID of the author creating the suggestion.
+        change: ExplorationChange. The new change to apply to the suggestion.
 
     Raises:
         Exception. The summary message is empty.
         Exception. The suggestion has not been handled yet.
         Exception. The suggestion has already been accepted.
     """
+    suggestion = get_suggestion_by_id(suggestion_id)
     if not summary_message:
         raise Exception('Summary message cannot be empty.')
     if not suggestion.is_handled:
         raise Exception(
-            'The suggestion with id %s is not yet handled.' % (
-                suggestion.suggestion_id)
+            'The suggestion with id %s is not yet handled.' % (suggestion_id)
         )
     if suggestion.status == suggestion_models.STATUS_ACCEPTED:
         raise Exception(
             'The suggestion with id %s was accepted. '
-            'Only rejected suggestions can be resubmitted.' % (
-                suggestion.suggestion_id)
+            'Only rejected suggestions can be resubmitted.' % (suggestion_id)
         )
 
-    suggestion.status = suggestion_models.STATUS_IN_REVIEW
+    suggestion.pre_update_validate(change)
+    suggestion.change = change
+    suggestion.set_suggestion_status_to_in_review()
     _update_suggestion(suggestion)
 
-    thread_id = suggestion.suggestion_id
     feedback_services.create_message(
-        thread_id, author_id, feedback_models.STATUS_CHOICES_OPEN,
+        suggestion_id, author_id, feedback_models.STATUS_CHOICES_OPEN,
         None, summary_message)
 
 
@@ -545,6 +571,53 @@ def get_submitted_suggestions(user_id, suggestion_type):
     ])
 
 
+def get_user_scoring_from_model(user_scoring_model):
+    """Converts the given UserContributionScoringModel to a
+    UserContributionScoring domain object.
+
+    Args:
+        user_scoring_model: UserContributionScoringModel.
+            UserContributionScoringModel to be
+            converted to UserContributionScoring domain object.
+
+    Returns:
+        UserContributionScoring. The corresponding UserContributionScoring
+        domain object.
+    """
+    return user_domain.UserContributionScoring(
+        user_scoring_model.user_id, user_scoring_model.score_category,
+        user_scoring_model.score,
+        user_scoring_model.onboarding_email_sent
+    )
+
+
+def _update_user_scoring(user_scoring):
+    """Updates the user_scoring.
+
+    Args:
+        user_scoring: UserContributionScoring. The user scoring to be
+            updated.
+    """
+    user_scoring_model = user_models.UserContributionScoringModel.get(
+        user_scoring.user_id, user_scoring.score_category
+    )
+
+    if user_scoring_model is not None:
+        user_scoring_model.user_id = user_scoring.user_id
+        user_scoring_model.score_category = user_scoring.score_category
+        user_scoring_model.score = user_scoring.score
+        user_scoring_model.onboarding_email_sent = (
+            user_scoring.onboarding_email_sent
+        )
+
+        user_scoring_model.put()
+
+    else:
+        user_models.UserContributionScoringModel.create(
+            user_scoring.user_id, user_scoring.score_category,
+            user_scoring.score, user_scoring.onboarding_email_sent)
+
+
 def get_all_scores_of_user(user_id):
     """Gets all scores for a given user.
 
@@ -564,7 +637,7 @@ def get_all_scores_of_user(user_id):
     return scores
 
 
-def check_user_can_review_in_category(user_id, score_category):
+def can_user_review_category(user_id, score_category):
     """Checks if user can review suggestions in category score_category.
     If the user has score above the minimum required score, then the user is
     allowed to review.
@@ -577,45 +650,8 @@ def check_user_can_review_in_category(user_id, score_category):
         bool. Whether the user can review suggestions under category
         score_category.
     """
-    score = (
-        user_models.UserContributionScoringModel.get_score_of_user_for_category(
-            user_id, score_category))
-    if score is None:
-        return False
-    return score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
-
-
-def check_if_email_has_been_sent_to_user(user_id, score_category):
-    """Checks if user has already received an email.
-
-    Args:
-        user_id: str. The id of the user.
-        score_category: str. The score category.
-
-    Returns:
-        bool. Whether the email has already been sent to the user.
-    """
-    scoring_model_instance = user_models.UserContributionScoringModel.get_by_id(
-        '%s.%s' % (score_category, user_id))
-    if scoring_model_instance is None:
-        return False
-    return scoring_model_instance.has_email_been_sent
-
-
-def mark_email_has_been_sent_to_user(user_id, score_category):
-    """Marks that the user has already received an email.
-
-    Args:
-        user_id: str. The id of the user.
-        score_category: str. The score category.
-    """
-    scoring_model_instance = user_models.UserContributionScoringModel.get_by_id(
-        '%s.%s' % (score_category, user_id))
-
-    if scoring_model_instance is None:
-        raise Exception('Expected user scoring model to exist for user')
-    scoring_model_instance.has_email_been_sent = True
-    scoring_model_instance.put()
+    user_scoring = _get_user_scoring(user_id, score_category)
+    return user_scoring.can_user_review_category()
 
 
 def get_all_user_ids_who_are_allowed_to_review(score_category):
@@ -629,39 +665,33 @@ def get_all_user_ids_who_are_allowed_to_review(score_category):
         list(str). All user_ids of users who are allowed to review in the given
         category.
     """
-    return [model.user_id for model in
-            user_models.UserContributionScoringModel
-            .get_all_users_with_score_above_minimum_for_category(
-                score_category)]
+    return [
+        model.user_id for model in user_models.UserContributionScoringModel
+        .get_all_users_with_score_above_minimum_for_category(score_category)
+    ]
 
 
-def increment_score_for_user(user_id, score_category, increment_by):
-    """Increment the score of the user in the category by the given amount.
-
-    In the first version of the scoring system, the increment_by quantity will
-    be +1, i.e, each user gains a point for a successful contribution and
-    doesn't lose score in any way.
-
-    Args:
-        user_id: str. The id of the user.
-        score_category: str. The category of the suggestion.
-        increment_by: float. The amount to increase the score of the user by.
-    """
-    user_models.UserContributionScoringModel.increment_score_for_user(
-        user_id, score_category, increment_by)
-
-
-def create_new_user_contribution_scoring_model(user_id, score_category, score):
-    """Create a new UserContributionScoringModel instance for the user and the
-    given category with a score of 0.
+def _get_user_scoring(user_id, score_category):
+    """Gets the user scoring model from storage and creates the
+    corresponding user scoring domain object if the model exists. If the model
+    does not exist a user scoring domain object with the given user_id and
+    score category is created with the initial score and email values.
 
     Args:
         user_id: str. The id of the user.
         score_category: str. The category of the suggestion.
-        score: float. The score of the user for the given category.
+
+    Returns:
+        UserContributionScoring. The user scoring object.
     """
-    user_models.UserContributionScoringModel.create(
-        user_id, score_category, score)
+    user_scoring_model = user_models.UserContributionScoringModel.get(
+        user_id, score_category)
+
+    if user_scoring_model is not None:
+        return get_user_scoring_from_model(user_scoring_model)
+
+    return user_domain.UserContributionScoring(
+        user_id, score_category, 0, False)
 
 
 def check_can_resubmit_suggestion(suggestion_id, user_id):

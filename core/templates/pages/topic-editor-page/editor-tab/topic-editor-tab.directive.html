@@ -82,6 +82,20 @@
                 What does this topic contain?
               </span>
             </div>
+            <div class="topic-meta-tag-content" ng-class="{'has-error': editableMetaTagContent.length === 0}">
+              <label for="topicMetaTagContent" class="form-heading protractor-test-topic-meta-tag-content-label">Meta Tag Content</label>
+              <textarea type="text" class="form-control topic-description protractor-test-topic-meta-tag-content-field"
+                        ng-model="editableMetaTagContent" maxlength="<[MAX_CHARS_IN_META_TAG_CONTENT]>"
+                        ng-blur="updateTopicMetaTagContent(editableMetaTagContent)"
+                        placeholder="Enter the meta tag content for the topic">
+              </textarea>
+              <span class="oppia-input-box-subtitle">
+                <em>
+                  Meta tags provide information about the webpage. This information will not displayed on the page but it can be read by search engines and web crawlers. This text will be shown to users in seach engine results.
+                  Topic meta tag content should be at most <[MAX_CHARS_IN_META_TAG_CONTENT]> characters.
+                </em>
+              </span>
+            </div>
             <label class="form-heading">Thumbnail</label>
             <thumbnail-uploader disabled="!topicRights.canEditTopic()"
                                 filename="topic.getThumbnailFilename()"
@@ -138,6 +152,13 @@
         </div>
       </div>
       <div ng-if="subtopicsListIsShown" class="oppia-mobile-collapsible-card-content">
+        <div>
+          <label>
+            <input class="practice-tab-checkbox" type="checkbox" ng-model="editablePracticeIsDisplayed" ng-change="updatePracticeTabIsDisplayed(editablePracticeIsDisplayed)">
+            <span class="practice-tab-text"> Show Practice Tab to learners.</span>
+          </label>
+          <i class="fas fa-info-circle practice-tab-info-circle" title="This setting show/hides the practice tab in the topic viewer page. It is recommended that this option be enabled only if there are at least 5 questions attached to the topic"></i>
+        </div>
         <button class="btn add-subtopic-btn protractor-test-add-subtopic-button" ng-click="createSubtopic()">
           + ADD SUBTOPIC
         </button>
@@ -413,7 +434,8 @@
   }
 
   .topic-editor .topic-name,
-  .topic-editor .topic-url-fragment {
+  .topic-editor .topic-url-fragment,
+  .topic-editor .topic-meta-tag-content {
     margin-bottom: 25px;
     margin-top: 32px;
   }
@@ -422,7 +444,8 @@
     margin-top: 20px;
   }
 
-  .topic-editor .topic-description textarea {
+  .topic-editor .topic-description textarea,
+  .topic-editor .topic-meta-tag-content textarea {
     height: 10vh;
   }
 
@@ -577,6 +600,23 @@
 
   .topic-editor .subtopic-skill-card-container {
     margin-top: 64px;
+  }
+
+  .topic-editor .practice-tab-info-circle {
+    background: #000;
+    border-radius: 10px;
+    color: #FFF;
+    margin-left: 3px;
+    padding: 1px;
+  }
+
+  .topic-editor .practice-tab-checkbox {
+    box-shadow: rgb(102, 102, 102) 0px 0px 0px 2px inset;
+  }
+
+  .topic-editor .practice-tab-text {
+    font-weight: normal;
+    padding-left: 5px;
   }
 
   @media screen and (max-width: 1200px) {
