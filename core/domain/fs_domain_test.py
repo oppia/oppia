@@ -104,6 +104,16 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION, 'eid2'))
         self.assertEqual(new_fs.listdir('assets'), [])
 
+    def test_copy(self):
+        self.fs.commit('abc2.png', 'file_contents')
+        self.assertEqual(self.fs.listdir(''), ['abc2.png'])
+        destination_fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_QUESTION, 'question_id1'))
+        self.assertEqual(destination_fs.listdir(''), [])
+        destination_fs.copy(self.fs.impl.assets_path, 'abc2.png')
+        self.assertTrue(destination_fs.isfile('abc2.png'))
+
 
 class DirectoryTraversalTests(test_utils.GenericTestBase):
     """Tests to check for the possibility of directory traversal."""

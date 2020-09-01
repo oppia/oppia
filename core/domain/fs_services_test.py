@@ -46,6 +46,17 @@ class FileSystemServicesTests(test_utils.GenericTestBase):
                 file_system(feconf.ENTITY_TYPE_EXPLORATION, 'entity_id'),
                 fs_domain.GcsFileSystem)
 
+    def test_get_image_context_for_suggestion_target(self):
+        self.assertEqual(
+            fs_services.get_image_context_for_suggestion_target('skill'),
+            'question_suggestions')
+        self.assertEqual(
+            fs_services.get_image_context_for_suggestion_target('exploration'),
+            'exploration_suggestions')
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid suggestion target type.'):
+            fs_services.get_image_context_for_suggestion_target('invalid')
+
 
 class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
     """Test for saving the three versions of the image file."""
@@ -165,6 +176,32 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             self.assertEqual(original_image_content, image_content)
             self.assertEqual(compressed_image_content, image_content)
             self.assertEqual(micro_image_content, image_content)
+
+    def test_copy_images(self):
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
+            original_image_content = f.read()
+        fs_services.save_original_and_compressed_versions_of_image(
+            self.FILENAME, 'exploration', self.EXPLORATION_ID,
+            original_image_content, 'image', True)
+        destination_fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_QUESTION, 'question_id1'))
+        self.assertFalse(destination_fs.isfile('image/%s' % self.FILENAME))
+        self.assertFalse(
+            destination_fs.isfile(
+                'image/%s' % self.COMPRESSED_IMAGE_FILENAME))
+        self.assertFalse(
+            destination_fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
+        fs_services.copy_images(
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID,
+            feconf.ENTITY_TYPE_QUESTION, 'question_id1', ['image.png'])
+        self.assertTrue(destination_fs.isfile('image/%s' % self.FILENAME))
+        self.assertTrue(
+            destination_fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
+        self.assertTrue(
+            destination_fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
 
 
 class FileSystemClassifierDataTests(test_utils.GenericTestBase):

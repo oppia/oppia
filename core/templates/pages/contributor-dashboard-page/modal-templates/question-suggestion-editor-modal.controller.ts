@@ -26,16 +26,20 @@ require(
   'pages/contributor-dashboard-page/services/' +
   'question-suggestion.service.ts');
 require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/image-local-storage.service.ts');
 require('services/question-validation.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
   '$scope', '$uibModal', '$uibModalInstance', 'AlertsService',
+  'ContextService', 'ImageLocalStorageService',
   'QuestionSuggestionService', 'QuestionUndoRedoService',
   'QuestionValidationService', 'UrlInterpolationService',
   'question', 'questionId', 'questionStateData', 'skill', 'skillDifficulty',
   'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
       $scope, $uibModal, $uibModalInstance, AlertsService,
+      ContextService, ImageLocalStorageService,
       QuestionSuggestionService, QuestionUndoRedoService,
       QuestionValidationService, UrlInterpolationService,
       question, questionId, questionStateData, skill, skillDifficulty,
@@ -53,12 +57,17 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     $scope.misconceptionsBySkill = {};
     $scope.misconceptionsBySkill[$scope.skill.getId()] = (
       $scope.skill.getMisconceptions());
+    ContextService.setImageSaveDestinationToLocalStorage();
     $scope.done = function() {
       if (!$scope.isQuestionValid()) {
         return;
       }
+      var imagesData = ImageLocalStorageService.getStoredImagesData();
+      ImageLocalStorageService.flushStoredImagesData();
+      ContextService.resetImageSaveDestination();
       QuestionSuggestionService.submitSuggestion(
-        $scope.question, $scope.skill, $scope.skillDifficulty, function() {
+        $scope.question, $scope.skill, $scope.skillDifficulty, imagesData,
+        function() {
           AlertsService.addSuccessMessage('Submitted question for review.');
         });
       $uibModalInstance.close();
@@ -81,12 +90,16 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           $uibModalInstance.dismiss('cancel');
+          ImageLocalStorageService.flushStoredImagesData();
+          ContextService.resetImageSaveDestination();
         }, function() {
           // Note to developers:
           // This callback is triggered when the cancel button is clicked.
           // No further action is needed.
         });
       } else {
+        ImageLocalStorageService.flushStoredImagesData();
+        ContextService.resetImageSaveDestination();
         $uibModalInstance.dismiss('cancel');
       }
     };

@@ -52,12 +52,12 @@ angular.module('oppia').component('contributionsAndReview', {
     '$filter', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'MisconceptionObjectFactory',
     'QuestionObjectFactory', 'SkillBackendApiService',
-    'UrlInterpolationService', 'UserService', 'ENTITY_TYPE',
+    'UrlInterpolationService', 'UserService', 'ENTITY_TYPE', 'IMAGE_CONTEXT',
     function(
         $filter, $uibModal, AlertsService, ContextService,
         ContributionAndReviewService, MisconceptionObjectFactory,
         QuestionObjectFactory, SkillBackendApiService,
-        UrlInterpolationService, UserService, ENTITY_TYPE) {
+        UrlInterpolationService, UserService, ENTITY_TYPE, IMAGE_CONTEXT) {
       var ctrl = this;
       var SUGGESTION_LABELS = {
         review: {
@@ -236,6 +236,8 @@ angular.module('oppia').component('contributionsAndReview', {
           var contributionDetails = (
             ctrl.contributions[suggestionId].details);
           var skillId = suggestion.change.skill_id;
+          ContextService.setCustomEntityContext(
+            IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
           SkillBackendApiService.fetchSkill(skillId).then((skillDict) => {
             var misconceptionsBySkill = {};
             var skill = skillDict.skill;

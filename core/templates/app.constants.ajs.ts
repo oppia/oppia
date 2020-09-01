@@ -157,6 +157,8 @@ angular.module('oppia').constant(
 
 angular.module('oppia').constant('ENTITY_TYPE', AppConstants.ENTITY_TYPE);
 
+angular.module('oppia').constant('IMAGE_CONTEXT', AppConstants.IMAGE_CONTEXT);
+
 angular.module('oppia').constant(
   'IMAGE_SAVE_DESTINATION_SERVER', AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
 angular.module('oppia').constant(
