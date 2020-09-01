@@ -159,7 +159,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         language_code = 'en'
         version = 1
         question_model = question_models.QuestionModel.create(
-            question_state_data, language_code, version, [])
+            question_state_data, language_code, version, [], [])
         question_model.question_state_data_schema_version = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
         question_model.commit(self.albert_id, 'invalid question created', [])

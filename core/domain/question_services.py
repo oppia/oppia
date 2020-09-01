@@ -49,7 +49,9 @@ def create_new_question(committer_id, question, commit_message):
         version=question.version,
         linked_skill_ids=question.linked_skill_ids,
         question_state_data_schema_version=(
-            question.question_state_data_schema_version)
+            question.question_state_data_schema_version),
+        inapplicable_misconception_ids=(
+            question.inapplicable_misconception_ids)
     )
     model.commit(
         committer_id, commit_message, [{'cmd': question_domain.CMD_CREATE_NEW}])
@@ -524,6 +526,8 @@ def apply_change_list(question_id, change_list):
         Question. The resulting question domain object.
     """
     question = get_question_by_id(question_id)
+    question_property_inapplicable_misconception_ids = (
+        question_domain.QUESTION_PROPERTY_INAPPLICABLE_MISCONCEPTION_IDS)
     try:
         for change in change_list:
             if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
@@ -538,6 +542,10 @@ def apply_change_list(question_id, change_list):
                 elif (change.property_name ==
                       question_domain.QUESTION_PROPERTY_LINKED_SKILL_IDS):
                     question.update_linked_skill_ids(change.new_value)
+                elif (change.property_name ==
+                      question_property_inapplicable_misconception_ids):
+                    question.update_inapplicable_misconception_ids(
+                        change.new_value)
 
         return question
 
@@ -577,6 +585,8 @@ def _save_question(committer_id, question, change_list, commit_message):
     question_model.question_state_data_schema_version = (
         question.question_state_data_schema_version)
     question_model.linked_skill_ids = question.linked_skill_ids
+    question_model.inapplicable_misconception_ids = (
+        question.inapplicable_misconception_ids)
     change_dicts = [change.to_dict() for change in change_list]
     question_model.commit(committer_id, commit_message, change_dicts)
     question.version += 1
@@ -631,8 +641,14 @@ def compute_summary_of_question(question):
         QuestionSummary. The computed summary for the given question.
     """
     question_content = question.question_state_data.content.html
+    answer_groups = question.question_state_data.interaction.answer_groups
+    misconception_ids = [
+        answer_group.to_dict()['tagged_skill_misconception_id']
+        for answer_group in answer_groups
+        if answer_group.to_dict()['tagged_skill_misconception_id']]
+    misconception_ids.extend(question.inapplicable_misconception_ids)
     question_summary = question_domain.QuestionSummary(
-        question.id, question_content,
+        question.id, question_content, misconception_ids,
         question.created_on, question.last_updated)
     return question_summary
 
@@ -649,7 +665,8 @@ def save_question_summary(question_summary):
         id=question_summary.id,
         question_model_last_updated=question_summary.last_updated,
         question_model_created_on=question_summary.created_on,
-        question_content=question_summary.question_content
+        question_content=question_summary.question_content,
+        misconception_ids=question_summary.misconception_ids
     )
 
     question_summary_model.put()
@@ -670,6 +687,7 @@ def get_question_summary_from_model(question_summary_model):
     return question_domain.QuestionSummary(
         question_summary_model.id,
         question_summary_model.question_content,
+        question_summary_model.misconception_ids,
         question_summary_model.question_model_created_on,
         question_summary_model.question_model_last_updated
     )
