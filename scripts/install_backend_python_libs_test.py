@@ -56,7 +56,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             def write(self, buf): # pylint: disable=missing-docstring
                 mock_write(buf)
 
-        class MockOpenFile(python_utils.OBJECT©153):
+        class MockOpenFile(python_utils.OBJECT):
             def __init__(self, path=None, mode=None):
                 self.path = path
                 self.mode = mode
@@ -481,7 +481,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             'correct metadata folders which may indicate that the '
             'convention for naming the metadata folders have changed. '
             'Please go to `scripts/install_backend_python_libs` and modify '
-            'our assumptions in the _get_possible_metadata_directory_names'
-            ' function for what metadata directory names can be.' )
+            'our assumptions in the _get_possible_metadata_directory_names '
+            'function for what metadata directory names can be.')
         with swap_find_distributions, swap_list_dir, metadata_exception:
             install_backend_python_libs.validate_metadata_directories()
