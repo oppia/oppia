@@ -165,7 +165,8 @@ def _rectify_third_party_directory(mismatches):
 
 
 def _install_library(library_name, version_string):
-    """Installs a library with a certain version.
+    """Installs a library with a certain version to the
+    'third_party/python_libs' folder.
 
     Args:
         library_name: str. Name of the library to install.
@@ -278,17 +279,18 @@ def _get_possible_metadata_directory_names(library_name, version_string):
     return possible_names
 
 
-def _validate_metadata_directories():
+def validate_metadata_directories():
     """Validates that for each installed library in 'third_party/python_libs',
     folder there exists corresponding metadata directories with the correct
     naming conventions that follows the PEP-427 and PEP-376 python guidelines
 
     Raises:
-        Exception: An installed library's metadata does not exist in a format
-            that follows the PEP-427 and PEP-376 python guidelines.
+        Exception: An installed library's metadata does not exist the
+            'third_party/python_libs' directory in the format that we expect
+            (following the PEP-427 and PEP-376 python guidelines).
     """
     directory_contents = _get_third_party_python_libs_directory_contents()
-    names_in_directory = set(
+    directory_names = set(
         [
             name.lower()
             for name in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR)
@@ -299,18 +301,18 @@ def _validate_metadata_directories():
             library_name, version_string)
         has_name_in_directory = False
         for name in possible_file_names:
-            if name in names_in_directory:
+            if name in directory_names:
                 has_name_in_directory = True
                 break
         if not has_name_in_directory:
             raise Exception(
-                'The python library %s was installed without the correct \n'
-                'metadata folders which may indicate that the convention for \n'
-                'naming the metadata folders have changed. Please go to \n'
-                '`scripts/install_backend_python_libs` and modify our \n'
-                'assumptions in the _get_possible_metadata_directory_names() \n'
-                'function for what metadata directory names can be.' % (
-                    library_name))
+                'The python library %s was installed without the correct '
+                'metadata folders which may indicate that the convention for '
+                'naming the metadata folders have changed. Please go to '
+                '`scripts/install_backend_python_libs` and modify our '
+                'assumptions in the _get_possible_metadata_directory_names'
+                ' function for what metadata directory names can be.' %
+                    library_name)
 
 
 def main():
@@ -347,11 +349,10 @@ def main():
     mismatches = get_mismatches()
     if mismatches:
         _rectify_third_party_directory(mismatches)
+        validate_metadata_directories()
     else:
         python_utils.PRINT(
             'All third-party Python libraries are already installed correctly.')
-
-    _validate_metadata_directories()
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when install_third_party_libs.py is used as a script.
