@@ -147,6 +147,7 @@ describe('Keyboard Shortcuts', () => {
       keyboardShortcutService, 'openQuickReference').and.callThrough();
     spyOn(ngbModal, 'open');
     spyOn(ngbModal, 'dismissAll');
+    spyOn(appRef, 'tick');
 
     keyboardShortcutService.bindLibraryPageShortcuts();
 
