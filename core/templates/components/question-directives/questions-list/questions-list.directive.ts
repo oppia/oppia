@@ -97,9 +97,9 @@ angular.module('oppia').directive('questionsList', [
         'ContextService', 'EditableQuestionBackendApiService',
         'ImageLocalStorageService', 'MisconceptionObjectFactory',
         'QuestionCreationService', 'QuestionObjectFactory',
-        'QuestionsListService', 'QuestionUndoRedoService',
-        'QuestionValidationService', 'SkillBackendApiService',
-        'SkillDifficultyObjectFactory', 'ShortSkillSummaryObjectFactory',
+        'QuestionUndoRedoService', 'QuestionValidationService',
+        'QuestionsListService', 'ShortSkillSummaryObjectFactory',
+        'SkillBackendApiService', 'SkillDifficultyObjectFactory',
         'WindowDimensionsService', 'DEFAULT_SKILL_DIFFICULTY',
         'MODE_SELECT_DIFFICULTY', 'MODE_SELECT_SKILL', 'NUM_QUESTIONS_PER_PAGE',
         function(
@@ -107,9 +107,9 @@ angular.module('oppia').directive('questionsList', [
             ContextService, EditableQuestionBackendApiService,
             ImageLocalStorageService, MisconceptionObjectFactory,
             QuestionCreationService, QuestionObjectFactory,
-            QuestionsListService, QuestionUndoRedoService,
-            QuestionValidationService, SkillBackendApiService,
-            SkillDifficultyObjectFactory, ShortSkillSummaryObjectFactory,
+            QuestionUndoRedoService, QuestionValidationService,
+            QuestionsListService, ShortSkillSummaryObjectFactory,
+            SkillBackendApiService, SkillDifficultyObjectFactory,
             WindowDimensionsService, DEFAULT_SKILL_DIFFICULTY,
             MODE_SELECT_DIFFICULTY, MODE_SELECT_SKILL, NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;

@@ -51,10 +51,10 @@ angular.module('oppia').directive('rubricsEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'ContextService', 'SkillCreationService',
-        'SKILL_DIFFICULTY_MEDIUM', 'SKILL_DESCRIPTION_STATUS_VALUES',
+        'SKILL_DESCRIPTION_STATUS_VALUES', 'SKILL_DIFFICULTY_MEDIUM',
         function(
             $scope, ContextService, SkillCreationService,
-            SKILL_DIFFICULTY_MEDIUM, SKILL_DESCRIPTION_STATUS_VALUES) {
+            SKILL_DESCRIPTION_STATUS_VALUES, SKILL_DIFFICULTY_MEDIUM) {
           var ctrl = this;
           var explanationsMemento = {};
 

@@ -39,12 +39,11 @@ angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
         '/pages/story-editor-page/navbar/' +
         'story-editor-navbar-breadcrumb.directive.html'),
       controller: [
-        '$scope', '$uibModal', '$window', 'UrlInterpolationService',
-        'UndoRedoService', 'StoryEditorStateService',
+        '$scope', '$uibModal', '$window', 'StoryEditorStateService',
+        'UndoRedoService', 'UrlInterpolationService',
         function(
-            $scope, $uibModal, $window, UrlInterpolationService,
-            UndoRedoService, StoryEditorStateService
-        ) {
+            $scope, $uibModal, $window, StoryEditorStateService,
+            UndoRedoService, UrlInterpolationService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';

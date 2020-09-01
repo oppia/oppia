@@ -77,8 +77,8 @@ angular.module('oppia').component('stateTranslation', {
     'TranslationLanguageService', 'TranslationStatusService',
     'TranslationTabActiveContentIdService',
     'TranslationTabActiveModeService', 'COMPONENT_NAME_CONTENT',
-    'COMPONENT_NAME_FEEDBACK',
-    'COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS', 'COMPONENT_NAME_HINT',
+    'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
+    'COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS',
     'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
     'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
     function(
@@ -89,8 +89,8 @@ angular.module('oppia').component('stateTranslation', {
         TranslationLanguageService, TranslationStatusService,
         TranslationTabActiveContentIdService,
         TranslationTabActiveModeService, COMPONENT_NAME_CONTENT,
-        COMPONENT_NAME_FEEDBACK,
-        COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS, COMPONENT_NAME_HINT,
+        COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
+        COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS,
         COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
         RULE_SUMMARY_WRAP_CHARACTER_COUNT
     ) {

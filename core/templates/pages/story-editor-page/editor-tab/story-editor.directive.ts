@@ -52,19 +52,17 @@ angular.module('oppia').directive('storyEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/editor-tab/story-editor.directive.html'),
       controller: [
-        '$scope', '$rootScope', 'StoryEditorStateService', 'StoryUpdateService',
-        'UndoRedoService', 'StoryEditorNavigationService',
-        'WindowDimensionsService', 'WindowRef', '$uibModal',
-        'AlertsService', 'MAX_CHARS_IN_STORY_TITLE',
-        'MAX_CHARS_IN_META_TAG_CONTENT',
-        'MAX_CHARS_IN_STORY_URL_FRAGMENT',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        'StoryEditorNavigationService', 'StoryEditorStateService',
+        'StoryUpdateService', 'UndoRedoService', 'WindowDimensionsService',
+        'WindowRef', 'MAX_CHARS_IN_META_TAG_CONTENT',
+        'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
         function(
-            $scope, $rootScope, StoryEditorStateService, StoryUpdateService,
-            UndoRedoService, StoryEditorNavigationService,
-            WindowDimensionsService, WindowRef, $uibModal,
-            AlertsService, MAX_CHARS_IN_STORY_TITLE,
-            MAX_CHARS_IN_META_TAG_CONTENT,
-            MAX_CHARS_IN_STORY_URL_FRAGMENT) {
+            $rootScope, $scope, $uibModal, AlertsService,
+            StoryEditorNavigationService, StoryEditorStateService,
+            StoryUpdateService, UndoRedoService, WindowDimensionsService,
+            WindowRef, MAX_CHARS_IN_META_TAG_CONTENT,
+            MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;

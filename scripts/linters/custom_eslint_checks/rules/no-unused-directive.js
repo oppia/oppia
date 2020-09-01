@@ -18,7 +18,7 @@
 
 'use strict';
 
-const { param } = require("jquery");
+const { param } = require('jquery');
 
 module.exports = {
   meta: {
@@ -42,15 +42,23 @@ module.exports = {
     const sourceCode = context.getSourceCode();
 
     var isEquals = function(sortedImports, params) {
-      if (sortedImports === params) return true;
-      if (sortedImports == null || params == null) return false;
-      if (sortedImports.length !== params.length) return false;
+      if (sortedImports === params) {
+        return true;
+      }
+      if (sortedImports === null || params === null) {
+        return false;
+      }
+      if (sortedImports.length !== params.length) {
+        return false;
+      }
 
       for (var i = 0; i < sortedImports.length; ++i) {
-        if (sortedImports[i] !== params[i]) return false;
+        if (sortedImports[i] !== params[i]) {
+          return false;
+        }
       }
       return true;
-    }
+    };
 
     var isUnused = function(param, tokensList) {
       var variableCounter = 0;
@@ -73,17 +81,18 @@ module.exports = {
       var re = new RegExp('[a-z]');
       params.forEach((param) => {
         if (param.startsWith('$')) {
-          dollarImports.push(param)
+          dollarImports.push(param);
         } else if (re.test(param)) {
-          regularImports.push(param)
+          regularImports.push(param);
         } else {
-          constantImports.push(param)
+          constantImports.push(param);
         }
       });
       dollarImports.sort();
       regularImports.sort();
       constantImports.sort();
-      var sortedImports = dollarImports.concat(regularImports).concat(constantImports)
+      var sortedImports = dollarImports.concat(
+        regularImports).concat(constantImports);
       if (!isEquals(sortedImports, params)) {
         context.report({
           node,

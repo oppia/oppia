@@ -45,14 +45,14 @@ angular.module('oppia').component('unresolvedAnswersOverview', {
   template: require('./unresolved-answers-overview.component.html'),
   controller: [
     '$scope', '$uibModal', 'EditabilityService',
-    'ExternalSaveService', 'ExplorationStatesService',
+    'ExplorationStatesService', 'ExternalSaveService',
     'ImprovementsService', 'StateEditorService',
     'StateInteractionIdService', 'StateTopAnswersStatsService',
     'UrlInterpolationService', 'INTERACTION_SPECS',
     'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
     function(
         $scope, $uibModal, EditabilityService,
-        ExternalSaveService, ExplorationStatesService,
+        ExplorationStatesService, ExternalSaveService,
         ImprovementsService, StateEditorService,
         StateInteractionIdService, StateTopAnswersStatsService,
         UrlInterpolationService, INTERACTION_SPECS,

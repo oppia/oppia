@@ -53,15 +53,15 @@ angular.module('oppia').directive('collectionEditorNavbar', [
         'collection-editor-navbar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$uibModal', 'AlertsService', 'RouterService',
-        'UndoRedoService', 'CollectionEditorStateService',
-        'CollectionValidationService', 'CollectionRightsBackendApiService',
-        'UrlService',
+        '$rootScope', '$uibModal', 'AlertsService',
+        'CollectionEditorStateService', 'CollectionRightsBackendApiService',
+        'CollectionValidationService', 'RouterService',
+        'UndoRedoService', 'UrlService',
         function(
-            $rootScope, $uibModal, AlertsService, RouterService,
-            UndoRedoService, CollectionEditorStateService,
-            CollectionValidationService, CollectionRightsBackendApiService,
-            UrlService) {
+            $rootScope, $uibModal, AlertsService,
+            CollectionEditorStateService, CollectionRightsBackendApiService,
+            CollectionValidationService, RouterService,
+            UndoRedoService, UrlService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _validateCollection = function() {

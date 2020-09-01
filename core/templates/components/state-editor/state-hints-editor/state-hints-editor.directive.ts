@@ -66,7 +66,7 @@ angular.module('oppia').directive('stateHintsEditor', [
         '/components/state-editor/state-hints-editor/' +
         'state-hints-editor.directive.html'),
       controller: [
-        '$scope', '$uibModal', '$filter', 'AlertsService',
+        '$filter', '$scope', '$uibModal', 'AlertsService',
         'EditabilityService', 'ExternalSaveService',
         'StateEditorService', 'StateHintsService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
@@ -74,7 +74,7 @@ angular.module('oppia').directive('stateHintsEditor', [
         'UrlInterpolationService', 'WindowDimensionsService',
         'INTERACTION_SPECS',
         function(
-            $scope, $uibModal, $filter, AlertsService,
+            $filter, $scope, $uibModal, AlertsService,
             EditabilityService, ExternalSaveService,
             StateEditorService, StateHintsService,
             StateInteractionIdService, StateNextContentIdIndexService,

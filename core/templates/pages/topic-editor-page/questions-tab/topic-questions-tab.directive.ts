@@ -49,11 +49,11 @@ angular.module('oppia').directive('questionsTab', [
         '/pages/topic-editor-page/questions-tab/' +
         'topic-questions-tab.directive.html'),
       controller: [
-        '$scope', 'TopicEditorStateService',
-        'TopicsAndSkillsDashboardBackendApiService', 'QuestionsListService',
+        '$scope', 'QuestionsListService', 'TopicEditorStateService',
+        'TopicsAndSkillsDashboardBackendApiService',
         function(
-            $scope, TopicEditorStateService,
-            TopicsAndSkillsDashboardBackendApiService, QuestionsListService) {
+            $scope, QuestionsListService, TopicEditorStateService,
+            TopicsAndSkillsDashboardBackendApiService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.getQuestionSummariesAsync =

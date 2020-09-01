@@ -40,15 +40,15 @@ angular.module('oppia').component('subtopicEditorTab', {
   template: require('./subtopic-editor-tab.component.html'),
   controller: [
     '$scope', 'QuestionBackendApiService',
-    'SubtopicValidationService', 'TopicEditorStateService',
-    'TopicEditorRoutingService', 'TopicUpdateService',
+    'SubtopicValidationService', 'TopicEditorRoutingService',
+    'TopicEditorStateService', 'TopicUpdateService',
     'UrlInterpolationService', 'WindowDimensionsService', 'WindowRef',
     'MAX_CHARS_IN_SUBTOPIC_TITLE',
     'MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT',
     function(
         $scope, QuestionBackendApiService,
-        SubtopicValidationService, TopicEditorStateService,
-        TopicEditorRoutingService, TopicUpdateService,
+        SubtopicValidationService, TopicEditorRoutingService,
+        TopicEditorStateService, TopicUpdateService,
         UrlInterpolationService, WindowDimensionsService, WindowRef,
         MAX_CHARS_IN_SUBTOPIC_TITLE,
         MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT) {

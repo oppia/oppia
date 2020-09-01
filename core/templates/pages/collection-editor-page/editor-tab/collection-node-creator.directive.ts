@@ -41,17 +41,17 @@ angular.module('oppia').directive('collectionNodeCreator', [
         'collection-node-creator.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$filter', 'AlertsService', 'ValidatorsService',
+        '$filter', '$http', 'AlertsService',
         'CollectionEditorStateService', 'CollectionLinearizerService',
         'ExplorationSummaryBackendApiService',
         'SearchExplorationsBackendApiService', 'SiteAnalyticsService',
-        'INVALID_NAME_CHARS',
+        'ValidatorsService', 'INVALID_NAME_CHARS',
         function(
-            $http, $filter, AlertsService, ValidatorsService,
+            $filter, $http, AlertsService,
             CollectionEditorStateService, CollectionLinearizerService,
             ExplorationSummaryBackendApiService,
             SearchExplorationsBackendApiService, SiteAnalyticsService,
-            INVALID_NAME_CHARS) {
+            ValidatorsService, INVALID_NAME_CHARS) {
           var ctrl = this;
           /**
            * Fetches a list of exploration metadata dicts from backend, given

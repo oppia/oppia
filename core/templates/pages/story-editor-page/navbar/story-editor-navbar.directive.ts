@@ -42,12 +42,12 @@ angular.module('oppia').directive('storyEditorNavbar', [
         '/pages/story-editor-page/navbar/story-editor-navbar.directive.html'),
       controller: [
         '$scope', '$uibModal', 'EditableStoryBackendApiService',
-        'UndoRedoService', 'StoryEditorStateService',
-        'StoryEditorNavigationService',
+        'StoryEditorNavigationService', 'StoryEditorStateService',
+        'UndoRedoService',
         function(
             $scope, $uibModal, EditableStoryBackendApiService,
-            UndoRedoService, StoryEditorStateService,
-            StoryEditorNavigationService) {
+            StoryEditorNavigationService, StoryEditorStateService,
+            UndoRedoService) {
           var ctrl = this;
           var EDITOR = 'Editor';
           var PREVIEW = 'Preview';

@@ -52,11 +52,11 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
       template: require('./logic-proof-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', '$timeout', '$uibModal', 'LogicProofRulesService',
-        'CurrentInteractionService',
+        '$attrs', '$scope', '$timeout', '$uibModal',
+        'CurrentInteractionService', 'LogicProofRulesService',
         function(
-            $scope, $attrs, $timeout, $uibModal, LogicProofRulesService,
-            CurrentInteractionService) {
+            $attrs, $scope, $timeout, $uibModal,
+            CurrentInteractionService, LogicProofRulesService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           // NOTE: for information on integrating angular and code-mirror see

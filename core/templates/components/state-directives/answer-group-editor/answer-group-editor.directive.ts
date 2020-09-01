@@ -78,15 +78,15 @@ angular.module('oppia').directive('answerGroupEditor', [
         'answer-group-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'StateInteractionIdService', 'AlertsService', 'ExternalSaveService',
-        'INTERACTION_SPECS', 'StateEditorService', 'RuleObjectFactory',
+        'AlertsService', 'ExternalSaveService', 'ResponsesService',
+        'RuleObjectFactory', 'StateEditorService', 'StateInteractionIdService',
         'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
-        'ResponsesService',
+        'INTERACTION_SPECS',
         function(
-            StateInteractionIdService, AlertsService, ExternalSaveService,
-            INTERACTION_SPECS, StateEditorService, RuleObjectFactory,
+            AlertsService, ExternalSaveService, ResponsesService,
+            RuleObjectFactory, StateEditorService, StateInteractionIdService,
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
-            ResponsesService) {
+            INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
 

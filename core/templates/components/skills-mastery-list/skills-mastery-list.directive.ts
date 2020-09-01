@@ -38,9 +38,9 @@ angular.module('oppia').directive('skillsMasteryList', [
         '/components/skills-mastery-list/skills-mastery-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$uibModal', 'UserService', 'MASTERY_CUTOFF', 'MASTERY_COLORS',
+        '$uibModal', 'UserService', 'MASTERY_COLORS', 'MASTERY_CUTOFF',
         function(
-            $uibModal, UserService, MASTERY_CUTOFF, MASTERY_COLORS) {
+            $uibModal, UserService, MASTERY_COLORS, MASTERY_CUTOFF) {
           var ctrl = this;
           ctrl.getMasteryPercentage = function(degreeOfMastery) {
             return Math.round(degreeOfMastery * 100);

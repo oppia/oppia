@@ -67,18 +67,17 @@ angular.module('oppia').directive('storyNodeEditor', [
         '/pages/story-editor-page/editor-tab/story-node-editor.directive.html'),
       controller: [
         '$scope', '$uibModal', 'AlertsService',
-        'PageTitleService',
-        'StoryEditorStateService', 'ExplorationIdValidationService',
-        'TopicsAndSkillsDashboardBackendApiService', 'StoryUpdateService',
-        'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_TITLE',
-        'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
-        function(
+        'ExplorationIdValidationService', 'PageTitleService',
+        'StoryEditorStateService', 'StoryUpdateService',
+        'TopicsAndSkillsDashboardBackendApiService',
+        'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
+        'MAX_CHARS_IN_CHAPTER_TITLE', function(
             $scope, $uibModal, AlertsService,
-            PageTitleService,
-            StoryEditorStateService, ExplorationIdValidationService,
-            TopicsAndSkillsDashboardBackendApiService, StoryUpdateService,
-            WindowDimensionsService, MAX_CHARS_IN_CHAPTER_TITLE,
-            MAX_CHARS_IN_CHAPTER_DESCRIPTION) {
+            ExplorationIdValidationService, PageTitleService,
+            StoryEditorStateService, StoryUpdateService,
+            TopicsAndSkillsDashboardBackendApiService,
+            WindowDimensionsService, MAX_CHARS_IN_CHAPTER_DESCRIPTION,
+            MAX_CHARS_IN_CHAPTER_TITLE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_CHAPTER_TITLE = MAX_CHARS_IN_CHAPTER_TITLE;

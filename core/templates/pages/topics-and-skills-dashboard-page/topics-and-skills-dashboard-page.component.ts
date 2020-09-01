@@ -60,21 +60,19 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('topicsAndSkillsDashboardPage', {
   template: require('./topics-and-skills-dashboard-page.component.html'),
   controller: [
-    '$timeout', '$rootScope', '$scope', 'AlertsService',
-    'WindowDimensionsService', 'TopicsAndSkillsDashboardFilterObjectFactory',
-    'SkillCreationService', 'TopicCreationService',
-    'TopicsAndSkillsDashboardBackendApiService',
-    'TopicsAndSkillsDashboardPageService', 'FATAL_ERROR_CODES',
-    'SKILL_STATUS_OPTIONS', 'TOPIC_FILTER_CLASSROOM_ALL',
-    'TOPIC_SORT_OPTIONS', 'TOPIC_PUBLISHED_OPTIONS',
+    '$rootScope', '$scope', '$timeout', 'AlertsService', 'SkillCreationService',
+    'TopicCreationService', 'TopicsAndSkillsDashboardBackendApiService',
+    'TopicsAndSkillsDashboardFilterObjectFactory',
+    'TopicsAndSkillsDashboardPageService', 'WindowDimensionsService',
+    'FATAL_ERROR_CODES', 'SKILL_STATUS_OPTIONS', 'TOPIC_FILTER_CLASSROOM_ALL',
+    'TOPIC_PUBLISHED_OPTIONS', 'TOPIC_SORT_OPTIONS',
     function(
-        $timeout, $rootScope, $scope, AlertsService,
-        WindowDimensionsService, TopicsAndSkillsDashboardFilterObjectFactory,
-        SkillCreationService, TopicCreationService,
-        TopicsAndSkillsDashboardBackendApiService,
-        TopicsAndSkillsDashboardPageService, FATAL_ERROR_CODES,
-        SKILL_STATUS_OPTIONS, TOPIC_FILTER_CLASSROOM_ALL,
-        TOPIC_SORT_OPTIONS, TOPIC_PUBLISHED_OPTIONS) {
+        $rootScope, $scope, $timeout, AlertsService, SkillCreationService,
+        TopicCreationService, TopicsAndSkillsDashboardBackendApiService,
+        TopicsAndSkillsDashboardFilterObjectFactory,
+        TopicsAndSkillsDashboardPageService, WindowDimensionsService,
+        FATAL_ERROR_CODES, SKILL_STATUS_OPTIONS, TOPIC_FILTER_CLASSROOM_ALL,
+        TOPIC_PUBLISHED_OPTIONS, TOPIC_SORT_OPTIONS) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var TOPIC_CLASSROOM_UNASSIGNED = 'Unassigned';

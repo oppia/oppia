@@ -38,10 +38,10 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
       template: require('./number-with-units-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', '$uibModal', 'NumberWithUnitsObjectFactory',
-        'NumberWithUnitsRulesService', 'CurrentInteractionService', function(
-            $scope, $attrs, $uibModal, NumberWithUnitsObjectFactory,
-            NumberWithUnitsRulesService, CurrentInteractionService) {
+        '$attrs', '$scope', '$uibModal', 'CurrentInteractionService',
+        'NumberWithUnitsObjectFactory', 'NumberWithUnitsRulesService', function(
+            $attrs, $scope, $uibModal, CurrentInteractionService,
+            NumberWithUnitsObjectFactory, NumberWithUnitsRulesService) {
           var ctrl = this;
           var errorMessage = '';
           // Label for errors caused whilst parsing number with units.

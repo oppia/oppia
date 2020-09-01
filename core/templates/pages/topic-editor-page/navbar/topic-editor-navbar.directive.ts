@@ -44,13 +44,13 @@ angular.module('oppia').directive('topicEditorNavbar', [
         '/pages/topic-editor-page/navbar/topic-editor-navbar.directive.html'),
       controller: [
         '$scope', '$uibModal', '$window', 'AlertsService',
-        'UndoRedoService', 'TopicEditorStateService', 'UrlService',
-        'TopicRightsBackendApiService', 'TopicEditorRoutingService',
+        'TopicEditorRoutingService', 'TopicEditorStateService',
+        'TopicRightsBackendApiService', 'UndoRedoService', 'UrlService',
         'TOPIC_VIEWER_URL_TEMPLATE',
         function(
             $scope, $uibModal, $window, AlertsService,
-            UndoRedoService, TopicEditorStateService, UrlService,
-            TopicRightsBackendApiService, TopicEditorRoutingService,
+            TopicEditorRoutingService, TopicEditorStateService,
+            TopicRightsBackendApiService, UndoRedoService, UrlService,
             TOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();

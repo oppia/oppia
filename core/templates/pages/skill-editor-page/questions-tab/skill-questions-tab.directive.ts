@@ -45,9 +45,9 @@ angular.module('oppia').directive('questionsTab', [
         '/pages/skill-editor-page/questions-tab/' +
         'skill-questions-tab.directive.html'),
       controller: [
-        '$scope', 'SkillEditorStateService', 'QuestionsListService',
+        '$scope', 'QuestionsListService', 'SkillEditorStateService',
         function(
-            $scope, SkillEditorStateService, QuestionsListService) {
+            $scope, QuestionsListService, SkillEditorStateService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _init = function() {

@@ -48,12 +48,14 @@ angular.module('oppia').directive('topicsList', [
         '/pages/topics-and-skills-dashboard-page/topics-list/' +
         'topics-list.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'EditableTopicBackendApiService',
-        'AlertsService', 'TopicsAndSkillsDashboardBackendApiService',
+        '$scope', '$uibModal', 'AlertsService',
+        'EditableTopicBackendApiService',
+        'TopicsAndSkillsDashboardBackendApiService',
         'UrlInterpolationService',
         function(
-            $scope, $uibModal, EditableTopicBackendApiService,
-            AlertsService, TopicsAndSkillsDashboardBackendApiService,
+            $scope, $uibModal, AlertsService,
+            EditableTopicBackendApiService,
+            TopicsAndSkillsDashboardBackendApiService,
             UrlInterpolationService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();

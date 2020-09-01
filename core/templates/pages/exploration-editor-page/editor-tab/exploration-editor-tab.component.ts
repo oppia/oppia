@@ -60,17 +60,17 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('explorationEditorTab', {
   template: require('./exploration-editor-tab.component.html'),
   controller: [
-    '$scope', '$uibModal', 'LoaderService',
-    'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
-    'ExplorationInitStateNameService', 'ExplorationStatesService',
-    'ExplorationWarningsService', 'GraphDataService', 'RouterService',
+    '$scope', '$uibModal', 'ExplorationCorrectnessFeedbackService',
+    'ExplorationFeaturesService', 'ExplorationInitStateNameService',
+    'ExplorationStatesService', 'ExplorationWarningsService',
+    'GraphDataService', 'LoaderService', 'RouterService',
     'StateEditorRefreshService', 'StateEditorService',
     'UrlInterpolationService',
     function(
-        $scope, $uibModal, LoaderService,
-        ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
-        ExplorationInitStateNameService, ExplorationStatesService,
-        ExplorationWarningsService, GraphDataService, RouterService,
+        $scope, $uibModal, ExplorationCorrectnessFeedbackService,
+        ExplorationFeaturesService, ExplorationInitStateNameService,
+        ExplorationStatesService, ExplorationWarningsService,
+        GraphDataService, LoaderService, RouterService,
         StateEditorRefreshService, StateEditorService,
         UrlInterpolationService) {
       var ctrl = this;
