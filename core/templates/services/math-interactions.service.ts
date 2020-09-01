@@ -62,7 +62,8 @@ export class MathInteractionsService {
       errorMessage = 'Your answer includes a division by zero, which is ' +
         'not valid.';
     }
-    if (errorMessage.indexOf('is not a valid postfix operator.') !== -1) {
+    if (
+      errorMessage.indexOf('is not a valid postfix operator.') !== -1) {
       errorMessage = (
         'Your answer seems to be missing a variable/number after the "' +
         errorMessage[0] + '".');
@@ -81,11 +82,23 @@ export class MathInteractionsService {
         'Your answer has two symbols next to each other: "' + symbol1 +
         '" and "' + symbol2 + '".');
     }
+    if (
+      errorMessage === 'Cannot read property \'parent\' of undefined.') {
+      let invalidFunctionName = '';
+      for (let functionName of this.mathFunctionNames) {
+        if (expressionString.includes(functionName + '()')) {
+          invalidFunctionName = functionName;
+          break;
+        }
+      }
+      errorMessage = (
+        'The ' + invalidFunctionName +
+        ' function cannot be empty. Please enter a variable/number in it.');
+    }
     return errorMessage;
   }
 
-  _validateExpression(
-      expressionString: string, validVariablesList: string[]): boolean {
+  _validateExpression(expressionString: string): boolean {
     expressionString = expressionString.replace(/\s/g, '');
     if (expressionString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
@@ -119,7 +132,7 @@ export class MathInteractionsService {
 
   validateAlgebraicExpression(
       expressionString: string, validVariablesList: string[]): boolean {
-    if (!this._validateExpression(expressionString, validVariablesList)) {
+    if (!this._validateExpression(expressionString)) {
       return false;
     }
 
@@ -160,7 +173,7 @@ export class MathInteractionsService {
   }
 
   validateNumericExpression(expressionString: string): boolean {
-    if (!this._validateExpression(expressionString, [])) {
+    if (!this._validateExpression(expressionString)) {
       return false;
     }
     for (let functionName of this.mathFunctionNames) {
