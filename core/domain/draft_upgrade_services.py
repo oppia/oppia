@@ -364,8 +364,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                   exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                 new_value = [
                     state_domain.AnswerGroup.convert_html_in_answer_group(
-                        answer_group,
-                        conversion_fn)
+                        answer_group, conversion_fn)
                     for answer_group in new_value]
             if new_value is not None:
                 draft_change_list[i] = exp_domain.ExplorationChange({
