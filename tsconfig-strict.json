@@ -32,7 +32,11 @@
   },
   "files": [
     "core/templates/pages/admin-page/services/admin-router.service.ts",
-    "core/templates/pages/admin-page/services/admin-router.service.spec.ts"
+    "core/templates/pages/admin-page/services/admin-router.service.spec.ts",
+    "core/templates/pages/admin-page/services/admin-task-manager.service.ts",
+    "core/templates/pages/admin-page/services/admin-task-manager.service.spec.ts",
+    "core/templates/pages/exploration-editor-page/services/angular-name.service.ts",
+    "core/templates/pages/exploration-editor-page/services/angular-name.service.spec.ts"
   ],
   "include": ["typings/*.ts"]
 }

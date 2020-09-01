@@ -61,7 +61,8 @@ import { WrittenTranslationsObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('components/state-editor/state-editor-properties-services/' +
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-solicit-answer-details.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 

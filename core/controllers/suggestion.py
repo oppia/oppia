@@ -128,11 +128,11 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
                     'Commit messages must be at most %s characters long.'
                     % feconf.MAX_COMMIT_MESSAGE_LENGTH)
             suggestion_services.accept_suggestion(
-                suggestion, self.user_id, self.payload.get('commit_message'),
+                suggestion_id, self.user_id, self.payload.get('commit_message'),
                 self.payload.get('review_message'))
         elif action == suggestion_models.ACTION_TYPE_REJECT:
             suggestion_services.reject_suggestion(
-                suggestion, self.user_id, self.payload.get('review_message'))
+                suggestion_id, self.user_id, self.payload.get('review_message'))
         else:
             raise self.InvalidInputException('Invalid action.')
 
@@ -148,11 +148,9 @@ class ResubmitSuggestionHandler(base.BaseHandler):
         new_change = self.payload.get('change')
         change_cls = type(suggestion.change)
         change_object = change_cls(new_change)
-        suggestion.pre_update_validate(change_object)
-        suggestion.change = change_object
         summary_message = self.payload.get('summary_message')
         suggestion_services.resubmit_rejected_suggestion(
-            suggestion, summary_message, self.user_id)
+            suggestion_id, summary_message, self.user_id, change_object)
         self.render_json(self.values)
 
 
@@ -172,16 +170,15 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
                 'part of the suggestion_id')
 
         action = self.payload.get('action')
-        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         if action == suggestion_models.ACTION_TYPE_ACCEPT:
             # Question suggestions do not use commit messages.
             suggestion_services.accept_suggestion(
-                suggestion, self.user_id, 'UNUSED_COMMIT_MESSAGE',
+                suggestion_id, self.user_id, 'UNUSED_COMMIT_MESSAGE',
                 self.payload.get('review_message'))
         elif action == suggestion_models.ACTION_TYPE_REJECT:
             suggestion_services.reject_suggestion(
-                suggestion, self.user_id, self.payload.get('review_message'))
+                suggestion_id, self.user_id, self.payload.get('review_message'))
         else:
             raise self.InvalidInputException('Invalid action.')
 

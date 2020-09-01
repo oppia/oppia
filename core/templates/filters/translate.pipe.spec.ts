@@ -43,15 +43,16 @@ class MockTranslateService {
     I18n_rogue_2: '<oppia-img>Me</oppia-img>Hola'
   };
 
-  getInterpolatedString(key: string,
-      interpolateParams?: Object) {
+  getInterpolatedString(
+      key: string, interpolateParams?: Object) {
     const str = this.translations[key];
     if (!str) {
       return key;
     }
 
     if (interpolateParams) {
-      return str.replace(/\<\[\s?([^{}\s]*)\s?\]\>/g,
+      return str.replace(
+        /\<\[\s?([^{}\s]*)\s?\]\>/g,
         (substring: string, interpolateParamsKey: string) => {
           return interpolateParams[interpolateParamsKey];
         });

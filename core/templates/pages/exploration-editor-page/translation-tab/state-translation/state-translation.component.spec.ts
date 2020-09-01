@@ -372,17 +372,19 @@ describe('State translation component', function() {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
       'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
-    $provide.value('ContinueValidationService',
-      TestBed.get(ContinueValidationService));
-    $provide.value('ContinueRulesService',
-      TestBed.get(ContinueRulesService));
-    $provide.value('ExplorationImprovementsTaskRegistryService',
+    $provide.value(
+      'ContinueValidationService', TestBed.get(ContinueValidationService));
+    $provide.value(
+      'ContinueRulesService', TestBed.get(ContinueRulesService));
+    $provide.value(
+      'ExplorationImprovementsTaskRegistryService',
       TestBed.get(ExplorationImprovementsTaskRegistryService));
-    $provide.value('ExplorationStatsService',
-      TestBed.get(ExplorationStatsService));
+    $provide.value(
+      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
     $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
     $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));
-    $provide.value('NumberWithUnitsObjectFactory',
+    $provide.value(
+      'NumberWithUnitsObjectFactory',
       TestBed.get(NumberWithUnitsObjectFactory));
     $provide.value(
       'TextInputRulesService',
@@ -392,14 +394,15 @@ describe('State translation component', function() {
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
-    $provide.value('StateInteractionIdService',
-      TestBed.get(StateInteractionIdService));
-    $provide.value('StateEditorRefreshService',
-      TestBed.get(StateEditorRefreshService));
-    $provide.value('StateRecordedVoiceoversService',
-      stateRecordedVoiceoversService);
+    $provide.value(
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateRecordedVoiceoversService', stateRecordedVoiceoversService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
-    $provide.value('StateWrittenTranslationsService',
+    $provide.value(
+      'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
     $provide.value('RatioObjectFactory', TestBed.get(RatioObjectFactory));
   }));
@@ -450,8 +453,8 @@ describe('State translation component', function() {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
       explorationStatesService.init(explorationState1);
-      stateRecordedVoiceoversService.init('Introduction',
-        recordedVoiceoversObjectFactory.createFromBackendDict(
+      stateRecordedVoiceoversService.init(
+        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
@@ -752,8 +755,8 @@ describe('State translation component', function() {
       spyOnProperty(stateEditorService, 'onShowTranslationTabBusyModal').and
         .returnValue(showTranslationTabBusyModalEmitter);
       explorationStatesService.init(explorationState1);
-      stateRecordedVoiceoversService.init('Introduction',
-        recordedVoiceoversObjectFactory.createFromBackendDict(
+      stateRecordedVoiceoversService.init(
+        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
@@ -896,8 +899,8 @@ describe('State translation component', function() {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
       explorationStatesService.init(explorationState2);
-      stateRecordedVoiceoversService.init('Introduction',
-        recordedVoiceoversObjectFactory.createFromBackendDict(
+      stateRecordedVoiceoversService.init(
+        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
@@ -939,8 +942,8 @@ describe('State translation component', function() {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
       explorationStatesService.init(explorationState3);
-      stateRecordedVoiceoversService.init('Introduction',
-        recordedVoiceoversObjectFactory.createFromBackendDict(
+      stateRecordedVoiceoversService.init(
+        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
@@ -1010,8 +1013,8 @@ describe('State translation component', function() {
         }
       });
       explorationStatesService.init(explorationState4);
-      stateRecordedVoiceoversService.init('Introduction',
-        recordedVoiceoversObjectFactory.createFromBackendDict(
+      stateRecordedVoiceoversService.init(
+        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
           {
             voiceovers_mapping: {
               content: {},

@@ -114,8 +114,8 @@ describe('RatioExpressionInputValidationService', () => {
     // The third rule will never get matched.
     answerGroups[0].rules = [equals, isEquivalent];
 
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because' +
@@ -132,8 +132,8 @@ describe('RatioExpressionInputValidationService', () => {
     // The second rule will never get matched.
     answerGroups[0].rules = [isEquivalent, isEquivalentNonSimplified];
 
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because' +
@@ -156,8 +156,8 @@ describe('RatioExpressionInputValidationService', () => {
     // The second rule will never get matched.
     answerGroups[0].rules = [hasNumberOfTermsEqualTo, equals, equalFourTerms];
 
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because' +

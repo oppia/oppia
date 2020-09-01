@@ -34,8 +34,9 @@ angular.module('oppia').controller('RteHelperModalController', [
       IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
     var extractVideoIdFromVideoUrl = function(videoUrl) {
       videoUrl = videoUrl.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
-      return ((videoUrl[2] !== undefined) ?
-                videoUrl[2].split(/[^0-9a-z_\-]/i)[0] : videoUrl[0]);
+      return (
+        (videoUrl[2] !== undefined) ?
+        videoUrl[2].split(/[^0-9a-z_\-]/i)[0] : videoUrl[0]);
     };
 
     $scope.customizationArgSpecs = customizationArgSpecs;

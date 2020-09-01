@@ -103,8 +103,8 @@ describe('MathEquationInputValidationService', () => {
     // The second rule will never get matched.
     answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
 
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because it' +
@@ -128,8 +128,8 @@ describe('MathEquationInputValidationService', () => {
     // The second rule will never get matched.
     answerGroups[0].rules = [isEquivalentTo1, isEquivalentTo2];
 
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because it' +
@@ -155,8 +155,8 @@ describe('MathEquationInputValidationService', () => {
     // The second rule will never get matched.
     answerGroups[0].rules = [matchesExactlyWith1, matchesExactlyWith2];
 
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because it' +
@@ -186,8 +186,8 @@ describe('MathEquationInputValidationService', () => {
 
     answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
 
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 

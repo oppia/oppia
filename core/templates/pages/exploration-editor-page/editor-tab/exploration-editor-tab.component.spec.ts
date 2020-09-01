@@ -175,8 +175,8 @@ describe('Exploration editor tab component', function() {
     stateEditorRefreshService = $injector.get('StateEditorRefreshService');
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
-    spyOnProperty(stateEditorRefreshService,
-      'onRefreshStateEditor').and.returnValue(
+    spyOnProperty(
+      stateEditorRefreshService, 'onRefreshStateEditor').and.returnValue(
       mockRefreshStateEditorEventEmitter);
 
     explorationStatesService.init({
@@ -580,22 +580,26 @@ describe('Exploration editor tab component', function() {
     });
     stateEditorService.setActiveStateName('First State');
 
-    expect(explorationStatesService.getState('First State')
-      .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
+    expect(
+      explorationStatesService.getState('First State')
+        .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
       false);
-    expect(explorationStatesService.getState('First State')
-      .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate).toBe(
-      false);
+    expect(
+      explorationStatesService.getState('First State')
+        .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
+      .toBe(false);
 
     ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
     $scope.$apply();
 
-    expect(explorationStatesService.getState('First State')
-      .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
+    expect(
+      explorationStatesService.getState('First State')
+        .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
       true);
-    expect(explorationStatesService.getState('First State')
-      .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate).toBe(
-      true);
+    expect(
+      explorationStatesService.getState('First State')
+        .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
+      .toBe(true);
   });
 
   it('should not mark all audio as needing update when dismissing modal',
@@ -605,21 +609,25 @@ describe('Exploration editor tab component', function() {
       });
       stateEditorService.setActiveStateName('First State');
 
-      expect(explorationStatesService.getState('First State')
-        .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
+      expect(
+        explorationStatesService.getState('First State')
+          .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
         false);
-      expect(explorationStatesService.getState('First State')
-        .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
+      expect(
+        explorationStatesService.getState('First State')
+          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
         .toBe(false);
 
       ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
       $scope.$apply();
 
-      expect(explorationStatesService.getState('First State')
-        .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
+      expect(
+        explorationStatesService.getState('First State')
+          .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
         false);
-      expect(explorationStatesService.getState('First State')
-        .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
+      expect(
+        explorationStatesService.getState('First State')
+          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
         .toBe(false);
     });
 

@@ -63,7 +63,8 @@ export class StatsReportingBackendApiService {
           exploration_id: explorationId
         });
     } catch (e) {
-      let additionalInfo = ('\nUndefined exploration id error debug logs:' +
+      let additionalInfo = (
+        '\nUndefined exploration id error debug logs:' +
         '\nThe event being recorded: ' + urlIdentifier +
         '\nExploration ID: ' + this.contextService.getExplorationId()
       );
