@@ -445,8 +445,7 @@ var AdminPage = function() {
   };
 
   this.expectContributionRegenerationFailure = async function() {
-    var text = 'Server error: Entity for class TopicModel with id ' +
-      topicId + ' not found';
+    var text = 'Server error: Entity for class TopicModel with id 0 not found';
     await waitFor.visibilityOf(
       regenerationMessage, 'Regeneration message not visible');
     await waitFor.textToBePresentInElement(regenerationMessage, text);

@@ -148,12 +148,13 @@ describe('Admin misc tab', function() {
     await browser.refresh();
     await waitFor.pageToFullyLoad();
     await adminPage.expectUsernameToBeChanged('mTabChecker');
+    allowedErrors.push('500');
   });
 
   it('should regenerate contribution opportunities for a topic',
     async function() {
       // These errors come from supplying '0' as the topic ID (invalid)
-      allowedErrors.push('id', 'Entity', 'Object');
+      allowedErrors.push('id', 'Entity', 'Object', '500');
       await adminPage.regenerateContributionsForTopic('0');
       await adminPage.expectContributionRegenerationFailure();
       await adminPage.regenerateContributionsForTopic(topicId);
@@ -177,7 +178,7 @@ describe('Admin misc tab', function() {
     await adminPage.extractData('0', '0', '0', '0', true);
     // We expect errors because we inputted an invalid exploration ID.
     await adminPage.expectExtractionFailure();
-    allowedErrors.push('rejection', '400');
+    allowedErrors.push('rejection', '400', '500');
   });
 
   afterEach(async function() {
