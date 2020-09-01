@@ -354,7 +354,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         # The language_code field is used for querying purposes. We do not want
         # to query suggestions of this type by language. Therefore, this
         # property is set to None.
-        if (self.language_code != None):
+        if self.language_code != None:
             raise utils.ValidationError(
                 'Expected language_code to be None, received %s' % (
                     self.language_code))
@@ -523,7 +523,7 @@ class SuggestionTranslateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.change.language_code)
 
-        if (self.language_code != self.change.language_code):
+        if self.language_code != self.change.language_code:
             raise utils.ValidationError(
                 'Expected language_code to be %s, received %s' % (
                     self.change.language_code, self.language_code))
@@ -654,7 +654,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected change to contain question_dict')
 
-        if (self.language_code != self.change.question_dict['language_code']):
+        if self.language_code != self.change.question_dict['language_code']:
             raise utils.ValidationError(
                 'Expected language_code to be %s, received %s' % (
                     self.change.question_dict['language_code'],

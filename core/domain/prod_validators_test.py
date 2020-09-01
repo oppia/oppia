@@ -4759,7 +4759,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, '0',
             1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
-            self.admin_id, change, score_category, self.thread_id)
+            self.admin_id, change, score_category, self.thread_id, None)
 
         self.model_instance = (
             feedback_models.GeneralFeedbackThreadModel.get_by_id(
@@ -9216,7 +9216,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, '0',
             1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
-            self.admin_id, change, score_category, self.thread_id)
+            self.admin_id, change, score_category, self.thread_id, None)
         self.model_instance = (
             suggestion_models.GeneralSuggestionModel.get_by_id(self.thread_id))
 
@@ -9408,7 +9408,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, '0',
             1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
-            self.admin_id, change, score_category, thread_id)
+            self.admin_id, change, score_category, thread_id, None)
         model_instance = (
             suggestion_models.GeneralSuggestionModel.get_by_id(thread_id))
         expected_output = [((
@@ -9459,7 +9459,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             suggestion_models.TARGET_TYPE_SKILL, '0',
             1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
-            self.admin_id, change, score_category, thread_id)
+            self.admin_id, change, score_category, thread_id, None)
         model_instance = (
             suggestion_models.GeneralSuggestionModel.get_by_id(thread_id))
         expected_output = [(

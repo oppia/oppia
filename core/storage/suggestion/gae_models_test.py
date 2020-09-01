@@ -37,6 +37,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     target_id = 'exp1'
     target_version_at_submission = 1
     change_cmd = {}
+    # Language code that would normally be derived from the change_cmd.
+    translation_language_code = 'en'
 
     def setUp(self):
         super(SuggestionModelUnitTests, self).setUp()
@@ -46,35 +48,35 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_1',
             'reviewer_1', self.change_cmd, self.score_category,
-            'exploration.exp1.thread_1')
+            'exploration.exp1.thread_1', None)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_ACCEPTED, 'author_2',
             'reviewer_2', self.change_cmd, self.score_category,
-            'exploration.exp1.thread_2')
+            'exploration.exp1.thread_2', None)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_ACCEPTED, 'author_2',
             'reviewer_2', self.change_cmd, self.score_category,
-            'exploration.exp1.thread_3')
+            'exploration.exp1.thread_3', None)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_2',
             'reviewer_3', self.change_cmd, self.score_category,
-            'exploration.exp1.thread_4')
+            'exploration.exp1.thread_4', None)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_3',
             'reviewer_2', self.change_cmd, self.score_category,
-            'exploration.exp1.thread_5')
+            'exploration.exp1.thread_5', None)
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -123,7 +125,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_3', self.change_cmd, self.score_category,
-            'exploration.exp1.thread_6')
+            'exploration.exp1.thread_6', None)
 
         suggestion_id = 'exploration.exp1.thread_6'
 
@@ -161,7 +163,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 self.target_id, self.target_version_at_submission,
                 suggestion_models.STATUS_IN_REVIEW, 'author_3',
                 'reviewer_3', self.change_cmd,
-                self.score_category, 'exploration.exp1.thread_1')
+                self.score_category, 'exploration.exp1.thread_1', None)
 
     def test_get_suggestions_by_type(self):
         queries = [(
@@ -302,7 +304,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'exp1', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change_cmd, self.score_category,
-            'exploration.exp1.thread_6')
+            'exploration.exp1.thread_6', self.translation_language_code)
 
         # Assert that there is one translation suggestion with the given
         # exploration id found.
@@ -319,14 +321,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'exp2', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change_cmd, self.score_category,
-            'exploration.exp1.thread_7')
+            'exploration.exp1.thread_7', self.translation_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             'exp3', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change_cmd, self.score_category,
-            'exploration.exp1.thread_8')
+            'exploration.exp1.thread_8', self.translation_language_code)
 
         # Assert that there are two translation suggestions with the given
         # exploration ids found.
@@ -352,14 +354,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'exp4', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change_cmd, self.score_category,
-            'exploration.exp1.thread_9')
+            'exploration.exp1.thread_9', self.translation_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             'exp5', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change_cmd, self.score_category,
-            'exploration.exp1.thread_10')
+            'exploration.exp1.thread_10', self.translation_language_code)
 
         with self.swap(feconf, 'DEFAULT_QUERY_LIMIT', 1):
             suggestion_model_results = (
@@ -394,35 +396,35 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change_cmd, 'category1',
-            'exploration.exp1.thread_6')
+            'exploration.exp1.thread_6', None)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_2',
             'reviewer_2', self.change_cmd, 'category2',
-            'exploration.exp1.thread_7')
+            'exploration.exp1.thread_7', None)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_2',
             'reviewer_2', self.change_cmd, 'category3',
-            'exploration.exp1.thread_8')
+            'exploration.exp1.thread_8', None)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_2',
             'reviewer_2', self.change_cmd, 'category1',
-            'exploration.exp1.thread_9')
+            'exploration.exp1.thread_9', None)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change_cmd, 'category2',
-            'exploration.exp1.thread_10')
+            'exploration.exp1.thread_10', None)
 
         self.assertEqual(len(
             suggestion_models.GeneralSuggestionModel
@@ -462,14 +464,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change_cmd, 'category1',
-            'exploration.exp1.thread_11')
+            'exploration.exp1.thread_11', None)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_3',
             'reviewer_2', self.change_cmd, 'category2',
-            'exploration.exp1.thread_12')
+            'exploration.exp1.thread_12', None)
         score_categories = (
             suggestion_models.GeneralSuggestionModel.get_all_score_categories())
         self.assertIn(self.score_category, score_categories)
@@ -506,7 +508,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             test_export_reviewer,
             test_export_change_cmd,
             test_export_score_category,
-            test_export_thread_id
+            test_export_thread_id,
+            None
         )
 
         user_data = (

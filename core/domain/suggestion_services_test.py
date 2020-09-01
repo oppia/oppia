@@ -1020,29 +1020,34 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             'exp1', 1, suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change, 'category1', 'exploration.exp1.thread_1')
+            'reviewer_2', self.change, 'category1',
+            'exploration.exp1.thread_1', None)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change, 'category2', 'exploration.exp1.thread_2')
+            'reviewer_2', self.change, 'category2',
+            'exploration.exp1.thread_2', None)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change, 'category3', 'exploration.exp1.thread_3')
+            'reviewer_2', self.change, 'category3',
+            'exploration.exp1.thread_3', None)
         # This suggestion does not count as a suggestion that can be reviewed
         # by a user because it has already been rejected.
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_REJECTED, 'author_3',
-            'reviewer_2', self.change, 'category1', 'exploration.exp1.thread_4')
+            'reviewer_2', self.change, 'category1',
+            'exploration.exp1.thread_4', None)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change, 'category2', 'exploration.exp1.thread_5')
+            'reviewer_2', self.change, 'category2',
+            'exploration.exp1.thread_5', None)
 
         self.assertEqual(len(
             suggestion_services

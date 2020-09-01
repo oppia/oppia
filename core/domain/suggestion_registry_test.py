@@ -467,6 +467,25 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected property_name to be content'):
             suggestion.validate()
 
+    def test_validate_language_code_fails_when_language_codes_do_not_match(
+            self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+        suggestion.validate()
+
+        suggestion.language_code = 'wrong_language_code'
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected language_code to be None, received wrong_language_code'):
+            suggestion.validate()
+
     def test_pre_accept_validate_state_name(self):
         self.save_new_default_exploration('exp1', self.author_id)
         expected_suggestion_dict = self.suggestion_dict
@@ -1029,6 +1048,29 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.change.cmd = 'invalid_cmd'
         with self.assertRaisesRegexp(
             Exception, 'Expected cmd to be add_translation'):
+            suggestion.validate()
+
+    def test_validate_language_code_fails_when_language_codes_do_not_match(
+            self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+        expected_language_code = (
+            expected_suggestion_dict['change']['language_code']
+        )
+        suggestion.validate()
+
+        suggestion.language_code = 'wrong_language_code'
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected language_code to be %s, received wrong_language_code' % (
+                expected_language_code)):
             suggestion.validate()
 
     def test_validate_change_with_invalid_language_code_fails_validation(self):
@@ -1700,6 +1742,30 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Expected final_reviewer_id to be in a valid user ID format.'):
+            suggestion.validate()
+
+    def test_validate_language_code_fails_when_language_codes_do_not_match(
+            self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+        expected_question_dict = (
+            expected_suggestion_dict['change']['question_dict']
+        )
+        expected_language_code = expected_question_dict['language_code']
+        suggestion.validate()
+
+        suggestion.language_code = 'wrong_language_code'
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected language_code to be %s, received wrong_language_code' % (
+                expected_language_code)):
             suggestion.validate()
 
     def test_get_all_html_content_strings(self):

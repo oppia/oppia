@@ -122,8 +122,7 @@ def get_suggestion_from_model(suggestion_model):
         suggestion_model.target_version_at_submission,
         suggestion_model.status, suggestion_model.author_id,
         suggestion_model.final_reviewer_id, suggestion_model.change_cmd,
-        suggestion_model.score_category, suggestion_model.last_updated,
-        suggestion_model.language_code)
+        suggestion_model.score_category, suggestion_model.last_updated)
 
 
 def get_suggestion_by_id(suggestion_id):

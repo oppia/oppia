@@ -154,7 +154,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # the second will be the subcategory of the suggestion.
     score_category = ndb.StringProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language of the suggestion.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = ndb.StringProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy():
