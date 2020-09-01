@@ -982,17 +982,18 @@ class QuestionSummary(python_utils.OBJECT):
 
     def __init__(
             self, question_id, question_content, misconception_ids,
-            interaction_id, question_model_created_on=None, question_model_last_updated=None):
+            interaction_id, question_model_created_on=None,
+            question_model_last_updated=None):
         """Constructs a Question Summary domain object.
 
         Args:
             question_id: str. The ID of the question.
             question_content: str. The static HTML of the question shown to
                 the learner.
-            interaction_id: str. The ID of the interaction.
             misconception_ids: str. The misconception ids addressed in
                 the question. This includes tagged misconceptions ids as well
                 as inapplicable misconception ids in the question.
+            interaction_id: str. The ID of the interaction.
             question_model_created_on: datetime.datetime. Date and time when
                 the question model is created.
             question_model_last_updated: datetime.datetime. Date and time

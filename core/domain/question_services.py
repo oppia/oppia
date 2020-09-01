@@ -649,7 +649,7 @@ def compute_summary_of_question(question):
     misconception_ids.extend(question.inapplicable_misconception_ids)
     interaction_id = question.question_state_data.interaction.id
     question_summary = question_domain.QuestionSummary(
-        question.id, question_content, interaction_id, misconception_ids,
+        question.id, question_content, misconception_ids, interaction_id,
         question.created_on, question.last_updated)
     return question_summary
 
@@ -667,7 +667,7 @@ def save_question_summary(question_summary):
         question_model_last_updated=question_summary.last_updated,
         question_model_created_on=question_summary.created_on,
         question_content=question_summary.question_content,
-        interaction_id=question_summary.interaction_id
+        interaction_id=question_summary.interaction_id,
         misconception_ids=question_summary.misconception_ids
     )
 
