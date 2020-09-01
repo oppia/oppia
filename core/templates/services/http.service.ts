@@ -21,7 +21,7 @@ import { HttpHeaders, HttpParams, HttpClient } from
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-interface HttpOptions { params: HttpParams, headers: HttpHeaders };
+interface HttpOptions { params: HttpParams, headers: HttpHeaders }
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +49,7 @@ export class HttpService {
 
   /* Used when we want to trigger a logical delete of some data.*/
   delete<T>(url: string, options?: HttpOptions): Promise<T> {
+    /* eslint-disable-next-line dot-notation */
     return this.httpClient.delete<T>(url, options).toPromise();
   }
 
