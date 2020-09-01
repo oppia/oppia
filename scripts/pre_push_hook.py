@@ -295,7 +295,7 @@ def get_refs():
 def start_linter(files):
     """Starts the lint checks and returns the returncode of the task."""
     task = subprocess.Popen(
-        [PYTHON_CMD, '-m', LINTER_MODULE, '--verbose', LINTER_FILE_FLAG] + files)
+        [PYTHON_CMD, '-m', LINTER_MODULE, LINTER_FILE_FLAG] + files)
     task.communicate()
     return task.returncode
 
