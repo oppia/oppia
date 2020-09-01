@@ -44,7 +44,7 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         super(ExplorationRecommendationsOneOffJob, cls).enqueue(
-            job_id, shard_count=128)
+            job_id, shard_count=64)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -110,7 +110,7 @@ class DeleteAllExplorationRecommendationsOneOffJob(
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         super(DeleteAllExplorationRecommendationsOneOffJob, cls).enqueue(
-            job_id, shard_count=128)
+            job_id, shard_count=64)
 
     @classmethod
     def entity_classes_to_map_over(cls):
