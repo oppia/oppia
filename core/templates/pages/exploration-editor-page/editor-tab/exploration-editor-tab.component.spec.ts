@@ -195,8 +195,7 @@ describe('Exploration editor tab component', function() {
             rows: {value: 1}
           },
           answer_groups: [{
-            rule_input_translations: {},
-            rule_types_to_inputs: {},
+            rule_specs: [],
             outcome: {
               dest: 'unused',
               feedback: {
@@ -280,8 +279,7 @@ describe('Exploration editor tab component', function() {
             rows: {value: 1}
           },
           answer_groups: [{
-            rule_input_translations: {},
-            rule_types_to_inputs: {},
+            rule_specs: [],
             outcome: {
               dest: 'unused',
               feedback: {
@@ -426,8 +424,7 @@ describe('Exploration editor tab component', function() {
 
     expect(stateEditorService.interaction.answerGroups).toEqual([
       answerGroupObjectFactory.createFromBackendDict({
-        rule_input_translations: {},
-        rule_types_to_inputs: {},
+        rule_specs: [],
         outcome: {
           dest: 'unused',
           feedback: {
@@ -441,8 +438,7 @@ describe('Exploration editor tab component', function() {
       })]);
 
     var displayedValue = [answerGroupObjectFactory.createFromBackendDict({
-      rule_input_translations: {},
-      rule_types_to_inputs: {},
+      rule_specs: [],
       outcome: {
         dest: 'Second State',
         feedback: {
