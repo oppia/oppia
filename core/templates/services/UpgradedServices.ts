@@ -396,6 +396,11 @@ import { PencilCodeEditorRulesService } from
 import { PencilCodeEditorValidationService } from
   // eslint-disable-next-line max-len
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { PlatformFeatureAdminBackendApiService } from
+  'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformFeatureBackendApiService } from
+  'domain/platform_feature/platform-feature-backend-api.service';
 import { PlatformParameterFilterObjectFactory } from
   'domain/platform_feature/platform-parameter-filter-object.factory';
 import { PlatformParameterObjectFactory } from
@@ -1402,6 +1407,14 @@ export class UpgradedServices {
         new LearnerDashboardIdsBackendApiService(
           upgradedServices['HttpClient'],
           upgradedServices['LearnerDashboardActivityIdsObjectFactory']);
+    upgradedServices['PlatformFeatureBackendApiService'] =
+      new PlatformFeatureBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['FeatureStatusSummaryObjectFactory']
+      );
+    upgradedServices['PlatformFeatureAdminBackendApiService'] =
+      new PlatformFeatureAdminBackendApiService(
+        upgradedServices['HttpClient']);
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
       upgradedServices['PlayerTranscriptService']);
     upgradedServices['PlaythroughBackendApiService'] =
@@ -1561,6 +1574,15 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
+    upgradedServices['PlatformFeatureService'] = new PlatformFeatureService(
+      upgradedServices['ClientContextObjectFactory'],
+      upgradedServices['PlatformFeatureBackendApiService'],
+      upgradedServices['FeatureStatusSummaryObjectFactory'],
+      upgradedServices['I18nLanguageCodeService'],
+      upgradedServices['WindowRef'],
+      upgradedServices['LoggerService'],
+      upgradedServices['UrlService'],
+      upgradedServices['BrowserCheckerService']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],

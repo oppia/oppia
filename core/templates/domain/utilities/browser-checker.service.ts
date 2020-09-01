@@ -61,6 +61,41 @@ export class BrowserCheckerService {
   isMobileDevice(): boolean {
     return this._isMobileDevice();
   }
+
+  /**
+   * Detects the type of browser from its user agent.
+   *
+   * Note that the returned string of this method should not be changed
+   * since they are directly used for comparison in platform parameter
+   * evaluation.
+   *
+   * @returns {string} - The name of the browser that is being used.
+   */
+  detectBrowserType(): string {
+    const userAgent = this.windowRef.nativeWindow.navigator.userAgent;
+    // Note: The orders of the following if statements should not be changed
+    // unless there is solid reason to do so. For example, the user agent of
+    // Edge browser also contains 'Chrome' so it should be checked prior to
+    // Chrome.
+
+    // Per https://docs.microsoft.com/en-us/microsoft-edge/web-platform/user-agent-string
+    // there are two types of tokens, 'edg' & 'Edge', for the Edge browser in
+    // its user agent.
+    if (userAgent.includes('edg') || userAgent.includes('Edge')) {
+      return 'Edge';
+    }
+    if (userAgent.includes('Chrome')) {
+      return 'Chrome';
+    }
+    if (userAgent.includes('Firefox')) {
+      return 'Firefox';
+    }
+    if (userAgent.includes('Safari')) {
+      return 'Safari';
+    }
+
+    return 'Unknown';
+  }
 }
 
 angular.module('oppia').factory(

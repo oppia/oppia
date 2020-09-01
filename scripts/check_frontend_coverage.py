@@ -172,7 +172,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'NumberWithUnitsObjectFactory.ts',
     'numeric-input-validation.service.ts',
     'object-editor.directive.ts',
-    'oppia-angular-root.component.ts',
     'oppia-interactive-code-repl.directive.ts',
     'oppia-interactive-continue.directive.ts',
     'oppia-interactive-drag-and-drop-sort-input.directive.ts',

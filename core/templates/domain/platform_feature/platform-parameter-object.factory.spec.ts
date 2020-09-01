@@ -19,13 +19,13 @@
 import { TestBed } from '@angular/core/testing';
 
 import {
+  PlatformParameterFilterType,
+  ServerMode
+} from 'domain/platform_feature/platform-parameter-filter-object.factory';
+import {
   PlatformParameterBackendDict,
   PlatformParameterObjectFactory
 } from 'domain/platform_feature/platform-parameter-object.factory';
-import {
-  PlatformParameterFilterType,
-  ServerMode
-} from './platform-parameter-filter-object.factory';
 
 describe('PlatformParameterObjectFactory', () => {
   let factory: PlatformParameterObjectFactory;

@@ -19,11 +19,22 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-
+import os
+import re
 from core import platform_feature_list
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
 from core.tests import test_utils
+import python_utils
+
+
+FRONTEND_FEATURE_NAMES_PATH = os.path.join(
+    os.getcwd(),
+    'core/templates/domain/platform_feature',
+    'feature-status-summary-object.factory.ts')
+
+ENUM_BODY_REGEXP = re.compile(r'enum FeatureNames \{(.+?)\}', flags=re.DOTALL)
+ENUM_MEMBER_REGEXP = re.compile(r'([a-zA-Z0-9_]+?)\s+=\s+\'([a-zA-Z0-9_]+?)\'')
 
 
 class PlatformFeatureListTest(test_utils.GenericTestBase):
@@ -37,6 +48,14 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
             platform_feature_list.TEST_FEATURES_LIST +
             platform_feature_list.PROD_FEATURES_LIST)
         self.all_feature_names_set = set(self.all_features_list)
+
+    def _parse_feature_names_in_frontend(self):
+        """Reads and parses feature flag definition in frontend."""
+        with python_utils.open_file(FRONTEND_FEATURE_NAMES_PATH, 'r') as f:
+            content = f.read()
+
+        body = ENUM_BODY_REGEXP.search(content).group(1)
+        return [name for _, name in ENUM_MEMBER_REGEXP.findall(body)]
 
     def test_all_names_in_features_lists_exist(self):
         missing_names = []
@@ -133,4 +152,30 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
             len(invalid_feature_names) == 0,
             msg='Following entries defined in PROD_FEATURES_LIST are not in '
             '\'prod\' stage: %s.' % (invalid_feature_names)
+        )
+
+    def test_all_names_in_features_lists_exist_in_frontend(self):
+        feature_names_in_frontend = self._parse_feature_names_in_frontend()
+
+        missing_features = (
+            self.all_feature_names_set -
+            set(feature_names_in_frontend))
+
+        self.assertTrue(
+            len(missing_features) == 0,
+            msg='Following entries are not defined in frontend: %s.' % (
+                list(missing_features))
+        )
+
+    def test_all_names_in_frontend_are_known(self):
+        feature_names_in_frontend = self._parse_feature_names_in_frontend()
+
+        missing_features = (
+            set(feature_names_in_frontend) -
+            self.all_feature_names_set)
+
+        self.assertTrue(
+            len(missing_features) == 0,
+            msg='Following entries are defined in frontend but not defined'
+                ' in the backend feature list: %s.' % list(missing_features)
         )

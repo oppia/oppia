@@ -441,6 +441,11 @@ import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import { PencilCodeEditorValidationService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
+import { PlatformFeatureAdminBackendApiService } from
+  'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformFeatureBackendApiService } from
+  'domain/platform_feature/platform-feature-backend-api.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 import { PlatformParameterFilterObjectFactory } from
   'domain/platform_feature/platform-parameter-filter-object.factory';
 import { PlatformParameterObjectFactory } from
@@ -908,6 +913,9 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static pencilCodeEditorRulesService: PencilCodeEditorRulesService;
   static pencilCodeEditorValidationService: PencilCodeEditorValidationService;
   static playerCorrectnessFeedbackEnabledService: PlayerCorrectnessFeedbackEnabledService;
+  static platformFeatureAdminBackendApiService: PlatformFeatureAdminBackendApiService;
+  static platformFeatureBackendApiService: PlatformFeatureBackendApiService;
+  static platformFeatureService: PlatformFeatureService;
   static platformParameterFilterObjectFactory: PlatformParameterFilterObjectFactory;
   static platformParameterObjectFactory: PlatformParameterObjectFactory;
   static platformParameterRuleObjectFactory: PlatformParameterRuleObjectFactory;
@@ -1239,6 +1247,9 @@ private paramSpecsObjectFactory: ParamSpecsObjectFactory,
 private paramTypeObjectFactory: ParamTypeObjectFactory,
 private pencilCodeEditorRulesService: PencilCodeEditorRulesService,
 private pencilCodeEditorValidationService: PencilCodeEditorValidationService,
+private platformFeatureAdminBackendApiService: PlatformFeatureAdminBackendApiService,
+private platformFeatureBackendApiService: PlatformFeatureBackendApiService,
+private platformFeatureService: PlatformFeatureService,
 private platformParameterFilterObjectFactory: PlatformParameterFilterObjectFactory,
 private platformParameterObjectFactory: PlatformParameterObjectFactory,
 private platformParameterRuleObjectFactory: PlatformParameterRuleObjectFactory,
@@ -1572,6 +1583,9 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.paramTypeObjectFactory = this.paramTypeObjectFactory;
     OppiaAngularRootComponent.pencilCodeEditorRulesService = this.pencilCodeEditorRulesService;
     OppiaAngularRootComponent.pencilCodeEditorValidationService = this.pencilCodeEditorValidationService;
+    OppiaAngularRootComponent.platformFeatureAdminBackendApiService = this.platformFeatureAdminBackendApiService;
+    OppiaAngularRootComponent.platformFeatureBackendApiService = this.platformFeatureBackendApiService;
+    OppiaAngularRootComponent.platformFeatureService = this.platformFeatureService;
     OppiaAngularRootComponent.platformParameterFilterObjectFactory = this.platformParameterFilterObjectFactory;
     OppiaAngularRootComponent.platformParameterObjectFactory = this.platformParameterObjectFactory;
     OppiaAngularRootComponent.platformParameterRuleObjectFactory = this.platformParameterRuleObjectFactory;
@@ -1709,6 +1723,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.workedExampleObjectFactory = this.workedExampleObjectFactory;
     OppiaAngularRootComponent.writtenTranslationObjectFactory = this.writtenTranslationObjectFactory;
     OppiaAngularRootComponent.writtenTranslationsObjectFactory = this.writtenTranslationsObjectFactory;
+
     // This emit triggers ajs to start its app.
     this.initialized.emit();
   }
