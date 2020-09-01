@@ -41,6 +41,17 @@ module.exports = {
   create: function(context) {
     const sourceCode = context.getSourceCode();
 
+    var isEquals = function(sortedImports, params) {
+      if (sortedImports === params) return true;
+      if (sortedImports == null || params == null) return false;
+      if (sortedImports.length !== params.length) return false;
+
+      for (var i = 0; i < sortedImports.length; ++i) {
+        if (sortedImports[i] !== params[i]) return false;
+      }
+      return true;
+    }
+
     var isUnused = function(param, tokensList) {
       var variableCounter = 0;
       tokensList.forEach((token) => {
@@ -73,7 +84,9 @@ module.exports = {
       regularImports.sort();
       constantImports.sort();
       var sortedImports = dollarImports.concat(regularImports).concat(constantImports)
-      if (sortedImports !== regularImports) {
+      // console.log(sortedImports);
+      // console.log(params);
+      if (!isEquals(sortedImports, params)) {
         context.report({
           node,
           loc: node.loc,
