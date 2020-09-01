@@ -11,7 +11,8 @@
     "html",
     "unused-imports",
     "@typescript-eslint",
-    "oppia"
+    "oppia",
+    "sort-requires"
   ],
   "overrides": [{
     // We exclude test files from dependency injection format checks because
