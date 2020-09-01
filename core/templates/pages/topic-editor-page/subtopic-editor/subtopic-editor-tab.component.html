@@ -195,10 +195,6 @@
             <span class="question-count-value"><[$ctrl.questionCount]></span>
             <span class="question-count-text">Questions</span>
           </div>
-          <div class="create-skill-container" ng-click="$ctrl.createSkill()">
-            <i class="fa fa-plus-circle"></i>
-            <span class="create-skill-text">Create New Skill</span>
-          </div>
         </div>
       </md-card>
     </div>
@@ -324,22 +320,20 @@
     height: 110px;
     justify-content: center;
     position: fixed;
-    width: 26%;
+    width: 24%;
   }
   .subtopic-content .skill-count,
-  .subtopic-content .question-count,
-  .subtopic-content .create-skill-container {
+  .subtopic-content .question-count {
     border-right: 2px solid #aaaac1;
     display: inline-block;
     text-align: center;
-    width: 33%;
+    width: 50%;
   }
   .subtopic-content .edit-icon {
     color: #595959;
   }
-  .subtopic-content .create-skill-container {
+  .subtopic-content .question-count {
     border-right: none;
-    cursor: pointer;
   }
   .subtopic-content .skill-count-value,
   .subtopic-content .question-count-value,
