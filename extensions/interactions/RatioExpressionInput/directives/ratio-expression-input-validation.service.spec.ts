@@ -112,14 +112,14 @@ describe('RatioExpressionInputValidationService', () => {
 
   it('should catch redundancy of rules with matching inputs', () => {
     // The third rule will never get matched.
-    answerGroups[0].rules = [isEquivalent, equals];
+    answerGroups[0].rules = [equals, isEquivalent];
 
     warnings = validatorService.getAllWarnings(currentState,
       customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because' +
-      ' it is preceded by a \'IsEquivalent\' rule with a matching' +
+      ' it is preceded by a \'Equals\' rule with a matching' +
       ' input.'
     }]);
     let isEquivalentNonSimplified = rof.createFromBackendDict({
