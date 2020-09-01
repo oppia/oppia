@@ -29,6 +29,10 @@ describe('OnScreenKeyboard', function() {
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     ctrl = $componentController('customOskLettersEditor');
+    let mockDiv = document.createElement('div');
+    mockDiv.setAttribute('class', 'custom-letters-div');
+    let $document = angular.element(document);
+    $document.find('body').append(mockDiv.outerHTML);
     ctrl.$onInit();
     ctrl.value = [];
   }));
