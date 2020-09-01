@@ -48,7 +48,7 @@ describe('Keyboard Shortcuts', () => {
   };
 
   let windowRef;
-  let appRef;
+  let appRef: ApplicationRef;
   let keyboardShortcutService;
   let component: KeyboardShortcutHelpModalComponent;
   let fixture: ComponentFixture<KeyboardShortcutHelpModalComponent>;
