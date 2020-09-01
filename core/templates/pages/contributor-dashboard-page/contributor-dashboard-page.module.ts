@@ -40,8 +40,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-import { ContributorDashboardConstants } from
-  'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
 
@@ -60,7 +58,6 @@ import { TranslationLanguageSelectorComponent } from
     TranslationLanguageSelectorComponent
   ],
   providers: [
-    ContributorDashboardConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

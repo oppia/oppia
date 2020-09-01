@@ -38,16 +38,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-import { CollectionSummaryTileConstants } from
-  'components/summary-tile/collection-summary-tile.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { ServicesConstants } from 'services/services.constants';
-import { LearnerDashboardPageConstants } from
-  'pages/learner-dashboard-page/learner-dashboard-page.constants';
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -61,11 +51,6 @@ import { LearnerDashboardPageConstants } from
     OppiaAngularRootComponent
   ],
   providers: [
-    CollectionSummaryTileConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    ServicesConstants,
-    LearnerDashboardPageConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

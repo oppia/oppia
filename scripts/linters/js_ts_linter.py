@@ -1005,27 +1005,17 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     .properties)
                             except Exception:
                                 continue
-                        for angular_constant_node in angular_constants_nodes:
-                            angular_constants_list.append(
-                                angular_constant_node.key.name)
                     else:
-                        # Ignore if file contains only type definitions for
-                        # constants.
                         for node in parsed_nodes:
-                            if 'declarations' in node.keys():
-                                try:
-                                    angular_constants_nodes = (
-                                        node.declarations[0].init.callee.body
-                                        .body)
-                                except Exception:
-                                    continue
-                        for angular_constant_node in angular_constants_nodes:
-                            if not angular_constant_node.expression:
+                            try:
+                                angular_constants_nodes = (
+                                    node.expression.right.properties)
+                            except Exception:
                                 continue
-                            angular_constant_name = (
-                                angular_constant_node.expression.left
-                                .property.name)
-                            angular_constants_list.append(angular_constant_name)
+
+                    for angular_constant_node in angular_constants_nodes:
+                        angular_constants_list.append(
+                            angular_constant_node.key.name)
 
                     angular_constants_set = set(angular_constants_list)
                     if len(angular_constants_set) != len(

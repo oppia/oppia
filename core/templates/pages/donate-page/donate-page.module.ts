@@ -31,10 +31,6 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { DonatePageComponent } from './donate-page.component';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
@@ -55,8 +51,6 @@ import { OppiaAngularRootComponent } from
     OppiaAngularRootComponent
   ],
   providers: [
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

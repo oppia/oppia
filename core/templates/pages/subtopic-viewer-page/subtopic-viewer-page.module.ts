@@ -41,10 +41,6 @@ import { SubtopicViewerNavbarBreadcrumbComponent } from
   // eslint-disable-next-line max-len
   'pages/subtopic-viewer-page/navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component';
 
-
-import { SubtopicViewerDomainConstants } from
-  'domain/subtopic_viewer/subtopic-viewer-domain.constants';
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -60,7 +56,6 @@ import { SubtopicViewerDomainConstants } from
     SubtopicViewerNavbarBreadcrumbComponent
   ],
   providers: [
-    SubtopicViewerDomainConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

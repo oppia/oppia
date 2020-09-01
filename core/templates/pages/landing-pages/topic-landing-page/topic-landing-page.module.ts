@@ -38,15 +38,6 @@ import { TopicLandingPageComponent } from
   'pages/landing-pages/topic-landing-page/topic-landing-page.component';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { ServicesConstants } from 'services/services.constants';
-import { TopicLandingPageConstants } from
-  'pages/landing-pages/topic-landing-page/topic-landing-page.constants';
-
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -62,10 +53,6 @@ import { TopicLandingPageConstants } from
     TopicLandingPageComponent
   ],
   providers: [
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    ServicesConstants,
-    TopicLandingPageConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

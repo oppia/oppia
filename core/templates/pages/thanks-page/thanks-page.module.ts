@@ -35,10 +35,6 @@ import { ThanksPageComponent } from './thanks-page.component';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 
 @NgModule({
@@ -56,8 +52,6 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
     ThanksPageComponent
   ],
   providers: [
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
