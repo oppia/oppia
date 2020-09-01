@@ -106,6 +106,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook,
             'does_diff_include_travis_yml_or_js_files',
             mock_does_diff_include_travis_yml_or_js_files)
+        self.number_of_times_prompt_is_displayed = 0
 
     def test_start_subprocess_for_result(self):
         with self.popen_swap:
@@ -757,3 +758,47 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.print_arr,
             ['No inconsistencies found in the backend python libraries.'])
+
+    def test_that_python_library_validation_prompt_behaves_correctly(self):
+        """Tests that the 'Choose an option or Ctrl-C to exit prompt: '
+        correctly recurs until the user chooses a correct option.
+        """
+        check_function_calls = {
+            'input_is_called': False,
+            'install_backend_python_libs': False,
+            'get_mismatches': False
+        }
+        expected_check_function_calls = {
+            'input_is_called': True,
+            'install_backend_python_libs': False,
+            'get_mismatches': True
+        }
+        def mock_get_mismatches():
+            check_function_calls['get_mismatches'] = True
+            return {
+                'library': ('version', 'version')
+            }
+        inputs = ['0', '0', '1']
+        def mock_input(unused_args): # pylint: disable=unused-argument
+            check_function_calls['input_is_called'] = True
+            return inputs.pop(0)
+
+        def mock_install_backend_python_libs():
+            check_function_calls['install_backend_python_libs'] = True
+
+        swap_get_mismatches = self.swap(
+            install_backend_python_libs, 'get_mismatches',
+            mock_get_mismatches)
+
+        swap_input = self.swap(python_utils, 'INPUT', mock_input)
+        swap_install_backend_python_libs = self.swap(
+            install_backend_python_libs, 'main',
+            mock_install_backend_python_libs)
+        self.assertNotEqual(check_function_calls, expected_check_function_calls)
+        self.assertEqual(len(inputs), 3)
+        with swap_input, swap_get_mismatches, swap_install_backend_python_libs:
+            with self.print_swap:
+                pre_push_hook.check_for_backend_python_library_inconsistencies()
+
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+        self.assertEqual(len(inputs), 0)

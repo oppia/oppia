@@ -39,301 +39,53 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     TEST_REQUIREMENTS_TXT_FILE_PATH = os.path.join(
         THIRD_PARTY_DATA_FILE_PATH, 'requirements_test.txt')
 
-    def test_adding_library_to_requirements_returns_correct_mismatches(self):
-        def mock_get_requirements_file_contents():
-            return {
-                u'html5lib': u'1.0.1',
-                u'six': u'1.15.0',
-                u'redis': u'3.5.3',
-                u'webencodings': u'0.5.1',
-                u'flask': u'1.0.1'
-            }
-        def mock_get_directory_file_contents():
-            return {
-                u'html5lib': u'1.0.1',
-                u'six': u'1.15.0',
-                u'redis': u'3.5.3',
-                u'webencodings': u'0.5.1',
-            }
+    ThIRD_PARTY_DATA_FILE_PATH
 
-        swap_get_requirements_file_contents = self.swap(
-            install_backend_python_libs, '_get_requirements_file_contents',
-            mock_get_requirements_file_contents)
-        swap_get_directory_file_contents = self.swap(
-            install_backend_python_libs, '_get_third_party_python_libs_directory_contents',
-            mock_get_directory_file_contents)
-        with swap_get_requirements_file_contents, (
-            swap_get_directory_file_contents):
-            self.assertEqual(
-                {
-                    u'flask': (u'1.0.1', None)
-                },
-                install_backend_python_libs.get_mismatches())
+    def setUp(self):
+        super(InstallBackendPythonLibsTests, self).setUp()
+        self.print_arr = []
 
-    def test_removing_library_from_requirements_returns_correct_mismatches(
-            self):
-        def mock_get_requirements_file_contents():
-            return {
-                u'html5lib': u'1.0.1',
-                u'six': u'1.15.0',
-                u'redis': u'3.5.3',
-                u'webencodings': u'0.5.1'
-            }
-        def mock_get_directory_file_contents():
-            return {
-                u'html5lib': u'1.0.1',
-                u'six': u'1.15.0',
-                u'flask': u'1.0.1',
-                u'redis': u'3.5.3',
-                u'webencodings': u'0.5.1',
-            }
+        def mock_print(msg):
+            self.print_arr.append(msg)
+        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        class MockFile(python_utils.OBJECT):
+            def __init__(self, file):
+                self.file = file
+            def read(self): # pylint: disable=missing-docstring
+                return self.file
+            def write(self, buffer): # pylint: disable=missing-docstring
+                self.file.append(buffer)
+        class MockOpenFile(object):
+            def __init__(self, path=None, mode=None, file=''):
+                self.path = path
+                self.mode = mode
+                self.file = file
+            def __enter__(self):
+                return MockFile(self.file)
+            def __exit__(self, *args):
+                pass
+        self.open_file_swap = self.swap(
+            python_utils, 'open_file', MockOpenFile)
+        self.cmd_token_list = []
+        def mock_check_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
 
-        swap_get_requirements_file_contents = self.swap(
-            install_backend_python_libs, '_get_requirements_file_contents',
-            mock_get_requirements_file_contents)
-        swap_get_directory_file_contents = self.swap(
-            install_backend_python_libs, '_get_third_party_python_libs_directory_contents',
-            mock_get_directory_file_contents)
-        with swap_get_requirements_file_contents, (
-            swap_get_directory_file_contents):
-            self.assertEqual(
-                {
-                    u'flask': (None, u'1.0.1')
-                },
-                install_backend_python_libs.get_mismatches())
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    """Return required method."""
+                    return '', ''
+            self.cmd_token_list.append(unused_cmd_tokens)
+            return Ret()
+        self.swap_check_call = self.swap(
+            subprocess, 'check_call', mock_check_call)
 
     def test_multiple_discrepancies_returns_correct_mismatches(self):
-        def mock_get_requirements_file_contents():
-            return {
-                u'html5lib': u'1.0.1',
-                u'six': u'1.13.0',
-                u'redis': u'3.5.3',
-                u'webencodings': u'0.5.2',
-                u'bleach': u'3.1.5'
-            }
-        def mock_get_directory_file_contents():
-            return {
-                u'html5lib': u'1.0.1',
-                u'six': u'1.15.0',
-                u'flask': u'1.0.1',
-                u'redis': u'3.5.3',
-                u'webencodings': u'0.5.0'
-            }
+        swap_requirements = self.swap(
+            common, 'COMPILED_REQUIREMENTS_FILE_PATH',
+            self.TEST_REQUIREMENTS_TXT_FILE_PATH)
 
-        swap_get_requirements_file_contents = self.swap(
-            install_backend_python_libs, '_get_requirements_file_contents',
-            mock_get_requirements_file_contents)
-        swap_get_directory_file_contents = self.swap(
-            install_backend_python_libs, '_get_third_party_python_libs_directory_contents',
-            mock_get_directory_file_contents)
-        with swap_get_requirements_file_contents, (
-            swap_get_directory_file_contents):
-            self.assertEqual(
-                {
-                    u'flask': (None, u'1.0.1'),
-                    u'six': (u'1.13.0', u'1.15.0'),
-                    u'bleach': (u'3.1.5', None),
-                    u'webencodings': (u'0.5.2', u'0.5.0')
-                },
-                install_backend_python_libs.get_mismatches())
-
-
-    def test_rectify_party_directory_handles_library_downgrade(self):
-        cmd_token_list = []
-        def mock_check_call(cmd_tokens):
-            cmd_token_list.append(cmd_tokens)
-
-        metadata_removal_list = []
-        def mock_remove_metadata(library, directory_version):
-            metadata_removal_list.append((library, directory_version))
-
-        mismatches = {
-            u'flask': (u'1.1.1', u'10.0.1'),
-            u'six': (u'1.15.0', u'10.13.0'),
-            u'webencodings': (u'1.1.1', u'1.0.1'),
-            u'mapreduce': (u'1.15.0', u'1.13.0')
-        }
-        swap_metadata_removal = self.swap(
-            install_backend_python_libs, '_remove_metadata',
-            mock_remove_metadata)
-
-        swap_check_call = self.swap(subprocess, 'check_call', mock_check_call)
-        with swap_check_call, swap_metadata_removal:
-            install_backend_python_libs._rectify_third_party_directory( # pylint: disable=protected-access
-                mismatches)
-        print(metadata_removal_list)
-        self.assertEqual(
-            metadata_removal_list,
-            [
-                (u'flask', '10.0.1'),
-                (u'webencodings', '1.0.1'),
-                (u'six', '10.13.0'),
-                (u'mapreduce', '1.13.0')
-            ]
-
-        )
-
-        self.assertEqual(
-            cmd_token_list,
-            [
-                [
-                    'pip', 'install', '--target',
-                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
-                    '--no-dependencies',
-                    '%s==%s' % ('flask', '1.1.1'),
-                    '--upgrade'
-                ],
-                [
-                    'pip', 'install', '--target',
-                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
-                    '--no-dependencies',
-                    '%s==%s' % ('webencodings', '1.1.1'),
-                    '--upgrade'
-                ],
-                [
-                    'pip', 'install', '--target',
-                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
-                    '--no-dependencies',
-                    '%s==%s' % ('six', '1.15.0'),
-                    '--upgrade'
-                ],
-                [
-                    'pip', 'install', '--target',
-                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
-                    '--no-dependencies',
-                    '%s==%s' % ('mapreduce', '1.15.0'),
-                    '--upgrade'
-                ]
-            ]
-        )
-
-    def test_rectify_party_directory_handles_library_removal(self):
-        """Library exists in the 'third_party/python_libs' directory but it is
-        not required in the 'requirements.txt' file.
-        """
-        cmd_token_list = []
-        def mock_check_call(cmd_tokens):
-            cmd_token_list.append(cmd_tokens)
-
-        removed_dirs = []
-        def mock_remove_dir(directory):
-            removed_dirs.append(directory)
-
-        mismatches = {
-            u'flask': (None, u'10.0.1'),
-            u'six': (None, u'10.13.0')
-        }
-        swap_remove_dir = self.swap(shutil, 'rmtree', mock_remove_dir)
-
-        swap_check_call = self.swap(subprocess, 'check_call', mock_check_call)
-        with swap_check_call, swap_remove_dir:
-            install_backend_python_libs._rectify_third_party_directory( # pylint: disable=protected-access
-                mismatches)
-
-        self.assertEqual(
-            removed_dirs,
-            [
-                common.THIRD_PARTY_PYTHON_LIBS_DIR
-            ]
-        )
-
-        self.assertEqual(
-            cmd_token_list,
-            [
-                [
-                    'pip', 'install', '--target',
-                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
-                    '--no-dependencies',
-                    '-r', common.COMPILED_REQUIREMENTS_FILE_PATH
-                ]
-            ]
-        )
-
-    def test_rectify_party_directory_handles_library_addition(self):
-        """Library is required by the 'requirements.txt' file but it doesn't
-        exist in 'third_party/python_libs'.
-        """
-        cmd_token_list = []
-        def mock_check_call(cmd_tokens):
-            cmd_token_list.append(cmd_tokens)
-
-        mismatches = {
-            u'flask': (u'1.1.1', None),
-            u'six': (u'1.15.0', None)
-        }
-
-        swap_check_call = self.swap(subprocess, 'check_call', mock_check_call)
-        with swap_check_call:
-            install_backend_python_libs._rectify_third_party_directory( # pylint: disable=protected-access
-                mismatches)
-
-        self.assertEqual(
-            cmd_token_list,
-            [
-                [
-                    'pip', 'install', '--target',
-                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
-                    '--no-dependencies',
-                    '%s==%s' % ('flask', '1.1.1'),
-                    '--upgrade'
-                ],
-                [
-                    'pip', 'install', '--target',
-                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
-                    '--no-dependencies',
-                    '%s==%s' % ('six', '1.15.0'),
-                    '--upgrade'
-                ]
-            ]
-        )
-
-    def test_rectify_party_directory_handles_more_than_five_mismatches(self):
-        """Test that the function reinstalls all of the libraries from scratch
-        when 5 or more mismatches are found.
-        """
-        cmd_token_list = []
-        def mock_check_call(cmd_tokens):
-            cmd_token_list.append(cmd_tokens)
-
-        removed_dirs = []
-        def mock_remove_dir(directory):
-            removed_dirs.append(directory)
-
-        mismatches = {
-            u'flask': (u'1.1.1', None),
-            u'six': (u'1.15.0', None),
-            u'simplejson': (None, u'3.16.0'),
-            u'bleach': (u'3.1.4', u'3.1.5'),
-            u'callbacks': (u'0.3.0', u'0.2.0'),
-        }
-
-        swap_remove_dir = self.swap(shutil, 'rmtree', mock_remove_dir)
-
-        swap_check_call = self.swap(subprocess, 'check_call', mock_check_call)
-        with swap_check_call, swap_remove_dir:
-            install_backend_python_libs._rectify_third_party_directory( # pylint: disable=protected-access
-                mismatches)
-
-        self.assertEqual(
-            removed_dirs,
-            [
-                common.THIRD_PARTY_PYTHON_LIBS_DIR
-            ]
-        )
-
-        self.assertEqual(
-            cmd_token_list,
-            [
-                [
-                    'pip', 'install', '--target',
-                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
-                    '--no-dependencies', '-r',
-                    common.COMPILED_REQUIREMENTS_FILE_PATH
-                ]
-            ]
-        )
-
-    def test_get_third_party_python_libs_directory_contents(self):
         def mock_find_distributions(paths): # pylint: disable=unused-argument
             class Distribution(python_utils.OBJECT):
                 """Distribution object containing python library information."""
@@ -350,88 +102,144 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     self.project_name = library_name
                     self.version = version_string
             return [
-                Distribution('GoogleAppEnginePipeline', '1.9.22.1'),
-                Distribution('html5lib', '1.0.1'),
-                Distribution('mox', '0.5.3')
+                Distribution('dependency1', '1.5.1'),
+                Distribution('dependency2', '5.0.0'),
+                Distribution('dependency5', '0.5.3')
             ]
 
-        swap_find_distributions = self.swap(
-            pkg_resources,
-            'find_distributions',
-            mock_find_distributions)
+        swap_get_directory_file_contents = self.swap(
+            pkg_resources, 'find_distributions', mock_find_distributions)
+        with swap_requirements, swap_get_directory_file_contents:
+            self.assertEqual(
+                {
+                    u'dependency1': (u'1.6.1', u'1.5.1'),
+                    u'dependency2': (u'4.9.1', u'5.0.0'),
+                    u'dependency3': (u'3.1.5', None),
+                    u'dependency4': (u'0.3.0', None),
+                    u'dependency5': (None, u'0.5.3')
+                },
+                install_backend_python_libs.get_mismatches())
 
-        with swap_find_distributions:
-            directory_contents = (
-                install_backend_python_libs. # pylint: disable=protected-access
-                _get_third_party_python_libs_directory_contents())
+    def test_library_removal_runs_correct_commands(self):
+        """Library exists in the 'third_party/python_libs' directory but it is
+        not required in the 'requirements.txt' file.
+        """
+        removed_dirs = []
+        def mock_remove_dir(directory):
+            removed_dirs.append(directory)
 
-        self.assertEqual(
-            directory_contents,
-            {
-                'googleappenginepipeline': '1.9.22.1',
-                'html5lib': '1.0.1',
-                'mox': '0.5.3'
-            })
+        def mock_get_mismatches():
+            return {
+                u'flask': (None, u'10.0.1'),
+                u'six': (None, u'10.13.0')
+            }
+        swap_get_mismatches = self.swap(
+            install_backend_python_libs, 'get_mismatches', mock_get_mismatches)
+        swap_remove_dir = self.swap(shutil, 'rmtree', mock_remove_dir)
 
-    def test_get_requirements_file_contents(self):
-        swap_requirements = self.swap(
-            common, 'COMPILED_REQUIREMENTS_FILE_PATH',
-            self.TEST_REQUIREMENTS_TXT_FILE_PATH)
-
-        with swap_requirements:
-            requirements_contents = (
-                install_backend_python_libs._get_requirements_file_contents()) # pylint: disable=protected-access
-
-        self.assertEqual(
-            requirements_contents,
-            {
-                u'dependency1': u'1.6.1',
-                u'dependency2': u'4.9.1',
-                u'dependency3': u'3.1.5',
-                u'dependency4': u'0.3.0'
-            })
-
-    def test_remove_metadata(self):
-        files_in_directory = [
-            'webencodings-0.5.1.dist-info/',
-            'webencodings',
-            'redis',
-            'redis-3.5.3.dist-info/',
-            'google_cloud_datastore-1.15.0-py3.8-nspkg.pth',
-            'google_cloud_datastore-1.15.0.dist-info/',
-            'google'
-        ]
-        def mock_list_dir(path):  # pylint: disable=unused-argument
-            return files_in_directory
-
-        def mock_is_dir(path):
-            return path.endswith('/')
-
-        paths_to_delete = []
-        def mock_rm(path):
-            paths_to_delete.append(
-                path[len(common.THIRD_PARTY_PYTHON_LIBS_DIR) + 1:])
-
-        swap_rm_tree = self.swap(shutil, 'rmtree', mock_rm)
-        swap_os_rm = self.swap(os, 'remove', mock_rm)
-        swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
-        swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
-
-        libraries_to_remove = [
-            ('webencodings', '0.5.1'),
-            ('google-cloud-datastore', '1.15.0')
-        ]
-        with swap_rm_tree, swap_os_rm, swap_list_dir, swap_is_dir:
-            for library, version in libraries_to_remove:
-                install_backend_python_libs._remove_metadata(library, version) # pylint: disable=protected-access
+        with self.swap_check_call, swap_remove_dir, self.open_file_swap:
+            with swap_get_mismatches:
+                install_backend_python_libs.main()
 
         self.assertEqual(
-            paths_to_delete,
+            removed_dirs,
             [
-                'webencodings-0.5.1.dist-info/',
-                'google_cloud_datastore-1.15.0-py3.8-nspkg.pth',
-                'google_cloud_datastore-1.15.0.dist-info/',
-            ])
+                common.THIRD_PARTY_PYTHON_LIBS_DIR
+            ]
+        )
+
+        self.assertEqual(
+            self.cmd_token_list,
+            [
+                ['python', '-m', 'scripts.regenerate_requirements'],
+                [
+                    'pip', 'install', '--target',
+                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies',
+                    '-r', common.COMPILED_REQUIREMENTS_FILE_PATH,
+                    '--upgrade'
+                ]
+            ]
+        )
+
+    def test_library_addition_runs_correct_commands(self):
+        """Library is required by the 'requirements.txt' file but it doesn't
+        exist in 'third_party/python_libs'.
+        """
+        def mock_get_mismatches():
+            return {
+                u'flask': (u'1.1.1', None),
+                u'six': (u'1.15.0', None)
+            }
+        swap_get_mismatches = self.swap(
+            install_backend_python_libs, 'get_mismatches', mock_get_mismatches)
+
+        with self.swap_check_call, swap_get_mismatches:
+            install_backend_python_libs.main()
+
+        self.assertEqual(
+            self.cmd_token_list,
+            [
+                ['python', '-m', 'scripts.regenerate_requirements'],
+                [
+                    'pip', 'install', '--target',
+                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies',
+                    '%s==%s' % ('flask', '1.1.1'),
+                    '--upgrade'
+                ],
+                [
+                    'pip', 'install', '--target',
+                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies',
+                    '%s==%s' % ('six', '1.15.0'),
+                    '--upgrade'
+                ]
+            ]
+        )
+
+    def test_large_number_of_discrepancies_results_in_clean_install(self):
+        """Test that the function reinstalls all of the libraries from scratch
+        when 5 or more mismatches are found.
+        """
+        removed_dirs = []
+        def mock_remove_dir(directory):
+            removed_dirs.append(directory)
+        def mock_get_mismatches():
+            return {
+                u'flask': (u'1.1.1', None),
+                u'six': (u'1.15.0', None),
+                u'simplejson': (None, u'3.16.0'),
+                u'bleach': (u'3.1.4', u'3.1.5'),
+                u'callbacks': (u'0.3.0', u'0.2.0'),
+            }
+        swap_get_mismatches = self.swap(
+            install_backend_python_libs, 'get_mismatches', mock_get_mismatches)
+
+        swap_remove_dir = self.swap(shutil, 'rmtree', mock_remove_dir)
+        with self.swap_check_call, swap_remove_dir, swap_get_mismatches:
+            install_backend_python_libs.main()
+
+        self.assertEqual(
+            removed_dirs,
+            [
+                common.THIRD_PARTY_PYTHON_LIBS_DIR
+            ]
+        )
+
+        self.assertEqual(
+            self.cmd_token_list,
+            [
+                ['python', '-m', 'scripts.regenerate_requirements'],
+                [
+                    'pip', 'install', '--target',
+                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies', '-r',
+                    common.COMPILED_REQUIREMENTS_FILE_PATH,
+                    '--upgrade'
+                ]
+            ]
+        )
 
     def test_main_with_library_mismatches_calls_correct_functions(self):
         check_function_calls = {
@@ -536,4 +344,96 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 'Regenerating "requirements.txt" file...',
                 'All third-party Python libraries are already installed '
                 'correctly.'
+            ])
+
+    def test_library_version_change_is_handled_correctly(self):
+        files_in_directory = [
+            'webencodings-1.1.1.dist-info/',
+            'webencodings-1.0.1.dist-info/',
+            'webencodings/',
+            'flask/',
+            'flask-1.1.1.dist-info/',
+            'flask-10.0.1.dist-info/',
+            'six/',
+            'six-1.15.0.dist-info/',
+            'six-10.13.0.dist-info/',
+            'google_cloud_datastore-1.15.0-py3.8-nspkg.pth',
+            'google_cloud_datastore-1.15.0.dist-info/',
+            'google_cloud_datastore-1.13.0-py3.8-nspkg.pth',
+            'google_cloud_datastore-1.13.0.dist-info/',
+            'google/'
+        ]
+        def mock_list_dir(path):  # pylint: disable=unused-argument
+            return files_in_directory
+
+        def mock_is_dir(path):
+            return path.endswith('/')
+
+        paths_to_delete = []
+        def mock_rm(path):
+            paths_to_delete.append(
+                path[len(common.THIRD_PARTY_PYTHON_LIBS_DIR) + 1:])
+
+        def mock_get_mismatches():
+            return {
+                u'flask': (u'1.1.1', u'10.0.1'),
+                u'six': (u'1.15.0', u'10.13.0'),
+                u'webencodings': (u'1.1.1', u'1.0.1'),
+                u'google-cloud-datastore': (u'1.15.0', u'1.13.0')
+            }
+        swap_get_mismatches = self.swap(
+            install_backend_python_libs, 'get_mismatches', mock_get_mismatches)
+        swap_rm_tree = self.swap(shutil, 'rmtree', mock_rm)
+        swap_os_rm = self.swap(os, 'remove', mock_rm)
+        swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
+        swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
+
+        with self.swap_check_call, swap_get_mismatches:
+            with self.open_file_swap:
+                with swap_rm_tree, swap_os_rm, swap_list_dir, swap_is_dir:
+                    install_backend_python_libs.main()
+
+        self.assertEqual(
+            self.cmd_token_list,
+            [
+                ['python', '-m', 'scripts.regenerate_requirements'],
+                [
+                    'pip', 'install', '--target',
+                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies',
+                    '%s==%s' % ('flask', '1.1.1'),
+                    '--upgrade'
+                ],
+                [
+                    'pip', 'install', '--target',
+                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies',
+                    '%s==%s' % ('webencodings', '1.1.1'),
+                    '--upgrade'
+                ],
+                [
+                    'pip', 'install', '--target',
+                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies',
+                    '%s==%s' % ('six', '1.15.0'),
+                    '--upgrade'
+                ],
+                [
+                    'pip', 'install', '--target',
+                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies',
+                    '%s==%s' % ('google-cloud-datastore', '1.15.0'),
+                    '--upgrade'
+                ]
+            ]
+        )
+        print(paths_to_delete)
+        self.assertEqual(
+            paths_to_delete,
+            [
+                u'flask-10.0.1.dist-info/',
+                u'webencodings-1.0.1.dist-info/',
+                u'six-10.13.0.dist-info/',
+                u'google_cloud_datastore-1.13.0-py3.8-nspkg.pth',
+                u'google_cloud_datastore-1.13.0.dist-info/'
             ])

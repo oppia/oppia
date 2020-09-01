@@ -23,14 +23,9 @@ pylatexenc==2.6           # via -r requirements.in
 pyparsing==2.4.7          # via packaging
 redis==3.5.3              # via -r requirements.in
 simplejson==3.17.0        # via -r requirements.in, googleappenginemapreduce
-six==1.14.0               # via -r requirements.in, bleach, html5lib, mock, packaging
+six==1.15.0               # via -r requirements.in, bleach, html5lib, mock, packaging
 soupsieve==1.9.5          # via -r requirements.in, beautifulsoup4
 webencodings==0.5.1       # via -r requirements.in, bleach, html5lib
-
-# Developers: Please do not modify this auto-generated file. If
-# you want to add, remove, upgrade, or downgrade libraries,
-# please change the `requirements.in` file, and then follow
-# the instructions there to regenerate this file.
 
 # Developers: Please do not modify this auto-generated file. If
 # you want to add, remove, upgrade, or downgrade libraries,

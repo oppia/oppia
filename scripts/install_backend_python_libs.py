@@ -89,9 +89,11 @@ def _remove_metadata(library_name, version_string):
         version_string: str. Stringified version of the library to remove the
             metadata for.
     """
-    # The possible strings that a metadata directory or file name can
-    # start with.
-    possible_filename_start_strings = [
+    # The possible directory names that metadata folders/files can start with:
+    # follows these conventions:
+    # https://www.python.org/dev/peps/pep-0427/#file-contents
+    # https://www.python.org/dev/peps/pep-0376/#how-distributions-are-installed
+    possible_metadata_start_strings = [
         '%s-%s' % (library_name, version_string),
         # Some metadata folders replace the hyphens of the library name with
         # underscores.
@@ -100,7 +102,7 @@ def _remove_metadata(library_name, version_string):
     for f in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
         if any(
             [f.startswith(start_string)
-            for start_string in possible_filename_start_strings]):
+            for start_string in possible_metadata_start_strings]):
             path_to_delete = os.path.join(
                 common.THIRD_PARTY_PYTHON_LIBS_DIR, f)
             if os.path.isdir(path_to_delete):
@@ -135,12 +137,7 @@ def _rectify_third_party_directory(mismatches):
     if len(mismatches) >= 5:
         if os.path.isdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
             shutil.rmtree(common.THIRD_PARTY_PYTHON_LIBS_DIR)
-        subprocess.check_call([
-            'pip', 'install', '--target',
-            common.THIRD_PARTY_PYTHON_LIBS_DIR,
-            '--no-dependencies', '-r',
-            common.COMPILED_REQUIREMENTS_FILE_PATH
-        ])
+        _reinstall_all_dependencies()
         return
 
     for library_name, versions in mismatches.items():
@@ -154,45 +151,58 @@ def _rectify_third_party_directory(mismatches):
         # We don't have functionality to remove a library cleanly, and if we
         # ignore the library, This might cause issues when pushing the branch to
         # develop as there are possible hidden use cases of a deleted library
-        # that the developer did not catch.
+        # that the developer did not catch. The only way to enforce the removal
+        # of a library is to clean out the folder and reinstall everything from
+        # scratch.
         if not requirements_version:
             if os.path.isdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
                 shutil.rmtree(common.THIRD_PARTY_PYTHON_LIBS_DIR)
-            subprocess.check_call([
-                'pip', 'install', '--target',
-                common.THIRD_PARTY_PYTHON_LIBS_DIR,
-                '--no-dependencies', '-r',
-                common.COMPILED_REQUIREMENTS_FILE_PATH
-            ])
+            _reinstall_all_dependencies()
             return
 
         # Either the library listed in 'requirements.txt' is not in the
         # third party directory.
         elif (not directory_version):
-            subprocess.check_call([
-                'pip', 'install', '--target',
-                common.THIRD_PARTY_PYTHON_LIBS_DIR,
-                '--no-dependencies',
-                '%s==%s' % (
-                    library_name,
-                    python_utils.convert_to_bytes(requirements_version)),
-                '--upgrade'
-            ])
+            _install_library(
+                library_name,
+                python_utils.convert_to_bytes(requirements_version))
         # The currently installed library version is not equal to the required
         # 'requirements.txt' version.
         elif requirements_version != directory_version:
-            subprocess.check_call([
-                'pip', 'install', '--target',
-                common.THIRD_PARTY_PYTHON_LIBS_DIR,
-                '--no-dependencies',
-                '%s==%s' % (
-                    library_name,
-                    python_utils.convert_to_bytes(requirements_version)),
-                '--upgrade'
-            ])
+            _install_library(
+                library_name,
+                python_utils.convert_to_bytes(requirements_version))
             _remove_metadata(
                 library_name, python_utils.convert_to_bytes(directory_version))
 
+def _install_library(library_name, version_string):
+    """Installs a library with a certain version.
+
+    Args:
+        library_name: str. Name of the library to install.
+        version_string: str. Stringified version of the library to install.
+    """
+    subprocess.check_call([
+        'pip', 'install', '--target',
+        common.THIRD_PARTY_PYTHON_LIBS_DIR,
+        '--no-dependencies',
+        '%s==%s' % (
+            library_name,
+            version_string),
+        '--upgrade'
+    ])
+
+def _reinstall_all_dependencies():
+    """Reinstalls all of the libraries detailed in the compiled
+    'requirements.txt' file to the 'third_party/python_libs' folder.
+    """
+    subprocess.check_call([
+        'pip', 'install', '--target',
+        common.THIRD_PARTY_PYTHON_LIBS_DIR,
+        '--no-dependencies', '-r',
+        common.COMPILED_REQUIREMENTS_FILE_PATH,
+        '--upgrade'
+    ])
 
 def get_mismatches():
     """Returns a dictionary containing mismatches between the 'requirements.txt'
