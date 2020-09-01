@@ -139,7 +139,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             },
             'score_category': 'content.Algebra',
             'last_updated': utils.get_time_in_millisecs(self.fake_date),
-            'language_code': ''
+            'language_code': None
         }
 
     def test_create_suggestion_edit_state_content(self):
@@ -1887,13 +1887,15 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                     'language_code': 'en',
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
-                    'linked_skill_ids': ['skill_1']
+                    'linked_skill_ids': ['skill_1'],
+                    'inapplicable_misconception_ids': []
                 },
                 'skill_id': 'skill1',
                 'skill_difficulty': 0.3,
             },
             'score_category': 'question.skill1',
-            'last_updated': utils.get_time_in_millisecs(self.fake_date)
+            'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'language_code': 'en'
         }
         suggestion = suggestion_registry.SuggestionAddQuestion(
             suggestion_dict['suggestion_id'], suggestion_dict['target_id'],

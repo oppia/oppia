@@ -153,6 +153,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # separated by a ., the first will be a value from SCORE_TYPE_CHOICES and
     # the second will be the subcategory of the suggestion.
     score_category = ndb.StringProperty(required=True, indexed=True)
+    # The ISO 639-1 code for the language of the suggestion.
+    language_code = ndb.StringProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -181,9 +183,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, suggestion_type, target_type, target_id,
-            target_version_at_submission, status, author_id,
-            final_reviewer_id, change_cmd, score_category,
-            thread_id):
+            target_version_at_submission, status, author_id, final_reviewer_id,
+            change_cmd, score_category, thread_id, language_code):
         """Creates a new SuggestionModel entry.
 
         Args:
@@ -199,6 +200,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             change_cmd: dict. The actual content of the suggestion.
             score_category: str. The scoring category for the suggestion.
             thread_id: str. The ID of the feedback thread linked to the
+                suggestion.
+            language_code: str. The ISO 639-1 code for the language of the
                 suggestion.
 
         Raises:
@@ -217,7 +220,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             target_version_at_submission=target_version_at_submission,
             status=status, author_id=author_id,
             final_reviewer_id=final_reviewer_id, change_cmd=change_cmd,
-            score_category=score_category).put()
+            score_category=score_category, language_code=language_code).put()
 
     @classmethod
     def query_suggestions(cls, query_fields_and_values):

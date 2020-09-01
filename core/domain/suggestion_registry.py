@@ -316,7 +316,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         self.change = exp_domain.ExplorationChange(change)
         self.score_category = score_category
         self.last_updated = last_updated
-        self.language_code = ""
+        self.language_code = None
 
     def validate(self):
         """Validates a suggestion object of type SuggestionEditStateContent.
@@ -352,11 +352,11 @@ class SuggestionEditStateContent(BaseSuggestion):
                     self.change.property_name))
 
         # The language_code field is used for querying purposes. We do not want
-        # to query suggestions of this type by language. Therefore, it is set
-        # to the empty string.
-        if (self.language_code != ''):
+        # to query suggestions of this type by language. Therefore, this
+        # property is set to None.
+        if (self.language_code != None):
             raise utils.ValidationError(
-                'Expected language_code to be '', received %s' % (
+                'Expected language_code to be None, received %s' % (
                     self.language_code))
 
     def pre_accept_validate(self):

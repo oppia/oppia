@@ -100,7 +100,7 @@ def create_suggestion(
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,
-        None, change, score_category, thread_id)
+        None, change, score_category, thread_id, suggestion.language_code)
     return get_suggestion_by_id(thread_id)
 
 
@@ -122,7 +122,8 @@ def get_suggestion_from_model(suggestion_model):
         suggestion_model.target_version_at_submission,
         suggestion_model.status, suggestion_model.author_id,
         suggestion_model.final_reviewer_id, suggestion_model.change_cmd,
-        suggestion_model.score_category, suggestion_model.last_updated)
+        suggestion_model.score_category, suggestion_model.last_updated,
+        suggestion_model.language_code)
 
 
 def get_suggestion_by_id(suggestion_id):
@@ -250,6 +251,7 @@ def _update_suggestions(suggestions, update_last_updated_time=True):
         suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
         suggestion_model.change_cmd = suggestion.change.to_dict()
         suggestion_model.score_category = suggestion.score_category
+        suggestion_model.language_code = suggestion.language_code
 
     suggestion_models.GeneralSuggestionModel.put_multi(
         suggestion_models_to_update,
