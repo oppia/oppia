@@ -33,7 +33,7 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      unusedDirective: '{{varName}} is defined but never used.',
+      unusedDirective: '{{dependencyName}} is injected but never used.',
       sortedDependency: 'Dependencies are not sorted.'
     }
   },
@@ -130,7 +130,7 @@ module.exports = {
                     loc: node.loc,
                     messageId: 'unusedDirective',
                     data: {
-                      varName: param
+                      dependencyName: param
                     }
                   });
                 }
