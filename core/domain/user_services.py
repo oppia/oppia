@@ -403,7 +403,7 @@ def is_pseudonymous_id(user_id):
         user_id: str. The ID to be checked.
 
     Returns:
-        bool. True when the ID is a pseudonymous one.
+        bool. Whether the ID represents a pseudonymous user.
     """
     return all((
         user_id.islower(),
@@ -494,19 +494,29 @@ def get_user_settings_from_username(username):
         return get_user_settings(user_model.id)
 
 
-def get_users_settings(user_ids):
+def get_users_settings(user_ids, strict=False):
     """Gets domain objects representing the settings for the given user_ids.
 
     Args:
         user_ids: list(str). The list of user_ids to get UserSettings
             domain objects for.
+        strict: bool. Whether to fail noisily if no user with the given ID
+            exists in the datastore. Defaults to False.
 
     Returns:
         list(UserSettings|None). The UserSettings domain objects corresponding
         to the given user ids. If the given user_id does not exist, the
         corresponding entry in the returned list is None.
+
+    Raises:
+        Exception. When strict mdoe is enabled and some user is not found.
     """
     user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
+    if strict:
+        for user_id, user_settings_model in python_utils.ZIP(
+                user_ids, user_settings_models):
+            if user_settings_model is None:
+                raise Exception('User with ID \'%s\' not found.' % user_id)
     result = []
     for i, model in enumerate(user_settings_models):
         if user_ids[i] == feconf.SYSTEM_COMMITTER_ID:
@@ -1019,11 +1029,11 @@ def _get_pseudonymous_username(pseudonymous_id):
             the username.
 
     Returns:
-        str. The pseudonymouse username, strating with 'PseudonymousUser' and
-        ending with six last letters from the pseudonymous_id.
+        str. The pseudonymous username, starting with 'User' and
+        ending with eight last letters from the pseudonymous_id.
     """
-    return 'PseudonymousUser%s%s' % (
-        pseudonymous_id[-6].upper(), pseudonymous_id[-5:])
+    return 'User%s%s' % (
+        pseudonymous_id[-8].upper(), pseudonymous_id[-7:])
 
 
 def get_username(user_id):
@@ -1035,20 +1045,16 @@ def get_username(user_id):
     Returns:
         str. Username corresponding to the given user_id.
     """
-    if is_pseudonymous_id(user_id):
-        return _get_pseudonymous_username(user_id)
-
-    if user_id in feconf.SYSTEM_USERS:
-        return feconf.SYSTEM_USERS[user_id]
-
-    return get_user_settings(user_id, strict=True).username
+    return get_usernames([user_id], strict=True)[0]
 
 
-def get_usernames(user_ids):
+def get_usernames(user_ids, strict=False):
     """Gets usernames corresponding to the given user_ids.
 
     Args:
         user_ids: list(str). The list of user_ids to get usernames for.
+        strict: bool. Whether to fail noisily if no user with the given ID
+            exists in the datastore. Defaults to False.
 
     Returns:
         list(str|None). Containing usernames based on given user_ids.
@@ -1067,7 +1073,8 @@ def get_usernames(user_ids):
             non_system_user_indices.append(index)
             non_system_user_ids.append(user_id)
 
-    non_system_users_settings = get_users_settings(non_system_user_ids)
+    non_system_users_settings = get_users_settings(
+        non_system_user_ids, strict=strict)
 
     for index, user_settings in enumerate(non_system_users_settings):
         if user_settings:

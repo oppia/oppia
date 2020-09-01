@@ -112,17 +112,17 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_username_for_pseudonymous_id(self):
         self.assertEqual(
-            'PseudonymousUserAaaaaa',
+            'UserAaaaaaaa',
             user_services.get_username('pid_' + 'a' * 32))
         self.assertEqual(
-            'PseudonymousUserBbbbbb',
+            'UserBbbbbbbb',
             user_services.get_username('pid_' + 'b' * 32))
 
     def test_get_usernames_for_pseudonymous_ids(self):
 
         # Handle usernames that exists.
         self.assertEqual(
-            ['PseudonymousUserAaaaaa', 'PseudonymousUserBbbbbb'],
+            ['UserAaaaaaaa', 'UserBbbbbbbb'],
             user_services.get_usernames(['pid_' + 'a' * 32, 'pid_' + 'b' * 32]))
 
     def test_get_usernames_empty_list(self):
@@ -136,7 +136,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_usernames([feconf.SYSTEM_COMMITTER_ID]))
 
     def test_get_username_for_nonexistent_user(self):
-        with self.assertRaisesRegexp(Exception, 'User not found.'):
+        with self.assertRaisesRegexp(
+            Exception,
+            'User with ID \'fakeUser\' not found.'
+        ):
             user_services.get_username('fakeUser')
 
     def test_get_username_none(self):
