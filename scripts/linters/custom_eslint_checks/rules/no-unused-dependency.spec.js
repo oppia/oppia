@@ -22,7 +22,7 @@ var rule = require('./no-unused-dependency');
 var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester();
-ruleTester.run('break-after-parens', rule, {
+ruleTester.run('no-unused-dependency', rule, {
   valid: [
     `function test() {
       return {
