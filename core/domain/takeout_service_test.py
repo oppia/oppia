@@ -1018,7 +1018,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(observed_data, expected_data)
         observed_json = json.dumps(observed_data)
         expected_json = json.dumps(expected_data)
-        self.assertItemsEqual(json.loads(observed_json), json.loads(expected_json))
+        self.assertItemsEqual(
+            json.loads(observed_json), json.loads(expected_json))
         expected_images = [
             takeout_domain.TakeoutImage(
                 self.GENERIC_IMAGE_URL, 'user_settings_profile_picture.png')
