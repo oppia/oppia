@@ -162,7 +162,8 @@ def preprocess_release(app_name, deploy_data_path):
             common.CONSTANTS_FILE_PATH))
 
     assert 'vpc_access_connector:\n  name: projects/PROJECT_ID' in (
-        app_dev_content), 'Missing vpc_access_connector'
+        app_dev_content), (
+            '"name: projects/PROJECT_ID" string is missing in app_dev.yaml')
 
     bucket_name = app_name + BUCKET_NAME_SUFFIX
     common.inplace_replace_file(
@@ -176,8 +177,6 @@ def preprocess_release(app_name, deploy_data_path):
     with python_utils.open_file(
         os.path.join(APP_DEV_YAML_PATH), 'w') as app_dev_file:
         app_dev_file.write(updated_app_dev_content)
-
-    update_configs.add_redishost()
 
 
 def check_errors_in_a_page(url_to_check, msg_to_confirm):
@@ -567,6 +566,8 @@ def execute_deployment():
                     raise Exception(
                         'The mailgun API key must be added before deployment.')
 
+        update_configs.add_redishost()
+
         if not os.path.exists(THIRD_PARTY_DIR):
             raise Exception(
                 'Could not find third_party directory at %s. Please run '
@@ -612,7 +613,7 @@ def execute_deployment():
 
         python_utils.PRINT('Done!')
     finally:
-        common.run_cmd([
+        subprocess.check_output([
             'git', 'checkout', '--',
             update_configs.LOCAL_FECONF_PATH,
             update_configs.LOCAL_CONSTANTS_PATH,

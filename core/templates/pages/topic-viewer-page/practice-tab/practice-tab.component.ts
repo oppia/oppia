@@ -20,6 +20,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { Subtopic } from 'domain/topic/SubtopicObjectFactory';
+import { QuestionBackendApiService } from
+  'domain/question/question-backend-api.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { PracticeSessionPageConstants } from
@@ -39,8 +41,10 @@ export class PracticeTabComponent implements OnInit {
   selectedSubtopics: Subtopic[] = [];
   availableSubtopics: Subtopic[] = [];
   selectedSubtopicIndices: boolean[] = [];
+  questionsAreAvailable: boolean = false;
 
   constructor(
+    private questionBackendApiService: QuestionBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowRef: WindowRef
@@ -63,10 +67,27 @@ export class PracticeTabComponent implements OnInit {
     }
     for (var idx in this.selectedSubtopicIndices) {
       if (this.selectedSubtopicIndices[idx]) {
-        return false;
+        return !this.questionsAreAvailable;
       }
     }
     return true;
+  }
+
+  checkIfQuestionsExist(subtopicIndices: boolean[]): void {
+    const skillIds = [];
+    for (let idx in subtopicIndices) {
+      if (subtopicIndices[idx]) {
+        skillIds.push(this.availableSubtopics[idx].getSkillIds());
+      }
+    }
+    if (skillIds.length > 0) {
+      this.questionBackendApiService.fetchTotalQuestionCountForSkillIds(
+        skillIds).then(questionCount => {
+        this.questionsAreAvailable = questionCount > 0;
+      });
+    } else {
+      this.questionsAreAvailable = false;
+    }
   }
 
   openNewPracticeSession(): void {
@@ -86,6 +107,10 @@ export class PracticeTabComponent implements OnInit {
         comma_separated_subtopic_ids: selectedSubtopicIds.join(',')
       });
     this.windowRef.nativeWindow.location.href = practiceSessionsUrl;
+  }
+
+  isAtLeastOneSubtopicSelected(): boolean {
+    return this.selectedSubtopicIndices.some(item => item);
   }
 }
 

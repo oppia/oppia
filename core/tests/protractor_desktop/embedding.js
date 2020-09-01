@@ -125,7 +125,8 @@ describe('Embedding', function() {
       await browser.sleep(5000);
       await waitFor.pageToFullyLoad();
       await explorationPlayerPage.expectContentToMatch(
-        await forms.toRichText((version === 2) ?
+        await forms.toRichText((
+          version === 2) ?
           'Given three balls of different colors. How many ways are there ' +
           'to arrange them in a straight line?' : 'Version 3'));
       await explorationPlayerPage.submitAnswer('NumericInput', 6);

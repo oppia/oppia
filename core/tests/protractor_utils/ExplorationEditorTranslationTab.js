@@ -329,7 +329,8 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.elementToBeClickable(
       saveUploadedAudioButton, 'Save button is not clickable');
     await saveUploadedAudioButton.click();
-    await waitFor.invisibilityOf(saveUploadedAudioButton,
+    await waitFor.invisibilityOf(
+      saveUploadedAudioButton,
       'Upload Audio modal takes too long to disappear');
   };
 
@@ -354,8 +355,8 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.elementToBeClickable(
       saveUploadedAudioButton, 'Save button is not clickable');
     await saveUploadedAudioButton.click();
-    await waitFor.visibilityOf(audioOverFiveMinutesErrorMessageElement,
-      'Error element is not visible');
+    await waitFor.visibilityOf(
+      audioOverFiveMinutesErrorMessageElement, 'Error element is not visible');
     await expect(audioOverFiveMinutesErrorMessageElement.getText()).toContain(
       'Audio files must be under 300 seconds in length.');
   };
@@ -421,13 +422,15 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.expectToBeInTranslationMode = async function() {
-    await waitFor.visibilityOf(languageSelectorLabelElement,
+    await waitFor.visibilityOf(
+      languageSelectorLabelElement,
       'Language selector label element taking too long to appear');
     expect(await languageSelectorLabelElement.getText()).toBe(
       'Translations for language:');
     expect(await progressBarLabelElement.getText()).toBe(
       'Exploration translation progress:');
-    await waitFor.visibilityOf(translationModeButton,
+    await waitFor.visibilityOf(
+      translationModeButton,
       'Translation mode button taking to long to appear');
     expect(await translationModeButton.getAttribute('class')).toMatch(
       'oppia-active-mode');
@@ -436,13 +439,15 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.expectToBeInVoiceoverMode = async function() {
-    await waitFor.visibilityOf(languageSelectorLabelElement,
+    await waitFor.visibilityOf(
+      languageSelectorLabelElement,
       'Language selector label element taking too long to appear');
     expect(await languageSelectorLabelElement.getText()).toBe(
       'Voiceovers for language:');
     expect(await progressBarLabelElement.getText()).toBe(
       'Exploration voiceover progress:');
-    await waitFor.visibilityOf(translationModeButton,
+    await waitFor.visibilityOf(
+      translationModeButton,
       'Translation mode button taking to long to appear');
     expect(await translationModeButton.getAttribute('class')).not.toMatch(
       'oppia-active-mode');
@@ -492,7 +497,8 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.expectNumericalStatusAccessibilityToMatch = async function(content) {
-    await waitFor.visibilityOf(numericalStatus,
+    await waitFor.visibilityOf(
+      numericalStatus,
       'Numerical status element taking too long to appear');
     expect(await numericalStatus.getAttribute('aria-label')).toMatch(content);
   };
@@ -538,7 +544,8 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.expectSelectedLanguageToBe = async function(language) {
-    await waitFor.visibilityOf(selectedLanguageElement,
+    await waitFor.visibilityOf(
+      selectedLanguageElement,
       'Selected language element taking too long to appear');
     expect(await selectedLanguageElement.getText()).toMatch(language);
   };
@@ -553,7 +560,8 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.expectFeedbackTabToBeActive = function() {
-    expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
+    expect(
+      element(by.css('.protractor-test-translation-feedback-tab'))[0]
     ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
   };
 
