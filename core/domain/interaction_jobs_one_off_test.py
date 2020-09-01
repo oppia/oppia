@@ -900,6 +900,7 @@ class ContinueLabelValidationOneOffJobTests(test_utils.GenericTestBase):
     def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
         """Checks output pairs are produced only for desired interactions."""
 
+        owner = user_services.UserActionsInfo(self.albert_id)
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -921,19 +922,20 @@ class ContinueLabelValidationOneOffJobTests(test_utils.GenericTestBase):
 
         state1.update_interaction_customization_args(customization_args_dict1)
         exp_services.save_new_exploration(self.albert_id, exploration)
+        rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
 
-        # Start ItemSelectionInteractionOneOff job on sample exploration.
+        # Start ContinueLabelValidationOneOffJob job on sample exploration.
         job_id = (
             interaction_jobs_one_off
-            .InteractionCustomizationArgsValidationOneOffJob.create_new())
+            .ContinueLabelValidationOneOffJob.create_new())
         (
             interaction_jobs_one_off
-            .InteractionCustomizationArgsValidationOneOffJob.enqueue(job_id))
+            .ContinueLabelValidationOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_tasks()
 
         actual_output = (
             interaction_jobs_one_off
-            .InteractionCustomizationArgsValidationOneOffJob.get_output(job_id))
+            .ContinueLabelValidationOneOffJob.get_output(job_id))
         self.assertEqual(actual_output, [])
 
         state2.update_interaction_id('Continue')
@@ -950,19 +952,39 @@ class ContinueLabelValidationOneOffJobTests(test_utils.GenericTestBase):
         state2.update_interaction_customization_args(customization_args_dict2)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # Start ItemSelectionInteractionOneOff job on sample exploration.
+        # Start ContinueLabelValidationOneOffJob job on sample exploration.
         job_id = (
             interaction_jobs_one_off
-            .InteractionCustomizationArgsValidationOneOffJob.create_new())
+            .ContinueLabelValidationOneOffJob.create_new())
         (
             interaction_jobs_one_off
-            .InteractionCustomizationArgsValidationOneOffJob.enqueue(job_id))
+            .ContinueLabelValidationOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_tasks()
 
         actual_output = (
             interaction_jobs_one_off
-            .InteractionCustomizationArgsValidationOneOffJob.get_output(job_id))
+            .ContinueLabelValidationOneOffJob.get_output(job_id))
+        # No output should be produced since the exploration has not been
+        # published.
         self.assertEqual(actual_output, [])
+
+        rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
+
+        # Start ContinueLabelValidationOneOffJob job on sample exploration.
+        job_id = (
+            interaction_jobs_one_off
+            .ContinueLabelValidationOneOffJob.create_new())
+        (
+            interaction_jobs_one_off
+            .ContinueLabelValidationOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            interaction_jobs_one_off
+            .ContinueLabelValidationOneOffJob.get_output(job_id))
+        self.assertEqual(actual_output, [
+            u'[u\'exp_id0\', '
+            u'[u\'State name: State2, Button label length: 51\']]'])
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
@@ -994,4 +1016,4 @@ class ContinueLabelValidationOneOffJobTests(test_utils.GenericTestBase):
         run_job_for_deleted_exp(
             self,
             interaction_jobs_one_off
-            .InteractionCustomizationArgsValidationOneOffJob)
+            .ContinueLabelValidationOneOffJob)

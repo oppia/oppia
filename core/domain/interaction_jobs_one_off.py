@@ -226,22 +226,23 @@ class ContinueLabelValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if not item.deleted:
-            exp_status = rights_manager.get_exploration_rights(item.id).status
-            if exp_status == rights_manager.ACTIVITY_STATUS_PRIVATE:
-                return
-            exploration = exp_fetchers.get_exploration_from_model(item)
-            for state_name, state in exploration.states.items():
-                interaction = state.interaction
-                if interaction.id == 'Continue':
-                    button_text = interaction.customization_args['buttonText']
-                    button_text_length = len(button_text.value.unicode_str)
-                    if button_text_length > 50:
-                        yield (
-                            item.id,
-                            'State name: %s, Button label length: %s' % (
-                                state_name.encode('utf-8'),
-                                python_utils.UNICODE(button_text_length)))
+        if item.deleted:
+            return
+        exp_status = rights_manager.get_exploration_rights(item.id).status
+        if exp_status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+            return
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        for state_name, state in exploration.states.items():
+            interaction = state.interaction
+            if interaction.id == 'Continue':
+                button_text = interaction.customization_args['buttonText']
+                button_text_length = len(button_text.value.unicode_str)
+                if button_text_length > 50:
+                    yield (
+                        item.id,
+                        'State name: %s, Button label length: %s' % (
+                            state_name.encode('utf-8'),
+                            python_utils.UNICODE(button_text_length)))
 
     @staticmethod
     def reduce(key, values):
