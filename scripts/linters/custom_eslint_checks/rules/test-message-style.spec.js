@@ -58,7 +58,7 @@ ruleTester.run('test-message-style', rule, {
     },
     {
       code:
-        `it('should transform all key value'+ ' pairs to angular constants',
+        `it('should transform all key value' + ' pairs to angular constants',
           function() {
           for (var constantName in constants) {
               expect($injector.has(constantName)).toBe(true);
@@ -99,7 +99,7 @@ ruleTester.run('test-message-style', rule, {
         }
         });`,
       errors: [{
-        message: 'Use should at the beginning of test message',
+        message: 'Test message should start with \'should\'',
         type: null
       }]
     },

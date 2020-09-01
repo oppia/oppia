@@ -30,7 +30,7 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      useShould: 'Use should at the beginning of test message',
+      useShould: 'Test message should start with \'should\'',
       singleSpace: 'Do not use multiple consecutive spaces in the test message',
       noSpaceAtEnd: 'Do not use space at the end of test message',
       spaceAtEnd: (
@@ -40,9 +40,7 @@ module.exports = {
   },
 
   create: function(context) {
-    const sourceCode = context.getSourceCode();
-
-    var checkShould = function(testMessageNode) {
+    var checkMessageStartsWithShould = function(testMessageNode) {
       if (!testMessageNode.value.startsWith('should ')) {
         context.report({
           testMessageNode,
@@ -52,7 +50,7 @@ module.exports = {
       }
     };
 
-    var checkSpaces = function(testMessageNode) {
+    var checkSpacesInMessage = function(testMessageNode) {
       if (testMessageNode.value.includes('  ')) {
         context.report({
           testMessageNode,
@@ -62,7 +60,7 @@ module.exports = {
       }
     };
 
-    var checkNoSpaceAtEnd = function(testMessageNode) {
+    var checkNoSpaceAtEndOfMessage = function(testMessageNode) {
       if (testMessageNode.value.endsWith(' ')) {
         context.report({
           testMessageNode,
@@ -87,14 +85,14 @@ module.exports = {
         if (node.callee.name === 'it') {
           const testMessageNode = node.arguments[0];
           if (testMessageNode.type === 'Literal') {
-            checkShould(testMessageNode);
-            checkSpaces(testMessageNode);
-            checkNoSpaceAtEnd(testMessageNode);
+            checkMessageStartsWithShould(testMessageNode);
+            checkSpacesInMessage(testMessageNode);
+            checkNoSpaceAtEndOfMessage(testMessageNode);
           } else if (testMessageNode.type === 'BinaryExpression') {
-            checkShould(testMessageNode.left);
-            checkNoSpaceAtEnd(testMessageNode.right);
-            checkSpaces(testMessageNode.left);
-            checkSpaces(testMessageNode.right);
+            checkMessageStartsWithShould(testMessageNode.left);
+            checkNoSpaceAtEndOfMessage(testMessageNode.right);
+            checkSpacesInMessage(testMessageNode.left);
+            checkSpacesInMessage(testMessageNode.right);
             checkSpaceAtEnd(testMessageNode.left);
           }
         }
