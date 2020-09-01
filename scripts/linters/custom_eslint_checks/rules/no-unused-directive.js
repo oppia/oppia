@@ -84,7 +84,7 @@ module.exports = {
       regularImports.sort();
       constantImports.sort();
       var sortedImports = dollarImports.concat(regularImports).concat(constantImports)
-      console.log(sortedImports);
+      // console.log(sortedImports);
       // console.log(params);
       if (!isEquals(sortedImports, params)) {
         context.report({
