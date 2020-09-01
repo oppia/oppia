@@ -74,9 +74,11 @@ describe('KeyboardShortcutHelpModalComponent', () => {
 
   it('should dismiss the modal when clicked on cancel', fakeAsync(() => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
-    let closeButtonDE = fixture.debugElement.query(
+    const closeButtonDE = fixture.debugElement.query(
       By.css('.modal-footer .btn.btn-secondary'));
+
     closeButtonDE.nativeElement.click();
+
     fixture.detectChanges();
     expect(dismissSpy).toHaveBeenCalled();
   }));

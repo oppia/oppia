@@ -20,7 +20,6 @@ import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlService } from 'services/contextual/url.service.ts';
 import { ContextService } from 'services/context.service.ts';
-
 @Component({
   selector: 'keyboard-shortcut-help-modal',
   templateUrl: './keyboard-shortcut-help-modal.component.html',
@@ -35,16 +34,19 @@ export class KeyboardShortcutHelpModalComponent implements OnInit {
   KEYBOARD_SHORTCUTS = {};
 
   ngOnInit(): void {
+    const help = '?';
+    const search = '/'
+
     if (this.urlService.getPathname() === '/community-library') {
       this.KEYBOARD_SHORTCUTS = {
-        '?': 'Show this help dialog',
-        '/': 'Search',
+        [help]: 'Show this help dialog',
+        [search]: 'Search',
         s: 'Select skip to main content button',
         c: 'Select exploration category',
       };
     } else if (this.contextService.isInExplorationPlayerPage()) {
       this.KEYBOARD_SHORTCUTS = {
-        '?': 'Show this help dialog',
+        [help]: 'Show this help dialog',
         s: 'Select skip to main content button',
         j: 'Select the continue button',
         k: 'Select the back button',

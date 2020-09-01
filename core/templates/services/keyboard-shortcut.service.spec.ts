@@ -31,27 +31,27 @@ class MockActiveModal {
   }
 }
 describe('Keyboard Shortcuts', () => {
-  var skipButton = document.createElement('button');
-  var nextButton = document.createElement('button');
-  var continueButton = document.createElement('button');
-  var backButton = document.createElement('button');
-  var searchBar = document.createElement('input');
-  var categoryBar = document.createElement('select');
+  let skipButton = document.createElement('button');
+  let nextButton = document.createElement('button');
+  let continueButton = document.createElement('button');
+  let backButton = document.createElement('button');
+  let searchBar = document.createElement('input');
+  let categoryBar = document.createElement('select');
 
-  var openQuickReferenceSpy;
+  let openQuickReferenceSpy;
 
-  var mockWindow = {
+  let mockWindow = {
     location: {
       href: ''
     }
   };
 
-  var windowRef;
-  var keyboardShortcutService;
-  var component: KeyboardShortcutHelpModalComponent;
-  var fixture: ComponentFixture<KeyboardShortcutHelpModalComponent>;
-  var ngbActiveModal: NgbActiveModal;
-  var ngbModal: NgbModal;
+  let windowRef;
+  let keyboardShortcutService;
+  let component: KeyboardShortcutHelpModalComponent;
+  let fixture: ComponentFixture<KeyboardShortcutHelpModalComponent>;
+  let ngbActiveModal: NgbActiveModal;
+  let ngbModal: NgbModal;
 
 
   beforeEach(async(() => {
