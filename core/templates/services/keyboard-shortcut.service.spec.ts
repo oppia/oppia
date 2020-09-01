@@ -17,6 +17,7 @@
  */
 import 'mousetrap';
 
+import { ApplicationRef } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { KeyboardShortcutHelpModalComponent } from
@@ -47,6 +48,7 @@ describe('Keyboard Shortcuts', () => {
   };
 
   let windowRef;
+  let appRef;
   let keyboardShortcutService;
   let component: KeyboardShortcutHelpModalComponent;
   let fixture: ComponentFixture<KeyboardShortcutHelpModalComponent>;
@@ -72,9 +74,11 @@ describe('Keyboard Shortcuts', () => {
     ngbActiveModal = TestBed.get(NgbActiveModal);
     component = fixture.componentInstance;
     windowRef = new WindowRef();
+    appRef = new ApplicationRef();
     keyboardShortcutService = new KeyboardShortcutService(
       windowRef,
-      ngbModal
+      ngbModal,
+      appRef
     );
   });
 

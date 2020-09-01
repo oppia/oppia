@@ -17,7 +17,7 @@
  */
 import 'mousetrap';
 
-import { Injectable } from '@angular/core';
+import { Injectable, ApplicationRef } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { KeyboardShortcutHelpModalComponent } from
@@ -32,12 +32,14 @@ import { WindowRef } from 'services/contextual/window-ref.service.ts';
 export class KeyboardShortcutService {
   constructor(
     private windowRef: WindowRef,
-    private ngbModal: NgbModal) {}
+    private ngbModal: NgbModal,
+    private appRef: ApplicationRef) {}
 
   openQuickReference(): void {
     this.ngbModal.dismissAll();
     this.ngbModal.open(
       KeyboardShortcutHelpModalComponent, {backdrop: true});
+    this.appRef.tick();
   }
 
   bindExplorationPlayerShortcuts(): void {
