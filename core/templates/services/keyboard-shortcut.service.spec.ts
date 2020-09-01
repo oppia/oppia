@@ -74,7 +74,7 @@ describe('Keyboard Shortcuts', () => {
     ngbActiveModal = TestBed.get(NgbActiveModal);
     component = fixture.componentInstance;
     windowRef = new WindowRef();
-    appRef = new ApplicationRef();
+    appRef = TestBed.get(ApplicationRef);
     keyboardShortcutService = new KeyboardShortcutService(
       windowRef,
       ngbModal,
