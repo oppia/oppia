@@ -62,33 +62,42 @@ angular.module('oppia').component('customOskLettersEditor', {
         } else {
           ctrl.value.splice(index, 1);
         }
-        GuppyInitializationService.customOskLetters = ctrl.value;
+        GuppyInitializationService.setCustomOskLetters(ctrl.value);
       };
 
       ctrl.getRemainingLettersCount = function() {
         return Math.max(MAX_CUSTOM_LETTERS_FOR_OSK - ctrl.value.length, 0);
       };
 
+      ctrl.isCustomizationArgOpen = function() {
+        return document.getElementsByClassName(
+          'custom-letters-div').length !== 0;
+      };
+
       ctrl.keyDownCallBack = function(e) {
-        let keyPressed = e.key;
-        if (keyPressed === 'Shift') {
-          ctrl.lettersAreLowercase = false;
-        } else if (keyPressed === 'Backspace') {
-          ctrl.value.pop();
-        } else if (
-          ctrl.latinLowerCase.join('').indexOf(
-            keyPressed.toLowerCase()) !== -1 &&
-          ctrl.value.indexOf(keyPressed) === -1) {
-          ctrl.updateLettersList(keyPressed);
+        if (ctrl.isCustomizationArgOpen()) {
+          let keyPressed = e.key;
+          if (keyPressed === 'Shift') {
+            ctrl.lettersAreLowercase = false;
+          } else if (keyPressed === 'Backspace') {
+            ctrl.value.pop();
+          } else if (
+            ctrl.latinLowerCase.join('').indexOf(
+              keyPressed.toLowerCase()) !== -1 &&
+            ctrl.value.indexOf(keyPressed) === -1) {
+            ctrl.updateLettersList(keyPressed);
+          }
+          $scope.$apply();
         }
-        $scope.$apply();
       };
 
       ctrl.keyUpCallBack = function(e) {
-        let keyPressed = e.key;
-        if (keyPressed === 'Shift') {
-          ctrl.lettersAreLowercase = true;
-          $scope.$apply();
+        if (ctrl.isCustomizationArgOpen()) {
+          let keyPressed = e.key;
+          if (keyPressed === 'Shift') {
+            ctrl.lettersAreLowercase = true;
+            $scope.$apply();
+          }
         }
       };
 
