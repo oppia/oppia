@@ -381,8 +381,8 @@ var ExplorationEditorMainTab = function() {
       setDestination: async function(
           destinationName, createNewState, refresherExplorationId) {
       // Begin editing destination.
-        await action.click('Outcome Destination Editor Open Button',
-          openOutcomeDestEditor);
+        await action.click(
+          'Outcome Destination Editor Open Button', openOutcomeDestEditor);
 
         // Set destination contents.
         await _setOutcomeDest(
@@ -464,8 +464,8 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.expectTickMarkIsDisplayed = async function() {
-    await waitFor.visibilityOf(correctAnswerTickMark,
-      'Correct answer tick mark not visible');
+    await waitFor.visibilityOf(
+      correctAnswerTickMark, 'Correct answer tick mark not visible');
     expect(correctAnswerTickMark.isPresent()).toBeTruthy();
   };
 
