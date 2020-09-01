@@ -863,7 +863,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
-            'linked_skill_ids': ['skill_id2']
+            'linked_skill_ids': ['skill_id2'],
+            'inapplicable_misconception_ids': ['skillid-1']
         }
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -911,7 +912,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
-            'linked_skill_ids': ['skill_id2']
+            'linked_skill_ids': ['skill_id2'],
+            'inapplicable_misconception_ids': ['skillid-1']
         }
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -957,7 +959,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
-            'linked_skill_ids': ['skill_id2']
+            'linked_skill_ids': ['skill_id2'],
+            'inapplicable_misconception_ids': ['skillid-1']
         }
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()

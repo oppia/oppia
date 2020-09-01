@@ -667,8 +667,8 @@ def save_question_summary(question_summary):
         question_model_last_updated=question_summary.last_updated,
         question_model_created_on=question_summary.created_on,
         question_content=question_summary.question_content,
-        interaction_id=question_summary.interaction_id,
-        misconception_ids=question_summary.misconception_ids
+        misconception_ids=question_summary.misconception_ids,
+        interaction_id=question_summary.interaction_id
     )
 
     question_summary_model.put()
