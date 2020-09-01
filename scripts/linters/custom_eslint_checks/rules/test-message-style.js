@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint check to ensure that there is a break after parenthesis
- * in case of multiline hanging indentation.
+ * @fileoverview Lint check to ensure that correct style is followed for the
+ * test messages in calling of 'it'.
  */
 
 'use strict';
