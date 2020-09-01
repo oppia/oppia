@@ -1662,7 +1662,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         }
     ),)
 
-    def _check_space_at_beginning_of_comment(self, line, line_num):
+    def _check_space_at_beginning_of_comments(self, line, line_num):
         """Checks if the comment starts with a space at the beginnig of the
         comment and returns False if there is no space at beginning else
         returns True.
@@ -1681,7 +1681,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             return False
         return True
 
-    def _check_no_capital_letter_at_beginning(self, line, line_num):
+    def _check_comment_starts_with_capital_letter(self, line, line_num):
         """Checks if the comment starts with a capital letter.
         Comments may include a lowercase character at the beginning only if they
         start with version info or a data type or a variable name e.g.
@@ -1693,7 +1693,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             line_num: int. Line number of the current comment.
         """
         # Check if variable name is used.
-        underscore_is_present = '_' in line.split()[1]
+        starts_with_underscore = '_' in line.split()[1]
 
         # Check if allowed prefix is used.
         allowed_prefix_is_present = any(
@@ -1701,11 +1701,11 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             self.config.allowed_comment_prefixes)
 
         # Check if comment contains any excluded phrase.
-        excluded_phrase_is_present_at_beginning = any(
+        excluded_phrase_is_present = any(
             word in line.split()[1] for word in EXCLUDED_PHRASES)
-        if (re.search(br'^# [a-z][A-Za-z]*.*$', line) and not (
-                excluded_phrase_is_present_at_beginning or
-                underscore_is_present or allowed_prefix_is_present)):
+        if (re.search(br'^# [a-z].*', line) and not (
+                excluded_phrase_is_present or
+                starts_with_underscore or allowed_prefix_is_present)):
             self.add_message(
                 'no-capital-letter-at-beginning', line=line_num)
 
@@ -1733,7 +1733,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         """Custom pylint checker to ensure that comments follow correct style.
 
         Args:
-            tokens: Token. Object to access all tokens of a module.
+            tokens: list(Token). Object to access all tokens of a module.
         """
         prev_line_num = -1
         comments = []
@@ -1756,13 +1756,13 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             first_comment_line_num, first_comment = comment[0]
             last_comment_line_num, last_comment = comment[-1]
             space_at_beginning_of_first_comment = (
-                self._check_space_at_beginning_of_comment(
+                self._check_space_at_beginning_of_comments(
                     first_comment, first_comment_line_num))
             space_at_beginning_of_last_comment = (
-                self._check_space_at_beginning_of_comment(
+                self._check_space_at_beginning_of_comments(
                     last_comment, last_comment_line_num))
             if space_at_beginning_of_first_comment and len(first_comment) > 1:
-                self._check_no_capital_letter_at_beginning(
+                self._check_comment_starts_with_capital_letter(
                     first_comment, first_comment_line_num)
             if space_at_beginning_of_last_comment and len(last_comment) > 1:
                 self._check_punctuation(
@@ -1770,7 +1770,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             if len(comment) <= 2:
                 continue
             for line_num, line in comment[1:-1]:
-                _ = self._check_space_at_beginning_of_comment(line, line_num)
+                _ = self._check_space_at_beginning_of_comments(line, line_num)
 
 
 class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
