@@ -22,7 +22,6 @@ import os
 import shutil
 import subprocess
 
-from pip._internal.utils import misc
 import python_utils
 from scripts import common
 
@@ -150,7 +149,7 @@ def _rectify_third_party_directory(mismatches):
 
         # Either the library listed in 'requirements.txt' is not in the
         # third party directory.
-        elif (not directory_version):
+        if not directory_version:
             _install_library(
                 library_name,
                 python_utils.convert_to_bytes(requirements_version))
@@ -182,6 +181,7 @@ def _install_library(library_name, version_string):
         '--upgrade'
     ])
 
+
 def _reinstall_all_dependencies():
     """Reinstalls all of the libraries detailed in the compiled
     'requirements.txt' file to the 'third_party/python_libs' folder.
@@ -193,6 +193,7 @@ def _reinstall_all_dependencies():
         common.COMPILED_REQUIREMENTS_FILE_PATH,
         '--upgrade'
     ])
+
 
 def get_mismatches():
     """Returns a dictionary containing mismatches between the 'requirements.txt'
@@ -230,7 +231,7 @@ def get_mismatches():
         if library_name in directory_contents:
             # Library matches but version doesn't match.
             if (directory_contents[library_name] !=
-                requirements_contents[library_name]):
+                    requirements_contents[library_name]):
                 mismatches[library_name] = (
                     requirements_contents[library_name],
                     directory_contents[library_name])
@@ -285,7 +286,7 @@ def validate_metadata_directories():
     naming conventions that follows the PEP-427 and PEP-376 python guidelines
 
     Raises:
-        Exception: An installed library's metadata does not exist the
+        Exception. An installed library's metadata does not exist the
             'third_party/python_libs' directory in the format that we expect
             (following the PEP-427 and PEP-376 python guidelines).
     """
@@ -312,7 +313,7 @@ def validate_metadata_directories():
                 '`scripts/install_backend_python_libs` and modify our '
                 'assumptions in the _get_possible_metadata_directory_names'
                 ' function for what metadata directory names can be.' %
-                    library_name)
+                library_name)
 
 
 def main():
@@ -353,6 +354,7 @@ def main():
     else:
         python_utils.PRINT(
             'All third-party Python libraries are already installed correctly.')
+
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when install_third_party_libs.py is used as a script.

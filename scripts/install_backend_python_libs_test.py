@@ -24,10 +24,11 @@ import shutil
 import subprocess
 
 from core.tests import test_utils
-import pkg_resources
 import python_utils
 from scripts import common
 from scripts import install_backend_python_libs
+
+import pkg_resources
 
 
 class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
@@ -52,10 +53,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.file_arr.append(msg)
 
         class MockFile(python_utils.OBJECT):
-            def write(self, buffer): # pylint: disable=missing-docstring
-                mock_write(buffer)
+            def write(self, buf): # pylint: disable=missing-docstring
+                mock_write(buf)
 
-        class MockOpenFile(object):
+        class MockOpenFile(python_utils.OBJECT©153):
             def __init__(self, path=None, mode=None):
                 self.path = path
                 self.mode = mode
@@ -88,6 +89,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_find_distributions(paths): # pylint: disable=unused-argument
             class Distribution(python_utils.OBJECT):
                 """Distribution object containing python library information."""
+
                 def __init__(self, library_name, version_string):
                     """Creates mock distribution metadata class that contains
                     the name and version information for a python library.
@@ -366,7 +368,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         def mock_is_dir(path):
             if (path[len(common.THIRD_PARTY_PYTHON_LIBS_DIR) + 1:]
-                in files_in_directory):
+                    in files_in_directory):
                 return True
             return False
 
@@ -440,6 +442,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_find_distributions(paths): # pylint: disable=unused-argument
             class Distribution(python_utils.OBJECT):
                 """Distribution object containing python library information."""
+
                 def __init__(self, library_name, version_string):
                     """Creates mock distribution metadata class that contains
                     the name and version information for a python library.
@@ -471,15 +474,14 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             pkg_resources, 'find_distributions', mock_find_distributions)
         swap_list_dir = self.swap(
             os, 'listdir', mock_list_dir)
-        dependency_with_missing_metadata = 'dependency5'
 
         metadata_exception = self.assertRaisesRegexp(
-                Exception,
-                'The python library dependency5 was installed without the '
-                'correct metadata folders which may indicate that the '
-                'convention for naming the metadata folders have changed. '
-                'Please go to `scripts/install_backend_python_libs` and modify '
-                'our assumptions in the _get_possible_metadata_directory_names'
-                ' function for what metadata directory names can be.' )
+            Exception,
+            'The python library dependency5 was installed without the '
+            'correct metadata folders which may indicate that the '
+            'convention for naming the metadata folders have changed. '
+            'Please go to `scripts/install_backend_python_libs` and modify '
+            'our assumptions in the _get_possible_metadata_directory_names'
+            ' function for what metadata directory names can be.' )
         with swap_find_distributions, swap_list_dir, metadata_exception:
             install_backend_python_libs.validate_metadata_directories()
