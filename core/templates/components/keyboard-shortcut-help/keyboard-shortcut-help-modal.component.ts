@@ -35,7 +35,7 @@ export class KeyboardShortcutHelpModalComponent implements OnInit {
 
   ngOnInit(): void {
     const help = '?';
-    const search = '/'
+    const search = '/';
 
     if (this.urlService.getPathname() === '/community-library') {
       this.KEYBOARD_SHORTCUTS = {
