@@ -16,23 +16,23 @@
  * @fileoverview Unit tests for Http Service.
  */
 
-import { TestBed, fakeAsync, flushMicrotasks } from "@angular/core/testing";
-import { HttpService } from "services/http.service";
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { HttpService } from 'services/http.service';
 import { HttpTestingController, HttpClientTestingModule } from
-  "@angular/common/http/testing";
+  '@angular/common/http/testing';
 
 describe('HTML escaper service', () => {
   let httpTestingController: HttpTestingController;
   let service: HttpService;
-  const arbitraryTestUrl='abcdfg.com';
+  const arbitraryTestUrl = 'abcdfg.com';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-    providers: [HttpService],
-    imports: [HttpClientTestingModule]
+      providers: [HttpService],
+      imports: [HttpClientTestingModule]
     });
-  httpTestingController = TestBed.get(HttpTestingController);
-  service = TestBed.get(HttpService);
+    httpTestingController = TestBed.get(HttpTestingController);
+    service = TestBed.get(HttpService);
   });
 
   afterEach(() => {
@@ -67,6 +67,7 @@ describe('HTML escaper service', () => {
   }));
 
   it('should make a HTTP DELETE request', fakeAsync(async() => {
+    /* eslint-disable-next-line dot-notation */
     const getPromise = service.delete(arbitraryTestUrl);
     const expectedReq = httpTestingController.expectOne(arbitraryTestUrl);
     expect(expectedReq.request.method).toEqual('DELETE');
