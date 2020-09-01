@@ -28,18 +28,21 @@ export interface QuestionBackendDict {
   'language_code': string;
   'version': number;
   'linked_skill_ids': string[];
+  'inapplicable_misconception_ids': string[];
 }
 
 angular.module('oppia').factory('QuestionObjectFactory', [
   'StateObjectFactory', 'DEFAULT_LANGUAGE_CODE', 'INTERACTION_SPECS',
   function(StateObjectFactory, DEFAULT_LANGUAGE_CODE, INTERACTION_SPECS) {
     var Question = function(
-        id, stateData, languageCode, version, linkedSkillIds) {
+        id, stateData, languageCode, version, linkedSkillIds,
+        inApplicableMisconceptionIds) {
       this._id = id;
       this._stateData = stateData;
       this._languageCode = languageCode;
       this._version = version;
       this._linkedSkillIds = linkedSkillIds;
+      this._inApplicableMisconceptionIds = inApplicableMisconceptionIds;
     };
 
     // ---- Instance methods ----
@@ -76,13 +79,22 @@ angular.module('oppia').factory('QuestionObjectFactory', [
       this._linkedSkillIds = linkedSkillIds;
     };
 
+    Question.prototype.getInApplicableMisconceptionIds = function() {
+      return this._inApplicableMisconceptionIds;
+    };
+
+    Question.prototype.setInApplicableMisconceptionIds = function(
+        inApplicableMisconceptionIds) {
+      this._inApplicableMisconceptionIds = inApplicableMisconceptionIds;
+    };
+
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     Question['createDefaultQuestion'] = function(skillIds) {
     /* eslint-enable dot-notation */
       return new Question(
         null, StateObjectFactory.createDefaultState(null),
-        DEFAULT_LANGUAGE_CODE, 1, skillIds);
+        DEFAULT_LANGUAGE_CODE, 1, skillIds, []);
     };
 
     Question.prototype.getValidationErrorMessage = function() {
@@ -150,7 +162,8 @@ angular.module('oppia').factory('QuestionObjectFactory', [
         StateObjectFactory.createFromBackendDict(
           'question', questionBackendDict.question_state_data),
         questionBackendDict.language_code, questionBackendDict.version,
-        questionBackendDict.linked_skill_ids
+        questionBackendDict.linked_skill_ids,
+        questionBackendDict.inapplicable_misconception_ids
       );
     };
 
@@ -160,6 +173,7 @@ angular.module('oppia').factory('QuestionObjectFactory', [
         question_state_data: this._stateData.toBackendDict(),
         language_code: this._languageCode,
         linked_skill_ids: this._linkedSkillIds,
+        inapplicable_misconception_ids: this._inApplicableMisconceptionIds,
         version: 0,
       };
       if (!isNewQuestion) {
