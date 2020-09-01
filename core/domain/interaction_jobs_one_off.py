@@ -50,8 +50,6 @@ class DragAndDropSortInputInteractionOneOffJob(
         exploration = exp_fetchers.get_exploration_from_model(item)
         validation_errors = []
         for state_name, state in exploration.states.items():
-            choices_length = len(
-                    state.interaction.customization_args['choices'].value)
             if state.interaction.id == 'DragAndDropSortInput':
                 for answer_group_index, answer_group in enumerate(
                         state.interaction.answer_groups):
