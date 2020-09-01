@@ -33,7 +33,8 @@ for (var constantName in constants) {
 angular.module('oppia').constant(
   'DEFAULT_TRANSLATIONS', AppConstants.DEFAULT_TRANSLATIONS);
 
-angular.module('oppia').constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+angular.module('oppia').constant(
+  'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
   AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT);
 
 angular.module('oppia').constant(
@@ -155,6 +156,8 @@ angular.module('oppia').constant(
   'COLLECTION_DATA_URL_TEMPLATE', AppConstants.COLLECTION_DATA_URL_TEMPLATE);
 
 angular.module('oppia').constant('ENTITY_TYPE', AppConstants.ENTITY_TYPE);
+
+angular.module('oppia').constant('IMAGE_CONTEXT', AppConstants.IMAGE_CONTEXT);
 
 angular.module('oppia').constant(
   'IMAGE_SAVE_DESTINATION_SERVER', AppConstants.IMAGE_SAVE_DESTINATION_SERVER);

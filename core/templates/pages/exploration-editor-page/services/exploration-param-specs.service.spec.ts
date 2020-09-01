@@ -21,7 +21,8 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('pages/exploration-editor-page/' +
+require(
+  'pages/exploration-editor-page/' +
   'services/exploration-param-specs.service.ts');
 
 describe('Exploration Param Specs Service', function() {

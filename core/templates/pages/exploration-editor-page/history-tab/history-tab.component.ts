@@ -35,6 +35,7 @@ require('services/editability.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 
 import { Subscription } from 'rxjs';
+import cloneDeep from 'lodash/cloneDeep';
 
 angular.module('oppia').component('historyTab', {
   template: require('./history-tab.component.html'),
@@ -61,34 +62,24 @@ angular.module('oppia').component('historyTab', {
         if (ctrl.selectedVersionsArray.length === 2) {
           ctrl.changeCompareVersion();
           ctrl.hideHistoryGraph = false;
-          ctrl.compareVersionsButtonIsHidden = true;
         }
       };
       // Changes the checkbox selection and provides an appropriate user
       // prompt.
-      ctrl.changeSelectedVersions = function(evt, versionNumber) {
-        var checkbox = evt.target;
-        var selectedVersionsArrayPos = ctrl.selectedVersionsArray.indexOf(
-          versionNumber);
-        if (checkbox.checked && selectedVersionsArrayPos === -1) {
-          ctrl.selectedVersionsArray.push(versionNumber);
+      ctrl.changeSelectedVersions = function(snapshot, item) {
+        if (item === 1 && snapshot && !ctrl.selectedVersionsArray.includes(
+          snapshot.versionNumber)) {
+          ctrl.selectedVersionsArray[0] = snapshot.versionNumber;
         }
-        if (!checkbox.checked && selectedVersionsArrayPos !== -1) {
-          ctrl.selectedVersionsArray.splice(selectedVersionsArrayPos, 1);
+        if (item === 2 && snapshot && !ctrl.selectedVersionsArray.includes(
+          snapshot.versionNumber)) {
+          ctrl.selectedVersionsArray[1] = snapshot.versionNumber;
         }
-
         if (ctrl.selectedVersionsArray.length === 2) {
-          // Disable version count prompt if two checkboxes are selected.
-          ctrl.versionCountPrompt = '';
+          ctrl.compareSelectedVersions();
         } else if (!ctrl.comparisonsAreDisabled) {
           ctrl.hideHistoryGraph = true;
           ctrl.compareVersionsButtonIsHidden = false;
-
-          if (ctrl.selectedVersionsArray.length === 0) {
-            ctrl.versionCountPrompt = 'Please select any two.';
-          } else if (ctrl.selectedVersionsArray.length === 1) {
-            ctrl.versionCountPrompt = 'Please select one more.';
-          }
         }
       };
 
@@ -117,8 +108,6 @@ angular.module('oppia').component('historyTab', {
 
           ctrl.compareVersionsButtonIsHidden = ctrl.comparisonsAreDisabled;
 
-          ctrl.versionCountPrompt = 'Please select any 2.';
-
           $http.get(ctrl.explorationAllSnapshotsUrl).then(
             function(response) {
               explorationSnapshots = response.data.snapshots;
@@ -127,16 +116,16 @@ angular.module('oppia').component('historyTab', {
               // Re-populate versionCheckboxArray and
               // explorationVersionMetadata when history is refreshed.
               ctrl.versionCheckboxArray = [];
-              ctrl.explorationVersionMetadata = {};
+              ctrl.explorationVersionMetadata = [];
               var lowestVersionIndex = 0;
               for (
                 var i = currentVersion - 1; i >= lowestVersionIndex; i--) {
                 var versionNumber = explorationSnapshots[i].version_number;
-                ctrl.explorationVersionMetadata[versionNumber] = {
+                ctrl.explorationVersionMetadata[versionNumber - 1] = {
                   committerId: explorationSnapshots[i].committer_id,
                   createdOnMsecsStr: (
                     DateTimeFormatService
-                      .getLocaleAbbreviatedDatetimeString(
+                      .getLocaleDateTimeHourString(
                         explorationSnapshots[i].created_on_ms)),
                   commitMessage: explorationSnapshots[i].commit_message,
                   versionNumber: explorationSnapshots[i].version_number
@@ -146,8 +135,11 @@ angular.module('oppia').component('historyTab', {
                   selected: false
                 });
               }
+              ctrl.totalExplorationVersionMetadata = cloneDeep(
+                ctrl.explorationVersionMetadata);
+              ctrl.totalExplorationVersionMetadata.reverse();
               LoaderService.hideLoadingScreen();
-              ctrl.computeVersionsToDisplay();
+              ctrl.changeItemsPerPage();
             });
         });
       };
@@ -162,6 +154,23 @@ angular.module('oppia').component('historyTab', {
               ': ' + versionMetadata.commitMessage : ''));
       };
 
+      ctrl.filterByUsername = function() {
+        if (!ctrl.username) {
+          ctrl.explorationVersionMetadata = cloneDeep(
+            ctrl.totalExplorationVersionMetadata);
+          ctrl.versionNumbersToDisplay = ctrl.explorationVersionMetadata.length;
+          return;
+        }
+
+        ctrl.explorationVersionMetadata = (
+          ctrl.totalExplorationVersionMetadata.filter((metadata) => {
+            return (
+              metadata && metadata.committerId.trim().toLowerCase().includes(
+                ctrl.username.trim().toLowerCase()));
+          }));
+        ctrl.versionNumbersToDisplay = ctrl.explorationVersionMetadata.length;
+      };
+
       // Function to set compared version metadata, download YAML and
       // generate diff graph and legend when selection is changed.
       ctrl.changeCompareVersion = function() {
@@ -173,12 +182,12 @@ angular.module('oppia').component('historyTab', {
           ctrl.selectedVersionsArray[0], ctrl.selectedVersionsArray[1]);
 
         ctrl.compareVersionMetadata.earlierVersion =
-          ctrl.explorationVersionMetadata[earlierComparedVersion];
+          ctrl.totalExplorationVersionMetadata[earlierComparedVersion - 1];
         ctrl.compareVersionMetadata.laterVersion =
-          ctrl.explorationVersionMetadata[laterComparedVersion];
+          ctrl.totalExplorationVersionMetadata[laterComparedVersion - 1];
 
-        CompareVersionsService.getDiffGraphData(earlierComparedVersion,
-          laterComparedVersion).then(
+        CompareVersionsService.getDiffGraphData(
+          earlierComparedVersion, laterComparedVersion).then(
           function(response) {
             $log.info('Retrieved version comparison data');
             $log.info(response);
@@ -190,20 +199,6 @@ angular.module('oppia').component('historyTab', {
               ctrl.compareVersionMetadata.laterVersion);
           }
         );
-      };
-
-      // Check if valid versions were selected.
-      ctrl.areCompareVersionsSelected = function() {
-        return (
-          ctrl.compareVersions && ctrl.selectedVersionsArray.length === 2);
-      };
-
-      // Check if other checkboxes should be disabled once two are selected.
-      ctrl.isCheckboxDisabled = function(versionNumber) {
-        if (ctrl.selectedVersionsArray.length === 2) {
-          return (ctrl.selectedVersionsArray.indexOf(versionNumber) === -1);
-        }
-        return false;
       };
 
       // Downloads the zip file for an exploration.
@@ -240,25 +235,37 @@ angular.module('oppia').component('historyTab', {
         });
       };
 
-      ctrl.computeVersionsToDisplay = function() {
-        currentPage = ctrl.displayedCurrentPageNumber - 1;
-        var begin = (currentPage * ctrl.VERSIONS_PER_PAGE);
-        var end = Math.min(
-          begin + ctrl.VERSIONS_PER_PAGE, ctrl.versionCheckboxArray.length);
-        ctrl.versionNumbersToDisplay = [];
-        for (var i = begin; i < end; i++) {
-          ctrl.versionNumbersToDisplay.push(
-            ctrl.versionCheckboxArray[i].vnum);
-        }
+      ctrl.changeItemsPerPage = function() {
+        ctrl.explorationVersionMetadata =
+            ctrl.totalExplorationVersionMetadata.slice(
+              (ctrl.displayedCurrentPageNumber - 1) * ctrl.VERSIONS_PER_PAGE,
+              (ctrl.displayedCurrentPageNumber) * ctrl.VERSIONS_PER_PAGE);
+        ctrl.startingIndex = (
+          (ctrl.displayedCurrentPageNumber - 1) * ctrl.VERSIONS_PER_PAGE + 1);
+        ctrl.endIndex = (
+          (ctrl.displayedCurrentPageNumber) * ctrl.VERSIONS_PER_PAGE);
+
+        ctrl.versionNumbersToDisplay = ctrl.explorationVersionMetadata.length;
       };
+
+      ctrl.isEditable = function() {
+        return ctrl.EditabilityService.isEditable();
+      };
+
+      ctrl.resetGraph = function() {
+        ctrl.firstVersion = null;
+        ctrl.secondVersion = null;
+        ctrl.hideHistoryGraph = true;
+        ctrl.selectedVersionsArray = [];
+      };
+
+      ctrl.toggleHistoryOptions = function(index) {
+        ctrl.highlightedIndex = !ctrl.highlightedIndex ? index : null;
+      };
+
       ctrl.$onInit = function() {
         ctrl.directiveSubscriptions.add(
           RouterService.onRefreshVersionHistory.subscribe((data) => {
-            // Uncheck all checkboxes when page is refreshed.
-            angular.forEach(ctrl.versionCheckboxArray, function(
-                versionCheckbox) {
-              versionCheckbox.selected = false;
-            });
             if (
               data.forceRefresh || ctrl.explorationVersionMetadata === null) {
               ctrl.refreshVersionHistory();
@@ -267,6 +274,7 @@ angular.module('oppia').component('historyTab', {
         );
 
         ctrl.EditabilityService = EditabilityService;
+        ctrl.highlightedIndex = null;
         ctrl.explorationId = ExplorationDataService.explorationId;
         ctrl.explorationAllSnapshotsUrl =
             '/createhandler/snapshots/' + ctrl.explorationId;
@@ -290,10 +298,17 @@ angular.module('oppia').component('historyTab', {
         */
         ctrl.explorationVersionMetadata = null;
         ctrl.versionCheckboxArray = [];
+        ctrl.username = '';
+        ctrl.firstVersion = '';
+        ctrl.secondVersion = '';
 
         ctrl.displayedCurrentPageNumber = currentPage + 1;
         ctrl.versionNumbersToDisplay = [];
-        ctrl.VERSIONS_PER_PAGE = 30;
+        ctrl.VERSIONS_PER_PAGE = 10;
+        ctrl.startingIndex = 1;
+        ctrl.endIndex = 10;
+
+        ctrl.versionChoices = [10, 15, 20];
       };
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();

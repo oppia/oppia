@@ -79,6 +79,7 @@ export class StateEditorService {
   stateHintsEditorInitialised: boolean = false;
   stateSolutionEditorInitialised: boolean = false;
   stateEditorDirectiveInitialised: boolean = false;
+  currentRuleInputIsValid: boolean = false;
 
   updateStateContentEditorInitialised(): void {
     this.stateContentEditorInitialised = true;
@@ -102,6 +103,14 @@ export class StateEditorService {
 
   updateStateEditorDirectiveInitialised(): void {
     this.stateEditorDirectiveInitialised = true;
+  }
+
+  updateCurrentRuleInputIsValid(value: boolean): void {
+    this.currentRuleInputIsValid = value;
+  }
+
+  checkCurrentRuleInputIsValid(): boolean {
+    return this.currentRuleInputIsValid;
   }
 
   checkEventListenerRegistrationStatus(): boolean {
