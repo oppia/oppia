@@ -24,7 +24,6 @@ require(
   'background-banner.component.ts');
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 
-require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/CollectionPlaythroughObjectFactory.ts');
 require('domain/collection/guest-collection-progress.service.ts');
 require('domain/collection/read-only-collection-backend-api.service.ts');

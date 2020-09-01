@@ -21,11 +21,7 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require('components/state-editor/state-editor.directive.ts');
 
-require('domain/question/editable-question-backend-api.service.ts');
-require('domain/question/QuestionObjectFactory.ts');
 require('domain/question/question-update.service.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'solution-validity.service.ts');
@@ -34,7 +30,6 @@ require(
   'state-editor.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/alerts.service.ts');
 require('services/editability.service.ts');
 
 require('pages/interaction-specs.constants.ajs.ts');

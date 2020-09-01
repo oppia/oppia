@@ -27,7 +27,6 @@ require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
   'interactions/interaction-attributes-extractor.service.ts');
-require('services/contextual/window-dimensions.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 
 import { Subscription } from 'rxjs';

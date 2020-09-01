@@ -21,7 +21,6 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
-require('components/entity-creation-services/skill-creation.service.ts');
 require(
   'components/forms/custom-forms-directives/' +
     'edit-thumbnail-modal.controller.ts');
@@ -42,9 +41,7 @@ require(
 require(
   'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
 
-require('services/alerts.service.ts');
 require('services/context.service.ts');
-require('services/csrf-token.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/image-upload-helper.service.ts');
 require('services/page-title.service.ts');

@@ -21,18 +21,11 @@ require(
   'components/question-directives/questions-list/' +
   'questions-list.directive.ts');
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/question/editable-question-backend-api.service.ts');
-require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/MisconceptionObjectFactory.ts');
-require('domain/skill/skill-backend-api.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/alerts.service.ts');
 require('services/questions-list.service.ts');
-require('services/contextual/url.service.ts');
 
 import { Subscription } from 'rxjs';
 

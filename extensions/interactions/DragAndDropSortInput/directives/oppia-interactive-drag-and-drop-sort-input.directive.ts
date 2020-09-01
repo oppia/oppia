@@ -24,7 +24,6 @@ require(
 
 require(
   'interactions/interaction-attributes-extractor.service.ts');
-require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
   'DragAndDropSortInputRulesService',

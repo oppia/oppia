@@ -17,7 +17,6 @@
  */
 
 require('domain/skill/concept-card-backend-api.service.ts');
-require('domain/skill/ConceptCardObjectFactory.ts');
 require('directives/angular-html-bind.directive.ts');
 require('filters/format-rte-preview.filter.ts');
 

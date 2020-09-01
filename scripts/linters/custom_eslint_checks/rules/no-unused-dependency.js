@@ -22,12 +22,12 @@ const { param } = require('jquery');
 
 module.exports = {
   meta: {
-    type: 'layout',
+    type: 'problem',
     docs: {
       description: (
         'There should not be any unused dependency and all dependencies ' +
         'should be sorted.'),
-      category: 'Stylistic Issues',
+      category: 'Variables',
       recommended: true
     },
     fixable: null,
@@ -108,9 +108,9 @@ module.exports = {
         var tokensList = [];
         if (node.parent.key) {
           if (node.parent.key.name === 'controller' &&
-          node.parent.parent.type === 'ObjectExpression') {
+              node.parent.parent.type === 'ObjectExpression') {
             if (node.elements[node.elements.length - 1].type ===
-              'FunctionExpression') {
+                'FunctionExpression') {
               var params = node.elements[node.elements.length - 1].params;
               for (var index in params) {
                 var param = params[index];

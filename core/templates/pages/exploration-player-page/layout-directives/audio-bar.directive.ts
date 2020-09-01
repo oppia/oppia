@@ -19,7 +19,6 @@
 
 import { Subscription } from 'rxjs';
 
-require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/audio-preloader.service.ts');
 require(

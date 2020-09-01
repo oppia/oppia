@@ -21,7 +21,6 @@ require('directives/angular-html-bind.directive.ts');
 require(
   'pages/exploration-player-page/services/' +
   'audio-translation-manager.service.ts');
-require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');

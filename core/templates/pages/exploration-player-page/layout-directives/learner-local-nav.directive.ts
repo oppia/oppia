@@ -27,8 +27,6 @@ require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require(
-  'pages/exploration-player-page/services/exploration-player-state.service.ts');
-require(
   'pages/exploration-player-page/layout-directives/' +
   'feedback-popup.directive.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
@@ -37,7 +35,6 @@ require(
   'suggestion-modal-for-exploration-player.service.ts');
 require('services/alerts.service.ts');
 require('services/user.service.ts');
-require('services/stateful/focus-manager.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');

@@ -21,7 +21,6 @@ require(
     'conversation-skin.directive.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('pages/review-test-page/review-test-engine.service.ts');
-require('domain/state_card/StateCardObjectFactory.ts');
 require(
   'pages/exploration-player-page/learner-experience/tutor-card.directive.ts');
 require(
@@ -30,7 +29,6 @@ require(
 require('pages/review-test-page/review-test-page.constants.ajs.ts');
 require('pages/review-test-page/review-test-engine.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
-require('domain/question/QuestionObjectFactory.ts');
 require(
   'pages/exploration-player-page/services/question-player-engine.service.ts');
 require('services/contextual/url.service.ts');

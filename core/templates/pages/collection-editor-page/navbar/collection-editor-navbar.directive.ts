@@ -33,7 +33,6 @@ require(
 require('domain/collection/collection-rights-backend-api.service.ts');
 require('domain/collection/collection-update.service.ts');
 require('domain/collection/collection-validation.service.ts');
-require('domain/collection/editable-collection-backend-api.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(

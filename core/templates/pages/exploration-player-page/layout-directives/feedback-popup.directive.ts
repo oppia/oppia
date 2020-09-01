@@ -19,7 +19,6 @@
 require('filters/string-utility-filters/get-abbreviated-text.filter.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
-require('services/alerts.service.ts');
 require('services/user.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/stateful/background-mask.service.ts');

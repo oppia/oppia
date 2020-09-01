@@ -34,7 +34,6 @@ require(
 
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('pages/topic-editor-page/services/entity-creation.service.ts');
 require('services/context.service.ts');
 require('services/contextual/url.service.ts');
 require('services/page-title.service.ts');

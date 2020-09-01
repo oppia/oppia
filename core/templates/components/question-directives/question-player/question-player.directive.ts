@@ -115,12 +115,9 @@ require(
   'pages/exploration-player-page/layout-directives/' +
   'learner-view-info.directive.ts');
 
-require('domain/question/question-backend-api.service.ts');
 require('domain/skill/skill-mastery-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/alerts.service.ts');
 require('services/user.service.ts');
-require('services/contextual/url.service.ts');
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
 

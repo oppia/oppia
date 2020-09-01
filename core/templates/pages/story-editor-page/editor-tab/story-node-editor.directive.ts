@@ -26,7 +26,6 @@ require(
   'new-chapter-title-modal.controller.ts');
 require(
   'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
-require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-update.service.ts');
 require('domain/exploration/exploration-id-validation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
@@ -38,8 +37,6 @@ require(
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/page-title.service.ts');
-require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
-
 
 import { Subscription } from 'rxjs';
 

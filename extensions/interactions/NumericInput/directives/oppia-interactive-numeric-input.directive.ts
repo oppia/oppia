@@ -26,7 +26,6 @@ require(
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveNumericInput', [
   function() {
