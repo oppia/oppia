@@ -89,26 +89,14 @@ def _remove_metadata(library_name, version_string):
         version_string: str. Stringified version of the library to remove the
             metadata for.
     """
-    # The possible directory names that metadata folders/files can start with:
-    # follows these conventions:
-    # https://www.python.org/dev/peps/pep-0427/#file-contents
-    # https://www.python.org/dev/peps/pep-0376/#how-distributions-are-installed
-    possible_metadata_start_strings = [
-        '%s-%s' % (library_name, version_string),
-        # Some metadata folders replace the hyphens of the library name with
-        # underscores.
-        '%s-%s' % (library_name.replace('-', '_'), version_string)
-    ]
+    possible_file_names = _get_possible_metadata_directory_names(
+        library_name, version_string)
     for f in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
-        if any(
-            [f.startswith(start_string)
-            for start_string in possible_metadata_start_strings]):
+        if f.lower() in possible_file_names:
             path_to_delete = os.path.join(
                 common.THIRD_PARTY_PYTHON_LIBS_DIR, f)
             if os.path.isdir(path_to_delete):
                 shutil.rmtree(path_to_delete)
-            else:
-                os.remove(path_to_delete)
 
 
 def _rectify_third_party_directory(mismatches):
@@ -174,6 +162,7 @@ def _rectify_third_party_directory(mismatches):
                 python_utils.convert_to_bytes(requirements_version))
             _remove_metadata(
                 library_name, python_utils.convert_to_bytes(directory_version))
+
 
 def _install_library(library_name, version_string):
     """Installs a library with a certain version.
@@ -257,6 +246,73 @@ def get_mismatches():
     return mismatches
 
 
+def _get_possible_metadata_directory_names(library_name, version_string):
+    """Possible metadata directory names for python libraries installed using
+    pip (following the guidelines of PEP-427 and PEP-376).
+    This ensures that our _remove_metadata() function works as intended. More
+    details about the guidelines concerning the metadata folders can be found
+    here:
+    https://www.python.org/dev/peps/pep-0427/#file-contents
+    https://www.python.org/dev/peps/pep-0376/#how-distributions-are-installed.
+
+    Args:
+        library_name: str. Name of the library.
+        version_string: str. Stringified version of the library.
+
+    Returns:
+        set(str). Set containing the possible directory name strings of metadata
+        folders.
+    """
+    possible_names = {
+        '%s-%s.dist-info' % (library_name, version_string),
+        # Some metadata folders replace the hyphens of the library name with
+        # underscores.
+        '%s-%s.dist-info' % (
+            library_name.replace('-', '_'), version_string),
+        '%s-%s.egg-info' % (library_name, version_string),
+        # Some metadata folders replace the hyphens of the library name with
+        # underscores.
+        '%s-%s.egg-info' % (
+            library_name.replace('-', '_'), version_string),
+    }
+    return possible_names
+
+
+def _validate_metadata_directories():
+    """Validates that for each installed library in 'third_party/python_libs',
+    folder there exists corresponding metadata directories with the correct
+    naming conventions that follows the PEP-427 and PEP-376 python guidelines
+
+    Raises:
+        Exception: An installed library's metadata does not exist in a format
+            that follows the PEP-427 and PEP-376 python guidelines.
+    """
+    directory_contents = _get_third_party_python_libs_directory_contents()
+    names_in_directory = set(
+        [
+            name.lower()
+            for name in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR)
+        ])
+    for library_name, version_string in directory_contents.items():
+        # Possible names of the metadata directory installed.
+        possible_file_names = _get_possible_metadata_directory_names(
+            library_name, version_string)
+        has_name_in_directory = False
+        for name in possible_file_names:
+            if name in names_in_directory:
+                has_name_in_directory = True
+                break
+        if not has_name_in_directory:
+            raise Exception(
+                'The python library %s was installed without the correct \n'
+                'metadata folders which may indicate that the convention for \n'
+                'naming the metadata folders have changed. Please go to \n'
+                '`scripts/install_backend_python_libs` and modify our \n'
+                'assumptions in the _get_possible_metadata_directory_names() \n'
+                'function for what metadata directory names can be.' % (
+                    library_name))
+
+
 def main():
     """Compares the state of the current 'third_party/python_libs' directory to
     the libraries listed in the 'requirements.txt' file. If there are
@@ -295,6 +351,7 @@ def main():
         python_utils.PRINT(
             'All third-party Python libraries are already installed correctly.')
 
+    _validate_metadata_directories()
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when install_third_party_libs.py is used as a script.

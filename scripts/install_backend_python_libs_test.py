@@ -33,11 +33,14 @@ from scripts import install_backend_python_libs
 class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     """Tests for installing backend python libraries."""
 
-    THIRD_PARTY_DATA_FILE_PATH = os.path.join(
+    THIRD_PARTY_DATA_DIRECTORY_FILE_PATH = os.path.join(
         common.CURR_DIR, 'core', 'tests', 'data', 'third_party')
 
+    THIRD_PARTY_PYTHON_LIBS_TEST_DIR = os.path.join(
+        THIRD_PARTY_DATA_DIRECTORY_FILE_PATH, 'python_libs'
+    )
     TEST_REQUIREMENTS_TXT_FILE_PATH = os.path.join(
-        THIRD_PARTY_DATA_FILE_PATH, 'requirements_test.txt')
+        THIRD_PARTY_DATA_DIRECTORY_FILE_PATH, 'requirements_test.txt')
 
     ThIRD_PARTY_DATA_FILE_PATH
 
@@ -80,6 +83,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return Ret()
         self.swap_check_call = self.swap(
             subprocess, 'check_call', mock_check_call)
+        self.swap_backend_python_libs_install_directory = self.swap(
+            common, 'THIRD_PARTY_PYTHON_LIBS_DIR',
+            self.THIRD_PARTY_PYTHON_LIBS_TEST_DIR)
 
     def test_multiple_discrepancies_returns_correct_mismatches(self):
         swap_requirements = self.swap(
