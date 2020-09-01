@@ -484,6 +484,9 @@ def main(args=None):
             'Your repo is in a dirty state which prevents the linting from'
             ' working.\nStash your changes or commit them.\n')
         sys.exit(1)
+
+    check_for_backend_python_library_inconsistencies()
+
     for branch, (modified_files, files_to_lint) in collected_files.items():
         with ChangedBranch(branch):
             if not modified_files and not files_to_lint:
@@ -530,8 +533,6 @@ def main(args=None):
                 python_utils.PRINT(
                     'Push aborted due to failing e2e test configuration check.')
                 sys.exit(1)
-
-    check_for_backend_python_library_inconsistencies()
 
     return
 
