@@ -32,7 +32,8 @@ angular.module('oppia').component('searchResults', {
   controller: [
     '$scope', '$q', '$timeout', '$window', 'LoaderService', 'SearchService',
     'SiteAnalyticsService', 'UrlInterpolationService', 'UserService',
-    function($scope, $q, $timeout, $window, LoaderService, SearchService,
+    function(
+        $scope, $q, $timeout, $window, LoaderService, SearchService,
         SiteAnalyticsService, UrlInterpolationService, UserService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();

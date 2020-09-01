@@ -104,7 +104,8 @@ export class WrittenTranslations {
     delete this.translationsMapping[contentId];
   }
 
-  addWrittenTranslation(contentId: string, languageCode: string,
+  addWrittenTranslation(
+      contentId: string, languageCode: string,
       dataFormat: WrittenTranslationDataFormat, translation: string): void {
     var writtenTranslations = this.translationsMapping[contentId];
     if (writtenTranslations.hasOwnProperty(languageCode)) {

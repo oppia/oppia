@@ -63,5 +63,22 @@ export const ObjectsDomainConstants = {
       front_units: [],
       base_unit: '0.01 rupee'
     }
+  },
+
+  RATIO_PARSING_ERRORS: {
+    INVALID_COLONS:
+      'Your answer has two colons (:) next to each other.',
+    INVALID_CHARS:
+      'Please write a ratio that consists of digits separated by colons' +
+      '(e.g. 1:2 or 1:2:3).',
+    INVALID_FORMAT:
+      'Please enter a valid ratio (e.g. 1:2 or 1:2:3).',
+    NON_INTEGER_ELEMENTS:
+      'For this question, each element in your ratio should be a whole ' +
+      'number (not a fraction or a decimal).',
+    INCLUDES_ZERO:
+      'Ratios cannot have 0 as a element.',
+    EMPTY_STRING:
+      'Please enter a valid ratio (e.g. 1:2 or 1:2:3).',
   }
 };

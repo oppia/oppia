@@ -34,8 +34,8 @@ describe('Exploration Metadata Modal Controller', function() {
   var ExplorationTitleService = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('StateEditorRefreshService',
-      TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('ExplorationDataService', {
       autosaveChangeList: function() {}
     });
@@ -71,18 +71,20 @@ describe('Exploration Metadata Modal Controller', function() {
       });
     }));
 
-    it('should evaluate scope variables values correctly', function() {
-      var TOTAL_CATEGORIES = 42;
-      expect($scope.objectiveHasBeenPreviouslyEdited).toBe(false);
-      expect($scope.requireTitleToBeSpecified).toBe(true);
-      expect($scope.requireObjectiveToBeSpecified).toBe(true);
-      expect($scope.requireCategoryToBeSpecified).toBe(true);
-      expect($scope.askForLanguageCheck).toBe(true);
-      expect($scope.askForTags).toBe(true);
-      expect($scope.CATEGORY_LIST_FOR_SELECT2.length).toBe(TOTAL_CATEGORIES);
-    });
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        var TOTAL_CATEGORIES = 42;
+        expect($scope.objectiveHasBeenPreviouslyEdited).toBe(false);
+        expect($scope.requireTitleToBeSpecified).toBe(true);
+        expect($scope.requireObjectiveToBeSpecified).toBe(true);
+        expect($scope.requireCategoryToBeSpecified).toBe(true);
+        expect($scope.askForLanguageCheck).toBe(true);
+        expect($scope.askForTags).toBe(true);
+        expect($scope.CATEGORY_LIST_FOR_SELECT2.length).toBe(TOTAL_CATEGORIES);
+      });
 
-    it('should save all exploration metadata values', function() {
+    it('should save all exploration metadata values when it contains title,' +
+      ' category and objective', function() {
       ExplorationCategoryService.displayed = 'New Category';
       ExplorationLanguageCodeService.displayed = 'es';
       ExplorationObjectiveService.displayed = (

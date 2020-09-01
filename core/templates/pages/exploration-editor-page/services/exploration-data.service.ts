@@ -176,7 +176,8 @@ angular.module('oppia').factory('ExplorationDataService', [
        */
       save: function(
           changeList, commitMessage, successCallback, errorCallback) {
-        EditableExplorationBackendApiService.updateExploration(explorationId,
+        EditableExplorationBackendApiService.updateExploration(
+          explorationId,
           explorationData.data ? explorationData.data.version : null,
           commitMessage, changeList).then(
           function(response) {

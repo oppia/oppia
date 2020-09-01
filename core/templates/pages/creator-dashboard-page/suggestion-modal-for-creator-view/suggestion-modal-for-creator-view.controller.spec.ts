@@ -60,29 +60,30 @@ describe('Suggestion Modal For Creator View Controller', function() {
         });
     }));
 
-    it('should evaluate scope variable values correctly', function() {
-      expect($scope.isNotHandled).toBe(false);
-      expect($scope.canReject).toBe(false);
-      expect($scope.canAccept).toBe(false);
-      expect($scope.errorMessage).toBe(
-        'This suggestion has already been accepted.');
-      expect($scope.isSuggestionRejected).toBe(false);
-      expect($scope.oldContent).toEqual({
-        html: 'Old content'
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.isNotHandled).toBe(false);
+        expect($scope.canReject).toBe(false);
+        expect($scope.canAccept).toBe(false);
+        expect($scope.errorMessage).toBe(
+          'This suggestion has already been accepted.');
+        expect($scope.isSuggestionRejected).toBe(false);
+        expect($scope.oldContent).toEqual({
+          html: 'Old content'
+        });
+        expect($scope.newContent).toEqual({
+          html: 'New content'
+        });
+        expect($scope.stateName).toBe('Init');
+        expect($scope.suggestionType).toBe('accept');
+        expect($scope.commitMessage).toBe('Description');
+        expect($scope.reviewMessage).toBe(null);
+        expect($scope.summaryMessage).toBe(null);
+        expect($scope.canReviewActiveThread).toBe(true);
+        expect($scope.suggestionData).toEqual(
+          {newSuggestionHtml: 'New content'});
+        expect($scope.suggestionEditorIsShown).toBe(false);
       });
-      expect($scope.newContent).toEqual({
-        html: 'New content'
-      });
-      expect($scope.stateName).toBe('Init');
-      expect($scope.suggestionType).toBe('accept');
-      expect($scope.commitMessage).toBe('Description');
-      expect($scope.reviewMessage).toBe(null);
-      expect($scope.summaryMessage).toBe(null);
-      expect($scope.canReviewActiveThread).toBe(true);
-      expect($scope.suggestionData).toEqual(
-        {newSuggestionHtml: 'New content'});
-      expect($scope.suggestionEditorIsShown).toBe(false);
-    });
 
     it('should accept suggestion', function() {
       $scope.acceptSuggestion();
@@ -172,29 +173,30 @@ describe('Suggestion Modal For Creator View Controller', function() {
         });
     }));
 
-    it('should evaluate scope variable values correctly', function() {
-      expect($scope.isNotHandled).toBe(false);
-      expect($scope.canReject).toBe(false);
-      expect($scope.canAccept).toBe(false);
-      expect($scope.errorMessage).toBe(
-        'This suggestion has already been rejected.');
-      expect($scope.isSuggestionRejected).toBe(true);
-      expect($scope.oldContent).toEqual({
-        html: 'Old content'
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.isNotHandled).toBe(false);
+        expect($scope.canReject).toBe(false);
+        expect($scope.canAccept).toBe(false);
+        expect($scope.errorMessage).toBe(
+          'This suggestion has already been rejected.');
+        expect($scope.isSuggestionRejected).toBe(true);
+        expect($scope.oldContent).toEqual({
+          html: 'Old content'
+        });
+        expect($scope.newContent).toEqual({
+          html: 'New content'
+        });
+        expect($scope.stateName).toBe('Init');
+        expect($scope.suggestionType).toBe('reject');
+        expect($scope.commitMessage).toBe('Description');
+        expect($scope.reviewMessage).toBe(null);
+        expect($scope.summaryMessage).toBe(null);
+        expect($scope.canReviewActiveThread).toBe(true);
+        expect($scope.suggestionData).toEqual(
+          {newSuggestionHtml: 'New content'});
+        expect($scope.suggestionEditorIsShown).toBe(false);
       });
-      expect($scope.newContent).toEqual({
-        html: 'New content'
-      });
-      expect($scope.stateName).toBe('Init');
-      expect($scope.suggestionType).toBe('reject');
-      expect($scope.commitMessage).toBe('Description');
-      expect($scope.reviewMessage).toBe(null);
-      expect($scope.summaryMessage).toBe(null);
-      expect($scope.canReviewActiveThread).toBe(true);
-      expect($scope.suggestionData).toEqual(
-        {newSuggestionHtml: 'New content'});
-      expect($scope.suggestionEditorIsShown).toBe(false);
-    });
 
     it('should toggle edit mode suggestion', function() {
       expect($scope.suggestionEditorIsShown).toBe(false);
@@ -257,28 +259,29 @@ describe('Suggestion Modal For Creator View Controller', function() {
         });
     }));
 
-    it('should evaluate scope variable values correctly', function() {
-      expect($scope.isNotHandled).toBe(true);
-      expect($scope.canReject).toBe(true);
-      expect($scope.canAccept).toBe(true);
-      expect($scope.errorMessage).toBe('');
-      expect($scope.isSuggestionRejected).toBe(undefined);
-      expect($scope.oldContent).toEqual({
-        html: 'Same content'
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.isNotHandled).toBe(true);
+        expect($scope.canReject).toBe(true);
+        expect($scope.canAccept).toBe(true);
+        expect($scope.errorMessage).toBe('');
+        expect($scope.isSuggestionRejected).toBe(undefined);
+        expect($scope.oldContent).toEqual({
+          html: 'Same content'
+        });
+        expect($scope.oldContent).toEqual({
+          html: 'Same content'
+        });
+        expect($scope.stateName).toBe('Init');
+        expect($scope.suggestionType).toBe('accept');
+        expect($scope.commitMessage).toBe('Description');
+        expect($scope.reviewMessage).toBe(null);
+        expect($scope.summaryMessage).toBe(null);
+        expect($scope.canReviewActiveThread).toBe(true);
+        expect($scope.suggestionData).toEqual(
+          {newSuggestionHtml: 'Same content'});
+        expect($scope.suggestionEditorIsShown).toBe(false);
       });
-      expect($scope.oldContent).toEqual({
-        html: 'Same content'
-      });
-      expect($scope.stateName).toBe('Init');
-      expect($scope.suggestionType).toBe('accept');
-      expect($scope.commitMessage).toBe('Description');
-      expect($scope.reviewMessage).toBe(null);
-      expect($scope.summaryMessage).toBe(null);
-      expect($scope.canReviewActiveThread).toBe(true);
-      expect($scope.suggestionData).toEqual(
-        {newSuggestionHtml: 'Same content'});
-      expect($scope.suggestionEditorIsShown).toBe(false);
-    });
 
     it('should evalute if edit button is showing', function() {
       expect($scope.isEditButtonShown()).toBe(false);

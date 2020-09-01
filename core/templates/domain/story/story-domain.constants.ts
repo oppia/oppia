@@ -45,6 +45,7 @@ export const StoryDomainConstants = {
   STORY_PROPERTY_NOTES: 'notes',
   STORY_PROPERTY_LANGUAGE_CODE: 'language_code',
   STORY_PROPERTY_URL_FRAGMENT: 'url_fragment',
+  STORY_PROPERTY_META_TAG_CONTENT: 'meta_tag_content',
 
   INITIAL_NODE_ID: 'initial_node_id',
   NODE: 'node',

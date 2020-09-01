@@ -55,6 +55,9 @@ export const TopicDomainConstants = {
   TOPIC_PROPERTY_DESCRIPTION: 'description',
   TOPIC_PROPERTY_LANGUAGE_CODE: 'language_code',
   TOPIC_PROPERTY_URL_FRAGMENT: 'url_fragment',
+  TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED: (
+    'practice_tab_is_displayed'),
+  TOPIC_PROPERTY_META_TAG_CONTENT: 'meta_tag_content',
 
   SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME: 'thumbnail_filename',
   SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR: 'thumbnail_bg_color',

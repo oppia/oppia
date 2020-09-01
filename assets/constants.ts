@@ -5144,7 +5144,8 @@ export = {
       "NumericExpressionInput",
       "AlgebraicExpressionInput",
       "MathEquationInput",
-      "NumberWithUnits"
+      "NumberWithUnits",
+      "RatioExpressionInput"
     ]
   }, {
     "name": "Programming",
@@ -5263,6 +5264,9 @@ export = {
   // in /learn/math/fractions/revision/place-values, 'place-values' is the
   // 'subtopic URL fragment'.
   "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
+  // The recommended length for meta tag contents. Search engines will truncate
+  // results greater than this limit.
+  "MAX_CHARS_IN_META_TAG_CONTENT": 160,
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
