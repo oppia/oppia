@@ -152,7 +152,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       16: {
-        text: '    rule_specs: {}',
+        text: '    rule_specs:',
         highlighted: true
       },
       17: {
