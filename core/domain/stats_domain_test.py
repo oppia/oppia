@@ -309,6 +309,11 @@ class StateStatsTests(test_utils.GenericTestBase):
 
         self.assertNotEqual(state_stats, different_stats)
 
+    def test_hash(self):
+        state_stats = stats_domain.StateStats.create_default()
+        with self.assertRaisesRegexp(TypeError, 'unhashable'):
+            unused_hash = hash(state_stats)
+
     def test_aggregate_from(self):
         state_stats = stats_domain.StateStats(
             100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100)

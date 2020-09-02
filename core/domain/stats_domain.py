@@ -430,7 +430,9 @@ class StateStats(python_utils.OBJECT):
             )
         return NotImplemented
 
-    ___hash__ = None # Not hashable because it is mutable-by-default.
+    def __hash__(self):
+        """Disallow hashing StateStats since they are mutable by design."""
+        raise TypeError('%s is unhashable' % self.__class__.__name__)
 
     @classmethod
     def from_dict(cls, state_stats_dict):
