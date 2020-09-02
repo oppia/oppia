@@ -13,23 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint check to ensure that there is a break after parenthesis
- * in case of multiline hanging indentation.
+ * @fileoverview Lint check to ensure that there are no multiline eslint
+ * disable statements.
  */
 
 'use strict';
 
 module.exports = {
   meta: {
-    type: 'layout',
+    type: 'suggestion',
     docs: {
       description: (
-        'Lint check to ensure that there is a break after parenthesis in case' +
-        ' of multiline hanging indentation'),
+        'Lint check to ensure that there are no multiline eslint disable ' +
+        'statements'),
       category: 'Stylistic Issues',
       recommended: true
     },
-    fixable: null,
+    fixable: 'code',
     schema: [],
     messages: {
       noMultilineDisable: 'Do not use disable statement for multilines'
@@ -40,10 +40,10 @@ module.exports = {
     const sourceCode = context.getSourceCode();
     const lines = sourceCode.lines;
 
-    var processComment = function(comment) {
+    var _checkNotMultilineDisableComment = function(comment) {
       if (comment.value.includes('eslint-disable ')) {
         const line = lines[comment.loc.start.line - 1].trim();
-        if (line.startsWith('/*') || line.startsWith(line.startsWith('//'))) {
+        if (line.startsWith('/*') || line.startsWith('//')) {
           context.report({
             comment,
             loc: comment.loc,
@@ -57,7 +57,8 @@ module.exports = {
       Program() {
         const comments = sourceCode.getAllComments();
         comments.filter(
-          token => token.type !== 'Shebang').forEach(processComment);
+          token => token.type !== 'Shebang').forEach(
+          _checkNotMultilineDisableComment);
       }
     };
   }
