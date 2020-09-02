@@ -33,6 +33,7 @@ from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 from googleapiclient.discovery import build as gacbuild
+from google.oauth2 import service_account
 
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
@@ -539,15 +540,10 @@ def cleanup_portserver(portserver_process):
         portserver_process.kill()
 
 
-def get_flaky_tests_data_from_sheets():
-    api_key = os.getenv('GOOGLE_SHEETS_API_KEY')
+def get_flaky_tests_data_from_sheets(sheet):
     sheet_id = os.getenv('FLAKY_E2E_TEST_SHEET_ID')
     flaky_tests_list = []
-    if api_key is not None and sheet_id is not None:
-
-        service = gacbuild('sheets', 'v4', developerKey=api_key)
-        sheet = service.spreadsheets()
-        # Get the range of cells usable from the sheet.
+    if sheet_id is not None:
         result = sheet.values().get(spreadsheetId=sheet_id,
                                     range='Log!A5:T1000').execute()
         values = result.get('values', [])
@@ -563,12 +559,9 @@ def get_flaky_tests_data_from_sheets():
     return flaky_tests_list
 
 
-def update_flaky_tests_count(row_index, current_count):
-    api_key = os.getenv('GOOGLE_SHEETS_API_KEY')
+def update_flaky_tests_count(sheet, row_index, current_count):
     sheet_id = os.getenv('FLAKY_E2E_TEST_SHEET_ID')
-    if api_key is not None and sheet_id is not None:
-        service = gacbuild('sheets', 'v4', developerKey=api_key)
-        sheet = service.spreadsheets()
+    if sheet_id is not None:
         values = [
             [
                 current_count + 1
@@ -580,12 +573,9 @@ def update_flaky_tests_count(row_index, current_count):
         }
 
         result = sheet.values().update(spreadsheetId=sheet_id,
-                                       range='Log!F' + str(row_index + 1),
+                                       range='Log!F' + str(row_index + 5),
                                        valueInputOption='USER_ENTERED',
                                        body=body).execute()
-
-        for row in values:
-            flaky_tests_list.append((row[0], row[1], row[2]))
 
 
 def main(args=None):
@@ -632,8 +622,6 @@ def main(args=None):
     commands.extend(get_e2e_test_parameters(
         parsed_args.sharding_instances, parsed_args.suite, dev_mode))
 
-    flaky_tests_list = get_flaky_tests_data_from_sheets()
-
     p = subprocess.Popen(commands, stdout=subprocess.PIPE)
     output_lines = []
     while True:
@@ -643,7 +631,18 @@ def main(args=None):
         sys.stdout.write(nextline)
         sys.stdout.flush()
         output_lines.append(nextline.strip())
-        
+
+    flaky_tests_list = []
+    auth_file_url = os.getenv('GOOGLE_SHEETS_AUTH_FILE_URL')
+    if auth_file_url is not None:
+        subprocess.Popen(['wget', auth_file_url, '-O', 'auth.json']).wait()
+        SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+        creds = service_account.Credentials.from_service_account_file('auth.json', scopes=SCOPES)
+        sheet = gacbuild('sheets', 'v4', credentials=creds).spreadsheets()
+
+        flaky_tests_list = get_flaky_tests_data_from_sheets(sheet)
+
+    
     if len(flaky_tests_list) > 0 and p.returncode != 0:
         for i, line in enumerate(output_lines):
             if line == '*                    Failures                    *':
@@ -655,12 +654,12 @@ def main(args=None):
                     flaky_suite_name = row[0].strip().lower()
                     flaky_error_message = row[1].strip().lower()
                     if suite == flaky_suite_name or flaky_error_message == failure_log:
-                        update_flaky_tests_count(index, row[2])
+                        update_flaky_tests_count(sheet, index, row[2])
                         try:
                             atexit._run_exitfuncs()
                         finally:
                             return 'flake'
-
+        os.remove('auth.json')
     sys.exit(p.returncode)
 
 
