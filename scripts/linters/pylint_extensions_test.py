@@ -2390,7 +2390,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
             msg_id='no-space-at-beginning',
             line=1)
 
-        with self.checker_test_object.assertAddsMessages(message, message):
+        with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
     def test_no_capital_letter_at_beginning(self):

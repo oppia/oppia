@@ -582,7 +582,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
     not_needed_param_in_docstring = {'self', 'cls'}
     docstring_sections = {'Raises:', 'Returns:', 'Yields:'}
 
-    # Docstring section headers split up into arguments, returns, yields and
+    # Docstring section headers split up into arguments, returns, yieldsg
     # and raises sections signifying that we are currently parsing the
     # corresponding section of that docstring.
     DOCSTRING_SECTION_RETURNS = 'returns'
@@ -1663,23 +1663,15 @@ class SingleLineCommentChecker(checkers.BaseChecker):
     ),)
 
     def _check_space_at_beginning_of_comments(self, line, line_num):
-        """Checks if the comment starts with a space at the beginnig of the
-        comment and returns False if there is no space at beginning else
-        returns True.
+        """Checks if the comment starts with a space.
 
         Args:
             line: str. The current line of comment.
             line_num: int. Line number of the current comment.
-
-        Returns:
-            bool. False if there is no space at the beginning of the comment
-            else returns True.
         """
         if re.search(br'^#[^\s].*$', line) and not line.startswith(b'#!'):
             self.add_message(
                 'no-space-at-beginning', line=line_num)
-            return False
-        return True
 
     def _check_comment_starts_with_capital_letter(self, line, line_num):
         """Checks if the comment starts with a capital letter.
@@ -1693,7 +1685,10 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             line_num: int. Line number of the current comment.
         """
         # Check if variable name is used.
-        starts_with_underscore = '_' in line.split()[1]
+        if line[1:].startswith(b' '):
+            starts_with_underscore = '_' in line.split()[1]
+        else:
+            starts_with_underscore = '_' in line.split()[0]
 
         # Check if allowed prefix is used.
         allowed_prefix_is_present = any(
@@ -1702,7 +1697,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
 
         # Check if comment contains any excluded phrase.
         excluded_phrase_is_present = any(
-            word in line.split()[1] for word in EXCLUDED_PHRASES)
+            line[1:].strip().startswith(word) for word in EXCLUDED_PHRASES)
         if (re.search(br'^# [a-z].*', line) and not (
                 excluded_phrase_is_present or
                 starts_with_underscore or allowed_prefix_is_present)):
@@ -1743,34 +1738,21 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             if token_type == tokenize.COMMENT and line.strip().startswith('#'):
                 line = line.strip()
 
+                self._check_space_at_beginning_of_comments(line, line_num)
+
                 if prev_line_num + 1 == line_num:
-                    comments[comments_index].append((line_num, line))
+                    comments[comments_index].append((line, line_num))
                 else:
-                    comments.append([(line_num, line)])
+                    comments.append([(line, line_num)])
                     comments_index += 1
                 prev_line_num = line_num
 
         for comment in comments:
-            space_at_beginning_of_first_comment = True
-            space_at_beginning_of_last_comment = True
-            first_comment_line_num, first_comment = comment[0]
-            last_comment_line_num, last_comment = comment[-1]
-            space_at_beginning_of_first_comment = (
-                self._check_space_at_beginning_of_comments(
-                    first_comment, first_comment_line_num))
-            space_at_beginning_of_last_comment = (
-                self._check_space_at_beginning_of_comments(
-                    last_comment, last_comment_line_num))
-            if space_at_beginning_of_first_comment and len(first_comment) > 1:
-                self._check_comment_starts_with_capital_letter(
-                    first_comment, first_comment_line_num)
-            if space_at_beginning_of_last_comment and len(last_comment) > 1:
-                self._check_punctuation(
-                    last_comment, last_comment_line_num)
-            if len(comment) <= 2:
-                continue
-            for line_num, line in comment[1:-1]:
-                _ = self._check_space_at_beginning_of_comments(line, line_num)
+            first_comment, first_comment_line_num = comment[0]
+            last_comment, last_comment_line_num = comment[-1]
+            self._check_comment_starts_with_capital_letter(
+                first_comment, first_comment_line_num)
+            self._check_punctuation(last_comment, last_comment_line_num)
 
 
 class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
