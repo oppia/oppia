@@ -263,6 +263,10 @@ angular.module('oppia').component('historyTab', {
         ctrl.highlightedIndex = !ctrl.highlightedIndex ? index : null;
       };
 
+      ctrl.reverseDateOrder = function() {
+        ctrl.explorationVersionMetadata.reverse();
+      };
+
       ctrl.$onInit = function() {
         ctrl.directiveSubscriptions.add(
           RouterService.onRefreshVersionHistory.subscribe((data) => {
