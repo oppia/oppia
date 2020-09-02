@@ -32,6 +32,7 @@ from scripts import build
 from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
+from googleapiclient.discovery import build as gacbuild
 
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
@@ -538,6 +539,55 @@ def cleanup_portserver(portserver_process):
         portserver_process.kill()
 
 
+def get_flaky_tests_data_from_sheets():
+    api_key = os.getenv('GOOGLE_SHEETS_API_KEY')
+    sheet_id = os.getenv('FLAKY_E2E_TEST_SHEET_ID')
+    flaky_tests_list = []
+    if api_key is not None and sheet_id is not None:
+
+        service = gacbuild('sheets', 'v4', developerKey=api_key)
+        sheet = service.spreadsheets()
+        # Get the range of cells usable from the sheet.
+        result = sheet.values().get(spreadsheetId=sheet_id,
+                                    range='Log!A5:T1000').execute()
+        values = result.get('values', [])
+
+        for row in values:
+            if len(row) < 3:
+                continue
+            if len(row) >= 6 and row[5] != '':
+                flaky_tests_list.append((row[1], row[2], int(row[5])))
+            else:
+                flaky_tests_list.append((row[1], row[2], 0))
+    
+    return flaky_tests_list
+
+
+def update_flaky_tests_count(row_index, current_count):
+    api_key = os.getenv('GOOGLE_SHEETS_API_KEY')
+    sheet_id = os.getenv('FLAKY_E2E_TEST_SHEET_ID')
+    if api_key is not None and sheet_id is not None:
+        service = gacbuild('sheets', 'v4', developerKey=api_key)
+        sheet = service.spreadsheets()
+        values = [
+            [
+                current_count + 1
+            ]
+        ]
+
+        body = {
+            'values' : values
+        }
+
+        result = sheet.values().update(spreadsheetId=sheet_id,
+                                       range='Log!F' + str(row_index + 1),
+                                       valueInputOption='USER_ENTERED',
+                                       body=body).execute()
+
+        for row in values:
+            flaky_tests_list.append((row[0], row[1], row[2]))
+
+
 def main(args=None):
     """Run the scripts to start end-to-end tests."""
 
@@ -582,10 +632,39 @@ def main(args=None):
     commands.extend(get_e2e_test_parameters(
         parsed_args.sharding_instances, parsed_args.suite, dev_mode))
 
-    p = subprocess.Popen(commands)
-    p.communicate()
+    flaky_tests_list = get_flaky_tests_data_from_sheets()
+
+    p = subprocess.Popen(commands, stdout=subprocess.PIPE)
+    output_lines = []
+    while True:
+        nextline = p.stdout.readline()
+        if len(nextline) == 0 and p.poll() is not None:
+            break
+        sys.stdout.write(nextline)
+        sys.stdout.flush()
+        output_lines.append(nextline.strip())
+        
+    if len(flaky_tests_list) > 0 and p.returncode != 0:
+        for i, line in enumerate(output_lines):
+            if line == '*                    Failures                    *':
+                suite = output_lines[i+3][3:].strip().lower()
+                ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+                failure_log = ansi_escape.sub('', output_lines[i+4])
+                failure_log = failure_log[2:].strip().lower()
+                for index, row in enumerate(flaky_tests_list):
+                    flaky_suite_name = row[0].strip().lower()
+                    flaky_error_message = row[1].strip().lower()
+                    if suite == flaky_suite_name or flaky_error_message == failure_log:
+                        update_flaky_tests_count(index, row[2])
+                        try:
+                            atexit._run_exitfuncs()
+                        finally:
+                            return 'flake'
+
     sys.exit(p.returncode)
 
 
 if __name__ == '__main__':  # pragma: no cover
-    main()
+    flake_state = main()
+    if flake_state == 'flake':
+        main()
