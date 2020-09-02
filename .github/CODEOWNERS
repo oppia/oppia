@@ -39,6 +39,7 @@
 /core/templates/domain/ @kevintab95
 /core/templates/pages/ @seanlip
 /core/templates/services/ @nithusha21
+# TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /extensions/ @seanlip
 /scripts/ @ankita240796
 
@@ -66,6 +67,7 @@
 /core/templates/services/UpgradedServices.ts @bansalnitish @srijanreddy98
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
+# TODO(#10538): Add @vojtechjelinek as an owner after 2020-09-06.
 /tsconfig-strict.json @nishantwrp
 
 
@@ -173,6 +175,7 @@
 # Exploration project.
 /core/controllers/editor*.py @aks681
 /core/controllers/reader*.py @aks681
+# TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /core/controllers/resources*.py @seanlip
 /core/domain/exp*.py @aks681
 /core/domain/fs*.py @aks681
@@ -180,6 +183,7 @@
 /core/domain/rating_services*.py @aks681
 /core/domain/state_domain*.py @aks681
 /core/domain/summary_services*.py @aks681
+# TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /core/domain/value_generators_domain*.py @seanlip
 /core/storage/exploration/ @aks681
 /core/templates/components/entity-creation-services/exploration-creation.service*.ts @kevintab95
@@ -291,7 +295,9 @@
 /core/templates/services/math-interactions.service.ts @aks681
 /extensions/domain*.py @brianrodri
 /extensions/interactions/ @aks681 @seanlip
+# TODO(#10538): Add @vojtechjelinek as an owner after 2020-09-06.
 /extensions/objects/ @aks681
+# TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /extensions/value_generators/ @seanlip
 /extensions/__init__.py @aks681
 
@@ -445,6 +451,7 @@
 /core/templates/app.constants.ajs.ts @ankita240796
 /core/templates/app-type.constants.ts @nishantwrp @ankita240796
 /core/templates/combined-tests.spec.ts @ankita240796
+# TODO(#10538): Add @vojtechjelinek as an owner after 2020-09-06.
 /core/templates/pages/interaction-specs.constants.ajs.ts @jameesjohn
 /core/templates/pages/interaction-specs.constants.ts @bansalnitish
 /core/templates/I18nFooter.ts @nithusha21
@@ -501,9 +508,13 @@
 /core/templates/services/rte-helper.service*.ts @aks681
 /core/templates/services/rte-helper-modal.controller*.ts @aks681
 /core/domain/image_validation_services*.py @DubeySandeep
+# TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /core/domain/rte_component_registry*.py @seanlip
+# TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /extensions/ckeditor_plugins/ @seanlip
+# TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /extensions/rich_text_components/ @seanlip
+# TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /assets/rich_text_components_definitions.ts @seanlip
 
 
@@ -528,6 +539,8 @@
 /core/templates/pages/exploration-editor-page/feedback-tab/ @nithusha21
 
 
+# TODO(#10538): Add @vojtechjelinek as an owner for all simple pages
+# after 2020-09-06.
 # Simple pages.
 /core/controllers/pages*.py @jameesjohn
 /core/controllers/custom_landing_pages*.py @jameesjohn
@@ -546,6 +559,8 @@
 /core/templates/pages/thanks-page/ @jameesjohn
 
 
+# TODO(#10538): Add @vojtechjelinek as an owner or replace @seanlip for all
+# Speed Improvement team files after 2020-09-06.
 # Speed Improvement team.
 /app_dev.yaml @seanlip
 /core/templates/google-analytics.initializer.ts @jameesjohn
@@ -568,19 +583,23 @@
 /typings @ankita240796 @nishantwrp
 /typings/tests/ @shavavo
 
-
+# TODO(#10538): Add @vojtechjelinek as an owner for all User Data Takeout files
+# after 2020-09-06.
 # User Data Takeout.
 /core/domain/takeout_*.py @seanlip
 /core/domain/wipeout_*.py @seanlip
 
-
+# TODO(#10538): Revert ownership to @vojtechjelinek for all the User’s profile
+# page files after 2020-09-06.
 # User’s profile page.
 /core/controllers/profile*.py @seanlip
 /core/templates/domain/user/ @seanlip
 /core/templates/pages/profile-page/ @seanlip
 /core/templates/services/user.service*.ts @seanlip
 
+# TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /core/templates/services/services.constants.ajs.ts @seanlip
+# TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /core/templates/services/services.constants.ts @seanlip
 
 
@@ -609,6 +628,7 @@
 /core/tests/ @nithusha21
 /assets/ @nithusha21
 /data/ @nithusha21
+# TODO(#10538): Add @vojtechjelinek as an owner after 2020-09-06.
 /core/templates/karma.module.ts @nishantwrp
 /core/tests/protractor_utils/ @U8NWXD @kevintab95
 /core/tests/protractor_desktop/ @U8NWXD @kevintab95
@@ -639,9 +659,13 @@
 /core/storage/ @seanlip
 /core/domain/user*.py @seanlip
 /export/ @seanlip
+# TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /manifest.json @seanlip
+# TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /package.json @seanlip
+# TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /yarn.lock @seanlip
+# TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /scripts/install_third_party_libs.py @seanlip
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
