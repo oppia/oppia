@@ -84,7 +84,7 @@ SCORE_CATEGORY_DELIMITER = '.'
 
 ALLOWED_QUERY_FIELDS = ['suggestion_type', 'target_type', 'target_id',
                         'status', 'author_id', 'final_reviewer_id',
-                        'score_category']
+                        'score_category', 'language_code']
 
 # Threshold number of days after which suggestion will be accepted.
 THRESHOLD_DAYS_BEFORE_ACCEPT = 7
@@ -153,7 +153,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # separated by a ., the first will be a value from SCORE_TYPE_CHOICES and
     # the second will be the subcategory of the suggestion.
     score_category = ndb.StringProperty(required=True, indexed=True)
-    # The ISO 639-1 code for the language of the suggestion.
+    # The ISO 639-1 language code used to query question and translation
+    # suggestions by language. This field is None for edit state content
+    # suggestions, since they are not queryable by language.
     language_code = ndb.StringProperty(indexed=True)
 
     @staticmethod

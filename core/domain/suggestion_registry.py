@@ -352,8 +352,8 @@ class SuggestionEditStateContent(BaseSuggestion):
                     self.change.property_name))
 
         # The language_code field is used for querying purposes. We do not want
-        # to query suggestions of this type by language. Therefore, this
-        # property is set to None.
+        # to query suggestions of this type by language. Therefore, the
+        # language_code field is set to None.
         if self.language_code != None:
             raise utils.ValidationError(
                 'Expected language_code to be None, received %s' % (

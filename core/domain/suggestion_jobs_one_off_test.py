@@ -1637,7 +1637,7 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
         'state_name': 'state_1',
         'content_id': 'content',
         'language_code': 'hi',
-        'content_html': '<p>State name: state_1, Content id: content</p>',
+        'content_html': '<p>This is html to translate.</p>',
         'translation_html': '<p>This is translated html.</p>'
     }
 
@@ -1664,14 +1664,9 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
             self.states = states
             self.category = 'Algebra'
 
-        def get_content_html(self, state_name, content_id):
+        def get_content_html(self, unused_state_name, unused_content_id):
             """Used to mock the get_content_html method for explorations."""
-            # state_name and content_id are used here to suppress the unused
-            # arguments warning. The main goal of this method is to just
-            # produce content html for the tests.
-            return '<p>State name: %s, Content id: %s</p>' % (
-                state_name, content_id
-            )
+            return '<p>This is html to translate.</p>'
 
     # A mock exploration created for testing.
     explorations = [
@@ -1728,7 +1723,8 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
         # Verify the output from the one off job.
         actual_output = (
             suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id))
+            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id)
+        )
         expected_output = [
             '[u\'edit_exploration_state_content_suggestion_migrated\', 1]'
         ]
@@ -1770,7 +1766,8 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
         # Verify the output from the one off job.
         actual_output = (
             suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id))
+            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id)
+        )
         expected_output = ['[u\'translate_content_suggestion_migrated\', 1]']
         self.assertEqual(len(actual_output), 1)
         self.assertEqual(actual_output, expected_output)
@@ -1803,7 +1800,8 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
         # Verify the output from the one off job.
         actual_output = (
             suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id))
+            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id)
+        )
         expected_output = ['[u\'add_question_suggestion_migrated\', 1]']
         self.assertEqual(len(actual_output), 1)
         self.assertEqual(actual_output, expected_output)
@@ -1854,7 +1852,8 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
         # Verify the output from the one off job.
         actual_output = (
             suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id))
+            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id)
+        )
         expected_output = [
             '[u\'add_question_suggestion_migrated\', 1]',
             '[u\'translate_content_suggestion_migrated\', 1]'

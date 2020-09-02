@@ -200,7 +200,6 @@ class SuggestionLanguageCodeMigrationOneOffJob(
             return
 
         suggestion = suggestion_services.get_suggestion_from_model(item)
-
         if suggestion.suggestion_type == (
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             suggestion.language_code = suggestion.change.language_code
