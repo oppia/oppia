@@ -53,6 +53,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.file_arr.append(msg)
 
         class MockFile(python_utils.OBJECT):
+            def seek(self, start, stop): # pylint: disable=missing-docstring
+                pass
+            def read(self): # pylint: disable=missing-docstring
+                return ''
             def write(self, buf): # pylint: disable=missing-docstring
                 mock_write(buf)
 
@@ -64,6 +68,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 return MockFile()
             def __exit__(self, *args):
                 pass
+
         self.open_file_swap = self.swap(
             python_utils, 'open_file', MockOpenFile)
         self.cmd_token_list = []
@@ -189,7 +194,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             install_backend_python_libs, 'get_mismatches', mock_get_mismatches)
 
         with self.swap_check_call, swap_get_mismatches:
-            with swap_validate_metadata_directories:
+            with swap_validate_metadata_directories, self.open_file_swap:
                 install_backend_python_libs.main()
 
         self.assertEqual(
@@ -238,7 +243,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         swap_remove_dir = self.swap(shutil, 'rmtree', mock_remove_dir)
         with self.swap_check_call, swap_remove_dir, swap_get_mismatches:
-            with swap_validate_metadata_directories:
+            with swap_validate_metadata_directories, self.open_file_swap:
                 install_backend_python_libs.main()
 
         self.assertEqual(
@@ -262,7 +267,26 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             ]
         )
 
-    def test_main_adds_comment_to_end_of_requirements(self):
+    def test_main_adds_comment_to_start_of_requirements(self):
+        check_function_calls = {
+            'subprocess_call_is_called': False
+        }
+        expected_check_function_calls = {
+            'subprocess_call_is_called': True
+        }
+        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            check_function_calls['subprocess_call_is_called'] = True
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
+
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    """Return required method."""
+                    return '', ''
+
+            return Ret()
+
         def mock_get_mismatches():
             return {}
         def mock_validate_metadata_directories():
@@ -272,9 +296,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             mock_validate_metadata_directories)
         swap_get_mismatches = self.swap(
             install_backend_python_libs, 'get_mismatches', mock_get_mismatches)
+        swap_call = self.swap(subprocess, 'check_call', mock_call)
 
         expected_lines = [
-            '\n',
             '# Developers: Please do not modify this auto-generated file.'
             ' If\n# you want to add, remove, upgrade, or downgrade libraries,'
             '\n# please change the `requirements.in` file, and then follow\n#'
@@ -282,7 +306,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         ]
         self.assertEqual(self.file_arr, [])
 
-        with self.swap_check_call, self.open_file_swap:
+        with self.swap_check_call, self.open_file_swap, swap_call:
             with swap_get_mismatches, swap_validate_metadata_directories:
                 install_backend_python_libs.main()
 
@@ -290,6 +314,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.file_arr,
             expected_lines
         )
+
+        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_main_without_library_mismatches_calls_correct_functions(self):
         check_function_calls = {
@@ -328,7 +354,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             mock_get_mismatches)
         swap_call = self.swap(subprocess, 'check_call', mock_call)
         swap_print = self.swap(python_utils, 'PRINT', mock_print)
-        with swap_call, swap_get_mismatches, swap_print:
+        with swap_call, swap_get_mismatches, swap_print, self.open_file_swap:
             with swap_validate_metadata_directories:
                 install_backend_python_libs.main()
 
