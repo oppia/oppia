@@ -294,8 +294,8 @@
 /core/templates/services/guppy-initialization.service.ts @aks681
 /core/templates/services/math-interactions.service.ts @aks681
 /extensions/domain*.py @brianrodri
-/extensions/interactions/ @aks681 @seanlip
 # TODO(#10538): Add @vojtechjelinek as an owner after 2020-09-06.
+/extensions/interactions/ @aks681 @seanlip
 /extensions/objects/ @aks681
 # TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /extensions/value_generators/ @seanlip
