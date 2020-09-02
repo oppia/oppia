@@ -85,43 +85,43 @@ angular.module('oppia').directive('learnerDashboardIcons', [
           $scope.belongsToLearnerPlaylist = function() {
             var activityType = $scope.getActivityType();
             if ($scope.learnerDashboardActivityIds) {
-              /* eslint-disable max-len */
               if (activityType === ACTIVITY_TYPE_EXPLORATION) {
                 return (
+                  /* eslint-disable-next-line max-len */
                   $scope.learnerDashboardActivityIds.belongsToExplorationPlaylist(
                     $scope.getActivityId()));
               } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
                 return (
+                  /* eslint-disable-next-line max-len */
                   $scope.learnerDashboardActivityIds.belongsToCollectionPlaylist(
                     $scope.getActivityId()));
               }
-              /* eslint-enable max-len */
             }
           };
 
           $scope.belongsToCompletedActivities = function() {
             var activityType = $scope.getActivityType();
             if ($scope.learnerDashboardActivityIds) {
-              /* eslint-disable max-len */
               if (activityType === ACTIVITY_TYPE_EXPLORATION) {
                 return (
+                  // eslint-disable-next-line max-len
                   $scope.learnerDashboardActivityIds.belongsToCompletedExplorations(
                     $scope.getActivityId()));
               } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
                 return (
+                  // eslint-disable-next-line max-len
                   $scope.learnerDashboardActivityIds.belongsToCompletedCollections(
                     $scope.getActivityId()));
               }
-              /* eslint-enable max-len */
             }
           };
 
           $scope.belongsToIncompleteActivities = function() {
             var activityType = $scope.getActivityType();
             if ($scope.learnerDashboardActivityIds) {
-              /* eslint-disable max-len */
               if (activityType === ACTIVITY_TYPE_EXPLORATION) {
                 return (
+                  // eslint-disable-next-line max-len
                   $scope.learnerDashboardActivityIds.belongsToIncompleteExplorations(
                     $scope.getActivityId()));
               } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
@@ -129,7 +129,6 @@ angular.module('oppia').directive('learnerDashboardIcons', [
                   $scope.learnerDashboardActivityIds.belongsToIncompleteCollections(
                     $scope.getActivityId()));
               }
-              /* eslint-enable max-len */
             }
           };
 
@@ -139,15 +138,13 @@ angular.module('oppia').directive('learnerDashboardIcons', [
                 activityId, activityType));
             if (isSuccessfullyAdded) {
               if (activityType === ACTIVITY_TYPE_EXPLORATION) {
-                /* eslint-disable max-len */
+                /* eslint-disable-next-line max-len */
                 $scope.learnerDashboardActivityIds.addToExplorationLearnerPlaylist(
                   activityId);
-                /* eslint-enable max-len */
               } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
-                /* eslint-disable max-len */
+                /* eslint-disable-next-line max-len */
                 $scope.learnerDashboardActivityIds.addToCollectionLearnerPlaylist(
                   activityId);
-                /* eslint-enable max-len */
               }
               $scope.disablePlaylistTooltip();
             }

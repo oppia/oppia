@@ -1,3 +1,4 @@
+/* eslint-disable no-multiline-disable */
 /* eslint-disable quote-props */
 /* eslint-disable quotes */
 /* Don't modify anything outside the {} brackets.

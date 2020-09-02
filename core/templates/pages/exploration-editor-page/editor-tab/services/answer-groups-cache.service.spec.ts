@@ -16,10 +16,9 @@
  * @fileoverview Unit tests for Answer Groups Cache Service.
  */
 
-/* eslint-disable max-len */
 import { AnswerGroupsCacheService } from
+  /* eslint-disable-next-line max-len */
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
-/* eslint-enable max-len */
 
 describe('Answer Groups Cache Service', () => {
   describe('AnswerGroupsCache', () => {

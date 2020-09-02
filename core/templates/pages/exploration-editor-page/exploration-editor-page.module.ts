@@ -48,7 +48,7 @@ import { OppiaAngularRootComponent } from
 
 import { AppConstants } from 'app.constants';
 import { CkEditorCopyToolbarComponent } from
-  /* eslint-disable max-len */
+  /* eslint-disable-next-line max-len */
   'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { ClassifiersExtensionConstants } from
   'classifiers/classifiers-extension.constants';

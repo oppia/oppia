@@ -106,7 +106,7 @@ describe('Ck editor copy content service', () => {
     expect(service.copyModeActive).toBe(false);
     service.toggleCopyMode();
     expect(service.copyModeActive).toBe(true);
-
+    /* eslint-disable no-multiline-disable */
     /* eslint-disable quotes */
     const imageWidgetElement = generateContent(
       `<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" capt\
@@ -194,6 +194,7 @@ ve-math></p>`);
 latex&amp;quot;:&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filen\
 ame&amp;quot;:&amp;quot;&amp;quot;}"></oppia-noninteractive-math></p>`);
     /* eslint-enable quotes */
+    /* eslint-enable no-multiline-disable */
 
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(mathWidgetElement);

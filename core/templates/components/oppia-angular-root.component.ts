@@ -61,6 +61,7 @@
  *       loading
  */
 
+/* eslint-disable no-multiline-disable */
 /* eslint-disable max-len */
 import { Component, Output, AfterViewInit, EventEmitter } from '@angular/core';
 import { AdminBackendApiService } from
