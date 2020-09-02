@@ -69,7 +69,7 @@ class RegenerateMissingStateStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """
 
     REDUCE_KEY_BAD_RENAME = 'ExplorationStatsModel state stats has bad rename'
-    REDUCE_KEY_MISSING = 'ExplorationStatsModel state stats regenerated'
+    REDUCE_KEY_REGENERATED = 'ExplorationStatsModel state stats regenerated'
     REDUCE_KEY_OK = 'ExplorationStatsModel with valid state(s)'
 
     RELEVANT_COMMIT_CMDS = [
@@ -140,7 +140,7 @@ class RegenerateMissingStateStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
                 exp_stats.state_stats_mapping[state_name] = state_stats
                 yield (
-                    RegenerateMissingStateStatsOneOffJob.REDUCE_KEY_MISSING,
+                    RegenerateMissingStateStatsOneOffJob.REDUCE_KEY_REGENERATED,
                     '%s.%s %s' % (exp.id, exp.version, state_name))
 
             stats_services.save_stats_model_transactional(exp_stats)
