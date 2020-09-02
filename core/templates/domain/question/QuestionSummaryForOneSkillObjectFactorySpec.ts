@@ -42,7 +42,8 @@ describe('Question summary for one skill object factory', () => {
         skill_difficulty: 0.6,
         summary: {
           id: 'question_id',
-          question_content: 'Question 1'
+          question_content: 'Question 1',
+          interaction_id: 'TextInput'
         }
       };
     });
