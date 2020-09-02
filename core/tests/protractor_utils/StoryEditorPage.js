@@ -66,6 +66,10 @@ var StoryEditorPage = function() {
   var chapterEditOptions = element.all(by.css('.protractor-test-edit-options'));
   var backToStoryEditorButton = element(
     by.css('.protractor-test-back-to-story-editor-button'));
+  var storyMetaTagContentField = element(
+    by.css('.protractor-test-story-meta-tag-content-field'));
+  var storyMetaTagContentLabel = element(
+    by.css('.protractor-test-story-meta-tag-content-label'));
 
   /*
    * CHAPTER
@@ -434,6 +438,12 @@ var StoryEditorPage = function() {
     await deletePrerequisiteSkillButton.get(index).click();
   };
 
+  this.updateMetaTagContent = async function(newMetaTagContent) {
+    await action.sendKeys(
+      'Update Meta Tag Content', storyMetaTagContentField, newMetaTagContent);
+    await action.click('Meta Tag Content label', storyMetaTagContentLabel);
+  };
+
   this.expectAcquiredSkillDescriptionCardCount = async function(number) {
     expect(await acquiredSkillDescriptionCard.count()).toBe(number);
   };
@@ -443,8 +453,8 @@ var StoryEditorPage = function() {
   };
 
   this.expectWarningInIndicator = async function(warning) {
-    await waitFor.visibilityOf(warningIndicator,
-      'Warning Indicator taking too long to appear.');
+    await waitFor.visibilityOf(
+      warningIndicator, 'Warning Indicator taking too long to appear.');
     await browser.actions().mouseMove(warningIndicator).perform();
     var warningElemCount = await warningTextElements.count();
     var matchFound = false;

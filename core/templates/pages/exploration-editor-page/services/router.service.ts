@@ -22,6 +22,8 @@ require(
 require(
   'pages/exploration-editor-page/services/' +
   'exploration-init-state-name.service.ts');
+require(
+  'pages/exploration-editor-page/services/state-editor-refresh.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/exploration-improvements.service.ts');
 require('services/external-save.service.ts');
@@ -31,11 +33,13 @@ import { EventEmitter } from '@angular/core';
 angular.module('oppia').factory('RouterService', [
   '$interval', '$location', '$q', '$rootScope', '$timeout', '$window',
   'ExplorationImprovementsService', 'ExplorationInitStateNameService',
-  'ExplorationStatesService', 'ExternalSaveService', 'StateEditorService',
+  'ExplorationStatesService', 'ExternalSaveService',
+  'StateEditorRefreshService', 'StateEditorService',
   function(
       $interval, $location, $q, $rootScope, $timeout, $window,
       ExplorationImprovementsService, ExplorationInitStateNameService,
-      ExplorationStatesService, ExternalSaveService, StateEditorService) {
+      ExplorationStatesService, ExternalSaveService,
+      StateEditorRefreshService, StateEditorService) {
     var TABS = {
       MAIN: {name: 'main', path: '/main'},
       TRANSLATION: {name: 'translation', path: '/translation'},
@@ -154,13 +158,13 @@ angular.module('oppia').factory('RouterService', [
           if (ExplorationStatesService.hasState(putativeStateName)) {
             StateEditorService.setActiveStateName(putativeStateName);
             if (pathType === SLUG_GUI) {
-              $rootScope.$broadcast('refreshStateEditor');
+              StateEditorRefreshService.onRefreshStateEditor.emit();
               // Fire an event to center the Graph in the Editor.
               centerGraphEventEmitter.emit();
             }
           } else {
-            $location.path(pathBase +
-                           ExplorationInitStateNameService.savedMemento);
+            $location.path(
+              pathBase + ExplorationInitStateNameService.savedMemento);
           }
         }
       }, 300);
@@ -183,8 +187,8 @@ angular.module('oppia').factory('RouterService', [
       if (newStateName) {
         StateEditorService.setActiveStateName(newStateName);
       }
-      $location.path('/' + pathType + '/' +
-                     StateEditorService.getActiveStateName());
+      $location.path(
+        '/' + pathType + '/' + StateEditorService.getActiveStateName());
       $window.scrollTo(0, 0);
     };
 

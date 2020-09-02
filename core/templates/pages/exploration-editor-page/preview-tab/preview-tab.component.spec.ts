@@ -105,10 +105,12 @@ describe('Preview Tab Component', function() {
         .returnValue(parameters);
       spyOn(editableExplorationBackendApiService, 'fetchApplyDraftExploration')
         .and.returnValue($q.resolve(exploration));
-      spyOnProperty(explorationEngineService,
+      spyOnProperty(
+        explorationEngineService,
         'onUpdateActiveStateIfInEditor').and.returnValue(
         mockUpdateActiveStateIfInEditorEventEmitter);
-      spyOnProperty(explorationPlayerStateService,
+      spyOnProperty(
+        explorationPlayerStateService,
         'onPlayerStateChange').and.returnValue(
         mockPlayerStateChangeEventEmitter);
       $scope = $rootScope.$new();
@@ -123,13 +125,14 @@ describe('Preview Tab Component', function() {
       ctrl.$onDestroy();
     });
 
-    it('should evaluate ctrl properties after its initialization', function() {
-      // Get data from exploration data service.
-      $scope.$apply();
+    it('should initialize controller properties after its initialization',
+      function() {
+        // Get data from exploration data service.
+        $scope.$apply();
 
-      expect(ctrl.isExplorationPopulated).toBe(false);
-      expect(ctrl.previewWarning).toBe('Preview started from \"State1\"');
-    });
+        expect(ctrl.isExplorationPopulated).toBe(false);
+        expect(ctrl.previewWarning).toBe('Preview started from \"State1\"');
+      });
 
     it('should set active state name when broadcasting' +
       ' updateActiveStateIfInEditor', function() {
@@ -153,7 +156,7 @@ describe('Preview Tab Component', function() {
         });
       });
 
-    it('should evaluate when parameter summary is shown', function() {
+    it('should evaluate whenever parameter summary is shown', function() {
       spyOn(explorationFeaturesService, 'areParametersEnabled')
         .and.returnValue(true);
       expect(ctrl.showParameterSummary()).toBe(false);
@@ -165,7 +168,7 @@ describe('Preview Tab Component', function() {
       expect(ctrl.showParameterSummary()).toBe(true);
     });
 
-    it('should open set params modal with $uibModal', function() {
+    it('should open set params modal', function() {
       spyOn($uibModal, 'open').and.callThrough();
 
       // Get data from exploration data service.
@@ -248,13 +251,14 @@ describe('Preview Tab Component', function() {
       ctrl.$onInit();
     }));
 
-    it('should evaluate ctrl properties after its initialization', function() {
-      // Get data from exploration data service.
-      $scope.$apply();
+    it('should initialize controller properties after its initialization',
+      function() {
+        // Get data from exploration data service.
+        $scope.$apply();
 
-      expect(ctrl.isExplorationPopulated).toBe(false);
-      expect(ctrl.previewWarning).toBe('');
-    });
+        expect(ctrl.isExplorationPopulated).toBe(false);
+        expect(ctrl.previewWarning).toBe('');
+      });
 
     it('should load preview state when closing set params modal', function() {
       spyOn($uibModal, 'open');
@@ -271,7 +275,7 @@ describe('Preview Tab Component', function() {
       expect(ctrl.isExplorationPopulated).toBe(true);
     });
 
-    it('should reset preview', function() {
+    it('should reset preview settings', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
       });
