@@ -44,7 +44,8 @@ angular.module('oppia').directive('learnerViewInfo', [
         'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
         'UrlService', 'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
-        function($http, $log, $uibModal, ContextService,
+        function(
+            $http, $log, $uibModal, ContextService,
             ReadOnlyExplorationBackendApiService, UrlInterpolationService,
             UrlService, DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {

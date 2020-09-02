@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the component of the 'State Editor'.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
@@ -84,9 +85,12 @@ describe('Exploration editor tab component', function() {
   var hintObjectFactory = null;
   var outcomeObjectFactory = null;
   var routerService = null;
+  var stateEditorRefreshService = null;
   var solutionObjectFactory = null;
   var stateEditorService = null;
   var subtitledHtmlObjectFactory = null;
+
+  var mockRefreshStateEditorEventEmitter = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     const ugs = new UpgradedServices();
@@ -168,6 +172,12 @@ describe('Exploration editor tab component', function() {
     explorationStatesService = $injector.get('ExplorationStatesService');
     explorationWarningsService = $injector.get('ExplorationWarningsService');
     routerService = $injector.get('RouterService');
+    stateEditorRefreshService = $injector.get('StateEditorRefreshService');
+
+    mockRefreshStateEditorEventEmitter = new EventEmitter();
+    spyOnProperty(
+      stateEditorRefreshService, 'onRefreshStateEditor').and.returnValue(
+      mockRefreshStateEditorEventEmitter);
 
     explorationStatesService.init({
       'First State': {
@@ -315,7 +325,11 @@ describe('Exploration editor tab component', function() {
     ctrl.$onInit();
   }));
 
-  it('should evaluate controller properties after its initialization',
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
+  it('should initialize controller properties after its initialization',
     function() {
       expect(ctrl.interactionIsShown).toBe(false);
     });
@@ -353,7 +367,7 @@ describe('Exploration editor tab component', function() {
       'Fourth State', null);
   });
 
-  it('should refresh warnings from exploration warnings', function() {
+  it('should refresh warnings', function() {
     spyOn(explorationWarningsService, 'updateWarnings');
 
     ctrl.refreshWarnings();
@@ -361,7 +375,7 @@ describe('Exploration editor tab component', function() {
     expect(explorationWarningsService.updateWarnings).toHaveBeenCalled();
   });
 
-  it('should save state content successfully', function() {
+  it('should save state content', function() {
     stateEditorService.setActiveStateName('First State');
     expect(explorationStatesService.getState('First State').content).toEqual(
       subtitledHtmlObjectFactory.createFromBackendDict({
@@ -380,7 +394,7 @@ describe('Exploration editor tab component', function() {
     expect(ctrl.interactionIsShown).toBe(true);
   });
 
-  it('should save state interaction id successfully', function() {
+  it('should save state interaction id', function() {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -393,7 +407,7 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.interaction.id).toBe(newInteractionId);
   });
 
-  it('should save state next content id index successfully', function() {
+  it('should save state next content id index', function() {
     stateEditorService.setActiveStateName('First State');
     expect(
       explorationStatesService.getState('First State').nextContentIdIndex
@@ -405,7 +419,7 @@ describe('Exploration editor tab component', function() {
     ).toBe(2);
   });
 
-  it('should save interaction answer groups successfully', function() {
+  it('should save interaction answer groups', function() {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -447,7 +461,7 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.interaction.answerGroups).toEqual(displayedValue);
   });
 
-  it('should save interaction default outcome successfully', function() {
+  it('should save interaction default outcome', function() {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -480,7 +494,7 @@ describe('Exploration editor tab component', function() {
       displayedValue);
   });
 
-  it('should save interaction customization args successfully', function() {
+  it('should save interaction customization args', function() {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -492,7 +506,7 @@ describe('Exploration editor tab component', function() {
 
     var displayedValue = {
       placeholder: {
-        value: 'Placeholder value'
+        value: new SubtitledUnicode('Placeholder value', 'ca_placeholder')
       },
       rows: {
         value: 2
@@ -504,7 +518,7 @@ describe('Exploration editor tab component', function() {
       displayedValue);
   });
 
-  it('should save interaction solution successfully', function() {
+  it('should save interaction solution', function() {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -533,7 +547,7 @@ describe('Exploration editor tab component', function() {
       displayedValue);
   });
 
-  it('should save interaction hints successfully', function() {
+  it('should save interaction hints', function() {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
       explorationStatesService.getState('First State').interaction);
@@ -552,7 +566,7 @@ describe('Exploration editor tab component', function() {
       displayedValue);
   });
 
-  it('should save solicit answer details successfully', function() {
+  it('should save solicit answer details', function() {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setSolicitAnswerDetails(
       explorationStatesService.getState('First State').solicitAnswerDetails);
@@ -570,22 +584,26 @@ describe('Exploration editor tab component', function() {
     });
     stateEditorService.setActiveStateName('First State');
 
-    expect(explorationStatesService.getState('First State')
-      .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
+    expect(
+      explorationStatesService.getState('First State')
+        .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
       false);
-    expect(explorationStatesService.getState('First State')
-      .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate).toBe(
-      false);
+    expect(
+      explorationStatesService.getState('First State')
+        .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
+      .toBe(false);
 
-    ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired('feedback_1');
+    ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
     $scope.$apply();
 
-    expect(explorationStatesService.getState('First State')
-      .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
+    expect(
+      explorationStatesService.getState('First State')
+        .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
       true);
-    expect(explorationStatesService.getState('First State')
-      .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate).toBe(
-      true);
+    expect(
+      explorationStatesService.getState('First State')
+        .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
+      .toBe(true);
   });
 
   it('should not mark all audio as needing update when dismissing modal',
@@ -595,21 +613,25 @@ describe('Exploration editor tab component', function() {
       });
       stateEditorService.setActiveStateName('First State');
 
-      expect(explorationStatesService.getState('First State')
-        .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
+      expect(
+        explorationStatesService.getState('First State')
+          .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
         false);
-      expect(explorationStatesService.getState('First State')
-        .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
+      expect(
+        explorationStatesService.getState('First State')
+          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
         .toBe(false);
 
-      ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired('feedback_1');
+      ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
       $scope.$apply();
 
-      expect(explorationStatesService.getState('First State')
-        .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
+      expect(
+        explorationStatesService.getState('First State')
+          .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
         false);
-      expect(explorationStatesService.getState('First State')
-        .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
+      expect(
+        explorationStatesService.getState('First State')
+          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
         .toBe(false);
     });
 
@@ -640,7 +662,7 @@ describe('Exploration editor tab component', function() {
     stateEditorService.updateStateResponsesInitialised();
     stateEditorService.updateStateEditorDirectiveInitialised();
 
-    $rootScope.$broadcast('refreshStateEditor');
+    mockRefreshStateEditorEventEmitter.emit();
 
     const stateEditorInitializedSpy = jasmine.createSpy(
       'stateEditorInitialized');

@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
 import collections
 import contextlib
 import copy
@@ -51,6 +52,7 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 import feconf
 import main
 import main_mail
@@ -61,6 +63,7 @@ import utils
 
 from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map
+from google.appengine.api import datastore_types
 from google.appengine.api import mail
 import webtest
 
@@ -1650,7 +1653,7 @@ tags: []
             self, story_id, owner_id, corresponding_topic_id,
             title='Title', description='Description', notes='Notes',
             language_code=constants.DEFAULT_LANGUAGE_CODE,
-            url_fragment='title'):
+            url_fragment='title', meta_tag_content='story meta tag content'):
         """Creates an Oppia Story and saves it.
 
         NOTE: Callers are responsible for ensuring that the
@@ -1669,6 +1672,7 @@ tags: []
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
             url_fragment: str. The url fragment of the story.
+            meta_tag_content: str. The meta tag content of the story.
 
         Returns:
             Story. A newly-created story.
@@ -1680,6 +1684,7 @@ tags: []
         story.notes = notes
         story.language_code = language_code
         story.url_fragment = url_fragment
+        story.meta_tag_content = meta_tag_content
         story_services.save_new_story(owner_id, story)
         return story
 
@@ -1688,7 +1693,8 @@ tags: []
             owner_id, title, description,
             notes, corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
-            url_fragment='story-frag'):
+            url_fragment='story-frag',
+            meta_tag_content='story meta tag content'):
         """Saves a new story with a default version 1 story contents
         data dictionary.
 
@@ -1716,6 +1722,7 @@ tags: []
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
             url_fragment: str. The URL fragment for the story.
+            meta_tag_content: str. The meta tag content of the story.
         """
         story_model = story_models.StoryModel(
             id=story_id,
@@ -1728,7 +1735,8 @@ tags: []
             notes=notes,
             corresponding_topic_id=corresponding_topic_id,
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT,
-            url_fragment=url_fragment
+            url_fragment=url_fragment,
+            meta_tag_content=meta_tag_content
         )
         commit_message = (
             'New story created with title \'%s\'.' % title)
@@ -1747,7 +1755,9 @@ tags: []
             description='description', canonical_story_ids=None,
             additional_story_ids=None, uncategorized_skill_ids=None,
             subtopics=None, next_subtopic_id=0,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            meta_tag_content='topic meta tag content',
+            practice_tab_is_displayed=False):
         """Creates an Oppia Topic and saves it.
 
         Args:
@@ -1771,6 +1781,9 @@ tags: []
             next_subtopic_id: int. The id for the next subtopic.
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
+            meta_tag_content: str. The meta tag content for the topic.
+            practice_tab_is_displayed: bool. Whether the practice tab should be
+                displayed.
 
         Returns:
             Topic. A newly-created topic.
@@ -1791,7 +1804,8 @@ tags: []
             description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
-            language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
+            meta_tag_content, practice_tab_is_displayed
         )
         topic_services.save_new_topic(owner_id, topic)
         return topic
@@ -1802,7 +1816,9 @@ tags: []
             thumbnail_bg_color, canonical_story_references,
             additional_story_references,
             uncategorized_skill_ids, next_subtopic_id,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            meta_tag_content='topic meta tag content',
+            practice_tab_is_displayed=False):
         """Saves a new topic with a default version 1 subtopic
         data dictionary.
 
@@ -1837,6 +1853,9 @@ tags: []
             next_subtopic_id: int. The id for the next subtopic.
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
+            meta_tag_content: str. The meta tag content for the topic.
+            practice_tab_is_displayed: bool. Whether the practice tab should be
+                displayed.
         """
         topic_rights_model = topic_models.TopicRightsModel(
             id=topic_id,
@@ -1860,7 +1879,9 @@ tags: []
             story_reference_schema_version=(
                 feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
             next_subtopic_id=next_subtopic_id,
-            subtopics=[self.VERSION_1_SUBTOPIC_DICT]
+            subtopics=[self.VERSION_1_SUBTOPIC_DICT],
+            meta_tag_content=meta_tag_content,
+            practice_tab_is_displayed=practice_tab_is_displayed
         )
         commit_message = (
             'New topic created with name \'%s\'.' % name)
@@ -1877,7 +1898,7 @@ tags: []
 
     def save_new_question(
             self, question_id, owner_id, question_state_data,
-            linked_skill_ids,
+            linked_skill_ids, inapplicable_misconception_ids=None,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Question and saves it.
 
@@ -1887,22 +1908,29 @@ tags: []
             question_state_data: State. The state data for the question.
             linked_skill_ids: list(str). List of skill IDs linked to the
                 question.
+            inapplicable_misconception_ids: list(str). List of misconceptions
+                ids that are not applicable to the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 
         Returns:
             Question. A newly-created question.
         """
+        # This needs to be done because default arguments can not be of list
+        # type.
+        if inapplicable_misconception_ids is None:
+            inapplicable_misconception_ids = []
         question = question_domain.Question(
             question_id, question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0,
-            linked_skill_ids)
+            linked_skill_ids, inapplicable_misconception_ids)
         question_services.add_question(owner_id, question)
         return question
 
     def save_new_question_with_state_data_schema_v27(
             self, question_id, owner_id,
             linked_skill_ids,
+            inapplicable_misconception_ids=None,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new default question with a default version 27 state
         data dictionary.
@@ -1920,16 +1948,23 @@ tags: []
             question_id: str. ID for the question to be created.
             owner_id: str. The id of the user creating the question.
             linked_skill_ids: list(str). The skill IDs linked to the question.
+            inapplicable_misconception_ids: list(str). List of misconceptions
+                ids that are not applicable to the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
+        # This needs to be done because default arguments can not be of list
+        # type.
+        if inapplicable_misconception_ids is None:
+            inapplicable_misconception_ids = []
         question_model = question_models.QuestionModel(
             id=question_id,
             question_state_data=self.VERSION_27_STATE_DICT,
             language_code=language_code,
             version=1,
             question_state_data_schema_version=27,
-            linked_skill_ids=linked_skill_ids
+            linked_skill_ids=linked_skill_ids,
+            inapplicable_misconception_ids=inapplicable_misconception_ids
         )
         question_model.commit(
             owner_id, 'New question created',
@@ -2616,6 +2651,120 @@ class LinterTestBase(GenericTestBase):
         """
         failed_count = sum(msg.startswith('FAILED') for msg in stdout)
         self.assertEqual(failed_count, expected_failed_count)
+
+
+class AuditJobsTestBase(GenericTestBase):
+    """Base class for audit jobs tests."""
+
+    @contextlib.contextmanager
+    def mock_datetime_for_audit(self, mocked_datetime):
+        """Mocks response from datetime.datetime.utcnow method for audit jobs.
+
+        Example usage:
+            import datetime
+            mocked_datetime_utcnow = datetime.datetime.utcnow() -
+                datetime.timedelta(days=1)
+            with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+                print datetime.datetime.utcnow() # prints time reduced by 1 day
+            print datetime.datetime.utcnow()  # prints current time.
+
+        Args:
+            mocked_datetime: datetime.datetime. The datetime which will be used
+                instead of the current UTC datetime.
+
+        Yields:
+            None. Empty yield statement.
+        """
+        from google.appengine.ext import ndb
+
+        if not isinstance(mocked_datetime, datetime.datetime):
+            raise utils.ValidationError(
+                'Expected mocked_datetime to be datetime.datetime, got %s' % (
+                    type(mocked_datetime)))
+
+        original_datetime_type = datetime.datetime
+
+        class PatchedDatetimeType(type):
+            """Validates the datetime instances."""
+
+            def __instancecheck__(cls, other):
+                """Validates whether the given instance is datetime
+                instance.
+                """
+                return isinstance(other, original_datetime_type)
+
+        class MockDatetime( # pylint: disable=inherit-non-class
+                python_utils.with_metaclass(
+                    PatchedDatetimeType, datetime.datetime)):
+            @classmethod
+            def utcnow(cls):
+                """Returns the mocked datetime."""
+
+                return mocked_datetime
+
+        setattr(datetime, 'datetime', MockDatetime)
+        setattr(ndb.DateTimeProperty, 'data_type', MockDatetime)
+
+        # Updates datastore types for MockDatetime to ensure that
+        # validation of ndb datetime properties does not fail.
+        datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime] = (  # pylint: disable=protected-access
+            datastore_types.ValidatePropertyNothing)
+        datastore_types._PACK_PROPERTY_VALUES[MockDatetime] = (  # pylint: disable=protected-access
+            datastore_types.PackDatetime)
+        datastore_types._PROPERTY_MEANINGS[MockDatetime] = (  # pylint: disable=protected-access
+            datastore_types.entity_pb.Property.GD_WHEN)
+
+        try:
+            yield
+        finally:
+            setattr(datetime, 'datetime', original_datetime_type)
+            setattr(ndb.DateTimeProperty, 'data_type', datetime.datetime)
+
+    def run_job_and_check_output(
+            self, expected_output, sort=False, literal_eval=False):
+        """Helper function to run job and compare output.
+
+        Args:
+            expected_output: list(*). The expected result of the job.
+            sort: bool. Whether to sort the outputs before comparison.
+            literal_eval: bool. Whether to use ast.literal_eval before
+                comparison.
+        """
+        job_id = self.job_class.create_new()
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+        self.job_class.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        actual_output = self.job_class.get_output(job_id)
+        if literal_eval:
+            actual_output_dict = {}
+            expected_output_dict = {}
+
+            for item in [ast.literal_eval(value) for value in actual_output]:
+                value = item[1]
+                if isinstance(value, list):
+                    value = sorted(value)
+                actual_output_dict[item[0]] = value
+
+            for item in [ast.literal_eval(value) for value in expected_output]:
+                value = item[1]
+                if isinstance(value, list):
+                    value = sorted(value)
+                expected_output_dict[item[0]] = value
+            self.assertEqual(
+                sorted(actual_output_dict.keys()),
+                sorted(expected_output_dict.keys()))
+            for key in actual_output_dict:
+                self.assertEqual(
+                    actual_output_dict[key], expected_output_dict[key])
+        elif sort:
+            self.assertEqual(sorted(actual_output), sorted(expected_output))
+        else:
+            self.assertEqual(actual_output, expected_output)
 
 
 class EmailMessageMock(python_utils.OBJECT):

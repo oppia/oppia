@@ -33,7 +33,6 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import html_domain
 from core.domain import opportunity_services
 from core.domain import platform_feature_services as feature_services
 from core.domain import question_domain
@@ -50,7 +49,6 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
-from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
@@ -366,7 +364,7 @@ class AdminHandler(base.BaseHandler):
         question = question_domain.Question(
             question_id, state,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids)
+            constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids, [])
         return question
 
     def _create_dummy_skill(self, skill_id, skill_description, explanation):
@@ -636,138 +634,6 @@ class AdminHandler(base.BaseHandler):
             raise Exception('Cannot generate dummy explorations in production.')
 
 
-class ExplorationsLatexSvgHandler(base.BaseHandler):
-    """Handler updating explorations having math rich-text components with
-    math SVGs.
-
-    TODO(#10045): Remove this function once all the math-rich text components in
-    explorations have a valid math SVG stored in the datastore.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
-        item_to_fetch = self.request.get('item_to_fetch')
-        if item_to_fetch == 'exp_id_to_latex_mapping':
-            latex_strings_to_exp_id_mapping = (
-                exp_services.get_batch_of_exps_for_latex_svg_generation())
-            self.render_json({
-                'latex_strings_to_exp_id_mapping': (
-                    latex_strings_to_exp_id_mapping)
-            })
-        elif item_to_fetch == 'number_of_explorations_left_to_update':
-            number_of_explorations_left_to_update = (
-                exp_services.
-                get_number_explorations_having_latex_strings_without_svgs())
-            self.render_json({
-                'number_of_explorations_left_to_update': '%d' % (
-                    number_of_explorations_left_to_update)
-            })
-        else:
-            raise self.InvalidInputException(
-                'Please specify a valid type of item to fetch.')
-
-    @acl_decorators.can_access_admin_page
-    def post(self):
-        latex_to_svg_mappings = self.payload.get('latexMapping')
-        for exp_id, latex_to_svg_mapping_dict in latex_to_svg_mappings.items():
-            for latex_string in latex_to_svg_mapping_dict.keys():
-                svg_image = self.request.get(
-                    latex_to_svg_mappings[exp_id][latex_string]['latexId'])
-                if not svg_image:
-                    raise self.InvalidInputException(
-                        'SVG for LaTeX string %s in exploration %s is not '
-                        'supplied.' % (latex_string, exp_id))
-
-                dimensions = (
-                    latex_to_svg_mappings[exp_id][latex_string]['dimensions'])
-                latex_string_svg_image_dimensions = (
-                    html_domain.LatexStringSvgImageDimensions(
-                        dimensions['encoded_height_string'],
-                        dimensions['encoded_width_string'],
-                        dimensions['encoded_vertical_padding_string']))
-                latex_string_svg_image_data = (
-                    html_domain.LatexStringSvgImageData(
-                        svg_image, latex_string_svg_image_dimensions))
-                latex_to_svg_mappings[exp_id][latex_string] = (
-                    latex_string_svg_image_data)
-
-        for exp_id in latex_to_svg_mappings.keys():
-            exp_services.update_exploration_with_math_svgs(
-                exp_id, latex_to_svg_mappings[exp_id])
-            logging.info('Successfully updated exploration %s' % (exp_id))
-        number_of_explorations_left_to_update = (
-            exp_services.
-            get_number_explorations_having_latex_strings_without_svgs())
-        self.render_json({
-            'number_of_explorations_updated': '%d' % (
-                len(latex_to_svg_mappings.keys())),
-            'number_of_explorations_left_to_update': '%d' % (
-                number_of_explorations_left_to_update)
-        })
-
-
-class SuggestionsLatexSvgHandler(base.BaseHandler):
-    """Handler updating suggestions having math rich-text components with
-    math SVGs.
-
-    TODO(#10045): Remove this function once all the math-rich text components in
-    suggestions have a valid math SVG stored in the datastore.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
-        latex_strings_to_suggestion_ids_mapping = (
-            suggestion_services.
-            get_latex_strings_to_suggestion_ids_mapping())
-        self.render_json({
-            'latex_strings_to_suggestion_ids_mapping': (
-                latex_strings_to_suggestion_ids_mapping)
-        })
-
-    @acl_decorators.can_access_admin_page
-    def post(self):
-        latex_to_svg_mappings = self.payload.get('latexMapping')
-        if not isinstance(latex_to_svg_mappings, dict):
-            raise self.InvalidInputException(
-                'Expected latex_to_svg_mappings to be a dict.')
-
-        for suggestion_id, latex_to_svg_mapping_dict in (
-                latex_to_svg_mappings.items()):
-            for latex_string in latex_to_svg_mapping_dict.keys():
-                svg_image = self.request.get(
-                    latex_to_svg_mappings[suggestion_id][latex_string][
-                        'latexId'])
-                if not svg_image:
-                    raise self.InvalidInputException(
-                        'SVG for LaTeX string %s in suggestion %s is not '
-                        'supplied.' % (latex_string, suggestion_id))
-
-                dimensions = (
-                    latex_to_svg_mappings[suggestion_id][latex_string][
-                        'dimensions'])
-                latex_string_svg_image_dimensions = (
-                    html_domain.LatexStringSvgImageDimensions(
-                        dimensions['encoded_height_string'],
-                        dimensions['encoded_width_string'],
-                        dimensions['encoded_vertical_padding_string']))
-                latex_string_svg_image_data = (
-                    html_domain.LatexStringSvgImageData(
-                        svg_image, latex_string_svg_image_dimensions))
-                latex_to_svg_mappings[suggestion_id][latex_string] = (
-                    latex_string_svg_image_data)
-
-        suggestion_services.update_suggestions_with_math_svgs(
-            latex_to_svg_mappings)
-        self.render_json({
-            'number_of_suggestions_updated': '%d' % (
-                len(latex_to_svg_mappings.keys()))
-        })
-
-
 class AdminRoleHandler(base.BaseHandler):
     """Handler for roles tab of admin page. Used to view and update roles."""
 
@@ -966,8 +832,6 @@ class RemoveContributionReviewerHandler(base.BaseHandler):
         username = self.payload.get('username', None)
         if username is None:
             raise self.InvalidInputException('Missing username param')
-        removal_type = self.payload.get('removal_type')
-
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
@@ -979,6 +843,7 @@ class RemoveContributionReviewerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid language_code: %s' % language_code)
 
+        removal_type = self.payload.get('removal_type')
         if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
             user_services.remove_contribution_reviewer(user_id)
         elif removal_type == constants.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS:

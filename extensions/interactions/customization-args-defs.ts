@@ -45,14 +45,14 @@ export interface AlgebraicExpressionInputCustomizationArgs {
     value: string[];
   };
 }
-interface AlgebraicExpressionInputCustomizationArgsBackendDict {
+export interface AlgebraicExpressionInputCustomizationArgsBackendDict {
   customOskLetters: {
     value: string[];
   };
 }
 
 
-interface CodeReplCustomizationArgsBackendDict {
+export interface CodeReplCustomizationArgsBackendDict {
   language: {
     value: string;
   };
@@ -112,7 +112,7 @@ export interface DragAndDropSortInputCustomizationArgs {
 }
 
 
-interface EndExplorationCustomizationArgsBackendDict {
+export interface EndExplorationCustomizationArgsBackendDict {
   recommendedExplorationIds: {
     value: string[];
   };
@@ -154,7 +154,7 @@ export interface FractionInputCustomizationArgs {
 }
 
 
-interface GraphInputCustomizationArgsBackendDict {
+export interface GraphInputCustomizationArgsBackendDict {
   graph: {
     value: GraphAnswer;
   };
@@ -208,12 +208,12 @@ export interface GraphInputCustomizationArgs {
 }
 
 
-interface ImageClickInputCustomizationArgsBackendDict {
+export interface ImageClickInputCustomizationArgsBackendDict {
   imageAndRegions: {
     value: ImageWithRegions;
   };
   highlightRegionsOnHover: {
-    value: string;
+    value: boolean;
   };
 }
 export interface ImageClickInputCustomizationArgs {
@@ -226,7 +226,7 @@ export interface ImageClickInputCustomizationArgs {
 }
 
 
-interface InteractiveMapCustomizationArgsBackendDict {
+export interface InteractiveMapCustomizationArgsBackendDict {
   latitude: {
     value: number;
   };
@@ -234,7 +234,7 @@ interface InteractiveMapCustomizationArgsBackendDict {
     value: number;
   };
   zoom: {
-    value: string;
+    value: number;
   };
 }
 export interface InteractiveMapCustomizationArgs {
@@ -274,7 +274,7 @@ export interface ItemSelectionInputCustomizationArgs {
 }
 
 
-interface LogicProofCustomizationArgsBackendDict {
+export interface LogicProofCustomizationArgsBackendDict {
   question: {
     value: Object;
   };
@@ -286,7 +286,7 @@ export interface LogicProofCustomizationArgs {
 }
 
 
-interface MathEquationInputCustomizationArgsBackendDict {
+export interface MathEquationInputCustomizationArgsBackendDict {
   customOskLetters: {
     value: string[];
   };
@@ -316,7 +316,7 @@ export interface MultipleChoiceInputCustomizationArgs {
 }
 
 
-interface MusicNotesInputCustomizationArgsBackendDict {
+export interface MusicNotesInputCustomizationArgsBackendDict {
   sequenceToGuess: {
     value: ReadableMusicNote[];
   };
@@ -334,7 +334,7 @@ export interface MusicNotesInputCustomizationArgs {
 }
 
 
-interface PencilCodeEditorCustomizationArgsBackendDict {
+export interface PencilCodeEditorCustomizationArgsBackendDict {
   initialCode: {
     value: string;
   };
@@ -342,6 +342,23 @@ interface PencilCodeEditorCustomizationArgsBackendDict {
 export interface PencilCodeEditorCustomizationArgs {
   initialCode: {
     value: string;
+  };
+}
+
+export interface RatioExpressionInputCustomizationArgsBackendDict {
+  placeholder: {
+    value: SubtitledUnicodeBackendDict;
+  };
+  numberOfTerms: {
+    value: number;
+  };
+}
+export interface RatioExpressionInputCustomizationArgs {
+  placeholder: {
+    value: SubtitledUnicode;
+  };
+  numberOfTerms: {
+    value: number;
   };
 }
 
@@ -376,19 +393,15 @@ export interface TextInputCustomizationArgs {
 }
 
 
-interface MathExpressionInputCustomizationArgsBackendDict { }
-export interface MathExpressionInputCustomizationArgs { }
-
-
-interface NumericExpressionInputCustomizationArgsBackendDict { }
+export interface NumericExpressionInputCustomizationArgsBackendDict { }
 export interface NumericExpressionInputCustomizationArgs { }
 
 
-interface NumericInputCustomizationArgsBackendDict { }
+export interface NumericInputCustomizationArgsBackendDict { }
 export interface NumericInputCustomizationArgs { }
 
 
-interface NumberWithUnitsCustomizationArgsBackendDict { }
+export interface NumberWithUnitsCustomizationArgsBackendDict { }
 export interface NumberWithUnitsCustomizationArgs { }
 
 
@@ -405,13 +418,13 @@ export type InteractionCustomizationArgsBackendDict = (
   ItemSelectionInputCustomizationArgsBackendDict |
   LogicProofCustomizationArgsBackendDict |
   MathEquationInputCustomizationArgsBackendDict |
-  MathExpressionInputCustomizationArgsBackendDict |
   MultipleChoiceInputCustomizationArgsBackendDict |
   MusicNotesInputCustomizationArgsBackendDict |
   NumberWithUnitsCustomizationArgsBackendDict |
   NumericExpressionInputCustomizationArgsBackendDict |
   NumericInputCustomizationArgsBackendDict |
   PencilCodeEditorCustomizationArgsBackendDict |
+  RatioExpressionInputCustomizationArgsBackendDict |
   SetInputCustomizationArgsBackendDict |
   TextInputCustomizationArgsBackendDict);
 
@@ -428,12 +441,12 @@ export type InteractionCustomizationArgs = (
   ItemSelectionInputCustomizationArgs |
   LogicProofCustomizationArgs |
   MathEquationInputCustomizationArgs |
-  MathExpressionInputCustomizationArgs |
   MultipleChoiceInputCustomizationArgs |
   MusicNotesInputCustomizationArgs |
   NumberWithUnitsCustomizationArgs |
   NumericExpressionInputCustomizationArgs |
   NumericInputCustomizationArgs |
   PencilCodeEditorCustomizationArgs |
+  RatioExpressionInputCustomizationArgs |
   SetInputCustomizationArgs |
   TextInputCustomizationArgs);

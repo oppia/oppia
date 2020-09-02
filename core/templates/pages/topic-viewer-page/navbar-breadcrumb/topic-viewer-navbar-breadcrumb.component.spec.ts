@@ -60,7 +60,7 @@ describe('Topic viewer navbar breadcrumb component', () => {
         topic_name: 'Topic Name 1',
         topic_id: 'topic1',
         topic_description: 'Description',
-        train_tab_should_be_displayed: false
+        practice_tab_is_displayed: false
       }));
   }));
 

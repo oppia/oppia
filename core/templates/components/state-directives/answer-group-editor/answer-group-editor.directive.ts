@@ -139,6 +139,7 @@ angular.module('oppia').directive('answerGroupEditor', [
                   getDefaultInputValue('Real')];
               case 'ListOfSetsOfHtmlStrings':
               case 'ListOfUnicodeString':
+              case 'SetOfAlgebraicIdentifier':
               case 'SetOfUnicodeString':
               case 'SetOfHtmlString':
                 return [];
@@ -295,7 +296,17 @@ angular.module('oppia').directive('answerGroupEditor', [
             ctrl.directiveSubscriptions.add(
               ExternalSaveService.onExternalSave.subscribe(() => {
                 if (ctrl.isRuleEditorOpen()) {
-                  ctrl.saveRules();
+                  if (StateEditorService.checkCurrentRuleInputIsValid()) {
+                    ctrl.saveRules();
+                  } else {
+                    var messageContent = (
+                      'There was an unsaved rule input which was invalid and ' +
+                      'has been discarded.');
+                    if (!AlertsService.messages.some(messageObject => (
+                      messageObject.content === messageContent))) {
+                      AlertsService.addInfoMessage(messageContent);
+                    }
+                  }
                 }
               })
             );
@@ -310,7 +321,6 @@ angular.module('oppia').directive('answerGroupEditor', [
                   if (ctrl.isRuleEditorOpen()) {
                     ctrl.saveRules();
                   }
-                  $scope.$broadcast('updateAnswerGroupInteractionId');
                   ctrl.answerChoices = ctrl.getAnswerChoices();
                 }
               )

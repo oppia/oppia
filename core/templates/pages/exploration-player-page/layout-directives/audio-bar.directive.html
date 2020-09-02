@@ -239,15 +239,18 @@
 
   .audio-header {
     left: 0;
-    margin-top: -128px;
     position: fixed;
     text-align: center;
-    top: 184px;
+    top: 126px;
     transition: margin-top 0.2s ease-in-out;
     width: 100%;
     z-index: 100;
   }
-
+  @media screen and (max-width: 768px) {
+    .audio-header {
+      top: 56px;
+    }
+  }
   .audio-language-select {
     border-radius: 9px;
     font-size: 15px;

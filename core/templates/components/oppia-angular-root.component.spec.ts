@@ -16,68 +16,35 @@
  * @fileoverview Unit tests for the OppiaAngularRootComponent.
  */
 
-import { ComponentFixture, fakeAsync, TestBed, async, flushMicrotasks} from
+import { ComponentFixture, TestBed, async} from
   '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { OppiaAngularRootComponent } from './oppia-angular-root.component';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 
 let component: OppiaAngularRootComponent;
 let fixture: ComponentFixture<OppiaAngularRootComponent>;
 
-let initialzationPromise: Promise<void>;
-
-class MockPlatformFeatureService {
-  async initialize(): Promise<void> {
-    return initialzationPromise;
-  }
-}
-
 describe('OppiaAngularRootComponent', function() {
   let emitSpy: jasmine.Spy;
-
-  let resolveInitPromise: () => void;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [OppiaAngularRootComponent],
-      providers: [
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService
-        }
-      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(OppiaAngularRootComponent);
     component = fixture.componentInstance;
 
-    initialzationPromise = new Promise(resolveFn => {
-      resolveInitPromise = resolveFn;
-    });
     emitSpy = spyOn(component.initialized, 'emit');
-
-    component.ngAfterViewInit();
   }));
 
   describe('.initialized', () => {
-    it('should not emit before initialization of PlatformFeatureService',
-      fakeAsync(() => {
-        flushMicrotasks();
+    it('should emit once ngAfterViewInit is called', () => {
+      component.ngAfterViewInit();
 
-        expect(emitSpy).not.toHaveBeenCalled();
-      })
-    );
-
-    it('should emit once the platform feature service completes initialization',
-      fakeAsync(() => {
-        resolveInitPromise();
-        flushMicrotasks();
-
-        expect(emitSpy).toHaveBeenCalled();
-      })
-    );
+      expect(emitSpy).toHaveBeenCalled();
+    });
   });
 });
