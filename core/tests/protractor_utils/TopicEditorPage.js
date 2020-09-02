@@ -106,6 +106,8 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-topic-meta-tag-content-field'));
   var topicMetaTagContentLabel = element(
     by.css('.protractor-test-topic-meta-tag-content-label'));
+  var easyRubricDifficulty = element(
+    by.css('.protractor-test-skill-difficulty-easy'));
 
   var dragAndDrop = async function(fromElement, toElement) {
     await browser.executeScript(dragAndDropScript, fromElement, toElement);
@@ -169,6 +171,7 @@ var TopicEditorPage = function() {
     await element(by.css('option[label="' + skillDescription + '"]')).click();
 
     await action.click('Create question button', createQuestionButton);
+    await action.click('Easy difficulty for skill', easyRubricDifficulty);
   };
 
   this.moveToQuestionsTab = async function() {
