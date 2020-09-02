@@ -36,6 +36,7 @@ import release_constants
 CURRENT_PYTHON_BIN = sys.executable
 
 # Versions of libraries used in devflow.
+WHEEL_VERSION = '0.35.0'
 COVERAGE_VERSION = '5.1'
 ESPRIMA_VERSION = '4.0.1'
 ISORT_VERSION = '4.3.21'

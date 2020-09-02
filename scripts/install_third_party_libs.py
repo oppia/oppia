@@ -28,7 +28,6 @@ TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 # These libraries need to be installed before running or importing any script.
 
 PREREQUISITES = [
-    ('wheel', '0.35.0', os.path.join(TOOLS_DIR, 'wheel-0.35.0')),
     ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
     ('future', '0.17.1', os.path.join('third_party', 'future-0.17.1'))
 ]
@@ -44,8 +43,6 @@ for package_name, version_number, target_path in PREREQUISITES:
         output_stderr = current_process.communicate()[1]
         if 'can\'t combine user with prefix' in output_stderr:
             subprocess.check_call(command_text + uextention_text)
-
-sys.path.insert(0, os.path.join(TOOLS_DIR, 'wheel-0.35.0'))
 
 import python_utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
@@ -166,6 +163,12 @@ def main():
     """Install third-party libraries for Oppia."""
     setup.main(args=[])
     setup_gae.main(args=[])
+    # Installing wheel because this is required.
+    ensure_pip_library_is_installed(
+        'wheel', common.WHEEL_VERSION, common.OPPIA_TOOLS_DIR)
+    sys.path.insert(
+        0,
+        os.path.join(common.OPPIA_TOOLS_DIR, 'wheel-%s' % common.WHEEL_VERSION))
     pip_dependencies = [
         ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
         ('pylint', common.PYLINT_VERSION, common.OPPIA_TOOLS_DIR),
