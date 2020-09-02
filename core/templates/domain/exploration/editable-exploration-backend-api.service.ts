@@ -26,7 +26,8 @@ angular.module('oppia').factory('EditableExplorationBackendApiService', [
   '$http', '$q', 'ReadOnlyExplorationBackendApiService',
   'UrlInterpolationService', 'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
-  function($http, $q, ReadOnlyExplorationBackendApiService,
+  function(
+      $http, $q, ReadOnlyExplorationBackendApiService,
       UrlInterpolationService, EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE,
       EDITABLE_EXPLORATION_DATA_URL_TEMPLATE) {
     var _fetchExploration = function(

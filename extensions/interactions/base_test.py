@@ -355,6 +355,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
         for interaction_id in all_interaction_ids:
+
             # Check that the interaction id is valid.
             self.assertTrue(self._is_camel_cased(interaction_id))
             hyphenated_interaction_id = (
@@ -499,15 +500,18 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     '%s-short-response.directive.html' %
                     hyphenated_interaction_id)
 
-            self.assertTrue(os.path.isfile(interaction_ts_file))
-            self.assertTrue(os.path.isfile(response_ts_file))
-            self.assertTrue(os.path.isfile(
-                short_response_ts_file))
+            # TODO(#10460): Remove this as soon as the learner's flow is added
+            # for RatioExpressionInput.
+            if interaction_id != u'RatioExpressionInput':
+                self.assertTrue(os.path.isfile(interaction_ts_file))
+                self.assertTrue(os.path.isfile(response_ts_file))
+                self.assertTrue(os.path.isfile(
+                    short_response_ts_file))
+                self.assertTrue(os.path.isfile(interaction_html))
+                self.assertTrue(os.path.isfile(response_html))
+                self.assertTrue(os.path.isfile(short_response_html))
             self.assertTrue(os.path.isfile(rules_service_ts_file))
             self.assertTrue(os.path.isfile(validation_service_ts_file))
-            self.assertTrue(os.path.isfile(interaction_html))
-            self.assertTrue(os.path.isfile(response_html))
-            self.assertTrue(os.path.isfile(short_response_html))
 
             # Check that the PNG thumbnail image has the correct dimensions.
             static_dir = os.path.join(interaction_dir, 'static')
@@ -522,27 +526,33 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
 
-            interaction_ts_file_content = utils.get_file_contents(
-                interaction_ts_file)
-            response_ts_file_content = utils.get_file_contents(
-                response_ts_file)
-            short_response_ts_file_content = (
-                utils.get_file_contents(short_response_ts_file))
+            # TODO(#10460): Remove this as soon as the learner's flow is added
+            # for RatioExpressionInput.
+            if interaction_id != u'RatioExpressionInput':
+                interaction_ts_file_content = utils.get_file_contents(
+                    interaction_ts_file)
+                response_ts_file_content = utils.get_file_contents(
+                    response_ts_file)
+                short_response_ts_file_content = (
+                    utils.get_file_contents(short_response_ts_file))
             ts_file_content = utils.get_file_contents(ts_file)
             rules_service_ts_file_content = utils.get_file_contents(
                 rules_service_ts_file)
             validation_service_ts_file_content = utils.get_file_contents(
                 validation_service_ts_file)
 
-            self.assertIn(
-                'oppiaInteractive%s' % interaction_id,
-                interaction_ts_file_content)
-            self.assertIn(
-                'oppiaResponse%s' % interaction_id,
-                response_ts_file_content)
-            self.assertIn(
-                'oppiaShortResponse%s' % interaction_id,
-                short_response_ts_file_content)
+            # TODO(#10460): Remove this as soon as the learner's flow is added
+            # for RatioExpressionInput.
+            if interaction_id != u'RatioExpressionInput':
+                self.assertIn(
+                    'oppiaInteractive%s' % interaction_id,
+                    interaction_ts_file_content)
+                self.assertIn(
+                    'oppiaResponse%s' % interaction_id,
+                    response_ts_file_content)
+                self.assertIn(
+                    'oppiaShortResponse%s' % interaction_id,
+                    short_response_ts_file_content)
             self.assertIn(
                 '%sRulesService' % (
                     interaction_id[0] + interaction_id[1:]),
@@ -553,21 +563,24 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             # Check that the html template includes js script for the
             # interaction.
-            self.assertTrue(
-                'oppia-interactive-%s.component.ts' %
-                hyphenated_interaction_id in ts_file_content or (
-                    'oppia-interactive-%s.directive.ts' %
-                    hyphenated_interaction_id in ts_file_content))
-            self.assertTrue(
-                'oppia-response-%s.component.ts' %
-                hyphenated_interaction_id in ts_file_content or (
-                    'oppia-response-%s.directive.ts' %
-                    hyphenated_interaction_id in ts_file_content))
-            self.assertTrue(
-                'oppia-short-response-%s.component.ts' %
-                hyphenated_interaction_id in ts_file_content or (
-                    'oppia-short-response-%s.directive.ts' %
-                    hyphenated_interaction_id in ts_file_content))
+            # TODO(#10460): Remove this as soon as the learner's flow is added
+            # for RatioExpressionInput.
+            if interaction_id != u'RatioExpressionInput':
+                self.assertTrue(
+                    'oppia-interactive-%s.component.ts' %
+                    hyphenated_interaction_id in ts_file_content or (
+                        'oppia-interactive-%s.directive.ts' %
+                        hyphenated_interaction_id in ts_file_content))
+                self.assertTrue(
+                    'oppia-response-%s.component.ts' %
+                    hyphenated_interaction_id in ts_file_content or (
+                        'oppia-response-%s.directive.ts' %
+                        hyphenated_interaction_id in ts_file_content))
+                self.assertTrue(
+                    'oppia-short-response-%s.component.ts' %
+                    hyphenated_interaction_id in ts_file_content or (
+                        'oppia-short-response-%s.directive.ts' %
+                        hyphenated_interaction_id in ts_file_content))
             self.assertIn(
                 '%s-rules.service.ts' % hyphenated_interaction_id,
                 ts_file_content)
@@ -740,6 +753,9 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
 
         missing_interaction_ids = (
             all_interaction_ids - observed_interaction_ids)
-        self.assertEqual(len(missing_interaction_ids), 0, msg=(
-            'Missing interaction IDs in demo exploration: %s' %
-            missing_interaction_ids))
+        if list(missing_interaction_ids) != ['RatioExpressionInput']:
+            # TODO(#10460): Remove this as soon as the learner's flow is added
+            # for RatioExpressionInput.
+            self.assertEqual(len(missing_interaction_ids), 0, msg=(
+                'Missing interaction IDs in demo exploration: %s' %
+                missing_interaction_ids))

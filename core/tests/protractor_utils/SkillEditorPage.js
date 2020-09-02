@@ -17,7 +17,8 @@
  * in Protractor tests.
  */
 
-var forms = require('./forms.js');
+var action = require('./action.js');
+var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
 var SkillEditorPage = function() {
@@ -97,6 +98,8 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-save-rubric-explanation-button'));
   var deleteRubricExplanationButton = element(
     by.css('.protractor-test-delete-rubric-explanation-button'));
+  var easyRubricDifficulty = element(
+    by.css('.protractor-test-skill-difficulty-easy'));
 
   this.get = async function(skillId) {
     await browser.get(EDITOR_URL_PREFIX + skillId);
@@ -192,6 +195,7 @@ var SkillEditorPage = function() {
   };
 
   this.saveQuestion = async function() {
+    await general.scrollToTop();
     await saveQuestionButton.click();
     await waitFor.pageToFullyLoad();
   };
@@ -205,6 +209,7 @@ var SkillEditorPage = function() {
 
   this.clickCreateQuestionButton = async function() {
     await createQuestionButton.click();
+    await action.click('Easy difficulty for skill', easyRubricDifficulty);
   };
 
   this.confirmSkillDifficulty = async function() {

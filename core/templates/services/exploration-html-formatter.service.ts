@@ -65,8 +65,8 @@ export class ExplorationHtmlFormatterService {
     element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs));
-    element.attr('last-answer', parentHasLastAnswerProperty ?
-      'lastAnswer' : 'null');
+    element.attr(
+      'last-answer', parentHasLastAnswerProperty ? 'lastAnswer' : 'null');
     if (labelForFocusTarget) {
       element.attr('label-for-focus-target', labelForFocusTarget);
     }

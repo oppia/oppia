@@ -144,9 +144,10 @@ var ensurePageHasNoTranslationIds = async function() {
   var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
   var REGEX_NG_TOP_NAV_VISIBILITY = (
     new RegExp('ng-show="\\$ctrl.navElementsVisibilityStatus.I18N_', 'g'));
-  expect(promiseValue.replace(REGEX_TRANSLATE_ATTR, '')
-    .replace(REGEX_NG_VARIABLE, '')
-    .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
+  expect(
+    promiseValue.replace(REGEX_TRANSLATE_ATTR, '')
+      .replace(REGEX_NG_VARIABLE, '')
+      .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
 };
 
 var acceptAlert = async function() {

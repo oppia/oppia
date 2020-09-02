@@ -396,6 +396,11 @@ import { PencilCodeEditorRulesService } from
 import { PencilCodeEditorValidationService } from
   // eslint-disable-next-line max-len
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { PlatformFeatureAdminBackendApiService } from
+  'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformFeatureBackendApiService } from
+  'domain/platform_feature/platform-feature-backend-api.service';
 import { PlatformParameterFilterObjectFactory } from
   'domain/platform_feature/platform-parameter-filter-object.factory';
 import { PlatformParameterObjectFactory } from
@@ -440,6 +445,10 @@ import { QuestionSummaryObjectFactory } from
   'domain/question/QuestionSummaryObjectFactory';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
+import { RatioExpressionInputValidationService } from
+  // eslint-disable-next-line max-len
+  'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
+import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { ReadOnlyStoryNodeObjectFactory } from
@@ -853,6 +862,7 @@ export class UpgradedServices {
       new QuestionSummaryObjectFactory();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
+    upgradedServices['RatioObjectFactory'] = new RatioObjectFactory();
     upgradedServices['ReviewTestEngineService'] = new ReviewTestEngineService();
     upgradedServices['ReviewTestObjectFactory'] = new ReviewTestObjectFactory();
     upgradedServices['RubricObjectFactory'] =
@@ -1082,6 +1092,10 @@ export class UpgradedServices {
     upgradedServices['ReadOnlyStoryNodeObjectFactory'] =
         new ReadOnlyStoryNodeObjectFactory(
           upgradedServices['LearnerExplorationSummaryObjectFactory']);
+    upgradedServices['RatioExpressionInputValidationService'] =
+          new RatioExpressionInputValidationService(
+            upgradedServices['RatioObjectFactory'],
+            upgradedServices['baseInteractionValidationService']);
     upgradedServices['RecordedVoiceoversObjectFactory'] =
       new RecordedVoiceoversObjectFactory(
         upgradedServices['VoiceoverObjectFactory']);
@@ -1305,6 +1319,7 @@ export class UpgradedServices {
         upgradedServices['NumericExpressionInputRulesService'],
         upgradedServices['NumericInputRulesService'],
         upgradedServices['PencilCodeEditorRulesService'],
+        upgradedServices['RatioExpressionInputRulesService'],
         upgradedServices['SetInputRulesService'],
         upgradedServices['TextInputRulesService']);
     upgradedServices['AudioTranslationLanguageService'] =
@@ -1392,6 +1407,14 @@ export class UpgradedServices {
         new LearnerDashboardIdsBackendApiService(
           upgradedServices['HttpClient'],
           upgradedServices['LearnerDashboardActivityIdsObjectFactory']);
+    upgradedServices['PlatformFeatureBackendApiService'] =
+      new PlatformFeatureBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['FeatureStatusSummaryObjectFactory']
+      );
+    upgradedServices['PlatformFeatureAdminBackendApiService'] =
+      new PlatformFeatureAdminBackendApiService(
+        upgradedServices['HttpClient']);
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
       upgradedServices['PlayerTranscriptService']);
     upgradedServices['PlaythroughBackendApiService'] =
@@ -1551,6 +1574,15 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
+    upgradedServices['PlatformFeatureService'] = new PlatformFeatureService(
+      upgradedServices['ClientContextObjectFactory'],
+      upgradedServices['PlatformFeatureBackendApiService'],
+      upgradedServices['FeatureStatusSummaryObjectFactory'],
+      upgradedServices['I18nLanguageCodeService'],
+      upgradedServices['WindowRef'],
+      upgradedServices['LoggerService'],
+      upgradedServices['UrlService'],
+      upgradedServices['BrowserCheckerService']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],
