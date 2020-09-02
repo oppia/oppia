@@ -164,6 +164,17 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
+- url: /contributor-dashboard
+  static_files: webpack_bundles/contributor-dashboard-page.mainpage.html
+  upload: webpack_bundles/contributor-dashboard-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
 - url: /donate
   static_files: webpack_bundles/donate-page.mainpage.html
   upload: webpack_bundles/donate-page.mainpage.html

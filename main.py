@@ -233,9 +233,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/contributionreviewerrightsdatahandler',
         admin.ContributionReviewerRightsDataHandler),
-    get_redirect_route(
-        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
-        contributor_dashboard.ContributorDashboardPage),
 
     get_redirect_route(
         '/notifications_dashboard',
