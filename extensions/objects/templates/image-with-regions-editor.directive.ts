@@ -531,6 +531,10 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
             // The initializeEditor function is written separately since it
             // is also called in resetEditor function.
             ctrl.initializeEditor();
+            ctrl.SCHEMA = {
+              type: 'custom',
+              obj_type: 'Filepath'
+            };
           };
         }
       ]
