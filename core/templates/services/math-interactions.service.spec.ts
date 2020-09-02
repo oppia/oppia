@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { MathInteractionsService } from 'services/math-interactions.service';
 
-fdescribe('MathInteractionsService', () => {
+describe('MathInteractionsService', () => {
   let mathInteractionsService: MathInteractionsService = null;
 
   beforeEach(() => {
