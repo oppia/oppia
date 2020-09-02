@@ -517,7 +517,6 @@ def main(args=None):
                 python_utils.PRINT(
                     'Push aborted due to failing e2e test configuration check.')
                 sys.exit(1)
-
     return
 
 

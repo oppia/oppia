@@ -106,7 +106,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook,
             'does_diff_include_travis_yml_or_js_files',
             mock_does_diff_include_travis_yml_or_js_files)
-        self.number_of_times_prompt_is_displayed = 0
 
     def test_start_subprocess_for_result(self):
         with self.popen_swap:
@@ -728,7 +727,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 '`third_party/python_libs` directory.\n\n'
             ])
 
-    def test_no_inconsistencies_in_backend_python_libs(self):
+    def test_main_with_no_inconsistencies_in_backend_python_libs(self):
         def mock_get_mismatches():
             return {}
         swap_get_mismatches = self.swap(

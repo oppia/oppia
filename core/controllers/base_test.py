@@ -448,7 +448,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         # We need to re-import appengine_config here to make it look like a
         # local variable so that we can again re-import appengine_config later.
         import appengine_config
-
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception,
             'virtualenv: cannot access invalid_path/python_libs: No such '

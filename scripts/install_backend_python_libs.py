@@ -46,8 +46,8 @@ def _get_requirements_file_contents():
                 continue
             library_name_and_version_string = l.split(' ')[0].split('==')
             # Libraries are not distinguished by case so in order to make sure
-            # the same libraries have the same library name, all library names
-            # are changed to lowercase.
+            # the same libraries have the same library name for easy comparison,
+            # all library names are changed to lowercase.
             library_name = library_name_and_version_string[0].lower()
             version_string = library_name_and_version_string[1]
             requirements_contents[library_name] = version_string
@@ -79,9 +79,9 @@ def _remove_metadata(library_name, version_string):
     was reinstalled with a new version. The reason we need this function is
     because `pip install --upgrade` upgrades libraries to a new version but
     does not remove the metadata that was installed with the previous version.
-    These metadata files confuse the pip function that extracts all of the
-    information about currently installed libraries and will cause this
-    installation script to behave incorrectly.
+    These metadata files confuse the pkg_resources function that extracts all of
+    the information about the currently installed python libraries and causes
+    this installation script to behave incorrectly.
 
     Args:
         library_name: str. Name of the library to remove the metadata for.
@@ -147,8 +147,8 @@ def _rectify_third_party_directory(mismatches):
             _reinstall_all_dependencies()
             return
 
-        # Either the library listed in 'requirements.txt' is not in the
-        # third party directory.
+        # The library listed in 'requirements.txt' is not in the
+        # 'third_party/python_libs' directory.
         if not directory_version:
             _install_library(
                 library_name,
@@ -193,6 +193,38 @@ def _reinstall_all_dependencies():
         common.COMPILED_REQUIREMENTS_FILE_PATH,
         '--upgrade'
     ])
+
+
+def _get_possible_metadata_directory_names(library_name, version_string):
+    """Possible metadata directory names for python libraries installed using
+    pip (following the guidelines of PEP-427 and PEP-376).
+    This ensures that our _remove_metadata() function works as intended. More
+    details about the guidelines concerning the metadata folders can be found
+    here:
+    https://www.python.org/dev/peps/pep-0427/#file-contents
+    https://www.python.org/dev/peps/pep-0376/#how-distributions-are-installed.
+
+    Args:
+        library_name: str. Name of the library.
+        version_string: str. Stringified version of the library.
+
+    Returns:
+        set(str). Set containing the possible directory name strings of metadata
+        folders.
+    """
+    possible_names = {
+        '%s-%s.dist-info' % (library_name, version_string),
+        # Some metadata folders replace the hyphens of the library name with
+        # underscores.
+        '%s-%s.dist-info' % (
+            library_name.replace('-', '_'), version_string),
+        '%s-%s.egg-info' % (library_name, version_string),
+        # Some metadata folders replace the hyphens of the library name with
+        # underscores.
+        '%s-%s.egg-info' % (
+            library_name.replace('-', '_'), version_string),
+    }
+    return possible_names
 
 
 def get_mismatches():
@@ -248,42 +280,11 @@ def get_mismatches():
     return mismatches
 
 
-def _get_possible_metadata_directory_names(library_name, version_string):
-    """Possible metadata directory names for python libraries installed using
-    pip (following the guidelines of PEP-427 and PEP-376).
-    This ensures that our _remove_metadata() function works as intended. More
-    details about the guidelines concerning the metadata folders can be found
-    here:
-    https://www.python.org/dev/peps/pep-0427/#file-contents
-    https://www.python.org/dev/peps/pep-0376/#how-distributions-are-installed.
-
-    Args:
-        library_name: str. Name of the library.
-        version_string: str. Stringified version of the library.
-
-    Returns:
-        set(str). Set containing the possible directory name strings of metadata
-        folders.
-    """
-    possible_names = {
-        '%s-%s.dist-info' % (library_name, version_string),
-        # Some metadata folders replace the hyphens of the library name with
-        # underscores.
-        '%s-%s.dist-info' % (
-            library_name.replace('-', '_'), version_string),
-        '%s-%s.egg-info' % (library_name, version_string),
-        # Some metadata folders replace the hyphens of the library name with
-        # underscores.
-        '%s-%s.egg-info' % (
-            library_name.replace('-', '_'), version_string),
-    }
-    return possible_names
-
-
 def validate_metadata_directories():
-    """Validates that for each installed library in 'third_party/python_libs',
-    folder there exists corresponding metadata directories with the correct
-    naming conventions that follows the PEP-427 and PEP-376 python guidelines
+    """Validates that for each installed library in the
+    'third_party/python_libs' folder, there exists corresponding metadata
+    directories following the correct naming conventions that are detailed by
+    the PEP-427 and PEP-376 python guidelines.
 
     Raises:
         Exception. An installed library's metadata does not exist the

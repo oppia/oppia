@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Script to generate a deterministic compiled 'requirements.txt' file.
+"""Script to compile a deterministic 'requirements.txt' file.
 
 This needs to be a separate script because the python function that regenerates
 the requirements file is a command-line interface (CLI) script. Once the CLI

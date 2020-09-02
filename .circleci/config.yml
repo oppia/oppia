@@ -108,7 +108,7 @@ jobs:
       - checkout
       - merge_target_branch
       - run:
-          name: Setup Python
+          name: Setup Python Installation
           command: pip install wheel==0.35.0
       - run:
           name: Install dependencies
