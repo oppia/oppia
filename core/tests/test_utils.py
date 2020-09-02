@@ -28,7 +28,6 @@ import inspect
 import itertools
 import json
 import os
-import time
 import unittest
 
 from constants import constants
@@ -2372,13 +2371,6 @@ class AppEngineTestBase(TestBase):
         self.taskqueue_stub = self.testbed.get_stub(
             testbed.TASKQUEUE_SERVICE_NAME)
 
-        # Set the timezone to be UTC.
-        # Retrieve the current timezone, accounting for daylight savings
-        # as necessary.
-        self.initial_timezone = time.tzname[time.daylight]
-        os.environ['TZ'] = 'UTC'
-        time.tzset()
-
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
 
@@ -2421,11 +2413,6 @@ class AppEngineTestBase(TestBase):
     def tearDown(self):
         self.logout()
         self._delete_all_models()
-
-        # Set the timezone back to the original timezone.
-        os.environ['TZ'] = self.initial_timezone
-        time.tzset()
-
         self.testbed.deactivate()
 
     def _get_all_queue_names(self):

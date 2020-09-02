@@ -677,6 +677,8 @@ class QuestionSummaryModel(base_models.BaseModel):
         indexed=True, required=True)
     # The html content for the question.
     question_content = ndb.TextProperty(indexed=False, required=True)
+    # The ID of the interaction.
+    interaction_id = ndb.StringProperty(indexed=True, required=True)
     # The misconception ids addressed in the question. This includes
     # tagged misconceptions ids as well as inapplicable misconception
     # ids in the question.
