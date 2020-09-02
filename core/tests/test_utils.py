@@ -1898,7 +1898,7 @@ tags: []
 
     def save_new_question(
             self, question_id, owner_id, question_state_data,
-            linked_skill_ids,
+            linked_skill_ids, inapplicable_misconception_ids=None,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Question and saves it.
 
@@ -1908,22 +1908,29 @@ tags: []
             question_state_data: State. The state data for the question.
             linked_skill_ids: list(str). List of skill IDs linked to the
                 question.
+            inapplicable_misconception_ids: list(str). List of misconceptions
+                ids that are not applicable to the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 
         Returns:
             Question. A newly-created question.
         """
+        # This needs to be done because default arguments can not be of list
+        # type.
+        if inapplicable_misconception_ids is None:
+            inapplicable_misconception_ids = []
         question = question_domain.Question(
             question_id, question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0,
-            linked_skill_ids)
+            linked_skill_ids, inapplicable_misconception_ids)
         question_services.add_question(owner_id, question)
         return question
 
     def save_new_question_with_state_data_schema_v27(
             self, question_id, owner_id,
             linked_skill_ids,
+            inapplicable_misconception_ids=None,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new default question with a default version 27 state
         data dictionary.
@@ -1941,16 +1948,23 @@ tags: []
             question_id: str. ID for the question to be created.
             owner_id: str. The id of the user creating the question.
             linked_skill_ids: list(str). The skill IDs linked to the question.
+            inapplicable_misconception_ids: list(str). List of misconceptions
+                ids that are not applicable to the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
+        # This needs to be done because default arguments can not be of list
+        # type.
+        if inapplicable_misconception_ids is None:
+            inapplicable_misconception_ids = []
         question_model = question_models.QuestionModel(
             id=question_id,
             question_state_data=self.VERSION_27_STATE_DICT,
             language_code=language_code,
             version=1,
             question_state_data_schema_version=27,
-            linked_skill_ids=linked_skill_ids
+            linked_skill_ids=linked_skill_ids,
+            inapplicable_misconception_ids=inapplicable_misconception_ids
         )
         question_model.commit(
             owner_id, 'New question created',
