@@ -500,8 +500,8 @@ def get_users_settings(user_ids, strict=False):
     Args:
         user_ids: list(str). The list of user_ids to get UserSettings
             domain objects for.
-        strict: bool. Whether to fail noisily if no user with the given ID
-            exists in the datastore. Defaults to False.
+        strict: bool. Whether to fail noisily if one or more user IDs don't
+            exist in the datastore. Defaults to False.
 
     Returns:
         list(UserSettings|None). The UserSettings domain objects corresponding
@@ -509,7 +509,7 @@ def get_users_settings(user_ids, strict=False):
         corresponding entry in the returned list is None.
 
     Raises:
-        Exception. When strict mdoe is enabled and some user is not found.
+        Exception. When strict mode is enabled and some user is not found.
     """
     user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
     if strict:
@@ -1029,8 +1029,8 @@ def _get_pseudonymous_username(pseudonymous_id):
             the username.
 
     Returns:
-        str. The pseudonymous username, starting with 'User' and
-        ending with eight last letters from the pseudonymous_id.
+        str. The pseudonymous username, starting with 'User' and ending with
+        the last eight letters from the pseudonymous_id.
     """
     return 'User%s%s' % (
         pseudonymous_id[-8].upper(), pseudonymous_id[-7:])
