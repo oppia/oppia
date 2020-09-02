@@ -1877,7 +1877,7 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
         self.assertEqual(user_data, test_data)
 
 
-class UserContributionsScoringModelTests(test_utils.GenericTestBase):
+class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
     """Tests for UserContributionProficiencyModel."""
 
     NONEXISTENT_USER_ID = 'id_x'
@@ -1890,7 +1890,7 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
-        super(UserContributionsScoringModelTests, self).setUp()
+        super(UserContributionProficiencyModelTests, self).setUp()
 
         user_models.UserContributionProficiencyModel(
             id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_1_ID),
