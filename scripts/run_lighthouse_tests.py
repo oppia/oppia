@@ -57,11 +57,13 @@ def cleanup():
 
     common.stop_redis_server()
 
+
 def run_lighthouse_puppeteer_script():
-    """Runs the lighthhouse checks through the .lighthouserc.js config."""
+    """Runs puppeteer script to collect dynamic urls."""
 
     node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
-    puppeteer_path = os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js')
+    puppeteer_path = os.path.join(
+        'core', 'tests', 'puppeteer', 'lighthouse_setup.js')
     bash_command = [node_path, puppeteer_path]
 
     try:
@@ -69,15 +71,17 @@ def run_lighthouse_puppeteer_script():
         python_utils.PRINT(script_output)
         for url in script_output:
             export_url(url)
-        python_utils.PRINT('Lighthouse puppeteer script completed successfully.')
-        
+        python_utils.PRINT(
+            'Puppeteer script completed successfully.')
+
     except subprocess.CalledProcessError:
         python_utils.PRINT(
-            'Lighthouse puppeteer script failed. More details can be found above.')
+            'Puppeteer script failed. More details can be found above.')
         sys.exit(1)
 
+
 def export_url(url):
-    # """Runs the lighthouse checks through the .lighthouserc.js config."""
+    """Assigns the url to an environmental variable"""
     python_utils.PRINT(url)
     if 'collection_editor' in url:
         os.environ['collection_editor'] = url
@@ -92,8 +96,9 @@ def export_url(url):
     else:
         return
 
+
 def run_lighthouse_checks():
-    """Runs the lighthhouse checks through the .lighthouserc.js config."""
+    """Runs the lighthouse checks through the .lighthouserc.js config."""
 
     node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
