@@ -128,7 +128,7 @@ class RegenerateMissingV1StatsModelsOneOffJob(
             if exp_version > 1:
                 prev_exp_stats = exp_stats_instances[exp_version - 2]
                 change_dicts = (
-                        snapshots_by_version[exp_version - 1]['commit_cmds'])
+                    snapshots_by_version[exp_version - 1]['commit_cmds'])
                 change_list = [
                     exp_domain.ExplorationChange(change_dict)
                     for change_dict in change_dicts
@@ -161,7 +161,7 @@ class RegenerateMissingV1StatsModelsOneOffJob(
                             '%s.%s: "%s"' % (
                                 exploration.id, exp_version - 1, state_name))
                         exp_stats_default.state_stats_mapping[state_name] = (
-                           stats_domain.StateStats.create_default())
+                            stats_domain.StateStats.create_default())
                     else:
                         new_state_stats = (
                             exp_stats_default.state_stats_mapping[state_name])
