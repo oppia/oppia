@@ -30,7 +30,8 @@ angular.module('oppia').controller('PreviewSummaryTileModalController', [
   '$controller', '$scope', '$uibModalInstance', 'ExplorationCategoryService',
   'ExplorationObjectiveService', 'ExplorationTitleService', 'ALL_CATEGORIES',
   'CATEGORIES_TO_COLORS', 'DEFAULT_CATEGORY_ICON', 'DEFAULT_COLOR',
-  function($controller, $scope, $uibModalInstance, ExplorationCategoryService,
+  function(
+      $controller, $scope, $uibModalInstance, ExplorationCategoryService,
       ExplorationObjectiveService, ExplorationTitleService, ALL_CATEGORIES,
       CATEGORIES_TO_COLORS, DEFAULT_CATEGORY_ICON, DEFAULT_COLOR) {
     $controller('ConfirmOrCancelModalController', {

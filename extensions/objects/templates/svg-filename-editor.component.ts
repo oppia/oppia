@@ -41,7 +41,8 @@ angular.module('oppia').component('svgFilenameEditor', {
     'DeviceInfoService', 'ImageLocalStorageService', 'ImagePreloaderService',
     'ImageUploadHelperService', 'UrlInterpolationService',
     'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
-    function($http, $q, $sce, $scope, AlertsService,
+    function(
+        $http, $q, $sce, $scope, AlertsService,
         AssetsBackendApiService, ContextService, CsrfTokenService,
         DeviceInfoService, ImageLocalStorageService, ImagePreloaderService,
         ImageUploadHelperService, UrlInterpolationService,
@@ -873,6 +874,13 @@ angular.module('oppia').component('svgFilenameEditor', {
             new polyPoint(50, 50), 30, currentAngle,
             currentAngle + ctrl.pieChartDataInput[i].angle,
             ctrl.pieChartDataInput[i].color));
+          // If a pie slice has an angle greater than 180, then
+          // it should be rendered first, otherwise it will overlap other
+          // slices.
+          if (ctrl.pieChartDataInput[i].angle > Math.PI) {
+            var pieSlice = pieSlices.pop();
+            pieSlices.splice(0, 0, pieSlice);
+          }
           currentAngle += ctrl.pieChartDataInput[i].angle;
         }
         // This is to prevent the text from being too small. This can be

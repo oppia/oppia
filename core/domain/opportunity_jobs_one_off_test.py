@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
+from constants import constants
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -29,6 +30,8 @@ from core.domain import opportunity_services
 from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.platform import models
@@ -76,6 +79,23 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
             self.topic_id_1, 'topic', 'abbrev-one', 'description')
         topic_1.thumbnail_filename = 'thumbnail.svg'
         topic_1.thumbnail_bg_color = '#C6DCDA'
+        topic_1.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        topic_1.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.topic_id_1))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
         topic_services.save_new_topic(self.owner_id, topic_1)
         topic_services.publish_topic(self.topic_id_1, self.admin_id)
 
@@ -83,6 +103,23 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
             self.topic_id_2, 'topic2', 'abbrev-two', 'description')
         topic_2.thumbnail_filename = 'thumbnail.svg'
         topic_2.thumbnail_bg_color = '#C6DCDA'
+        topic_2.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_2'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.topic_id_2))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_2.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic_2)
         topic_services.publish_topic(self.topic_id_2, self.admin_id)
 

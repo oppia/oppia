@@ -973,7 +973,7 @@ class MockCollectionRightsModel(
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put_async()
+            ).put()
 
 
 class MockExplorationRightsModel(exp_models.ExplorationRightsModel):
@@ -1020,7 +1020,7 @@ class MockExplorationRightsModel(exp_models.ExplorationRightsModel):
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put_async()
+            ).put()
 
 
 class MockTopicRightsModel(topic_models.TopicRightsModel):
@@ -1508,7 +1508,7 @@ class AddCommitCmdsUserIdsMetadataJobTests(test_utils.GenericTestBase):
             output,
             [
                 ['SUCCESS-ExplorationRightsSnapshotMetadataModel', 2],
-                [u'MIGRATION_SUCCESS', 1]
+                ['MIGRATION_SUCCESS', 1]
             ]
         )
 
@@ -1548,15 +1548,6 @@ class AddCommitCmdsUserIdsMetadataJobTests(test_utils.GenericTestBase):
             exp_models.ExplorationCommitLogEntryModel
             .get_by_id('rights-%s-2' % self.EXP_1_ID).commit_cmds
         )
-
-        self.assertItemsEqual(
-            [],
-            exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.EXP_1_ID).commit_cmds_user_ids)
-        self.assertItemsEqual(
-            [self.USER_1_ID, self.USER_2_ID],
-            exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.EXP_1_ID).commit_cmds_user_ids)
 
     def test_fix_user_ids_in_exploration_rights_snapshot_with_missing_commit(
             self):
@@ -1629,14 +1620,87 @@ class AddCommitCmdsUserIdsMetadataJobTests(test_utils.GenericTestBase):
             .get_by_id('%s-2' % self.EXP_1_ID).commit_cmds
         )
 
+    def test_fix_user_ids_in_exploration_rights_snapshot_with_missing_user(
+            self):
+        with self.exploration_rights_model_swap:
+            exp_model = exp_models.ExplorationRightsModel(
+                id=self.EXP_1_ID,
+                owner_ids=[self.USER_3_ID],
+                editor_ids=[self.USER_2_ID],
+                voice_artist_ids=[],
+                viewer_ids=[],
+                community_owned=False,
+                status=constants.ACTIVITY_STATUS_PUBLIC,
+                viewable_if_private=False,
+                first_published_msec=0.0)
+            exp_model.save(
+                'cid', 'Created new exploration rights',
+                [{'cmd': rights_domain.CMD_CREATE_NEW}])
+            exp_model.owner_ids = [
+                self.USER_1_ID, self.USER_2_ID, self.USER_3_ID]
+            exp_model.save(
+                'cid',
+                'Change owner',
+                [
+                    {
+                        'cmd': rights_domain.CMD_CHANGE_ROLE,
+                        'assignee_id': self.USER_GAE_1_ID,
+                        'old_role': rights_domain.ROLE_NONE,
+                        'new_role': rights_domain.ROLE_OWNER
+                    },
+                    {
+                        'cmd': rights_domain.CMD_CHANGE_ROLE,
+                        'assignee_id': self.USER_GAE_3_ID,
+                        'old_role': rights_domain.ROLE_EDITOR,
+                        'new_role': rights_domain.ROLE_OWNER
+                    }
+                ])
+
+        output = self._run_one_off_job()
         self.assertItemsEqual(
-            [],
-            exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-1' % self.EXP_1_ID).commit_cmds_user_ids)
+            output,
+            [
+                ['SUCCESS-ExplorationRightsSnapshotMetadataModel', 2],
+                ['MIGRATION_FAILURE', ['(\'exp_1_id-2\', u\'user_gae_3_id\')']],
+            ]
+        )
+
         self.assertItemsEqual(
-            [self.USER_1_ID, self.USER_2_ID],
+            [
+                {
+                    'cmd': rights_domain.CMD_CHANGE_ROLE,
+                    'assignee_id': self.USER_GAE_1_ID,
+                    'old_role': rights_domain.ROLE_NONE,
+                    'new_role': rights_domain.ROLE_OWNER
+                },
+                {
+                    'cmd': rights_domain.CMD_CHANGE_ROLE,
+                    'assignee_id': self.USER_GAE_3_ID,
+                    'old_role': rights_domain.ROLE_EDITOR,
+                    'new_role': rights_domain.ROLE_OWNER
+                }
+            ],
             exp_models.ExplorationRightsSnapshotMetadataModel
-            .get_by_id('%s-2' % self.EXP_1_ID).commit_cmds_user_ids)
+            .get_by_id('%s-2' % self.EXP_1_ID).commit_cmds
+        )
+        self.assertItemsEqual(
+            [
+                {
+                    'cmd': rights_domain.CMD_CHANGE_ROLE,
+                    'assignee_id': self.USER_GAE_1_ID,
+                    'old_role': rights_domain.ROLE_NONE,
+                    'new_role': rights_domain.ROLE_OWNER
+                },
+                {
+                    'cmd': rights_domain.CMD_CHANGE_ROLE,
+                    'assignee_id': self.USER_GAE_3_ID,
+                    'old_role': rights_domain.ROLE_EDITOR,
+                    'new_role': rights_domain.ROLE_OWNER
+                }
+            ],
+            exp_models.ExplorationCommitLogEntryModel
+            .get_by_id('rights-%s-2' % self.EXP_1_ID).commit_cmds
+        )
 
     def test_add_commit_cmds_user_ids_to_topic_rights_snapshot(self):
         with self.topic_rights_model_swap:

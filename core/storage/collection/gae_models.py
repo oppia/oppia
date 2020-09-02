@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from constants import constants
-from core.domain import rights_domain  # pylint: disable=invalid-import
 import core.storage.base_model.gae_models as base_models
 import feconf
 import python_utils
@@ -384,9 +383,10 @@ class CollectionRightsModel(base_models.VersionedModel):
 
         commit_cmds_user_ids = set()
         for commit_cmd in commit_cmds:
-            user_id_attribute_names = (
-                rights_domain.CollectionRightsChange
-                .get_user_id_attribute_names(commit_cmd['cmd'])
+            user_id_attribute_names = python_utils.NEXT(
+                cmd['user_id_attribute_names']
+                for cmd in feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS
+                if cmd['name'] == commit_cmd['cmd']
             )
             for user_id_attribute_name in user_id_attribute_names:
                 commit_cmds_user_ids.add(commit_cmd[user_id_attribute_name])

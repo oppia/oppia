@@ -306,8 +306,22 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         self.allow_revert_swap = self.swap(
             collection_models.CollectionRightsModel, 'ALLOW_REVERT', True)
 
+        collection_rights_allowed_commands = copy.deepcopy(
+            feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS)
+        collection_rights_allowed_commands.append({
+            'name': feconf.CMD_REVERT_COMMIT,
+            'required_attribute_names': [],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': []
+        })
+        self.allowed_commands_swap = self.swap(
+            feconf,
+            'COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS',
+            collection_rights_allowed_commands
+        )
+
     def test_revert_to_valid_version_is_successful(self):
-        with self.allow_revert_swap:
+        with self.allow_revert_swap, self.allowed_commands_swap:
             collection_models.CollectionRightsModel.revert(
                 self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
 
@@ -331,7 +345,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
         snapshot_model.content = broken_dict
         snapshot_model.put()
-        with self.allow_revert_swap:
+        with self.allow_revert_swap, self.allowed_commands_swap:
             collection_models.CollectionRightsModel.revert(
                 self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
 
@@ -356,7 +370,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
         snapshot_model.content = broken_dict
         snapshot_model.put()
-        with self.allow_revert_swap:
+        with self.allow_revert_swap, self.allowed_commands_swap:
             collection_models.CollectionRightsModel.revert(
                 self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
 

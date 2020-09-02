@@ -72,6 +72,8 @@ class StoryModel(base_models.VersionedModel):
     corresponding_topic_id = ndb.StringProperty(indexed=True, required=True)
     # The url fragment for the story.
     url_fragment = ndb.StringProperty(required=True, indexed=True)
+    # The content of the meta tag in the Story viewer page.
+    meta_tag_content = ndb.StringProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy():

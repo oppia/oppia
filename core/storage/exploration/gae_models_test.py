@@ -357,8 +357,22 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         self.allow_revert_swap = self.swap(
             exp_models.ExplorationRightsModel, 'ALLOW_REVERT', True)
 
+        exploration_rights_allowed_commands = copy.deepcopy(
+            feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS)
+        exploration_rights_allowed_commands.append({
+            'name': feconf.CMD_REVERT_COMMIT,
+            'required_attribute_names': [],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': []
+        })
+        self.allowed_commands_swap = self.swap(
+            feconf,
+            'EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS',
+            exploration_rights_allowed_commands
+        )
+
     def test_revert_to_valid_version_is_successful(self):
-        with self.allow_revert_swap:
+        with self.allow_revert_swap, self.allowed_commands_swap:
             exp_models.ExplorationRightsModel.revert(
                 self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
         new_collection_model = (
@@ -383,7 +397,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         snapshot_model.content = broken_dict
         snapshot_model.put()
 
-        with self.allow_revert_swap:
+        with self.allow_revert_swap, self.allowed_commands_swap:
             exp_models.ExplorationRightsModel.revert(
                 self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
         new_collection_model = (
@@ -407,7 +421,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         snapshot_model.content = broken_dict
         snapshot_model.put()
 
-        with self.allow_revert_swap:
+        with self.allow_revert_swap, self.allowed_commands_swap:
             exp_models.ExplorationRightsModel.revert(
                 self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
         new_collection_model = (
@@ -431,7 +445,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
         snapshot_model.content = broken_dict
         snapshot_model.put()
-        with self.allow_revert_swap:
+        with self.allow_revert_swap, self.allowed_commands_swap:
             exp_models.ExplorationRightsModel.revert(
                 self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
 

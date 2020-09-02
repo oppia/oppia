@@ -85,7 +85,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         });
     }
 
-    var storyId = UrlService.getStoryIdInPlayer();
+    var storyUrlFragment = UrlService.getStoryUrlFragmentFromLearnerUrl();
 
     var _playerStateChangeEventEmitter = new EventEmitter();
 
@@ -114,9 +114,11 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       QuestionPlayerEngineService.init(pretestQuestionDicts, callback);
     };
 
-    var initializeQuestionPlayerServices = function(questionDicts, callback) {
+    var initializeQuestionPlayerServices = function(
+        questionDicts, successCallback, errorCallback) {
       PlayerCorrectnessFeedbackEnabledService.init(true);
-      QuestionPlayerEngineService.init(questionDicts, callback);
+      QuestionPlayerEngineService.init(
+        questionDicts, successCallback, errorCallback);
     };
 
     var setExplorationMode = function() {
@@ -158,7 +160,8 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       });
     };
 
-    var initQuestionPlayer = function(questionPlayerConfig, callback) {
+    var initQuestionPlayer = function(
+        questionPlayerConfig, successCallback, errorCallback) {
       setQuestionPlayerMode();
       QuestionBackendApiService.fetchQuestions(
         questionPlayerConfig.skillList,
@@ -166,7 +169,8 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         questionPlayerConfig.questionsSortedByDifficulty
       ).then(function(questionData) {
         _totalQuestionsReceivedEventEmitter.emit(questionData.length);
-        initializeQuestionPlayerServices(questionData, callback);
+        initializeQuestionPlayerServices(
+          questionData, successCallback, errorCallback);
       });
     };
 
@@ -179,7 +183,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       $q.all([
         explorationDataPromise,
         PretestQuestionBackendApiService.fetchPretestQuestions(
-          explorationId, storyId),
+          explorationId, storyUrlFragment),
         ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
           explorationId),
       ]).then(function(combinedData) {
@@ -192,7 +196,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
           initializeExplorationServices(explorationData, true, callback);
           initializePretestServices(pretestQuestionsData, callback);
         } else if (
-          UrlService.getUrlParams().hasOwnProperty('story_id') &&
+          UrlService.getUrlParams().hasOwnProperty('story_url_fragment') &&
           UrlService.getUrlParams().hasOwnProperty('node_id')) {
           setStoryChapterMode();
           initializeExplorationServices(explorationData, false, callback);
@@ -212,9 +216,10 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
           initExplorationPlayer(callback);
         }
       },
-      initializeQuestionPlayer: function(config, callback) {
+      initializeQuestionPlayer: function(
+          config, successCallback, errorCallback) {
         PlayerTranscriptService.init();
-        initQuestionPlayer(config, callback);
+        initQuestionPlayer(config, successCallback, errorCallback);
       },
       getCurrentEngineService: function() {
         return currentEngineService;
@@ -237,7 +242,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       },
       moveToExploration: function(callback) {
         if (
-          UrlService.getUrlParams().hasOwnProperty('story_id') &&
+          UrlService.getUrlParams().hasOwnProperty('story_url_fragment') &&
           UrlService.getUrlParams().hasOwnProperty('node_id')) {
           setStoryChapterMode();
         } else {

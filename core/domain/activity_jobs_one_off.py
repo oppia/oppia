@@ -31,6 +31,7 @@ from core.domain import topic_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 
 (
     collection_models, exp_models, question_models,
@@ -374,20 +375,30 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
             (str, str). Result info, first part is result message, second is
             additional info like IDs.
         """
+        # Only commit_cmds of length 2 are processed by this method.
+        assert len(snapshot_model.commit_cmds) == 2
+        new_user_ids = [None, None]
         for i, commit_cmd in enumerate(snapshot_model.commit_cmds):
+            assignee_id = commit_cmd['assignee_id']
             if (
                     commit_cmd['cmd'] == rights_domain.CMD_CHANGE_ROLE and
-                    not user_services.is_user_id_correct(
-                        commit_cmd['assignee_id'])
+                    not user_services.is_user_id_correct(assignee_id)
             ):
-                old_user_id = commit_cmd['assignee_id']
                 user_settings_model = (
-                    user_models.UserSettingsModel.get_by_gae_id(old_user_id))
+                    user_models.UserSettingsModel.get_by_gae_id(assignee_id))
                 if user_settings_model is None:
-                    return ('MIGRATION_FAILURE', old_user_id)
+                    return (
+                        'MIGRATION_FAILURE', (snapshot_model.id, assignee_id))
 
-                snapshot_model.commit_cmds[i]['assignee_id'] = (
-                    user_settings_model.id)
+                new_user_ids[i] = user_settings_model.id
+
+        # This loop is used for setting the actual commit_cmds and is separate
+        # because if the second commit results in MIGRATION_FAILURE we do not
+        # want to set the first one either. We want to either set the correct
+        # user IDs in both commits or we don't want to set it at all.
+        for i in python_utils.RANGE(len(snapshot_model.commit_cmds)):
+            if new_user_ids[i] is not None:
+                snapshot_model.commit_cmds[i]['assignee_id'] = new_user_ids[i]
 
         commit_log_model = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
@@ -475,7 +486,7 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
         elif isinstance(
                 snapshot_model,
                 exp_models.ExplorationRightsSnapshotMetadataModel):
-            # From audit job and ananlysis of the user ID migration we know that
+            # From audit job and analysis of the user ID migration we know that
             # only commit_cmds of length 2 can have a wrong user ID.
             if len(snapshot_model.commit_cmds) == 2:
                 result = AddCommitCmdsUserIdsMetadataJob._migrate_user_id(

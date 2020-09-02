@@ -24,7 +24,7 @@ from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import rights_manager
+from core.domain import rights_domain
 from core.domain import takeout_domain
 from core.domain import takeout_service
 from core.domain import topic_domain
@@ -261,7 +261,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             'cid', 'Created new collection right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
 
         # Setup for GeneralSuggestionModel.
         suggestion_models.GeneralSuggestionModel.create(
@@ -303,7 +303,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             'cid', 'Created new exploration right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
 
         # Setup for UserSettingsModel.
         user_models.UserSettingsModel(
@@ -382,14 +382,14 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             user_id=self.USER_ID_1,
             score_category=self.SCORE_CATEGORY_1,
             score=1.5,
-            has_email_been_sent=False
+            onboarding_email_sent=False
         ).put()
         user_models.UserContributionScoringModel(
             id='%s.%s' % (self.SCORE_CATEGORY_2, self.USER_ID_1),
             user_id=self.USER_ID_1,
             score_category=self.SCORE_CATEGORY_2,
             score=2,
-            has_email_been_sent=False
+            onboarding_email_sent=False
         ).put()
 
         collection_models.CollectionRightsSnapshotMetadataModel(
@@ -865,11 +865,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
         expected_contrib_score_data = {
             self.SCORE_CATEGORY_1: {
-                'has_email_been_sent': False,
+                'onboarding_email_sent': False,
                 'score': 1.5
             },
             self.SCORE_CATEGORY_2: {
-                'has_email_been_sent': False,
+                'onboarding_email_sent': False,
                 'score': 2
             }
         }

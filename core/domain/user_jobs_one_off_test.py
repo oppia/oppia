@@ -675,7 +675,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 subscription_services, 'subscribe_to_exploration', self._null_fn
             ):
             # User A adds user B as an editor to the exploration.
-            rights_domain.assign_role_for_exploration(
+            rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID_1, self.user_b_id,
                 rights_domain.ROLE_EDITOR)
             # User A adds user C as a viewer of the exploration.
