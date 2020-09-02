@@ -60,8 +60,6 @@ class BaseSuggestion(python_utils.OBJECT):
             was last updated.
     """
 
-    IMAGE_CONTEXT = None
-
     def __init__(self, status, final_reviewer_id):
         """Initializes a Suggestion object."""
         self.status = status
@@ -307,7 +305,7 @@ class BaseSuggestion(python_utils.OBJECT):
         """
         new_image_filenames = self.get_new_image_filenames_added_in_suggestion()
         fs_services.copy_images(
-            self.IMAGE_CONTEXT, self.target_id, self.target_type,
+            self.image_context, self.target_id, self.target_type,
             self.target_id, new_image_filenames)
 
     def convert_html_in_suggestion_change(self, conversion_fn):
@@ -352,6 +350,9 @@ class SuggestionEditStateContent(BaseSuggestion):
         self.change = exp_domain.ExplorationChange(change)
         self.score_category = score_category
         self.last_updated = last_updated
+        # Currently, we don't allow adding images in the edit state content
+        # suggestion, so the image_context is None.
+        self.image_context = None
 
     def validate(self):
         """Validates a suggestion object of type SuggestionEditStateContent.
@@ -504,8 +505,6 @@ class SuggestionTranslateContent(BaseSuggestion):
     SUGGESTION_TYPE_TRANSLATE_CONTENT.
     """
 
-    IMAGE_CONTEXT = feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
-
     def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
@@ -525,6 +524,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         self.change = exp_domain.ExplorationChange(change)
         self.score_category = score_category
         self.last_updated = last_updated
+        self.image_context = feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
 
     def validate(self):
         """Validates a suggestion object of type SuggestionTranslateContent.
@@ -636,8 +636,6 @@ class SuggestionAddQuestion(BaseSuggestion):
             was last updated.
     """
 
-    IMAGE_CONTEXT = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
-
     def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
@@ -659,6 +657,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.score_category = score_category
         self.last_updated = last_updated
+        self.image_context = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
 
     def validate(self):
         """Validates a suggestion object of type SuggestionAddQuestion.

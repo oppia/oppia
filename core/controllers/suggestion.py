@@ -103,7 +103,7 @@ class SuggestionHandler(base.BaseHandler):
         new_image_filenames = (
             suggestion.get_new_image_filenames_added_in_suggestion())
 
-        suggestion_image_context = suggestion.IMAGE_CONTEXT
+        suggestion_image_context = suggestion.image_context
 
         for filename in new_image_filenames:
             image = self.request.get(filename)
