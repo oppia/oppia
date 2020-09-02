@@ -163,12 +163,11 @@ def main():
     """Install third-party libraries for Oppia."""
     setup.main(args=[])
     setup_gae.main(args=[])
-    # Installing wheel because this is required.
-    ensure_pip_library_is_installed(
-        'wheel', common.WHEEL_VERSION, common.OPPIA_TOOLS_DIR)
-    sys.path.insert(
-        0,
-        os.path.join(common.OPPIA_TOOLS_DIR, 'wheel-%s' % common.WHEEL_VERSION))
+    # Pinning the
+
+    subprocess.check_call(
+        [sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip==20.2.2'])
+
     pip_dependencies = [
         ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
         ('pylint', common.PYLINT_VERSION, common.OPPIA_TOOLS_DIR),
