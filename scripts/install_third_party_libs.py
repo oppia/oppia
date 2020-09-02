@@ -163,12 +163,6 @@ def main():
     """Install third-party libraries for Oppia."""
     setup.main(args=[])
     setup_gae.main(args=[])
-    ensure_pip_library_is_installed(
-        'wheel', common.WHEEL_VERSION, common.OPPIA_TOOLS_DIR)
-    wheel_path = os.path.join(
-        common.OPPIA_TOOLS_DIR, '%s-%s' % ('wheel', common.WHEEL_VERSION))
-    os.environ["PATH"] += os.pathsep + os.path.join(wheel_path, 'bin')
-    sys.path.insert(0, wheel_path)
 
     pip_dependencies = [
         ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
