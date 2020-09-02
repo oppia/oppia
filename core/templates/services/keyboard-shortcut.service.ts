@@ -17,8 +17,12 @@
  */
 import 'mousetrap';
 
-import { Injectable } from '@angular/core';
+import { Injectable, ApplicationRef } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { KeyboardShortcutHelpModalComponent } from
+  // eslint-disable-next-line max-len
+  'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component.ts';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
 
 
@@ -26,7 +30,18 @@ import { WindowRef } from 'services/contextual/window-ref.service.ts';
   providedIn: 'root'
 })
 export class KeyboardShortcutService {
-  constructor(private windowRef: WindowRef) {}
+  constructor(
+    private windowRef: WindowRef,
+    private ngbModal: NgbModal,
+    private appRef: ApplicationRef) {}
+
+  openQuickReference(): void {
+    this.ngbModal.dismissAll();
+    this.ngbModal.open(
+      KeyboardShortcutHelpModalComponent, {backdrop: true});
+    this.appRef.tick();
+  }
+
   bindExplorationPlayerShortcuts(): void {
     Mousetrap.bind('s', function() {
       document.getElementById('skipToMainContentId').focus();
@@ -51,6 +66,10 @@ export class KeyboardShortcutService {
         continueButton.focus();
       }
     });
+
+    Mousetrap.bind('?', () => {
+      this.openQuickReference();
+    });
   }
 
   bindLibraryPageShortcuts(): void {
@@ -69,6 +88,10 @@ export class KeyboardShortcutService {
 
     Mousetrap.bind('s', function() {
       document.getElementById('skipToMainContentId').focus();
+    });
+
+    Mousetrap.bind('?', () => {
+      this.openQuickReference();
     });
   }
 
