@@ -241,8 +241,7 @@ class ContinueLabelValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     yield (
                         item.id,
                         'State name: %s, Button label length: %s' % (
-                            state_name.encode('utf-8'),
-                            python_utils.UNICODE(button_text_length)))
+                            state_name.encode('utf-8'), button_text_length))
 
     @staticmethod
     def reduce(key, values):
