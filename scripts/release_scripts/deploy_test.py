@@ -288,7 +288,7 @@ class DeployTests(test_utils.GenericTestBase):
                 with self.run_swap, self.release_doc_swap, config_swap:
                     with get_token_swap, get_org_swap, get_repo_swap:
                         with bug_check_swap, pr_check_swap, out_swap:
-                            with args_swap, check_tests_swap:
+                            with self.cd_swap, args_swap, check_tests_swap:
                                 with self.assertRaisesRegexp(
                                     Exception,
                                     'Travis fails.'):
