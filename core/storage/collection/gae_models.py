@@ -25,6 +25,7 @@ from constants import constants
 import core.storage.base_model.gae_models as base_models
 import feconf
 import python_utils
+import utils
 
 from google.appengine.ext import ndb
 
@@ -307,6 +308,26 @@ class CollectionRightsModel(base_models.VersionedModel):
         if 'translator_ids' in model_dict and model_dict['translator_ids']:
             model_dict['voice_artist_ids'] = model_dict['translator_ids']
             model_dict['translator_ids'] = []
+
+        # We need to remove pseudonymous IDs from all the fields that contain
+        # user IDs.
+        model_dict['owner_ids'] = [
+            owner_id for owner_id in model_dict['owner_ids']
+            if not utils.is_pseudonymous_id(owner_id)
+        ]
+        model_dict['editor_ids'] = [
+            editor_id for editor_id in model_dict['editor_ids']
+            if not utils.is_pseudonymous_id(editor_id)
+        ]
+        model_dict['voice_artist_ids'] = [
+            voice_artist_id for voice_artist_id
+            in model_dict['voice_artist_ids']
+            if not utils.is_pseudonymous_id(voice_artist_id)
+        ]
+        model_dict['viewer_ids'] = [
+            viewer_id for viewer_id in model_dict['viewer_ids']
+            if not utils.is_pseudonymous_id(viewer_id)
+        ]
 
         return model_dict
 

@@ -31,11 +31,10 @@ import utils
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
+from feconf import USER_ID_RANDOM_PART_LENGTH
+
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 transaction_services = models.Registry.import_transaction_services()
-
-USER_ID_RANDOM_PART_LENGTH = 32
-USER_ID_LENGTH = 36
 
 
 class UserSettingsModel(base_models.BaseModel):

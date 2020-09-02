@@ -144,6 +144,9 @@ def pre_delete_user(user_id):
         exp_summary.id for exp_summary in subscribed_exploration_summaries
         if not exp_summary.is_solely_owned_by_user(user_id)
     ]
+    for exp_id in explorations_to_remove_user_from_ids:
+        rights_manager.deassign_role_for_exploration(
+            user_services.get_system_user(), exp_id, user_id)
 
     subscribed_collection_summaries = (
         collection_services.get_collection_summaries_subscribed_to(user_id))
@@ -168,6 +171,9 @@ def pre_delete_user(user_id):
         col_summary.id for col_summary in subscribed_collection_summaries
         if not col_summary.is_solely_owned_by_user(user_id)
     ]
+    for col_id in collections_to_remove_user_from_ids:
+        rights_manager.deassign_role_for_collection(
+            user_services.get_system_user(), col_id, user_id)
 
     topic_services.deassign_user_from_all_topics(
         user_services.get_system_user(), user_id)

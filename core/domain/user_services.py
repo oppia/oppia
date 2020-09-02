@@ -393,22 +393,7 @@ def is_user_id_correct(user_id):
     return all((
         user_id.islower(),
         user_id.startswith('uid_'),
-        len(user_id) == user_models.USER_ID_LENGTH))
-
-
-def is_pseudonymous_id(user_id):
-    """Check that the ID is a pseudonymous one.
-
-    Args:
-        user_id: str. The ID to be checked.
-
-    Returns:
-        bool. Whether the ID represents a pseudonymous user.
-    """
-    return all((
-        user_id.islower(),
-        user_id.startswith('pid_'),
-        len(user_id) == user_models.USER_ID_LENGTH))
+        len(user_id) == feconf.USER_ID_LENGTH))
 
 
 def is_username_taken(username):

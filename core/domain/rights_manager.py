@@ -778,7 +778,7 @@ def _assign_role(
 
 
 def _deassign_role(committer, removed_user_id, activity_id, activity_type):
-    """Deassigns given user from all topics assigned to them.
+    """Deassigns given user from any role in activity.
 
     Args:
         committer: UserActionsInfo. UserActionsInfo object for the user
@@ -1167,7 +1167,7 @@ def assign_role_for_collection(
             assignee_id, collection_id)
 
 
-def deassign_role_for_exploration(committer, collection_id, removed_user_id):
+def deassign_role_for_collection(committer, collection_id, removed_user_id):
     """Deassigns a user from a given collection.
 
     The caller should ensure that assignee_id corresponds to a valid user in
@@ -1176,7 +1176,7 @@ def deassign_role_for_exploration(committer, collection_id, removed_user_id):
     Args:
         committer: UserActionsInfo. The UserActionsInfo object for the
             committer.
-        collection_id: str. ID of the colelction.
+        collection_id: str. ID of the collection.
         removed_user_id: str. ID of the user whom is being deassigned from
             the exploration.
 
