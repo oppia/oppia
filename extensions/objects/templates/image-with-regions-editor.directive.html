@@ -1,6 +1,6 @@
 <div ng-if="$ctrl.value.imagePath === ''">
   <schema-based-editor local-value="$ctrl.value.imagePath"
-                       schema="{type: 'custom', obj_type: 'Filepath'}">
+                       schema="$ctrl.SCHEMA">
   </schema-based-editor>
 </div>
 <div style="position: relative" ng-if="$ctrl.value.imagePath !== ''">
