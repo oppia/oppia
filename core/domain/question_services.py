@@ -647,8 +647,9 @@ def compute_summary_of_question(question):
         for answer_group in answer_groups
         if answer_group.to_dict()['tagged_skill_misconception_id']]
     misconception_ids.extend(question.inapplicable_misconception_ids)
+    interaction_id = question.question_state_data.interaction.id
     question_summary = question_domain.QuestionSummary(
-        question.id, question_content, misconception_ids,
+        question.id, question_content, misconception_ids, interaction_id,
         question.created_on, question.last_updated)
     return question_summary
 
@@ -666,7 +667,8 @@ def save_question_summary(question_summary):
         question_model_last_updated=question_summary.last_updated,
         question_model_created_on=question_summary.created_on,
         question_content=question_summary.question_content,
-        misconception_ids=question_summary.misconception_ids
+        misconception_ids=question_summary.misconception_ids,
+        interaction_id=question_summary.interaction_id
     )
 
     question_summary_model.put()
@@ -688,6 +690,7 @@ def get_question_summary_from_model(question_summary_model):
         question_summary_model.id,
         question_summary_model.question_content,
         question_summary_model.misconception_ids,
+        question_summary_model.interaction_id,
         question_summary_model.question_model_created_on,
         question_summary_model.question_model_last_updated
     )

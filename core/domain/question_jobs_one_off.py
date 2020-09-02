@@ -91,3 +91,52 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+
+class RegenerateQuestionSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to regenerate question summaries."""
+
+    _DELETED_KEY = 'question_deleted'
+    _PROCESSED_KEY = 'question_processed'
+    _ERROR_KEY = 'question_errored'
+
+    @classmethod
+    def _pre_start_hook(cls, job_id):
+        """A hook or a callback function triggered before marking a job
+        as started.
+
+        Args:
+            job_id: str. The unique ID of the job to be marked as started.
+        """
+        pass
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [question_models.QuestionModel]
+
+    @staticmethod
+    def map(question_model):
+        if question_model.deleted:
+            yield (RegenerateQuestionSummaryOneOffJob._DELETED_KEY, 1)
+            return
+        try:
+            question_services.create_question_summary(question_model.id)
+        except Exception as e:
+            yield (
+                RegenerateQuestionSummaryOneOffJob._ERROR_KEY,
+                'Failed to create question summary %s: %s' % (
+                    question_model.id, e))
+            return
+
+        yield (RegenerateQuestionSummaryOneOffJob._PROCESSED_KEY, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == RegenerateQuestionSummaryOneOffJob._DELETED_KEY:
+            yield (key, ['Encountered %d deleted questions.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        elif key == RegenerateQuestionSummaryOneOffJob._PROCESSED_KEY:
+            yield (key, ['Successfully processed %d questions.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        else:
+            yield (key, values)

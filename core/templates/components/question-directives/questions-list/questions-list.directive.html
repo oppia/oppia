@@ -76,6 +76,9 @@
               <i class="material-icons">link_off</i>
             </span>
           </div>
+          <div class="question-interaction-id">
+            <span><[questionSummaryForOneSkill.getQuestionSummary().getInteractionId()]></span>
+          </div>
         </div>
       </div>
       <div class="page-navigation-arrows" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
@@ -299,6 +302,9 @@
   }
   questions-list .difficulty-card-header i {
     display: none;
+  }
+  questions-list .question-interaction-id {
+    color: #707070;
   }
   @media screen and (max-width: 768px) {
     questions-list .question-editor-container {
