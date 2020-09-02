@@ -62,8 +62,7 @@ export class MathInteractionsService {
       errorMessage = 'Your answer includes a division by zero, which is ' +
         'not valid.';
     }
-    if (
-      errorMessage.indexOf('is not a valid postfix operator.') !== -1) {
+    if (errorMessage.indexOf('is not a valid postfix operator.') !== -1) {
       errorMessage = (
         'Your answer seems to be missing a variable/number after the "' +
         errorMessage[0] + '".');
@@ -84,15 +83,15 @@ export class MathInteractionsService {
     }
     if (
       errorMessage === 'Cannot read property \'parent\' of undefined.') {
-      let invalidFunctionName = '';
+      let emptyFunctionName = '';
       for (let functionName of this.mathFunctionNames) {
         if (expressionString.includes(functionName + '()')) {
-          invalidFunctionName = functionName;
+          emptyFunctionName = functionName;
           break;
         }
       }
       errorMessage = (
-        'The ' + invalidFunctionName +
+        'The ' + emptyFunctionName +
         ' function cannot be empty. Please enter a variable/number in it.');
     }
     return errorMessage;
