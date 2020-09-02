@@ -169,7 +169,7 @@ class RegenerateMissingV1StatsModelsOneOffJobTests(OneOffJobTestBase):
             ['[u\'ExplorationStatsModel for missing versions regenerated: \', '
              '[u\'EXP_ID1 v2\']]'])
 
-    def test_stats_models_regeneration_with_missing_old_state_stats(self):
+    def test_job_successfully_regenerates_stats_with_missing_state_stats(self):
         # Delete the stats of the initial state.
         v1_stats = stats_models.ExplorationStatsModel.get(
             stats_models.ExplorationStatsModel.get_entity_id(self.exp1.id, 1))
