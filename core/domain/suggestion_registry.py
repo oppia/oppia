@@ -58,8 +58,9 @@ class BaseSuggestion(python_utils.OBJECT):
         score_category: str. The scoring category for the suggestion.
         last_updated: datetime.datetime. Date and time when the suggestion
             was last updated.
-        language_code: str. The ISO 639-1 code for the language of the
-            suggestion.
+        language_code: str| None. The ISO 639-1 code used to query suggestions
+            by language. It is set to None for edit state content suggestions,
+            since they are not queryable by language.
     """
 
     def __init__(self, status, final_reviewer_id):

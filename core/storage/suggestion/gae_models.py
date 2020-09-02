@@ -153,9 +153,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # separated by a ., the first will be a value from SCORE_TYPE_CHOICES and
     # the second will be the subcategory of the suggestion.
     score_category = ndb.StringProperty(required=True, indexed=True)
-    # The ISO 639-1 language code used to query question and translation
-    # suggestions by language. This field is None for edit state content
-    # suggestions, since they are not queryable by language.
+    # The ISO 639-1 code used to query suggestions by language. This field is
+    # set to the language of the translation for translation suggestions, the
+    # language of the question for question suggestions and None for edit state
+    # content suggestions, since they are not queryable by language.
     language_code = ndb.StringProperty(indexed=True)
 
     @staticmethod
@@ -203,8 +204,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
             score_category: str. The scoring category for the suggestion.
             thread_id: str. The ID of the feedback thread linked to the
                 suggestion.
-            language_code: str. The ISO 639-1 code for the language of the
-                suggestion.
+            language_code: str|None. The ISO 639-1 code used to query
+                suggestions by language. It is set to None for edit state
+                content suggestions, since they are not queryable by language.
 
         Raises:
             Exception. There is already a suggestion with the given id.

@@ -1616,7 +1616,6 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
     EXPLORATION_THREAD_ID = 'exploration.exp1.thread_1'
     SKILL_THREAD_ID = 'skill1.thread1'
     AUTHOR_EMAIL = 'author1@example.com'
-    REVIEWER_EMAIL = 'reviewer1@example.com'
 
     edit_state_content_change_dict = {
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
