@@ -27,13 +27,14 @@ import subprocess
 import sys
 import time
 
+from googleapiclient.discovery import build as gacbuild
+from google.oauth2 import service_account
 import python_utils
 from scripts import build
 from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
-from googleapiclient.discovery import build as gacbuild
-from google.oauth2 import service_account
+
 
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
@@ -555,7 +556,7 @@ def get_flaky_tests_data_from_sheets(sheet):
                 flaky_tests_list.append((row[1], row[2], int(row[5])))
             else:
                 flaky_tests_list.append((row[1], row[2], 0))
-    
+
     return flaky_tests_list
 
 
@@ -572,10 +573,11 @@ def update_flaky_tests_count(sheet, row_index, current_count):
             'values' : values
         }
 
-        result = sheet.values().update(spreadsheetId=sheet_id,
-                                       range='Log!F' + str(row_index + 5),
-                                       valueInputOption='USER_ENTERED',
-                                       body=body).execute()
+        sheet.values().update(
+            spreadsheetId=sheet_id,
+            range='Log!F' + python_utils.convert_to_bytes(row_index + 5),
+            valueInputOption='USER_ENTERED',
+            body=body).execute()
 
 
 def main(args=None):
@@ -637,29 +639,33 @@ def main(args=None):
     if auth_file_url is not None:
         subprocess.Popen(['wget', auth_file_url, '-O', 'auth.json']).wait()
         SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-        creds = service_account.Credentials.from_service_account_file('auth.json', scopes=SCOPES)
+        creds = service_account.Credentials.from_service_account_file(
+            'auth.json', scopes=SCOPES)
         sheet = gacbuild('sheets', 'v4', credentials=creds).spreadsheets()
 
         flaky_tests_list = get_flaky_tests_data_from_sheets(sheet)
 
-    
     if len(flaky_tests_list) > 0 and p.returncode != 0:
         for i, line in enumerate(output_lines):
             if line == '*                    Failures                    *':
-                suite = output_lines[i+3][3:].strip().lower()
-                ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+                suite = output_lines[i + 3][3 :].strip().lower()
+
+                # Remove coloring characters.
+                ansi_escape = re.compile(
+                    r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
                 failure_log = ansi_escape.sub('', output_lines[i+4])
-                failure_log = failure_log[2:].strip().lower()
+                failure_log = failure_log[2 :].strip().lower()
                 for index, row in enumerate(flaky_tests_list):
                     flaky_suite_name = row[0].strip().lower()
                     flaky_error_message = row[1].strip().lower()
-                    if suite == flaky_suite_name or flaky_error_message == failure_log:
+                    if (
+                        suite == flaky_suite_name or
+                        flaky_error_message == failure_log):
                         update_flaky_tests_count(sheet, index, row[2])
                         try:
                             atexit._run_exitfuncs()
                         finally:
                             return 'flake'
-        os.remove('auth.json')
     sys.exit(p.returncode)
 
 

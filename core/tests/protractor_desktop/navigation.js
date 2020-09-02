@@ -20,8 +20,8 @@ var waitFor = require('../protractor_utils/waitFor.js');
 var ThanksPage = require('../protractor_utils/ThanksPage.js');
 var GetStartedPage = require('../protractor_utils/GetStartedPage.js');
 
-fdescribe('Oppia landing pages tour', function() {
-  fit('visits the Fractions landing page', async function() {
+describe('Oppia landing pages tour', function() {
+  it('visits the Fractions landing page', async function() {
     await browser.get('/fractions');
     await waitFor.pageToFullyLoad();
 
@@ -30,7 +30,6 @@ fdescribe('Oppia landing pages tour', function() {
 
     await browser.get('/math/fractions');
     await waitFor.pageToFullyLoad();
-    expect('apple').toBe('Orange');
   });
 
   it('visits the Partners landing page', async function() {
