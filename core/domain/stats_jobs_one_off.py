@@ -115,69 +115,72 @@ class RegenerateMissingV1StatsModelsOneOffJob(
         current_version = exploration_model.version
         for exp_version in python_utils.RANGE(1, current_version + 1):
             exp_stats = old_exp_stats_instances[exp_version - 1]
-            if not exp_stats:
-                curr_exploration = exploration_instances[exp_version - 1]
-                state_stats_mapping = {
-                    state_name: stats_domain.StateStats.create_default()
-                    for state_name in curr_exploration.states
-                }
-                exp_stats_default = (
-                    stats_domain.ExplorationStats.create_default(
-                        exploration.id, exp_version, state_stats_mapping))
-                if exp_version > 1:
-                    prev_exp_stats = exp_stats_instances[exp_version - 2]
-                    change_dicts = snapshots_by_version[exp_version - 1][
-                        'commit_cmds']
-                    change_list = [
-                        exp_domain.ExplorationChange(change_dict)
-                        for change_dict in change_dicts
-                        if change_dict['cmd'] in relevant_commit_cmds]
-                    exp_versions_diff = exp_domain.ExplorationVersionsDiff(
-                        change_list)
-
-                    # Copy v1 stats.
-                    exp_stats_default.num_starts_v1 = (
-                        prev_exp_stats.num_starts_v1)
-                    exp_stats_default.num_actual_starts_v1 = (
-                        prev_exp_stats.num_actual_starts_v1)
-                    exp_stats_default.num_completions_v1 = (
-                        prev_exp_stats.num_completions_v1)
-                    for state_name in exp_stats_default.state_stats_mapping:
-                        old_state_name = state_name
-                        if state_name in (
-                                exp_versions_diff.added_state_names):
-                            continue
-                        if state_name in (
-                                exp_versions_diff.new_to_old_state_names):
-                            old_state_name = (
-                                exp_versions_diff.new_to_old_state_names[
-                                    state_name])
-                        # 'pssm' mean 'previous state stats mapping'.
-                        pssm = prev_exp_stats.state_stats_mapping[
-                            old_state_name]
-                        exp_stats_default.state_stats_mapping[
-                            state_name].first_hit_count_v1 = (
-                                pssm.first_hit_count_v1)
-                        exp_stats_default.state_stats_mapping[
-                            state_name].total_hit_count_v1 = (
-                                pssm.total_hit_count_v1)
-                        exp_stats_default.state_stats_mapping[
-                            state_name].useful_feedback_count_v1 = (
-                                pssm.useful_feedback_count_v1)
-                        exp_stats_default.state_stats_mapping[
-                            state_name].total_answers_count_v1 = (
-                                pssm.total_answers_count_v1)
-                        exp_stats_default.state_stats_mapping[
-                            state_name].num_completions_v1 = (
-                                pssm.num_completions_v1)
-
-                exp_stats_instances.append(exp_stats_default)
-                stats_services.create_stats_model(exp_stats_default)
-                yield (
-                    'ExplorationStatsModel for missing versions regenerated: ',
-                    '%s v%s' % (exploration.id, exp_version))
-            else:
+            if exp_stats:
                 exp_stats_instances.append(exp_stats)
+                continue
+            curr_exploration = exploration_instances[exp_version - 1]
+            state_stats_mapping = {
+                state_name: stats_domain.StateStats.create_default()
+                for state_name in curr_exploration.states
+            }
+            exp_stats_default = stats_domain.ExplorationStats.create_default(
+                exploration.id, exp_version, state_stats_mapping)
+            if exp_version > 1:
+                prev_exp_stats = exp_stats_instances[exp_version - 2]
+                change_dicts = (
+                        snapshots_by_version[exp_version - 1]['commit_cmds'])
+                change_list = [
+                    exp_domain.ExplorationChange(change_dict)
+                    for change_dict in change_dicts
+                    if change_dict['cmd'] in relevant_commit_cmds]
+                exp_versions_diff = exp_domain.ExplorationVersionsDiff(
+                    change_list)
+
+                # Copy v1 stats.
+                exp_stats_default.num_starts_v1 = (
+                    prev_exp_stats.num_starts_v1)
+                exp_stats_default.num_actual_starts_v1 = (
+                    prev_exp_stats.num_actual_starts_v1)
+                exp_stats_default.num_completions_v1 = (
+                    prev_exp_stats.num_completions_v1)
+
+                for state_name in exp_stats_default.state_stats_mapping:
+                    if state_name in exp_versions_diff.added_state_names:
+                        continue
+
+                    if state_name in exp_versions_diff.new_to_old_state_names:
+                        old_state_name = (
+                            exp_versions_diff.new_to_old_state_names[
+                                state_name])
+                    else:
+                        old_state_name = state_name
+
+                    if old_state_name not in prev_exp_stats.state_stats_mapping:
+                        yield (
+                            'ExplorationStatsModel missing expected StateStats',
+                            '%s.%s: "%s"' % (
+                                exploration.id, exp_version - 1, state_name))
+                        exp_stats_default.state_stats_mapping[state_name] = (
+                           stats_domain.StateStats.create_default())
+                    else:
+                        new_state_stats = (
+                            exp_stats_default.state_stats_mapping[state_name])
+                        old_state_stats = (
+                            prev_exp_stats.state_stats_mapping[old_state_name])
+                        new_state_stats.first_hit_count_v1 = (
+                            old_state_stats.first_hit_count_v1)
+                        new_state_stats.total_hit_count_v1 = (
+                            old_state_stats.total_hit_count_v1)
+                        new_state_stats.useful_feedback_count_v1 = (
+                            old_state_stats.useful_feedback_count_v1)
+                        new_state_stats.total_answers_count_v1 = (
+                            old_state_stats.total_answers_count_v1)
+                        new_state_stats.num_completions_v1 = (
+                            old_state_stats.num_completions_v1)
+            stats_services.create_stats_model(exp_stats_default)
+            yield (
+                'ExplorationStatsModel for missing versions regenerated: ',
+                '%s v%s' % (exploration.id, exp_version))
 
     @staticmethod
     def reduce(message, values):

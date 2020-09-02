@@ -169,6 +169,30 @@ class RegenerateMissingV1StatsModelsOneOffJobTests(OneOffJobTestBase):
             ['[u\'ExplorationStatsModel for missing versions regenerated: \', '
              '[u\'EXP_ID1 v2\']]'])
 
+    def test_stats_models_regeneration_with_missing_old_state_stats(self):
+        # Delete the stats of the initial state.
+        v1_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.exp1.id, 1))
+        del v1_stats.state_stats_mapping[self.exp1.init_state_name]
+        v1_stats.put()
+
+        v2_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.exp1.id, 2))
+        v2_stats.delete()
+
+        self.assertEqual(
+            self.run_one_off_job(),
+            ['[u\'ExplorationStatsModel for missing versions regenerated: \', '
+             '[u\'EXP_ID1 v2\']]',
+             '[u\'ExplorationStatsModel missing expected StateStats\', '
+             '[u\'EXP_ID1.1: "Introduction"\']]'])
+
+        v2_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.exp1.id, 2))
+        self.assertEqual(
+            v2_stats.state_stats_mapping[self.exp1.init_state_name],
+            stats_domain.StateStats.create_default().to_dict())
+
 
 class RecomputeStateCompleteStatisticsTests(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.RecomputeStatisticsOneOffJob
@@ -1369,6 +1393,18 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(
             output, [u'[u\'Missing model at version 1\', [u\''
                      + self.EXP_ID + '\']]'])
+
+    def test_job_successfully_regenerates_stats_with_missing_state_stats(self):
+        v4_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 4))
+        del v4_stats.state_stats_mapping[self.state_name]
+        v4_stats.put()
+
+        v5_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 5))
+        v5_stats.delete()
+
+        self.assertEqual(self.run_one_off_job(), [u'[u\'Success\', 1]'])
 
     def test_job_yields_no_change_when_no_regeneration_is_needed(self):
         self.exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
