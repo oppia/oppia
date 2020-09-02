@@ -19,6 +19,8 @@
 
 'use strict';
 
+const { cos } = require("mathjs");
+
 module.exports = {
   meta: {
     type: 'layout',
@@ -40,6 +42,8 @@ module.exports = {
   },
 
   create: function(context) {
+    var nodePos = {};
+
     var checkMessageStartsWithShould = function(testMessageNode) {
       if (!testMessageNode.value.startsWith('should ')) {
         context.report({
@@ -80,6 +84,25 @@ module.exports = {
       }
     };
 
+    var checkMessage = function(node) {
+      if (node.type === 'Literal') {
+        if (node.loc.start.line === nodePos.start.line &&
+            node.loc.start.column === nodePos.start.column) {
+          checkMessageStartsWithShould(node);
+          checkSpaceAtEnd(node);
+        } else if (node.loc.end.line === nodePos.end.line &&
+            node.loc.end.column === nodePos.end.column) {
+          checkNoSpaceAtEndOfMessage(node);
+        } else {
+          checkSpaceAtEnd(node);
+        }
+        checkSpacesInMessage(node);
+      } else if (node.type === 'BinaryExpression') {
+        checkMessage(node.left);
+        checkMessage(node.right);
+      }
+    }
+
     return {
       CallExpression(node) {
         if (node.callee.name === 'it') {
@@ -89,11 +112,9 @@ module.exports = {
             checkSpacesInMessage(testMessageNode);
             checkNoSpaceAtEndOfMessage(testMessageNode);
           } else if (testMessageNode.type === 'BinaryExpression') {
-            checkMessageStartsWithShould(testMessageNode.left);
-            checkNoSpaceAtEndOfMessage(testMessageNode.right);
-            checkSpacesInMessage(testMessageNode.left);
-            checkSpacesInMessage(testMessageNode.right);
-            checkSpaceAtEnd(testMessageNode.left);
+            nodePos = testMessageNode.loc;
+            checkMessage(testMessageNode.left);
+            checkMessage(testMessageNode.right)
           }
         }
       }
