@@ -691,35 +691,26 @@ class PrePushHookTests(test_utils.GenericTestBase):
                         with self.swap_check_backend_python_libs:
                             pre_push_hook.main(args=[])
 
-    def test_mismatches_in_backend_python_libs_produces_correct_behavior(self):
-        check_function_calls = {
-            'install_backend_python_libs': False
-        }
-        expected_check_function_calls = {
-            'install_backend_python_libs': True
-        }
+    def test_main_exits_when_mismatches_exist_in_backend_python_libs(self):
+        """Test that main exits with correct error message when mismatches are
+        found between the installed python libraries in `third_party/python_libs
+         and the compiled 'requirements.txt' file'.
+        """
         def mock_get_mismatches():
             return {
                 'library': ('version', 'version')
             }
-        def mock_input(unused_args): # pylint: disable=unused-argument
-            return '2'
-        def mock_install_backend_python_libs():
-            check_function_calls['install_backend_python_libs'] = True
+
+        def mock_exit_error(error_code):
+            self.assertEqual(error_code, 1)
 
         swap_get_mismatches = self.swap(
             install_backend_python_libs, 'get_mismatches',
             mock_get_mismatches)
+        swap_sys_exit = self.swap(sys, 'exit', mock_exit_error)
+        with self.print_swap, swap_sys_exit, swap_get_mismatches:
+            pre_push_hook.check_for_backend_python_library_inconsistencies()
 
-        swap_input = self.swap(python_utils, 'INPUT', mock_input)
-        swap_install_backend_python_libs = self.swap(
-            install_backend_python_libs, 'main',
-            mock_install_backend_python_libs)
-        with swap_input, swap_get_mismatches, swap_install_backend_python_libs:
-            with self.print_swap:
-                pre_push_hook.check_for_backend_python_library_inconsistencies()
-
-        self.assertEqual(check_function_calls, expected_check_function_calls)
         self.assertEqual(
             self.print_arr,
             [
@@ -731,17 +722,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 'library                             |version                  '
                 '|version                  ',
                 '\n',
-                'Please choose one of the following options to rectify your '
-                'local\n dev environment: \n',
-                '1. Update the `requirements.in` file yourself to reflect '
-                'which\n   libraries should be installed. Choose this option'
-                ' if your \n   current branch involves manual changes to Python'
-                ' dependencies\n   and your `requirements.in` file is not '
-                'up-to-date.\n',
-                '2. Regenerate the third_party/python_libs directory. '
-                '(Selecting\n   this option will run scripts.install_third_'
-                'party to\n   regenerate the third_party/python_utils folder'
-                ' with\n   the correct dependencies.)\n\n\n'
+                'Please fix these discrepancies by editing the '
+                '`requirements.in`\nfile or running '
+                '`scripts.install_third_party` to regenerate\nthe '
+                '`third_party/python_libs` directory.\n\n'
             ])
 
     def test_no_inconsistencies_in_backend_python_libs(self):
@@ -758,47 +742,3 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.print_arr,
             ['No inconsistencies found in the backend python libraries.'])
-
-    def test_that_python_library_validation_prompt_behaves_correctly(self):
-        """Tests that the 'Choose an option or Ctrl-C to exit prompt: '
-        correctly recurs until the user chooses a correct option.
-        """
-        check_function_calls = {
-            'input_is_called': False,
-            'install_backend_python_libs': False,
-            'get_mismatches': False
-        }
-        expected_check_function_calls = {
-            'input_is_called': True,
-            'install_backend_python_libs': False,
-            'get_mismatches': True
-        }
-        def mock_get_mismatches():
-            check_function_calls['get_mismatches'] = True
-            return {
-                'library': ('version', 'version')
-            }
-        inputs = ['0', '0', '1']
-        def mock_input(unused_args): # pylint: disable=unused-argument
-            check_function_calls['input_is_called'] = True
-            return inputs.pop(0)
-
-        def mock_install_backend_python_libs():
-            check_function_calls['install_backend_python_libs'] = True
-
-        swap_get_mismatches = self.swap(
-            install_backend_python_libs, 'get_mismatches',
-            mock_get_mismatches)
-
-        swap_input = self.swap(python_utils, 'INPUT', mock_input)
-        swap_install_backend_python_libs = self.swap(
-            install_backend_python_libs, 'main',
-            mock_install_backend_python_libs)
-        self.assertNotEqual(check_function_calls, expected_check_function_calls)
-        self.assertEqual(len(inputs), 3)
-        with swap_input, swap_get_mismatches, swap_install_backend_python_libs:
-            with self.print_swap:
-                pre_push_hook.check_for_backend_python_library_inconsistencies()
-
-        self.assertEqual(check_function_calls, expected_check_function_calls)
-        self.assertEqual(len(inputs), 0)

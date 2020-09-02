@@ -414,8 +414,8 @@ def does_diff_include_travis_yml_or_js_files(diff_files):
 def check_for_backend_python_library_inconsistencies():
     """Checks the state of the 'third_party/python_libs' folder and compares it
     to the required libraries specified in 'requirements.txt'.
-    If any inconsistencies are found, the script presents options to the
-    developer to fix the conflicts.
+    If any inconsistencies are found, the script displays the inconsistencies
+    and exits.
     """
     mismatches = install_backend_python_libs.get_mismatches()
 
@@ -434,28 +434,10 @@ def check_for_backend_python_library_inconsistencies():
                 library_name, version_strings[0], version_strings[1]))
         python_utils.PRINT('\n')
         common.print_each_string_after_two_new_lines([
-            'Please choose one of the following options to rectify your local\n'
-            ' dev environment: ',
-            '1. Update the `requirements.in` file yourself to reflect which\n'
-            '   libraries should be installed. Choose this option if your \n'
-            '   current branch involves manual changes to Python dependencies\n'
-            '   and your `requirements.in` file is not up-to-date.',
-            '2. Regenerate the third_party/python_libs directory. (Selecting\n'
-            '   this option will run scripts.install_third_party to\n'
-            '   regenerate the third_party/python_utils folder with\n'
-            '   the correct dependencies.)\n\n'])
-        sys.stdin = python_utils.open_file('/dev/tty', 'r')
-        while True:
-            choice = python_utils.INPUT('Choose an option or Ctrl-C to exit: ')
-            python_utils.PRINT('\n')
-            if choice == '2':
-                install_backend_python_libs.main()
-                break
-            elif choice == '1':
-                sys.exit(1)
-            else:
-                python_utils.PRINT('Please choose between 1 or 2.\n')
-
+            'Please fix these discrepancies by editing the `requirements.in`\n'
+            'file or running `scripts.install_third_party` to regenerate\n'
+            'the `third_party/python_libs` directory.\n'])
+        sys.exit(1)
     else:
         python_utils.PRINT(
             'No inconsistencies found in the backend python libraries.')
