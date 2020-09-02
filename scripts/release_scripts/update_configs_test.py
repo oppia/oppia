@@ -51,10 +51,6 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         super(UpdateConfigsTests, self).setUp()
         self.mock_repo = github.Repository.Repository(
             requester='', headers='', attributes={}, completed='')
-        def mock_get_current_branch_name():
-            return 'release-1.2.3'
-        def mock_release_scripts_exist():
-            pass
         def mock_get_organization(unused_self, unused_name):
             return github.Organization.Organization(
                 requester='', headers='', attributes={}, completed='')
@@ -67,11 +63,6 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         def mock_url_open(unused_url):
             pass
 
-        self.release_scripts_exist_swap = self.swap(
-            common, 'ensure_release_scripts_folder_exists_and_is_up_to_date',
-            mock_release_scripts_exist)
-        self.branch_name_swap = self.swap(
-            common, 'get_current_branch_name', mock_get_current_branch_name)
         self.get_org_swap = self.swap(
             github.Github, 'get_organization', mock_get_organization)
         self.get_repo_swap = self.swap(
@@ -79,28 +70,15 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         self.open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         self.getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-        self.feconf_swap = self.swap(
-            update_configs, 'LOCAL_FECONF_PATH',
-            MOCK_LOCAL_FECONF_PATH)
         self.url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
-
-    def test_invalid_branch_name(self):
-        def mock_get_current_branch_name():
-            return 'invalid'
-        branch_name_swap = self.swap(
-            common, 'get_current_branch_name', mock_get_current_branch_name)
-        with branch_name_swap, self.assertRaisesRegexp(
-            AssertionError, 'Current branch is not a release branch_name'):
-            update_configs.main('test-token')
 
     def test_missing_terms_page(self):
         def mock_url_open(unused_url):
             raise Exception('Not found.')
         url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
-        with self.branch_name_swap, self.release_scripts_exist_swap:
-            with url_open_swap, self.assertRaisesRegexp(
-                Exception, 'Terms mainpage does not exist on Github.'):
-                update_configs.main('test-token')
+        with url_open_swap, self.assertRaisesRegexp(
+            Exception, 'Terms mainpage does not exist on Github.'):
+            update_configs.main('test-release-dir', 'test-token')
 
     def test_invalid_user_input(self):
         print_msgs = []
@@ -116,7 +94,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         print_swap = self.swap(python_utils, 'PRINT', mock_print)
         with self.getpass_swap, self.get_org_swap, self.get_repo_swap:
             with self.open_tab_swap, input_swap, print_swap:
-                update_configs.check_updates_to_terms_of_service('test-token')
+                update_configs.check_updates_to_terms_of_service(
+                    MOCK_LOCAL_FECONF_PATH, 'test-token')
         self.assertEqual(
             print_msgs, ['Invalid Input: invalid. Please enter yes or no.'])
 
@@ -148,13 +127,36 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'datetime.datetime(2016, 11, 15, 3, 41, 1)')
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
-        feconf_swap = self.swap(
-            update_configs, 'LOCAL_FECONF_PATH', temp_feconf_path)
+
         with self.getpass_swap, self.get_org_swap, self.get_repo_swap:
-            with self.open_tab_swap, input_swap, feconf_swap, get_commit_swap:
-                update_configs.check_updates_to_terms_of_service('test-token')
+            with self.open_tab_swap, input_swap, get_commit_swap:
+                update_configs.check_updates_to_terms_of_service(
+                    temp_feconf_path, 'test-token')
         with python_utils.open_file(temp_feconf_path, 'r') as f:
             self.assertEqual(f.read(), expected_feconf_text)
+
+    def test_missing_mailgun_api_key_line(self):
+        mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
+            return mailgun_api_key
+        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
+
+        temp_feconf_path = tempfile.NamedTemporaryFile().name
+        feconf_text = (
+            '# When the site terms were last updated, in UTC.\n'
+            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+            '# Format of string for dashboard statistics logs.\n'
+            '# NOTE TO DEVELOPERS: This format should not be changed, '
+            'since it is used in\n'
+            '# the existing storage models for UserStatsModel.\n'
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
+        with python_utils.open_file(temp_feconf_path, 'w') as f:
+            f.write(feconf_text)
+
+        with getpass_swap, self.assertRaisesRegexp(
+            AssertionError, 'Missing mailgun API key'):
+            update_configs.add_mailgun_api_key(temp_feconf_path)
 
     def test_invalid_mailgun_api_key(self):
         check_prompts = {
@@ -199,38 +201,12 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 mailgun_api_key))
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
-        feconf_swap = self.swap(
-            update_configs, 'LOCAL_FECONF_PATH', temp_feconf_path)
 
-        with getpass_swap, feconf_swap:
-            update_configs.add_mailgun_api_key()
+        with getpass_swap:
+            update_configs.add_mailgun_api_key(temp_feconf_path)
         self.assertEqual(check_prompts, expected_check_prompts)
         with python_utils.open_file(temp_feconf_path, 'r') as f:
             self.assertEqual(f.read(), expected_feconf_text)
-
-    def test_missing_mailgun_api_key_line(self):
-        mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
-        def mock_getpass(prompt):  # pylint: disable=unused-argument
-            return mailgun_api_key
-        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
-        feconf_swap = self.swap(
-            update_configs, 'LOCAL_FECONF_PATH', temp_feconf_path)
-        with getpass_swap, feconf_swap, self.assertRaisesRegexp(
-            AssertionError, 'Missing mailgun API key'):
-            update_configs.add_mailgun_api_key()
 
     def test_addition_of_mailgun_api_key(self):
         mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
@@ -262,229 +238,46 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 mailgun_api_key))
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
-        feconf_swap = self.swap(
-            update_configs, 'LOCAL_FECONF_PATH', temp_feconf_path)
-        with getpass_swap, feconf_swap:
-            update_configs.add_mailgun_api_key()
+
+        with getpass_swap:
+            update_configs.add_mailgun_api_key(temp_feconf_path)
         with python_utils.open_file(temp_feconf_path, 'r') as f:
             self.assertEqual(f.read(), expected_feconf_text)
-
-    def test_invalid_redishost(self):
-        check_prompts = {
-            'Enter REDISHOST from the release process doc.': False,
-            'You have entered an invalid IP Address: 192.123.23.11235, '
-            'please retry.': False
-        }
-        expected_check_prompts = {
-            'Enter REDISHOST from the release process doc.': True,
-            'You have entered an invalid IP Address: 192.123.23.11235, '
-            'please retry.': True
-        }
-        def mock_getpass(prompt):
-            check_prompts[prompt] = True
-            if 'invalid' in prompt:
-                return '192.123.23.1'
-            return '192.123.23.11235'
-        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            'REDISHOST = \'localhost\'\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
-        expected_feconf_text = (
-            'REDISHOST = \'192.123.23.1\'\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
-        feconf_swap = self.swap(
-            update_configs, 'LOCAL_FECONF_PATH', temp_feconf_path)
-
-        with getpass_swap, feconf_swap:
-            update_configs.add_redishost()
-        self.assertEqual(check_prompts, expected_check_prompts)
-        with python_utils.open_file(temp_feconf_path, 'r') as f:
-            self.assertEqual(f.read(), expected_feconf_text)
-
-    def test_missing_redishost_line(self):
-        def mock_getpass(prompt):  # pylint: disable=unused-argument
-            return '192.123.23.1'
-        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'%Y-%m-%d\'\n')
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
-        feconf_swap = self.swap(
-            update_configs, 'LOCAL_FECONF_PATH', temp_feconf_path)
-        with getpass_swap, feconf_swap, self.assertRaisesRegexp(
-            AssertionError, 'Missing REDISHOST'):
-            update_configs.add_redishost()
-
-    def test_addition_of_redishost(self):
-        def mock_getpass(prompt):  # pylint: disable=unused-argument
-            return '192.123.23.1'
-        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            'REDISHOST = \'localhost\'\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
-        expected_feconf_text = (
-            'REDISHOST = \'192.123.23.1\'\n'
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
-        feconf_swap = self.swap(
-            update_configs, 'LOCAL_FECONF_PATH', temp_feconf_path)
-        with getpass_swap, feconf_swap:
-            update_configs.add_redishost()
-        with python_utils.open_file(temp_feconf_path, 'r') as f:
-            self.assertEqual(f.read(), expected_feconf_text)
-
-    def test_error_is_raised_if_redishost_not_updated(self):
-        def mock_getpass(prompt):  # pylint: disable=unused-argument
-            return '192.123.23.1'
-        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-
-        feconf_lines = [
-            'REDISHOST = \'localhost\'\n',
-            '# When the site terms were last updated, in UTC.\n',
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n',
-            '# Format of string for dashboard statistics logs.\n',
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n',
-            '# the existing storage models for UserStatsModel.\n',
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n']
-
-        class MockFile(python_utils.OBJECT):
-            def readlines(self):
-                """Mock method to read lines of the file object."""
-                return mock_readlines()
-            def write(self, unused_line):
-                """Mock method to write lines."""
-                pass
-            def __enter__(self):
-                return self
-            def __exit__(self, exc_type, exc_value, exc_traceback):
-                pass
-
-        def mock_readlines():
-            return feconf_lines
-
-        def mock_open_file(unused_path, unused_mode):
-            return MockFile()
-
-        open_file_swap = self.swap(python_utils, 'open_file', mock_open_file)
-
-        with getpass_swap, open_file_swap, self.assertRaisesRegexp(
-            AssertionError,
-            'REDISHOST not updated correctly in feconf.py'):
-            update_configs.add_redishost()
 
     def test_invalid_config(self):
-        config_swap = self.swap(
-            update_configs, 'FECONF_CONFIG_PATH', INVALID_FECONF_CONFIG_PATH)
-        with self.feconf_swap, config_swap, self.assertRaisesRegexp(
+        with self.assertRaisesRegexp(
             Exception,
             'Invalid line in invalid_feconf_updates.config '
             'config file: INVALID_KEY: \'invalid\''):
             update_configs.apply_changes_based_on_config(
-                update_configs.LOCAL_FECONF_PATH,
-                update_configs.FECONF_CONFIG_PATH, update_configs.FECONF_REGEX)
+                MOCK_LOCAL_FECONF_PATH,
+                INVALID_FECONF_CONFIG_PATH, update_configs.FECONF_REGEX)
 
     def test_missing_line_in_local_config(self):
-        config_swap = self.swap(
-            update_configs, 'FECONF_CONFIG_PATH',
-            FECONF_CONFIG_PATH_WITH_EXTRA_LINE)
-        with self.feconf_swap, config_swap, self.assertRaisesRegexp(
+        with self.assertRaisesRegexp(
             Exception,
             'Could not find correct number of lines in '
             'feconf.txt matching: EXTRA_KEY = \'extra\''):
             update_configs.apply_changes_based_on_config(
-                update_configs.LOCAL_FECONF_PATH,
-                update_configs.FECONF_CONFIG_PATH, update_configs.FECONF_REGEX)
+                MOCK_LOCAL_FECONF_PATH,
+                FECONF_CONFIG_PATH_WITH_EXTRA_LINE, update_configs.FECONF_REGEX)
 
     def test_changes_are_applied_to_config(self):
-        config_swap = self.swap(
-            update_configs, 'FECONF_CONFIG_PATH', VALID_FECONF_CONFIG_PATH)
         with python_utils.open_file(MOCK_LOCAL_FECONF_PATH, 'r') as f:
             original_text = f.read()
         expected_text = original_text.replace(
             'INCOMING_EMAILS_DOMAIN_NAME = \'\'',
             'INCOMING_EMAILS_DOMAIN_NAME = \'oppia.org\'')
         try:
-            with self.feconf_swap, config_swap:
-                update_configs.apply_changes_based_on_config(
-                    update_configs.LOCAL_FECONF_PATH,
-                    update_configs.FECONF_CONFIG_PATH,
-                    update_configs.FECONF_REGEX)
+            update_configs.apply_changes_based_on_config(
+                MOCK_LOCAL_FECONF_PATH,
+                VALID_FECONF_CONFIG_PATH,
+                update_configs.FECONF_REGEX)
             with python_utils.open_file(MOCK_LOCAL_FECONF_PATH, 'r') as f:
                 self.assertEqual(f.read(), expected_text)
         finally:
             with python_utils.open_file(MOCK_LOCAL_FECONF_PATH, 'w') as f:
                 f.write(original_text)
-
-    def test_checkout_is_run_in_case_of_exception(self):
-        check_function_calls = {
-            'check_updates_to_terms_of_service_gets_called': False,
-            'run_cmd_gets_called': False
-        }
-        expected_check_function_calls = {
-            'check_updates_to_terms_of_service_gets_called': True,
-            'run_cmd_gets_called': True
-        }
-        def mock_check_updates(unused_personal_access_token):
-            check_function_calls[
-                'check_updates_to_terms_of_service_gets_called'] = True
-            raise Exception('Testing')
-        def mock_run_cmd(unused_cmd_tokens):
-            check_function_calls['run_cmd_gets_called'] = True
-        check_updates_swap = self.swap(
-            update_configs, 'check_updates_to_terms_of_service',
-            mock_check_updates)
-        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
-        with self.branch_name_swap, self.release_scripts_exist_swap:
-            with self.url_open_swap, check_updates_swap, run_cmd_swap:
-                with self.assertRaisesRegexp(Exception, 'Testing'):
-                    update_configs.main('test-token')
-        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_function_calls(self):
         check_function_calls = {
@@ -499,10 +292,11 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'apply_changes_based_on_config_gets_called': True,
             'ask_user_to_confirm_gets_called': True
         }
-        def mock_check_updates(unused_personal_access_token):
+        def mock_check_updates(
+                unused_release_feconf_path, unused_personal_access_token):
             check_function_calls[
                 'check_updates_to_terms_of_service_gets_called'] = True
-        def mock_add_mailgun_api_key():
+        def mock_add_mailgun_api_key(unused_release_feconf_path):
             check_function_calls['add_mailgun_api_key_gets_called'] = True
         def mock_apply_changes(
                 unused_local_filepath, unused_config_filepath,
@@ -521,8 +315,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             update_configs, 'apply_changes_based_on_config', mock_apply_changes)
         ask_user_swap = self.swap(
             common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
-        with self.branch_name_swap, self.release_scripts_exist_swap:
-            with self.url_open_swap, check_updates_swap, ask_user_swap:
-                with add_mailgun_api_key_swap, apply_changes_swap:
-                    update_configs.main('test-token')
+        with self.url_open_swap, check_updates_swap, ask_user_swap:
+            with add_mailgun_api_key_swap, apply_changes_swap:
+                update_configs.main('test-release-dir', 'test-token')
         self.assertEqual(check_function_calls, expected_check_function_calls)

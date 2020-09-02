@@ -33,8 +33,6 @@ from scripts.release_scripts import deploy
 from scripts.release_scripts import gcloud_adapter
 from scripts.release_scripts import update_configs
 
-import github  # isort:skip pylint: disable=wrong-import-position
-
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 
 MOCK_FECONF_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'feconf.txt')
@@ -98,7 +96,10 @@ class DeployTests(test_utils.GenericTestBase):
             self.print_arr.append(msg)
         def mock_check_release_doc():
             pass
-        def mock_add_redishost():
+        def mock_update_redishost_in_config(unused_app_name):
+            pass
+        def mock_update_configs_in_deploy_data(
+                unused_release_dir_path, unused_app_name):
             pass
 
         self.install_swap = self.swap(
@@ -135,8 +136,12 @@ class DeployTests(test_utils.GenericTestBase):
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
         self.release_doc_swap = self.swap(
             deploy, 'check_release_doc', mock_check_release_doc)
-        self.redishost_swap = self.swap(
-            update_configs, 'add_redishost', mock_add_redishost)
+        self.rd_swap = self.swap(
+            deploy, 'update_redishost_in_config',
+            mock_update_redishost_in_config)
+        self.uc_swap = self.swap(
+            deploy, 'update_configs_in_deploy_data',
+            mock_update_configs_in_deploy_data)
 
     def test_invalid_app_name(self):
         args_swap = self.swap(
@@ -230,75 +235,48 @@ class DeployTests(test_utils.GenericTestBase):
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with self.run_swap, self.release_doc_swap, args_swap, out_swap:
-                    with get_token_swap, self.assertRaisesRegexp(
-                        Exception, 'Invalid last commit message: Invalid.'):
-                        deploy.execute_deployment()
+                    with get_token_swap, self.rd_swap, self.cd_swap:
+                        with self.assertRaisesRegexp(
+                            Exception, 'Invalid last commit message: Invalid.'):
+                            deploy.execute_deployment()
 
     def test_missing_mailgun_api(self):
-        args_swap = self.swap(
-            sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
-        feconf_swap = self.swap(
-            common, 'FECONF_PATH', MOCK_FECONF_FILEPATH)
-        def mock_main(unused_personal_access_token):
-            pass
-        def mock_get_personal_access_token():
-            return 'test'
-        def mock_get_organization(unused_self, unused_name):
-            return github.Organization.Organization(
-                requester='', headers='', attributes={}, completed='')
-        def mock_get_repo(unused_self, unused_org):
-            return 'repo'
-        def mock_check_blocking_bug_issue_count(unused_repo):
-            pass
-        def mock_check_prs_for_current_release_are_released(unused_repo):
-            pass
-        def mock_check_output(unused_cmd_tokens):
-            return 'Update authors and changelog for v1.2.3'
-        def mock_check_travis_and_circleci_tests(unused_current_branch_name):
+        mock_content = python_utils.open_file(
+            MOCK_FECONF_FILEPATH, 'r').read()
+        class MockFile(python_utils.OBJECT):
+            def read(self):
+                """Read content of the file object."""
+                return mock_content
+
+        def mock_open_file(unused_path, unused_mode):
+            return MockFile()
+
+        def mock_main(unused_release_dir_path, unused_personal_access_token):
             pass
 
         config_swap = self.swap(update_configs, 'main', mock_main)
-        get_token_swap = self.swap(
-            common, 'get_personal_access_token', mock_get_personal_access_token)
-        get_org_swap = self.swap(
-            github.Github, 'get_organization', mock_get_organization)
-        get_repo_swap = self.swap(
-            github.Organization.Organization, 'get_repo', mock_get_repo)
-        bug_check_swap = self.swap(
-            common, 'check_blocking_bug_issue_count',
-            mock_check_blocking_bug_issue_count)
-        pr_check_swap = self.swap(
-            common, 'check_prs_for_current_release_are_released',
-            mock_check_prs_for_current_release_are_released)
-        out_swap = self.swap(
-            subprocess, 'check_output', mock_check_output)
-        check_tests_swap = self.swap(
-            deploy, 'check_travis_and_circleci_tests',
-            mock_check_travis_and_circleci_tests)
+        open_swap = self.swap(python_utils, 'open_file', mock_open_file)
 
-        with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
-            with self.release_script_exist_swap, self.gcloud_available_swap:
-                with self.run_swap, self.release_doc_swap, config_swap:
-                    with get_token_swap, get_org_swap, get_repo_swap:
-                        with bug_check_swap, pr_check_swap, out_swap:
-                            with args_swap, feconf_swap, check_tests_swap:
-                                with self.assertRaisesRegexp(
-                                    Exception,
-                                    'The mailgun API key must be added before '
-                                    'deployment.'):
-                                    deploy.execute_deployment()
+        with config_swap, open_swap, self.assertRaisesRegexp(
+            Exception,
+            'The mailgun API key must be added before '
+            'deployment.'):
+            deploy.update_configs_in_deploy_data(
+                'test-release-dir', 'test-token')
 
     def test_missing_third_party_dir(self):
         third_party_swap = self.swap(deploy, 'THIRD_PARTY_DIR', 'INVALID_DIR')
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
-                with self.run_swap, self.args_swap, self.redishost_swap:
-                    with third_party_swap, self.assertRaisesRegexp(
-                        Exception,
-                        'Could not find third_party directory at INVALID_DIR. '
-                        'Please run install_third_party_libs.py prior to '
-                        'running this script.'):
-                        deploy.execute_deployment()
+                with self.run_swap, self.args_swap, self.rd_swap, self.cd_swap:
+                    with self.check_output_swap, third_party_swap:
+                        with self.assertRaisesRegexp(
+                            Exception,
+                            'Could not find third_party directory at '
+                            'INVALID_DIR. Please run '
+                            'install_third_party_libs.py prior to '
+                            'running this script.'):
+                            deploy.execute_deployment()
 
     def test_invalid_dir_access(self):
         def mock_getcwd():
@@ -308,7 +286,7 @@ class DeployTests(test_utils.GenericTestBase):
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with self.args_swap, self.exists_swap, self.check_output_swap:
                     with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
-                        with self.run_swap, self.redishost_swap, getcwd_swap:
+                        with self.run_swap, self.rd_swap, getcwd_swap:
                             with self.assertRaisesRegexp(
                                 Exception,
                                 'Invalid directory accessed '
@@ -323,7 +301,8 @@ class DeployTests(test_utils.GenericTestBase):
             'deploy_application_and_write_log_entry_gets_called': False,
             'switch_version_gets_called': False,
             'flush_memcache_gets_called': False,
-            'check_breakage_gets_called': False
+            'check_breakage_gets_called': False,
+            'update_redishost_in_config_gets_called': False
         }
         expected_check_function_calls = {
             'preprocess_release_gets_called': True,
@@ -332,12 +311,15 @@ class DeployTests(test_utils.GenericTestBase):
             'deploy_application_and_write_log_entry_gets_called': True,
             'switch_version_gets_called': True,
             'flush_memcache_gets_called': True,
-            'check_breakage_gets_called': True
+            'check_breakage_gets_called': True,
+            'update_redishost_in_config_gets_called': True,
         }
         def mock_getcwd():
             return 'deploy-oppiatestserver-release-1.2.3-%s' % (
                 deploy.CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
-        def mock_preprocess_release(unused_app_name, unused_deploy_data_path):
+        def mock_preprocess_release(
+                unused_app_name, unused_deploy_data_path,
+                unused_release_dir_path, unused_personal_access_token):
             check_function_calls['preprocess_release_gets_called'] = True
         def mock_update_and_check_indexes(unused_app_name):
             check_function_calls['update_and_check_indexes_gets_called'] = True
@@ -359,6 +341,9 @@ class DeployTests(test_utils.GenericTestBase):
                 unused_app_name, current_release_version):
             if current_release_version == '1-2-3':
                 check_function_calls['check_breakage_gets_called'] = True
+        def mock_update_redishost_in_config(unused_app_name):
+            check_function_calls[
+                'update_redishost_in_config_gets_called'] = True
 
         cwd_swap = self.swap(os, 'getcwd', mock_getcwd)
         preprocess_swap = self.swap(
@@ -375,13 +360,16 @@ class DeployTests(test_utils.GenericTestBase):
             deploy, 'flush_memcache', mock_flush_memcache)
         check_breakage_swap = self.swap(
             deploy, 'check_breakage', mock_check_breakage)
+        rd_swap = self.swap(
+            deploy, 'update_redishost_in_config',
+            mock_update_redishost_in_config)
 
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with self.args_swap, self.exists_swap, self.check_output_swap:
                     with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
                         with cwd_swap, preprocess_swap, update_swap, build_swap:
-                            with deploy_swap, switch_swap, self.redishost_swap:
+                            with deploy_swap, switch_swap, rd_swap:
                                 with memcache_swap, check_breakage_swap:
                                     deploy.execute_deployment()
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -394,7 +382,8 @@ class DeployTests(test_utils.GenericTestBase):
             'deploy_application_and_write_log_entry_gets_called': False,
             'switch_version_gets_called': False,
             'flush_memcache_gets_called': False,
-            'check_breakage_gets_called': False
+            'check_breakage_gets_called': False,
+            'update_redishost_in_config_gets_called': False
         }
         expected_check_function_calls = {
             'preprocess_release_gets_called': True,
@@ -403,12 +392,15 @@ class DeployTests(test_utils.GenericTestBase):
             'deploy_application_and_write_log_entry_gets_called': True,
             'switch_version_gets_called': True,
             'flush_memcache_gets_called': True,
-            'check_breakage_gets_called': True
+            'check_breakage_gets_called': True,
+            'update_redishost_in_config_gets_called': True
         }
         def mock_getcwd():
             return 'deploy-oppiatestserver-release-1.2.3-%s' % (
                 deploy.CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
-        def mock_preprocess_release(unused_app_name, unused_deploy_data_path):
+        def mock_preprocess_release(
+                unused_app_name, unused_deploy_data_path,
+                unused_release_dir_path, unused_personal_access_token):
             check_function_calls['preprocess_release_gets_called'] = True
         def mock_update_and_check_indexes(unused_app_name):
             check_function_calls['update_and_check_indexes_gets_called'] = True
@@ -430,6 +422,9 @@ class DeployTests(test_utils.GenericTestBase):
                 unused_app_name, current_release_version):
             if current_release_version == 'release-1-2-3-custom':
                 check_function_calls['check_breakage_gets_called'] = True
+        def mock_update_redishost_in_config(unused_app_name):
+            check_function_calls[
+                'update_redishost_in_config_gets_called'] = True
 
         cwd_swap = self.swap(os, 'getcwd', mock_getcwd)
         preprocess_swap = self.swap(
@@ -450,21 +445,94 @@ class DeployTests(test_utils.GenericTestBase):
             sys, 'argv', [
                 'deploy.py', '--app_name=oppiatestserver',
                 '--version=release-1.2.3-custom'])
+        rd_swap = self.swap(
+            deploy, 'update_redishost_in_config',
+            mock_update_redishost_in_config)
 
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with args_swap, self.exists_swap, self.check_output_swap:
                     with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
                         with cwd_swap, preprocess_swap, update_swap, build_swap:
-                            with deploy_swap, switch_swap, self.redishost_swap:
+                            with deploy_swap, switch_swap, rd_swap:
                                 with memcache_swap, check_breakage_swap:
                                     deploy.execute_deployment()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
+    def test_update_redishost_in_config_for_main_server(self):
+        temp_feconf_config_path = tempfile.NamedTemporaryFile().name
+        feconf_text = (
+            'CONFIG_VAR_1 = \'test-var-1\'\n'
+            'CONFIG_VAR_2 = \'test-var-2\'\n'
+            'REDISHOST_PROD = \'192.23.1.1\'\n'
+            'REDISHOST_TEST = \'192.23.1.2\'\n'
+            'REDISHOST_BACKUP = \'192.23.1.3\'\n')
+        expected_feconf_text = (
+            'CONFIG_VAR_1 = \'test-var-1\'\n'
+            'CONFIG_VAR_2 = \'test-var-2\'\n'
+            'REDISHOST = \'192.23.1.1\'\n')
+        with python_utils.open_file(temp_feconf_config_path, 'w') as f:
+            f.write(feconf_text)
+        feconf_swap = self.swap(
+            update_configs, 'FECONF_CONFIG_PATH', temp_feconf_config_path)
+
+        with feconf_swap:
+            deploy.update_redishost_in_config(deploy.APP_NAME_OPPIASERVER)
+
+        with python_utils.open_file(temp_feconf_config_path, 'r') as f:
+            self.assertEqual(f.read(), expected_feconf_text)
+
+    def test_update_redishost_in_config_for_test_server(self):
+        temp_feconf_config_path = tempfile.NamedTemporaryFile().name
+        feconf_text = (
+            'CONFIG_VAR_1 = \'test-var-1\'\n'
+            'CONFIG_VAR_2 = \'test-var-2\'\n'
+            'REDISHOST_PROD = \'192.23.1.1\'\n'
+            'REDISHOST_TEST = \'192.23.1.2\'\n'
+            'REDISHOST_BACKUP = \'192.23.1.3\'\n')
+        expected_feconf_text = (
+            'CONFIG_VAR_1 = \'test-var-1\'\n'
+            'CONFIG_VAR_2 = \'test-var-2\'\n'
+            'REDISHOST = \'192.23.1.2\'\n')
+        with python_utils.open_file(temp_feconf_config_path, 'w') as f:
+            f.write(feconf_text)
+        feconf_swap = self.swap(
+            update_configs, 'FECONF_CONFIG_PATH', temp_feconf_config_path)
+
+        with feconf_swap:
+            deploy.update_redishost_in_config(deploy.APP_NAME_OPPIATESTSERVER)
+
+        with python_utils.open_file(temp_feconf_config_path, 'r') as f:
+            self.assertEqual(f.read(), expected_feconf_text)
+
+    def test_update_redishost_in_config_for_backup_server(self):
+        temp_feconf_config_path = tempfile.NamedTemporaryFile().name
+        feconf_text = (
+            'CONFIG_VAR_1 = \'test-var-1\'\n'
+            'CONFIG_VAR_2 = \'test-var-2\'\n'
+            'REDISHOST_PROD = \'192.23.1.1\'\n'
+            'REDISHOST_TEST = \'192.23.1.2\'\n'
+            'REDISHOST_BACKUP = \'192.23.1.3\'\n')
+        expected_feconf_text = (
+            'CONFIG_VAR_1 = \'test-var-1\'\n'
+            'CONFIG_VAR_2 = \'test-var-2\'\n'
+            'REDISHOST = \'192.23.1.3\'\n')
+        with python_utils.open_file(temp_feconf_config_path, 'w') as f:
+            f.write(feconf_text)
+        feconf_swap = self.swap(
+            update_configs, 'FECONF_CONFIG_PATH', temp_feconf_config_path)
+
+        with feconf_swap:
+            deploy.update_redishost_in_config('server-migration')
+
+        with python_utils.open_file(temp_feconf_config_path, 'r') as f:
+            self.assertEqual(f.read(), expected_feconf_text)
+
     def test_missing_deploy_data_dir(self):
-        with self.assertRaisesRegexp(
+        with self.uc_swap, self.assertRaisesRegexp(
             Exception, 'Could not find deploy_data directory at invalid_path'):
-            deploy.preprocess_release('oppiaserver', 'invalid_path')
+            deploy.preprocess_release(
+                'oppiaserver', 'invalid_path', 'test-release-dir', 'test-token')
 
     def test_missing_deploy_files(self):
         def mock_exists(path):
@@ -472,11 +540,12 @@ class DeployTests(test_utils.GenericTestBase):
                 return True
             return False
         exists_swap = self.swap(os.path, 'exists', mock_exists)
-        with exists_swap, self.assertRaisesRegexp(
+        with self.uc_swap, exists_swap, self.assertRaisesRegexp(
             Exception,
             'Could not find source path deploy_dir/%s. Please '
             'check your deploy_data folder.' % deploy.FILES_AT_ROOT[0]):
-            deploy.preprocess_release('oppiaserver', 'deploy_dir')
+            deploy.preprocess_release(
+                'oppiaserver', 'deploy_dir', 'test-release-dir', 'test-token')
 
     def test_missing_assets_files(self):
         def mock_exists(path):
@@ -485,12 +554,13 @@ class DeployTests(test_utils.GenericTestBase):
             return False
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         files_swap = self.swap(deploy, 'FILES_AT_ROOT', ['invalid.txt'])
-        with exists_swap, files_swap, self.assertRaisesRegexp(
+        with self.uc_swap, exists_swap, files_swap, self.assertRaisesRegexp(
             Exception,
             'Could not find destination path %s. Has the code been '
             'updated in the meantime?' % os.path.join(
                 os.getcwd(), 'assets', 'invalid.txt')):
-            deploy.preprocess_release('oppiaserver', 'deploy_dir')
+            deploy.preprocess_release(
+                'oppiaserver', 'deploy_dir', 'test-release-dir', 'test-token')
 
     def test_missing_images_dir(self):
         def mock_exists(path):
@@ -500,12 +570,14 @@ class DeployTests(test_utils.GenericTestBase):
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         images_dir_swap = self.swap(deploy, 'IMAGE_DIRS', ['invalid'])
 
-        with exists_swap, images_dir_swap, self.copyfile_swap:
+        with self.uc_swap, exists_swap, images_dir_swap, self.copyfile_swap:
             with self.assertRaisesRegexp(
                 Exception,
                 'Could not find source dir deploy_dir/images/invalid. '
                 'Please check your deploy_data folder.'):
-                deploy.preprocess_release('oppiaserver', 'deploy_dir')
+                deploy.preprocess_release(
+                    'oppiaserver', 'deploy_dir', 'test-release-dir',
+                    'test-token')
 
     def test_invalid_dev_mode(self):
         constants_swap = self.swap(
@@ -513,9 +585,11 @@ class DeployTests(test_utils.GenericTestBase):
             'CONSTANTS_FILE_PATH',
             INVALID_CONSTANTS_WITH_WRONG_DEV_MODE)
         with self.exists_swap, self.copyfile_swap, constants_swap:
-            with self.listdir_swap, self.assertRaisesRegexp(
+            with self.listdir_swap, self.uc_swap, self.assertRaisesRegexp(
                 AssertionError, 'Invalid DEV_MODE'):
-                deploy.preprocess_release('oppiaserver', 'deploy_dir')
+                deploy.preprocess_release(
+                    'oppiaserver', 'deploy_dir', 'test-release-dir',
+                    'test-token')
 
     def test_invalid_bucket_name(self):
         constants_swap = self.swap(
@@ -523,21 +597,25 @@ class DeployTests(test_utils.GenericTestBase):
             'CONSTANTS_FILE_PATH',
             INVALID_CONSTANTS_WITH_WRONG_BUCKET_NAME)
         with self.exists_swap, self.copyfile_swap, constants_swap:
-            with self.listdir_swap, self.assertRaisesRegexp(
+            with self.listdir_swap, self.uc_swap, self.assertRaisesRegexp(
                 AssertionError,
                 'Invalid value for GCS_RESOURCE_BUCKET_NAME in %s' % (
                     common.CONSTANTS_FILE_PATH)):
-                deploy.preprocess_release('oppiaserver', 'deploy_dir')
+                deploy.preprocess_release(
+                    'oppiaserver', 'deploy_dir', 'test-release-dir',
+                    'test-token')
 
     def test_missing_vpc_access_connector(self):
         app_dev_swap = self.swap(
             deploy, 'APP_DEV_YAML_PATH', INVALID_APP_DEV_YAML_PATH)
         with self.exists_swap, self.copyfile_swap, app_dev_swap:
-            with self.listdir_swap, self.assertRaisesRegexp(
+            with self.listdir_swap, self.uc_swap, self.assertRaisesRegexp(
                 AssertionError,
                 '"name: projects/PROJECT_ID" string is missing in app_dev.yaml'
                 ):
-                deploy.preprocess_release('oppiaserver', 'deploy_dir')
+                deploy.preprocess_release(
+                    'oppiaserver', 'deploy_dir', 'test-release-dir',
+                    'test-token')
 
     def test_constants_and_app_dev_are_updated_correctly(self):
         constants_swap = self.swap(
@@ -562,8 +640,10 @@ class DeployTests(test_utils.GenericTestBase):
 
         try:
             with self.exists_swap, constants_swap, files_swap, images_dir_swap:
-                with self.listdir_swap, app_dev_swap:
-                    deploy.preprocess_release('oppiaserver', 'deploy_dir')
+                with self.listdir_swap, self.uc_swap, app_dev_swap:
+                    deploy.preprocess_release(
+                        'oppiaserver', 'deploy_dir', 'test-release-dir',
+                        'test-token')
             with python_utils.open_file(VALID_CONSTANTS, 'r') as f:
                 self.assertEqual(f.read(), expected_common_content)
             with python_utils.open_file(VALID_APP_DEV_YAML_PATH, 'r') as f:
