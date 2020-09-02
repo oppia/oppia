@@ -98,12 +98,16 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
             // don't have loading indicator or try again for showing images in
             // this case. So we directly assign the url to the imageUrl.
             try {
+              ctrl.imageUrl === '';
               if (
                 ContextService.getImageSaveDestination() ===
-                IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+                IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
+                  ImageLocalStorageService.isInStorage(ctrl.filepath))) {
                 ctrl.imageUrl = ImageLocalStorageService.getObjectUrlForImage(
                   ctrl.filepath);
-              } else {
+              }
+
+              if (ctrl.imageUrl === '') {
                 ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
                   ContextService.getEntityType(), ContextService.getEntityId(),
                   ctrl.filepath);

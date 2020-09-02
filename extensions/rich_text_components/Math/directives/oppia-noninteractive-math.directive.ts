@@ -74,12 +74,15 @@ angular.module('oppia').directive('oppiaNoninteractiveMath', [
             // don't pre-load the images in this case. So we directly assign
             // the url to the imageUrl.
             try {
+              ctrl.imageUrl = null;
               if (
                 ContextService.getImageSaveDestination() ===
-                IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+                IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
+                  ImageLocalStorageService.isInStorage(svgFilename))) {
                 ctrl.imageUrl = ImageLocalStorageService.getObjectUrlForImage(
                   svgFilename);
-              } else {
+              }
+              if (ctrl.imageUrl === null) {
                 ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
                   ContextService.getEntityType(), ContextService.getEntityId(),
                   svgFilename);

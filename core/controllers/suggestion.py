@@ -100,17 +100,12 @@ class SuggestionHandler(base.BaseHandler):
 
         # TODO(#10513) : Find a way to save the images before the suggestion is
         # created.
-        html_list = suggestion.get_all_html_content_strings()
-        filenames = (
-            html_cleaner.get_image_filenames_from_html_strings(html_list))
-        if suggestion.suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
-            filenames = []
-        suggestion_image_context = (
-            fs_services.get_image_context_for_suggestion_target(
-                suggestion.target_type))
+        new_image_filenames = (
+            suggestion.get_new_image_filenames_added_in_suggestion())
 
-        for filename in filenames:
+        suggestion_image_context = suggestion.IMAGE_CONTEXT
+
+        for filename in new_image_filenames:
             image = self.request.get(filename)
             if not image:
                 logging.error(
@@ -131,6 +126,15 @@ class SuggestionHandler(base.BaseHandler):
             fs_services.save_original_and_compressed_versions_of_image(
                 filename, suggestion_image_context, suggestion.target_id,
                 image, 'image', image_is_compressible)
+
+        target_entity_html_list = suggestion.get_target_entity_html_strings()
+        target_image_filenames = (
+            html_cleaner.get_image_filenames_from_html_strings(
+                target_entity_html_list))
+        fs_services.copy_images(
+            suggestion.target_type, suggestion.target_id,
+            suggestion_image_context, suggestion.target_id,
+            target_image_filenames)
 
         self.render_json(self.values)
 

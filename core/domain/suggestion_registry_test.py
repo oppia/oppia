@@ -1861,8 +1861,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
-        image_context = fs_services.get_image_context_for_suggestion_target(
-            'skill')
+        image_context = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
         fs_services.save_original_and_compressed_versions_of_image(
             'img.svg', image_context, 'skill1',
             raw_image, 'image', False)
