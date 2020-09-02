@@ -17,25 +17,70 @@
  */
 import 'mousetrap';
 
+import { ApplicationRef } from '@angular/core';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
+import { KeyboardShortcutHelpModalComponent } from
+  // eslint-disable-next-line max-len
+  'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component.ts';
+import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
+class MockActiveModal {
+  dismiss(): void {
+    return;
+  }
+}
 describe('Keyboard Shortcuts', () => {
-  var skipButton = document.createElement('button');
-  var nextButton = document.createElement('button');
-  var continueButton = document.createElement('button');
-  var backButton = document.createElement('button');
-  var searchBar = document.createElement('input');
-  var categoryBar = document.createElement('select');
+  let skipButton = document.createElement('button');
+  let nextButton = document.createElement('button');
+  let continueButton = document.createElement('button');
+  let backButton = document.createElement('button');
+  let searchBar = document.createElement('input');
+  let categoryBar = document.createElement('select');
 
-  var mockWindow = {
+  let openQuickReferenceSpy;
+
+  let mockWindow = {
     location: {
       href: ''
     }
   };
 
-  const windowRef = new WindowRef();
-  const keyboardShortcutService = new KeyboardShortcutService(windowRef);
+  let windowRef;
+  let appRef: ApplicationRef;
+  let keyboardShortcutService;
+  let component: KeyboardShortcutHelpModalComponent;
+  let fixture: ComponentFixture<KeyboardShortcutHelpModalComponent>;
+  let ngbActiveModal: NgbActiveModal;
+  let ngbModal: NgbModal;
+
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [KeyboardShortcutHelpModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        }
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(async() => {
+    fixture = TestBed.createComponent(KeyboardShortcutHelpModalComponent);
+    ngbModal = TestBed.get(NgbModal);
+    ngbActiveModal = TestBed.get(NgbActiveModal);
+    component = fixture.componentInstance;
+    windowRef = new WindowRef();
+    appRef = TestBed.get(ApplicationRef);
+    keyboardShortcutService = new KeyboardShortcutService(
+      windowRef,
+      ngbModal,
+      appRef
+    );
+  });
 
   beforeAll(() => {
     skipButton.setAttribute('id', 'skipToMainContentId');
@@ -49,13 +94,12 @@ describe('Keyboard Shortcuts', () => {
     document.body.append(backButton);
     document.body.append(searchBar);
     document.body.append(categoryBar);
-
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue(mockWindow);
   });
 
 
   it('should navigate to the corresponding page' +
     ' when the navigation key is pressed', () => {
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue(mockWindow);
     keyboardShortcutService.bindNavigationShortcuts();
 
     mockWindow.location.href = '';
@@ -99,6 +143,12 @@ describe('Keyboard Shortcuts', () => {
 
   it('should move the focus to the corresponding element' +
     ' when the action key is pressed', () => {
+    openQuickReferenceSpy = spyOn(
+      keyboardShortcutService, 'openQuickReference').and.callThrough();
+    spyOn(ngbModal, 'open');
+    spyOn(ngbModal, 'dismissAll');
+    spyOn(appRef, 'tick');
+
     keyboardShortcutService.bindLibraryPageShortcuts();
 
     Mousetrap.trigger('s');
@@ -109,6 +159,9 @@ describe('Keyboard Shortcuts', () => {
 
     Mousetrap.trigger('c');
     expect(categoryBar.isEqualNode(document.activeElement));
+
+    Mousetrap.trigger('?');
+    expect(openQuickReferenceSpy).toHaveBeenCalled();
 
     keyboardShortcutService.bindExplorationPlayerShortcuts();
 
@@ -124,5 +177,8 @@ describe('Keyboard Shortcuts', () => {
     document.body.append(nextButton);
     Mousetrap.trigger('j');
     expect(nextButton.isEqualNode(document.activeElement));
+
+    Mousetrap.trigger('?');
+    expect(openQuickReferenceSpy).toHaveBeenCalled();
   });
 });
