@@ -166,7 +166,7 @@ def main():
     # Pinning the
 
     subprocess.check_call(
-        [sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip==20.2.2'])
+        [sys.executable, '-m', 'pip', 'install', 'wheel'])
 
     pip_dependencies = [
         ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
