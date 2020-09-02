@@ -97,8 +97,8 @@ angular.module('oppia').directive('questionsList', [
         'QuestionUndoRedoService', 'QuestionValidationService',
         'QuestionsListService', 'ShortSkillSummaryObjectFactory',
         'SkillBackendApiService', 'SkillDifficultyObjectFactory',
-        'WindowDimensionsService', 'DEFAULT_SKILL_DIFFICULTY',
-        'MODE_SELECT_DIFFICULTY', 'MODE_SELECT_SKILL', 'NUM_QUESTIONS_PER_PAGE',
+        'WindowDimensionsService', 'MODE_SELECT_DIFFICULTY',
+        'MODE_SELECT_SKILL', 'NUM_QUESTIONS_PER_PAGE',
         function(
             $location, $timeout, $uibModal, AlertsService,
             ContextService, EditableQuestionBackendApiService,
@@ -107,8 +107,8 @@ angular.module('oppia').directive('questionsList', [
             QuestionUndoRedoService, QuestionValidationService,
             QuestionsListService, ShortSkillSummaryObjectFactory,
             SkillBackendApiService, SkillDifficultyObjectFactory,
-            WindowDimensionsService, DEFAULT_SKILL_DIFFICULTY,
-            MODE_SELECT_DIFFICULTY, MODE_SELECT_SKILL, NUM_QUESTIONS_PER_PAGE) {
+            WindowDimensionsService, MODE_SELECT_DIFFICULTY,
+            MODE_SELECT_SKILL, NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _reInitializeSelectedSkillIds = function() {
