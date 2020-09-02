@@ -307,7 +307,7 @@ class StateStatsTests(test_utils.GenericTestBase):
         state_stats = stats_domain.StateStats.create_default()
         different_stats = DifferentStats()
 
-        self.assertNotEqual(state_stats, different_stats)
+        self.assertFalse(state_stats == different_stats)
 
     def test_hash(self):
         state_stats = stats_domain.StateStats.create_default()
