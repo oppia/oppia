@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the skill concept card editor directive.
  */
@@ -115,11 +114,6 @@ describe('Skill concept card editor directive', function() {
     expect($scope.isEditable()).toEqual(true);
     expect($scope.getStaticImageUrl('/test.png')).toBe(
       '/assets/images/test.png');
-    // $scope.WORKED_EXAMPLES_SORTABLE_OPTIONS.start();
-    //
-    // start: function(e, ui) {
-    //   $scope.activeWorkedExampleIndex = null;
-    //   ui.placeholder.height(ui.item.height());
     let uiVar = {
       placeholder: {
         height: () => true,
