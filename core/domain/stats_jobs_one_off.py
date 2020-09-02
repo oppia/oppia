@@ -64,6 +64,9 @@ def require_non_negative(
 
 
 class RegenerateMissingStateStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job to regenerate individual state-stats in
+    ExplorationStatsModel.
+    """
 
     REDUCE_KEY_BAD_RENAME = 'ExplorationStatsModel state stats has bad rename'
     REDUCE_KEY_MISSING = 'ExplorationStatsModel state stats regenerated'
@@ -243,8 +246,8 @@ class RegenerateMissingV1StatsModelsOneOffJob(
                         if old_state_name not in (
                                 prev_exp_stats.state_stats_mapping):
                             yield (
-                                ('ExplorationStatsModel ignored StateStats '
-                                 'regeneration due to missing historical data'),
+                                'ExplorationStatsModel ignored StateStats '
+                                'regeneration due to missing historical data',
                                 '%s.%s "%s"' % (
                                     exploration.id, exp_version,
                                     old_state_name))

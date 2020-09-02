@@ -301,6 +301,7 @@ class StateStatsTests(test_utils.GenericTestBase):
     def test_equality_fails_with_invalid_class(self):
         class DifferentStats(python_utils.OBJECT):
             """A different class."""
+
             pass
 
         state_stats = stats_domain.StateStats.create_default()

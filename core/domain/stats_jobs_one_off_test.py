@@ -85,7 +85,7 @@ class RegenerateMissingStateStatsOneOffJobTests(OneOffJobTestBase):
 
     def test_job_yields_nothing_when_all_explorations_are_deleted(self):
         exp = self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
-        exp_models.ExplorationModel.get(self.EXP_ID).delete(
+        exp_models.ExplorationModel.get(exp.id).delete(
             self.OWNER_ID, feconf.COMMIT_MESSAGE_EXPLORATION_DELETED)
 
         self.assertEqual(self.run_one_off_job(), [])
@@ -327,10 +327,10 @@ class RegenerateMissingV1StatsModelsOneOffJobTests(OneOffJobTestBase):
 
         self.assertEqual(
             self.run_one_off_job(),
-            [('[u\'ExplorationStatsModel for missing versions regenerated: \', '
-              '[u\'EXP_ID1 v2\']]'),
-             ('[u\'ExplorationStatsModel ignored StateStats regeneration due '
-              'to missing historical data\', [u\'EXP_ID1.2 "Introduction"\']]')
+            ['[u\'ExplorationStatsModel for missing versions regenerated: \', '
+             '[u\'EXP_ID1 v2\']]',
+             '[u\'ExplorationStatsModel ignored StateStats regeneration due '
+             'to missing historical data\', [u\'EXP_ID1.2 "Introduction"\']]'
              ])
 
 
