@@ -66,8 +66,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
         'skill-concept-card-editor.directive.html'),
-      controller: [
-        '$scope', '$filter', '$uibModal',
+      controller: ['$scope', '$filter', '$uibModal',
         function($scope, $filter, $uibModal) {
           var ctrl = this;
 
@@ -187,12 +186,16 @@ angular.module('oppia').directive('skillConceptCardEditor', [
           };
 
           $scope.toggleWorkedExampleList = function() {
-            $scope.workedExamplesListIsShown = (
-              !$scope.workedExamplesListIsShown);
+            if (WindowDimensionsService.isWindowNarrow()) {
+              $scope.workedExamplesListIsShown = (
+                !$scope.workedExamplesListIsShown);
+            }
           };
 
           $scope.toggleSkillEditorCard = function() {
-            $scope.skillEditorCardIsShown = !$scope.skillEditorCardIsShown;
+            if (WindowDimensionsService.isWindowNarrow()) {
+              $scope.skillEditorCardIsShown = !$scope.skillEditorCardIsShown;
+            }
           };
 
           ctrl.$onInit = function() {
