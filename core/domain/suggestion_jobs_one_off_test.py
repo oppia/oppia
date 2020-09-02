@@ -1611,10 +1611,50 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
 class SuggestionLanguageCodeMigrationOneOffJobTests(
         test_utils.GenericTestBase):
 
-    target_id_1 = 'exp1'
+    target_id = 'exp1'
     target_version_at_submission = 1
-    AUTHOR_EMAIL_1 = 'author1@example.com'
-    REVIEWER_EMAIL_1 = 'reviewer1@example.com'
+    EXPLORATION_THREAD_ID = 'exploration.exp1.thread_1'
+    SKILL_THREAD_ID = 'skill1.thread1'
+    AUTHOR_EMAIL = 'author1@example.com'
+    REVIEWER_EMAIL = 'reviewer1@example.com'
+
+    edit_state_content_change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': {
+                'content_id': 'content',
+                'html': 'new html content'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': 'old html content'
+            }
+        }
+
+    add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'state_1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>State name: state_1, Content id: content</p>',
+            'translation_html': '<p>This is translated html.</p>'
+        }
+
+    # The question_state_data is set to a valid state data in the setup.
+    add_question_change_dict = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': {},
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_misconception_ids': ['skillid-1']
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3,
+        }
 
     class MockExploration(python_utils.OBJECT):
         """Mocks an exploration. To be used only for testing."""
@@ -1633,14 +1673,18 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
                 state_name, content_id
             )
 
-    # All mock explorations created for testing.
+    # A mock exploration created for testing.
     explorations = [
         MockExploration('exp1', {'state_1': {}, 'state_2': {}})
     ]
 
+    def mock_generate_new_exploration_thread_id(
+            self, unused_entity_type, unused_entity_id):
+        return self.EXPLORATION_THREAD_ID
+
     def mock_generate_new_skill_thread_id(
             self, unused_entity_type, unused_entity_id):
-        return 'skill1.thread1'
+        return self.SKILL_THREAD_ID
 
     def mock_get_exploration_by_id(self, exp_id):
         for exp in self.explorations:
@@ -1651,9 +1695,177 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
         super(SuggestionLanguageCodeMigrationOneOffJobTests, self).setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
-        self.signup(self.REVIEWER_EMAIL, 'reviewer')
-        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        # Add valid question state data to the question dict.
+        self.add_question_change_dict['question_dict']['question_state_data'] = (
+            self._create_valid_question_data('default_state').to_dict())
         self.process_and_flush_pending_tasks()
 
     def test_migrate_language_code_for_edit_state_content_suggestions(self):
-        suggestion_models.GeneralSu
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id',
+            self.mock_generate_new_exploration_thread_id):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, self.edit_state_content_change_dict,
+                    'test description')
+
+        job_id = (
+            suggestion_jobs_one_off.
+            SuggestionLanguageCodeMigrationOneOffJob.create_new())
+        suggestion_jobs_one_off.SuggestionLanguageCodeMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Verify the output from the one off job.
+        actual_output = (
+            suggestion_jobs_one_off.
+            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id))
+        expected_output = [
+            '[u\'edit_exploration_state_content_suggestion_migrated\', 1]'
+        ]
+        self.assertEqual(len(actual_output), 1)
+        self.assertEqual(actual_output, expected_output)
+        # Verify the language_code field was updated properly.
+        suggestion = suggestion_services.get_suggestion_by_id(
+            self.EXPLORATION_THREAD_ID)
+        expected_language_code = None
+        self.assertEqual(suggestion.language_code, expected_language_code)
+
+    def test_migrate_language_code_for_translation_suggestions(self):
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id',
+            self.mock_generate_new_exploration_thread_id):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                with self.swap(
+                    exp_domain.Exploration, 'get_content_html',
+                    self.MockExploration.get_content_html):
+                    suggestion_services.create_suggestion(
+                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                        suggestion_models.TARGET_TYPE_EXPLORATION,
+                        self.target_id, self.target_version_at_submission,
+                        self.author_id, self.add_translation_change_dict,
+                        'test description')
+
+        job_id = (
+            suggestion_jobs_one_off.
+            SuggestionLanguageCodeMigrationOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off.SuggestionLanguageCodeMigrationOneOffJob
+            .enqueue(job_id)
+        )
+        self.process_and_flush_pending_tasks()
+
+        # Verify the output from the one off job.
+        actual_output = (
+            suggestion_jobs_one_off.
+            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id))
+        expected_output = ['[u\'translate_content_suggestion_migrated\', 1]']
+        self.assertEqual(len(actual_output), 1)
+        self.assertEqual(actual_output, expected_output)
+        # Verify the language_code field was updated properly.
+        suggestion = suggestion_services.get_suggestion_by_id(
+            self.EXPLORATION_THREAD_ID)
+        expected_language_code = 'hi'
+        self.assertEqual(suggestion.language_code, expected_language_code)
+
+    def test_migrate_language_code_for_question_suggestions(self):
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+                suggestion_models.TARGET_TYPE_SKILL,
+                'skill_1', feconf.CURRENT_STATE_SCHEMA_VERSION,
+                self.author_id, self.add_question_change_dict,
+                'test description')
+
+        job_id = (
+            suggestion_jobs_one_off.
+            SuggestionLanguageCodeMigrationOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off.SuggestionLanguageCodeMigrationOneOffJob
+            .enqueue(job_id)
+        )
+        self.process_and_flush_pending_tasks()
+
+        # Verify the output from the one off job.
+        actual_output = (
+            suggestion_jobs_one_off.
+            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id))
+        expected_output = ['[u\'add_question_suggestion_migrated\', 1]']
+        self.assertEqual(len(actual_output), 1)
+        self.assertEqual(actual_output, expected_output)
+        # Verify the language_code field was updated properly.
+        suggestion = suggestion_services.get_suggestion_by_id(
+            self.SKILL_THREAD_ID)
+        expected_language_code = 'en'
+        self.assertEqual(suggestion.language_code, expected_language_code)
+
+    def test_migrate_language_code_for_multiple_suggestions(self):
+        # Create an add question suggestion.
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+                suggestion_models.TARGET_TYPE_SKILL,
+                'skill_1', feconf.CURRENT_STATE_SCHEMA_VERSION,
+                self.author_id, self.add_question_change_dict,
+                'test description')
+        # Create a translate content suggestion.
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id',
+            self.mock_generate_new_exploration_thread_id):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                with self.swap(
+                    exp_domain.Exploration, 'get_content_html',
+                    self.MockExploration.get_content_html):
+                    suggestion_services.create_suggestion(
+                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                        suggestion_models.TARGET_TYPE_EXPLORATION,
+                        self.target_id, self.target_version_at_submission,
+                        self.author_id, self.add_translation_change_dict,
+                        'test description')
+
+        job_id = (
+            suggestion_jobs_one_off.
+            SuggestionLanguageCodeMigrationOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off.SuggestionLanguageCodeMigrationOneOffJob
+            .enqueue(job_id)
+        )
+        self.process_and_flush_pending_tasks()
+
+        # Verify the output from the one off job.
+        actual_output = (
+            suggestion_jobs_one_off.
+            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id))
+        expected_output = [
+            '[u\'add_question_suggestion_migrated\', 1]',
+            '[u\'translate_content_suggestion_migrated\', 1]'
+        ]
+        self.assertEqual(len(actual_output), 2)
+        self.assertEqual(actual_output, expected_output)
+        # Verify the language_code field was updated properly for the
+        # question suggestion.
+        suggestion = suggestion_services.get_suggestion_by_id(
+            self.SKILL_THREAD_ID)
+        expected_language_code = 'en'
+        self.assertEqual(suggestion.language_code, expected_language_code)
+        # Verify the language_code field was updated properly for the
+        # translation suggestion.
+        suggestion = suggestion_services.get_suggestion_by_id(
+            self.EXPLORATION_THREAD_ID)
+        expected_language_code = 'hi'
+        self.assertEqual(suggestion.language_code, expected_language_code)
