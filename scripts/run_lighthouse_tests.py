@@ -81,7 +81,7 @@ def run_lighthouse_puppeteer_script():
 
 
 def export_url(url):
-    """Assigns the url to an environmental variable"""
+    """Exports the url to an environmental variable."""
     python_utils.PRINT(url)
     if 'collection_editor' in url:
         os.environ['collection_editor'] = url
