@@ -1395,16 +1395,22 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
                      + self.EXP_ID + '\']]'])
 
     def test_job_successfully_regenerates_stats_with_missing_state_stats(self):
-        v4_stats = stats_models.ExplorationStatsModel.get(
-            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 4))
-        del v4_stats.state_stats_mapping[self.state_name]
-        v4_stats.put()
+        v1_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 1))
+        del v1_stats.state_stats_mapping[self.state_name]
+        v1_stats.put()
 
-        v5_stats = stats_models.ExplorationStatsModel.get(
-            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 5))
-        v5_stats.delete()
+        v2_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
+        v2_stats.delete()
 
         self.assertEqual(self.run_one_off_job(), [u'[u\'Success\', 1]'])
+
+        v2_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
+        self.assertEqual(
+            v2_stats.state_stats_mapping[self.state_name],
+            stats_domain.StateStats.create_default().to_dict())
 
     def test_job_yields_no_change_when_no_regeneration_is_needed(self):
         self.exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
