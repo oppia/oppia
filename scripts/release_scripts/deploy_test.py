@@ -33,6 +33,8 @@ from scripts.release_scripts import deploy
 from scripts.release_scripts import gcloud_adapter
 from scripts.release_scripts import update_configs
 
+import github  # isort:skip pylint: disable=wrong-import-position
+
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 
 MOCK_FECONF_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'feconf.txt')
@@ -239,6 +241,62 @@ class DeployTests(test_utils.GenericTestBase):
                         with self.assertRaisesRegexp(
                             Exception, 'Invalid last commit message: Invalid.'):
                             deploy.execute_deployment()
+
+    def test_finally_block_is_executed_in_case_of_exception(self):
+        args_swap = self.swap(
+            sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
+        def mock_main(unused_personal_access_token):
+            pass
+        def mock_get_personal_access_token():
+            return 'test'
+        def mock_get_organization(unused_self, unused_name):
+            return github.Organization.Organization(
+                requester='', headers='', attributes={}, completed='')
+        def mock_get_repo(unused_self, unused_org):
+            return 'repo'
+        def mock_check_blocking_bug_issue_count(unused_repo):
+            pass
+        def mock_check_prs_for_current_release_are_released(unused_repo):
+            pass
+        all_cmd_tokens = []
+        def mock_check_output(cmd_tokens):
+            all_cmd_tokens.extend(cmd_tokens)
+            return 'Update authors and changelog for v1.2.3'
+        def mock_check_travis_and_circleci_tests(unused_current_branch_name):
+            raise Exception('Travis fails.')
+
+        config_swap = self.swap(update_configs, 'main', mock_main)
+        get_token_swap = self.swap(
+            common, 'get_personal_access_token', mock_get_personal_access_token)
+        get_org_swap = self.swap(
+            github.Github, 'get_organization', mock_get_organization)
+        get_repo_swap = self.swap(
+            github.Organization.Organization, 'get_repo', mock_get_repo)
+        bug_check_swap = self.swap(
+            common, 'check_blocking_bug_issue_count',
+            mock_check_blocking_bug_issue_count)
+        pr_check_swap = self.swap(
+            common, 'check_prs_for_current_release_are_released',
+            mock_check_prs_for_current_release_are_released)
+        out_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        check_tests_swap = self.swap(
+            deploy, 'check_travis_and_circleci_tests',
+            mock_check_travis_and_circleci_tests)
+        with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
+            with self.release_script_exist_swap, self.gcloud_available_swap:
+                with self.run_swap, self.release_doc_swap, config_swap:
+                    with get_token_swap, get_org_swap, get_repo_swap:
+                        with bug_check_swap, pr_check_swap, out_swap:
+                            with args_swap, check_tests_swap:
+                                with self.assertRaisesRegexp(
+                                    Exception,
+                                    'Travis fails.'):
+                                    deploy.execute_deployment()
+        self.assertEqual(
+            all_cmd_tokens, [
+                'git', 'log', '-1', '--pretty=%B',
+                'git', 'checkout', '--', update_configs.FECONF_CONFIG_PATH])
 
     def test_missing_mailgun_api(self):
         mock_content = python_utils.open_file(
