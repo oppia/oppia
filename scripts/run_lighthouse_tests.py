@@ -66,6 +66,7 @@ def run_lighthouse_puppeteer_script():
 
     try:
         script_output = subprocess.check_output(bash_command).split('\n')
+        python_utils.PRINT(script_output)
         for url in script_output:
             export_url(url)
         python_utils.PRINT('Lighthouse puppeteer script completed successfully.')
@@ -85,9 +86,9 @@ def export_url(url):
     elif 'topic_editor' in url:
         os.environ['topic_editor'] = url
     elif 'story_editor' in url:
-        os.environ['topic_editor'] = url
+        os.environ['story_editor'] = url
     elif 'skill_editor' in url:
-        os.environ['topic_editor'] = url
+        os.environ['skill_editor'] = url
     else:
         return
 

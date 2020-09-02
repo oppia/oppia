@@ -24,6 +24,7 @@ var topicUploadButton = '.protractor-test-photo-upload-input'
 var topicPhotoSubmit = '.protractor-test-photo-upload-submit'
 var thumbnailContainer = '.protractor-test-thumbnail-container';
 var confirmTopicCreationButton = '.protractor-test-confirm-topic-creation-button';
+var createdTopicLink = '.protractor-test-topic-name';
 
 var createStoryButtonSelector = '.protractor-test-create-story-button';
 var storyNameField = '.protractor-test-new-story-title-field';
@@ -61,7 +62,6 @@ const login = async function(browser, page) {
         await page.click('#signup-submit');
         await page.waitForSelector('.oppia-navbar-dropdown-toggle');
       } catch (error) {
-        console.log(error);
         // Already Signed in.
       }
     } catch (e) {
@@ -160,8 +160,16 @@ const getTopicEditorUrl = async function(browser, page) {
       await page.click(confirmTopicCreationButton);
       // Doing waitFor(10000) to handle new tab being opened.
       await page.waitFor(10000);
-      let pages = await browser.pages();
-      topicEditorUrl = await pages[2].url();
+      await browser.pages();
+      
+      // Need to refresh dashboard and click on topic name to access topic editor.
+      await page.goto(
+        SERVER_URL_PREFIX + TOPIC_AND_SKILLS_DASHBOARD_URL, { waitUntil: 'networkidle0' });
+      await page.waitForSelector(createdTopicLink, {visible: true});
+      await page.click(createdTopicLink);
+      await page.waitForSelector(createStoryButtonSelector);
+
+      topicEditorUrl = await page.url();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
@@ -176,9 +184,9 @@ const getStoryEditorUrl = async function(browser, page) {
       await page.click(createStoryButtonSelector);
 
       await page.waitForSelector(storyNameField, {visible: true});
-      await page.type(storyNameField, 'Topic1 TASD');
-      await page.type(storyUrlFragmentField, 'topic-tasd-one');
-      await page.type(storyDescriptionField, 'Topic 1 description');
+      await page.type(storyNameField, 'Story TASD');
+      await page.type(storyUrlFragmentField, 'story-url-one');
+      await page.type(storyDescriptionField, 'Story 1 description');
       await page.click(storyThumbnailButton);
       await page.waitForSelector(storyUploadButton, {visible: true});
       
@@ -220,7 +228,7 @@ const getSkillEditorUrl = async function(browser, page) {
       // Doing waitFor(15000) to handle new tab being opened.
       await page.waitFor(15000);
       let pages = await browser.pages();
-      skillEditorUrl = await pages[3].url();
+      skillEditorUrl = await pages[2].url();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
@@ -231,18 +239,20 @@ const main = async function() {
   // Change headless to false to see the puppeteer actions.
   const browser = await puppeteer.launch({headless: false});
   const page = await browser.newPage();
+  await page.setViewport({
+    width: 1920,
+    height: 1080
+  });
   await login(browser, page);
   await getExplorationEditorUrl(browser, page);
   await getCollectionEditorUrl(browser, page);
   await getTopicEditorUrl(browser, page);
-  await getStoryEditorUrl(browser, page);
   await getSkillEditorUrl(browser, page);
   await process.stdout.write(
     [
       new URL(explorationEditorUrl),
       new URL(collectionEditorUrl),
       new URL(topicEditorUrl),
-      new URL(storyEditorUrl),
       new URL(skillEditorUrl),
     ].join('\n')
   );
