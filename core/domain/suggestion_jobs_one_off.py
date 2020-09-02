@@ -179,3 +179,41 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 no_of_suggestions_migrated)])
         else:
             yield (key, values)
+
+
+class SuggestionLanguageCodeMigrationOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """A reusable one-time job that may be used to add the language_code field
+    to suggestions that do not have that field yet. The language_code field
+    allows question and translation suggestions to be queryable by language.
+    This job will load all existing suggestions from the data store, update
+    them and immediately store them back into the data store.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        suggestion = suggestion_services.get_suggestion_from_model(item)
+
+        if suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            suggestion.language_code = suggestion.change.language_code
+        if suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+            suggestion.language_code = suggestion.change.question_dict['language_code']
+        if suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
+            suggestion.language_code = None
+
+        suggestion_services.update_suggestion(suggestion)
+        yield('%s_suggestion_migrated' % suggestion.suggestion_type, item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

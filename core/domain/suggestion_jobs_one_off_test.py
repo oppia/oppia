@@ -1606,3 +1606,54 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             'hread1 failed validation: Expected change to be an instance of '
             'QuestionSuggestionChange\']]')
         self.assertEqual(actual_output, [expected_output])
+
+
+class SuggestionLanguageCodeMigrationOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    target_id_1 = 'exp1'
+    target_version_at_submission = 1
+    AUTHOR_EMAIL_1 = 'author1@example.com'
+    REVIEWER_EMAIL_1 = 'reviewer1@example.com'
+
+    class MockExploration(python_utils.OBJECT):
+        """Mocks an exploration. To be used only for testing."""
+
+        def __init__(self, exploration_id, states):
+            self.id = exploration_id
+            self.states = states
+            self.category = 'Algebra'
+
+        def get_content_html(self, state_name, content_id):
+            """Used to mock the get_content_html method for explorations."""
+            # state_name and content_id are used here to suppress the unused
+            # arguments warning. The main goal of this method is to just
+            # produce content html for the tests.
+            return '<p>State name: %s, Content id: %s</p>' % (
+                state_name, content_id
+            )
+
+    # All mock explorations created for testing.
+    explorations = [
+        MockExploration('exp1', {'state_1': {}, 'state_2': {}})
+    ]
+
+    def mock_generate_new_skill_thread_id(
+            self, unused_entity_type, unused_entity_id):
+        return 'skill1.thread1'
+
+    def mock_get_exploration_by_id(self, exp_id):
+        for exp in self.explorations:
+            if exp.id == exp_id:
+                return exp
+
+    def setUp(self):
+        super(SuggestionLanguageCodeMigrationOneOffJobTests, self).setUp()
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.signup(self.REVIEWER_EMAIL, 'reviewer')
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_migrate_language_code_for_edit_state_content_suggestions(self):
+        suggestion_models.GeneralSu

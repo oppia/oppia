@@ -47,7 +47,6 @@ def create_suggestion(
             be one of the constants defined in storage/suggestion/gae_models.py.
         target_type: str. The target entity being edited. This parameter should
             be one of the constants defined in storage/suggestion/gae_models.py.
-
         target_id: str. The ID of the target entity being suggested to.
         target_version_at_submission: int. The version number of the target
             entity at the time of creation of the suggestion.
@@ -216,17 +215,17 @@ def get_all_stale_suggestion_ids():
     )
 
 
-def _update_suggestion(suggestion):
+def update_suggestion(suggestion):
     """Updates the given suggestion.
 
     Args:
         suggestion: Suggestion. The suggestion to be updated.
     """
 
-    _update_suggestions([suggestion])
+    update_suggestions([suggestion])
 
 
-def _update_suggestions(suggestions, update_last_updated_time=True):
+def update_suggestions(suggestions, update_last_updated_time=True):
     """Updates the given suggestions.
 
     Args:
@@ -325,7 +324,7 @@ def accept_suggestion(
         author_name, commit_message)
     suggestion.accept(commit_message)
 
-    _update_suggestion(suggestion)
+    update_suggestion(suggestion)
 
     feedback_services.create_message(
         suggestion_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
@@ -410,7 +409,7 @@ def reject_suggestions(suggestion_ids, reviewer_id, review_message):
         suggestion.set_suggestion_status_to_rejected()
         suggestion.set_final_reviewer_id(reviewer_id)
 
-    _update_suggestions(suggestions)
+    update_suggestions(suggestions)
 
     feedback_services.create_messages(
         suggestion_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
@@ -490,7 +489,7 @@ def resubmit_rejected_suggestion(
     suggestion.pre_update_validate(change)
     suggestion.change = change
     suggestion.set_suggestion_status_to_in_review()
-    _update_suggestion(suggestion)
+    update_suggestion(suggestion)
 
     feedback_services.create_message(
         suggestion_id, author_id, feedback_models.STATUS_CHOICES_OPEN,
