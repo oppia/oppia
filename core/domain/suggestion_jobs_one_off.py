@@ -206,13 +206,14 @@ class SuggestionLanguageCodeMigrationOneOffJob(
             suggestion.language_code = suggestion.change.language_code
         if suggestion.suggestion_type == (
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
-            suggestion.language_code = suggestion.change.question_dict['language_code']
+            suggestion.language_code = suggestion.change.question_dict[
+                'language_code']
         if suggestion.suggestion_type == (
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
             suggestion.language_code = None
 
         suggestion_services.update_suggestion(suggestion)
-        yield('%s_suggestion_migrated' % suggestion.suggestion_type, item.id)
+        yield ('%s_suggestion_migrated' % suggestion.suggestion_type, item.id)
 
     @staticmethod
     def reduce(key, values):

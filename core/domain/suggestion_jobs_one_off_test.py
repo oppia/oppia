@@ -1619,42 +1619,42 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
     REVIEWER_EMAIL = 'reviewer1@example.com'
 
     edit_state_content_change_dict = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-            'state_name': 'Introduction',
-            'new_value': {
-                'content_id': 'content',
-                'html': 'new html content'
-            },
-            'old_value': {
-                'content_id': 'content',
-                'html': 'old html content'
-            }
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+        'state_name': 'Introduction',
+        'new_value': {
+            'content_id': 'content',
+            'html': 'new html content'
+        },
+        'old_value': {
+            'content_id': 'content',
+            'html': 'old html content'
         }
+    }
 
     add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
-            'state_name': 'state_1',
-            'content_id': 'content',
-            'language_code': 'hi',
-            'content_html': '<p>State name: state_1, Content id: content</p>',
-            'translation_html': '<p>This is translated html.</p>'
-        }
+        'cmd': exp_domain.CMD_ADD_TRANSLATION,
+        'state_name': 'state_1',
+        'content_id': 'content',
+        'language_code': 'hi',
+        'content_html': '<p>State name: state_1, Content id: content</p>',
+        'translation_html': '<p>This is translated html.</p>'
+    }
 
     # The question_state_data is set to a valid state data in the setup.
     add_question_change_dict = {
-            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
-            'question_dict': {
-                'question_state_data': {},
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION),
-                'linked_skill_ids': ['skill_1'],
-                'inapplicable_misconception_ids': ['skillid-1']
-            },
-            'skill_id': 'skill_1',
-            'skill_difficulty': 0.3,
-        }
+        'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+        'question_dict': {
+            'question_state_data': {},
+            'language_code': 'en',
+            'question_state_data_schema_version': (
+                feconf.CURRENT_STATE_SCHEMA_VERSION),
+            'linked_skill_ids': ['skill_1'],
+            'inapplicable_misconception_ids': ['skillid-1']
+        },
+        'skill_id': 'skill_1',
+        'skill_difficulty': 0.3,
+    }
 
     class MockExploration(python_utils.OBJECT):
         """Mocks an exploration. To be used only for testing."""
@@ -1696,8 +1696,9 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         # Add valid question state data to the question dict.
-        self.add_question_change_dict['question_dict']['question_state_data'] = (
-            self._create_valid_question_data('default_state').to_dict())
+        self.add_question_change_dict['question_dict'][
+            'question_state_data'] = self._create_valid_question_data(
+                'default_state').to_dict()
         self.process_and_flush_pending_tasks()
 
     def test_migrate_language_code_for_edit_state_content_suggestions(self):
@@ -1718,7 +1719,10 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
         job_id = (
             suggestion_jobs_one_off.
             SuggestionLanguageCodeMigrationOneOffJob.create_new())
-        suggestion_jobs_one_off.SuggestionLanguageCodeMigrationOneOffJob.enqueue(job_id)
+        (
+            suggestion_jobs_one_off.SuggestionLanguageCodeMigrationOneOffJob
+            .enqueue(job_id)
+        )
         self.process_and_flush_pending_tasks()
 
         # Verify the output from the one off job.
