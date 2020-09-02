@@ -19,8 +19,6 @@
 
 'use strict';
 
-const { cos } = require("mathjs");
-
 module.exports = {
   meta: {
     type: 'layout',
@@ -101,7 +99,7 @@ module.exports = {
         checkMessage(node.left);
         checkMessage(node.right);
       }
-    }
+    };
 
     return {
       CallExpression(node) {
@@ -114,7 +112,7 @@ module.exports = {
           } else if (testMessageNode.type === 'BinaryExpression') {
             nodePos = testMessageNode.loc;
             checkMessage(testMessageNode.left);
-            checkMessage(testMessageNode.right)
+            checkMessage(testMessageNode.right);
           }
         }
       }
