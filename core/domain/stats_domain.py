@@ -430,6 +430,8 @@ class StateStats(python_utils.OBJECT):
             )
         return NotImplemented
 
+    ___hash__ = None # Not hashable because it is mutable-by-default.
+
     @classmethod
     def from_dict(cls, state_stats_dict):
         """Constructs a StateStats domain object from a dict."""

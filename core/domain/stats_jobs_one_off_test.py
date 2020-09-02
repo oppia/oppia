@@ -330,8 +330,7 @@ class RegenerateMissingV1StatsModelsOneOffJobTests(OneOffJobTestBase):
             ['[u\'ExplorationStatsModel for missing versions regenerated: \', '
              '[u\'EXP_ID1 v2\']]',
              '[u\'ExplorationStatsModel ignored StateStats regeneration due '
-             'to missing historical data\', [u\'EXP_ID1.2 "Introduction"\']]'
-             ])
+             'to missing historical data\', [u\'EXP_ID1.2 "Introduction"\']]'])
 
 
 class RecomputeStateCompleteStatisticsTests(OneOffJobTestBase):
