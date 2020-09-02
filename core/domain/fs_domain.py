@@ -34,6 +34,9 @@ ALLOWED_ENTITY_NAMES = [
     feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_TOPIC,
     feconf.ENTITY_TYPE_SKILL, feconf.ENTITY_TYPE_STORY,
     feconf.ENTITY_TYPE_QUESTION, feconf.ENTITY_TYPE_VOICEOVER_APPLICATION]
+ALLOWED_SUGGESTION_IMAGE_CONTEXTS = [
+    feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
+    feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS]
 
 
 class FileStream(python_utils.OBJECT):
@@ -92,7 +95,8 @@ class GeneralFileSystem(python_utils.OBJECT):
         Raises:
             ValidationError. When parameters passed in are invalid.
         """
-        if entity_name not in ALLOWED_ENTITY_NAMES:
+        if entity_name not in ALLOWED_ENTITY_NAMES and (
+                entity_name not in ALLOWED_SUGGESTION_IMAGE_CONTEXTS):
             raise utils.ValidationError(
                 'Invalid entity_name received: %s.' % entity_name)
         if not isinstance(entity_id, python_utils.BASESTRING):
@@ -198,6 +202,25 @@ class GcsFileSystem(GeneralFileSystem):
             cloudstorage.delete(gcs_file_url)
         except cloudstorage.NotFoundError:
             raise IOError('Image does not exist: %s' % filepath)
+
+    def copy(self, source_assets_path, filepath):
+        """Copy images from source_path.
+
+        Args:
+            source_assets_path: str. The path to the source entity's assets
+                folder.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
+        """
+        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+        source_file_url = (
+            '/%s/%s/%s' % (bucket_name, source_assets_path, filepath))
+        destination_file_url = (
+            '/%s/%s/%s' % (bucket_name, self._assets_path, filepath))
+
+        # The cloudstorage.copy2 method copies the file from the source URL to
+        # the destination URL.
+        cloudstorage.copy2(source_file_url, destination_file_url)
 
     def listdir(self, dir_name):
         """Lists all files in a directory.
@@ -351,3 +374,14 @@ class AbstractFileSystem(python_utils.OBJECT):
         """
         self._check_filepath(dir_name)
         return self._impl.listdir(dir_name)
+
+    def copy(self, source_assets_path, filepath):
+        """Copy images from source.
+
+        Args:
+            source_assets_path: str. The path to the source entity's assets
+                folder.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
+        """
+        self._impl.copy(source_assets_path, filepath)
