@@ -19,12 +19,15 @@
 module.exports = {
   'ci': {
     'collect': {
-      'numberOfRuns': 3,
+      'numberOfRuns': 1,
       'puppeteerScript': 'puppeteer-login-script.js',
       'url': [
-        'http://127.0.0.1:8181/signup?return_url=%2F',
-        'http://127.0.0.1:8181/',
         'http://127.0.0.1:8181/admin',
+         process.env.exploration_editor,
+         process.env.collection_editor,
+         process.env.topic_editor,
+         process.env.story_editor,
+         process.env.skill_editor,
         'http://127.0.0.1:8181/about',
         'http://127.0.0.1:8181/community-library',
         'http://127.0.0.1:8181/contact',
@@ -32,9 +35,11 @@ module.exports = {
         'http://127.0.0.1:8181/creator-dashboard',
         'http://127.0.0.1:8181/delete-account',
         'http://127.0.0.1:8181/donate',
+        "http://127.0.0.1:8181/emaildashboard",
         'http://127.0.0.1:8181/get-started',
         'http://127.0.0.1:8181/learner-dashboard',
         'http://127.0.0.1:8181/nonprofits',
+        "http://127.0.0.1:8181/moderator",
         'http://127.0.0.1:8181/parents',
         'http://127.0.0.1:8181/partners',
         'http://127.0.0.1:8181/preferences',
@@ -42,6 +47,7 @@ module.exports = {
         'http://127.0.0.1:8181/profile/username1',
         'http://127.0.0.1:8181/teach',
         'http://127.0.0.1:8181/teachers',
+        'http://127.0.0.1:8181/topics-and-skills-dashboard',
         'http://127.0.0.1:8181/terms',
         'http://127.0.0.1:8181/thanks',
         'http://127.0.0.1:8181/volunteers'

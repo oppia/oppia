@@ -35,7 +35,7 @@ module.exports = async(browser, context) => {
   await page.close();
 };
 
-
+// This function is needed to relogin after lighthouse_setup.js
 const login = async function(context, page) {
   try {
     // eslint-disable-next-line no-console
