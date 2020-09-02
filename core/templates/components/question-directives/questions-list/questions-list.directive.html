@@ -76,6 +76,9 @@
               <i class="material-icons">link_off</i>
             </span>
           </div>
+          <div class="question-interaction-id">
+            <span><[questionSummaryForOneSkill.getQuestionSummary().getInteractionId()]></span>
+          </div>
         </div>
       </div>
       <div class="page-navigation-arrows" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
@@ -123,15 +126,15 @@
           <div class="checklist-item-text">Solution</div>
         </div>
       </div>
-      <div class="save-question-button-container">
-        <button class="btn btn-secondary" ng-click="$ctrl.cancel()">Cancel</button>
-        <button title="To Save please add: interaction, hint, solution and address all misconceptions"
-                class="btn btn-success add-question-btn protractor-test-save-question-button"
-                ng-click="$ctrl.saveQuestion()"
-                ng-disabled="!$ctrl.isQuestionValid()">
-          Save
-        </button>
-      </div>
+    </div>
+    <div class="save-question-button-container">
+      <button class="btn question-edit-cancel-button" ng-click="$ctrl.cancel()">CANCEL</button>
+      <button title="To Save please add: interaction, hint, solution and address all misconceptions"
+              class="btn add-question-btn question-edit-save-button protractor-test-save-question-button"
+              ng-click="$ctrl.saveQuestion()"
+              ng-disabled="!$ctrl.isQuestionValid()">
+        SAVE
+      </button>
     </div>
   </md-card>
   <div class="create-question-container" ng-if="!$ctrl.editorIsOpen">
@@ -155,10 +158,10 @@
   }
   questions-list .question-data-container {
     margin: 0;
-    max-height: 70vh;
-    min-height: 70vh;
+    max-height: 68vh;
+    min-height: 68vh;
     overflow-y: scroll;
-    padding: 20px 15px;
+    padding: 0;
     width: 60%;
   }
   questions-list .question-editor-container {
@@ -167,6 +170,14 @@
     justify-content: space-between;
     margin: 60px auto 0;
     width: 70%;
+  }
+  questions-list .question-edit-cancel-button {
+    margin-left: 8%;
+  }
+  questions-list .question-edit-save-button {
+    margin-right: 8%;
+    text-align: center;
+    width: 90px;
   }
   questions-list .question-list-container,
   questions-list .save-question-container {
@@ -205,7 +216,7 @@
     background-color: #008098;
     color: #FFFFFF;
     font-weight: bold;
-    text-align: left;
+    text-align: center;
   }
   questions-list .question-editor-parent {
     width: 60%;
@@ -291,6 +302,9 @@
   }
   questions-list .difficulty-card-header i {
     display: none;
+  }
+  questions-list .question-interaction-id {
+    color: #707070;
   }
   @media screen and (max-width: 768px) {
     questions-list .question-editor-container {
