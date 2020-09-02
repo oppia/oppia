@@ -277,6 +277,50 @@ class StateStatsTests(test_utils.GenericTestBase):
         self.assertEqual(state_stats.num_completions_v1, 0)
         self.assertEqual(state_stats.num_completions_v2, 0)
 
+    def test_equality(self):
+        state_stats_a = stats_domain.StateStats.create_default()
+        state_stats_b = stats_domain.StateStats.create_default()
+        state_stats_c = stats_domain.StateStats.create_default()
+
+        self.assertEqual(state_stats_a, state_stats_b)
+        self.assertEqual(state_stats_b, state_stats_c)
+        self.assertEqual(state_stats_a, state_stats_c)
+
+        state_stats_a.total_answers_count_v1 += 1
+        self.assertEqual(state_stats_b, state_stats_c)
+        self.assertNotEqual(state_stats_a, state_stats_b)
+        self.assertNotEqual(state_stats_a, state_stats_c)
+
+        state_stats_b.total_answers_count_v1 += 1
+        state_stats_c.total_answers_count_v1 += 1
+
+        self.assertEqual(state_stats_a, state_stats_b)
+        self.assertEqual(state_stats_b, state_stats_c)
+        self.assertEqual(state_stats_a, state_stats_c)
+
+    def test_equality_fails_with_invalid_class(self):
+        class DifferentStats(python_utils.OBJECT):
+            """A different class."""
+            pass
+
+        state_stats = stats_domain.StateStats.create_default()
+        different_stats = DifferentStats()
+
+        self.assertNotEqual(state_stats, different_stats)
+
+    def test_aggregate_from(self):
+        state_stats = stats_domain.StateStats(
+            100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100)
+        other_state_stats = stats_domain.StateStats(
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+
+        state_stats.aggregate_from(other_state_stats)
+
+        self.assertEqual(
+            state_stats,
+            stats_domain.StateStats(
+                101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111))
+
     def test_to_dict(self):
         state_stats_dict = {
             'total_answers_count_v1': 0,
