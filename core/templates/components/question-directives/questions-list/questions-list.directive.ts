@@ -236,9 +236,23 @@ angular.module('oppia').directive('questionsList', [
           };
 
           ctrl.cancel = function() {
-            ContextService.resetImageSaveDestination();
-            ctrl.editorIsOpen = false;
-            $location.hash(null);
+            $uibModal.open({
+              templateUrl:
+                  UrlInterpolationService.getDirectiveTemplateUrl(
+                    '/components/question-directives' +
+                      '/modal-templates/' +
+                      'confirm-question-modal-exit-modal.directive.html'),
+              backdrop: true,
+              controller: 'ConfirmOrCancelModalController'
+            }).result.then(function() {
+              ContextService.resetImageSaveDestination();
+              ctrl.editorIsOpen = false;
+              $location.hash(null);
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is
+              // clicked. No further action is needed.
+            });
           };
 
           ctrl.initializeNewQuestionCreation = function(skillIds) {
@@ -264,24 +278,31 @@ angular.module('oppia').directive('questionsList', [
             ctrl.newQuestionSkillIds.forEach(function(skillId) {
               ctrl.linkedSkillsWithDifficulty.push(
                 SkillDifficultyObjectFactory.create(
-                  skillId, '', DEFAULT_SKILL_DIFFICULTY));
+                  skillId, '', null));
             });
             ctrl.showDifficultyChoices = true;
             ctrl.editorIsOpen = true;
             ctrl.initiateQuestionCreation();
           };
+
           ctrl.changeLinkedSkillDifficulty = function() {
-            ctrl.linkedSkillsWithDifficulty.forEach(
-              (linkedSkillWithDifficulty) => {
-                if (!ctrl.newQuestionSkillIds.includes(
-                  linkedSkillWithDifficulty.getId())) {
-                  ctrl.newQuestionSkillIds.push(
-                    linkedSkillWithDifficulty.getId());
-                  ctrl.newQuestionSkillDifficulties.push(
-                    linkedSkillWithDifficulty.getDifficulty());
-                }
-              });
+            if (ctrl.newQuestionSkillIds.length === 1) {
+              ctrl.newQuestionSkillDifficulties = (
+                [ctrl.linkedSkillsWithDifficulty[0].getDifficulty()]);
+            } else {
+              ctrl.linkedSkillsWithDifficulty.forEach(
+                (linkedSkillWithDifficulty) => {
+                  if (!ctrl.newQuestionSkillIds.includes(
+                    linkedSkillWithDifficulty.getId())) {
+                    ctrl.newQuestionSkillIds.push(
+                      linkedSkillWithDifficulty.getId());
+                    ctrl.newQuestionSkillDifficulties.push(
+                      linkedSkillWithDifficulty.getDifficulty());
+                  }
+                });
+            }
           };
+
           ctrl.initiateQuestionCreation = function() {
             ctrl.showDifficultyChoices = true;
             ctrl.newQuestionSkillIds = [];
@@ -291,8 +312,10 @@ angular.module('oppia').directive('questionsList', [
               (linkedSkillWithDifficulty) => {
                 ctrl.newQuestionSkillIds.push(
                   linkedSkillWithDifficulty.getId());
-                ctrl.newQuestionSkillDifficulties.push(
-                  linkedSkillWithDifficulty.getDifficulty());
+                if (linkedSkillWithDifficulty.getDifficulty()) {
+                  ctrl.newQuestionSkillDifficulties.push(
+                    linkedSkillWithDifficulty.getDifficulty());
+                }
               });
             ctrl.populateMisconceptions(ctrl.newQuestionSkillIds);
             if (AlertsService.warnings.length === 0) {
