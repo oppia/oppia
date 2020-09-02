@@ -29,25 +29,22 @@ angular.module('oppia').directive('selectTopics', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics-and-skills-dashboard-page/topic-selector/' +
         'topic-selector.directive.html'),
-      controller: [
-        '$scope', '$uibModal', '$rootScope',
-        function(
-            $scope, $uibModal, $rootScope) {
-          var ctrl = this;
-          $scope.selectOrDeselectTopic = function(topicId, index) {
-            if (!$scope.topicSummaries[index].isSelected) {
-              $scope.selectedTopicIds.push(topicId);
-              $scope.topicSummaries[index].isSelected = true;
-            } else {
-              var idIndex = $scope.selectedTopicIds.indexOf(topicId);
-              $scope.selectedTopicIds.splice(idIndex, 1);
-              $scope.topicSummaries[index].isSelected = false;
-            }
-          };
-          ctrl.$onInit = function() {
-            $scope.topicSummaries = $scope.getTopicSummaries();
-          };
-        }
+      controller: ['$scope', function($scope) {
+        var ctrl = this;
+        $scope.selectOrDeselectTopic = function(topicId, index) {
+          if (!$scope.topicSummaries[index].isSelected) {
+            $scope.selectedTopicIds.push(topicId);
+            $scope.topicSummaries[index].isSelected = true;
+          } else {
+            var idIndex = $scope.selectedTopicIds.indexOf(topicId);
+            $scope.selectedTopicIds.splice(idIndex, 1);
+            $scope.topicSummaries[index].isSelected = false;
+          }
+        };
+        ctrl.$onInit = function() {
+          $scope.topicSummaries = $scope.getTopicSummaries();
+        };
+      }
       ]
     };
   }]);
