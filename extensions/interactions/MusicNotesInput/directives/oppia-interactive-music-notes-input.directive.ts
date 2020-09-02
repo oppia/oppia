@@ -189,6 +189,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         // Highest number of notes that can fit on the staff at any given time.
         var MAXIMUM_NOTES_POSSIBLE = 8;
 
+        element.find('.oppia-music-input-note-choices');
         var staffContainerElt = element.find('.oppia-music-input-staff');
 
         // Staff has to be reinitialized every time that the staff is resized or
@@ -216,8 +217,13 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           scope.VERTICAL_GRID_SPACING = scope.CONTAINER_HEIGHT /
             verticalGridKeys.length;
 
+          computeStaffTop();
+          computeStaffBottom();
+
           // The farthest edge of the staff. If a note is placed beyond this
           // position, it will be discarded.
+          element.find('.oppia-music-input-valid-note-area').width();
+
           clearNotesFromStaff();
           initPalette();
 
@@ -244,6 +250,22 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
             };
             scope._addNoteToNoteSequence(initialNote);
           }
+        };
+
+        // Gets the staff top by getting the first staff line's position and
+        // subtracting one vertical grid space from it.
+        var computeStaffTop = function() {
+          return (
+            getStaffLinePositions()[verticalGridKeys[0]] -
+            scope.VERTICAL_GRID_SPACING
+          );
+        };
+
+        // Gets the staff bottom position by adding the staff top position value
+        // with the total sum of all the vertical grid spaces (staff lines).
+        var computeStaffBottom = function() {
+          return computeStaffTop() + (
+            scope.VERTICAL_GRID_SPACING * verticalGridKeys.length);
         };
 
         // Removes all notes from staff.

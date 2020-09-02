@@ -91,6 +91,7 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
           ctrl.$onInit = function() {
             $scope.$watch('$ctrl.answer', function(newValue) {
               try {
+                NumberWithUnitsObjectFactory.fromRawInputString(newValue);
                 errorMessage = '';
                 ctrl.NumberWithUnitsForm.answer.$setValidity(
                   FORM_ERROR_TYPE, true);
