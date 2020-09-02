@@ -3987,10 +3987,10 @@ eslint-plugin-html@^6.0.0:
 "eslint-plugin-oppia@file:scripts/linters/custom_eslint_checks":
   version "0.0.0"
 
-eslint-plugin-require-sort@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-require-sort/-/eslint-plugin-require-sort-1.2.2.tgz#7ebad3751eddf4bfbd967be2a5cdc2bf330f368a"
-  integrity sha512-n+aqtOrdCBRd+J/9e1WeWKWTN2PpKzIFJgm+eUNg/evAn/wKJF1BtNFBIZ+1DEnkRtSHdH0uTEeXhX7Dvbxp1A==
+eslint-plugin-sort-requires@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-sort-requires/-/eslint-plugin-sort-requires-2.1.0.tgz#3efad948dc83798219e809f54067c40e55444861"
+  integrity sha1-PvrZSNyDeYIZ6An1QGfEDlVESGE=
 
 eslint-plugin-unused-imports@^0.1.3:
   version "0.1.3"

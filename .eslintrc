@@ -12,7 +12,7 @@
     "unused-imports",
     "@typescript-eslint",
     "oppia",
-    "require-sort"
+    "sort-requires"
   ],
   "overrides": [{
     // We exclude test files from dependency injection format checks because
@@ -246,7 +246,7 @@
         "before": false
       }
     ],
-    "require-sort/require-sort": "error",
+    "sort-requires/sort-requires": 2,
     "unused-imports/no-unused-imports-ts": "error",
     "@typescript-eslint/no-explicit-any": ["error"],
     "@typescript-eslint/semi": ["error"],
