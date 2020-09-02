@@ -298,7 +298,7 @@ class StateStatsTests(test_utils.GenericTestBase):
         self.assertEqual(state_stats_b, state_stats_c)
         self.assertEqual(state_stats_a, state_stats_c)
 
-    def test_equality_fails_with_invalid_class(self):
+    def test_equality_with_different_class(self):
         class DifferentStats(python_utils.OBJECT):
             """A different class."""
 
