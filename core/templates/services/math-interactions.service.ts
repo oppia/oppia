@@ -83,16 +83,15 @@ export class MathInteractionsService {
     }
     if (
       errorMessage === 'Cannot read property \'parent\' of undefined.') {
-      let emptyFunctionName = '';
+      let emptyFunctionNames = [];
       for (let functionName of this.mathFunctionNames) {
         if (expressionString.includes(functionName + '()')) {
-          emptyFunctionName = functionName;
-          break;
+          emptyFunctionNames.push(functionName);
         }
       }
       errorMessage = (
-        'The ' + emptyFunctionName +
-        ' function cannot be empty. Please enter a variable/number in it.');
+        'The ' + emptyFunctionNames +
+        ' function(s) cannot be empty. Please enter a variable/number in it.');
     }
     return errorMessage;
   }

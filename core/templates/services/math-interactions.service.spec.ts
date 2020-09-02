@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { MathInteractionsService } from 'services/math-interactions.service';
 
-describe('MathInteractionsService', () => {
+fdescribe('MathInteractionsService', () => {
   let mathInteractionsService: MathInteractionsService = null;
 
   beforeEach(() => {
@@ -131,19 +131,19 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateAlgebraicExpression(
       'sqrt() + x', ['x'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'The sqrt function cannot be empty. ' +
+      'The sqrt function(s) cannot be empty. ' +
       'Please enter a variable/number in it.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       'sin()/x', ['x'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'The sin function cannot be empty. ' +
+      'The sin function(s) cannot be empty. ' +
       'Please enter a variable/number in it.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       'tan()sin()', ['x'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'The sin function cannot be empty. ' +
+      'The sin,tan function(s) cannot be empty. ' +
       'Please enter a variable/number in it.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
