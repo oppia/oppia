@@ -86,6 +86,15 @@ describe('ContinueValidationService', () => {
         message: 'The button text should not be empty.'
       }]);
 
+      customizationArguments.buttonText.value = (
+        new SubtitledUnicode('a'.repeat(51), 'ca_buttonText'));
+      warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, [], goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.CRITICAL,
+        message: 'The button text shouldn\'t be longer than 50 characters.'
+      }]);
+
       expect(() => {
         validatorService.getAllWarnings(
           // This throws "Argument of type '{}' is not assignable to

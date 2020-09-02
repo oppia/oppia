@@ -29,6 +29,7 @@ import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
 import { AppConstants } from 'app.constants';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -44,10 +45,23 @@ export class ContinueValidationService {
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
       customizationArgs, ['buttonText']);
 
+    var textSpecs = InteractionSpecsConstants.INTERACTION_SPECS.Continue;
+    var customizationArgSpecs = textSpecs.customization_arg_specs;
+    var buttonTextMaxLength = (
+      customizationArgSpecs[0].schema.validators[0].max_value);
+
     if (customizationArgs.buttonText.value.getUnicode().length === 0) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
         message: 'The button text should not be empty.'
+      });
+    }
+
+    if (customizationArgs.buttonText.value.getUnicode().length > (
+      buttonTextMaxLength)) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message: 'The button text shouldn\'t be longer than 50 characters.'
       });
     }
     return warningsList;
