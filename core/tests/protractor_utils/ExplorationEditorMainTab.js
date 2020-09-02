@@ -362,7 +362,7 @@ var ExplorationEditorMainTab = function() {
           feedbackInstructionsText);
       },
       setFeedback: async function(richTextInstructions) {
-      // Begin editing feedback.
+        // Begin editing feedback.
         await action.click(
           'openOutcomeFeedBackEditor', openOutcomeFeedBackEditor);
 
@@ -380,7 +380,7 @@ var ExplorationEditorMainTab = function() {
       //    created at this point.
       setDestination: async function(
           destinationName, createNewState, refresherExplorationId) {
-      // Begin editing destination.
+        // Begin editing destination.
         await action.click(
           'Outcome Destination Editor Open Button', openOutcomeDestEditor);
 
@@ -398,7 +398,7 @@ var ExplorationEditorMainTab = function() {
       },
       // The current state name must be at the front of the list.
       expectAvailableDestinationsToBe: async function(stateNames) {
-      // Begin editing destination.
+        // Begin editing destination.
         await openOutcomeDestEditor.click();
 
         var expectedOptionTexts = [_CURRENT_STATE_OPTION].concat(
@@ -466,7 +466,6 @@ var ExplorationEditorMainTab = function() {
   this.expectTickMarkIsDisplayed = async function() {
     await waitFor.visibilityOf(
       correctAnswerTickMark, 'Correct answer tick mark not visible');
-    expect(correctAnswerTickMark.isPresent()).toBeTruthy();
   };
 
   var _setOutcomeDest = async function(
@@ -844,8 +843,7 @@ var ExplorationEditorMainTab = function() {
     var ruleDescriptionInDropdown = ruleDescription;
     var answerDescription = element(
       by.css('.protractor-test-answer-description'));
-    expect(await answerDescription.isDisplayed()).toBe(true);
-    await answerDescription.click();
+    await action.click('Answer Description', answerDescription);
     var ruleDropdownElement = await element.all(by.cssContainingText(
       '.select2-results__option', ruleDescriptionInDropdown)).first();
     await action.click('Rule Dropdown Element', ruleDropdownElement);
