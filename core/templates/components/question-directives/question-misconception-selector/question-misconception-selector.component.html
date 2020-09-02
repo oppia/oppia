@@ -1,8 +1,8 @@
 Selected Misconception: <[$ctrl.selectedMisconception && $ctrl.selectedMisconception.getName()]>
 <div ng-repeat="(skillId, misconceptions) in $ctrl.misconceptionsBySkill">
   <div ng-repeat="misconception in misconceptions">
-    <button class="btn btn-secondary misconception-button" style="width: 100%" ng-click="$ctrl.selectMisconception(misconception, skillId)">
-      <b style="display: inline;"><[misconception.isMandatory() ? '' : ' (Optional) ']><[misconception.getName()]></b>
+    <button class="btn btn-secondary misconception-button" ng-click="$ctrl.selectMisconception(misconception, skillId)">
+      <b class="d-inline"><[misconception.isMandatory() ? '' : ' (Optional) ']><[misconception.getName()]></b>
       <angular-html-bind class="misconception-notes-container" html-data="misconception.getNotes()">
       </angular-html-bind>
     </button>
@@ -22,16 +22,17 @@ Selected Misconception: <[$ctrl.selectedMisconception && $ctrl.selectedMisconcep
   Use misconception feedback as answer group feedback.
 </span>
 <style>
-  .misconception-button {
+  question-misconception-selector .misconception-button {
     text-align: left;
+    width: 100%
   }
-  .misconception-feedback-usage-checkbox {
+  question-misconception-selector .misconception-feedback-usage-checkbox {
     cursor: pointer;
   }
-  .misconception-label {
+  question-misconception-selector .misconception-label {
     margin-top: 2vh;
   }
-  .misconception-notes-container > p {
+  question-misconception-selector .misconception-notes-container > p {
     display: inline;
   }
 </style>

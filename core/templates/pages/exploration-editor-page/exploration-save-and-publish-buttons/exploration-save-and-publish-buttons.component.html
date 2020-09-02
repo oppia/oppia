@@ -2,7 +2,7 @@
 
   <!-- Start of html for large screens. -->
   <li class="nav-item d-none d-sm-block" ng-if="showPublishButton()">
-    <div class="btn-group" style="margin-right: 10px; margin-top: 8px;"
+    <div class="btn-group oppia-publish-button-container"
          uib-tooltip="<[getPublishExplorationButtonTooltip()]>"
          tooltip-placement="bottom"
          ng-class="{'disable-publish-button': isExplorationLockedForEditing() || countWarnings()}">
@@ -32,7 +32,7 @@
   </li>
 
   <li class="nav-item d-none d-sm-block" ng-if="isEditableOutsideTutorialMode()">
-    <div uib-dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;"
+    <div uib-dropdown class="btn-group oppia-publish-button-container"
          title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !isExplorationSaveable()}">
       <button id="tutorialSaveButton"
               class="btn btn-light oppia-save-draft-button protractor-test-save-changes"
@@ -45,7 +45,7 @@
               &#xE161;
             </i>
             <span class="oppia-save-draft-button-label oppia-save-publish-button-label">Save Draft</span>
-            <span class="d-none d-md-block" ng-if="getChangeListLength()" style="opacity: 0.5;margin-left: 2px;">(<[getChangeListLength()]>)</span>
+            <span class="d-none d-md-block oppia-num-changes-text" ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
           </span>
           <span class="oppia-publish-label-container" ng-if="!isPrivate()" title="Publish Changes">
             <i class="material-icons md-18 oppia-save-publish-button-icon"
@@ -53,7 +53,7 @@
               &#xE2C3;
             </i>
             <span class="oppia-save-publish-button-label">Publish Changes</span>
-            <span class="d-none d-md-block" ng-if="getChangeListLength()" style="opacity: 0.5">(<[getChangeListLength()]>)</span>
+            <span class="d-none d-md-block oppia-num-changes-count-text" ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
           </span>
         </span>
         <span ng-if="saveIsInProcess">
@@ -66,7 +66,7 @@
           <loading-dots ng-show="loadingDotsAreShown"></loading-dots>
         </span>
       </button>
-      <button type="button" style="height: 34px;" class="btn btn-light uib-dropdown-toggle protractor-test-save-discard-toggle dropdown-toggle"
+      <button type="button" class="btn btn-light uib-dropdown-toggle oppia-discard-button protractor-test-save-discard-toggle dropdown-toggle"
               ng-disabled="!getChangeListLength()" uib-dropdown-toggle aria-label="Discard Draft">
       </button>
       <ul uib-dropdown-menu ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
@@ -84,19 +84,23 @@
   exploration-save-and-publish-buttons .disable-save-button {
     cursor: default;
   }
-  .oppia-draft-label-container,
-  .oppia-publish-label-container {
+  exploration-save-and-publish-buttons .oppia-draft-label-container,
+  exploration-save-and-publish-buttons .oppia-publish-label-container {
     display: flex;
     flex-direction: row;
   }
-  .oppia-save-publish-dropdown {
-    border: 0;
-    max-width: 280px;
-    min-width: 170px;
-    padding: 8px 0;
-  }
-  .oppia-save-publish-dropdown-toggle {
-    border: none;
+  exploration-save-and-publish-buttons .oppia-publish-button-container {
+    margin-right: 10px;
     margin-top: 8px;
+  }
+  exploration-save-and-publish-buttons .oppia-num-changes-text {
+    margin-left: 2px;
+    opacity: 0.5;
+  }
+  exploration-save-and-publish-buttons .oppia-num-changes-count-text {
+    opacity: 0.5;
+  }
+  exploration-save-and-publish-buttons .oppia-discard-button {
+    height: 34px;
   }
 </style>

@@ -5,8 +5,8 @@
       <h4 class="not-logged-in-warning" ng-if="!$ctrl.userIsLoggedIn"> Please login to view your skill mastery. </h4>
       <table class="skill-mastery-table" ng-if="$ctrl.skillIdsAndMastery.length > 0">
         <colgroup>
-          <col style="width: 40%;">
-          <col style="width: 60%">
+          <col class="oppia-colgroup-col-1">
+          <col class="oppia-colgroup-col-2">
         </colgroup>
         <tr>
           <th class="skill-mastery-table-headings">
@@ -17,8 +17,7 @@
           </th>
         </tr>
         <tr ng-repeat="item in $ctrl.skillIdsAndMastery | orderBy: '-mastery'"
-            class="list-item"
-            style="height: 4em;"
+            class="list-item oppia-list-item"
             ng-click="$ctrl.openConceptCardModal(item.skillId)">
           <td> <[$ctrl.getSkillDescriptions()[item.skillId]]> </td>
           <td>
@@ -95,6 +94,18 @@
 
   skills-mastery-list .skill-mastery-table .list-item:hover {
     background-color: #ededed;
+  }
+
+  skills-mastery-list .oppia-colgroup-col-1 {
+    width: 40%;
+  }
+
+  skills-mastery-list .oppia-colgroup-col-2 {
+    width: 60%;
+  }
+
+  skills-mastery-list .oppia-list-item {
+    height: 4em;
   }
 
   skills-mastery-list .skill-mastery-table .list-summary span {

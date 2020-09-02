@@ -5,7 +5,7 @@
       <div ng-show="$ctrl.totalQuestions > 0">
         <h3 class="oppia-question-player-header">Question <[$ctrl.currentQuestion]>/<[$ctrl.totalQuestions]></h3>
         <div class="oppia-question-player-progress">
-          <div class="current-progress" style="width: <[$ctrl.currentProgress]>%"></div>
+          <div class="current-progress" ng-style="{width: $ctrl.currentProgress + '%'}"></div>
         </div>
       </div>
       <div ng-show="$ctrl.totalQuestions === 0">
@@ -34,8 +34,8 @@
       <h3 class="oppia-question-player-header" translate="I18N_QUESTION_PLAYER_LEARN_MORE_ABOUT_SCORE"></h3>
       <table class="skill-score-table">
         <colgroup>
-          <col style="width: 50%;">
-          <col style="width: 50%">
+          <col class="oppia-col-width">
+          <col class="oppia-col-width">
         </colgroup>
         <tr>
           <th class="skill-score-table-headings" translate="I18N_QUESTION_PLAYER_SKILL_DESCRIPTIONS">
@@ -49,15 +49,14 @@
           <td> <[scorePerSkill.description]> </td>
           <td>
             <div class="oppia-skill-score-container">
-              <div class="score-bar" style="width: <[$ctrl.getScorePercentage(scorePerSkill)]>%; background: <[$ctrl.getColorForScore(scorePerSkill)]>"></div>
+              <div class="score-bar" ng-style="{width: $ctrl.getScorePercentage(scorePerSkill) + '%', background: $ctrl.getColorForScore(scorePerSkill)}"></div>
             </div>
           </td>
         </tr>
       </table>
-      <button class="btn btn-secondary oppia-review-and-retry-button"
+      <button class="btn btn-secondary oppia-review-and-retry-button oppia-review-and-retry-button-text"
               ng-if="!$ctrl.testIsPassed"
-              ng-click="$ctrl.reviewConceptCardAndRetryTest()"
-              style="background-color: #11776D; color: #FFFFFF;">
+              ng-click="$ctrl.reviewConceptCardAndRetryTest()">
         Review and Retry
       </button>
     </div>
@@ -252,5 +251,9 @@
   .oppia-question-player-container .practice-questions-coming-soon-text {
     font-family: Roboto, Arial, sans-serif;
     font-size: 18px;
+  }
+
+  .oppia-question-player-container .oppia-col-width {
+    width: 50%;
   }
 </style>
