@@ -683,6 +683,7 @@ interface UpgradedServicesDict {
 export class UpgradedServices {
   getUpgradedServices(): UpgradedServicesDict {
     var upgradedServices = {};
+    /* eslint-disable-next-line oppia/no-multiline-disable */
     /* eslint-disable dot-notation */
 
     // Topological level: 0.

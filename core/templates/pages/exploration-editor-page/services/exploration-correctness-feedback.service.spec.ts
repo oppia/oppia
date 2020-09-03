@@ -18,9 +18,8 @@
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
-/* eslint-disable max-len */
+/* eslint-disable-next-line max-len */
 require('pages/exploration-editor-page/services/exploration-correctness-feedback.service');
-/* eslint-enable max-len */
 require('pages/exploration-editor-page/services/exploration-property.service');
 
 describe('Exploration Correctness Feedback Service', function() {

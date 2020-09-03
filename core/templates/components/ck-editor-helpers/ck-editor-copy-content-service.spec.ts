@@ -106,7 +106,7 @@ describe('Ck editor copy content service', () => {
     expect(service.copyModeActive).toBe(false);
     service.toggleCopyMode();
     expect(service.copyModeActive).toBe(true);
-    /* eslint-disable no-multiline-disable */
+    /* eslint-disable oppia/no-multiline-disable */
     /* eslint-disable quotes */
     const imageWidgetElement = generateContent(
       `<oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;" capt\
@@ -136,6 +136,7 @@ quot;img_20200630_114637_c2ek92uvb8_height_326_width_490.png&amp;quot;\
     service.toggleCopyMode();
     expect(service.copyModeActive).toBe(true);
 
+    /* eslint-disable oppia/no-multiline-disable */
     /* eslint-disable quotes */
     const imageWidgetElement = generateContent(
       `<oppia-noninteractive-fake alt-with-value="&amp;quot;&amp;quot;" capt\
@@ -143,6 +144,7 @@ ion-with-value="&amp;quot;Banana&amp;quot;" filepath-with-value="&amp;\
 quot;img_20200630_114637_c2ek92uvb8_height_326_width_490.png&amp;quot;\
 "></oppia-noninteractive-fake>`);
     /* eslint-enable quotes */
+    /* eslint-enable oppia/no-multiline-disable */
 
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(imageWidgetElement);
@@ -156,6 +158,7 @@ quot;img_20200630_114637_c2ek92uvb8_height_326_width_490.png&amp;quot;\
     service.toggleCopyMode();
     expect(service.copyModeActive).toBe(true);
 
+    /* eslint-disable oppia/no-multiline-disable */
     /* eslint-disable quotes */
     const mathWidgetElement = generateContent(
       `<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_\
@@ -163,6 +166,7 @@ latex&amp;quot;:&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filen\
 ame&amp;quot;:&amp;quot;&amp;quot;}"><span></span></oppia-noninteracti\
 ve-math></p>`);
     /* eslint-enable quotes */
+    /* eslint-enable oppia/no-multiline-disable */
 
     const nestedMathWidgetElement = (
       <HTMLElement>mathWidgetElement.firstChild.firstChild);
@@ -188,13 +192,14 @@ ve-math></p>`);
     service.toggleCopyMode();
     expect(service.copyModeActive).toBe(true);
 
+    /* eslint-disable oppia/no-multiline-disable */
     /* eslint-disable quotes */
     const mathWidgetElement = generateContent(
       `<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_\
 latex&amp;quot;:&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filen\
 ame&amp;quot;:&amp;quot;&amp;quot;}"></oppia-noninteractive-math></p>`);
     /* eslint-enable quotes */
-    /* eslint-enable no-multiline-disable */
+    /* eslint-enable oppia/no-multiline-disable */
 
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(mathWidgetElement);

@@ -33,14 +33,17 @@ import { LogicProofRulesService } from
   'interactions/LogicProof/directives/logic-proof-rules.service';
 import { MusicNotesInputRulesService } from
   'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
-/* eslint-disable max-len */
 import { AlgebraicExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
   'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 import { DragAndDropSortInputRulesService } from
+  // eslint-disable-next-line max-len
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { MultipleChoiceInputRulesService } from
+  // eslint-disable-next-line max-len
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { ItemSelectionInputRulesService } from
+  // eslint-disable-next-line max-len
   'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { MathEquationInputRulesService } from
   'interactions/MathEquationInput/directives/math-equation-input-rules.service';
@@ -49,12 +52,14 @@ import { NumberWithUnitsRulesService } from
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory.ts';
 import { NumericExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
   'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
 import { RatioExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
   'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
 import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 import { UtilsService } from 'services/utils.service';

@@ -45,10 +45,11 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { ServicesConstants } from 'services/services.constants';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
-/* eslint-disable max-len */
 import { TopicsAndSkillsDashboardDomainConstants } from
+  // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
 import { TopicsAndSkillsDashboardPageConstants } from
+  // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 /* eslint-enable max-len */
 

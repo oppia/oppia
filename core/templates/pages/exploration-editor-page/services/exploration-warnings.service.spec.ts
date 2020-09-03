@@ -52,16 +52,13 @@ import { ParamMetadataObjectFactory } from
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-/* eslint-disable max-len */
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-/* eslint-enable max-len */
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
-/* eslint-disable max-len */
 import { StateEditorService } from
+  /* eslint-disable-next-line max-len */
   'components/state-editor/state-editor-properties-services/state-editor.service';
-/* eslint-enable max-len */
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -76,9 +73,8 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/exploration-editor-page/services/graph-data.service');
 require('pages/exploration-editor-page/services/exploration-property.service');
-/* eslint-disable max-len */
+/* eslint-disable-next-line max-len */
 require('pages/exploration-editor-page/services/exploration-init-state-name.service');
-/* eslint-enable max-len */
 
 describe('Exploration Warnings Service', function() {
   var ExplorationWarningsService = null;

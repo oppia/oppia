@@ -16,10 +16,9 @@
  * @fileoverview Unit tests for Item Selection rules.
  */
 
-/* eslint-disable max-len */
 import { ItemSelectionInputRulesService } from
+  /* eslint-disable-next-line max-len */
   'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
-/* eslint-enable max-len */
 
 describe('Item Selection rules service', () => {
   beforeEach(angular.mock.module('oppia'));

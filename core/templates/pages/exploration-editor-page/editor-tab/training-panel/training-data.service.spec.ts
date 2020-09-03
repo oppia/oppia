@@ -22,10 +22,9 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
-/* eslint-disable max-len */
 import { AnswerGroupsCacheService } from
+  /* eslint-disable-next-line max-len */
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
-/* eslint-enable max-len */
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { ClassifierObjectFactory } from
@@ -43,16 +42,14 @@ import { ParamChangesObjectFactory } from
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-/* eslint-disable max-len */
 import { SolutionValidityService } from
+  /* eslint-disable-next-line max-len */
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-/* eslint-enable max-len */
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
-/* eslint-disable max-len */
 import { StateEditorService } from
+  /* eslint-disable-next-line max-len */
   'components/state-editor/state-editor-properties-services/state-editor.service';
-/* eslint-enable max-len */
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';

@@ -1,3 +1,4 @@
+/* eslint-disable oppia/no-multiline-disable */
 /* eslint-disable */
 /* Don't modify anything outside the {} brackets.
  * Insides of the {} brackets should be formatted as a JSON object.

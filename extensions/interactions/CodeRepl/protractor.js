@@ -33,6 +33,7 @@ var expectInteractionDetailsToMatch = async function(elem, placeHolderText) {
   // The \n must be included in the check because the editor inserts a newline.
   // For testing purposes it is required that the order of
   // the quotes is single-quotes within double-quotes.
+  // eslint-disable-next-line oppia/no-multiline-disable
   /* eslint-disable quotes */
   var testValue = await browser.executeScript(
     "var elem = $('.protractor-test-preview-tab .CodeMirror')[0].CodeMirror;" +

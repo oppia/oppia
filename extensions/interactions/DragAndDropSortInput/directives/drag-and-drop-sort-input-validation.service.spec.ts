@@ -20,10 +20,9 @@ import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-/* eslint-disable max-len */
 import { DragAndDropSortInputValidationService } from
+  /* eslint-disable-next-line max-len */
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
-/* eslint-enable max-len */
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from

@@ -15,10 +15,9 @@
 /**
  * @fileoverview Unit tests for Drag and Drop Sorting rules.
  */
-/* eslint-disable max-len */
 import { DragAndDropSortInputRulesService } from
+  /* eslint-disable-next-line max-len */
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
-/* eslint-enable max-len */
 
 describe('Drag and Drop Sort Input rules service', () => {
   let ddsrs: DragAndDropSortInputRulesService = null;

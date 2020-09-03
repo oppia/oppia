@@ -240,11 +240,10 @@ angular.module('oppia').component('learnerDashboardPage', {
             $scope.$apply();
           },
           sort: function(e, ui) {
-            /* eslint-disable quote-props */
             // Making top : 0px to avoid irregular change in position.
             ui.helper.css(
+              /* eslint-disable-next-line quote-props */
               {'top': '0 px'});
-            /* eslint-enable quote-props */
           },
           update: function(e, ui) {
             var insertExpInLearnerPlaylistUrl = (
