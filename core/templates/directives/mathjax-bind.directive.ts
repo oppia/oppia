@@ -24,10 +24,13 @@ angular.module('oppia').directive('mathjaxBind', [function() {
   return {
     restrict: 'E',
     controller: [
-      '$scope', '$element', '$attrs', function($scope, $element, $attrs) {
+      '$attrs', '$element', '$scope', function($attrs, $element, $scope) {
         var ctrl = this;
         ctrl.$onInit = function() {
           $scope.$watch($attrs.mathjaxData, function(value) {
+            // TODO(#10197): Upgrade to MathJax 3, after proper investigation
+            // and testing. MathJax 3 provides a faster and more cleaner way to
+            // convert a LaTeX string to an SVG.
             var $script = angular.element(
               '<script type="math/tex">'
             ).html(value === undefined ? '' : value);

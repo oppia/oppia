@@ -23,14 +23,23 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/topic-editor-page/topic-editor-page.component.ts');
 
+import { EventEmitter } from '@angular/core';
+
 describe('Topic editor page', function() {
   var ctrl = null;
   var $scope = null;
   var ContextService = null;
   var PageTitleService = null;
   var TopicEditorRoutingService = null;
+  var UndoRedoService = null;
   var TopicEditorStateService = null;
   var UrlService = null;
+  var SubtopicObjectFactory = null;
+  var TopicObjectFactory = null;
+  var SkillSummaryObjectFactory = null;
+  var StoryReferenceObjectFactory = null;
+  var topic = null;
+  var ShortSkillSummaryObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -42,11 +51,34 @@ describe('Topic editor page', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');
+    UndoRedoService = $injector.get('UndoRedoService');
     PageTitleService = $injector.get('PageTitleService');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     UrlService = $injector.get('UrlService');
+    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
+    TopicObjectFactory = $injector.get('TopicObjectFactory');
+    SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
+    StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
+    ShortSkillSummaryObjectFactory = $injector.get(
+      'ShortSkillSummaryObjectFactory');
 
+    var subtopic = SubtopicObjectFactory.createFromTitle(1, 'subtopic1');
+    subtopic._thumbnailFilename = 'b.svg';
+    var skillSummary = ShortSkillSummaryObjectFactory.create(
+      'skill1', 'Addition');
+    subtopic._skillSummaries = [skillSummary];
+    topic = TopicObjectFactory.createInterstitialTopic();
+    topic._subtopics = [subtopic];
+    topic._thumbnailFilename = 'a.svg';
+    topic._metaTagContent = 'topic';
+    var story1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
+    var story2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
+    topic._canonicalStoryReferences = [story1, story2];
+    topic.setName('New Name');
+    topic.setUrlFragment('topic-url-fragment');
+    TopicEditorStateService.setTopic(topic);
+    spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
     $scope = $rootScope.$new();
     ctrl = $componentController('topicEditorPage', {
       $scope: $scope
@@ -55,26 +87,130 @@ describe('Topic editor page', function() {
 
   it('should load topic based on its id on url when component is initialized' +
     ' and set page title', function() {
-    spyOn(TopicEditorStateService, 'loadTopic').and.stub();
+    let topicInitializedEventEmitter = new EventEmitter();
+    let topicReinitializedEventEmitter = new EventEmitter();
+    let undoRedoChangeEventEmitter = new EventEmitter();
+    spyOn(TopicEditorStateService, 'loadTopic').and.callFake(function() {
+      topicInitializedEventEmitter.emit();
+      topicReinitializedEventEmitter.emit();
+      undoRedoChangeEventEmitter.emit();
+    });
+    spyOnProperty(
+      TopicEditorStateService, 'onTopicInitialized').and.returnValue(
+      topicInitializedEventEmitter);
+    spyOnProperty(
+      TopicEditorStateService, 'onTopicReinitialized').and.returnValue(
+      topicReinitializedEventEmitter);
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
 
     ctrl.$onInit();
-    $scope.$broadcast('topicInitialized');
-    $scope.$broadcast('topicReinitialized');
 
     expect(TopicEditorStateService.loadTopic).toHaveBeenCalledWith('topic_1');
     expect(PageTitleService.setPageTitle).toHaveBeenCalledTimes(2);
+
+    ctrl.$onDestroy();
   });
 
   it('should get active tab name', function() {
+    ctrl.selectQuestionsTab();
     spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
       'questions');
     expect(ctrl.getActiveTabName()).toBe('questions');
+    expect(ctrl.isInTopicEditorTabs()).toBe(true);
+    expect(ctrl.isInPreviewTab()).toBe(false);
+    expect(ctrl.isMainEditorTabSelected()).toBe(false);
+    expect(ctrl.getNavbarText()).toBe('Question Editor');
+  });
+
+  it('should return the change count', function() {
+    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
+    expect(ctrl.getChangeListLength()).toBe(10);
   });
 
   it('should get entity type from context service', function() {
     spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
     expect(ctrl.getEntityType()).toBe('exploration');
+  });
+
+  it('should open subtopic preview tab if active tab is subtopic editor',
+    function() {
+      spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
+        'subtopic_editor');
+      const topicPreviewSpy = spyOn(
+        TopicEditorRoutingService, 'navigateToSubtopicPreviewTab');
+      ctrl.openTopicViewer();
+      expect(topicPreviewSpy).toHaveBeenCalled();
+    });
+
+  it('should open topic preview if active tab is topic editor', function() {
+    spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'topic_editor');
+    const topicPreviewSpy = spyOn(
+      TopicEditorRoutingService, 'navigateToTopicPreviewTab');
+    ctrl.openTopicViewer();
+    expect(topicPreviewSpy).toHaveBeenCalled();
+  });
+
+  it('should open subtopic preview tab if active tab is subtopic editor',
+    function() {
+      spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
+        'subtopic_editor');
+      const topicPreviewSpy = spyOn(
+        TopicEditorRoutingService, 'navigateToSubtopicPreviewTab');
+      ctrl.openTopicViewer();
+      expect(topicPreviewSpy).toHaveBeenCalled();
+    });
+
+  it('should navigate to topic editor tab in topic editor', function() {
+    spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'topic_preview');
+    const topicPreviewSpy = spyOn(
+      TopicEditorRoutingService, 'navigateToMainTab');
+    ctrl.selectMainTab();
+    expect(topicPreviewSpy).toHaveBeenCalled();
+  });
+
+  it('should select navigate to the subtopic editor tab in subtopic editor',
+    function() {
+      spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
+        'subtopic_preview');
+      const topicPreviewSpy = spyOn(
+        TopicEditorRoutingService, 'navigateToSubtopicEditorWithId');
+      ctrl.selectMainTab();
+      expect(topicPreviewSpy).toHaveBeenCalled();
+    });
+
+  it('should validate the topic and return validation issues', function() {
+    ctrl.topic = topic;
+    spyOn(
+      TopicEditorStateService, 'getTopicWithNameExists').and.returnValue(true);
+    spyOn(
+      TopicEditorStateService, 'getTopicWithUrlFragmentExists').and.returnValue(
+      true);
+    ctrl._validateTopic();
+    expect(ctrl.validationIssues.length).toEqual(2);
+    expect(ctrl.validationIssues[0]).toEqual(
+      'A topic with this name already exists.');
+    expect(ctrl.validationIssues[1]).toEqual(
+      'Topic URL fragment already exists.');
+    expect(ctrl.getWarningsCount()).toEqual(2);
+    expect(ctrl.getTotalWarningsCount()).toEqual(2);
+  });
+
+  it('should return the navbar text', function() {
+    ctrl.selectQuestionsTab();
+    var routingSpy = spyOn(
+      TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'questions');
+    expect(ctrl.getNavbarText()).toBe('Question Editor');
+    routingSpy.and.returnValue('subtopic_editor');
+    expect(ctrl.getNavbarText()).toEqual('Subtopic Editor');
+    routingSpy.and.returnValue('subtopic_preview');
+    expect(ctrl.getNavbarText()).toEqual('Subtopic Preview');
+    routingSpy.and.returnValue('topic_preview');
+    expect(ctrl.getNavbarText()).toEqual('Topic Preview');
+    routingSpy.and.returnValue('main');
+    expect(ctrl.getNavbarText()).toEqual('Topic Editor');
   });
 });

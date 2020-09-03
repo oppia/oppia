@@ -31,21 +31,36 @@ require('services/exploration-improvements.service.ts');
 require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+   'user-exploration-permissions.service.ts');
+require('pages/exploration-editor-page/services/change-list.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('editorNavigation', {
   template: require('./editor-navigation.component.html'),
   controller: [
-    '$q', '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
+    '$q', '$scope', '$timeout', '$uibModal', 'ChangeListService',
+    'ContextService', 'EditabilityService',
     'ExplorationImprovementsService', 'ExplorationRightsService',
+    'ExplorationSaveService',
     'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
-    'ThreadDataService', 'UrlInterpolationService', 'UserService',
+    'StateTutorialFirstTimeService',
+    'ThreadDataService', 'UrlInterpolationService',
+    'UserExplorationPermissionsService', 'UserService',
     'WindowDimensionsService',
     function(
-        $q, $rootScope, $scope, $timeout, $uibModal, ContextService,
+        $q, $scope, $timeout, $uibModal, ChangeListService,
+        ContextService, EditabilityService,
         ExplorationImprovementsService, ExplorationRightsService,
+        ExplorationSaveService,
         ExplorationWarningsService, RouterService, SiteAnalyticsService,
-        ThreadDataService, UrlInterpolationService, UserService,
+        StateTutorialFirstTimeService,
+        ThreadDataService, UrlInterpolationService,
+        UserExplorationPermissionsService, UserService,
         WindowDimensionsService) {
+      this.directiveSubscriptions = new Subscription();
       $scope.showUserHelpModal = () => {
         var explorationId = ContextService.getExplorationId();
         SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
@@ -60,9 +75,9 @@ angular.module('oppia').component('editorNavigation', {
           windowClass: 'oppia-help-modal'
         }).result.then(mode => {
           if (mode === EDITOR_TUTORIAL_MODE) {
-            $rootScope.$broadcast('openEditorTutorial');
+            StateTutorialFirstTimeService.onOpenEditorTutorial.emit();
           } else if (mode === TRANSLATION_TUTORIAL_MODE) {
-            $rootScope.$broadcast('openTranslationTutorial');
+            StateTutorialFirstTimeService.onOpenTranslationTutorial.emit();
           }
         }, () => {
           // Note to developers:
@@ -71,6 +86,71 @@ angular.module('oppia').component('editorNavigation', {
         });
       };
 
+      $scope.saveIsInProcess = false;
+      $scope.publishIsInProcess = false;
+      $scope.loadingDotsAreShown = false;
+
+      $scope.isPrivate = function() {
+        return ExplorationRightsService.isPrivate();
+      };
+
+      $scope.isExplorationLockedForEditing = function() {
+        return ChangeListService.isExplorationLockedForEditing();
+      };
+
+      $scope.isEditableOutsideTutorialMode = function() {
+        return EditabilityService.isEditableOutsideTutorialMode() ||
+            EditabilityService.isTranslatable();
+      };
+
+      $scope.discardChanges = function() {
+        ExplorationSaveService.discardChanges();
+      };
+
+      $scope.getChangeListLength = function() {
+        return ChangeListService.getChangeList().length;
+      };
+
+
+      $scope.isExplorationSaveable = function() {
+        return ExplorationSaveService.isExplorationSaveable();
+      };
+
+      $scope.showLoadingDots = function() {
+        $scope.loadingDotsAreShown = true;
+      };
+
+      $scope.hideLoadingDots = function() {
+        $scope.loadingDotsAreShown = false;
+      };
+
+      $scope.showPublishExplorationModal = function() {
+        $scope.publishIsInProcess = true;
+        $scope.loadingDotsAreShown = true;
+
+        ExplorationSaveService.showPublishExplorationModal(
+          $scope.showLoadingDots, $scope.hideLoadingDots)
+          .then(function() {
+            $scope.publishIsInProcess = false;
+            $scope.loadingDotsAreShown = false;
+          });
+      };
+
+      $scope.saveChanges = function() {
+        $scope.saveIsInProcess = true;
+        $scope.loadingDotsAreShown = true;
+
+        ExplorationSaveService.saveChanges(
+          $scope.showLoadingDots, $scope.hideLoadingDots)
+          .then(function() {
+            $scope.saveIsInProcess = false;
+            $scope.loadingDotsAreShown = false;
+          });
+      };
+
+      $scope.toggleMobileNavOptions = function() {
+        $scope.mobileNavOptionsAreShown = !$scope.mobileNavOptionsAreShown;
+      };
       $scope.countWarnings = () => ExplorationWarningsService.countWarnings();
       $scope.getWarnings = () => ExplorationWarningsService.getWarnings();
       $scope.hasCriticalWarnings = (
@@ -92,25 +172,39 @@ angular.module('oppia').component('editorNavigation', {
       this.$onInit = () => {
         $scope.ExplorationRightsService = ExplorationRightsService;
 
+        UserExplorationPermissionsService.getPermissionsAsync()
+          .then(function(permissions) {
+            $scope.showPublishButton = function() {
+              return permissions.canPublish && (
+                ExplorationRightsService.isPrivate());
+            };
+          });
+
         this.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
-        this.resizeSubscription = (
+        this.directiveSubscriptions.add(
           WindowDimensionsService.getResizeEvent().subscribe(evt => {
             this.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
             $scope.$applyAsync();
-          }));
+          })
+        );
         $scope.isScreenLarge = () => this.screenIsLarge;
 
         this.postTutorialHelpPopoverIsShown = false;
-        $scope.$on('openPostTutorialHelpPopover', () => {
-          if (this.screenIsLarge) {
-            this.postTutorialHelpPopoverIsShown = true;
-            $timeout(() => {
-              this.postTutorialHelpPopoverIsShown = false;
-            }, 4000);
-          } else {
-            this.postTutorialHelpPopoverIsShown = false;
-          }
-        });
+        this.directiveSubscriptions.add(
+          StateTutorialFirstTimeService.onOpenPostTutorialHelpPopover.subscribe(
+            () => {
+              if (this.screenIsLarge) {
+                this.postTutorialHelpPopoverIsShown = true;
+                $timeout(() => {
+                  this.postTutorialHelpPopoverIsShown = false;
+                }, 4000);
+              } else {
+                this.postTutorialHelpPopoverIsShown = false;
+              }
+            }
+          )
+        );
+
         $scope.isPostTutorialHelpPopoverShown = (
           () => this.postTutorialHelpPopoverIsShown);
 
@@ -128,11 +222,8 @@ angular.module('oppia').component('editorNavigation', {
           });
         $scope.isUserLoggedIn = () => this.userIsLoggedIn;
       };
-
-      this.$onDestroy = () => {
-        if (this.resizeSubscription) {
-          this.resizeSubscription.unsubscribe();
-        }
+      this.$onDestroy = function() {
+        this.directiveSubscriptions.unsubscribe();
       };
     }
   ]

@@ -17,6 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
+require('third-party-imports/select2.import.ts');
 
 angular.module('oppia').directive('select2Dropdown', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -47,7 +48,7 @@ angular.module('oppia').directive('select2Dropdown', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/custom-forms-directives/' +
         'select2-dropdown.directive.html'),
-      controller: ['$scope', '$element', function($scope, $element) {
+      controller: ['$element', '$scope', function($element, $scope) {
         var ctrl = this;
         ctrl.$onInit = function() {
           $scope.newChoiceValidator = new RegExp($scope.newChoiceRegex);

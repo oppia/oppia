@@ -44,11 +44,11 @@ export interface ConceptCardBackendDict {
 
 export class ConceptCard {
   _explanation: SubtitledHtml;
-  _workedExamples: Array<WorkedExample>;
+  _workedExamples: WorkedExample[];
   _recordedVoiceovers: RecordedVoiceovers;
 
   constructor(
-      explanation: SubtitledHtml, workedExamples: Array<WorkedExample>,
+      explanation: SubtitledHtml, workedExamples: WorkedExample[],
       recordedVoiceovers: RecordedVoiceovers) {
     this._explanation = explanation;
     this._workedExamples = workedExamples;
@@ -66,8 +66,9 @@ export class ConceptCard {
     };
   }
 
-  _getElementsInFirstSetButNotInSecond(setA: Set<string>,
-      setB: Set<string>): Array<string> {
+  _getElementsInFirstSetButNotInSecond(
+      setA: Set<string>,
+      setB: Set<string>): string[] {
     let diffList = Array.from(setA).filter((element) => {
       return !setB.has(element);
     });
@@ -75,7 +76,7 @@ export class ConceptCard {
   }
 
   _extractAvailableContentIdsFromWorkedExamples(
-      workedExamples: Array<WorkedExample>): Set<string> {
+      workedExamples: WorkedExample[]): Set<string> {
     let contentIds: Set<string> = new Set();
     workedExamples.forEach((workedExample: WorkedExample) => {
       contentIds.add(workedExample.getQuestion().getContentId());
@@ -92,11 +93,11 @@ export class ConceptCard {
     this._explanation = explanation;
   }
 
-  getWorkedExamples(): Array<WorkedExample> {
+  getWorkedExamples(): WorkedExample[] {
     return this._workedExamples.slice();
   }
 
-  setWorkedExamples(workedExamples: Array<WorkedExample>): void {
+  setWorkedExamples(workedExamples: WorkedExample[]): void {
     let oldContentIds = this._extractAvailableContentIdsFromWorkedExamples(
       this._workedExamples);
 
@@ -134,12 +135,11 @@ export class ConceptCardObjectFactory {
       private workedExampleObjectFactory: WorkedExampleObjectFactory) {}
 
   _generateWorkedExamplesFromBackendDict(
-      workedExampleDicts): Array<WorkedExample> {
-    return workedExampleDicts.map(
-      (workedExampleDict: WorkedExampleBackendDict) => {
-        return this.workedExampleObjectFactory.createFromBackendDict(
-          workedExampleDict);
-      });
+      workedExampleDicts: WorkedExampleBackendDict[]): WorkedExample[] {
+    return workedExampleDicts.map(workedExampleDict=> {
+      return this.workedExampleObjectFactory.createFromBackendDict(
+        workedExampleDict);
+    });
   }
 
   // Create an interstitial concept card that would be displayed in the
@@ -152,8 +152,7 @@ export class ConceptCardObjectFactory {
     };
     return new ConceptCard(
       this.subtitledHtmlObjectFactory.createDefault(
-        'Loading review material',
-        AppConstants.COMPONENT_NAME_EXPLANATION), [],
+        'Loading review material', AppConstants.COMPONENT_NAME_EXPLANATION), [],
       this.recordedVoiceoversObjectFactory.createFromBackendDict(
         recordedVoiceoversDict)
     );

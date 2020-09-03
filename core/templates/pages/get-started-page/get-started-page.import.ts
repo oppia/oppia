@@ -16,7 +16,7 @@
  * @fileoverview File to import necessary scripts for get_started page.
  */
 
-// The module needs to be loaded before everything else since it defines the
+// The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/get-started-page/get-started-page.module.ts');
 require('App.ts');

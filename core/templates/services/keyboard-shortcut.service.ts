@@ -17,17 +17,34 @@
  */
 import 'mousetrap';
 
-import { Injectable } from '@angular/core';
+import { Injectable, ApplicationRef } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { KeyboardShortcutHelpModalComponent } from
+  // eslint-disable-next-line max-len
+  'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component.ts';
+import { WindowRef } from 'services/contextual/window-ref.service.ts';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class KeyboardShortcutService {
-  bindExplorationPlayerShortcuts() {
+  constructor(
+    private windowRef: WindowRef,
+    private ngbModal: NgbModal,
+    private appRef: ApplicationRef) {}
+
+  openQuickReference(): void {
+    this.ngbModal.dismissAll();
+    this.ngbModal.open(
+      KeyboardShortcutHelpModalComponent, {backdrop: true});
+    this.appRef.tick();
+  }
+
+  bindExplorationPlayerShortcuts(): void {
     Mousetrap.bind('s', function() {
       document.getElementById('skipToMainContentId').focus();
-      return false;
     });
 
     Mousetrap.bind('k', function() {
@@ -35,79 +52,77 @@ export class KeyboardShortcutService {
       if (previousButton !== null) {
         previousButton.focus();
       }
-      return false;
     });
 
     Mousetrap.bind('j', function() {
       var nextButton = <HTMLElement>document.querySelector(
-        '.protractor-test-next-button');
-      var continueToNextCardButton = <HTMLElement>document.querySelector(
-        '.protractor-test-continue-to-next-card-button');
+        '.oppia-next-button');
       var continueButton = <HTMLElement>document.querySelector(
-        '.protractor-test-continue-button');
+        '.oppia-learner-confirm-button');
       if (nextButton !== null) {
         nextButton.focus();
-      }
-      if (continueToNextCardButton !== null) {
-        continueToNextCardButton.focus();
       }
       if (continueButton !== null) {
         continueButton.focus();
       }
-      return false;
+    });
+
+    Mousetrap.bind('?', () => {
+      this.openQuickReference();
     });
   }
 
-  bindLibraryPageShortcuts() {
+  bindLibraryPageShortcuts(): void {
     Mousetrap.bind('/', function() {
       var searchBar = <HTMLElement>document.querySelector(
-        '.protractor-test-search-input');
+        '.oppia-search-bar-text-input');
       searchBar.focus();
       return false;
     });
 
     Mousetrap.bind('c', function() {
-      document.getElementById('categoryBar').focus();
-      return false;
+      var categoryBar = <HTMLElement>document.querySelector(
+        '.oppia-search-bar-dropdown-toggle');
+      categoryBar.focus();
     });
 
     Mousetrap.bind('s', function() {
       document.getElementById('skipToMainContentId').focus();
-      return false;
+    });
+
+    Mousetrap.bind('?', () => {
+      this.openQuickReference();
     });
   }
 
-  setHref(href) {
-    window.location.href = href;
-  }
 
-  bindNavigationShortcuts() {
+  bindNavigationShortcuts(): void {
     Mousetrap.bind('ctrl+0', () => {
-      this.setHref('/get-started');
+      this.windowRef.nativeWindow.location.href = '/get-started';
     });
 
     Mousetrap.bind('ctrl+1', () => {
-      this.setHref('/community-library');
+      this.windowRef.nativeWindow.location.href = '/community-library';
     });
 
     Mousetrap.bind('ctrl+2', () => {
-      this.setHref('/learner-dashboard');
+      this.windowRef.nativeWindow.location.href = '/learner-dashboard';
     });
 
     Mousetrap.bind('ctrl+3', () => {
-      this.setHref('/creator-dashboard');
+      this.windowRef.nativeWindow.location.href = '/creator-dashboard';
     });
 
     Mousetrap.bind('ctrl+4', () => {
-      this.setHref('/about');
+      this.windowRef.nativeWindow.location.href = '/about';
     });
 
     Mousetrap.bind('ctrl+5', () => {
-      this.setHref('/notifications');
+      this.windowRef.nativeWindow.location.href = '/notifications';
     });
 
     Mousetrap.bind('ctrl+6', () => {
-      this.setHref('/preferences');
+      this.windowRef.nativeWindow.location.href = '/preferences';
     });
   }
 }

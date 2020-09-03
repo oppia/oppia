@@ -19,10 +19,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 
+from core.domain import config_domain
 from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
@@ -61,6 +63,7 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='topic-one', url_fragment='topic-one',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
@@ -77,6 +80,26 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        new_config_value = [{
+            'name': 'math',
+            'url_fragment': 'math',
+            'topic_ids': [self.topic_id],
+            'course_details': '',
+            'topic_list_intro': ''
+        }]
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.CLASSROOM_PAGES_DATA.name: (
+                    new_config_value),
+            }
+        }
+        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+        self.logout()
 
 
 class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
@@ -98,6 +121,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
         self.save_new_topic(
             topic_id, self.admin_id, name='New name',
+            abbreviated_name='topic-two', url_fragment='topic-two',
             description='New description',
             canonical_story_ids=[canonical_story_id],
             additional_story_ids=[additional_story_id],
@@ -158,7 +182,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'title': 'Story title',
             'description': 'Story Description',
             'filename': 'test_svg.svg',
-            'thumbnailBgColor': '#F8BF74'
+            'thumbnailBgColor': '#F8BF74',
+            'story_url_fragment': 'story-frag-one'
         }
 
         with python_utils.open_file(
@@ -184,7 +209,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'title': 'Story title',
             'description': 'Story Description',
             'filename': 'cafe.flac',
-            'thumbnailBgColor': '#F8BF74'
+            'thumbnailBgColor': '#F8BF74',
+            'story_url_fragment': 'story-frag-two'
         }
 
         with python_utils.open_file(
@@ -441,6 +467,29 @@ class TopicEditorTests(
 
         self.logout()
 
+    def test_editable_topic_handler_put_fails_with_long_commit_message(self):
+        change_cmd = {
+            'version': 2,
+            'commit_message': 'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1),
+            'topic_and_subtopic_page_change_dicts': [{
+                'cmd': 'update_topic_property',
+                'property_name': 'name',
+                'old_value': '',
+                'new_value': 0
+            }]
+        }
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Commit messages must be at most 1000 characters long.')
+
     def test_editable_topic_handler_put_raises_error_with_invalid_name(self):
         change_cmd = {
             'version': 2,
@@ -650,6 +699,7 @@ class TopicEditorTests(
         topic_id_1 = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id_1, self.admin_id, name='Name 1',
+            abbreviated_name='topic-three', url_fragment='topic-three',
             description='Description 1', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id],
@@ -889,14 +939,14 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
             '%s/%s' % (
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
             {'publish_status': True}, csrf_token=csrf_token)
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
         self.assertTrue(topic_rights.topic_is_published)
 
         self.put_json(
             '%s/%s' % (
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
             {'publish_status': False}, csrf_token=csrf_token)
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
         self.assertFalse(topic_rights.topic_is_published)
         self.logout()
 
@@ -929,7 +979,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
             '%s/%s' % (
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
             {'publish_status': True}, csrf_token=csrf_token)
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
         self.assertTrue(topic_rights.topic_is_published)
 
         response = self.put_json(
@@ -942,7 +992,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
     def test_cannot_unpublish_an_unpublished_exploration(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_fetchers.get_topic_rights(self.topic_id)
         self.assertFalse(topic_rights.topic_is_published)
 
         response = self.put_json(

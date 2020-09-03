@@ -17,7 +17,6 @@
  */
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require('domain/skill/RubricObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
@@ -50,13 +49,11 @@ angular.module('oppia').directive('rubricsEditor', [
         '/components/rubrics-editor/rubrics-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$uibModal', 'ContextService',
-        'RubricObjectFactory', 'SkillCreationService', 'PAGE_CONTEXT',
-        'SKILL_DIFFICULTY_MEDIUM', 'SKILL_DESCRIPTION_STATUS_VALUES',
+        '$scope', 'ContextService', 'SkillCreationService',
+        'SKILL_DESCRIPTION_STATUS_VALUES', 'SKILL_DIFFICULTY_MEDIUM',
         function(
-            $scope, $filter, $uibModal, ContextService,
-            RubricObjectFactory, SkillCreationService, PAGE_CONTEXT,
-            SKILL_DIFFICULTY_MEDIUM, SKILL_DESCRIPTION_STATUS_VALUES) {
+            $scope, ContextService, SkillCreationService,
+            SKILL_DESCRIPTION_STATUS_VALUES, SKILL_DIFFICULTY_MEDIUM) {
           var ctrl = this;
           var explanationsMemento = {};
 
@@ -92,6 +89,9 @@ angular.module('oppia').directive('rubricsEditor', [
           ctrl.cancelEditExplanation = function(difficulty, index) {
             ctrl.editableExplanations[difficulty][index] = (
               explanationsMemento[difficulty][index]);
+            if (!ctrl.editableExplanations[difficulty][index]) {
+              ctrl.deleteExplanation(difficulty, index);
+            }
             ctrl.explanationEditorIsOpen[difficulty][index] = false;
           };
 
@@ -151,6 +151,8 @@ angular.module('oppia').directive('rubricsEditor', [
               {id: 1, difficulty: 'Medium'},
               {id: 2, difficulty: 'Hard'}
             ];
+            ctrl.selectedRubricIndex = 1;
+            ctrl.rubric = ctrl.getRubrics()[1];
           };
 
           ctrl.onRubricSelectionChange = function() {

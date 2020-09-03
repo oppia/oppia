@@ -24,6 +24,17 @@ import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter } from '@angular/core';
+
+class MockRouterService {
+  private refreshStatisticsTabEventEmitter: EventEmitter<void>;
+  get onRefreshStatisticsTab() {
+    return this.refreshStatisticsTabEventEmitter;
+  }
+  set refreshStatisticsTabEmitter(val) {
+    this.refreshStatisticsTabEventEmitter = val;
+  }
+}
 
 describe('Statistics Tab Component', function() {
   var ctrl = null;
@@ -37,6 +48,7 @@ describe('Statistics Tab Component', function() {
   var readOnlyExplorationBackendApiService = null;
   var stateInteractionStatsService = null;
   var statesObjectFactory = null;
+  var routerService = null;
 
   var explorationId = 'exp1';
   var state = {
@@ -115,6 +127,7 @@ describe('Statistics Tab Component', function() {
     explorationStatsService = TestBed.get(ExplorationStatsService);
     stateInteractionStatsService = TestBed.get(StateInteractionStatsService);
     statesObjectFactory = TestBed.get(StatesObjectFactory);
+    routerService = new MockRouterService();
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -150,19 +163,25 @@ describe('Statistics Tab Component', function() {
         visualizationsInfo: {}
       }));
 
+    routerService.refreshStatisticsTabEmitter = new EventEmitter();
     $scope = $rootScope.$new();
     ctrl = $componentController('statisticsTab', {
       $scope: $scope,
       AlertsService: alertsService,
       ComputeGraphService: computeGraphService,
       ExplorationStatsService: explorationStatsService,
+      RouterService: routerService,
       StateInteractionStatsService: stateInteractionStatsService,
       StatesObjectFactory: statesObjectFactory
     });
     ctrl.$onInit();
   }));
 
-  it('should evaluate controller properties after its initialization',
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
+  it('should initialize controller properties after its initialization',
     function() {
       expect(ctrl.stateStatsModalIsOpen).toBe(false);
       expect($scope.explorationHasBeenVisited).toBe(false);
@@ -170,7 +189,7 @@ describe('Statistics Tab Component', function() {
 
   it('should refresh exploration statistics when broadcasting' +
     ' refreshStatisticsTab', function() {
-    $rootScope.$broadcast('refreshStatisticsTab');
+    routerService.onRefreshStatisticsTab.emit();
 
     // Resolve promise.
     $scope.$apply();
@@ -198,8 +217,8 @@ describe('Statistics Tab Component', function() {
     expect($scope.explorationHasBeenVisited).toBe(true);
   });
 
-  it('should open state stats modal using $uibModal', function() {
-    $rootScope.$broadcast('refreshStatisticsTab');
+  it('should open state stats modal', function() {
+    routerService.onRefreshStatisticsTab.emit();
 
     // Resolve promise.
     $scope.$apply();
@@ -215,7 +234,7 @@ describe('Statistics Tab Component', function() {
 
   it('should open state stats modal and close it when clicking in stats' +
     ' graph', function() {
-    $rootScope.$broadcast('refreshStatisticsTab');
+    routerService.onRefreshStatisticsTab.emit();
 
     // Resolve promise.
     $scope.$apply();
@@ -232,7 +251,7 @@ describe('Statistics Tab Component', function() {
 
   it('should open state stats modal and dismiss it when clicking in' +
     ' stats graph', function() {
-    $rootScope.$broadcast('refreshStatisticsTab');
+    routerService.onRefreshStatisticsTab.emit();
 
     // Resolve promise.
     $scope.$apply();

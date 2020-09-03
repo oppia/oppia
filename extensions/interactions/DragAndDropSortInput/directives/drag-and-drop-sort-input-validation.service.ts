@@ -137,8 +137,8 @@ export class DragAndDropSortInputValidationService {
           }
         }
         var range = {
-          answerGroupIndex: i + 1,
-          ruleIndex: j + 1
+          answerGroupIndex: i,
+          ruleIndex: j
         };
         seenItems = [];
         areAnyItemsEmpty = false;
@@ -253,8 +253,8 @@ export class DragAndDropSortInputValidationService {
         }
 
         for (var k = 0; k < ranges.length; k++) {
-          var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1].
-            rules[ranges[k].ruleIndex - 1];
+          var earlierRule = answerGroups[ranges[k].answerGroupIndex].
+            rules[ranges[k].ruleIndex];
           if (earlierRule.type ===
             'IsEqualToOrderingWithOneItemAtIncorrectPosition' &&
             rule.type === 'IsEqualToOrdering') {
@@ -264,8 +264,8 @@ export class DragAndDropSortInputValidationService {
                 message: (
                   `Rule ${(j + 1)} from answer group ${(i + 1)} ` +
                   'will never be matched because it is made redundant by ' +
-                  `rule ${ranges[k].ruleIndex} from answer group ` +
-                  `${ranges[k].answerGroupIndex}.`)
+                  `rule ${ranges[k].ruleIndex + 1} from answer group ` +
+                  `${ranges[k].answerGroupIndex + 1}.`)
               });
             }
           }

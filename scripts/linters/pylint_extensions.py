@@ -42,7 +42,7 @@ ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
 # the punctuation and capital letter checks will be skipped for that
 # comment or docstring.
 EXCLUDED_PHRASES = [
-    'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
+    'coding:', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
 
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
@@ -582,7 +582,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
     not_needed_param_in_docstring = {'self', 'cls'}
     docstring_sections = {'Raises:', 'Returns:', 'Yields:'}
 
-    # Docstring section headers split up into arguments, returns, yields and
+    # Docstring section headers split up into arguments, returns, yields
     # and raises sections signifying that we are currently parsing the
     # corresponding section of that docstring.
     DOCSTRING_SECTION_RETURNS = 'returns'
@@ -817,7 +817,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
                         'single-space-above-yield', node=node)
             if line != b'':
                 blank_line_counter = 0
-
 
     def check_docstring_structure(self, node):
         """Checks whether the docstring has the correct structure i.e.
@@ -1605,65 +1604,6 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
             self.add_message('single-space-after-yield', node=node)
 
 
-class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
-    """Checks if there are excessive newlines between method definitions."""
-
-    __implements__ = interfaces.IRawChecker
-
-    name = 'excessive-new-lines'
-    priority = -1
-    msgs = {
-        'C0011': (
-            'Excessive new lines between function definations.',
-            'excessive-new-lines',
-            'Remove extra newlines.'
-        )
-    }
-
-    def process_module(self, node):
-        """Process a module to ensure that method definitions are not seperated
-        by more than two blank lines.
-
-        Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
-        """
-        in_multi_line_comment = False
-        multi_line_indicator = b'"""'
-        file_content = read_from_node(node)
-        file_length = len(file_content)
-        blank_line_counter = 0
-
-        for line_num in python_utils.RANGE(file_length):
-            line = file_content[line_num].strip()
-
-            # Single multi-line comment, ignore it.
-            if line.count(multi_line_indicator) == 2:
-                continue
-
-            # Flip multi-line boolean depending on whether or not we see
-            # the multi-line indicator. Possible for multiline comment to
-            # be somewhere other than the start of a line (e.g. func arg),
-            # so we can't look at start of or end of a line, which is why
-            # the case where two indicators in a single line is handled
-            # separately (i.e. one line comment with multi-line strings).
-            if multi_line_indicator in line:
-                in_multi_line_comment = not in_multi_line_comment
-
-            # Ignore anything inside a multi-line comment.
-            if in_multi_line_comment:
-                continue
-
-            if file_content[line_num] == b'\n':
-                blank_line_counter += 1
-            else:
-                blank_line_counter = 0
-
-            if line_num + 1 < file_length and blank_line_counter > 2:
-                line = file_content[line_num + 1].strip()
-                if line.startswith(b'def') or line.startswith(b'@'):
-                    self.add_message('excessive-new-lines', line=line_num + 1)
-
-
 class DivisionOperatorChecker(checkers.BaseChecker):
     """Checks if division operator is used."""
 
@@ -1693,7 +1633,7 @@ class DivisionOperatorChecker(checkers.BaseChecker):
 class SingleLineCommentChecker(checkers.BaseChecker):
     """Checks if comments follow correct style."""
 
-    __implements__ = interfaces.IRawChecker
+    __implements__ = interfaces.ITokenChecker
     name = 'incorrectly_styled_comment'
     priority = -1
     msgs = {
@@ -1713,100 +1653,105 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             'Please use capital letter to begin the content of comment.'
         )
     }
+    options = ((
+        'allowed-comment-prefixes',
+        {
+            'default': ('int', 'str', 'float', 'bool', 'v'),
+            'type': 'csv', 'metavar': '<comma separated list>',
+            'help': 'List of allowed prefixes in a comment.'
+        }
+    ),)
 
-    def process_module(self, node):
-        """Process a module to ensure that comments follow correct style.
+    def _check_space_at_beginning_of_comments(self, line, line_num):
+        """Checks if the comment starts with a space.
 
         Args:
-            node: astroid.scoped_nodes.Function. Node to access module content.
+            line: str. The current line of comment.
+            line_num: int. Line number of the current comment.
         """
+        if re.search(br'^#[^\s].*$', line) and not line.startswith(b'#!'):
+            self.add_message(
+                'no-space-at-beginning', line=line_num)
 
-        allowed_comment_prefixes = ['int', 'str', 'float', 'bool', 'v']
-        in_multi_line_comment = False
-        space_at_beginning_of_comment = True
-        multi_line_indicator = b'"""'
-        file_content = read_from_node(node)
-        file_length = len(file_content)
+    def _check_comment_starts_with_capital_letter(self, line, line_num):
+        """Checks if the comment starts with a capital letter.
+        Comments may include a lowercase character at the beginning only if they
+        start with version info or a data type or a variable name e.g.
+        "# next_line is of string type." or "# v2 version does not have
+        ExplorationStats Model." or "# int. The file size, in bytes.".
 
-        for line_num in python_utils.RANGE(file_length):
-            line = file_content[line_num].strip()
+        Args:
+            line: str. The current line of comment.
+            line_num: int. Line number of the current comment.
+        """
+        # Check if variable name is used.
+        if line[1:].startswith(b' '):
+            starts_with_underscore = '_' in line.split()[1]
+        else:
+            starts_with_underscore = '_' in line.split()[0]
 
-            # Single multi-line comment, ignore it.
-            if line.count(multi_line_indicator) == 2:
-                continue
+        # Check if allowed prefix is used.
+        allowed_prefix_is_present = any(
+            line[2:].startswith(word) for word in
+            self.config.allowed_comment_prefixes)
 
-            # Flip multi-line boolean depending on whether or not we see
-            # the multi-line indicator. Possible for multiline comment to
-            # be somewhere other than the start of a line (e.g. func arg),
-            # so we can't look at start of or end of a line, which is why
-            # the case where two indicators in a single line is handled
-            # separately (i.e. one line comment with multi-line strings).
-            if multi_line_indicator in line:
-                in_multi_line_comment = not in_multi_line_comment
+        # Check if comment contains any excluded phrase.
+        excluded_phrase_is_present = any(
+            line[1:].strip().startswith(word) for word in EXCLUDED_PHRASES)
+        if (re.search(br'^# [a-z].*', line) and not (
+                excluded_phrase_is_present or
+                starts_with_underscore or allowed_prefix_is_present)):
+            self.add_message(
+                'no-capital-letter-at-beginning', line=line_num)
 
-            # Ignore anything inside a multiline comment.
-            if in_multi_line_comment:
-                continue
+    def _check_punctuation(self, line, line_num):
+        """Checks if the comment starts with a correct punctuation.
 
-            next_line = ''
-            previous_line = ''
-            if line_num + 1 < file_length:
-                next_line = file_content[line_num + 1].strip()
-            if line_num > 0:
-                previous_line = file_content[line_num - 1].strip()
+        Args:
+            line: str. The current line of comment.
+            line_num: int. Line number of the current comment.
+        """
+        excluded_phrase_is_present_at_end = any(
+            word in line for word in EXCLUDED_PHRASES)
+        # Comments must end with the proper punctuation.
+        last_char_is_invalid = line[-1] not in (
+            ALLOWED_TERMINATING_PUNCTUATIONS)
 
-            # Ignore lines which are not comments.
-            if not line.startswith(b'#'):
-                continue
+        excluded_phrase_at_beginning_of_line = any(
+            line[1:].startswith(word) for word in EXCLUDED_PHRASES)
+        if (last_char_is_invalid and not (
+                excluded_phrase_is_present_at_end or
+                excluded_phrase_at_beginning_of_line)):
+            self.add_message('invalid-punctuation-used', line=line_num)
 
-            # Check if comment contains any excluded phrase.
-            word_is_present_in_excluded_phrases = any(
-                word in line for word in EXCLUDED_PHRASES)
+    def process_tokens(self, tokens):
+        """Custom pylint checker to ensure that comments follow correct style.
 
-            # Comments may include a lowercase character at beginning
-            # or may not use a punctuation at end if it contains a
-            # excluded phrase e.g. "# coding: utf-8".
-            if word_is_present_in_excluded_phrases:
-                continue
+        Args:
+            tokens: list(Token). Object to access all tokens of a module.
+        """
+        prev_line_num = -1
+        comments_group_list = []
+        comments_index = -1
 
-            if not next_line.startswith(b'#'):
-                # Comments must end with the proper punctuation.
-                last_char_is_invalid = line[-1] not in (
-                    ALLOWED_TERMINATING_PUNCTUATIONS)
-                if last_char_is_invalid:
-                    self.add_message(
-                        'invalid-punctuation-used', line=line_num + 1)
+        for (token_type, _, (line_num, _), _, line) in tokens:
+            if token_type == tokenize.COMMENT and line.strip().startswith('#'):
+                line = line.strip()
 
-            # Comments must start with a space.
-            if re.search(br'^#[^\s].*$', line) and not line.startswith(b'#!'):
-                space_at_beginning_of_comment = False
-                self.add_message(
-                    'no-space-at-beginning', line=line_num + 1)
+                self._check_space_at_beginning_of_comments(line, line_num)
 
-            # Comments may include a lowercase character at the beginning
-            # only if they start with version info or a data type or.
-            # a variable name e.g. "# next_line is of string type."
-            # or "# v2 version does not have ExplorationStatsModel."
-            # or "# int. The file size, in bytes.".
-            if len(line) > 1 and space_at_beginning_of_comment:
+                if prev_line_num + 1 == line_num:
+                    comments_group_list[comments_index].append((line, line_num))
+                else:
+                    comments_group_list.append([(line, line_num)])
+                    comments_index += 1
+                prev_line_num = line_num
 
-                # Check if variable name is used.
-                underscore_is_present = '_' in line.split()[1]
-                if underscore_is_present:
-                    continue
-
-                # Check if allowed prefix is used.
-                allowed_prefix_is_present = any(
-                    line[2:].startswith(word) for word in (
-                        allowed_comment_prefixes))
-                if allowed_prefix_is_present:
-                    continue
-
-            # Comments must start with a capital letter.
-            if not previous_line.startswith(b'#') and (
-                    re.search(br'^# [a-z][A-Za-z]*.*$', line)):
-                self.add_message(
-                    'no-capital-letter-at-beginning', line=line_num + 1)
+        for comments in comments_group_list:
+            # Checks first line of comment.
+            self._check_comment_starts_with_capital_letter(*comments[0])
+            # Checks last line of comment.
+            self._check_punctuation(*comments[-1])
 
 
 class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
@@ -1816,7 +1761,7 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
     (missing-docstring) for missing file overviews.
     """
 
-    __implements__ = interfaces.IRawChecker
+    __implements__ = interfaces.IAstroidChecker
     name = 'space_between_imports_and_file-overview'
     priority = -1
     msgs = {
@@ -1832,45 +1777,37 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
         )
     }
 
-    def process_module(self, node):
-        """Process a module to ensure that there is a blank line below
+    def visit_module(self, node):
+        """Visit a module to ensure that there is a blank line below
         file overview docstring.
 
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-
-        multi_line_indicator = b'"""'
-        file_content = read_from_node(node)
-        file_length = len(file_content)
-        triple_quote_counter = 0
-        empty_line_counter = 0
-        for line_num in python_utils.RANGE(file_length):
-            line = file_content[line_num].strip()
-            # Single line comment, ignore it.
-            if line.startswith(b'#'):
-                continue
-            triple_quote_counter += line.count(multi_line_indicator)
-
-            if line.endswith(b'"""') and triple_quote_counter == 2:
-                closing_line_index_of_fileoverview = line_num
+        # Check if the given node has docstring.
+        if node.doc is None:
+            return
+        line_number = node.fromlineno
+        # Iterate till the start of docstring.
+        while True:
+            line = linecache.getline(node.root().file, line_number).strip()
+            if line.startswith((b'\'', b'"')):
                 break
+            else:
+                line_number += 1
 
-        if triple_quote_counter == 2:
-            empty_line_check_index = closing_line_index_of_fileoverview
-            if empty_line_check_index < file_length - 1:
-                while file_content[empty_line_check_index + 1] == b'\n':
-                    empty_line_counter += 1
-                    empty_line_check_index += 1
-
-            if empty_line_counter > 1:
-                self.add_message(
-                    'only-a-single-empty-line-should-be-provided',
-                    line=closing_line_index_of_fileoverview + 1)
-            elif empty_line_counter == 0:
-                self.add_message(
-                    'no-empty-line-provided-below-fileoverview',
-                    line=closing_line_index_of_fileoverview + 1)
+        doc_length = len(node.doc.split(b'\n'))
+        line_number += doc_length
+        first_line_after_doc = linecache.getline(
+            node.root().file, line_number).strip()
+        second_line_after_doc = linecache.getline(
+            node.root().file, line_number + 1).strip()
+        if first_line_after_doc != b'':
+            self.add_message(
+                'no-empty-line-provided-below-fileoverview', node=node)
+        elif second_line_after_doc == b'':
+            self.add_message(
+                'only-a-single-empty-line-should-be-provided', node=node)
 
 
 class SingleLinePragmaChecker(checkers.BaseChecker):
@@ -1932,7 +1869,6 @@ def register(linter):
     linter.register_checker(RestrictedImportChecker(linter))
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
     linter.register_checker(SingleSpaceAfterYieldChecker(linter))
-    linter.register_checker(ExcessiveEmptyLinesChecker(linter))
     linter.register_checker(DivisionOperatorChecker(linter))
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))

@@ -27,12 +27,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import copy
 import functools
+import json
 import re
 import string
 
 from constants import constants
 from core.domain import change_domain
 from core.domain import customization_args_util
+from core.domain import expression_parser
 from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
@@ -400,102 +402,6 @@ class ExpVersionReference(python_utils.OBJECT):
         if not isinstance(self.version, int):
             raise utils.ValidationError(
                 'Expected version to be an int, received %s' % self.version)
-
-
-class ExplorationMathRichTextInfo(python_utils.OBJECT):
-    """Value object representing all the information related to math rich
-    text components in an exploration's HTML.
-    """
-
-    def __init__(
-            self, exp_id, math_images_generation_required,
-            latex_strings_without_svg):
-        """Initializes an ExplorationMathRichTextInfo domain object.
-
-        Args:
-            exp_id: str. ID of the exploration.
-            math_images_generation_required: bool. A boolean which indicates
-                whether the exploration requires images to be generated and
-                saved for the math rich-text components.
-            latex_strings_without_svg: list(str). list of unique LaTeX strings
-                from the math rich-text components having the 'svg_filename'
-                field as an empty string. Basically these are the LaTeX strings
-                for which we need to generate and save an SVG image.
-        """
-        self.exp_id = exp_id
-        self.math_images_generation_required = math_images_generation_required
-        self.latex_strings_without_svg = latex_strings_without_svg
-        self.validate()
-
-    def to_dict(self):
-        """Returns a dict representing this ExplorationMathRichTextInfo domain
-        object.
-
-        Returns:
-            dict. A dict, mapping all fields of ExplorationMathRichTextInfo
-            instance.
-        """
-        return {
-            'exp_id': self.exp_id,
-            'math_images_generation_required': (
-                self.math_images_generation_required),
-            'latex_strings_without_svg': self.latex_strings_without_svg
-        }
-
-    def validate(self):
-        """Validates properties of the ExplorationMathRichTextInfo.
-
-        Raises:
-            ValidationError. Attributes of the ExplorationMathRichTextInfo
-                are invalid.
-        """
-        if not isinstance(self.exp_id, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected exp_id to be a str, received %s' % self.exp_id)
-        if not isinstance(self.math_images_generation_required, bool):
-            raise utils.ValidationError(
-                'Expected math_images_generation_required to be an bool, '
-                'received %s' % self.math_images_generation_required)
-        if not isinstance(self.latex_strings_without_svg, list):
-            raise utils.ValidationError(
-                'Expected latex_strings to be a list, received %s' % (
-                    self.latex_strings_without_svg))
-        for latex_string in self.latex_strings_without_svg:
-            if not isinstance(latex_string, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected each element in the list of latex strings to be'
-                    ' a str, received %s' % latex_string)
-
-    def get_svg_size_in_bytes(self):
-        """Returns the approximate size of SVG images for the LaTeX strings in
-        bytes.
-
-        Returns:
-            int. The approximate size of Math SVGs in bytes.
-        """
-
-        # The approximate size for an SVG image for a LaTeX expression with one
-        # character is around 1000 Kb. But, when the number of characters
-        # increases the size of SVG per character reduces. For example: If the
-        # size of SVG for the character 'a' is 1000 bytes, the size of SVG for
-        # 'abc' will be less than 3000 bytes. So the below approximation to
-        # find the size will give us the maximum size.
-        size_in_bytes = 0
-        for latex_string in self.latex_strings_without_svg:
-            # The characters in special LaTeX keywords like 'frac' and 'sqrt'
-            # don't add up to the total size of SVG.
-            length_of_expression = len(latex_string)
-            size_in_bytes += (length_of_expression * 1000)
-        return size_in_bytes
-
-    def get_longest_latex_expression(self):
-        """Returns the longest LaTeX string among the LaTeX strings in the
-        object.
-
-        Returns:
-            str. The longest LaTeX string.
-        """
-        return max(self.latex_strings_without_svg, key=len)
 
 
 class ExplorationVersionsDiff(python_utils.OBJECT):
@@ -1572,7 +1478,7 @@ class Exploration(python_utils.OBJECT):
         """
         content_count = 0
         for state in self.states.values():
-            content_count += state.get_content_count()
+            content_count += state.get_translatable_content_count()
 
         return content_count
 
@@ -2337,7 +2243,8 @@ class Exploration(python_utils.OBJECT):
         """
         for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
-                state_dict, html_validation_service.convert_to_ckeditor,
+                state_dict,
+                html_validation_service.convert_to_ckeditor,
                 state_uses_old_interaction_cust_args_schema=True)
         return states_dict
 
@@ -2357,7 +2264,7 @@ class Exploration(python_utils.OBJECT):
         """
         for key, state_dict in states_dict.items():
             add_dimensions_to_image_tags = functools.partial(
-                html_validation_service.add_dimensions_to_image_tags, # pylint: disable=line-too-long
+                html_validation_service.add_dimensions_to_image_tags,
                 exp_id)
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
@@ -2634,6 +2541,129 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v34_dict_to_v35_dict(cls, states_dict):
+        """Converts from version 34 to 35. Version 35 upgrades all explorations
+        that use the MathExpressionInput interaction to use one of
+        AlgebraicExpressionInput, NumericExpressionInput, or MathEquationInput
+        interactions.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        is_valid_algebraic_expression = schema_utils.get_validator(
+            'is_valid_algebraic_expression')
+        is_valid_numeric_expression = schema_utils.get_validator(
+            'is_valid_numeric_expression')
+        is_valid_math_equation = schema_utils.get_validator(
+            'is_valid_math_equation')
+        ltt = latex2text.LatexNodes2Text()
+
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'MathExpressionInput':
+                new_answer_groups = []
+                types_of_inputs = set()
+                for group in state_dict['interaction']['answer_groups']:
+                    new_answer_group = copy.deepcopy(group)
+                    for rule_spec in new_answer_group['rule_specs']:
+                        rule_input = ltt.latex_to_text(rule_spec['inputs']['x'])
+
+                        rule_input = clean_math_expression(
+                            rule_input)
+
+                        type_of_input = TYPE_INVALID_EXPRESSION
+                        if is_valid_algebraic_expression(rule_input):
+                            type_of_input = TYPE_VALID_ALGEBRAIC_EXPRESSION
+                        elif is_valid_numeric_expression(rule_input):
+                            type_of_input = TYPE_VALID_NUMERIC_EXPRESSION
+                        elif is_valid_math_equation(rule_input):
+                            type_of_input = TYPE_VALID_MATH_EQUATION
+
+                        types_of_inputs.add(type_of_input)
+
+                        if type_of_input != TYPE_INVALID_EXPRESSION:
+                            rule_spec['inputs']['x'] = rule_input
+                            if type_of_input == TYPE_VALID_MATH_EQUATION:
+                                rule_spec['inputs']['y'] = 'both'
+                            rule_spec['rule_type'] = 'MatchesExactlyWith'
+
+                    new_answer_groups.append(new_answer_group)
+
+                if TYPE_INVALID_EXPRESSION not in types_of_inputs:
+                    # If at least one rule input is an equation, we remove
+                    # all other rule inputs that are expressions.
+                    if TYPE_VALID_MATH_EQUATION in types_of_inputs:
+                        new_interaction_id = TYPE_VALID_MATH_EQUATION
+                        for group in new_answer_groups:
+                            new_rule_specs = []
+                            for rule_spec in group['rule_specs']:
+                                if is_valid_math_equation(
+                                        rule_spec['inputs']['x']):
+                                    new_rule_specs.append(rule_spec)
+                            group['rule_specs'] = new_rule_specs
+                    # Otherwise, if at least one rule_input is an algebraic
+                    # expression, we remove all other rule inputs that are
+                    # numeric expressions.
+                    elif TYPE_VALID_ALGEBRAIC_EXPRESSION in (
+                            types_of_inputs):
+                        new_interaction_id = TYPE_VALID_ALGEBRAIC_EXPRESSION
+                        for group in new_answer_groups:
+                            new_rule_specs = []
+                            for rule_spec in group['rule_specs']:
+                                if is_valid_algebraic_expression(
+                                        rule_spec['inputs']['x']):
+                                    new_rule_specs.append(rule_spec)
+                            group['rule_specs'] = new_rule_specs
+                    else:
+                        new_interaction_id = TYPE_VALID_NUMERIC_EXPRESSION
+
+                    # Removing answer groups that have no rule specs left after
+                    # the filtration done above.
+                    new_answer_groups = [
+                        answer_group for answer_group in new_answer_groups if (
+                            len(answer_group['rule_specs']) != 0)]
+
+                    # Removing feedback keys, from voiceovers_mapping and
+                    # translations_mapping, that correspond to the rules that
+                    # got deleted.
+                    old_answer_groups_feedback_keys = [
+                        answer_group['outcome'][
+                            'feedback']['content_id'] for answer_group in (
+                                state_dict['interaction']['answer_groups'])]
+                    new_answer_groups_feedback_keys = [
+                        answer_group['outcome'][
+                            'feedback']['content_id'] for answer_group in (
+                                new_answer_groups)]
+                    content_ids_to_delete = set(
+                        old_answer_groups_feedback_keys) - set(
+                            new_answer_groups_feedback_keys)
+                    for content_id in content_ids_to_delete:
+                        if content_id in state_dict['recorded_voiceovers'][
+                                'voiceovers_mapping']:
+                            del state_dict['recorded_voiceovers'][
+                                'voiceovers_mapping'][content_id]
+                        if content_id in state_dict['written_translations'][
+                                'translations_mapping']:
+                            del state_dict['written_translations'][
+                                'translations_mapping'][content_id]
+
+                    state_dict['interaction']['id'] = new_interaction_id
+                    state_dict['interaction']['answer_groups'] = (
+                        new_answer_groups)
+                    if state_dict['interaction']['solution']:
+                        correct_answer = state_dict['interaction'][
+                            'solution']['correct_answer']['ascii']
+                        correct_answer = clean_math_expression(correct_answer)
+                        state_dict['interaction'][
+                            'solution']['correct_answer'] = correct_answer
+
+        return states_dict
+
+    @classmethod
     def _convert_states_v35_dict_to_v36_dict(cls, states_dict):
         """Converts from version 35 to 36. Version 36 adds translation support
         for interaction customization arguments. This migration converts
@@ -2643,6 +2673,14 @@ class Exploration(python_utils.OBJECT):
         customization arguments, normalizes customization arguments against
         its schema, and changes PencilCodeEditor's customization argument
         name from initial_code to initialCode.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             max_existing_content_id_index = -1
@@ -2815,11 +2853,9 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
-    def _convert_states_v34_dict_to_v35_dict(cls, states_dict):
-        """Converts from version 34 to 35. Version 35 upgrades all explorations
-        that use the MathExpressionInput interaction to use one of
-        AlgebraicExpressionInput, NumericExpressionInput, or MathEquationInput
-        interactions.
+    def _convert_states_v36_dict_to_v37_dict(cls, states_dict):
+        """Converts from version 36 to 37. Version 37 changes all rules with
+        type CaseSensitiveEquals to Equals.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -2829,111 +2865,54 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        is_valid_algebraic_expression = schema_utils.get_validator(
-            'is_valid_algebraic_expression')
-        is_valid_numeric_expression = schema_utils.get_validator(
-            'is_valid_numeric_expression')
-        is_valid_math_equation = schema_utils.get_validator(
-            'is_valid_math_equation')
-        ltt = latex2text.LatexNodes2Text()
-
         for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'MathExpressionInput':
-                new_answer_groups = []
-                types_of_inputs = set()
+            if state_dict['interaction']['id'] != 'TextInput':
+                continue
+            answer_group_dicts = state_dict['interaction']['answer_groups']
+            for answer_group_dict in answer_group_dicts:
+                for rule_spec_dict in answer_group_dict['rule_specs']:
+                    if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
+                        rule_spec_dict['rule_type'] = 'Equals'
+
+        return states_dict
+
+    @classmethod
+    def _convert_states_v37_dict_to_v38_dict(cls, states_dict):
+        """Converts from version 37 to 38. Version 38 adds a customization arg
+        for the Math interactions that allows creators to specify the letters
+        that would be displayed to the learner.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] in (
+                    'AlgebraicExpressionInput', 'MathEquationInput'):
+                variables = set()
                 for group in state_dict['interaction']['answer_groups']:
-                    new_answer_group = copy.deepcopy(group)
-                    for rule_spec in new_answer_group['rule_specs']:
-                        rule_input = ltt.latex_to_text(rule_spec['inputs']['x'])
+                    for rule_spec in group['rule_specs']:
+                        rule_input = rule_spec['inputs']['x']
+                        for variable in expression_parser.get_variables(
+                                rule_input):
+                            # Replacing greek letter names with greek symbols.
+                            if len(variable) > 1:
+                                variable = (
+                                    constants.GREEK_LETTER_NAMES_TO_SYMBOLS[
+                                        variable])
+                            variables.add(variable)
 
-                        rule_input = clean_math_expression(
-                            rule_input)
-
-                        type_of_input = TYPE_INVALID_EXPRESSION
-                        if is_valid_algebraic_expression(rule_input):
-                            type_of_input = TYPE_VALID_ALGEBRAIC_EXPRESSION
-                        elif is_valid_numeric_expression(rule_input):
-                            type_of_input = TYPE_VALID_NUMERIC_EXPRESSION
-                        elif is_valid_math_equation(rule_input):
-                            type_of_input = TYPE_VALID_MATH_EQUATION
-
-                        types_of_inputs.add(type_of_input)
-
-                        if type_of_input != TYPE_INVALID_EXPRESSION:
-                            rule_spec['inputs']['x'] = rule_input
-                            if type_of_input == TYPE_VALID_MATH_EQUATION:
-                                rule_spec['inputs']['y'] = 'both'
-                            rule_spec['rule_type'] = 'MatchesExactlyWith'
-
-                    new_answer_groups.append(new_answer_group)
-
-                if TYPE_INVALID_EXPRESSION not in types_of_inputs:
-                    # If at least one rule input is an equation, we remove
-                    # all other rule inputs that are expressions.
-                    if TYPE_VALID_MATH_EQUATION in types_of_inputs:
-                        new_interaction_id = TYPE_VALID_MATH_EQUATION
-                        for group in new_answer_groups:
-                            new_rule_specs = []
-                            for rule_spec in group['rule_specs']:
-                                if is_valid_math_equation(
-                                        rule_spec['inputs']['x']):
-                                    new_rule_specs.append(rule_spec)
-                            group['rule_specs'] = new_rule_specs
-                    # Otherwise, if at least one rule_input is an algebraic
-                    # expression, we remove all other rule inputs that are
-                    # numeric expressions.
-                    elif TYPE_VALID_ALGEBRAIC_EXPRESSION in (
-                            types_of_inputs):
-                        new_interaction_id = TYPE_VALID_ALGEBRAIC_EXPRESSION
-                        for group in new_answer_groups:
-                            new_rule_specs = []
-                            for rule_spec in group['rule_specs']:
-                                if is_valid_algebraic_expression(
-                                        rule_spec['inputs']['x']):
-                                    new_rule_specs.append(rule_spec)
-                            group['rule_specs'] = new_rule_specs
-                    else:
-                        new_interaction_id = TYPE_VALID_NUMERIC_EXPRESSION
-
-                    # Removing answer groups that have no rule specs left after
-                    # the filtration done above.
-                    new_answer_groups = [
-                        answer_group for answer_group in new_answer_groups if (
-                            len(answer_group['rule_specs']) != 0)]
-
-                    # Removing feedback keys, from voiceovers_mapping and
-                    # translations_mapping, that correspond to the rules that
-                    # got deleted.
-                    old_answer_groups_feedback_keys = [
-                        answer_group['outcome'][
-                            'feedback']['content_id'] for answer_group in (
-                                state_dict['interaction']['answer_groups'])]
-                    new_answer_groups_feedback_keys = [
-                        answer_group['outcome'][
-                            'feedback']['content_id'] for answer_group in (
-                                new_answer_groups)]
-                    content_ids_to_delete = set(
-                        old_answer_groups_feedback_keys) - set(
-                            new_answer_groups_feedback_keys)
-                    for content_id in content_ids_to_delete:
-                        if content_id in state_dict['recorded_voiceovers'][
-                                'voiceovers_mapping']:
-                            del state_dict['recorded_voiceovers'][
-                                'voiceovers_mapping'][content_id]
-                        if content_id in state_dict['written_translations'][
-                                'translations_mapping']:
-                            del state_dict['written_translations'][
-                                'translations_mapping'][content_id]
-
-                    state_dict['interaction']['id'] = new_interaction_id
-                    state_dict['interaction']['answer_groups'] = (
-                        new_answer_groups)
-                    if state_dict['interaction']['solution']:
-                        correct_answer = state_dict['interaction'][
-                            'solution']['correct_answer']['ascii']
-                        correct_answer = clean_math_expression(correct_answer)
-                        state_dict['interaction'][
-                            'solution']['correct_answer'] = correct_answer
+                customization_args = state_dict[
+                    'interaction']['customization_args']
+                customization_args.update({
+                    'customOskLetters': {
+                        'value': sorted(variables)
+                    }
+                })
 
         return states_dict
 
@@ -2972,7 +2951,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 41
+    CURRENT_EXP_SCHEMA_VERSION = 43
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3919,7 +3898,7 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
-                with schema version v39.
+                with schema version v40.
 
         Returns:
             dict. The dict representation of the Exploration domain object,
@@ -3930,6 +3909,49 @@ class Exploration(python_utils.OBJECT):
         exploration_dict['states'] = cls._convert_states_v35_dict_to_v36_dict(
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 36
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v41_dict_to_v42_dict(cls, exploration_dict):
+        """Converts a v41 exploration dict into a v42 exploration dict.
+        Adds translation support to customization args.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v41.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v42.
+        """
+        exploration_dict['schema_version'] = 42
+
+        exploration_dict['states'] = cls._convert_states_v36_dict_to_v37_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 37
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v42_dict_to_v43_dict(cls, exploration_dict):
+        """Converts a v42 exploration dict into a v43 exploration dict.
+        Adds a customization arg for the Math interactions that allows creators
+        to specify the letters that would be displayed to the learner.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v42.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v43.
+        """
+        exploration_dict['schema_version'] = 43
+
+        exploration_dict['states'] = cls._convert_states_v37_dict_to_v38_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 38
 
         return exploration_dict
 
@@ -4171,6 +4193,16 @@ class Exploration(python_utils.OBJECT):
                 exploration_dict)
             exploration_schema_version = 41
 
+        if exploration_schema_version == 41:
+            exploration_dict = cls._convert_v41_dict_to_v42_dict(
+                exploration_dict)
+            exploration_schema_version = 42
+
+        if exploration_schema_version == 42:
+            exploration_dict = cls._convert_v42_dict_to_v43_dict(
+                exploration_dict)
+            exploration_schema_version = 43
+
         return (exploration_dict, initial_schema_version)
 
     @classmethod
@@ -4275,6 +4307,63 @@ class Exploration(python_utils.OBJECT):
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.items()}
         })
+
+    def serialize(self):
+        """Returns the object serialized as a JSON string.
+
+        Returns:
+            str. JSON-encoded utf-8 string encoding all of the information
+            composing the object.
+        """
+        exploration_dict = self.to_dict()
+        # The only reason we add the version parameter separately is that our
+        # yaml encoding/decoding of this object does not handle the version
+        # parameter.
+        # NOTE: If this changes in the future (i.e the version parameter is
+        # added as part of the yaml representation of this object), all YAML
+        # files must add a version parameter to their files with the correct
+        # version of this object. The line below must then be moved to
+        # to_dict().
+        exploration_dict['version'] = self.version
+
+        if self.created_on:
+            exploration_dict['created_on'] = (
+                utils.convert_naive_datetime_to_string(self.created_on))
+
+        if self.last_updated:
+            exploration_dict['last_updated'] = (
+                utils.convert_naive_datetime_to_string(self.last_updated))
+
+        return json.dumps(exploration_dict).encode('utf-8')
+
+    @classmethod
+    def deserialize(cls, json_string):
+        """Returns an Exploration domain object decoded from a JSON string.
+
+        Args:
+            json_string: str. A JSON-encoded utf-8 string that can be
+                decoded into a dictionary representing an Exploration. Only call
+                on strings that were created using serialize().
+
+        Returns:
+            Exploration. The corresponding Exploration domain object.
+        """
+        exploration_dict = json.loads(json_string.decode('utf-8'))
+        created_on = (
+            utils.convert_string_to_naive_datetime_object(
+                exploration_dict['created_on'])
+            if 'created_on' in exploration_dict else None)
+        last_updated = (
+            utils.convert_string_to_naive_datetime_object(
+                exploration_dict['last_updated'])
+            if 'last_updated' in exploration_dict else None)
+        exploration = cls.from_dict(
+            exploration_dict,
+            exploration_version=exploration_dict['version'],
+            exploration_created_on=created_on,
+            exploration_last_updated=last_updated)
+
+        return exploration
 
     def to_player_dict(self):
         """Returns a copy of the exploration suitable for inclusion in the

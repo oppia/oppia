@@ -21,9 +21,6 @@ export class ExplorationEditorPageConstants {
   public static EXPLORATION_TITLE_INPUT_FOCUS_LABEL =
     'explorationTitleInputFocusLabel';
 
-  public static EVENT_EXPLORATION_PROPERTY_CHANGED =
-    'explorationPropertyChanged';
-
   public static PARAM_ACTION_GET = 'get';
 
   public static PARAM_ACTION_SET = 'set';

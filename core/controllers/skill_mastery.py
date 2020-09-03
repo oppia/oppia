@@ -64,7 +64,6 @@ class SkillMasteryDataHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
-
     @acl_decorators.can_access_learner_dashboard
     def put(self):
         """Handles PUT requests."""

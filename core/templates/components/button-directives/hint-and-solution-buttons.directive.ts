@@ -26,13 +26,16 @@ require(
   'hints-and-solution-manager.service.ts');
 require(
   'pages/exploration-player-page/services/hint-and-solution-modal.service.ts');
+require(
+  'pages/exploration-player-page/services/learner-answer-info.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
 require('pages/exploration-player-page/services/stats-reporting.service.ts');
 require('services/context.service.ts');
-require('services/contextual/device-info.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('hintAndSolutionButtons', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -45,18 +48,17 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
         'hint-and-solution-buttons.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$rootScope', 'HintsAndSolutionManagerService',
-        'PlayerTranscriptService', 'ExplorationPlayerStateService',
-        'HintAndSolutionModalService', 'DeviceInfoService', 'ContextService',
-        'PlayerPositionService', 'EVENT_ACTIVE_CARD_CHANGED',
-        'EVENT_NEW_CARD_OPENED', 'INTERACTION_SPECS', 'StatsReportingService',
+        'ContextService', 'ExplorationPlayerStateService',
+        'HintAndSolutionModalService', 'HintsAndSolutionManagerService',
+        'PlayerPositionService', 'PlayerTranscriptService',
+        'StatsReportingService',
         function(
-            $scope, $rootScope, HintsAndSolutionManagerService,
-            PlayerTranscriptService, ExplorationPlayerStateService,
-            HintAndSolutionModalService, DeviceInfoService, ContextService,
-            PlayerPositionService, EVENT_ACTIVE_CARD_CHANGED,
-            EVENT_NEW_CARD_OPENED, INTERACTION_SPECS, StatsReportingService) {
+            ContextService, ExplorationPlayerStateService,
+            HintAndSolutionModalService, HintsAndSolutionManagerService,
+            PlayerPositionService, PlayerTranscriptService,
+            StatsReportingService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           StatsReportingService = (
             OppiaAngularRootComponent.statsReportingService);
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
@@ -138,22 +140,33 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             ctrl.solutionModalIsActive = false;
             ctrl.currentlyOnLatestCard = true;
             resetLocalHintsArray();
-            $scope.$on(EVENT_NEW_CARD_OPENED, function(evt, newCard) {
-              ctrl.displayedCard = newCard;
-              HintsAndSolutionManagerService.reset(
-                newCard.getHints(), newCard.getSolution()
-              );
-              resetLocalHintsArray();
-            });
-            $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function(evt) {
-              var displayedCardIndex =
-                PlayerPositionService.getDisplayedCardIndex();
-              ctrl.currentlyOnLatestCard = PlayerTranscriptService.isLastCard(
-                displayedCardIndex);
-              if (ctrl.currentlyOnLatestCard) {
-                resetLocalHintsArray();
-              }
-            });
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onNewCardOpened.subscribe(
+                (newCard) => {
+                  ctrl.displayedCard = newCard;
+                  HintsAndSolutionManagerService.reset(
+                    newCard.getHints(), newCard.getSolution()
+                  );
+                  resetLocalHintsArray();
+                }
+              )
+            );
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onActiveCardChanged.subscribe(
+                () => {
+                  var displayedCardIndex =
+                    (PlayerPositionService.getDisplayedCardIndex());
+                  ctrl.currentlyOnLatestCard =
+                    (PlayerTranscriptService.isLastCard(displayedCardIndex));
+                  if (ctrl.currentlyOnLatestCard) {
+                    resetLocalHintsArray();
+                  }
+                }
+              )
+            );
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

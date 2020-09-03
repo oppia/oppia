@@ -69,7 +69,11 @@ describe('AlgebraicExpressionInputValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    customizationArgs = {};
+    customizationArgs = {
+      customOskLetters: {
+        value: ['x', 'y', 'a', 'b']
+      }
+    };
 
     isEquivalentTo = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
@@ -98,8 +102,8 @@ describe('AlgebraicExpressionInputValidationService', () => {
     // The second rule will never get matched.
     answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
 
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because it' +
@@ -123,8 +127,8 @@ describe('AlgebraicExpressionInputValidationService', () => {
     // The second rule will never get matched.
     answerGroups[0].rules = [isEquivalentTo1, isEquivalentTo2];
 
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because it' +
@@ -148,8 +152,8 @@ describe('AlgebraicExpressionInputValidationService', () => {
     // The second rule will never get matched.
     answerGroups[0].rules = [matchesExactlyWith1, matchesExactlyWith2];
 
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because it' +
@@ -160,10 +164,9 @@ describe('AlgebraicExpressionInputValidationService', () => {
   it('should not catch redundancy of rules with non-matching inputs', () => {
     answerGroups[0].rules = [matchesExactlyWith, isEquivalentTo];
 
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
-
 
     matchesExactlyWith = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
@@ -180,8 +183,56 @@ describe('AlgebraicExpressionInputValidationService', () => {
 
     answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
 
-    warnings = validatorService.getAllWarnings(currentState,
-      customizationArgs, answerGroups, goodDefaultOutcome);
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
+  });
+
+  it('should warn if there are missing custom variables', function() {
+    answerGroups[0].rules = [
+      rof.createFromBackendDict({
+        rule_type: 'IsEquivalentTo',
+        inputs: {
+          x: 'x^2 + alpha - y/b'
+        }
+      })
+    ];
+    customizationArgs = {
+      customOskLetters: {
+        value: ['y', 'a', 'b']
+      }
+    };
+
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: (
+        'The following variables are present in some of the answer groups ' +
+        'but are missing from the custom letters list: α,x')
+    }]);
+  });
+
+  it('should warn if there are too many custom variables', function() {
+    answerGroups[0].rules = [
+      rof.createFromBackendDict({
+        rule_type: 'IsEquivalentTo',
+        inputs: {
+          x: 'x+y'
+        }
+      })
+    ];
+    customizationArgs = {
+      customOskLetters: {
+        value: ['y', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+      }
+    };
+
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: AppConstants.WARNING_TYPES.ERROR,
+      message: 'The number of custom letters cannot be more than 10.'
+    }]);
   });
 });

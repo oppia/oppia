@@ -17,6 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -26,8 +27,12 @@ import { StateRecordedVoiceoversService } from
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { AlertsService } from 'services/alerts.service';
 import { UtilsService } from 'services/utils.service';
+
+import { Subscription } from 'rxjs';
 
 describe('State Translation Status Graph Component', function() {
   var $rootScope = null;
@@ -38,6 +43,9 @@ describe('State Translation Status Graph Component', function() {
   var stateRecordedVoiceoversService = null;
   var stateWrittenTranslationsService = null;
   var translationStatusService = null;
+  var testSubscriptions: Subscription;
+  const refreshStateTranslationSpy = jasmine.createSpy(
+    'refreshStateTranslationSpy');
 
   var stateName = 'State1';
   var state = {
@@ -47,6 +55,8 @@ describe('State Translation Status Graph Component', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AlertsService', TestBed.get(AlertsService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value(
       'StateRecordedVoiceoversService',
       TestBed.get(StateRecordedVoiceoversService));
@@ -62,6 +72,17 @@ describe('State Translation Status Graph Component', function() {
       StateRecordedVoiceoversService);
     stateWrittenTranslationsService = TestBed.get(
       StateWrittenTranslationsService);
+  });
+
+  beforeEach(() => {
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(
+      stateEditorService.onRefreshStateTranslation.subscribe(
+        refreshStateTranslationSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
   });
 
   describe('when translation tab is not busy', function() {
@@ -115,13 +136,12 @@ describe('State Translation Status Graph Component', function() {
 
     it('should set new active state name and refresh state when clicking' +
       ' on state in map', function() {
-      var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
       spyOn(stateEditorService, 'setActiveStateName');
       $scope.onClickStateInMap('State2');
 
       expect(stateEditorService.setActiveStateName).toHaveBeenCalledWith(
         'State2');
-      expect(broadcastSpy).toHaveBeenCalledWith('refreshStateTranslation');
+      expect(refreshStateTranslationSpy).toHaveBeenCalled();
     });
   });
 
@@ -144,13 +164,29 @@ describe('State Translation Status Graph Component', function() {
       });
     }));
 
-    it('should show translation tab busy modal', function() {
-      var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
-      spyOn(stateEditorService, 'setActiveStateName');
-      $scope.onClickStateInMap('State2');
+    var showTranslationTabBusyModalspy = null;
+    var testSubscriptions = null;
 
-      expect(stateEditorService.setActiveStateName).not.toHaveBeenCalled();
-      expect(broadcastSpy).toHaveBeenCalledWith('showTranslationTabBusyModal');
+    beforeEach(() => {
+      showTranslationTabBusyModalspy = jasmine.createSpy(
+        'showTranslationTabBusyModal');
+      testSubscriptions = new Subscription();
+      testSubscriptions.add(
+        stateEditorService.onShowTranslationTabBusyModal.subscribe(
+          showTranslationTabBusyModalspy));
     });
+
+    afterEach(() => {
+      testSubscriptions.unsubscribe();
+    });
+
+    it('should show translation tab busy modal when clicking on state in map',
+      function() {
+        spyOn(stateEditorService, 'setActiveStateName');
+        $scope.onClickStateInMap('State2');
+
+        expect(stateEditorService.setActiveStateName).not.toHaveBeenCalled();
+        expect(showTranslationTabBusyModalspy).toHaveBeenCalled();
+      });
   });
 });

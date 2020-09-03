@@ -198,9 +198,7 @@ describe('TrainingDataService', function() {
           answer_groups: [{
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {
-                x: 'Test'
-              }
+              inputs: {x: 'Test'}
             }],
             outcome: {
               dest: 'State',

@@ -20,6 +20,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+const constants = require('constants.ts');
+
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 // This makes the UrlParamsType like a dict whose keys and values both are
@@ -100,29 +102,68 @@ export class UrlService {
   }
 
   /**
-   * This function is used to find the topic name
+   * This function is used to find the topic URL fragment
    * from the learner's url.
-   * @return {string} the topic name.
+   * @return {string} the topic URL fragment.
    * @throws Will throw an error if the url is invalid.
    */
-  getTopicNameFromLearnerUrl(): string {
+  getTopicUrlFragmentFromLearnerUrl(): string {
     let pathname = this.getPathname();
-    if (pathname.match(/\/(story|topic|subtopic|practice_session)/g)) {
-      return decodeURIComponent(pathname.split('/')[2]);
+    if (pathname.startsWith('/learn')) {
+      return decodeURIComponent(pathname.split('/')[3]);
     }
     throw new Error('Invalid URL for topic');
   }
 
+  getStoryUrlFragmentFromLearnerUrl(): string {
+    let pathname = this.getPathname();
+    // The following segment is for getting the fragment from the new learner
+    // pages.
+    if (
+      pathname.startsWith('/learn') &&
+      pathname.match(/\/story\/|\/review-test\//g)) {
+      return decodeURIComponent(pathname.split('/')[5]);
+    }
+    // The following section is for getting the URL fragment from the
+    // exploration player.
+    if (pathname.startsWith('/explore')) {
+      if (
+        this.getUrlParams().hasOwnProperty('story_url_fragment') &&
+        this.getUrlParams().story_url_fragment.match(
+          constants.VALID_URL_FRAGMENT_REGEX)) {
+        return this.getUrlParams().story_url_fragment;
+      }
+    }
+    // Shouldn't throw an error, since this is called whenever an exploration
+    // starts, to check if it is linked to a story.
+    return null;
+  }
+
+  getSubtopicUrlFragmentFromLearnerUrl(): string {
+    let pathname = this.getPathname();
+    if (pathname.startsWith('/learn') && pathname.includes('/revision')) {
+      return decodeURIComponent(pathname.split('/')[5]);
+    }
+    throw new Error('Invalid URL for subtopic');
+  }
+
+  getClassroomUrlFragmentFromLearnerUrl(): string {
+    let pathname = this.getPathname();
+    if (pathname.startsWith('/learn')) {
+      return decodeURIComponent(pathname.split('/')[2]);
+    }
+    throw new Error('Invalid URL for classroom');
+  }
 
   /**
-   * This function is used to find the subtopic name from the learner's url.
+   * This function is used to find the subtopic name from the learner's URL.
    * @return {string} the subtopic name.
    * @throws Will throw an error if the url for practice session is invalid.
    */
   getSelectedSubtopicsFromUrl(): string {
     let pathname = this.getPathname();
     let queryStrings = this.getCurrentQueryString().split('=');
-    if (pathname.match(/\/practice_session/g) && queryStrings.length === 2) {
+    if (pathname.match(/\/practice/g) && queryStrings.length === 2) {
       return decodeURIComponent(queryStrings[1]);
     }
     throw new Error('Invalid URL for practice session');
@@ -130,15 +171,16 @@ export class UrlService {
 
 
   /**
-   * This function is used to find the classroom name from the learner's url.
-   * @return {string} the classroom name.
-   * @throws Will throw an error if the url is invalid.
+   * This function is used to find the classroom URL fragment from the learner's
+   * URL.
+   * @return {string} the classroom URL fragment.
+   * @throws Will throw an error if the URL is invalid.
    */
-  getClassroomNameFromUrl(): string {
+  getClassroomUrlFragmentFromUrl(): string {
     let pathname = this.getPathname();
     let argumentsArray = pathname.split('/');
-    if (argumentsArray.length === 2) {
-      return decodeURIComponent(pathname.split('/')[1]);
+    if (pathname.startsWith('/learn') && argumentsArray.length === 3) {
+      return decodeURIComponent(pathname.split('/')[2]);
     }
     throw new Error('Invalid URL for classroom');
   }
@@ -151,8 +193,8 @@ export class UrlService {
   getSubtopicIdFromUrl(): string {
     let pathname = this.getPathname();
     let argumentsArray = pathname.split('/');
-    if (pathname.match(/\/subtopic/g) && argumentsArray.length === 4) {
-      return decodeURIComponent(argumentsArray[3]);
+    if (pathname.match(/\/revision/g) && argumentsArray.length === 6) {
+      return decodeURIComponent(argumentsArray[5]);
     }
     throw new Error('Invalid URL for subtopic');
   }
@@ -164,8 +206,10 @@ export class UrlService {
    */
   getStoryIdFromUrl(): string {
     let pathname = this.getPathname();
-    if (pathname.match(/\/(story_editor|review_test)\/(\w|-){12}/g)) {
-      return pathname.split('/')[2];
+    var matchedPath = pathname.match(
+      /\/(story_editor|review-test)\/(\w|-){12}/g);
+    if (matchedPath) {
+      return matchedPath[0].split('/')[2];
     }
     throw new Error('Invalid story id url');
   }
@@ -178,26 +222,9 @@ export class UrlService {
   getStoryIdFromViewerUrl(): string {
     let pathname = this.getPathname();
     if (pathname.match(/\/story\/(\w|-){12}/g)) {
-      return pathname.split('/')[2];
+      return pathname.split('/')[5];
     }
     throw new Error('Invalid story id url');
-  }
-
-
-  /**
-   * This function is used to find the story id from the player.
-   * @return {string} the story id if the id exists.
-   */
-  getStoryIdInPlayer(): string | null {
-    let query = this.getCurrentQueryString();
-    let queryItems = query.split('&');
-    for (let i = 0; i < queryItems.length; i++) {
-      let part = queryItems[i];
-      if (part.match(/\?story_id=((\w|-){12})/g)) {
-        return part.split('=')[1];
-      }
-    }
-    return null;
   }
 
   /**
@@ -217,9 +244,9 @@ export class UrlService {
   /**
    * This function is used to find the query values as a list.
    * @param {string} fieldName - the name of the field.
-   * @return {Array<string>} the list of query field values.
+   * @return {string[]} the list of query field values.
    */
-  getQueryFieldValuesAsList(fieldName: string): Array<string> {
+  getQueryFieldValuesAsList(fieldName: string): string[] {
     let fieldValues = [];
     if (this.getCurrentQueryString().indexOf('?') > -1) {
       // Each queryItem return one field-value pair in the url.
@@ -244,7 +271,7 @@ export class UrlService {
    * @param {string} url - the url.
    * @param {string} fieldName - the field name.
    * @param {string} fieldValue - the field value.
-   * @return {Array<string>} the list of query field values.
+   * @return {string[]} the list of query field values.
    */
   addField(url: string, fieldName: string, fieldValue: string): string {
     let encodedFieldValue = encodeURIComponent(fieldValue);

@@ -78,10 +78,8 @@ describe('Question Validation Service', function() {
               refresher_exploration_id: null
             },
             rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
+              rule_type: 'Equals',
+              inputs: {x: 10}
             }],
             tagged_skill_misconception_id: null
           }, {
@@ -96,10 +94,8 @@ describe('Question Validation Service', function() {
               refresher_exploration_id: null
             },
             rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
+              rule_type: 'Equals',
+              inputs: {x: 10}
             }],
             tagged_skill_misconception_id: 'abc-1'
           }],

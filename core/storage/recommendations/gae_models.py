@@ -37,7 +37,7 @@ class ExplorationRecommendationsModel(
 
     # Ids of recommended explorations.
     recommended_exploration_ids = ndb.StringProperty(
-        repeated=True, indexed=False)
+        repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():

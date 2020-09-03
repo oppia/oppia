@@ -43,9 +43,11 @@ angular.module('oppia').factory('TopicUpdateService', [
   'SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME', 'SUBTOPIC_PROPERTY_TITLE',
   'SUBTOPIC_PROPERTY_URL_FRAGMENT',
   'TOPIC_PROPERTY_ABBREVIATED_NAME', 'TOPIC_PROPERTY_DESCRIPTION',
-  'TOPIC_PROPERTY_LANGUAGE_CODE', 'TOPIC_PROPERTY_NAME',
+  'TOPIC_PROPERTY_LANGUAGE_CODE', 'TOPIC_PROPERTY_META_TAG_CONTENT',
+  'TOPIC_PROPERTY_NAME', 'TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED',
   'TOPIC_PROPERTY_THUMBNAIL_BG_COLOR',
-  'TOPIC_PROPERTY_THUMBNAIL_FILENAME', function(
+  'TOPIC_PROPERTY_THUMBNAIL_FILENAME',
+  'TOPIC_PROPERTY_URL_FRAGMENT', function(
       ChangeObjectFactory, UndoRedoService,
       CMD_ADD_SUBTOPIC, CMD_DELETE_ADDITIONAL_STORY,
       CMD_DELETE_CANONICAL_STORY, CMD_DELETE_SUBTOPIC,
@@ -61,9 +63,11 @@ angular.module('oppia').factory('TopicUpdateService', [
       SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME, SUBTOPIC_PROPERTY_TITLE,
       SUBTOPIC_PROPERTY_URL_FRAGMENT,
       TOPIC_PROPERTY_ABBREVIATED_NAME, TOPIC_PROPERTY_DESCRIPTION,
-      TOPIC_PROPERTY_LANGUAGE_CODE, TOPIC_PROPERTY_NAME,
+      TOPIC_PROPERTY_LANGUAGE_CODE, TOPIC_PROPERTY_META_TAG_CONTENT,
+      TOPIC_PROPERTY_NAME, TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED,
       TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
-      TOPIC_PROPERTY_THUMBNAIL_FILENAME) {
+      TOPIC_PROPERTY_THUMBNAIL_FILENAME,
+      TOPIC_PROPERTY_URL_FRAGMENT) {
     // Creates a change using an apply function, reverse function, a change
     // command and related parameters. The change is applied to a given
     // topic.
@@ -156,6 +160,67 @@ angular.module('oppia').factory('TopicUpdateService', [
           }, function(changeDict, topic) {
             // ---- Undo ----
             topic.setAbbreviatedName(oldAbbreviatedName);
+          });
+      },
+
+      /**
+       * Changes the meta tag content of a topic and records the change in the
+       * undo/redo service.
+       */
+      setMetaTagContent: function(topic, metaTagContent) {
+        var oldMetaTagContent = angular.copy(topic.getMetaTagContent());
+        _applyTopicPropertyChange(
+          topic, TOPIC_PROPERTY_META_TAG_CONTENT,
+          metaTagContent, oldMetaTagContent,
+          function(changeDict, topic) {
+            // ---- Apply ----
+            var metaTagContent = _getNewPropertyValueFromChangeDict(
+              changeDict);
+            topic.setMetaTagContent(metaTagContent);
+          }, function(changeDict, topic) {
+            // ---- Undo ----
+            topic.setMetaTagContent(oldMetaTagContent);
+          });
+      },
+
+      /**
+       * Changes the 'practice tab is displayed' property of a topic and
+       * records the change in the undo/redo service.
+       */
+      setPracticeTabIsDisplayed: function(topic, practiceTabIsDisplayed) {
+        var oldPracticeTabIsDisplayed = angular.copy(
+          topic.getPracticeTabIsDisplayed());
+        _applyTopicPropertyChange(
+          topic, TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED,
+          practiceTabIsDisplayed, oldPracticeTabIsDisplayed,
+          function(changeDict, topic) {
+            // ---- Apply ----
+            var practiceTabIsDisplayed = _getNewPropertyValueFromChangeDict(
+              changeDict);
+            topic.setPracticeTabIsDisplayed(practiceTabIsDisplayed);
+          }, function(changeDict, topic) {
+            // ---- Undo ----
+            topic.setPracticeTabIsDisplayed(oldPracticeTabIsDisplayed);
+          });
+      },
+
+      /**
+       * Changes the url fragment of a topic and records the change in the
+       * undo/redo service.
+       */
+      setTopicUrlFragment: function(topic, urlFragment) {
+        var oldUrlFragment = angular.copy(topic.getUrlFragment());
+        _applyTopicPropertyChange(
+          topic, TOPIC_PROPERTY_URL_FRAGMENT,
+          urlFragment, oldUrlFragment,
+          function(changeDict, topic) {
+            // ---- Apply ----
+            var newUrlFragment = (
+              _getNewPropertyValueFromChangeDict(changeDict));
+            topic.setUrlFragment(newUrlFragment);
+          }, function(changeDict, topic) {
+            // ---- Undo ----
+            topic.setUrlFragment(oldUrlFragment);
           });
       },
 
@@ -548,8 +613,8 @@ angular.module('oppia').factory('TopicUpdateService', [
           });
       },
 
-      setSubtopicPageContentsAudio: function(subtopicPage, subtopicId,
-          newRecordedVoiceovers) {
+      setSubtopicPageContentsAudio: function(
+          subtopicPage, subtopicId, newRecordedVoiceovers) {
         var oldRecordedVoiceovers = angular.copy(
           subtopicPage.getPageContents().getRecordedVoiceovers());
         _applySubtopicPagePropertyChange(

@@ -45,6 +45,8 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-skills-list-item'));
   var topicNameField = element(by.css(
     '.protractor-test-new-topic-name-field'));
+  var topicUrlFragmentField = element(by.css(
+    '.protractor-test-new-topic-url-fragment-field'));
   var topicDescriptionField = element(by.css(
     '.protractor-test-new-topic-description-field'));
   var topicFilterKeywordField = element(by.css(
@@ -137,19 +139,19 @@ var TopicsAndSkillsDashboardPage = function() {
   // Only use this if the skills count is not zero. This is supposed to be used
   // for actions being performed on the skills like deleting, assigning etc.
   this.waitForSkillsToLoad = async function() {
-    await waitFor.visibilityOf(skillsTable,
-      'Skills table taking too long to appear.');
-    await waitFor.invisibilityOf(noSkillsPresentMessage,
-      'Skills list taking too long to appear.');
+    await waitFor.visibilityOf(
+      skillsTable, 'Skills table taking too long to appear.');
+    await waitFor.invisibilityOf(
+      noSkillsPresentMessage, 'Skills list taking too long to appear.');
   };
 
   // Only use this if the topics count is not zero. This is supposed to be used
   // for actions being performed on the topics like editing, deleting etc.
   this.waitForTopicsToLoad = async function() {
-    await waitFor.visibilityOf(topicsTable,
-      'Topics table taking too long to appear');
-    await waitFor.visibilityOf(topicsListItems.first(),
-      'Topics list taking too long to appear');
+    await waitFor.visibilityOf(
+      topicsTable, 'Topics table taking too long to appear');
+    await waitFor.visibilityOf(
+      topicsListItems.first(), 'Topics list taking too long to appear');
   };
 
   this.mergeSkillWithIndexToSkillWithIndex = async function(
@@ -219,7 +221,7 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.createTopic = async function(
-      topicName, description, shouldCloseTopicEditor) {
+      topicName, topicUrlFragment, description, shouldCloseTopicEditor) {
     var initialHandles = [];
     var handles = await browser.getAllWindowHandles();
     initialHandles = handles;
@@ -232,6 +234,7 @@ var TopicsAndSkillsDashboardPage = function() {
       topicNameField,
       'Create Topic modal takes too long to appear.');
     await topicNameField.sendKeys(topicName);
+    await topicUrlFragmentField.sendKeys(topicUrlFragment);
     await topicDescriptionField.sendKeys(description);
     await workflow.submitImage(
       topicThumbnailButton, thumbnailContainer,
@@ -358,8 +361,9 @@ var TopicsAndSkillsDashboardPage = function() {
     var editor = element(by.css('.protractor-test-concept-card-text'));
     await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
-
-    await (await browser.switchTo().activeElement()).sendKeys(reviewMaterial);
+    var skillReviewMaterialInput = editor.element(by.css('.oppia-rte'));
+    await action.click('Skill review material input', skillReviewMaterialInput);
+    await skillReviewMaterialInput.sendKeys(reviewMaterial);
 
     await waitFor.elementToBeClickable(
       confirmSkillCreationButton,

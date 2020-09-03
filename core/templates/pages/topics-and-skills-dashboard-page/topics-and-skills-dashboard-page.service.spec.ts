@@ -56,6 +56,7 @@ describe('Topic and Skill dashboard page service', () => {
       description: 'Alpha description',
       subtopic_count: 0,
       language_code: 'en',
+      url_fragment: 'alpha',
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA'
     });
@@ -75,6 +76,7 @@ describe('Topic and Skill dashboard page service', () => {
       description: 'Beta description',
       subtopic_count: 0,
       language_code: 'en',
+      url_fragment: 'beta',
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA'
     });
@@ -94,6 +96,7 @@ describe('Topic and Skill dashboard page service', () => {
       description: 'Gamma description',
       subtopic_count: 0,
       language_code: 'en',
+      url_fragment: 'gamma',
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA'
     });

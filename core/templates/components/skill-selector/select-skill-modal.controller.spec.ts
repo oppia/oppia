@@ -20,7 +20,11 @@ describe('Select Skill Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var allowSkillsFromOtherTopics = true;
-  var categorizedSkills = {};
+  var categorizedSkills = {
+    'Dummy Topic': {
+      Subtopic1: [{id: '4'}]
+    }
+  };
   var skillsInSameTopicCount = 3;
   var sortedSkillSummaries = [{
     id: '1'
@@ -45,20 +49,22 @@ describe('Select Skill Modal Controller', function() {
       categorizedSkills: categorizedSkills,
       skillsInSameTopicCount: skillsInSameTopicCount,
       sortedSkillSummaries: sortedSkillSummaries,
-      untriagedSkillSummaries: []
+      skillSummaries: [{id: '9'}],
+      untriagedSkillSummaries: [{id: '10'}]
     });
   }));
 
-  it('should check properties set after controller is initialized', function() {
-    expect($scope.skillSummaries).toEqual(sortedSkillSummaries);
-    expect($scope.categorizedSkills).toEqual(categorizedSkills);
-    expect($scope.allowSkillsFromOtherTopics).toEqual(
-      allowSkillsFromOtherTopics);
-    expect($scope.selectedSkillId).toBe(null);
-    expect($scope.countOfSkillsToPrioritize).toBe(skillsInSameTopicCount);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.skillSummaries).toEqual(sortedSkillSummaries);
+      expect($scope.categorizedSkills).toEqual(categorizedSkills);
+      expect($scope.allowSkillsFromOtherTopics).toEqual(
+        allowSkillsFromOtherTopics);
+      expect($scope.selectedSkillId).toBe(null);
+      expect($scope.countOfSkillsToPrioritize).toBe(skillsInSameTopicCount);
+    });
 
-  it('should save skill with its id', function() {
+  it('should save skill with its id when closing modal', function() {
     $scope.selectedSkillId = '2';
     $scope.save();
 

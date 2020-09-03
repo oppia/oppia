@@ -52,6 +52,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         })]
         self.save_new_topic(
             self.TOPIC_ID, self.user_id, name='Name',
+            abbreviated_name='name', url_fragment='name-one',
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
@@ -106,6 +107,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             id='topic_id',
             name='name',
             abbreviated_name='abbrev',
+            url_fragment='name-two',
             canonical_name='canonical_name',
             description='description',
             next_subtopic_id=1,
@@ -130,6 +132,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             name='name 2',
             description='description 2',
             abbreviated_name='abbrev',
+            url_fragment='name-three',
             canonical_name='canonical_name_2',
             next_subtopic_id=1,
             language_code='en',
@@ -156,6 +159,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.user_id, name='topic name',
+            abbreviated_name='topic-name', url_fragment='topic-name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -191,6 +195,17 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         topics = topic_fetchers.get_all_topics_with_skills()
         self.assertEqual(topics[0].to_dict(), expected_topic)
         self.assertEqual(len(topics), 1)
+
+    def test_get_all_topic_rights_of_user(self):
+        topic_services.assign_role(
+            self.user_admin, self.user_a,
+            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
+
+        topic_rights = topic_services.get_topic_rights_with_user(self.user_id_a)
+
+        self.assertEqual(len(topic_rights), 1)
+        self.assertEqual(topic_rights[0].id, self.TOPIC_ID)
+        self.assertEqual(topic_rights[0].manager_ids, [self.user_id_a])
 
     def test_commit_log_entry(self):
         topic_commit_log_entry = (

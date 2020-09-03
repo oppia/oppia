@@ -30,6 +30,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import numbers
 import re
 
+from constants import constants
 from core.domain import expression_parser
 from core.domain import html_cleaner
 import python_utils
@@ -108,12 +109,20 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
             normalized_obj[key] = normalize_against_schema(
                 obj[key], prop[SCHEMA_KEY_SCHEMA])
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_FLOAT:
-        obj = float(obj)
+        try:
+            obj = float(obj)
+        except Exception:
+            raise Exception('Could not convert %s to float: %s' % (
+                type(obj).__name__, obj))
         assert isinstance(obj, numbers.Real), (
             'Expected float, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_INT:
-        obj = int(obj)
+        try:
+            obj = int(obj)
+        except Exception:
+            raise Exception('Could not convert %s to int: %s' % (
+                type(obj).__name__, obj))
         assert isinstance(obj, numbers.Integral), (
             'Expected int, received %s' % obj)
         assert isinstance(obj, int), ('Expected int, received %s' % obj)
@@ -365,6 +374,19 @@ class _Validators(python_utils.OBJECT):
             bool. Whether the given object has no duplicates.
         """
         return sorted(list(set(obj))) == sorted(obj)
+
+    @staticmethod
+    def is_url_fragment(obj):
+        """Returns True iff the given object (a string) is a valid
+        URL fragment.
+
+        Args:
+            obj: str. A string.
+
+        Returns:
+            bool. Whether the given object is a valid URL fragment.
+        """
+        return re.match(constants.VALID_URL_FRAGMENT_REGEX, obj)
 
     @staticmethod
     def is_at_least(obj, min_value):

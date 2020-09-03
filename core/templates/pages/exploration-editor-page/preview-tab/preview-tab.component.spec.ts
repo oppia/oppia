@@ -19,6 +19,10 @@
 import { TestBed } from '@angular/core/testing';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
+import { EventEmitter } from '@angular/core';
+
+// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Preview Tab Component', function() {
   var ctrl = null;
@@ -32,12 +36,15 @@ describe('Preview Tab Component', function() {
   var explorationEngineService = null;
   var explorationInitStateNameService = null;
   var explorationFeaturesService = null;
+  var explorationPlayerStateService = null;
   var learnerParamsService = null;
   var numberAttemptsService = null;
   var routerService = null;
   var stateEditorService = null;
   var paramChangeObjectFactory = null;
   var parameterMetadataService = null;
+  var mockUpdateActiveStateIfInEditorEventEmitter = new EventEmitter();
+  var mockPlayerStateChangeEventEmitter = new EventEmitter();
 
   var explorationId = 'exp1';
   var stateName = 'State1';
@@ -56,7 +63,12 @@ describe('Preview Tab Component', function() {
     paramName: 'paramName2'
   }];
 
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    const ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(function() {
     paramChangeObjectFactory = TestBed.get(ParamChangeObjectFactory);
@@ -81,18 +93,26 @@ describe('Preview Tab Component', function() {
         'EditableExplorationBackendApiService');
       explorationEngineService = $injector.get('ExplorationEngineService');
       explorationFeaturesService = $injector.get('ExplorationFeaturesService');
+      explorationPlayerStateService = $injector.get(
+        'ExplorationPlayerStateService');
       learnerParamsService = $injector.get('LearnerParamsService');
       parameterMetadataService = $injector.get('ParameterMetadataService');
       routerService = $injector.get('RouterService');
       stateEditorService = $injector.get('StateEditorService');
-
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         stateName);
       spyOn(parameterMetadataService, 'getUnsetParametersInfo').and
         .returnValue(parameters);
       spyOn(editableExplorationBackendApiService, 'fetchApplyDraftExploration')
         .and.returnValue($q.resolve(exploration));
-
+      spyOnProperty(
+        explorationEngineService,
+        'onUpdateActiveStateIfInEditor').and.returnValue(
+        mockUpdateActiveStateIfInEditorEventEmitter);
+      spyOnProperty(
+        explorationPlayerStateService,
+        'onPlayerStateChange').and.returnValue(
+        mockPlayerStateChangeEventEmitter);
       $scope = $rootScope.$new();
       ctrl = $componentController('previewTab', {
         $scope: $scope,
@@ -101,18 +121,24 @@ describe('Preview Tab Component', function() {
       ctrl.$onInit();
     }));
 
-    it('should evaluate ctrl properties after its initialization', function() {
-      // Get data from exploration data service.
-      $scope.$apply();
-
-      expect(ctrl.isExplorationPopulated).toBe(false);
-      expect(ctrl.previewWarning).toBe('Preview started from \"State1\"');
+    afterEach(() => {
+      ctrl.$onDestroy();
     });
+
+    it('should initialize controller properties after its initialization',
+      function() {
+        // Get data from exploration data service.
+        $scope.$apply();
+
+        expect(ctrl.isExplorationPopulated).toBe(false);
+        expect(ctrl.previewWarning).toBe('Preview started from \"State1\"');
+      });
 
     it('should set active state name when broadcasting' +
       ' updateActiveStateIfInEditor', function() {
       spyOn(stateEditorService, 'setActiveStateName');
-      $rootScope.$broadcast('updateActiveStateIfInEditor', 'State2');
+
+      mockUpdateActiveStateIfInEditorEventEmitter.emit('State2');
 
       expect(stateEditorService.setActiveStateName).toHaveBeenCalledWith(
         'State2');
@@ -123,14 +149,14 @@ describe('Preview Tab Component', function() {
         spyOn(learnerParamsService, 'getAllParams').and.returnValue({
           foo: []
         });
-        $rootScope.$broadcast('playerStateChange');
+        mockPlayerStateChangeEventEmitter.emit();
 
         expect(ctrl.allParams).toEqual({
           foo: []
         });
       });
 
-    it('should evaluate when parameter summary is shown', function() {
+    it('should evaluate whenever parameter summary is shown', function() {
       spyOn(explorationFeaturesService, 'areParametersEnabled')
         .and.returnValue(true);
       expect(ctrl.showParameterSummary()).toBe(false);
@@ -138,12 +164,11 @@ describe('Preview Tab Component', function() {
       spyOn(learnerParamsService, 'getAllParams').and.returnValue({
         foo: []
       });
-
-      $rootScope.$broadcast('playerStateChange');
+      mockPlayerStateChangeEventEmitter.emit();
       expect(ctrl.showParameterSummary()).toBe(true);
     });
 
-    it('should open set params modal with $uibModal', function() {
+    it('should open set params modal', function() {
       spyOn($uibModal, 'open').and.callThrough();
 
       // Get data from exploration data service.
@@ -226,13 +251,14 @@ describe('Preview Tab Component', function() {
       ctrl.$onInit();
     }));
 
-    it('should evaluate ctrl properties after its initialization', function() {
-      // Get data from exploration data service.
-      $scope.$apply();
+    it('should initialize controller properties after its initialization',
+      function() {
+        // Get data from exploration data service.
+        $scope.$apply();
 
-      expect(ctrl.isExplorationPopulated).toBe(false);
-      expect(ctrl.previewWarning).toBe('');
-    });
+        expect(ctrl.isExplorationPopulated).toBe(false);
+        expect(ctrl.previewWarning).toBe('');
+      });
 
     it('should load preview state when closing set params modal', function() {
       spyOn($uibModal, 'open');
@@ -249,7 +275,7 @@ describe('Preview Tab Component', function() {
       expect(ctrl.isExplorationPopulated).toBe(true);
     });
 
-    it('should reset preview', function() {
+    it('should reset preview settings', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
       });

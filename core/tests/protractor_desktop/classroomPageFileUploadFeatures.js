@@ -45,7 +45,7 @@ describe('Classroom page functionality', function() {
     await users.createAndLoginAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
     await adminPage.editConfigProperty(
-      'Show classroom components.',
+      'Make classroom page accessible.',
       'Boolean', async function(elem) {
         await elem.setValue(true);
       });
@@ -59,9 +59,10 @@ describe('Classroom page functionality', function() {
     async function() {
       var handle = await browser.getWindowHandle();
       await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.createTopic('Topic 1',
-        'Description', false);
+      await topicsAndSkillsDashboardPage.createTopic(
+        'Topic 1', 'topic-one', 'Description', false);
       await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
+      await topicEditorPage.updateMetaTagContent('topic meta tag');
       await topicEditorPage.saveTopic('Added thumbnail.');
       var url = await browser.getCurrentUrl();
       var topicId = url.split('/')[4].slice(0, -1);
@@ -71,14 +72,34 @@ describe('Classroom page functionality', function() {
         'List',
         async function(elem) {
           elem = await elem.editItem(0, 'Dictionary');
-          elem = await elem.editEntry(3, 'List');
+          elem = await elem.editEntry(4, 'List');
           elem = await elem.addItem('Unicode');
           await elem.setValue(topicId);
         });
       await classroomPage.get('math');
       await classroomPage.expectNumberOfTopicsToBe(0);
       await topicsAndSkillsDashboardPage.get();
+      (
+        await
+        topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+          'Skill 1', 'Concept card explanation', false));
+      await topicsAndSkillsDashboardPage.get();
+      await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+      await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+      await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+      await topicEditorPage.addSubtopic(
+        'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
+        'Subtopic content');
+      await topicEditorPage.saveTopic('Added subtopic.');
+
+      await topicEditorPage.navigateToTopicEditorTab();
+      await topicEditorPage.navigateToReassignModal();
+
+      await topicEditorPage.dragSkillToSubtopic('Skill 1', 0);
+      await topicEditorPage.saveRearrangedSkills();
+      await topicEditorPage.saveTopic('Added skill to subtopic.');
+
       await topicEditorPage.publishTopic();
       await classroomPage.get('math');
       await classroomPage.expectNumberOfTopicsToBe(1);

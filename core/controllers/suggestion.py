@@ -19,8 +19,13 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import fs_services
+from core.domain import html_cleaner
+from core.domain import image_validation_services
 from core.domain import opportunity_services
 from core.domain import skill_fetchers
 from core.domain import suggestion_services
@@ -84,7 +89,7 @@ class SuggestionHandler(base.BaseHandler):
     @acl_decorators.can_suggest_changes
     def post(self):
         try:
-            suggestion_services.create_suggestion(
+            suggestion = suggestion_services.create_suggestion(
                 self.payload.get('suggestion_type'),
                 self.payload.get('target_type'), self.payload.get('target_id'),
                 self.payload.get('target_version_at_submission'),
@@ -92,6 +97,41 @@ class SuggestionHandler(base.BaseHandler):
                 self.payload.get('description'))
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
+
+        # TODO(#10513) : Find a way to save the images before the suggestion is
+        # created.
+        html_list = suggestion.get_all_html_content_strings()
+        filenames = (
+            html_cleaner.get_image_filenames_from_html_strings(html_list))
+        if suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
+            filenames = []
+        suggestion_image_context = (
+            fs_services.get_image_context_for_suggestion_target(
+                suggestion.target_type))
+
+        for filename in filenames:
+            image = self.request.get(filename)
+            if not image:
+                logging.error(
+                    'Image not provided for file with name %s when the '
+                    ' suggestion with target id %s was created.' % (
+                        filename, suggestion.target_id))
+                raise self.InvalidInputException(
+                    'No image data provided for file with name %s.'
+                    % (filename))
+            try:
+                file_format = (
+                    image_validation_services.validate_image_and_filename(
+                        image, filename))
+            except utils.ValidationError as e:
+                raise self.InvalidInputException('%s' % (e))
+            image_is_compressible = (
+                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+            fs_services.save_original_and_compressed_versions_of_image(
+                filename, suggestion_image_context, suggestion.target_id,
+                image, 'image', image_is_compressible)
+
         self.render_json(self.values)
 
 
@@ -121,12 +161,18 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
                 'You cannot accept/reject your own suggestion.')
 
         if action == suggestion_models.ACTION_TYPE_ACCEPT:
+            commit_message = self.payload.get('commit_message')
+            if (commit_message is not None and
+                    len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
+                raise self.InvalidInputException(
+                    'Commit messages must be at most %s characters long.'
+                    % feconf.MAX_COMMIT_MESSAGE_LENGTH)
             suggestion_services.accept_suggestion(
-                suggestion, self.user_id, self.payload.get('commit_message'),
+                suggestion_id, self.user_id, self.payload.get('commit_message'),
                 self.payload.get('review_message'))
         elif action == suggestion_models.ACTION_TYPE_REJECT:
             suggestion_services.reject_suggestion(
-                suggestion, self.user_id, self.payload.get('review_message'))
+                suggestion_id, self.user_id, self.payload.get('review_message'))
         else:
             raise self.InvalidInputException('Invalid action.')
 
@@ -142,11 +188,9 @@ class ResubmitSuggestionHandler(base.BaseHandler):
         new_change = self.payload.get('change')
         change_cls = type(suggestion.change)
         change_object = change_cls(new_change)
-        suggestion.pre_update_validate(change_object)
-        suggestion.change = change_object
         summary_message = self.payload.get('summary_message')
         suggestion_services.resubmit_rejected_suggestion(
-            suggestion, summary_message, self.user_id)
+            suggestion_id, summary_message, self.user_id, change_object)
         self.render_json(self.values)
 
 
@@ -166,16 +210,15 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
                 'part of the suggestion_id')
 
         action = self.payload.get('action')
-        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         if action == suggestion_models.ACTION_TYPE_ACCEPT:
             # Question suggestions do not use commit messages.
             suggestion_services.accept_suggestion(
-                suggestion, self.user_id, 'UNUSED_COMMIT_MESSAGE',
+                suggestion_id, self.user_id, 'UNUSED_COMMIT_MESSAGE',
                 self.payload.get('review_message'))
         elif action == suggestion_models.ACTION_TYPE_REJECT:
             suggestion_services.reject_suggestion(
-                suggestion, self.user_id, self.payload.get('review_message'))
+                suggestion_id, self.user_id, self.payload.get('review_message'))
         else:
             raise self.InvalidInputException('Invalid action.')
 

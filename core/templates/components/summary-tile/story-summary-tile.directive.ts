@@ -27,10 +27,11 @@ angular.module('oppia').directive('storySummaryTile', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        getStorySummary: '&storySummary'
+        classroomUrlFragment: '<',
+        storySummary: '<',
+        topicUrlFragment: '<'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary-tile/story-summary-tile.directive.html'),
+      template: require('./story-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'AssetsBackendApiService', 'WindowDimensionsService',
@@ -39,15 +40,25 @@ angular.module('oppia').directive('storySummaryTile', [
             AssetsBackendApiService, WindowDimensionsService,
             ENTITY_TYPE, STORY_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
+          var circumference = (20 * 2 * Math.PI);
+          var gapLength = 5;
+
           ctrl.getStoryLink = function() {
+            // This component is being used in the topic editor as well and
+            // we want to disable the linking in this case.
+            if (!ctrl.classroomUrlFragment || !ctrl.topicUrlFragment) {
+              return '#';
+            }
             return UrlInterpolationService.interpolateUrl(
               STORY_VIEWER_URL_TEMPLATE, {
-                story_id: ctrl.getStorySummary().getId()
+                classroom_url_fragment: ctrl.classroomUrlFragment,
+                story_url_fragment: ctrl.storySummary.getUrlFragment(),
+                topic_url_fragment: ctrl.topicUrlFragment
               });
           };
 
           ctrl.isChapterCompleted = function(title) {
-            return ctrl.getStorySummary().isNodeCompleted(title);
+            return ctrl.storySummary.isNodeCompleted(title);
           };
 
           ctrl.isPreviousChapterCompleted = function(index) {
@@ -55,8 +66,8 @@ angular.module('oppia').directive('storySummaryTile', [
               return true;
             }
             var previousNodeTitle = (
-              ctrl.getStorySummary().getNodeTitles()[index - 1]);
-            return ctrl.getStorySummary().isNodeCompleted(previousNodeTitle);
+              ctrl.storySummary.getNodeTitles()[index - 1]);
+            return ctrl.storySummary.isNodeCompleted(previousNodeTitle);
           };
 
           ctrl.showAllChapters = function() {
@@ -68,8 +79,50 @@ angular.module('oppia').directive('storySummaryTile', [
             ctrl.chaptersDisplayed = ctrl.initialCount;
           };
 
+          ctrl.getStrokeDashArrayValues = function() {
+            if (ctrl.nodeCount === 1) {
+              return '';
+            }
+            var segmentLength = (
+              (circumference - (ctrl.nodeCount * gapLength)) / ctrl.nodeCount);
+            return segmentLength.toString() + ' ' + gapLength.toString();
+          };
+
+          ctrl.getCompletedStrokeDashArrayValues = function() {
+            var completedStrokeValues = '';
+            var remainingCircumference = circumference;
+            if (ctrl.completedStoriesCount === 0) {
+              return '0 ' + circumference.toString();
+            }
+            if (ctrl.completedStoriesCount === 1 && ctrl.nodeCount === 1) {
+              return '';
+            }
+            var segmentLength = (
+              (circumference - (ctrl.nodeCount * gapLength)) / ctrl.nodeCount);
+            for (var i = 1; i <= ctrl.completedStoriesCount - 1; i++) {
+              completedStrokeValues += (
+                segmentLength.toString() + ' ' + gapLength.toString() + ' ');
+              remainingCircumference -= (segmentLength + gapLength);
+            }
+            completedStrokeValues += (
+              segmentLength.toString() + ' ' +
+              (remainingCircumference - segmentLength).toString());
+            return completedStrokeValues;
+          };
+
           ctrl.$onInit = function() {
-            ctrl.nodeCount = ctrl.getStorySummary().getNodeTitles().length;
+            ctrl.nodeCount = ctrl.storySummary.getNodeTitles().length;
+            ctrl.completedStoriesCount = 0;
+            for (var idx in ctrl.storySummary.getNodeTitles()) {
+              if (
+                ctrl.storySummary.isNodeCompleted(
+                  ctrl.storySummary.getNodeTitles()[idx])) {
+                ctrl.completedStoriesCount++;
+              }
+            }
+            ctrl.storyProgress = Math.floor(
+              (ctrl.completedStoriesCount / ctrl.nodeCount) * 100);
+
             ctrl.chaptersDisplayed = 3;
             if (WindowDimensionsService.getWidth() <= 800) {
               ctrl.chaptersDisplayed = 2;
@@ -79,11 +132,11 @@ angular.module('oppia').directive('storySummaryTile', [
               ctrl.showButton = true;
             }
 
-            if (ctrl.getStorySummary().getThumbnailFilename()) {
+            if (ctrl.storySummary.getThumbnailFilename()) {
               ctrl.thumbnailUrl = (
                 AssetsBackendApiService.getThumbnailUrlForPreview(
-                  ENTITY_TYPE.STORY, ctrl.getStorySummary().getId(),
-                  ctrl.getStorySummary().getThumbnailFilename()));
+                  ENTITY_TYPE.STORY, ctrl.storySummary.getId(),
+                  ctrl.storySummary.getThumbnailFilename()));
             } else {
               ctrl.thumbnailUrl = null;
             }
@@ -92,3 +145,18 @@ angular.module('oppia').directive('storySummaryTile', [
       ]
     };
   }]);
+
+import { Directive, ElementRef, Injector, Input } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'story-summary-tile'
+})
+export class StorySummaryTileDirective extends UpgradeComponent {
+  @Input() classroomUrlFragment;
+  @Input() storySummary;
+  @Input() topicUrlFragment;
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('storySummaryTile', elementRef, injector);
+  }
+}

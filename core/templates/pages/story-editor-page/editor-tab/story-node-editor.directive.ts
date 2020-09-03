@@ -24,9 +24,8 @@ require(
 require(
   'pages/story-editor-page/modal-templates/' +
   'new-chapter-title-modal.controller.ts');
-require('pages/topic-editor-page/modal-templates/' +
-    'preview-thumbnail.component.ts');
-require('domain/editor/undo_redo/undo-redo.service.ts');
+require(
+  'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
 require('domain/story/story-update.service.ts');
 require('domain/exploration/exploration-id-validation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
@@ -38,8 +37,6 @@ require(
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/page-title.service.ts');
-require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
-
 
 import { Subscription } from 'rxjs';
 
@@ -66,21 +63,18 @@ angular.module('oppia').directive('storyNodeEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/editor-tab/story-node-editor.directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', 'AlertsService',
-        'PageTitleService',
-        'StoryEditorStateService', 'ExplorationIdValidationService',
+        '$scope', '$uibModal', 'AlertsService',
+        'ExplorationIdValidationService', 'PageTitleService',
+        'StoryEditorStateService', 'StoryUpdateService',
         'TopicsAndSkillsDashboardBackendApiService',
-        'TopicEditorRoutingService', 'StoryUpdateService', 'UndoRedoService',
-        'WindowDimensionsService', 'EVENT_VIEW_STORY_NODE_EDITOR',
-        'MAX_CHARS_IN_CHAPTER_TITLE', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
-        function(
-            $scope, $rootScope, $uibModal, AlertsService,
-            PageTitleService,
-            StoryEditorStateService, ExplorationIdValidationService,
+        'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
+        'MAX_CHARS_IN_CHAPTER_TITLE', function(
+            $scope, $uibModal, AlertsService,
+            ExplorationIdValidationService, PageTitleService,
+            StoryEditorStateService, StoryUpdateService,
             TopicsAndSkillsDashboardBackendApiService,
-            TopicEditorRoutingService, StoryUpdateService, UndoRedoService,
-            WindowDimensionsService, EVENT_VIEW_STORY_NODE_EDITOR,
-            MAX_CHARS_IN_CHAPTER_TITLE, MAX_CHARS_IN_CHAPTER_DESCRIPTION) {
+            WindowDimensionsService, MAX_CHARS_IN_CHAPTER_DESCRIPTION,
+            MAX_CHARS_IN_CHAPTER_TITLE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_CHAPTER_TITLE = MAX_CHARS_IN_CHAPTER_TITLE;
@@ -120,7 +114,6 @@ angular.module('oppia').directive('storyNodeEditor', [
               $scope.story.getStoryContents().getNodeIdsToTitleMap(
                 $scope.storyNodeIds);
             _recalculateAvailableNodes();
-            $scope.skillIdToSummaryMap = {};
             $scope.allowedBgColors = (
               storyNodeConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
@@ -214,7 +207,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.viewNodeEditor = function(nodeId) {
-            $rootScope.$broadcast(EVENT_VIEW_STORY_NODE_EDITOR, nodeId);
+            StoryEditorStateService.onViewStoryNodeEditor.emit(nodeId);
           };
 
           $scope.finalizeOutline = function() {
@@ -284,6 +277,7 @@ angular.module('oppia').directive('storyNodeEditor', [
               size: 'xl'
             }).result.then(function(summary) {
               try {
+                $scope.skillIdToSummaryMap[summary.id] = summary.description;
                 StoryUpdateService.addPrerequisiteSkillIdToNode(
                   $scope.story, $scope.getId(), summary.id);
               } catch (err) {
@@ -418,6 +412,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.mainChapterCardIsShown = true;
             $scope.explorationInputButtonsAreShown = false;
             $scope.chapterOutlineButtonsAreShown = false;
+            $scope.skillIdToSummaryMap = {};
             PageTitleService.setPageTitleForMobileView('Chapter Editor');
             $scope.chapterOutlineIsShown = (
               !WindowDimensionsService.isWindowNarrow());
@@ -437,8 +432,11 @@ angular.module('oppia').directive('storyNodeEditor', [
               StoryEditorStateService.onStoryReinitialized.subscribe(
                 () => _init()
               ));
-            $scope.$on('recalculateAvailableNodes', _recalculateAvailableNodes);
-
+            ctrl.directiveSubscriptions.add(
+              StoryEditorStateService.onRecalculateAvailableNodes.subscribe(
+                () => _recalculateAvailableNodes()
+              )
+            );
             _init();
           };
 

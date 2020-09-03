@@ -63,7 +63,8 @@ angular.module('oppia').controller('TrainingModalController', [
   'ExplorationStatesService', 'ExplorationWarningsService', 'GraphDataService',
   'ResponsesService', 'StateEditorService', 'StateInteractionIdService',
   'TrainingDataService', 'finishTrainingCallback', 'unhandledAnswer',
-  function($injector, $scope, $uibModalInstance, AngularNameService,
+  function(
+      $injector, $scope, $uibModalInstance, AngularNameService,
       AnswerClassificationService, AnswerGroupObjectFactory,
       ExplorationStatesService, ExplorationWarningsService, GraphDataService,
       ResponsesService, StateEditorService, StateInteractionIdService,

@@ -16,7 +16,14 @@
  * @fileoverview Unit tests for editorNavigation.
  */
 
-import { of } from 'rxjs';
+import { EventEmitter } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { of, Subscription } from 'rxjs';
+import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service';
+
+// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Editor Navigation Component', function() {
   var ctrl = null;
@@ -26,193 +33,371 @@ describe('Editor Navigation Component', function() {
   var $scope = null;
   var $uibModal = null;
   var $verifyNoPendingTasks = null;
-  var ContextService = null;
-  var ExplorationFeaturesService = null;
-  var ExplorationImprovementsService = null;
-  var ExplorationWarningsService = null;
-  var ThreadDataService = null;
-  var UserService = null;
+  var contextService = null;
+  var explorationFeaturesService = null;
+  var explorationImprovementsService = null;
+  var explorationWarningsService = null;
+  var stateTutorialFirstTimeService = null;
+  var threadDataService = null;
+  var userService = null;
+  var windowDimensionsService = null;
 
+  var mockOpenPostTutorialHelpPopover = new EventEmitter();
+
+  var testSubscriptions: Subscription;
+
+  const openEditorTutorialSpy = jasmine.createSpy('openEditorTutorial');
+  const openTranslationTutorialSpy = (
+    jasmine.createSpy('openTranslationTutorial'));
+
+  var explorationRightsService = null;
+  var editabilityService = null;
+  var explorationSaveService = null;
+  var changeListService = null;
   var explorationId = 'exp1';
   var userInfo = {
     isLoggedIn: () => true
   };
-  var windowWidth = null;
   var isImprovementsTabEnabledAsyncSpy = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'WindowDimensionsService', {
-        getWidth: function() {
-          return windowWidth;
-        },
-        getResizeEvent: function() {
-          return of(new Event('resize'));
+    const ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+
+  beforeEach(function() {
+    windowDimensionsService = TestBed.get(WindowDimensionsService);
+  });
+
+  describe('when screen is large', function() {
+    beforeEach(angular.mock.inject(function($injector, $componentController) {
+      $flushPendingTasks = $injector.get('$flushPendingTasks');
+      $q = $injector.get('$q');
+      $rootScope = $injector.get('$rootScope');
+      $uibModal = $injector.get('$uibModal');
+      $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
+      contextService = $injector.get('ContextService');
+      explorationRightsService = $injector.get('ExplorationRightsService');
+      changeListService = $injector.get('ChangeListService');
+      explorationSaveService = $injector.get('ExplorationSaveService');
+      editabilityService = $injector.get('EditabilityService');
+      explorationFeaturesService = $injector.get('ExplorationFeaturesService');
+      explorationImprovementsService = $injector.get(
+        'ExplorationImprovementsService');
+      explorationWarningsService = $injector.get('ExplorationWarningsService');
+      userService = $injector.get('UserService');
+      threadDataService = $injector.get('ThreadDataService');
+      stateTutorialFirstTimeService = (
+        $injector.get('StateTutorialFirstTimeService'));
+
+      spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
+        of(new Event('resize')));
+      spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
+
+      spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(userInfo);
+
+      isImprovementsTabEnabledAsyncSpy = spyOn(
+        explorationImprovementsService, 'isImprovementsTabEnabledAsync');
+
+      isImprovementsTabEnabledAsyncSpy.and.returnValue(false);
+      var MockUserExplorationPermissionsService = {
+        getPermissionsAsync: () => {
+          var deferred = $q.defer();
+          deferred.resolve({
+            canPublish: true
+          });
+          return deferred.promise;
         }
+      };
+
+      spyOnProperty(
+        stateTutorialFirstTimeService,
+        'onOpenPostTutorialHelpPopover').and.returnValue(
+        mockOpenPostTutorialHelpPopover);
+      $scope = $rootScope.$new();
+      ctrl = $componentController('editorNavigation', {
+        $scope: $scope,
+        WindowDimensionsService: windowDimensionsService,
+        UserExplorationPermissionsService: MockUserExplorationPermissionsService
       });
-  }));
+      ctrl.$onInit();
+      $scope.$apply();
+    }));
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $flushPendingTasks = $injector.get('$flushPendingTasks');
-    $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
-    $uibModal = $injector.get('$uibModal');
-    $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
-    ContextService = $injector.get('ContextService');
-    ExplorationFeaturesService = $injector.get('ExplorationFeaturesService');
-    ExplorationImprovementsService = $injector.get(
-      'ExplorationImprovementsService');
-    ExplorationWarningsService = $injector.get('ExplorationWarningsService');
-    UserService = $injector.get('UserService');
-    ThreadDataService = $injector.get('ThreadDataService');
-
-    spyOn(ContextService, 'getExplorationId').and.returnValue(explorationId);
-    spyOn(UserService, 'getUserInfoAsync').and.returnValue(userInfo);
-
-    windowWidth = 1200;
-
-    isImprovementsTabEnabledAsyncSpy = spyOn(
-      ExplorationImprovementsService, 'isImprovementsTabEnabledAsync');
-
-    isImprovementsTabEnabledAsyncSpy.and.returnValue(false);
-
-    $scope = $rootScope.$new();
-    ctrl = $componentController('editorNavigation', {
-      $scope: $scope
-    });
-    ctrl.$onInit();
-    $scope.$apply();
-  }));
-
-  afterEach(function() {
-    ctrl.$onDestroy();
-  });
-
-  it('should evaluate $scope properties after controller initialization',
-    function() {
-      expect($scope.isPostTutorialHelpPopoverShown())
-        .toBe(false);
-      expect($scope.isScreenLarge()).toBe(true);
-      expect($scope.isUserLoggedIn()).toBe(true);
-      expect($scope.isImprovementsTabEnabled()).toBe(false);
+    beforeEach(() => {
+      testSubscriptions = new Subscription();
+      testSubscriptions.add(
+        stateTutorialFirstTimeService.onOpenTranslationTutorial.subscribe(
+          openTranslationTutorialSpy));
+      testSubscriptions.add(
+        stateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(
+          openEditorTutorialSpy));
     });
 
-  it('should evaluate warnings from exploration warning service', function() {
-    var warnings = [{
-      type: 'ERROR'
-    }, {
-      type: 'CRITICAL'
-    }];
-    spyOn(ExplorationWarningsService, 'getWarnings').and.returnValue(warnings);
-    spyOn(ExplorationWarningsService, 'countWarnings').and.returnValue(
-      warnings.length);
-    // This approach was choosen because spyOn() doesn't work on properties
-    // that doesn't have a get access type.
-    // eslint-disable-next-line max-len
-    // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
-    Object.defineProperty(ExplorationWarningsService, 'hasCriticalWarnings', {
-      get: () => true
+    afterEach(function() {
+      testSubscriptions.unsubscribe();
+      ctrl.$onDestroy();
     });
-    spyOnProperty(ExplorationWarningsService, 'hasCriticalWarnings')
-      .and.returnValue(true);
 
-    expect($scope.countWarnings()).toBe(2);
-    expect($scope.getWarnings()).toEqual(warnings);
-    expect($scope.hasCriticalWarnings()).toBe(true);
-  });
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
+        expect($scope.isPostTutorialHelpPopoverShown())
+          .toBe(false);
+        expect($scope.isScreenLarge()).toBe(true);
+        expect($scope.isUserLoggedIn()).toBe(true);
+        expect($scope.isImprovementsTabEnabled()).toBe(false);
+        expect($scope.showPublishButton()).toEqual(true);
+      });
 
-  it('should open editor tutorial after closing user help modal with mode' +
-    'editor', function() {
-    spyOn($rootScope, '$broadcast');
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve('editor')
+    it('should get warnings whenever has one', function() {
+      var warnings = [{
+        type: 'ERROR'
+      }, {
+        type: 'CRITICAL'
+      }];
+      spyOn(explorationWarningsService, 'getWarnings').and.returnValue(
+        warnings);
+      spyOn(explorationWarningsService, 'countWarnings').and.returnValue(
+        warnings.length);
+      // This approach was chosen because spyOn() doesn't work on properties
+      // that doesn't have a get access type.
+      // eslint-disable-next-line max-len
+      // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+      Object.defineProperty(explorationWarningsService, 'hasCriticalWarnings', {
+        get: () => true
+      });
+      spyOnProperty(explorationWarningsService, 'hasCriticalWarnings')
+        .and.returnValue(true);
+
+      expect($scope.countWarnings()).toBe(2);
+      expect($scope.getWarnings()).toEqual(warnings);
+      expect($scope.hasCriticalWarnings()).toBe(true);
     });
-    $scope.showUserHelpModal();
-    $scope.$apply();
 
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'openEditorTutorial');
-  });
-
-  it('should open editor tutorial after closing user help modal with mode' +
-    'translation', function() {
-    spyOn($rootScope, '$broadcast');
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve('translation')
-    });
-    $scope.showUserHelpModal();
-    $scope.$apply();
-
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'openTranslationTutorial');
-  });
-
-  it('should not open any tutorial after dismissing user help modal',
-    function() {
-      spyOn($rootScope, '$broadcast');
+    it('should open editor tutorial after closing user help modal with mode' +
+      'editor', function() {
       spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
+        result: $q.resolve('editor')
       });
       $scope.showUserHelpModal();
       $scope.$apply();
 
-      expect($rootScope.$broadcast).not.toHaveBeenCalled();
+      expect(openEditorTutorialSpy).toHaveBeenCalled();
     });
 
-  it('should navigate to main tab', function() {
-    $scope.selectMainTab();
-    $rootScope.$apply();
-    expect($scope.getActiveTabName()).toBe('main');
+    it('should open editor tutorial after closing user help modal with mode' +
+      'translation', function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve('translation')
+      });
+      $scope.showUserHelpModal();
+      $scope.$apply();
+
+      expect(openTranslationTutorialSpy).toHaveBeenCalled();
+    });
+
+    it('should return if exploration is private', function() {
+      spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
+      expect($scope.isPrivate()).toEqual(true);
+    });
+
+    it('should return if exploration is locked for editing', function() {
+      spyOn(
+        changeListService,
+        'isExplorationLockedForEditing').and.returnValue(true);
+      expect($scope.isExplorationLockedForEditing()).toEqual(true);
+    });
+
+    it('should return if exploration is editable outside tutorial mode',
+      function() {
+        spyOn(
+          editabilityService,
+          'isEditableOutsideTutorialMode').and.returnValue(true);
+        spyOn(editabilityService, 'isTranslatable').and.returnValue(true);
+        expect($scope.isEditableOutsideTutorialMode()).toEqual(true);
+      });
+
+    it('should call exploration save service to discard changes', function() {
+      var explorationSpy = spyOn(explorationSaveService, 'discardChanges');
+      $scope.discardChanges();
+      expect(explorationSpy).toHaveBeenCalled();
+    });
+
+    it('should call exploration save service to save changes', function() {
+      var deferred = $q.defer();
+      deferred.resolve();
+      var explorationSpy = spyOn(
+        explorationSaveService,
+        'saveChanges').and.returnValue(deferred.promise);
+      $scope.saveChanges();
+      $rootScope.$apply();
+      expect(explorationSpy).toHaveBeenCalled();
+    });
+
+    it('should show/hide the loading dots', function() {
+      $scope.showLoadingDots();
+      expect($scope.loadingDotsAreShown).toEqual(true);
+      $scope.hideLoadingDots();
+      expect($scope.loadingDotsAreShown).toEqual(false);
+    });
+
+    it('should return if exploration is saveable', function() {
+      spyOn(
+        explorationSaveService, 'isExplorationSaveable').and.returnValue(true);
+      expect($scope.isExplorationSaveable()).toEqual(true);
+    });
+
+    it('should toggle mobile nav options', function() {
+      $scope.mobileNavOptionsAreShown = false;
+      $scope.toggleMobileNavOptions();
+      expect($scope.mobileNavOptionsAreShown).toEqual(true);
+      $scope.toggleMobileNavOptions();
+      expect($scope.mobileNavOptionsAreShown).toEqual(false);
+    });
+
+    it('should return the number of changes', function() {
+      spyOn(
+        changeListService, 'getChangeList').and.returnValue([]);
+      expect($scope.getChangeListLength()).toEqual(0);
+    });
+
+    it('should hide loading dots after publishing the exploration', function() {
+      $scope.loadingDotsAreShown = true;
+      var deferred = $q.defer();
+      deferred.resolve();
+      spyOn(
+        explorationSaveService,
+        'showPublishExplorationModal').and.returnValue(deferred.promise);
+      $scope.showPublishExplorationModal();
+      $rootScope.$apply();
+      expect($scope.loadingDotsAreShown).toEqual(false);
+    });
+
+    it('should navigate to main tab when clicking on tab', function() {
+      $scope.selectMainTab();
+      $rootScope.$apply();
+      expect($scope.getActiveTabName()).toBe('main');
+    });
+
+    it('should navigate to translation tab when clicking on tab', function() {
+      $scope.selectTranslationTab();
+      $rootScope.$apply();
+      expect($scope.getActiveTabName()).toBe('translation');
+    });
+
+    it('should navigate to preview tab when clicking on tab', function() {
+      $scope.selectPreviewTab();
+      $rootScope.$apply();
+      $flushPendingTasks();
+      $verifyNoPendingTasks('timeout');
+      expect($scope.getActiveTabName()).toBe('preview');
+    });
+
+    it('should navigate to settings tab when clicking on tab', function() {
+      $scope.selectSettingsTab();
+      $rootScope.$apply();
+      expect($scope.getActiveTabName()).toBe('settings');
+    });
+
+    it('should navigate to stats tab when clicking on tab', function() {
+      $scope.selectStatsTab();
+      $rootScope.$apply();
+      expect($scope.getActiveTabName()).toBe('stats');
+    });
+
+    it('should navigate to improvements tab when clicking on tab', function() {
+      spyOn(explorationFeaturesService, 'isInitialized').and.returnValue(true);
+      isImprovementsTabEnabledAsyncSpy.and.returnValue(true);
+      $scope.selectImprovementsTab();
+      $rootScope.$apply();
+      expect($scope.getActiveTabName()).toBe('improvements');
+    });
+
+    it('should navigate to history tab when clicking on tab', function() {
+      $scope.selectHistoryTab();
+      $rootScope.$apply();
+      expect($scope.getActiveTabName()).toBe('history');
+    });
+
+    it('should navigate to feedback tab when clicking on tab', function() {
+      $scope.selectFeedbackTab();
+      $rootScope.$apply();
+      expect($scope.getActiveTabName()).toBe('feedback');
+    });
+
+    it('should get open thread count', function() {
+      spyOn(threadDataService, 'getOpenThreadsCount').and.returnValue(5);
+      expect($scope.getOpenThreadsCount()).toBe(5);
+    });
+
+    it('should toggle post tutorial help popover when resizing page',
+      function() {
+        angular.element(window).triggerHandler('resize');
+        mockOpenPostTutorialHelpPopover.emit();
+
+        expect(ctrl.postTutorialHelpPopoverIsShown).toBe(true);
+
+        $flushPendingTasks();
+
+        expect(ctrl.postTutorialHelpPopoverIsShown).toBe(false);
+      });
   });
 
-  it('should navigate to translation tab', function() {
-    $scope.selectTranslationTab();
-    $rootScope.$apply();
-    expect($scope.getActiveTabName()).toBe('translation');
-  });
+  describe('when screen is not large', function() {
+    beforeEach(angular.mock.inject(function($injector, $componentController) {
+      $flushPendingTasks = $injector.get('$flushPendingTasks');
+      $q = $injector.get('$q');
+      $rootScope = $injector.get('$rootScope');
+      $uibModal = $injector.get('$uibModal');
+      $verifyNoPendingTasks = $injector.get('$verifyNoPendingTasks');
+      contextService = $injector.get('ContextService');
+      explorationFeaturesService = $injector.get('ExplorationFeaturesService');
+      explorationImprovementsService = $injector.get(
+        'ExplorationImprovementsService');
+      explorationWarningsService = $injector.get('ExplorationWarningsService');
+      userService = $injector.get('UserService');
+      threadDataService = $injector.get('ThreadDataService');
+      stateTutorialFirstTimeService = (
+        $injector.get('StateTutorialFirstTimeService'));
 
-  it('should navigate to preview tab', function() {
-    $scope.selectPreviewTab();
-    $rootScope.$apply();
-    $flushPendingTasks();
-    $verifyNoPendingTasks('timeout');
-    expect($scope.getActiveTabName()).toBe('preview');
-  });
+      spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
+        of(new Event('resize')));
+      spyOn(windowDimensionsService, 'getWidth').and.returnValue(768);
 
-  it('should navigate to settings tab', function() {
-    $scope.selectSettingsTab();
-    $rootScope.$apply();
-    expect($scope.getActiveTabName()).toBe('settings');
-  });
+      spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(userInfo);
 
-  it('should navigate to stats tab', function() {
-    $scope.selectStatsTab();
-    $rootScope.$apply();
-    expect($scope.getActiveTabName()).toBe('stats');
-  });
+      spyOnProperty(
+        stateTutorialFirstTimeService,
+        'onOpenPostTutorialHelpPopover').and.returnValue(
+        mockOpenPostTutorialHelpPopover);
 
-  it('should navigate to improvements tab', function() {
-    spyOn(ExplorationFeaturesService, 'isInitialized').and.returnValue(true);
-    isImprovementsTabEnabledAsyncSpy.and.returnValue(true);
-    $scope.selectImprovementsTab();
-    $rootScope.$apply();
-    expect($scope.getActiveTabName()).toBe('improvements');
-  });
+      isImprovementsTabEnabledAsyncSpy = spyOn(
+        explorationImprovementsService, 'isImprovementsTabEnabledAsync');
 
-  it('should navigate to history tab', function() {
-    $scope.selectHistoryTab();
-    $rootScope.$apply();
-    expect($scope.getActiveTabName()).toBe('history');
-  });
+      isImprovementsTabEnabledAsyncSpy.and.returnValue(false);
 
-  it('should navigate to feedback tab', function() {
-    $scope.selectFeedbackTab();
-    $rootScope.$apply();
-    expect($scope.getActiveTabName()).toBe('feedback');
-  });
+      $scope = $rootScope.$new();
+      ctrl = $componentController('editorNavigation', {
+        $scope: $scope,
+        WindowDimensionsService: windowDimensionsService
+      });
+      ctrl.$onInit();
+      $scope.$apply();
+    }));
 
-  it('should get open thread count from thread data service', function() {
-    spyOn(ThreadDataService, 'getOpenThreadsCount').and.returnValue(5);
-    expect($scope.getOpenThreadsCount()).toBe(5);
+    afterEach(function() {
+      ctrl.$onDestroy();
+    });
+
+    it('should hide post tutorial help popover when resizing page', function() {
+      angular.element(window).triggerHandler('resize');
+      mockOpenPostTutorialHelpPopover.emit();
+      expect(ctrl.postTutorialHelpPopoverIsShown).toBe(false);
+    });
   });
 });

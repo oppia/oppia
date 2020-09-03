@@ -30,128 +30,161 @@ describe('MathInteractionsService', () => {
   it('should validate expressions correctly', function() {
     // Success cases.
     // Algebraic Expressions.
-    expect(mathInteractionsService.validateExpression('a/2')).toBeTrue();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a/2', ['a'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
-    expect(mathInteractionsService.validateExpression(
-      'sqrt(alpha)')).toBeTrue();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'sqrt(alpha)', ['α'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
-    expect(mathInteractionsService.validateExpression(
-      'a^2 + 2*a*b + b^2')).toBeTrue();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a^2 + 2*a*b + b^2', ['a', 'b'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
-    expect(mathInteractionsService.validateExpression(
-      '(a+b+c)^(-3.5)')).toBeTrue();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '(a+b+c)^(-3.5)', ['a', 'b', 'c'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
-    expect(mathInteractionsService.validateExpression(
-      '(alpha - beta)^pi')).toBeTrue();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '(alpha - beta)^pi', ['α', 'β', 'π'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
-    expect(mathInteractionsService.validateExpression(
-      '((-3.4)^(gamma/(y^2)))/2')).toBeTrue();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '((-3.4)^(gamma/(y^2)))/2', ['y', 'γ'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
-    expect(mathInteractionsService.validateExpression(
-      'a/b/c/d/e/f/g')).toBeTrue();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a/b/c/d/e/f/g', ['a', 'b', 'c', 'd', 'e', 'f', 'g'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     // Numeric Expressions.
-    expect(mathInteractionsService.validateExpression(
-      '1/2', false)).toBeTrue();
+    expect(mathInteractionsService.validateNumericExpression(
+      '1/2')).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
-    expect(mathInteractionsService.validateExpression(
-      'sqrt(49)', false)).toBeTrue();
+    expect(mathInteractionsService.validateNumericExpression(
+      'sqrt(49)')).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
-    expect(mathInteractionsService.validateExpression(
-      '4^2 + 2*3*4 + 2^2', false)).toBeTrue();
+    expect(mathInteractionsService.validateNumericExpression(
+      '4^2 + 2*3*4 + 2^2')).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
-    expect(mathInteractionsService.validateExpression(
-      '(1+2+3)^(-3.5)', false)).toBeTrue();
+    expect(mathInteractionsService.validateNumericExpression(
+      '(1+2+3)^(-3.5)')).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
-    expect(mathInteractionsService.validateExpression(
-      '((-3.4)^(35/(2^2)))/2', false)).toBeTrue();
+    expect(mathInteractionsService.validateNumericExpression(
+      '((-3.4)^(35/(2^2)))/2')).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
-    expect(mathInteractionsService.validateExpression(
-      '1/2/3/4/5/6/7', false)).toBeTrue();
+    expect(mathInteractionsService.validateNumericExpression(
+      '1/2/3/4/5/6/7')).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     // Failure cases.
-    expect(mathInteractionsService.validateExpression('')).toBeFalse();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '', [])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Please enter an answer before submitting.');
 
-    expect(mathInteractionsService.validateExpression('a/')).toBeFalse();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a/', ['a'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer seems to be missing a variable/number after the "/".');
 
-    expect(mathInteractionsService.validateExpression('(x-)3')).toBeFalse();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '(x-)3', ['x'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer seems to be missing a variable/number after the "-".');
 
-    expect(mathInteractionsService.validateExpression(
-      '(x^3.5)^/2')).toBeFalse();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'xy+c/2', ['x', 'y', 'z'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'You have entered an invalid variable: c. Please use only the ' +
+      'variables x,y,z in your answer.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'ae^2 + 4b', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'You have entered an invalid variable: e. Please use only the ' +
+      'variables a,b in your answer.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'xyz + pi', ['x', 'y', 'z'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'You have entered an invalid variable: π. Please use only the ' +
+      'variables x,y,z in your answer.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'aalpha/2beta', ['α', 'β', 'γ'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'You have entered an invalid variable: a. Please use only the ' +
+      'variables α,β,γ in your answer.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '(x^3.5)^/2', ['x'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer has two symbols next to each other: "^" and "/".');
 
-    expect(mathInteractionsService.validateExpression(
-      '12+sqrt(4)')).toBeFalse();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '12+sqrt(4)', [])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered only numbers. Make sure to include' +
       ' the necessary variables mentioned in the question.');
 
-    expect(mathInteractionsService.validateExpression('x-y=0')).toBeFalse();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'x-y=0', ['x', 'y'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered an equation/inequality.' +
       ' Please enter an expression instead.');
 
-    expect(mathInteractionsService.validateExpression('x^2 < 2.5')).toBeFalse();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'x^2 < 2.5', ['x'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered an equation/inequality.' +
       ' Please enter an expression instead.');
 
-    expect(mathInteractionsService.validateExpression(
-      '5 >= 2*alpha')).toBeFalse();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '5 >= 2*alpha', ['α'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered an equation/inequality.' +
       ' Please enter an expression instead.');
 
-    expect(mathInteractionsService.validateExpression('(x+y)/0')).toBeFalse();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '(x+y)/0', ['x', 'y'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer includes a division by zero, which is not valid.');
 
-    expect(mathInteractionsService.validateExpression(
-      '(x+y)/(y-y)')).toBeFalse();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '(x+y)/(y-y)', ['x', 'y'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer includes a division by zero, which is not valid.');
 
-    expect(mathInteractionsService.validateExpression('a)(b')).toBeFalse();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a)(b', ['a', 'b'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like your answer has an invalid bracket pairing.');
 
-    expect(mathInteractionsService.validateExpression('a_2 + 3')).toBeFalse();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'a_2 + 3', ['a'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer contains an invalid character: "_".');
 
-    expect(mathInteractionsService.validateExpression(
-      '3.4.5 + 45/a')).toBeFalse();
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      '3.4.5 + 45/a', ['a'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer contains an invalid term: 3.4.5');
 
-    expect(mathInteractionsService.validateExpression(
-      'a/2', false)).toBeFalse();
+    expect(mathInteractionsService.validateNumericExpression(
+      'a/2')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered some variables. ' +
       'Please enter numbers only.');
 
-    expect(mathInteractionsService.validateExpression(
-      'sqrt(alpha/beta)', false)).toBeFalse();
+    expect(mathInteractionsService.validateNumericExpression(
+      'sqrt(alpha/beta)')).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered some variables. ' +
       'Please enter numbers only.');
@@ -160,94 +193,128 @@ describe('MathInteractionsService', () => {
   it('should validate equations correctly', function() {
     // Success cases.
     expect(mathInteractionsService.validateEquation(
-      'x=y')).toBeTrue();
+      'x=y', ['x', 'y'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateEquation(
-      'sqrt(alpha) = -1')).toBeTrue();
+      'sqrt(alpha) = -1', ['α'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateEquation(
-      'x + y - 12^3 = 0')).toBeTrue();
+      'x + y - 12^3 = 0', ['x', 'y'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateEquation(
-      '(a+b+c)^(-3.5) = (-3.5)^(a+b+c)')).toBeTrue();
+      '(a+b+c)^(-3.5) = (-3.5)^(a+b+c)', ['a', 'b', 'c'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateEquation(
-      'y = m*x + c')).toBeTrue();
+      'y = m*x + c', ['y', 'm', 'x', 'c'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateEquation(
-      'T = t*(1/sqrt(1-(v^2)/(c^2)))')).toBeTrue();
+      'T = t*(1/sqrt(1-(v^2)/(c^2)))', ['T', 't', 'v', 'c'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     // Failure cases.
-    expect(mathInteractionsService.validateEquation('')).toBeFalse();
+    expect(mathInteractionsService.validateEquation('', [])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Please enter an answer before submitting.');
 
-    expect(mathInteractionsService.validateEquation('a+b = ')).toBeFalse();
+    expect(mathInteractionsService.validateEquation(
+      'a+b = ', ['a', 'b'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'The RHS of your equation is empty.');
 
-    expect(mathInteractionsService.validateEquation(' =(x-y)/2')).toBeFalse();
+    expect(mathInteractionsService.validateEquation(
+      ' =(x-y)/2', ['x', 'y'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'The LHS of your equation is empty.');
 
-    expect(mathInteractionsService.validateEquation('a/ = (-5)')).toBeFalse();
+    expect(mathInteractionsService.validateEquation(
+      'a=b=c', ['a', 'b', 'c'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your equation contains multiple = signs.');
+
+    expect(mathInteractionsService.validateEquation(
+      'a==b', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your equation contains multiple = signs.');
+
+    expect(mathInteractionsService.validateEquation(
+      'a+b=0=0', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your equation contains multiple = signs.');
+
+    expect(mathInteractionsService.validateEquation(
+      'a/ = (-5)', ['a'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer seems to be missing a variable/number after the "/".');
 
-    expect(mathInteractionsService.validateEquation('(x-)3 = 2.5')).toBeFalse();
+    expect(mathInteractionsService.validateEquation(
+      '(x-)3 = 2.5', ['x'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer seems to be missing a variable/number after the "-".');
 
     expect(mathInteractionsService.validateEquation(
-      '(x^3.5)^/2 = 0')).toBeFalse();
+      '(x^3.5)^/2 = 0', ['x'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer has two symbols next to each other: "^" and "/".');
 
     expect(mathInteractionsService.validateEquation(
-      '12 = sqrt(144)')).toBeFalse();
+      '12 = sqrt(144)', [])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'The equation must contain at least one variable.');
 
-    expect(mathInteractionsService.validateEquation('x^2 < 2.5')).toBeFalse();
+    expect(mathInteractionsService.validateEquation(
+      'x^2 < 2.5', ['x'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered an inequality. ' +
       'Please enter an equation instead.');
 
     expect(mathInteractionsService.validateEquation(
-      '5 >= 2*alpha')).toBeFalse();
+      '5 >= 2*alpha', ['α'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered an inequality. ' +
       'Please enter an equation instead.');
 
     expect(mathInteractionsService.validateEquation(
-      '2*x^2 + 3')).toBeFalse();
+      '2*x^2 + 3', ['x'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered an expression. ' +
       'Please enter an equation instead.');
 
-    expect(mathInteractionsService.validateEquation('(x+y)/0 = 5')).toBeFalse();
+    expect(mathInteractionsService.validateEquation(
+      '(x+y)/0 = 5', ['x', 'y'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer includes a division by zero, which is not valid.');
 
     expect(mathInteractionsService.validateEquation(
-      '(x+y)/(y-y) = 3*x^2')).toBeFalse();
+      '(x+y)/(y-y) = 3*x^2', ['x', 'y'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer includes a division by zero, which is not valid.');
 
-    expect(mathInteractionsService.validateEquation('a)(b = x')).toBeFalse();
+    expect(mathInteractionsService.validateEquation(
+      'a)(b = x', ['a', 'b', 'x'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like your answer has an invalid bracket pairing.');
 
     expect(mathInteractionsService.validateEquation(
-      '3.4.5 = 45/a')).toBeFalse();
+      '3.4.5 = 45/a', ['a'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer contains an invalid term: 3.4.5');
+
+    expect(mathInteractionsService.validateEquation(
+      'y=mx+b', ['x', 'y', 'm', 'c'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'You have entered an invalid variable: b. Please use only the ' +
+      'variables x,y,m,c in your answer.');
+
+    expect(mathInteractionsService.validateEquation(
+      'alpha(x^2)=beta/2', ['α', 'β', 'γ'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'You have entered an invalid variable: x. Please use only the ' +
+      'variables α,β,γ in your answer.');
   });
 
   it('should insert missing multiplication signs', function() {
@@ -279,6 +346,10 @@ describe('MathInteractionsService', () => {
       'sqrt(4)abs(5)')).toBe('sqrt(4)*abs(5)');
     expect(mathInteractionsService.insertMultiplicationSigns(
       '(3+alpha)(3-alpha)4')).toBe('(3+alpha)*(3-alpha)*4');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      'alphabeta gamma')).toBe('alpha*beta*gamma');
+    expect(mathInteractionsService.insertMultiplicationSigns(
+      'xalphayzgamma')).toBe('x*alpha*y*z*gamma');
   });
 
   it('should replace abs symbol with text', function() {
@@ -362,5 +433,88 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.termsMatch('1/3', '0.333')).toBeFalse();
     expect(mathInteractionsService.termsMatch('4*(5+3)', '32')).toBeFalse();
     expect(mathInteractionsService.termsMatch('sqrt(x^2)', 'x')).toBeFalse();
+  });
+
+  it('should correctly match terms with placeholders', function() {
+    let expressionWithPlaceholders = 'a*x + b';
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '2x + 3', ['a', 'b'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '3 + 4x', ['a', 'b'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '-3 + 4x', ['a', 'b'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '3 - 4.5x', ['a', 'b'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '3 + x*5/2', ['a', 'b'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '3^5 + 4x', ['a', 'b'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'x + 5/2', ['a', 'b'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '0 + x', ['a', 'b'])).toBeTrue();
+
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '4x', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '4x^2', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '4a + 3', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'ax + b', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '3x^2 + 2', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '5x + 4 + 5', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '3x + 2y + 4', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'ax + 3', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '3x + b', ['a', 'b'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '4x + 5 + b', ['a', 'b'])).toBeFalse();
+
+
+    expressionWithPlaceholders = 'x/alpha + y/beta';
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'x/2 + y/3', ['alpha', 'beta'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'y/2 + x/3', ['alpha', 'beta'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '4x/2.5 + y', ['alpha', 'beta'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'x + y', ['alpha', 'beta'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'x/5 - y/2', ['alpha', 'beta'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, '-x/2 + 3y', ['alpha', 'beta'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'y - 8x', ['alpha', 'beta'])).toBeTrue();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders,
+      'x/3 + y/(8/22)', ['alpha', 'beta'])).toBeTrue();
+
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders,
+      '(x^2)/4 + y/2', ['alpha', 'beta'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'x/5', ['alpha', 'beta'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders,
+      'x/2 + y/3 - 5', ['alpha', 'beta'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'x', ['alpha', 'beta'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders,
+      'x/alpha + y/2', ['alpha', 'beta'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders,
+      'x/2 + y/5 + 2x/2', ['alpha', 'beta'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders, 'z/2 + y/3', ['alpha', 'beta'])).toBeFalse();
+    expect(mathInteractionsService.expressionMatchWithPlaceholders(
+      expressionWithPlaceholders,
+      'x/(x+1) + y/8', ['alpha', 'beta'])).toBeFalse();
   });
 });

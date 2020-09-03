@@ -178,7 +178,7 @@ describe('Compare versions service', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_specs: []
+              rule_specs: [],
             };
           });
         statesData[stateName] = newStateData;

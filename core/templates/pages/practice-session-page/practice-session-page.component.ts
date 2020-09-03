@@ -45,20 +45,28 @@ angular.module('oppia').component('practiceSessionPage', {
         TOPIC_VIEWER_PAGE, TOTAL_QUESTIONS) {
       var ctrl = this;
       var _fetchSkillDetails = function() {
+        var topicUrlFragment = (
+          UrlService.getTopicUrlFragmentFromLearnerUrl());
         var practiceSessionsDataUrl = UrlInterpolationService
           .interpolateUrl(
             PRACTICE_SESSIONS_DATA_URL, {
-              topic_name: ctrl.topicName,
+              topic_url_fragment: topicUrlFragment,
+              classroom_url_fragment: (
+                UrlService.getClassroomUrlFragmentFromLearnerUrl()),
               comma_separated_subtopic_ids: ctrl.commaSeparatedSubtopicIds
             });
         var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
           PRACTICE_SESSIONS_URL, {
-            topic_name: ctrl.topicName,
+            topic_url_fragment: topicUrlFragment,
+            classroom_url_fragment: (
+              UrlService.getClassroomUrlFragmentFromLearnerUrl()),
             comma_separated_subtopic_ids: ctrl.commaSeparatedSubtopicIds
           });
         var topicViewerUrl = UrlInterpolationService.interpolateUrl(
           TOPIC_VIEWER_PAGE, {
-            topic_name: ctrl.topicName
+            topic_url_fragment: topicUrlFragment,
+            classroom_url_fragment: (
+              UrlService.getClassroomUrlFragmentFromLearnerUrl()),
           });
         $http.get(practiceSessionsDataUrl).then(function(result) {
           var skillList = [];
@@ -91,15 +99,16 @@ angular.module('oppia').component('practiceSessionPage', {
             questionsSortedByDifficulty: false
           };
           ctrl.questionPlayerConfig = questionPlayerConfig;
+          ctrl.topicName = result.data.topic_name;
+          PageTitleService.setPageTitle(
+            'Practice Session: ' + ctrl.topicName + ' - Oppia');
         });
       };
       ctrl.$onInit = function() {
-        ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
+        ctrl.topicName = UrlService.getTopicUrlFragmentFromLearnerUrl();
         ctrl.commaSeparatedSubtopicIds = (
           UrlService.getSelectedSubtopicsFromUrl());
         _fetchSkillDetails();
-        PageTitleService.setPageTitle(
-          'Practice Session: ' + ctrl.topicName + ' - Oppia');
       };
     }
   ]

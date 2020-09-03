@@ -124,7 +124,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
             },
           },
           rule_specs: [{
-            type: '',
+            rule_type: '',
             inputs: {
               x: ['c', 'd', 'e'],
               y: ['a', 'b', 'c']
@@ -168,15 +168,16 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         });
     }));
 
-    it('should evaluate scope variables values correctly', function() {
-      expect($scope.stateName).toBe('Hola');
-      expect($scope.stateContent).toBe('This is Hola State');
-      expect($scope.answerGroupHasNonEmptyRules).toBe(true);
-      expect($scope.inputTemplate).toBe(
-        '<oppia-interactive-text-input last-answer="null"' +
-        ' label-for-focus-target="testInteractionInput">' +
-        '</oppia-interactive-text-input>');
-    });
+    it('should initialize $scope properties after controller is initialized',
+      function() {
+        expect($scope.stateName).toBe('Hola');
+        expect($scope.stateContent).toBe('This is Hola State');
+        expect($scope.answerGroupHasNonEmptyRules).toBe(true);
+        expect($scope.inputTemplate).toBe(
+          '<oppia-interactive-text-input last-answer="null"' +
+          ' label-for-focus-target="testInteractionInput">' +
+          '</oppia-interactive-text-input>');
+      });
 
     it('should call init when controller is initialized', function() {
       expect($scope.trainingData).toEqual([{

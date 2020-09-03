@@ -21,8 +21,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface ParamDict {
   action: string;
-  audioUpdateRequired?: boolean;
-  commitMessage?: string;
+  audioUpdateRequired: boolean;
+  commitMessage: string;
   reviewMessage: string;
 }
 

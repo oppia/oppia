@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import wipeout_domain
 from core.tests import test_utils
+import utils
 
 
 class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
@@ -42,4 +43,14 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
         self.assertEqual(default_pending_deletion.deletion_complete, False)
         self.assertEqual(default_pending_deletion.exploration_ids, [])
         self.assertEqual(default_pending_deletion.collection_ids, [])
-        self.assertEqual(default_pending_deletion.story_mappings, None)
+        self.assertEqual(default_pending_deletion.activity_mappings, {})
+
+    def test_validate_fails_for_wrong_key_in_activity_mappings(self):
+        """Tests the create_default_topic() function."""
+        pending_deletion_request = (
+            wipeout_domain.PendingDeletionRequest.create_default(
+                self.user_id_a, 'a@example.com', [], []))
+        pending_deletion_request.activity_mappings = {'wrong_key': {}}
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'activity_mappings contain wrong key'):
+            pending_deletion_request.validate()

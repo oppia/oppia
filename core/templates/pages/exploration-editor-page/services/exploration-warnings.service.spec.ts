@@ -911,10 +911,8 @@ describe('Exploration Warnings Service', function() {
                 },
               },
               rule_specs: [{
-                inputs: {
-                  x: 10
-                },
-                rule_type: 'Equals'
+                rule_type: 'Equals',
+                inputs: {x: 10}
               }],
               training_data: ['1']
             }],

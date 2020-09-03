@@ -58,13 +58,13 @@ class OldNotificationsDashboardRedirectPage(base.BaseHandler):
         self.redirect(feconf.NOTIFICATIONS_DASHBOARD_URL, permanent=True)
 
 
-class OldCommunityDashboardRedirectPage(base.BaseHandler):
-    """Redirects the old community dashboard URL to the new one."""
+class OldContributorDashboardRedirectPage(base.BaseHandler):
+    """Redirects the old contributor dashboard URL to the new one."""
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect('/community-dashboard', permanent=True)
+        self.redirect('/contributor-dashboard', permanent=True)
 
 
 class NotificationsDashboardPage(base.BaseHandler):
@@ -193,10 +193,9 @@ class CreatorDashboardHandler(base.BaseHandler):
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
 
-        if constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            topic_summaries = topic_services.get_all_topic_summaries()
-            topic_summary_dicts = [
-                summary.to_dict() for summary in topic_summaries]
+        topic_summaries = topic_services.get_all_topic_summaries()
+        topic_summary_dicts = [
+            summary.to_dict() for summary in topic_summaries]
 
         if role_services.ACTION_CREATE_COLLECTION in self.user.actions:
             for collection_summary in subscribed_collection_summaries:
@@ -318,12 +317,11 @@ class CreatorDashboardHandler(base.BaseHandler):
             'threads_for_suggestions_to_review_list': (
                 threads_linked_to_suggestions_which_can_be_reviewed),
             'created_suggestions_list': suggestion_dicts_created_by_user,
-            'suggestions_to_review_list': suggestion_dicts_which_can_be_reviewed
+            'suggestions_to_review_list': (
+                suggestion_dicts_which_can_be_reviewed),
+            'topic_summary_dicts': topic_summary_dicts
         })
-        if constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            self.values.update({
-                'topic_summary_dicts': topic_summary_dicts
-            })
+
         self.render_json(self.values)
 
     @acl_decorators.can_access_creator_dashboard

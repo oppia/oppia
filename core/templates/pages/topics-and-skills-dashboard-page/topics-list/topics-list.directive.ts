@@ -26,6 +26,11 @@ require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page.constants.ajs.ts');
 require('services/alerts.service.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-backend-api.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('topicsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -43,14 +48,17 @@ angular.module('oppia').directive('topicsList', [
         '/pages/topics-and-skills-dashboard-page/topics-list/' +
         'topics-list.directive.html'),
       controller: [
-        '$scope', '$uibModal', '$rootScope', 'EditableTopicBackendApiService',
-        'AlertsService', 'UrlInterpolationService',
-        'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+        '$scope', '$uibModal', 'AlertsService',
+        'EditableTopicBackendApiService',
+        'TopicsAndSkillsDashboardBackendApiService',
+        'UrlInterpolationService',
         function(
-            $scope, $uibModal, $rootScope, EditableTopicBackendApiService,
-            AlertsService, UrlInterpolationService,
-            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
+            $scope, $uibModal, AlertsService,
+            EditableTopicBackendApiService,
+            TopicsAndSkillsDashboardBackendApiService,
+            UrlInterpolationService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           /**
            * @param {String} topicId - ID of the topic.
            * @returns {String} Url of the topic editor with the
@@ -114,8 +122,8 @@ angular.module('oppia').directive('topicsList', [
             }).result.then(function() {
               EditableTopicBackendApiService.deleteTopic(topicId).then(
                 function(status) {
-                  $rootScope.$broadcast(
-                    EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                  TopicsAndSkillsDashboardBackendApiService.
+                    onTopicsAndSkillsDashboardReinitialized.emit();
                 },
                 function(error) {
                   AlertsService.addWarning(
@@ -139,6 +147,10 @@ angular.module('oppia').directive('topicsList', [
               'index', 'name', 'canonical_story_count', 'subtopic_count',
               'skill_count', 'topic_status'
             ];
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

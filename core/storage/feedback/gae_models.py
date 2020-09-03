@@ -492,7 +492,6 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
         return [thread_model.message_count for thread_model in thread_models]
 
-
     @classmethod
     def get_all_messages(cls, page_size, urlsafe_start_cursor):
         """Fetches a list of all the messages sorted by their last updated
@@ -546,7 +545,6 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
             'message_ids_read_by_user':
                 base_models.EXPORT_POLICY.EXPORTED
         })
-
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

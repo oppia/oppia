@@ -36,11 +36,11 @@ require('services/contextual/window-dimensions.service.ts');
 angular.module('oppia').component('subtopicViewerPage', {
   template: require('./subtopic-viewer-page.component.html'),
   controller: [
-    '$rootScope', '$window', 'AlertsService', 'ContextService', 'LoaderService',
+    '$rootScope', 'AlertsService', 'ContextService', 'LoaderService',
     'PageTitleService', 'SubtopicViewerBackendApiService', 'UrlService',
     'WindowDimensionsService', 'ENTITY_TYPE', 'FATAL_ERROR_CODES',
     function(
-        $rootScope, $window, AlertsService, ContextService, LoaderService,
+        $rootScope, AlertsService, ContextService, LoaderService,
         PageTitleService, SubtopicViewerBackendApiService, UrlService,
         WindowDimensionsService, ENTITY_TYPE, FATAL_ERROR_CODES) {
       var ctrl = this;
@@ -50,12 +50,18 @@ angular.module('oppia').component('subtopicViewerPage', {
         return (WindowDimensionsService.getWidth() < 500);
       };
       ctrl.$onInit = function() {
-        ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
-        ctrl.subtopicId = UrlService.getSubtopicIdFromUrl();
+        ctrl.topicUrlFragment = (
+          UrlService.getTopicUrlFragmentFromLearnerUrl());
+        ctrl.classroomUrlFragment = (
+          UrlService.getClassroomUrlFragmentFromLearnerUrl());
+        ctrl.subtopicUrlFragment = (
+          UrlService.getSubtopicUrlFragmentFromLearnerUrl());
 
         LoaderService.showLoadingScreen('Loading');
         SubtopicViewerBackendApiService.fetchSubtopicData(
-          ctrl.topicName, ctrl.subtopicId).then(
+          ctrl.topicUrlFragment,
+          ctrl.classroomUrlFragment,
+          ctrl.subtopicUrlFragment).then(
           function(subtopicDataObject) {
             ctrl.pageContents = (
               subtopicDataObject.getPageContents().getSubtitledHtml());
@@ -63,7 +69,8 @@ angular.module('oppia').component('subtopicViewerPage', {
             ctrl.parentTopicId = subtopicDataObject.getParentTopicId();
             ContextService.setCustomEntityContext(
               ENTITY_TYPE.TOPIC, ctrl.parentTopicId);
-            PageTitleService.setPageTitle(ctrl.subtopicTitle + ' - Oppia');
+            PageTitleService.setPageTitle(
+              `Review ${ctrl.subtopicTitle} | Oppia`);
 
             let nextSubtopic = (
               subtopicDataObject.getNextSubtopic());

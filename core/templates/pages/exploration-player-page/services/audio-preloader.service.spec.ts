@@ -349,10 +349,8 @@ describe('Audio preloader service', function() {
             solution: null,
             answer_groups: [{
               rule_specs: [{
-                inputs: {
-                  x: '1'
-                },
-                rule_type: 'Contains'
+                rule_type: 'Contains',
+                inputs: {x: '1'}
               }],
               outcome: {
                 dest: 'State 1',
@@ -366,10 +364,8 @@ describe('Audio preloader service', function() {
               }
             }, {
               rule_specs: [{
-                inputs: {
-                  x: '2'
-                },
-                rule_type: 'Contains'
+                rule_type: 'Contains',
+                inputs: {x: '2'}
               }],
               outcome: {
                 dest: 'State 2',

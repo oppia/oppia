@@ -311,14 +311,10 @@ describe('Image preloader service', function() {
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null
                 },
-                rule_specs: [
-                  {
-                    inputs: {
-                      x: 0
-                    },
-                    rule_type: 'Equals'
-                  }
-                ]
+                rule_specs: [{
+                  rule_type: 'Equals',
+                  inputs: {x: 0}
+                }],
               },
               {
                 labelled_as_correct: false,
@@ -332,14 +328,11 @@ describe('Image preloader service', function() {
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null
                 },
-                rule_specs: [
-                  {
-                    inputs: {
-                      x: 1
-                    },
-                    rule_type: 'Equals'
-                  }
-                ]
+                rule_input_translations: {},
+                rule_specs: [{
+                  rule_type: 'Equals',
+                  inputs: {x: 1}
+                }],
               }
             ],
             hints: [],
@@ -397,10 +390,8 @@ describe('Image preloader service', function() {
             },
             answer_groups: [{
               rule_specs: [{
-                inputs: {
-                  x: '1'
-                },
-                rule_type: 'Contains'
+                rule_type: 'Contains',
+                inputs: {x: '1'}
               }],
               outcome: {
                 dest: 'State 1',
@@ -415,10 +406,8 @@ describe('Image preloader service', function() {
               }
             }, {
               rule_specs: [{
-                inputs: {
-                  x: '2'
-                },
-                rule_type: 'Contains'
+                rule_type: 'Contains',
+                inputs: {x: '2'}
               }],
               outcome: {
                 dest: 'State 1',
@@ -649,6 +638,12 @@ describe('Image preloader service', function() {
         'sol_height_ds_width_60.png');
     }).toThrowError(
       /it does not contain dimensions/);
+    var mathSvgDimensions = ips.getDimensionsOfMathSvg(
+      'mathImg_20207261338r3ir43lmfd_height_2d456_width_6d124_vertical_0' +
+      'd231.svg');
+    expect(mathSvgDimensions.height).toBe('2.456');
+    expect(mathSvgDimensions.width).toBe('6.124');
+    expect(mathSvgDimensions.verticalPadding).toBe('0.231');
   });
 
   it('should get image url', function() {

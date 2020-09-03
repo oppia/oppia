@@ -20,7 +20,6 @@ import { TestBed, flushMicrotasks, fakeAsync } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 
-import { ContextService } from 'services/context.service';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 import { NormalizeWhitespacePunctuationAndCasePipe } from
@@ -31,8 +30,16 @@ import { StateInteractionStats, StateInteractionStatsService } from
 import { VisualizationInfoObjectFactory } from
   'domain/exploration/visualization-info-object.factory';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { State, StateBackendDict, StateObjectFactory } from
+  'domain/state/StateObjectFactory';
+
+const joC = jasmine.objectContaining;
 
 describe('State Interaction Stats Service', () => {
+  let httpTestingController: HttpTestingController;
+  let stateObjectFactory: StateObjectFactory;
+  let stateInteractionStatsService: StateInteractionStatsService;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -45,60 +52,135 @@ describe('State Interaction Stats Service', () => {
       ],
     });
 
-    this.joC = jasmine.objectContaining;
-    this.contextService = TestBed.get(ContextService);
-    this.httpTestingController = TestBed.get(HttpTestingController);
-    this.stateInteractionStatsService = (
+    stateObjectFactory = TestBed.get(StateObjectFactory);
+    httpTestingController = TestBed.get(HttpTestingController);
+    stateInteractionStatsService = (
       TestBed.get(StateInteractionStatsService));
-    this.visualizationInfoObjectFactory = TestBed.get(
-      VisualizationInfoObjectFactory);
   });
 
-  afterEach(() => this.httpTestingController.verify());
+  afterEach(() => httpTestingController.verify());
+
+  const expId = 'expid';
+  let mockState: State;
 
   beforeEach(() => {
-    this.expId = 'expid';
-    this.mockState = {
-      name: 'Hola',
+    const stateDict: StateBackendDict = {
+      classifier_model_id: 'model_id',
+      content: {
+        content_id: 'content',
+        html: 'content'
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {}
+      },
       interaction: {
-        id: 'TextInput',
-        answerGroups: [
+        answer_groups: [
           {
-            rules: [{type: 'Equals', inputs: {x: 'hola!'}}],
-            outcome: {dest: 'Me Llamo'}
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: {x: 'hola!'}
+            }],
+            outcome: {
+              dest: 'Me Llamo',
+              feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+              labelled_as_correct: true,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+            },
+            training_data: null,
+            tagged_skill_misconception_id: null,
           },
           {
-            rules: [{type: 'Contains', inputs: {x: 'hola'}}],
-            outcome: {dest: 'Me Llamo'}
+            rule_specs: [{
+              rule_type: 'Contains',
+              inputs: {x: 'hola'}
+            }],
+            outcome: {
+              dest: 'Me Llamo',
+              feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+              labelled_as_correct: true,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+            },
+            training_data: null,
+            tagged_skill_misconception_id: null,
           },
           {
-            rules: [{type: 'FuzzyEquals', inputs: {x: 'hola'}}],
-            outcome: {dest: 'Hola'}
+            rule_specs: [{
+              rule_type: 'FuzzyEquals',
+              inputs: {x: 'hola'}
+            }],
+            outcome: {
+              dest: 'Me Llamo',
+              feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
+              labelled_as_correct: true,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+            },
+            training_data: null,
+            tagged_skill_misconception_id: null,
           }
         ],
-        defaultOutcome: {dest: 'Hola'}
-      }
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'ca_placeholder_0',
+              unicode_str: ''
+            }
+          },
+          rows: { value: 1 }
+        },
+        default_outcome: {
+          dest: 'Hola',
+          feedback: {content_id: 'default_outcome', html: ''},
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        },
+        hints: [],
+        id: 'TextInput',
+        solution: {
+          answer_is_exclusive: true,
+          correct_answer: '',
+          explanation: {
+            content_id: '',
+            html: ''
+          }
+        }
+      },
+      param_changes: [],
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {}
+      },
+      next_content_id_index: 0
     };
+
+    mockState = stateObjectFactory.createFromBackendDict('Hola', stateDict);
   });
 
   it('should support improvements overview for states with text-input', () => {
     expect(
-      this.stateInteractionStatsService.stateSupportsImprovementsOverview(
-        this.mockState)
+      stateInteractionStatsService.stateSupportsImprovementsOverview(mockState)
     ).toBeTrue();
   });
 
   describe('when gathering stats from the backend', () => {
     it('should provide cached results after first call', fakeAsync(() => {
-      this.statsCaptured = [];
+      let statsCaptured: StateInteractionStats[] = [];
       const captureStats = (stats: StateInteractionStats) => {
         expect(stats).toBeDefined();
-        this.statsCaptured.push(stats);
+        statsCaptured.push(stats);
       };
 
-      this.stateInteractionStatsService.computeStats(this.expId, this.mockState)
+      stateInteractionStatsService.computeStats(expId, mockState)
         .then(captureStats);
-      const req = this.httpTestingController.expectOne(
+      const req = httpTestingController.expectOne(
         '/createhandler/state_interaction_stats/expid/Hola');
       expect(req.request.method).toEqual('GET');
       req.flush({
@@ -112,27 +194,27 @@ describe('State Interaction Stats Service', () => {
       });
       flushMicrotasks();
 
-      this.stateInteractionStatsService.computeStats(this.expId, this.mockState)
+      stateInteractionStatsService.computeStats(expId, mockState)
         .then(captureStats);
-      this.httpTestingController.expectNone(
+      httpTestingController.expectNone(
         '/createhandler/state_interaction_stats/expid/Hola');
       flushMicrotasks();
 
-      expect(this.statsCaptured.length).toEqual(2);
-      const [statsFromFirstFetch, statsFromSecondFetch] = this.statsCaptured;
+      expect(statsCaptured.length).toEqual(2);
+      const [statsFromFirstFetch, statsFromSecondFetch] = statsCaptured;
       expect(statsFromSecondFetch).toBe(statsFromFirstFetch);
     }));
 
     it('should have separate caches for different states', fakeAsync(() => {
-      this.statsCaptured = [];
+      let statsCaptured: StateInteractionStats[] = [];
       const captureStats = (stats: StateInteractionStats) => {
         expect(stats).toBeDefined();
-        this.statsCaptured.push(stats);
+        statsCaptured.push(stats);
       };
 
-      this.stateInteractionStatsService.computeStats(this.expId, this.mockState)
+      stateInteractionStatsService.computeStats(expId, mockState)
         .then(captureStats);
-      const holaReq = this.httpTestingController.expectOne(
+      const holaReq = httpTestingController.expectOne(
         '/createhandler/state_interaction_stats/expid/Hola');
       expect(holaReq.request.method).toEqual('GET');
       holaReq.flush({
@@ -146,10 +228,10 @@ describe('State Interaction Stats Service', () => {
       });
       flushMicrotasks();
 
-      this.mockState.name = 'Adios';
-      this.stateInteractionStatsService.computeStats(this.expId, this.mockState)
+      mockState.name = 'Adios';
+      stateInteractionStatsService.computeStats(expId, mockState)
         .then(captureStats);
-      const adiosReq = this.httpTestingController.expectOne(
+      const adiosReq = httpTestingController.expectOne(
         '/createhandler/state_interaction_stats/expid/Adios');
       expect(adiosReq.request.method).toEqual('GET');
       adiosReq.flush({
@@ -163,19 +245,19 @@ describe('State Interaction Stats Service', () => {
       });
       flushMicrotasks();
 
-      expect(this.statsCaptured.length).toEqual(2);
-      const [statsFromFirstFetch, statsFromSecondFetch] = this.statsCaptured;
+      expect(statsCaptured.length).toEqual(2);
+      const [statsFromFirstFetch, statsFromSecondFetch] = statsCaptured;
       expect(statsFromSecondFetch).not.toBe(statsFromFirstFetch);
     }));
 
     it('should include answer frequencies in the response', fakeAsync(() => {
-      this.onSuccess = jasmine.createSpy('success');
-      this.onFailure = jasmine.createSpy('failure');
+      const onSuccess = jasmine.createSpy('success');
+      const onFailure = jasmine.createSpy('failure');
 
-      this.stateInteractionStatsService.computeStats(this.expId, this.mockState)
-        .then(this.onSuccess, this.onFailure);
+      stateInteractionStatsService.computeStats(expId, mockState)
+        .then(onSuccess, onFailure);
 
-      const req = this.httpTestingController.expectOne(
+      const req = httpTestingController.expectOne(
         '/createhandler/state_interaction_stats/expid/Hola');
       expect(req.request.method).toEqual('GET');
       req.flush({
@@ -189,28 +271,28 @@ describe('State Interaction Stats Service', () => {
       });
       flushMicrotasks();
 
-      expect(this.onSuccess).toHaveBeenCalledWith(this.joC({
-        visualizationsInfo: [this.joC({
+      expect(onSuccess).toHaveBeenCalledWith(joC({
+        visualizationsInfo: [joC({
           data: [
-            this.joC({answer: 'Ni Hao', frequency: 5}),
-            this.joC({answer: 'Aloha', frequency: 3}),
-            this.joC({answer: 'Hola', frequency: 1})
+            joC({answer: 'Ni Hao', frequency: 5}),
+            joC({answer: 'Aloha', frequency: 3}),
+            joC({answer: 'Hola', frequency: 1})
           ]
         })]
       }));
-      expect(this.onFailure).not.toHaveBeenCalled();
+      expect(onFailure).not.toHaveBeenCalled();
     }));
 
     it(
       'should determine whether TextInput answers are addressed explicitly',
       fakeAsync(() => {
-        this.onSuccess = jasmine.createSpy('success');
-        this.onFailure = jasmine.createSpy('failure');
+        const onSuccess = jasmine.createSpy('success');
+        const onFailure = jasmine.createSpy('failure');
 
-        this.stateInteractionStatsService.computeStats(
-          this.expId, this.mockState).then(this.onSuccess, this.onFailure);
+        stateInteractionStatsService.computeStats(expId, mockState).then(
+          onSuccess, onFailure);
 
-        const req = this.httpTestingController.expectOne(
+        const req = httpTestingController.expectOne(
           '/createhandler/state_interaction_stats/expid/Hola');
         expect(req.request.method).toEqual('GET');
         req.flush({
@@ -221,36 +303,36 @@ describe('State Interaction Stats Service', () => {
         });
         flushMicrotasks();
 
-        expect(this.onSuccess).toHaveBeenCalledWith(this.joC({
-          visualizationsInfo: [this.joC({
+        expect(onSuccess).toHaveBeenCalledWith(joC({
+          visualizationsInfo: [joC({
             data: [
-              this.joC({answer: 'Ni Hao', isAddressed: false}),
-              this.joC({answer: 'Aloha', isAddressed: false}),
-              this.joC({answer: 'Hola', isAddressed: true})
+              joC({answer: 'Ni Hao', isAddressed: false}),
+              joC({answer: 'Aloha', isAddressed: false}),
+              joC({answer: 'Hola', isAddressed: true})
             ]
           })]
         }));
-        expect(this.onFailure).not.toHaveBeenCalled();
+        expect(onFailure).not.toHaveBeenCalled();
       }));
 
     it('should return content of MultipleChoiceInput answers', fakeAsync(() => {
-      this.onSuccess = jasmine.createSpy('success');
-      this.onFailure = jasmine.createSpy('failure');
+      const onSuccess = jasmine.createSpy('success');
+      const onFailure = jasmine.createSpy('failure');
 
-      this.stateInteractionStatsService.computeStats(this.expId, {
-        name: 'Fraction',
-        interaction: {
-          id: 'MultipleChoiceInput',
-          customizationArgs: {
-            choices: {value: [
-              new SubtitledHtml('<p>foo</p>', ''),
-              new SubtitledHtml('<p>bar</p>', '')
-            ]},
-          },
+      mockState.name = 'Fraction';
+      mockState.interaction.id = 'MultipleChoiceInput';
+      mockState.interaction.customizationArgs = {
+        choices: {
+          value: [
+            new SubtitledHtml('<p>foo</p>', ''),
+            new SubtitledHtml('<p>bar</p>', '')
+          ]
         }
-      }).then(this.onSuccess, this.onFailure);
+      };
+      stateInteractionStatsService.computeStats(expId, mockState).then(
+        onSuccess, onFailure);
 
-      const req = this.httpTestingController.expectOne(
+      const req = httpTestingController.expectOne(
         '/createhandler/state_interaction_stats/expid/Fraction');
       expect(req.request.method).toEqual('GET');
       req.flush({
@@ -260,11 +342,11 @@ describe('State Interaction Stats Service', () => {
       });
       flushMicrotasks();
 
-      expect(this.onSuccess).toHaveBeenCalledWith(this.joC({
-        visualizationsInfo: [this.joC({
+      expect(onSuccess).toHaveBeenCalledWith(joC({
+        visualizationsInfo: [joC({
           data: [
-            this.joC({answer: '<p>foo</p>'}),
-            this.joC({answer: '<p>bar</p>'}),
+            joC({answer: '<p>foo</p>'}),
+            joC({answer: '<p>bar</p>'}),
           ]
         })]
       }));
@@ -273,14 +355,24 @@ describe('State Interaction Stats Service', () => {
     it(
       'should return FractionInput answers as readable strings',
       fakeAsync(() => {
-        this.onSuccess = jasmine.createSpy('success');
-        this.onFailure = jasmine.createSpy('failure');
+        const onSuccess = jasmine.createSpy('success');
+        const onFailure = jasmine.createSpy('failure');
 
-        this.stateInteractionStatsService.computeStats(this.expId, {
-          name: 'Fraction', interaction: {id: 'FractionInput'}
-        }).then(this.onSuccess, this.onFailure);
+        mockState.name = 'Fraction';
+        mockState.interaction.id = 'FractionInput';
+        mockState.interaction.customizationArgs = {
+          choices: {
+            value: [
+              new SubtitledHtml('<p>foo</p>', ''),
+              new SubtitledHtml('<p>bar</p>', '')
+            ]
+          }
+        };
 
-        const req = this.httpTestingController.expectOne(
+        stateInteractionStatsService.computeStats(expId, mockState).then(
+          onSuccess, onFailure);
+
+        const req = httpTestingController.expectOne(
           '/createhandler/state_interaction_stats/expid/Fraction');
         expect(req.request.method).toEqual('GET');
         req.flush({
@@ -311,11 +403,11 @@ describe('State Interaction Stats Service', () => {
         });
         flushMicrotasks();
 
-        expect(this.onSuccess).toHaveBeenCalledWith(this.joC({
-          visualizationsInfo: [this.joC({
+        expect(onSuccess).toHaveBeenCalledWith(joC({
+          visualizationsInfo: [joC({
             data: [
-              this.joC({ answer: '1/2' }),
-              this.joC({ answer: '0' })
+              joC({ answer: '1/2' }),
+              joC({ answer: '0' })
             ]
           })]
         }));
