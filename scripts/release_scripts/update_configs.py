@@ -176,28 +176,9 @@ def add_mailgun_api_key(release_feconf_path):
             f.write(line)
 
 
-def update_feconf_for_main_server(release_dir_path, personal_access_token):
-    """Updates feconf config specifically for main server by updating
-    REGISTRATION_PAGE_LAST_UPDATED_UTC and mailgun api key.
-
-    Args:
-        release_dir_path: str. Path of directory where all files are copied
-            for release.
-        personal_access_token: str. The personal access token for the
-            GitHub id of user.
-    """
-    try:
-        python_utils.url_open(TERMS_PAGE_URL)
-    except Exception:
-        raise Exception('Terms mainpage does not exist on Github.')
-
-    release_feconf_path = os.path.join(release_dir_path, common.FECONF_PATH)
-    add_mailgun_api_key(release_feconf_path)
-    check_updates_to_terms_of_service(
-        release_feconf_path, personal_access_token)
-
-
-def main(release_dir_path, deploy_data_path):
+def main(
+        release_dir_path, deploy_data_path, personal_access_token,
+        prompt_for_mailgun_and_terms_update):
     """Updates the files corresponding to LOCAL_FECONF_PATH and
     LOCAL_CONSTANTS_PATH after doing the prerequisite checks.
 
@@ -205,6 +186,10 @@ def main(release_dir_path, deploy_data_path):
         release_dir_path: str. Path of directory where all files are copied
             for release.
         deploy_data_path: str. Path for deploy data directory.
+        personal_access_token: str. The personal access token for the
+            GitHub id of user.
+        prompt_for_mailgun_and_terms_update: bool. Whether to update mailgun api
+            and last updated time for terms page.
     """
     # Do prerequisite checks.
     feconf_config_path = os.path.join(deploy_data_path, 'feconf_updates.config')
@@ -214,6 +199,15 @@ def main(release_dir_path, deploy_data_path):
     release_feconf_path = os.path.join(release_dir_path, common.FECONF_PATH)
     release_constants_path = os.path.join(
         release_dir_path, common.CONSTANTS_FILE_PATH)
+
+    if prompt_for_mailgun_and_terms_update:
+        try:
+            python_utils.url_open(TERMS_PAGE_URL)
+        except Exception:
+            raise Exception('Terms mainpage does not exist on Github.')
+        add_mailgun_api_key(release_feconf_path)
+        check_updates_to_terms_of_service(
+            release_feconf_path, personal_access_token)
 
     apply_changes_based_on_config(
         release_feconf_path, feconf_config_path, FECONF_REGEX)

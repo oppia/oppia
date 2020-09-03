@@ -78,8 +78,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
         with url_open_swap, self.assertRaisesRegexp(
             Exception, 'Terms mainpage does not exist on Github.'):
-            update_configs.update_feconf_for_main_server(
-                'test-release-dir', 'test-token')
+            update_configs.main(
+                'test-release-dir', 'test-deploy-dir', 'test-token', True)
 
     def test_invalid_user_input(self):
         print_msgs = []
@@ -280,14 +280,18 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             with python_utils.open_file(MOCK_LOCAL_FECONF_PATH, 'w') as f:
                 f.write(original_text)
 
-    def test_update_feconf_for_main_server(self):
+    def test_function_calls_with_prompt_for_feconf_and_terms_update(self):
         check_function_calls = {
             'check_updates_to_terms_of_service_gets_called': False,
-            'add_mailgun_api_key_gets_called': False
+            'add_mailgun_api_key_gets_called': False,
+            'apply_changes_based_on_config_gets_called': False,
+            'ask_user_to_confirm_gets_called': False
         }
         expected_check_function_calls = {
             'check_updates_to_terms_of_service_gets_called': True,
-            'add_mailgun_api_key_gets_called': True
+            'add_mailgun_api_key_gets_called': True,
+            'apply_changes_based_on_config_gets_called': True,
+            'ask_user_to_confirm_gets_called': True
         }
         def mock_check_updates(
                 unused_release_feconf_path, unused_personal_access_token):
@@ -295,18 +299,31 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 'check_updates_to_terms_of_service_gets_called'] = True
         def mock_add_mailgun_api_key(unused_release_feconf_path):
             check_function_calls['add_mailgun_api_key_gets_called'] = True
+        def mock_apply_changes(
+                unused_local_filepath, unused_config_filepath,
+                unused_expected_config_line_regex):
+            check_function_calls[
+                'apply_changes_based_on_config_gets_called'] = True
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_gets_called'] = True
 
         check_updates_swap = self.swap(
             update_configs, 'check_updates_to_terms_of_service',
             mock_check_updates)
         add_mailgun_api_key_swap = self.swap(
             update_configs, 'add_mailgun_api_key', mock_add_mailgun_api_key)
+        apply_changes_swap = self.swap(
+            update_configs, 'apply_changes_based_on_config', mock_apply_changes)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+
         with self.url_open_swap, check_updates_swap, add_mailgun_api_key_swap:
-            update_configs.update_feconf_for_main_server(
-                'test-release-dir', 'test-token')
+            with apply_changes_swap, ask_user_swap:
+                update_configs.main(
+                    'test-release-dir', 'test-deploy-dir', 'test-token', True)
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_function_calls(self):
+    def test_function_calls_without_prompt_for_feconf_and_terms_update(self):
         check_function_calls = {
             'apply_changes_based_on_config_gets_called': False,
             'ask_user_to_confirm_gets_called': False
@@ -328,5 +345,6 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         ask_user_swap = self.swap(
             common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
         with ask_user_swap, apply_changes_swap:
-            update_configs.main('test-release-dir', 'test-deploy-dir')
+            update_configs.main(
+                'test-release-dir', 'test-deploy-dir', 'test-token', False)
         self.assertEqual(check_function_calls, expected_check_function_calls)

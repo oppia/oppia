@@ -477,8 +477,8 @@ def update_configs_in_deploy_data(
             GitHub id of user.
     """
     if app_name == APP_NAME_OPPIASERVER:
-        update_configs.update_feconf_for_main_server(
-            release_dir_path, personal_access_token)
+        update_configs.main(
+            release_dir_path, deploy_data_path, personal_access_token, True)
 
         release_feconf_path = os.path.join(release_dir_path, common.FECONF_PATH)
         feconf_contents = python_utils.open_file(
@@ -488,7 +488,9 @@ def update_configs_in_deploy_data(
             raise Exception(
                 'The mailgun API key must be added '
                 'before deployment.')
-    update_configs.main(release_dir_path, deploy_data_path)
+    else:
+        update_configs.main(
+            release_dir_path, deploy_data_path, personal_access_token, False)
 
 
 def execute_deployment():

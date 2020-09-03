@@ -241,19 +241,16 @@ class DeployTests(test_utils.GenericTestBase):
         def mock_open_file(unused_path, unused_mode):
             return MockFile()
 
-        def mock_main(unused_release_dir_path, unused_deploy_data_path):
-            pass
-        def mock_update_feconf_for_main_server(
-                unused_release_dir_path, unused_personal_access_token):
+        def mock_main(
+                unused_release_dir_path, unused_deploy_data_path,
+                unused_personal_access_token,
+                unused_prompt_for_mailgun_and_terms_update):
             pass
 
         config_swap = self.swap(update_configs, 'main', mock_main)
-        feconf_update_swap = self.swap(
-            update_configs, 'update_feconf_for_main_server',
-            mock_update_feconf_for_main_server)
         open_swap = self.swap(python_utils, 'open_file', mock_open_file)
 
-        with config_swap, open_swap, feconf_update_swap:
+        with config_swap, open_swap:
             with self.assertRaisesRegexp(
                 Exception,
                 'The mailgun API key must be added before '
@@ -263,7 +260,10 @@ class DeployTests(test_utils.GenericTestBase):
                     'test-token')
 
     def test_mailgun_api_update_not_done_for_test_server(self):
-        def mock_main(unused_release_dir_path, unused_deploy_data_path):
+        def mock_main(
+                unused_release_dir_path, unused_deploy_data_path,
+                unused_personal_access_token,
+                unused_prompt_for_mailgun_and_terms_update):
             pass
         config_swap = self.swap(update_configs, 'main', mock_main)
 
