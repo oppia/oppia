@@ -169,7 +169,7 @@ export class EditableStoryBackendApiService {
         StoryDomainConstants.STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
           story_url_fragment: storyUrlFragment
         });
-      this.http.get('storyUrlFragment',
+      this.http.get(
         storyUrlFragmentUrl).toPromise().then(
         (response) => {
           if (successCallback) {

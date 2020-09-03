@@ -376,6 +376,7 @@ describe('Chapter editor functionality', function() {
 
   it('should add one prerequisite and acquired skill to chapter 1',
     async function() {
+      //debugger;
       await storyEditorPage.navigateToChapterWithName('Chapter 1');
       await storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
       await storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
