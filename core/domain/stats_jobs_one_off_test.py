@@ -1590,6 +1590,13 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
             output, [u'[u\'Missing model at version 1\', [u\''
                      + self.EXP_ID + '\']]'])
 
+    def test_job_yields_no_change_when_no_regeneration_is_needed(self):
+        self.exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(self.exp.version, 5)
+
+        output = self.run_one_off_job()
+        self.assertEqual(output, [u'[u\'No change\', 1]'])
+
     def test_job_successfully_regenerates_stats_with_missing_state_stats(self):
         v1_stats = stats_models.ExplorationStatsModel.get(
             stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 1))
@@ -1607,13 +1614,6 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(
             v2_stats.state_stats_mapping[self.state_name],
             stats_domain.StateStats.create_default().to_dict())
-
-    def test_job_yields_no_change_when_no_regeneration_is_needed(self):
-        self.exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
-        self.assertEqual(self.exp.version, 5)
-
-        output = self.run_one_off_job()
-        self.assertEqual(output, [u'[u\'No change\', 1]'])
 
     def test_job_correctly_calculates_stats_for_missing_commit_log_models(self):
         class MockExplorationCommitLogEntryModel(
