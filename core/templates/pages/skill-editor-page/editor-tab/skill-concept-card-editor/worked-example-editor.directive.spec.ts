@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for the skill concept card editor directive.
+ * @fileoverview Unit tests for the worked example editor directive.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
