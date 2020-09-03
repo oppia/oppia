@@ -1058,3 +1058,7 @@ CLASSROOM_PAGES = ['math']
 
 # Authentication method using GAE ID (google sign in)
 AUTH_METHOD_GAE = 'gae'
+
+# Length of user PIN for different roles used on Android
+FULL_USER_PIN_LENGTH = 5
+PROFILE_USER_PIN_LENGTH = 3

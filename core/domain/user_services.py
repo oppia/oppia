@@ -191,12 +191,24 @@ class UserSettings(python_utils.OBJECT):
                 self.gae_id
             )
 
-        if (self.pin is not None and
-                not isinstance(self.pin, python_utils.BASESTRING)):
+        if not isinstance(self.role, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected PIN to be a string, received %s' %
-                self.pin
-            )
+                'Expected role to be a string, received %s' % self.role)
+        if self.role not in role_services.PARENT_ROLES:
+            raise utils.ValidationError('Role %s does not exist.' % self.role)
+
+        if self.pin is not None:
+            if not isinstance(self.pin, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected PIN to be a string, received %s' %
+                    self.pin
+                )
+            elif (len(self.pin)!=feconf.FULL_USER_PIN_LENGTH and
+                    len(self.pin)!=feconf.PROFILE_USER_PIN_LENGTH):
+                raise utils.ValidationError(
+                    'User PIN can only be of length %s or %s' %
+                    (feconf.FULL_USER_PIN_LENGTH, feconf.PROFILE_USER_PIN_LENGTH)
+                )
 
         if not isinstance(self.email, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -207,12 +219,6 @@ class UserSettings(python_utils.OBJECT):
                 or self.email.endswith('@')):
             raise utils.ValidationError(
                 'Invalid email address: %s' % self.email)
-
-        if not isinstance(self.role, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected role to be a string, received %s' % self.role)
-        if self.role not in role_services.PARENT_ROLES:
-            raise utils.ValidationError('Role %s does not exist.' % self.role)
 
         if not isinstance(
                 self.creator_dashboard_display_pref, python_utils.BASESTRING):
