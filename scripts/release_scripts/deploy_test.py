@@ -509,7 +509,7 @@ class DeployTests(test_utils.GenericTestBase):
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         with exists_swap, self.assertRaisesRegexp(
             Exception,
-            'Could not find source path deploy_dir/%s. Please '
+            'Could not find source path deploy_dir/assets/%s. Please '
             'check your deploy_data folder.' % deploy.FILES_AT_ROOT[0]):
             deploy.preprocess_release('oppiaserver', 'deploy_dir')
 
@@ -538,7 +538,7 @@ class DeployTests(test_utils.GenericTestBase):
         with exists_swap, images_dir_swap, self.copyfile_swap:
             with self.assertRaisesRegexp(
                 Exception,
-                'Could not find source dir deploy_dir/images/invalid. '
+                'Could not find source dir deploy_dir/assets/images/invalid. '
                 'Please check your deploy_data folder.'):
                 deploy.preprocess_release('oppiaserver', 'deploy_dir')
 

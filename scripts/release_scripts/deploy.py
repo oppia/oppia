@@ -476,8 +476,6 @@ def update_configs_in_deploy_data(
         personal_access_token: str. The personal access token for the
             GitHub id of user.
     """
-    update_configs.main(release_dir_path, deploy_data_path)
-
     if app_name == APP_NAME_OPPIASERVER:
         update_configs.update_feconf_for_main_server(
             release_dir_path, personal_access_token)
@@ -490,6 +488,7 @@ def update_configs_in_deploy_data(
             raise Exception(
                 'The mailgun API key must be added '
                 'before deployment.')
+    update_configs.main(release_dir_path, deploy_data_path)
 
 
 def execute_deployment():
