@@ -844,7 +844,10 @@ def deep_encode(value, encoding='utf-8'):
     if isinstance(value, list):
         return [deep_encode(v, encoding=encoding) for v in value]
     elif isinstance(value, dict):
-        return {k.encode(encoding): deep_encode(v, encoding=encoding) for k, v in value.items()}
+        return {
+            k.encode(encoding): deep_encode(v, encoding=encoding)
+            for k, v in value.items()
+        }
     elif isinstance(value, python_utils.BASESTRING):
         return value.encode(encoding)
     else:
@@ -867,7 +870,10 @@ def deep_decode(value, encoding='utf-8'):
     if isinstance(value, list):
         return [deep_decode(v, encoding=encoding) for v in value]
     elif isinstance(value, dict):
-        return {k.decode(encoding): deep_decode(v, encoding=encoding) for k, v in value.items()}
+        return {
+            k.decode(encoding): deep_decode(v, encoding=encoding)
+            for k, v in value.items()
+        }
     elif isinstance(value, python_utils.BASESTRING):
         return value.decode(encoding)
     else:
