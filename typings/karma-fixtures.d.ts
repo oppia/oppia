@@ -203,7 +203,6 @@ interface RuleTemplates {
     Equals: RuleDescription;
     IsSubsetOf: RuleDescription;
     IsSupersetOf: RuleDescription;
-    IsSupersetOf: RuleDescription;
     HasElementsNotIn: RuleDescription;
     OmitsElementsIn: RuleDescription;
     IsDisjointFrom: RuleDescription;

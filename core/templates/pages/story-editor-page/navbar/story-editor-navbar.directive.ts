@@ -91,6 +91,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
               $scope.validationIssues.push(
                 'Story URL fragment already exists.');
             }
+            $scope.forceValidateExplorations = true;
             _validateExplorations();
             var nodes = $scope.story.getStoryContents().getNodes();
             var storyPrepublishValidationIssues = (
