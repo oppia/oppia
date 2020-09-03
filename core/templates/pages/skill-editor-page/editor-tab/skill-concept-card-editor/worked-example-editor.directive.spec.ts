@@ -22,56 +22,20 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { EventEmitter } from '@angular/core';
-
-describe('Skill concept card editor directive', function() {
+fdescribe('Worked example editor directive', function() {
   var $scope = null;
   var ctrl = null;
   var $rootScope = null;
   var $uibModal = null;
   var directive = null;
   var QuestionCreationService = null;
+  var WorkedExampleObjectFactory = null;
   var SkillUpdateService = null;
   var $q = null;
   var SkillEditorStateService = null;
   var WindowDimensionsService = null;
   var SkillObjectFactory = null;
-  var misconceptionDict = {
-    feedback: 'feedback',
-    id: 'id1',
-    must_be_addressed: false,
-    name: 'name1',
-    notes: 'notes1'
-  };
-  var rubricDict = {
-    difficulty: 'Easy',
-    explanations: ['Easy']
-  };
 
-  var conceptCardDict = {
-    explanation: {content_id: 'content',
-      html: 'html_data'},
-    worked_examples: [],
-    recorded_voiceovers: {
-      voiceovers_mapping: {
-        explanation: {},
-        worked_example_1: {},
-        worked_example_2: {}
-      }
-    } };
-  var skillBackendDict = {
-    all_questions_merged: true,
-    description: 'description1',
-    id: 'skillId1',
-    language_code: 'en',
-    misconceptions: [misconceptionDict],
-    next_misconception_id: '2',
-    prerequisite_skill_ids: [],
-    rubrics: [rubricDict],
-    skill_contents: conceptCardDict,
-    superseding_skill_id: 'skillId2',
-    version: 2,
-  };
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -90,19 +54,22 @@ describe('Skill concept card editor directive', function() {
     WindowDimensionsService = $injector.get('WindowDimensionsService');
     SkillUpdateService = $injector.get('SkillUpdateService');
     SkillEditorStateService = $injector.get('SkillEditorStateService');
+    WorkedExampleObjectFactory = $injector.get('WorkedExampleObjectFactory');
 
-    var skillObject = SkillObjectFactory.createFromBackendDict(
-      skillBackendDict);
-    let skillChangeEventEmitter = new EventEmitter();
-
-    spyOn(
-      SkillEditorStateService, 'getSkill').and.callFake(function() {
-      skillChangeEventEmitter.emit();
-      return skillObject;
-    });
-    spyOnProperty(
-      SkillEditorStateService, 'onSkillChange').and.returnValue(
-      skillChangeEventEmitter);
+    var example1 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1'
+      },
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
+      }
+    };
+    $scope.workedExample = WorkedExampleObjectFactory.createFromBackendDict(
+      example1);
+    $scope.isEditable = () => true;
+    $scope.getIndex = () => 0;
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope,
       $scope: $scope
@@ -111,9 +78,36 @@ describe('Skill concept card editor directive', function() {
   }));
 
   it('should initialize the variables', function() {
-    expect($scope.skillEditorCardIsShown).toEqual(true);
-    expect($scope.isEditable()).toEqual(true);
-    expect($scope.getStaticImageUrl('/test.png')).toBe(
-      '/assets/images/test.png');
+    expect($scope.questionEditorIsOpen).toEqual(false);
+    expect($scope.explanationEditorIsOpen).toEqual(false);
+  });
+
+  it('should open and close question editor', function() {
+    expect($scope.questionEditorIsOpen).toEqual(false);
+    $scope.openQuestionEditor();
+    expect($scope.questionEditorIsOpen).toEqual(true);
+    $scope.cancelEditQuestion();
+    expect($scope.questionEditorIsOpen).toEqual(false);
+  });
+
+  it('should open and close explanation editor', function() {
+    expect($scope.explanationEditorIsOpen).toEqual(false);
+    $scope.openExplanationEditor();
+    expect($scope.explanationEditorIsOpen).toEqual(true);
+    $scope.cancelEditExplanation();
+    expect($scope.explanationEditorIsOpen).toEqual(false);
+  });
+
+  it('should save worked example', function() {
+    var skillUpdateSpy = spyOn(SkillUpdateService, 'updateWorkedExample');
+    $scope.questionEditorIsOpen = true;
+    $scope.saveWorkedExample(true);
+    expect($scope.questionEditorIsOpen).toEqual(false);
+
+    $scope.explanationEditorIsOpen = true;
+    $scope.saveWorkedExample(false);
+    expect($scope.explanationEditorIsOpen).toEqual(false);
+
+    expect(skillUpdateSpy).toHaveBeenCalled();
   });
 });
