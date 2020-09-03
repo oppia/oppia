@@ -1871,3 +1871,35 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
             self.EXPLORATION_THREAD_ID)
         expected_language_code = 'hi'
         self.assertEqual(suggestion.language_code, expected_language_code)
+
+    def test_no_action_is_performed_for_deleted_suggestion(self):
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+                suggestion_models.TARGET_TYPE_SKILL,
+                'skill_1', feconf.CURRENT_STATE_SCHEMA_VERSION,
+                self.author_id, self.add_question_change_dict,
+                'test description')
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            self.SKILL_THREAD_ID
+        )
+
+        suggestion_model.delete()
+
+        job_id = (
+            suggestion_jobs_one_off.
+            SuggestionLanguageCodeMigrationOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off.SuggestionLanguageCodeMigrationOneOffJob
+            .enqueue(job_id)
+        )
+        self.process_and_flush_pending_tasks()
+
+        # Verify the output from the one off job.
+        actual_output = (
+            suggestion_jobs_one_off.
+            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id)
+        )
+        self.assertEqual(actual_output, [])
