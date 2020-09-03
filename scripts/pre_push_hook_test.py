@@ -692,8 +692,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_main_exits_when_mismatches_exist_in_backend_python_libs(self):
         """Test that main exits with correct error message when mismatches are
-        found between the installed python libraries in `third_party/python_libs
-         and the compiled 'requirements.txt' file'.
+        found between the installed python libraries in
+        `third_party/python_libs` and the compiled 'requirements.txt' file.
         """
         def mock_get_mismatches():
             return {

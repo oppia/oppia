@@ -42,7 +42,7 @@ if os.path.isdir(OPPIA_TOOLS_PATH):
     sys.path.insert(0, PIL_PATH)
 
 # Google App Engine (GAE) uses its own virtual environment that sets up the
-# python library system path using their third party python library vendor. In
+# python library system path using their third party python library, vendor. In
 # order to inform GAE of the packages that are required for Oppia, we need to
 # add it using the vendor library. More information can be found here:
 # https://cloud.google.com/appengine/docs/standard/python/tools/using-libraries-python-27
