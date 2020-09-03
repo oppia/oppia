@@ -164,9 +164,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
                 )
 
     def test_all_fields_have_export_policy(self):
-        """
-        Ensure that every field in every model has an export policy defined.
-        """
+        """Ensure every field in every model has an export policy defined."""
         all_models = [
             clazz
             for clazz in self._get_model_classes()
