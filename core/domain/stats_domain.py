@@ -428,7 +428,7 @@ class StateStats(python_utils.OBJECT):
                 other.num_completions_v1,
                 other.num_completions_v2,
             )
-        return NotImplemented
+        return NotImplemented # https://stackoverflow.com/a/44575926
 
     def __hash__(self):
         """Disallow hashing StateStats since they are mutable by design."""
