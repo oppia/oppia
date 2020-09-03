@@ -1368,19 +1368,29 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    def test_validate_valid_length_str_pin_works_fine(self):
-        valid_pin_values_list = ['123', '12345']
-        for pin in valid_pin_values_list:
-            self.user_settings.pin = pin
-            self.user_settings.validate()
-
-    def test_validate_invalid_length_str_pin_works_raises_error(self):
-        invalid_pin_values_list = ['1', '12', '1234', '123456']
+    def test_validate_invalid_length_pin_raises_error(self):
+        invalid_pin_values_list = ['1', '12', '1234', '123@#6', 'ABCa', '1!#a']
         error_msg = (
             'User PIN can only be of length %s or %s' %
             (feconf.FULL_USER_PIN_LENGTH, feconf.PROFILE_USER_PIN_LENGTH)
         )
         for pin in invalid_pin_values_list:
+            with self.assertRaisesRegexp(
+                utils.ValidationError, error_msg
+            ):
+                self.user_settings.pin = pin
+                self.user_settings.validate()
+
+    def test_validate_valid_length_with_numeric_char_pin_works_fine(self):
+        valid_pin_values_list = ['123', '12345', '764', '42343']
+        for pin in valid_pin_values_list:
+            self.user_settings.pin = pin
+            self.user_settings.validate()
+
+    def test_validate_valid_length_pin_with_non_numeric_char_raises_error(self):
+        valid_pin_values_list = ['AbC', '123A}', '1!2', 'AB!', '[123]']
+        error_msg = 'Only numeric characters are allowed in PIN'
+        for pin in valid_pin_values_list:
             with self.assertRaisesRegexp(
                 utils.ValidationError, error_msg
             ):

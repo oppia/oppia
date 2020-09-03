@@ -212,6 +212,12 @@ class UserSettings(python_utils.OBJECT):
                         feconf.PROFILE_USER_PIN_LENGTH
                     )
                 )
+            else:
+                for character in self.pin:
+                    if character < '0' or character > '9':
+                        raise utils.ValidationError(
+                            'Only numeric characters are allowed in PIN.'
+                        )
 
         if not isinstance(self.email, python_utils.BASESTRING):
             raise utils.ValidationError(
