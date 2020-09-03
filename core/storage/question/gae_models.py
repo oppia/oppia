@@ -710,7 +710,8 @@ class QuestionSummaryModel(base_models.BaseModel):
         need to be defined here.
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'question_model_last_updated': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'question_model_last_updated':
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
             'question_model_created_on': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'question_content': base_models.EXPORT_POLICY.NOT_EXPORTED
         })

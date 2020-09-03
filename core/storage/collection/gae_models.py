@@ -93,7 +93,6 @@ class CollectionModel(base_models.VersionedModel):
             'language_code': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'tags': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'schema_version': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'nodes': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'collection_contents': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'nodes': base_models.EXPORT_POLICY.NOT_EXPORTED
         })
@@ -584,7 +583,8 @@ class CollectionSummaryModel(base_models.BaseModel):
             'ratings': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'collection_model_last_updated':
                 base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'collection_model_created_on': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'collection_model_created_on':
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
             'status': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'community_owned': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'owner_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,

@@ -186,8 +186,10 @@ class TopicModel(base_models.VersionedModel):
             'thumbnail_filename': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'description': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'canonical_story_references': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'additional_story_references': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'canonical_story_references':
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'additional_story_references':
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
             'story_reference_schema_version':
                 base_models.EXPORT_POLICY.NOT_EXPORTED,
             'uncategorized_skill_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,

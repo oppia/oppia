@@ -755,7 +755,8 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'feedback_message_references': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'feedback_message_references':
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
             'retries': base_models.EXPORT_POLICY.NOT_EXPORTED
         })
 

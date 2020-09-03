@@ -230,7 +230,8 @@ class ContinuousComputationModel(base_models.BaseModel):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'status_code': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'active_realtime_layer_index': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'active_realtime_layer_index':
+                base_models.EXPORT_POLICY.NOT_EXPORTED,
             'last_started_msec': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'last_finished_msec': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'last_stopped_msec': base_models.EXPORT_POLICY.NOT_EXPORTED

@@ -50,7 +50,8 @@ class ExplorationRecommendationsModel(
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'recommended_exploration_ids': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'recommended_exploration_ids':
+                base_models.EXPORT_POLICY.NOT_EXPORTED
         })
 
     @classmethod
