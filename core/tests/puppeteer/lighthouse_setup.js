@@ -35,6 +35,7 @@ var skillEditorUrl = 'Skill editor not loaded';
 var usernameInput = '.protractor-test-username-input';
 var agreeToTermsCheckBox = '.protractor-test-agree-to-terms-checkbox';
 var registerUser = '.protractor-test-register-user';
+var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
 var createButtonSelector = '.protractor-test-create-activity';
 var dismissCreateModalSelector = '.protractor-test-dismiss-welcome-modal';
@@ -93,7 +94,7 @@ const login = async function(browser, page) {
       await page.click(agreeToTermsCheckBox);
       await page.waitForSelector(registerUser);
       await page.click(registerUser);
-      await page.waitForSelector('.oppia-navbar-dropdown-toggle');
+      await page.waitForSelector(navbarToggle);
     } catch (error) {
       // Already Signed in.
     }

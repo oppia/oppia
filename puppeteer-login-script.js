@@ -50,7 +50,7 @@ const login = async function(context, page) {
     await page.click('#signup-submit');
     await page.waitForSelector('.oppia-navbar-dropdown-toggle');
   } catch (e) {
-    // Already signed in
+    // Already Signed in.
   }
 };
 
