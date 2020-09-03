@@ -54,15 +54,15 @@ class RoleQueryAuditModel(base_models.BaseModel):
         """Audit logs are kept for investigation purposes."""
         return base_models.DELETION_POLICY.KEEP
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'intent': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'role': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'username': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -98,14 +98,14 @@ class UsernameChangeAuditModel(base_models.BaseModel):
         """Audit logs are kept for investigation purposes."""
         return base_models.DELETION_POLICY.KEEP
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'committer_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'old_username': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'new_username': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

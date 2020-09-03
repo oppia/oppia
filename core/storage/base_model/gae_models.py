@@ -124,17 +124,15 @@ class BaseModel(ndb.Model):
             'The export_data() method is missing from the '
             'derived class. It should be implemented in the derived class.')
 
-    @staticmethod
-    def get_export_policy():
-        """This method should be implemented by subclasses.
-
-        Raises:
-            NotImplementedError. The method is not overwritten in a derived
-                class.
+    @classmethod
+    def get_export_policy(cls):
+        """Model creation time is not relevant to user data.
         """
-        raise NotImplementedError(
-            'The get_export_policy() method is missing from the '
-            'derived class. It should be implemented in the derived class.')
+        return {
+            'created_on': EXPORT_POLICY.NOT_EXPORTED,
+            'last_updated': EXPORT_POLICY.NOT_EXPORTED,
+            'deleted': EXPORT_POLICY.NOT_EXPORTED
+        }
 
     @classmethod
     def get(cls, entity_id, strict=True):
@@ -151,7 +149,7 @@ class BaseModel(ndb.Model):
             that corresponds to the given id.
 
         Raises:
-            base_models.BaseModel.EntityNotFoundError. The value of strict is
+            BaseModel.EntityNotFoundError. The value of strict is
                 True and no undeleted entity with the given id exists in the
                 datastore.
         """
@@ -399,6 +397,23 @@ class BaseCommitLogEntryModel(BaseModel):
     version = ndb.IntegerProperty()
 
     @classmethod
+    def get_export_policy(cls):
+        """The history of commits is not relevant for the purposes of
+        Takeout.
+        """
+        return dict(BaseModel.get_export_policy(), **{
+            'user_id': EXPORT_POLICY.NOT_EXPORTED,
+            'commit_type': EXPORT_POLICY.NOT_EXPORTED,
+            'commit_message': EXPORT_POLICY.NOT_EXPORTED,
+            'commit_cmds': EXPORT_POLICY.NOT_EXPORTED,
+            'post_commit_status': EXPORT_POLICY.NOT_EXPORTED,
+            'post_commit_community_owned':
+                EXPORT_POLICY.NOT_EXPORTED,
+            'post_commit_is_private': EXPORT_POLICY.NOT_EXPORTED,
+            'version': EXPORT_POLICY.NOT_EXPORTED
+        })
+
+    @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether BaseCommitLogEntryModel references user.
 
@@ -425,7 +440,7 @@ class BaseCommitLogEntryModel(BaseModel):
             committer_id: str. The user_id of the user who committed the
                 change.
             commit_type: str. The type of commit. Possible values are in
-                core.storage.base_models.COMMIT_TYPE_CHOICES.
+                core.storage.COMMIT_TYPE_CHOICES.
             commit_message: str. The commit description message.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
@@ -1061,6 +1076,15 @@ class VersionedModel(BaseModel):
             'created_on_ms': utils.get_time_in_millisecs(model.created_on),
         } for (ind, model) in enumerate(returned_models)]
 
+    @classmethod
+    def get_export_policy(cls):
+        """The history of commits is not relevant for the purposes of
+        Takeout.
+        """
+        return dict(BaseModel.get_export_policy(), **{
+            'version': EXPORT_POLICY.NOT_EXPORTED
+        })
+
 
 class BaseSnapshotMetadataModel(BaseModel):
     """Base class for snapshot metadata classes.
@@ -1079,15 +1103,15 @@ class BaseSnapshotMetadataModel(BaseModel):
     # Represented as a list of dicts.
     commit_cmds = ndb.JsonProperty(indexed=False)
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Snapshot Metadata is relevant to the user for Takeout."""
-        return {
-            'committer_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'commit_type': base_models.EXPORT_POLICY.EXPORTED,
-            'commit_message': base_models.EXPORT_POLICY.EXPORTED,
-            'commit_cmds': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        return dict(BaseModel.get_export_policy(), **{
+            'committer_id': EXPORT_POLICY.NOT_EXPORTED,
+            'commit_type': EXPORT_POLICY.EXPORTED,
+            'commit_message': EXPORT_POLICY.EXPORTED,
+            'commit_cmds': EXPORT_POLICY.NOT_EXPORTED
+        })
 
     @classmethod
     def exists_for_user_id(cls, user_id):
@@ -1115,7 +1139,7 @@ class BaseSnapshotMetadataModel(BaseModel):
             committer_id: str. The user_id of the user who committed the
                 change.
             commit_type: str. The type of commit. Possible values are in
-                core.storage.base_models.COMMIT_TYPE_CHOICES.
+                core.storage.COMMIT_TYPE_CHOICES.
             commit_message: str. The commit description message.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
@@ -1173,14 +1197,14 @@ class BaseSnapshotContentModel(BaseModel):
     # The snapshot content, as a JSON blob.
     content = ndb.JsonProperty(indexed=False)
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """The contents of snapshots are not relevant to the user for
         Takeout.
         """
-        return {
-            'content': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        return dict(BaseModel.get_export_policy(), **{
+            'content': EXPORT_POLICY.NOT_EXPORTED
+        })
 
     @classmethod
     def create(cls, snapshot_id, content):

@@ -119,10 +119,10 @@ class StoryModel(base_models.VersionedModel):
         story_commit_log_entry.story_id = self.id
         story_commit_log_entry.put()
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'thumbnail_filename': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_EXPORTED,
@@ -134,7 +134,7 @@ class StoryModel(base_models.VersionedModel):
                 base_models.EXPORT_POLICY.NOT_EXPORTED,
             'corresponding_topic_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'url_fragment': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def get_by_url_fragment(cls, url_fragment):
@@ -186,14 +186,14 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return 'story-%s-%s' % (story_id, version)
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'story_id': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
 
 class StorySummaryModel(base_models.BaseModel):
@@ -253,10 +253,10 @@ class StorySummaryModel(base_models.BaseModel):
         """
         return False
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'language_code': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'description': base_models.EXPORT_POLICY.NOT_EXPORTED,
@@ -267,4 +267,4 @@ class StorySummaryModel(base_models.BaseModel):
             'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'version': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'url_fragment': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })

@@ -54,12 +54,12 @@ class ConfigPropertyModel(base_models.VersionedModel):
         """ConfigPropertyModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'value': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     def commit(self, committer_id, commit_cmds):
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
@@ -97,13 +97,13 @@ class PlatformParameterModel(base_models.VersionedModel):
         """PlatformParameterModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'rules': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'rule_schema_version': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def create(cls, param_name, rule_dicts, rule_schema_version):

@@ -85,12 +85,12 @@ class SentEmailModel(base_models.BaseModel):
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Users already have access to this data since emails were sent
         to them.
         """
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'recipient_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'recipient_email': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'sender_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
@@ -100,7 +100,7 @@ class SentEmailModel(base_models.BaseModel):
             'html_body': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'sent_datetime': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'email_hash': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -312,12 +312,12 @@ class BulkEmailModel(base_models.BaseModel):
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Users already have access to this data since the emails were sent
         to them.
         """
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'recipient_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'sender_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'sender_email': base_models.EXPORT_POLICY.NOT_EXPORTED,
@@ -325,7 +325,7 @@ class BulkEmailModel(base_models.BaseModel):
             'subject': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'html_body': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'sent_datetime': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -389,14 +389,14 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         """Feedback email reply to id should be deleted."""
         return base_models.DELETION_POLICY.DELETE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'thread_id': base_models.EXPORT_POLICY.EXPORTED,
             'reply_to_id': base_models.EXPORT_POLICY.EXPORTED
-        }
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

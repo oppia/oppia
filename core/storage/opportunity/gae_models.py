@@ -54,10 +54,10 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'topic_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'topic_name': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'story_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
@@ -71,7 +71,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.NOT_EXPORTED,
             'need_voice_artist_in_language_codes':
                 base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
@@ -203,13 +203,13 @@ class SkillOpportunityModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'skill_description': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'question_count': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):

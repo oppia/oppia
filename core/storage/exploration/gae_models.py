@@ -108,10 +108,10 @@ class ExplorationModel(base_models.VersionedModel):
         """Exploration is deleted only if it is not public."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'category': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'objective': base_models.EXPORT_POLICY.NOT_EXPORTED,
@@ -130,7 +130,7 @@ class ExplorationModel(base_models.VersionedModel):
             'skill_tags': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'default_skin': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'skin_customizations': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -239,12 +239,12 @@ class ExplorationContextModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'story_id': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
@@ -293,17 +293,17 @@ class ExplorationMathRichTextInfoModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'math_images_generation_required':
                 base_models.EXPORT_POLICY.NOT_EXPORTED,
             'estimated_max_size_of_images_in_bytes':
                 base_models.EXPORT_POLICY.NOT_EXPORTED,
             'latex_strings_without_svg':
                 base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
@@ -383,10 +383,10 @@ class ExplorationRightsModel(base_models.VersionedModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
             'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
             'voice_artist_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -394,8 +394,10 @@ class ExplorationRightsModel(base_models.VersionedModel):
             'community_owned': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'cloned_from': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'viewable_if_private': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'first_published_msec': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+            'first_published_msec': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'status': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'translator_ids': base_models.EXPORT_POLICY.NOT_EXPORTED
+        })
 
     @staticmethod
     def convert_to_valid_dict(model_dict):
@@ -567,14 +569,14 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'exploration_id': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def get_multi(cls, exp_id, exp_versions):
@@ -851,13 +853,13 @@ class ExpSummaryModel(base_models.BaseModel):
             -ExpSummaryModel.first_published_msec
         ).fetch(limit)
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model data has already been exported as a part of the
         ExplorationModel and thus does not need a separate export_data
         function.
         """
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'category': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'objective': base_models.EXPORT_POLICY.NOT_EXPORTED,
@@ -880,4 +882,4 @@ class ExpSummaryModel(base_models.BaseModel):
             'contributors_summary': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'version': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'translator_ids': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })

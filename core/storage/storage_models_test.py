@@ -154,12 +154,34 @@ class StorageModelsTest(test_utils.GenericTestBase):
         for model in all_models:
             export_policy = model.get_export_policy()
             if model in models_with_export:
-                self.assertEqual(
-                    dir(model),
-                    []
+                self.assertTrue(
+                    base_models.EXPORT_POLICY.EXPORTED in export_policy.values()
                 )
             else:
-                self.assertEqual(
-                    dir(model),
-                    []
+                self.assertTrue(
+                    base_models.EXPORT_POLICY.EXPORTED 
+                    not in export_policy.values()
+                )
+    
+    def test_all_fields_have_export_policy(self):
+        """Ensure that every field in every model has an export policy defined.
+        """
+        all_models = [
+            clazz
+            for clazz in self._get_model_classes()
+            if not clazz.__name__ in self.BASE_CLASSES
+        ]
+        for model in all_models:
+            export_policy = model.get_export_policy()
+            for field in model._properties:
+                if (field not in export_policy.keys()):
+                    self.assertEquals((model, field), [])
+                self.assertTrue(
+                    field in export_policy.keys()
+                )
+                self.assertTrue(
+                    export_policy[field] in {
+                        base_models.EXPORT_POLICY.EXPORTED,
+                        base_models.EXPORT_POLICY.NOT_EXPORTED
+                    }
                 )

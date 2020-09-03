@@ -97,10 +97,10 @@ class JobModel(base_models.BaseModel):
         """JobModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'job_type': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'time_queued_msec': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'time_started_msec': base_models.EXPORT_POLICY.NOT_EXPORTED,
@@ -111,7 +111,7 @@ class JobModel(base_models.BaseModel):
             'error': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'has_been_cleaned_up': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'additional_job_params': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @property
     def is_cancelable(self):
@@ -225,13 +225,13 @@ class ContinuousComputationModel(base_models.BaseModel):
         """ContinuousComputationModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'status_code': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'active_realtime_layer_index': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'last_started_msec': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'last_finished_msec': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'last_stopped_msec': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })

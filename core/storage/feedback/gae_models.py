@@ -92,10 +92,10 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         """General feedback thread needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'entity_type': base_models.EXPORT_POLICY.EXPORTED,
             'entity_id': base_models.EXPORT_POLICY.EXPORTED,
             'original_author_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -108,7 +108,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'last_nonempty_message_author_id':
                 base_models.EXPORT_POLICY.EXPORTED
-        }
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -254,10 +254,10 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         """General feedback message needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'thread_id': base_models.EXPORT_POLICY.EXPORTED,
             'message_id': base_models.EXPORT_POLICY.EXPORTED,
             'author_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -265,7 +265,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             'updated_subject': base_models.EXPORT_POLICY.EXPORTED,
             'text': base_models.EXPORT_POLICY.EXPORTED,
             'received_via_email': base_models.EXPORT_POLICY.EXPORTED
-        }
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -537,15 +537,15 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'thread_id': base_models.EXPORT_POLICY.EXPORTED,
             'message_ids_read_by_user':
                 base_models.EXPORT_POLICY.EXPORTED
-        }
+        })
 
 
     @classmethod
@@ -687,13 +687,13 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'num_open_threads': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'num_total_threads': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
@@ -753,13 +753,13 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
         """Unsent feedback email is kept until sent."""
         return base_models.DELETION_POLICY.KEEP
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'feedback_message_references': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'retries': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

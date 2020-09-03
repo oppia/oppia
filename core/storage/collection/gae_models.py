@@ -83,10 +83,10 @@ class CollectionModel(base_models.VersionedModel):
         """Collection is deleted only if it is not public."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'category': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'objective': base_models.EXPORT_POLICY.NOT_EXPORTED,
@@ -96,7 +96,7 @@ class CollectionModel(base_models.VersionedModel):
             'nodes': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'collection_contents': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'nodes': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -247,18 +247,20 @@ class CollectionRightsModel(base_models.VersionedModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
             'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
             'voice_artist_ids': base_models.EXPORT_POLICY.EXPORTED,
             'viewer_ids': base_models.EXPORT_POLICY.EXPORTED,
             'community_owned': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'viewable_if_private': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'first_published_msec': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+            'status': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'first_published_msec': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'translator_ids': base_models.EXPORT_POLICY.NOT_EXPORTED
+        })
 
     @staticmethod
     def convert_to_valid_dict(model_dict):
@@ -418,14 +420,14 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """The history of commits is not relevant for the purposes of
         Takeout.
         """
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'collection_id': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def _get_instance_id(cls, collection_id, version):
@@ -564,13 +566,13 @@ class CollectionSummaryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model data has already been exported as a part of the
         CollectionRightsModel, and thus does not need an export_data
         function.
         """
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'category': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'objective': base_models.EXPORT_POLICY.NOT_EXPORTED,
@@ -583,12 +585,13 @@ class CollectionSummaryModel(base_models.BaseModel):
             'status': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'community_owned': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'owner_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'editor_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'viewer_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'contributor_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'contributors_summary': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'version': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'node_count': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

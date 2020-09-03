@@ -71,10 +71,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         """ClassifierTrainingJobModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'algorithm_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'interaction_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'exp_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
@@ -84,7 +84,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             'training_data': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'next_scheduled_check_time': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'data_schema_version': base_models.EXPORT_POLICY.NOT_EXPORTED
-        } 
+        }) 
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -236,15 +236,15 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
         """TrainingJobExplorationMappingModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return {
+        return dict(super(cls, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'exp_version': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'state_name': base_models.EXPORT_POLICY.NOT_EXPORTED,
             'job_id': base_models.EXPORT_POLICY.NOT_EXPORTED
-        }
+        })
 
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):
