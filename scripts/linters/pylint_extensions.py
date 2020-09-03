@@ -582,7 +582,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
     not_needed_param_in_docstring = {'self', 'cls'}
     docstring_sections = {'Raises:', 'Returns:', 'Yields:'}
 
-    # Docstring section headers split up into arguments, returns, yieldsg
+    # Docstring section headers split up into arguments, returns, yields
     # and raises sections signifying that we are currently parsing the
     # corresponding section of that docstring.
     DOCSTRING_SECTION_RETURNS = 'returns'
@@ -1731,7 +1731,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             tokens: list(Token). Object to access all tokens of a module.
         """
         prev_line_num = -1
-        comments = []
+        comments_group_list = []
         comments_index = -1
 
         for (token_type, _, (line_num, _), _, line) in tokens:
@@ -1741,18 +1741,17 @@ class SingleLineCommentChecker(checkers.BaseChecker):
                 self._check_space_at_beginning_of_comments(line, line_num)
 
                 if prev_line_num + 1 == line_num:
-                    comments[comments_index].append((line, line_num))
+                    comments_group_list[comments_index].append((line, line_num))
                 else:
-                    comments.append([(line, line_num)])
+                    comments_group_list.append([(line, line_num)])
                     comments_index += 1
                 prev_line_num = line_num
 
-        for comment in comments:
-            first_comment, first_comment_line_num = comment[0]
-            last_comment, last_comment_line_num = comment[-1]
-            self._check_comment_starts_with_capital_letter(
-                first_comment, first_comment_line_num)
-            self._check_punctuation(last_comment, last_comment_line_num)
+        for comments in comments_group_list:
+            # Checks first line of comment.
+            self._check_comment_starts_with_capital_letter(*comments[0])
+            # Checks last line of comment.
+            self._check_punctuation(*comments[-1])
 
 
 class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
