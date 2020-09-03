@@ -17,8 +17,7 @@
  * test messages in calling of 'it'.
  */
 
-// eslint-disable-next-line no-shadow-restricted-names
-const { eval } = require('expression-eval');
+'use strict';
 
 module.exports = {
   meta: {
@@ -40,8 +39,8 @@ module.exports = {
   create: function(context) {
     var nodePos = {};
 
-    var checkMessageStartsWithShould = function(testMessageNode, testMessage) {
-      if (!testMessage.startsWith('should ')) {
+    var checkMessageStartsWithShould = function(testMessageNode) {
+      if (!testMessageNode.value.startsWith('should ')) {
         context.report({
           testMessageNode,
           loc: testMessageNode.loc,
@@ -50,8 +49,8 @@ module.exports = {
       }
     };
 
-    var checkSpacesInMessage = function(testMessageNode, testMessage) {
-      if (testMessage.includes('  ')) {
+    var checkSpacesInMessage = function(testMessageNode) {
+      if (testMessageNode.value.includes('  ')) {
         context.report({
           testMessageNode,
           loc: testMessageNode.loc,
@@ -60,8 +59,8 @@ module.exports = {
       }
     };
 
-    var checkNoSpaceAtEndOfMessage = function(testMessageNode, testMessage) {
-      if (testMessage.endsWith(' ')) {
+    var checkNoSpaceAtEndOfMessage = function(testMessageNode) {
+      if (testMessageNode.value.endsWith(' ')) {
         context.report({
           testMessageNode,
           loc: testMessageNode.loc,
@@ -70,23 +69,29 @@ module.exports = {
       }
     };
 
-    var checkMessage = function(testMessageNode, testMessage) {
-      checkMessageStartsWithShould(testMessageNode, testMessage);
-      checkSpacesInMessage(testMessageNode, testMessage);
-      checkNoSpaceAtEndOfMessage(testMessageNode, testMessage);
-    };
+    var checkMessage = function(node) {
+      if (node.type === 'Literal') {
+        if (node.loc.start.line === nodePos.start.line &&
+            node.loc.start.column === nodePos.start.column) {
+          checkMessageStartsWithShould(node);
+        }
+        if (node.loc.end.line === nodePos.end.line &&
+            node.loc.end.column === nodePos.end.column) {
+          checkNoSpaceAtEndOfMessage(node);
+        }
+        checkSpacesInMessage(node);
+      } else if (node.type === 'BinaryExpression') {
+        checkMessage(node.left);
+        checkMessage(node.right);
+      }
+    }
 
     return {
       CallExpression(node) {
         if (node.callee.name === 'it') {
           const testMessageNode = node.arguments[0];
-          if (testMessageNode.type === 'Literal') {
-            var testMessage = testMessageNode.value;
-            checkMessage(testMessageNode, testMessage);
-          } else if (testMessageNode.type === 'BinaryExpression') {
-            var testMessage = eval(testMessageNode);
-            checkMessage(testMessageNode, testMessage);
-          }
+          nodePos = testMessageNode.loc;
+          checkMessage(testMessageNode);
         }
       }
     };
