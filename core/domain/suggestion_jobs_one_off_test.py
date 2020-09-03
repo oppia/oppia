@@ -1650,7 +1650,7 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
         'translation_html': '<p>This is translated html.</p>'
     }
 
-    # The question_state_data is set to a valid state data in the setup.
+    # The question_state_data is set to valid state data in the setup.
     add_question_change_dict = {
         'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
         'question_dict': {
