@@ -32,8 +32,15 @@ var topicEditorUrl = 'Topic editor not loaded';
 var storyEditorUrl = 'Story editor not loaded';
 var skillEditorUrl = 'Skill editor not loaded';
 
+var usernameInput = '.protractor-test-username-input';
+var agreeToTermsCheckBox = '.protractor-test-agree-to-terms-checkbox';
+var registerUser = '.protractor-test-register-user';
+
 var createButtonSelector = '.protractor-test-create-activity';
+var dismissCreateModalSelector = '.protractor-test-dismiss-welcome-modal';
+
 var createCollectionButtonSelector = '.protractor-test-create-collection';
+var addExplorationInput = '.protractor-test-add-exploration-input';
 
 var createTopicButtonSelector = '.protractor-test-create-topic-button';
 var topicNameField = '.protractor-test-new-topic-name-field';
@@ -66,6 +73,11 @@ var confirmSkillCreationButton =
   '.protractor-test-confirm-skill-creation-button';
 var skillReviewMaterialInput = '.oppia-rte';
 
+var updateFormName = '.protractor-update-form-name';
+var updateFormSubmit = '.protractor-update-form-submit';
+var roleSelect = '.protractor-update-form-role-select';
+var statusMessage = '.protractor-test-status-message';
+
 const login = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
@@ -76,11 +88,11 @@ const login = async function(browser, page) {
     await page.click('#submit-login');
     // Checks if the user's account was already made.
     try {
-      await page.waitForSelector('#username', {visible: true});
-      await page.type('#username', 'username1');
-      await page.click('#terms-checkbox');
-      await page.waitForSelector('#signup-submit');
-      await page.click('#signup-submit');
+      await page.waitForSelector(usernameInput, {visible: true});
+      await page.type(usernameInput, 'username1');
+      await page.click(agreeToTermsCheckBox);
+      await page.waitForSelector(registerUser);
+      await page.click(registerUser);
       await page.waitForSelector('.oppia-navbar-dropdown-toggle');
     } catch (error) {
       // Already Signed in.
@@ -98,12 +110,12 @@ const setRole = async function(browser, page, role) {
     // eslint-disable-next-line dot-notation
     await page.goto(
       'http://127.0.0.1:8181/admin#/roles', { waitUntil: networkIdle });
-    await page.waitForSelector('#update-role-username-input');
-    await page.type('#update-role-username-input', 'username1');
-    await page.select('#update-role-input', role);
-    await page.waitForSelector('#update-button-id');
-    await page.click('#update-button-id');
-    await page.waitForSelector('.protractor-test-status-message');
+    await page.waitForSelector(updateFormName);
+    await page.type(updateFormName, 'username1');
+    await page.select(roleSelect, role);
+    await page.waitForSelector(updateFormSubmit);
+    await page.click(updateFormSubmit);
+    await page.waitForSelector(statusMessage);
     await page.waitForFunction(
       'document.querySelector(' +
         '".protractor-test-status-message").innerText.includes(' +
@@ -128,7 +140,7 @@ const getExplorationEditorUrl = async function(browser, page) {
     await page.waitForSelector(createButtonSelector, {visible: true});
     await page.click(createButtonSelector);
     await page.waitForSelector(
-      '.protractor-test-dismiss-welcome-modal', {visible: true});
+      dismissCreateModalSelector, {visible: true});
     explorationEditorUrl = await page.url();
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -150,7 +162,7 @@ const getCollectionEditorUrl = async function(browser, page) {
       createCollectionButtonSelector, {visible: true});
     await page.click(createCollectionButtonSelector);
     await page.waitForSelector(
-      '.protractor-test-add-exploration-input', {visible: true});
+      addExplorationInput, {visible: true});
     collectionEditorUrl = await page.url();
   } catch (e) {
     // eslint-disable-next-line no-console

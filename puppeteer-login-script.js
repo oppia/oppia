@@ -49,13 +49,8 @@ const login = async function(context, page) {
     await page.waitForSelector('#signup-submit');
     await page.click('#signup-submit');
     await page.waitForSelector('.oppia-navbar-dropdown-toggle');
-    // eslint-disable-next-line no-console
-    console.log('Successfully Logged in');
   } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('Login Failed');
-    // eslint-disable-next-line no-console
-    console.log(e);
+    // Already signed in
   }
 };
 
