@@ -117,9 +117,7 @@ class RegenerateMissingStateStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
             missing_states = set(exp.states) - set(stats.state_stats_mapping)
             if not missing_states:
-                yield (
-                    RegenerateMissingStateStatsOneOffJob.REDUCE_KEY_OK,
-                    ('%s.%s' % (exp.id, exp.version)).encode('utf-8'))
+                yield (RegenerateMissingStateStatsOneOffJob.REDUCE_KEY_OK, 1)
                 continue
 
             for state_name in missing_states:
