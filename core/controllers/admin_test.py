@@ -340,6 +340,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
 
         topic_id = 'topic'
         story_id = 'story'
@@ -350,13 +351,23 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id, 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        topic.next_subtopic_id = 2
         topic_services.save_new_topic(owner_id, topic)
+        topic_services.publish_topic(topic_id, self.admin_id)
 
         story = story_domain.Story.create_default_story(
             story_id, 'A story', 'Description', topic_id, 'story')
         story_services.save_new_story(owner_id, story)
         topic_services.add_canonical_story(
             owner_id, topic_id, story_id)
+        topic_services.publish_story(topic_id, story_id, self.admin_id)
         story_services.update_story(
             owner_id, story_id, [story_domain.StoryChange({
                 'cmd': 'add_story_node',

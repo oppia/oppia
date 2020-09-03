@@ -19,7 +19,7 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-require('interactions/codemirrorRequires.ts');
+require('third-party-imports/ui-codemirror.import.ts');
 
 require('interactions/LogicProof/directives/logic-proof-rules.service.ts');
 require(
@@ -64,7 +64,8 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
           // NOTE: for information on integrating angular and code-mirror see
           // http://github.com/angular-ui/ui-codemirror
           ctrl.codeEditor = function(editor) {
-            var proofString = (ctrl.interactionIsActive ?
+            var proofString = (
+              ctrl.interactionIsActive ?
               ctrl.localQuestionData.default_proof_string :
               ctrl.getLastAnswer().proof_string);
             editor.setValue(proofString);

@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-require('interactions/codemirrorRequires.ts');
+require('third-party-imports/ui-codemirror.import.ts');
 
 require('interactions/CodeRepl/directives/code-repl-rules.service.ts');
 require(
@@ -171,7 +171,8 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
                 markOptions);
 
               for (var i = 0; i < postCodeNumLines; i++) {
-                editor.addLineClass(preCodeNumLines + userCodeNumLines + i,
+                editor.addLineClass(
+                  preCodeNumLines + userCodeNumLines + i,
                   'text', 'code-repl-noneditable-line');
               }
             }

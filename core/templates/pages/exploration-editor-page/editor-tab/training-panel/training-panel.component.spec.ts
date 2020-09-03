@@ -69,8 +69,7 @@ describe('Training Panel Component', function() {
           param_changes: [],
           refresher_exploration_id: null
         },
-        rule_input_translations: {},
-        rule_types_to_inputs: {},
+        rule_specs: [],
         tagged_skill_misconception_id: ''
       }, {
         outcome: {
@@ -83,8 +82,7 @@ describe('Training Panel Component', function() {
           param_changes: [],
           refresher_exploration_id: null
         },
-        rule_input_translations: {},
-        rule_types_to_inputs: {},
+        rule_specs: [],
         tagged_skill_misconception_id: ''
       }],
       confirmed_unclassified_answers: null,
@@ -132,8 +130,8 @@ describe('Training Panel Component', function() {
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
     $provide.value(
       'StateCustomizationArgsService', stateCustomizationArgsService);
-    $provide.value('StateEditorRefreshService',
-      TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('StateInteractionIdService', stateInteractionIdService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
   }));
@@ -173,7 +171,7 @@ describe('Training Panel Component', function() {
     ctrl.$onInit();
   }));
 
-  it('should evaluates $scope properties after controller initialization',
+  it('should initialize $scope properties after controller is initialized',
     function() {
       expect(ctrl.addingNewResponse).toBe(false);
       expect($scope.allOutcomes.length).toBe(2);
@@ -183,11 +181,11 @@ describe('Training Panel Component', function() {
         '</oppia-response-multiple-choice-input>');
     });
 
-  it('should evaluate active state name', function() {
+  it('should get name from current state', function() {
     expect($scope.getCurrentStateName()).toBe(stateName);
   });
 
-  it('should confirm new feedback', function() {
+  it('should add new feedback and select it', function() {
     spyOn(responsesService, 'getAnswerGroupCount').and.returnValue(0);
     expect($scope.allOutcomes.length).toBe(2);
     expect($scope.selectedAnswerGroupIndex).toBe(0);

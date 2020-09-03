@@ -162,9 +162,8 @@ angular.module('oppia').directive('stateResponses', [
               // Collect all answers which have been handled by at least one
               // answer group.
               for (var i = 0; i < answerGroups.length; i++) {
-                const rules = answerGroups[i].getRulesAsList();
-                for (var j = 0; j < rules.length; j++) {
-                  handledAnswersArray.push(rules[j].inputs.x);
+                for (var j = 0; j < answerGroups[i].rules.length; j++) {
+                  handledAnswersArray.push(answerGroups[i].rules[j].inputs.x);
                 }
               }
               for (var i = 0; i < numChoices; i++) {
@@ -195,7 +194,7 @@ angular.module('oppia').directive('stateResponses', [
                 });
 
                 answerGroups.forEach(function(answerGroup) {
-                  var rules = answerGroup.getRulesAsList();
+                  var rules = answerGroup.rules;
                   rules.forEach(function(rule) {
                     var ruleInputs = rule.inputs.x;
                     ruleInputs.forEach(function(ruleInput) {
@@ -203,8 +202,7 @@ angular.module('oppia').directive('stateResponses', [
                       if (rule.type === 'Equals' ||
                           rule.type === 'ContainsAtLeastOneOf') {
                         handledAnswersArray[choiceIndex] = true;
-                      } else if (rule.type ===
-                        'DoesNotContainAtLeastOneOf') {
+                      } else if (rule.type === 'DoesNotContainAtLeastOneOf') {
                         for (var i = 0; i < handledAnswersArray.length; i++) {
                           if (i !== choiceIndex) {
                             handledAnswersArray[i] = true;
@@ -321,14 +319,13 @@ angular.module('oppia').directive('stateResponses', [
                 currentInteractionId: () => currentInteractionId,
                 stateName: () => stateName,
               },
+              windowClass: 'add-answer-group-modal',
               controller: 'AddAnswerGroupModalController'
             }).result.then(function(result) {
               // Create a new answer group.
-              const newAnswerGroup = AnswerGroupObjectFactory.createNew(
-                result.tmpOutcome, [],
-                result.tmpTaggedSkillMisconceptionId);
-              newAnswerGroup.addRule(result.tmpRule);
-              $scope.answerGroups.push(newAnswerGroup);
+              $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
+                [result.tmpRule], result.tmpOutcome, [],
+                result.tmpTaggedSkillMisconceptionId));
               ResponsesService.save(
                 $scope.answerGroups, $scope.defaultOutcome,
                 function(newAnswerGroups, newDefaultOutcome) {
@@ -463,11 +460,10 @@ angular.module('oppia').directive('stateResponses', [
             var outcome = answerGroup.outcome;
             var hasFeedback = outcome.hasNonemptyFeedback();
 
-            if (answerGroup.ruleTypesToInputs) {
+            if (answerGroup.rules) {
               var firstRule = $filter('convertToPlainText')(
                 $filter('parameterizeRuleDescription')(
-                  answerGroup.getRulesAsList()[0],
-                  interactionId, answerChoices));
+                  answerGroup.rules[0], interactionId, answerChoices));
               summary = 'Answer ' + firstRule;
 
               if (hasFeedback && shortenRule) {
@@ -569,7 +565,8 @@ angular.module('oppia').directive('stateResponses', [
               StateInteractionIdService.onInteractionIdChanged.subscribe(
                 (newInteractionId) => {
                   ExternalSaveService.onExternalSave.emit();
-                  ResponsesService.onInteractionIdChanged(newInteractionId,
+                  ResponsesService.onInteractionIdChanged(
+                    newInteractionId,
                     function(newAnswerGroups, newDefaultOutcome) {
                       $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
                       $scope.onSaveInteractionAnswerGroups(newAnswerGroups);

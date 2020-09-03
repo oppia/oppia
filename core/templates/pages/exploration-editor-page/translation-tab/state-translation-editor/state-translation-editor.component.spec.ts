@@ -73,8 +73,7 @@ describe('State Translation Editor Component', function() {
           param_changes: [],
           refresher_exploration_id: null
         },
-        rule_input_translations: {},
-        rule_types_to_inputs: {},
+        rule_specs: [],
         tagged_skill_misconception_id: ''
       }, {
         outcome: {
@@ -87,8 +86,7 @@ describe('State Translation Editor Component', function() {
           param_changes: [],
           refresher_exploration_id: null
         },
-        rule_input_translations: {},
-        rule_types_to_inputs: {},
+        rule_specs: [],
         tagged_skill_misconception_id: ''
       }],
       confirmed_unclassified_answers: null,
@@ -141,12 +139,12 @@ describe('State Translation Editor Component', function() {
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
-    $provide.value('StateEditorRefreshService',
-      TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('StateRecordedVoiceoversService', TestBed.get(
       StateRecordedVoiceoversService));
-    $provide.value('StateWrittenTranslationsService',
-      stateWrittenTranslationsService);
+    $provide.value(
+      'StateWrittenTranslationsService', stateWrittenTranslationsService);
   }));
 
   describe('when has written translation', function() {
@@ -168,10 +166,11 @@ describe('State Translation Editor Component', function() {
       spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
         () => {});
 
-      spyOnProperty(translationLanguageService,
-        'onActiveLanguageChanged').and.returnValue(
+      spyOnProperty(
+        translationLanguageService, 'onActiveLanguageChanged').and.returnValue(
         mockActiveLanguageChangedEventEmitter);
-      spyOnProperty(translationTabActiveContentIdService,
+      spyOnProperty(
+        translationTabActiveContentIdService,
         'onActiveContentIdChanged').and.returnValue(
         mockActiveLanguageChangedEventEmitter);
 
@@ -184,7 +183,7 @@ describe('State Translation Editor Component', function() {
             needs_update: true
           })
         ),
-        updateWrittenTranslationHtml: () => {}
+        updateWrittenTranslation: () => {}
       });
 
       $scope = $rootScope.$new();
@@ -201,7 +200,7 @@ describe('State Translation Editor Component', function() {
       ctrl.$onDestroy();
     });
 
-    it('should evaluate $scope properties after controller initialization',
+    it('should initialize $scope properties after controller is initialized',
       function() {
         expect($scope.translationEditorIsOpen).toBe(false);
         expect($scope.activeWrittenTranslation).toEqual(
@@ -310,11 +309,11 @@ describe('State Translation Editor Component', function() {
       ' translation button', function() {
       spyOn(
         stateWrittenTranslationsService.displayed,
-        'updateWrittenTranslationHtml').and.callThrough();
+        'updateWrittenTranslation').and.callThrough();
       $scope.onSaveTranslationButtonClicked();
 
       expect(
-        stateWrittenTranslationsService.displayed.updateWrittenTranslationHtml)
+        stateWrittenTranslationsService.displayed.updateWrittenTranslation)
         .toHaveBeenCalled();
     });
 
@@ -339,7 +338,7 @@ describe('State Translation Editor Component', function() {
 
     it('should init editor when changing active content id language',
       function() {
-        mockActiveContentIdChangedEventEmitter.emit();
+        mockActiveContentIdChangedEventEmitter.emit('html');
         expect($scope.translationEditorIsOpen).toBe(false);
         expect($scope.activeWrittenTranslation).toEqual(
           writtenTranslationObjectFactory.createFromBackendDict({
@@ -379,6 +378,9 @@ describe('State Translation Editor Component', function() {
       spyOn(explorationStatesService, 'getState').and.returnValue(stateObj);
       spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
         () => {});
+      spyOn(
+        translationTabActiveContentIdService, 'getActiveDataFormat'
+      ).and.returnValue('html');
 
       stateWrittenTranslationsService.init(stateName, {
         hasWrittenTranslation: () => false,
@@ -406,13 +408,13 @@ describe('State Translation Editor Component', function() {
       ctrl.$onDestroy();
     });
 
-    it('should evaluate $scope properties after controller initialization',
+    it('should initialize $scope properties after controller is initialized',
       function() {
         expect($scope.translationEditorIsOpen).toBe(false);
         expect($scope.activeWrittenTranslation).toBe(null);
       });
 
-    it('should open translation editor when is editable', function() {
+    it('should open translation editor when it is editable', function() {
       $scope.openTranslationEditor();
       expect($scope.translationEditorIsOpen).toBe(true);
       expect($scope.activeWrittenTranslation).toEqual(

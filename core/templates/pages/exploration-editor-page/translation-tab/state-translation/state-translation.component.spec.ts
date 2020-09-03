@@ -71,6 +71,10 @@ import { ContinueRulesService } from
   'interactions/Continue/directives/continue-rules.service';
 import { EventEmitter } from '@angular/core';
 import { ExternalSaveService } from 'services/external-save.service';
+import { RatioObjectFactory } from
+  'domain/objects/RatioObjectFactory';
+import { SubtitledUnicodeObjectFactory } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 
 describe('State translation component', function() {
@@ -86,9 +90,11 @@ describe('State translation component', function() {
   var stateEditorService = null;
   var stateRecordedVoiceoversService = null;
   var subtitledHtmlObjectFactory = null;
+  var subtitledUnicodeObjectFactory = null;
   var translationLanguageService = null;
   var translationTabActiveContentIdService = null;
   var translationTabActiveModeService = null;
+  var explorationHtmlFormatterService = null;
 
   var explorationState1 = {
     Introduction: {
@@ -101,7 +107,7 @@ describe('State translation component', function() {
         customization_args: {
           placeholder: {
             value: {
-              content_id: '',
+              content_id: 'ca_placeholder',
               unicode_str: ''
             }
           },
@@ -110,8 +116,7 @@ describe('State translation component', function() {
           }
         },
         answer_groups: [{
-          rule_types_to_inputs: {},
-          rule_input_translations: {},
+          rule_specs: [],
           outcome: {
             dest: 'unused',
             feedback: {
@@ -120,8 +125,7 @@ describe('State translation component', function() {
             },
           }
         }, {
-          rule_types_to_inputs: {},
-          rule_input_translations: {},
+          rule_specs: [],
           outcome: {
             dest: 'unused',
             feedback: {
@@ -171,7 +175,8 @@ describe('State translation component', function() {
               translation: 'Translation',
               needs_update: false
             }
-          }
+          },
+          ca_placeholder: {}
         }
       }
     }
@@ -187,7 +192,7 @@ describe('State translation component', function() {
         customization_args: {
           placeholder: {
             value: {
-              content_id: '',
+              content_id: 'ca_placeholder',
               unicode_str: ''
             }
           },
@@ -253,7 +258,7 @@ describe('State translation component', function() {
         customization_args: {
           buttonText: {
             value: {
-              content_id: 'content',
+              content_id: 'ca_placeholder',
               unicode_str: 'Button text value'
             }
           }
@@ -354,9 +359,12 @@ describe('State translation component', function() {
       feedback_1: {},
       hint_1: {},
       solution: {},
-      solution_1: {}
+      solution_1: {},
+      ca_placeholder: {},
+      ca_fakePlaceholder: {}
     }
   };
+
   var refreshStateTranslationEmitter = new EventEmitter();
   var showTranslationTabBusyModalEmitter = new EventEmitter();
 
@@ -364,17 +372,19 @@ describe('State translation component', function() {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
       'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
-    $provide.value('ContinueValidationService',
-      TestBed.get(ContinueValidationService));
-    $provide.value('ContinueRulesService',
-      TestBed.get(ContinueRulesService));
-    $provide.value('ExplorationImprovementsTaskRegistryService',
+    $provide.value(
+      'ContinueValidationService', TestBed.get(ContinueValidationService));
+    $provide.value(
+      'ContinueRulesService', TestBed.get(ContinueRulesService));
+    $provide.value(
+      'ExplorationImprovementsTaskRegistryService',
       TestBed.get(ExplorationImprovementsTaskRegistryService));
-    $provide.value('ExplorationStatsService',
-      TestBed.get(ExplorationStatsService));
+    $provide.value(
+      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
     $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
     $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));
-    $provide.value('NumberWithUnitsObjectFactory',
+    $provide.value(
+      'NumberWithUnitsObjectFactory',
       TestBed.get(NumberWithUnitsObjectFactory));
     $provide.value(
       'TextInputRulesService',
@@ -384,15 +394,17 @@ describe('State translation component', function() {
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
-    $provide.value('StateInteractionIdService',
-      TestBed.get(StateInteractionIdService));
-    $provide.value('StateEditorRefreshService',
-      TestBed.get(StateEditorRefreshService));
-    $provide.value('StateRecordedVoiceoversService',
-      stateRecordedVoiceoversService);
+    $provide.value(
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateRecordedVoiceoversService', stateRecordedVoiceoversService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
-    $provide.value('StateWrittenTranslationsService',
+    $provide.value(
+      'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
+    $provide.value('RatioObjectFactory', TestBed.get(RatioObjectFactory));
   }));
 
   beforeEach(function() {
@@ -412,6 +424,7 @@ describe('State translation component', function() {
     stateRecordedVoiceoversService = TestBed.get(
       StateRecordedVoiceoversService);
     subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
+    subtitledUnicodeObjectFactory = TestBed.get(SubtitledUnicodeObjectFactory);
   });
 
   afterEach(function() {
@@ -440,8 +453,8 @@ describe('State translation component', function() {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
       explorationStatesService.init(explorationState1);
-      stateRecordedVoiceoversService.init('Introduction',
-        recordedVoiceoversObjectFactory.createFromBackendDict(
+      stateRecordedVoiceoversService.init(
+        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
@@ -458,13 +471,13 @@ describe('State translation component', function() {
     }));
 
     it('should init state translation when refreshing page', function() {
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       refreshStateTranslationEmitter.emit();
 
       expect($scope.isActive('content')).toBe(true);
       expect($scope.isDisabled('content')).toBe(false);
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('content_1');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('content_1', 'html');
     });
 
     it('should navigate to a given state', function() {
@@ -473,6 +486,24 @@ describe('State translation component', function() {
 
       expect(routerService.navigateToMainTab).toHaveBeenCalledWith(
         'Introduction');
+    });
+
+    it('should get customization argument translatable customization' +
+      ' arguments', () => {
+      let content = subtitledHtmlObjectFactory.createDefault('', '');
+      let translatableCa = (
+        $scope.getInteractionCustomizationArgTranslatableContents({
+          testingCustArgs: {
+            value: {
+              innerValue: content
+            }
+          }
+        })
+      );
+      expect(translatableCa).toEqual([{
+        name: 'Testing Cust Args > Inner Value',
+        content
+      }]);
     });
 
     it('should broadcast copy to ck editor when clicking on content',
@@ -492,13 +523,13 @@ describe('State translation component', function() {
       });
 
     it('should activate content tab when clicking on tab', function() {
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('content');
 
       expect($scope.isActive('content')).toBe(true);
       expect($scope.isDisabled('content')).toBe(false);
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('content_1');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('content_1', 'html');
       expect($scope.tabStatusColorStyle('content')).toEqual({
         'border-top-color': '#D14836'
       });
@@ -509,14 +540,33 @@ describe('State translation component', function() {
       });
     });
 
+    it('should activate interaction custimization arguments tab when ' +
+       'clicking on tab', function() {
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      $scope.onTabClick('ca');
+
+      expect($scope.isActive('ca')).toBe(true);
+      expect($scope.isDisabled('ca')).toBe(false);
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('ca_placeholder', 'unicode');
+      expect($scope.tabStatusColorStyle('ca')).toEqual({
+        'border-top-color': '#D14836'
+      });
+      expect($scope.tabNeedUpdatesStatus('ca')).toBe(false);
+      expect($scope.contentIdNeedUpdates('ca_placeholder')).toBe(false);
+      expect($scope.contentIdStatusColorStyle('ca_placeholder')).toEqual({
+        'border-left': '3px solid #D14836'
+      });
+    });
+
     it('should activate feedback tab when clicking on tab', function() {
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('feedback');
 
       expect($scope.isActive('feedback')).toBe(true);
       expect($scope.isDisabled('feedback')).toBe(false);
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('feedback_1');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('feedback_1', 'html');
       expect($scope.tabStatusColorStyle('feedback')).toEqual({
         'border-top-color': '#D14836'
       });
@@ -528,13 +578,13 @@ describe('State translation component', function() {
     });
 
     it('should activate hint tab when clicking on tab', function() {
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('hint');
 
       expect($scope.isActive('hint')).toBe(true);
       expect($scope.isDisabled('hint')).toBe(false);
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('hint_1');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('hint_1', 'html');
       expect($scope.tabStatusColorStyle('hint')).toEqual({
         'border-top-color': '#D14836'
       });
@@ -546,13 +596,13 @@ describe('State translation component', function() {
     });
 
     it('should activate solution tab when clicking on tab', function() {
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('solution');
 
       expect($scope.isActive('solution')).toBe(true);
       expect($scope.isDisabled('solution')).toBe(false);
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('solution_1');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('solution_1', 'html');
       expect($scope.tabStatusColorStyle('solution')).toEqual({
         'border-top-color': '#D14836'
       });
@@ -566,53 +616,65 @@ describe('State translation component', function() {
     it('should change active hint index ', function() {
       $scope.onTabClick('hint');
 
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveHintIndex(1);
 
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('hint_2');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('hint_2', 'html');
     });
 
     it('should not change active hint index if it is equal to the current one',
       function() {
         $scope.onTabClick('hint');
 
-        spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+        spyOn(translationTabActiveContentIdService, 'setActiveContent');
         $scope.changeActiveHintIndex(0);
 
-        expect(translationTabActiveContentIdService.setActiveContentId).not
+        expect(translationTabActiveContentIdService.setActiveContent).not
           .toHaveBeenCalled();
       });
 
     it('should change active answer group index ', function() {
       $scope.onTabClick('feedback');
 
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveAnswerGroupIndex(1);
 
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('feedback_2');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('feedback_2', 'html');
+    });
+
+    it('should not change active customization argument index if it is equal' +
+      ' to the current one',
+    function() {
+      $scope.onTabClick('ca');
+
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      $scope.changeActiveCustomizationArgContentIndex(0);
+
+      expect(translationTabActiveContentIdService.setActiveContent).not
+        .toHaveBeenCalled();
     });
 
     it('should change active answer group index to default outcome when' +
       ' index provided is equal to answer groups length', function() {
       $scope.onTabClick('feedback');
 
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveAnswerGroupIndex(2);
 
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('default_outcome');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('default_outcome', 'html');
     });
 
     it('should not change active hint index if it is equal to the current one',
       function() {
         $scope.onTabClick('feedback');
 
-        spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+        spyOn(translationTabActiveContentIdService, 'setActiveContent');
         $scope.changeActiveAnswerGroupIndex(0);
 
-        expect(translationTabActiveContentIdService.setActiveContentId).not
+        expect(translationTabActiveContentIdService.setActiveContent).not
           .toHaveBeenCalled();
       });
 
@@ -622,7 +684,8 @@ describe('State translation component', function() {
         html: 'This is the html'
       });
       expect($scope.getRequiredHtml(subtitledObject)).toBe('Translation');
-      expect($scope.getHtmlSummary(subtitledObject)).toBe('This is the html');
+      expect($scope.getSubtitledContentSummary(subtitledObject)).toBe(
+        'This is the html');
     });
 
     it('should get empty content message when text translations haven\'t' +
@@ -665,6 +728,7 @@ describe('State translation component', function() {
     it('should get summary answer group', function() {
       expect($scope.summarizeAnswerGroup(
         answerGroupObjectFactory.createNew(
+          [],
           outcomeObjectFactory.createNew('unused', '1', 'Feedback text', []),
           'Training data text', '0'), '1', {}, true))
         .toBe('[Answer] Feedback text');
@@ -691,8 +755,8 @@ describe('State translation component', function() {
       spyOnProperty(stateEditorService, 'onShowTranslationTabBusyModal').and
         .returnValue(showTranslationTabBusyModalEmitter);
       explorationStatesService.init(explorationState1);
-      stateRecordedVoiceoversService.init('Introduction',
-        recordedVoiceoversObjectFactory.createFromBackendDict(
+      stateRecordedVoiceoversService.init(
+        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
@@ -710,76 +774,107 @@ describe('State translation component', function() {
     it('should open translation tab busy modal when clicking on content' +
       ' tab', function() {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('content');
 
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-      expect(translationTabActiveContentIdService.setActiveContentId).not
+      expect(translationTabActiveContentIdService.setActiveContent).not
+        .toHaveBeenCalled();
+    });
+
+    it('should open translation tab busy modal when clicking on interaction' +
+      'customization arguments tab', function() {
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      $scope.onTabClick('ca');
+
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
+      expect(translationTabActiveContentIdService.setActiveContent).not
         .toHaveBeenCalled();
     });
 
     it('should open translation tab busy modal when clicking on feedback' +
       ' tab', function() {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('feedback');
 
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-      expect(translationTabActiveContentIdService.setActiveContentId).not
+      expect(translationTabActiveContentIdService.setActiveContent).not
         .toHaveBeenCalled();
     });
 
     it('should open translation tab busy modal when clicking on hint' +
       ' tab', function() {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('hint');
 
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-      expect(translationTabActiveContentIdService.setActiveContentId).not
+      expect(translationTabActiveContentIdService.setActiveContent).not
         .toHaveBeenCalled();
     });
 
     it('should open translation tab busy modal when clicking on solution' +
       ' tab', function() {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('solution');
 
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-      expect(translationTabActiveContentIdService.setActiveContentId).not
+      expect(translationTabActiveContentIdService.setActiveContent).not
         .toHaveBeenCalled();
     });
 
     it('should open translation tab busy modal when trying to change' +
       ' active hint index ', function() {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveHintIndex(1);
 
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-      expect(translationTabActiveContentIdService.setActiveContentId).not
+      expect(translationTabActiveContentIdService.setActiveContent).not
         .toHaveBeenCalled();
     });
 
     it('should open translation tab busy modal when trying to change' +
       ' active answer group index ', function() {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveAnswerGroupIndex(1);
 
       expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
-      expect(translationTabActiveContentIdService.setActiveContentId).not
+      expect(translationTabActiveContentIdService.setActiveContent).not
         .toHaveBeenCalled();
     });
 
-    it('should get subtitled html data', function() {
+    it('should open translation tab busy modal when trying to change' +
+      ' interaction customization argument index', function() {
+      spyOn(showTranslationTabBusyModalEmitter, 'emit');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+      $scope.changeActiveCustomizationArgContentIndex(0);
+
+      expect(showTranslationTabBusyModalEmitter.emit).toHaveBeenCalled();
+      expect(translationTabActiveContentIdService.setActiveContent).not
+        .toHaveBeenCalled();
+    });
+
+    it('should get subtitled data', function() {
       var subtitledObject = subtitledHtmlObjectFactory.createFromBackendDict({
         content_id: 'content_1',
         html: 'This is the html'
       });
       expect($scope.getRequiredHtml(subtitledObject)).toBe('This is the html');
-      expect($scope.getHtmlSummary(subtitledObject)).toBe('This is the html');
+      expect($scope.getSubtitledContentSummary(subtitledObject)).toBe(
+        'This is the html');
+
+      subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict(
+        {
+          content_id: 'content_1',
+          unicode_str: 'This is the unicode'
+        });
+      expect($scope.getSubtitledContentSummary(subtitledObject)).toBe(
+        'This is the unicode');
     });
 
     it('should get content message warning that there is not text available' +
@@ -804,8 +899,8 @@ describe('State translation component', function() {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
       explorationStatesService.init(explorationState2);
-      stateRecordedVoiceoversService.init('Introduction',
-        recordedVoiceoversObjectFactory.createFromBackendDict(
+      stateRecordedVoiceoversService.init(
+        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
@@ -823,13 +918,13 @@ describe('State translation component', function() {
 
     it('should activate feedback tab with default outcome when' +
       ' clicking on tab', function() {
-      spyOn(translationTabActiveContentIdService, 'setActiveContentId');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.onTabClick('feedback');
 
       expect($scope.isActive('feedback')).toBe(true);
       expect($scope.isDisabled('feedback')).toBe(false);
-      expect(translationTabActiveContentIdService.setActiveContentId)
-        .toHaveBeenCalledWith('default_outcome');
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('default_outcome', 'html');
     });
   });
 
@@ -847,8 +942,8 @@ describe('State translation component', function() {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
       explorationStatesService.init(explorationState3);
-      stateRecordedVoiceoversService.init('Introduction',
-        recordedVoiceoversObjectFactory.createFromBackendDict(
+      stateRecordedVoiceoversService.init(
+        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
@@ -881,7 +976,8 @@ describe('State translation component', function() {
     });
   });
 
-  describe('when state has no hints, solution and outcome', function() {
+  describe('when state has a multiple choice interaction with no hints, ' +
+           'solution or outcome', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
       explorationStatesService = $injector.get('ExplorationStatesService');
@@ -891,13 +987,47 @@ describe('State translation component', function() {
         'TranslationTabActiveContentIdService');
       translationTabActiveModeService = $injector.get(
         'TranslationTabActiveModeService');
+      explorationHtmlFormatterService = $injector.get(
+        'ExplorationHtmlFormatterService');
 
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
+
+      // Because the customization arguments we are passing for testing are
+      // invalid, we will skip getInteractionHtml(), which would error
+      // otherwise.
+      spyOn(
+        explorationHtmlFormatterService, 'getInteractionHtml'
+      ).and.returnValue('');
+      // These customization arguments are invalid. However, it is required to
+      // test an edge case that could occur in the future (customization
+      // argument value being a dictionary).
+      spyOn(
+        explorationStatesService, 'getInteractionCustomizationArgsMemento'
+      ).and.returnValue({
+        testCa: {
+          value: {
+            unicode: subtitledUnicodeObjectFactory.createDefault('', 'ca_0'),
+            html: [subtitledHtmlObjectFactory.createDefault('', 'ca_1')]
+          }
+        }
+      });
       explorationStatesService.init(explorationState4);
-      stateRecordedVoiceoversService.init('Introduction',
-        recordedVoiceoversObjectFactory.createFromBackendDict(
-          recordedVoiceovers));
+      stateRecordedVoiceoversService.init(
+        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
+          {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              content_1: {},
+              feedback_1: {},
+              hint_1: {},
+              solution: {},
+              solution_1: {},
+              ca_0: {},
+              ca_1: {}
+            }
+          }));
 
       $scope = $rootScope.$new();
       ctrl = $componentController('stateTranslation', {
@@ -921,6 +1051,19 @@ describe('State translation component', function() {
 
     it('should evaluate solution tab as disabled', function() {
       expect($scope.isDisabled('solution')).toBe(true);
+    });
+
+    it('should change active customization argument index ', function() {
+      $scope.onTabClick('ca');
+      spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+      $scope.changeActiveCustomizationArgContentIndex(1);
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('ca_1', 'html');
+
+      $scope.changeActiveCustomizationArgContentIndex(0);
+      expect(translationTabActiveContentIdService.setActiveContent)
+        .toHaveBeenCalledWith('ca_0', 'unicode');
     });
   });
 });

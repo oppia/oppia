@@ -82,9 +82,9 @@ angular.module('oppia').directive('storyEditorNavbar', [
 
           $scope.discardChanges = function() {
             UndoRedoService.clearChanges();
-            $scope.validationIssues = [];
-            $scope.explorationValidationIssues = [];
             StoryEditorStateService.loadStory($scope.story.getId());
+            _validateStory();
+            $scope.forceValidateExplorations = true;
           };
 
           var _validateStory = function() {
@@ -93,6 +93,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
               $scope.validationIssues.push(
                 'Story URL fragment already exists.');
             }
+            $scope.forceValidateExplorations = true;
             _validateExplorations();
             var nodes = $scope.story.getStoryContents().getNodes();
             var storyPrepublishValidationIssues = (
