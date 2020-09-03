@@ -141,7 +141,7 @@ class RegenerateMissingStateStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         yield (
                             RegenerateMissingStateStatsOneOffJob
                             .REDUCE_KEY_BAD_RENAME, (
-                                '%s.%s "%s" -> "%s"' % (
+                                '%s.%s: "%s" -> "%s"' % (
                                     exp.id, exp.version - 1, old_state_name,
                                     state_name)
                                 ).encode('utf-8'))
@@ -150,7 +150,7 @@ class RegenerateMissingStateStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 yield (
                     RegenerateMissingStateStatsOneOffJob
                     .REDUCE_KEY_REGENERATED, (
-                        '%s.%s %s' % (exp.id, exp.version, state_name)
+                        '%s.%s: %s' % (exp.id, exp.version, state_name)
                         ).encode('utf-8'))
 
             stats_services.save_stats_model_transactional(stats)

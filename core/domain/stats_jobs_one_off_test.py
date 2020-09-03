@@ -119,7 +119,7 @@ class RegenerateMissingStateStatsOneOffJobTests(OneOffJobTestBase):
 
         self.assertEqual(self.run_one_off_job(), [
             ['ExplorationStatsModel state stats regenerated', [
-                '%s.2 %s' % (self.EXP_ID, state_name)
+                '%s.2: %s' % (self.EXP_ID, state_name)
             ]],
             ['ExplorationStatsModel with valid state(s)', 1]
         ])
@@ -158,7 +158,7 @@ class RegenerateMissingStateStatsOneOffJobTests(OneOffJobTestBase):
 
         self.assertEqual(self.run_one_off_job(), [
             ['ExplorationStatsModel state stats regenerated', [
-                '%s.2 %s' % (self.EXP_ID, new_state_name)
+                '%s.2: %s' % (self.EXP_ID, new_state_name)
             ]],
             ['ExplorationStatsModel with valid state(s)', 1]
         ])
@@ -196,10 +196,10 @@ class RegenerateMissingStateStatsOneOffJobTests(OneOffJobTestBase):
 
         self.assertEqual(self.run_one_off_job(), [
             ['ExplorationStatsModel state stats has bad rename', [
-                'eid.1 "Fake Introduction" -> "Welcome!"'
+                'eid.1: "Fake Introduction" -> "Welcome!"'
             ]],
             ['ExplorationStatsModel state stats regenerated', [
-                '%s.2 %s' % (self.EXP_ID, new_state_name)
+                '%s.2: %s' % (self.EXP_ID, new_state_name)
             ]],
             ['ExplorationStatsModel with valid state(s)', 1]
         ])
@@ -233,7 +233,7 @@ class RegenerateMissingStateStatsOneOffJobTests(OneOffJobTestBase):
 
         self.assertEqual(self.run_one_off_job(), [
             ['ExplorationStatsModel state stats regenerated', [
-                '%s.2 State 2️⃣' % (self.EXP_ID,)
+                '%s.2: State 2️⃣' % (self.EXP_ID,)
             ]],
             ['ExplorationStatsModel with valid state(s)', 2]
         ])
