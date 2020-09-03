@@ -2,9 +2,10 @@
   <div ng-if="!$ctrl.isDiagramSaved()" class="diagram-editor-size-toolbar">
     <div class="input-box">Width: <input type="number" ng-model="$ctrl.diagramWidth" ng-blur="$ctrl.onWidthInputBlur()"></div>
     <div class="input-box">Height: <input type="number" ng-model="$ctrl.diagramHeight" ng-blur="$ctrl.onHeightInputBlur()"></div>
-    <i class="material-icons" title="<[$ctrl.getDiagramSizeInfo()]>">
-      &#xE887;
-    </i>
+    <div class="dimension-note">
+      This diagram has a maximum dimension of 490 X 550 px. Changes made to the dimensions will
+      be reflected after "Use this Image" button is clicked.
+    </div>
   </div>
   <div class="svg-editor" ng-if="!$ctrl.isDiagramSaved()">
     <div class="fabric-canvas" ng-attr-id="<[$ctrl.canvasContainerId]>">
@@ -38,6 +39,9 @@
     </div>
     <div ng-if="$ctrl.isDrawModePieChart()" class="fabric-canvas custom-tool-form">
       <div class="container">
+        <div class="piechart-note">
+          Note: The pie chart can't be edited once it has been added to the diagram.
+        </div>
         <div class="row">
           <div class="col-md-5 col-sm-5 col-4">
             Name:
@@ -63,7 +67,7 @@
           </div>
         </div>
         <div class="row">
-          <button ng-if="$ctrl.pieChartDataInput.length < $ctrl.pieChartDataLimit" type="button"
+          <button type="button" ng-if="$ctrl.pieChartDataInput.length < $ctrl.pieChartDataLimit"
                   class="btn btn-outline-secondary btn-block" ng-click="$ctrl.onAddItem()">
                   Add item +
           </button>
@@ -72,50 +76,50 @@
     </div>
     <div class="vertical-toolbar">
       <div>
-        <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isPencilEnabled()}"
+        <button type="button" class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isPencilEnabled()}"
                 ng-click="$ctrl.togglePencilDrawing()"
                 tooltip-placement="left" uib-tooltip="Pencil" ng-disabled="!$ctrl.isPencilEnabled()">
           <i class="fas fa-pencil-alt"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button protractor-test-create-line"
+        <button type="button" class="icon-tool toolbar-button thin-button protractor-test-create-line"
                 ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}" ng-click="$ctrl.createLine()"
                 tooltip-placement="right" uib-tooltip="Line" ng-disabled="!$ctrl.areAllToolsEnabled()">
           <i class="fas fa-slash oppia-slash-icon"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button protractor-test-create-rectangle"
+        <button type="button" class="icon-tool toolbar-button thin-button protractor-test-create-rectangle"
                 ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}" ng-click="$ctrl.createRect()"
                 tooltip-placement="left" uib-tooltip="Rectangle" ng-disabled="!$ctrl.areAllToolsEnabled()">
           <i class="far fa-square"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button protractor-test-create-circle"
+        <button type="button" class="icon-tool toolbar-button thin-button protractor-test-create-circle"
                 ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}" ng-click="$ctrl.createCircle()"
                 tooltip-placement="right" uib-tooltip="Circle" ng-disabled="!$ctrl.areAllToolsEnabled()">
           <i class="far fa-circle"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button protractor-test-create-text"
+        <button type="button" class="icon-tool toolbar-button thin-button protractor-test-create-text"
                 ng-class="{'disabled' : !$ctrl.areAllToolsEnabled()}" ng-click="$ctrl.createText()"
                 tooltip-placement="left" uib-tooltip="Text" ng-disabled="!$ctrl.areAllToolsEnabled()">
           <i class="fas fa-font"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button oppia-closed-polygon-icon" ng-class="{'disabled' : !$ctrl.isClosedPolygonEnabled()}"
+        <button type="button" class="icon-tool toolbar-button thin-button oppia-closed-polygon-icon" ng-class="{'disabled' : !$ctrl.isClosedPolygonEnabled()}"
                 ng-click="$ctrl.createClosedPolygon()" tooltip-placement="right" uib-tooltip="Closed Polygon"
                 ng-disabled="!$ctrl.isClosedPolygonEnabled()">
         </button>
-        <button class="icon-tool toolbar-button thin-button oppia-open-polygon-icon" ng-class="{'disabled' : !$ctrl.isOpenPolygonEnabled()}"
+        <button type="button" class="icon-tool toolbar-button thin-button oppia-open-polygon-icon" ng-class="{'disabled' : !$ctrl.isOpenPolygonEnabled()}"
                 ng-click="$ctrl.createOpenPolygon()" tooltip-placement="left" uib-tooltip="Open Polygon"
                 ng-disabled="!$ctrl.isOpenPolygonEnabled()">
         </button>
-        <button class="icon-tool toolbar-button thin-button protractor-test-create-bezier"
+        <button type="button" class="icon-tool toolbar-button thin-button protractor-test-create-bezier"
                 ng-class="{'disabled' : !($ctrl.areAllToolsEnabled() || $ctrl.isDrawModeBezier())}" ng-click="$ctrl.createQuadraticBezier()"
                 tooltip-placement="right" uib-tooltip="Quadratic Bezier curve" ng-disabled="!($ctrl.areAllToolsEnabled() || $ctrl.isDrawModeBezier())">
           <i class="fas fa-bezier-curve bezier-curve"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button protractor-test-create-piechart"
+        <button type="button" class="icon-tool toolbar-button thin-button protractor-test-create-piechart"
                 ng-class="{'disabled' : !$ctrl.isPieChartEnabled()}" ng-click="$ctrl.createPieChart()"
                 tooltip-placement="left" uib-tooltip="Pie Chart" ng-disabled="!$ctrl.isPieChartEnabled()">
           <i class="fas fa-chart-pie pie-chart"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button protractor-test-create-svgupload"
+        <button type="button" class="icon-tool toolbar-button thin-button protractor-test-create-svgupload"
                 ng-class="{'disabled' : !$ctrl.isSvgUploadEnabled()}" ng-click="$ctrl.uploadSvgFile()"
                 tooltip-placement="right" uib-tooltip="Upload SVG" ng-disabled="!$ctrl.isSvgUploadEnabled()">
           <i class="far fa-file-image file-upload"></i>
@@ -145,30 +149,30 @@
             </div>
           </div>
           <div>
-            <button class="icon-tool toolbar-button thin-button oppia-bring-forward-icon" ng-class="{'disabled' : !$ctrl.objectIsSelected}"
+            <button type="button" class="icon-tool toolbar-button thin-button oppia-bring-forward-icon" ng-class="{'disabled' : !$ctrl.objectIsSelected}"
                     ng-click="$ctrl.bringObjectForward()" tooltip-placement="left" uib-tooltip="Bring Forward"
                     ng-disabled="!$ctrl.objectIsSelected">
             </button>
-            <button class="icon-tool toolbar-button thin-button oppia-send-backward-icon" ng-class="{'disabled' : !$ctrl.objectIsSelected}"
+            <button type="button" class="icon-tool toolbar-button thin-button oppia-send-backward-icon" ng-class="{'disabled' : !$ctrl.objectIsSelected}"
                     ng-click="$ctrl.sendObjectBackward()" tooltip-placement="right" uib-tooltip="Send Backward"
                     ng-disabled="!$ctrl.objectIsSelected">
             </button>
-            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isUndoEnabled()}"
+            <button type="button" class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isUndoEnabled()}"
                     ng-click="$ctrl.onUndo()"
                     ng-disabled="!$ctrl.isUndoEnabled()">
               <i class="fas fa-undo"></i>
             </button>
-            <button class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isRedoEnabled()}"
+            <button type="button" class="icon-tool toolbar-button thin-button" ng-class="{'disabled' : !$ctrl.isRedoEnabled()}"
                     ng-click="$ctrl.onRedo()"
                     ng-disabled="!$ctrl.isRedoEnabled()">
               <i class="fas fa-redo"></i>
             </button>
           </div>
-          <button class="toolbar-button fat-button" ng-click="$ctrl.removeShape()"
+          <button type="button" class="toolbar-button fat-button" ng-click="$ctrl.removeShape()"
                   ng-disabled="!$ctrl.objectIsSelected">
             Remove
           </button>
-          <button class="toolbar-button fat-button" ng-click="$ctrl.onClear()"
+          <button type="button" class="toolbar-button fat-button" ng-click="$ctrl.onClear()"
                   ng-disabled="!$ctrl.isClearEnabled()">
             Clear
           </button>
@@ -216,6 +220,10 @@
       </div>
       <div class="input-tag" ng-if="$ctrl.objectIsSelected">
         Layer number:{{ $ctrl.layerNum }}
+        <i class="material-icons layer-info" tooltip-placement="bottom"
+           uib-tooltip="This denotes the layer in which the currently selected shape is present. Layer 1 is the bottom layer.">
+          &#xE887;
+        </i>
       </div>
     </div>
   </div>
@@ -238,6 +246,9 @@
   svg-filename-editor .diagram-editor-size-toolbar .input-box {
     display: inline-block;
   }
+  svg-filename-editor .diagram-editor-size-toolbar .dimension-note {
+    font-size: 15px;
+  }
 
   svg-filename-editor .diagram-editor-saved-image-container {
     position: relative;
@@ -254,7 +265,7 @@
 
   svg-filename-editor .svg-editor {
     background-color: #ffffff;
-    min-height: 430px;
+    min-height: 450px;
     position: relative;
   }
 
@@ -284,6 +295,10 @@
     background-color: #ffffff;
     bottom: 0px;
     overflow: auto;
+  }
+
+  .svg-editor .fabric-canvas .piechart-note {
+    font-size: 13px;
   }
 
   .svg-editor .fabric-canvas .upload-warning {
@@ -342,15 +357,24 @@
   }
 
   svg-filename-editor .svg-editor .horizontal-toolbar .info-tag {
-    font-size: 13px;
     padding-left: 3px;
     padding-top: 5px;
+  }
+
+  @media only screen and (min-width: 400px) {
+    .svg-editor .horizontal-toolbar .info-tag {
+      font-size: 13px;
+    }
   }
 
   @media only screen and (max-width: 400px) {
     .svg-editor .horizontal-toolbar .info-tag {
       font-size: 3vw;
     }
+  }
+
+  svg-filename-editor .svg-editor .horizontal-toolbar .layer-info {
+    font-size: 19px;
   }
 
   svg-filename-editor .svg-editor .vertical-toolbar {

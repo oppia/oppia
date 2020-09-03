@@ -45,8 +45,13 @@ import feconf
 import python_utils
 import utils
 
-(exp_models, user_models) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.user])
+(
+    exp_models, opportunity_models,
+    recommendations_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.opportunity,
+    models.NAMES.recommendations, models.NAMES.user
+])
 search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -113,12 +118,10 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                 category='Architecture', language_code='en')
 
         interaction_answer_groups = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': 'abc'
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 'abc'},
+            }],
             'outcome': {
                 'dest': feconf.DEFAULT_INIT_STATE_NAME,
                 'feedback': {
@@ -756,6 +759,68 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         # The exploration summary model has been purged from the backend.
         self.assertIsNone(
             exp_models.ExpSummaryModel.get_by_id(self.EXP_0_ID))
+
+    def test_recommendations_of_deleted_explorations_are_deleted(self):
+        """Test that recommendations for deleted explorations are correctly
+        deleted.
+        """
+        self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
+        recommendations_models.ExplorationRecommendationsModel(
+            id=self.EXP_0_ID,
+            recommended_exploration_ids=[]
+        ).put()
+        self.save_new_default_exploration(self.EXP_1_ID, self.owner_id)
+        recommendations_models.ExplorationRecommendationsModel(
+            id=self.EXP_1_ID,
+            recommended_exploration_ids=[]
+        ).put()
+
+        exp_services.delete_explorations(
+            self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
+
+        # The recommendations model has been purged from the backend.
+        self.assertIsNone(
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                self.EXP_0_ID))
+        self.assertIsNone(
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                self.EXP_1_ID))
+
+    def test_opportunity_of_deleted_explorations_are_deleted(self):
+        """Test that opportunity summary for deleted explorations are correctly
+        deleted.
+        """
+        self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id=self.EXP_0_ID,
+            topic_id='topic_id',
+            topic_name='topic_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=1,
+        ).put()
+        self.save_new_default_exploration(self.EXP_1_ID, self.owner_id)
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id=self.EXP_1_ID,
+            topic_id='topic_id',
+            topic_name='topic_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=1,
+        ).put()
+
+        exp_services.delete_explorations(
+            self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
+
+        # The opportunity model has been purged from the backend.
+        self.assertIsNone(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
+                self.EXP_0_ID))
+        self.assertIsNone(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
+                self.EXP_1_ID))
 
     def test_exploration_is_removed_from_index_when_deleted(self):
         """Tests that exploration is removed from the search index when
@@ -1568,10 +1633,13 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state2.update_interaction_hints(hint_list2)
 
         answer_group_list2 = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{'x': 0}, {'x': 1}]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 0}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': 1}
+            }],
             'outcome': {
                 'dest': 'state1',
                 'feedback': {
@@ -1592,10 +1660,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }, {
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{'x': 0}]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 0}
+            }],
             'outcome': {
                 'dest': 'state3',
                 'feedback': {
@@ -1611,26 +1679,29 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'tagged_skill_misconception_id': None
         }]
         answer_group_list3 = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{
-                    'x': [
-                        '<p>This is value1 for ItemSelection</p><oppia-noni'
-                        'nteractive-image filepath-with-value="&amp;quot;s3'
-                        'Choice1.png&amp;quot;" caption-with-value="&amp;qu'
-                        'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
-                        ';"></oppia-noninteractive-image>'
-                    ]
-                }, {
-                    'x': [
-                        '<p>This is value3 for ItemSelection</p><oppia-noni'
-                        'nteractive-image filepath-with-value="&amp;quot;s3'
-                        'Choice3.png&amp;quot;" caption-with-value="&amp;qu'
-                        'ot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot'
-                        ';"></oppia-noninteractive-image>'
-                    ]
-                }]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    (
+                        '<p>This is value1 for ItemSelection</p>'
+                        '<oppia-noninteractive-image filepath-with-value='
+                        '"&amp;quot;s3Choice1.png&amp;quot;"'
+                        ' caption-with-value="&amp;quot;&amp;quot;" '
+                        'alt-with-value="&amp;quot;&amp;quot;">'
+                        '</oppia-noninteractive-image>')
+                ]}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    (
+                        '<p>This is value3 for ItemSelection</p>'
+                        '<oppia-noninteractive-image filepath-with-value='
+                        '"&amp;quot;s3Choice3.png&amp;quot;"'
+                        ' caption-with-value="&amp;quot;&amp;quot;" '
+                        'alt-with-value="&amp;quot;&amp;quot;">'
+                        '</oppia-noninteractive-image>')
+                ]}
+            }],
             'outcome': {
                 'dest': 'state1',
                 'feedback': {
@@ -2395,10 +2466,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         }]
         # List of answer groups to add into an interaction.
         self.interaction_answer_groups = [{
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{'x': 0}]
-            },
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 0},
+            }],
             'outcome': {
                 'dest': self.init_state_name,
                 'feedback': {
@@ -2729,12 +2800,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         init_state = exploration.init_state
         init_interaction = init_state.interaction
-        rule_types_to_inputs = init_interaction.answer_groups[
-            0].rule_types_to_inputs
+        rule_specs = init_interaction.answer_groups[0].rule_specs
         outcome = init_interaction.answer_groups[0].outcome
-        self.assertEqual(rule_types_to_inputs, {
-            'Equals': [{'x': 0}]
-        })
+        self.assertEqual(rule_specs[0].rule_type, 'Equals')
+        self.assertEqual(rule_specs[0].inputs, {'x': 0})
         self.assertEqual(outcome.feedback.html, '<p>Try again</p>')
         self.assertEqual(outcome.dest, self.init_state_name)
         self.assertEqual(init_interaction.default_outcome.dest, 'State 2')
@@ -2779,8 +2848,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_state_variable_types(self):
         """Test that parameters in rules must have the correct type."""
-        self.interaction_answer_groups[0]['rule_types_to_inputs'][
-            'Equals'][0]['x'] = 'abc'
+        self.interaction_answer_groups[0]['rule_specs'][0][
+            'inputs']['x'] = 'abc'
         with self.assertRaisesRegexp(
             Exception,
             'abc has the wrong type. It should be a NonnegativeInt.'):

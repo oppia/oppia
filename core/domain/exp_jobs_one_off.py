@@ -268,29 +268,6 @@ class ExplorationMathSvgFilenameValidationOneOffJob(
         yield ('Detailed information on invalid tags. ', invalid_tags_info)
 
 
-class ExplorationMathRichTextInfoModelDeletionOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """Job that deletes all instances of the ExplorationMathRichTextInfoModel
-    from the datastore.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationMathRichTextInfoModel]
-
-    @staticmethod
-    def map(item):
-        item.delete()
-        yield ('model_deleted', 1)
-
-    @staticmethod
-    def reduce(key, values):
-        no_of_models_deleted = (
-            sum(ast.literal_eval(v) for v in values))
-        yield (key, ['%d models successfully delelted.' % (
-            no_of_models_deleted)])
-
-
 class ExplorationRteMathContentValidationOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that checks the html content of an exploration and validates the
