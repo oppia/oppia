@@ -22,7 +22,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-fdescribe('Worked example editor directive', function() {
+describe('Worked example editor directive', function() {
   var $scope = null;
   var ctrl = null;
   var $rootScope = null;

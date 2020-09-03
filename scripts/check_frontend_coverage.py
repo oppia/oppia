@@ -377,8 +377,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'version-diff-visualization.directive.ts',
     'version-tree.service.ts',
     'voiceover-recording.service.ts',
-    'warnings-and-alerts.directive.ts',
-    'worked-example-editor.directive.ts',
+    'warnings-and-alerts.directive.ts'
 ]
 
 
