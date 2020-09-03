@@ -246,6 +246,8 @@ jobs:
           name: Run e2e admin misc tab test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="adminMiscTab"
+      - store_artifacts:
+          path: /home/circleci/oppia/core/protractor-screenshots
       - run:
           name: Run e2e contributor dashboard test
           command: |

@@ -497,6 +497,7 @@ var ExplorationEditorMainTab = function() {
     // Wait for browser to time out the popover, which is 4000 ms.
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
+    await waitFor.pageToFullyLoad();
     await action.click('stateEditButton', stateEditButton);
     var stateEditorTag = element(by.tagName('state-content-editor'));
     await waitFor.visibilityOf(
@@ -509,8 +510,7 @@ var ExplorationEditorMainTab = function() {
     var richTextEditor = await forms.RichTextEditor(stateContentEditor);
     await richTextEditor.clear();
     await richTextInstructions(richTextEditor);
-    expect(await saveStateContentButton.isDisplayed()).toBe(true);
-    await saveStateContentButton.click();
+    await action.click('Save State Content Button', saveStateContentButton);
     await waitFor.invisibilityOf(
       saveStateContentButton,
       'State content editor takes too long to disappear');
