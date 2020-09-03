@@ -255,10 +255,11 @@ class RegenerateMissingV1StatsModelsOneOffJob(
                                 prev_exp_stats.state_stats_mapping):
                             yield (
                                 'ExplorationStatsModel ignored StateStats '
-                                'regeneration due to missing historical data',
-                                '%s.%s "%s"' % (
-                                    exploration.id, exp_version,
-                                    old_state_name))
+                                'regeneration due to missing historical data', (
+                                    '%s.%s "%s"' % (
+                                        exploration.id, exp_version,
+                                        old_state_name)
+                                    ).encode('utf-8'))
                             continue
                         # 'pssm' mean 'previous state stats mapping'.
                         pssm = prev_exp_stats.state_stats_mapping[
