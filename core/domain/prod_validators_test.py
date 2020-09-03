@@ -14737,25 +14737,28 @@ class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
+class UserContributionProficiencyModelValidatorTests(
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
-        super(UserContributionScoringModelValidatorTests, self).setUp()
+        super(UserContributionProficiencyModelValidatorTests, self).setUp()
 
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
         score_category = 'content.Art'
-        self.model_instance = user_models.UserContributionScoringModel.create(
-            self.user_id, score_category, 10
+        self.model_instance = (
+            user_models.UserContributionProficiencyModel.create(
+                self.user_id, score_category, 10
+            )
         )
         self.job_class = (
             prod_validation_jobs_one_off
-            .UserContributionScoringModelAuditOneOffJob)
+            .UserContributionProficiencyModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
-            u'[u\'fully-validated UserContributionScoringModel\', 1]']
+            u'[u\'fully-validated UserContributionProficiencyModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -14765,7 +14768,7 @@ class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
-            'of UserContributionScoringModel\', '
+            'of UserContributionProficiencyModel\', '
             '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
@@ -14778,7 +14781,7 @@ class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
-            'UserContributionScoringModel\', '
+            'UserContributionProficiencyModel\', '
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
@@ -14794,7 +14797,7 @@ class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
-                'field check of UserContributionScoringModel\', '
+                'field check of UserContributionProficiencyModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
                 '%s, expect model UserSettingsModel '
@@ -14808,7 +14811,7 @@ class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for score check of '
-            'UserContributionScoringModel\', [u\'Entity id %s: '
+            'UserContributionProficiencyModel\', [u\'Entity id %s: '
             'Expected score to be non-negative, received -1.0\']]') % (
                 self.model_instance.id)]
         self.run_job_and_check_output(

@@ -868,12 +868,13 @@ class UserSkillMasteryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [user_models.UserSkillMasteryModel]
 
 
-class UserContributionScoringModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates UserContributionScoringModel."""
+class UserContributionProficiencyModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserContributionProficiencyModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [user_models.UserContributionScoringModel]
+        return [user_models.UserContributionProficiencyModel]
 
 
 class UserContributionRightsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
