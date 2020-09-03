@@ -35,10 +35,10 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
     template: '<select></select>',
     controllerAs: '$ctrl',
     controller: [
-      '$scope', '$element', '$rootScope', '$filter',
+      '$element', '$filter', '$scope',
       'StateInteractionIdService', 'INTERACTION_SPECS',
       function(
-          $scope, $element, $rootScope, $filter,
+          $element, $filter, $scope,
           StateInteractionIdService, INTERACTION_SPECS) {
         var ctrl = this;
         ctrl.$onInit = function() {

@@ -273,8 +273,8 @@ class LearnerPlaylist(python_utils.OBJECT):
         self.collection_ids.remove(collection_id)
 
 
-class UserContributionScoring(python_utils.OBJECT):
-    """Domain object for UserContributionScoringModel."""
+class UserContributionProficiency(python_utils.OBJECT):
+    """Domain object for UserContributionProficiencyModel."""
 
     def __init__(self, user_id, score_category, score, onboarding_email_sent):
         self.user_id = user_id

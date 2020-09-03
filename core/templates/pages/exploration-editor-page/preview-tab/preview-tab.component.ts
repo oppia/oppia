@@ -58,7 +58,7 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('previewTab', {
   template: require('./preview-tab.component.html'),
   controller: [
-    '$q', '$scope', '$timeout', '$uibModal', 'ContextService',
+    '$q', '$timeout', '$uibModal', 'ContextService',
     'EditableExplorationBackendApiService',
     'ExplorationDataService', 'ExplorationEngineService',
     'ExplorationFeaturesService', 'ExplorationInitStateNameService',
@@ -68,7 +68,7 @@ angular.module('oppia').component('previewTab', {
     'PlayerCorrectnessFeedbackEnabledService', 'RouterService',
     'StateEditorService', 'UrlInterpolationService',
     function(
-        $q, $scope, $timeout, $uibModal, ContextService,
+        $q, $timeout, $uibModal, ContextService,
         EditableExplorationBackendApiService,
         ExplorationDataService, ExplorationEngineService,
         ExplorationFeaturesService, ExplorationInitStateNameService,
