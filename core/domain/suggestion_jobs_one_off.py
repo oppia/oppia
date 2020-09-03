@@ -185,7 +185,7 @@ class SuggestionLanguageCodeMigrationOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to add the language_code field
     to suggestions that do not have that field yet. The language_code field
-    allows question and translation suggestions to be queryable by language.
+    allows question and translation suggestions to be queried by language.
     This job will load all existing suggestions from the data store, update
     them and immediately store them back into the data store.
     """

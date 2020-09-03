@@ -1695,6 +1695,31 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
             if exp.id == exp_id:
                 return exp
 
+    def run_job_and_verify_output(self, expected_output):
+        """Runs the SuggestionLanguageCodeMigrationOneOffJob and verifies that
+        the output matches the expected output.
+
+        Args:
+            expected_output: list(str). The expected output from the one off
+                job.
+        """
+        job_id = (
+            suggestion_jobs_one_off.
+            SuggestionLanguageCodeMigrationOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off.SuggestionLanguageCodeMigrationOneOffJob
+            .enqueue(job_id)
+        )
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            suggestion_jobs_one_off.
+            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id)
+        )
+
+        self.assertEqual(len(actual_output), len(expected_output))
+        self.assertEqual(actual_output, expected_output)
+
     def setUp(self):
         super(SuggestionLanguageCodeMigrationOneOffJobTests, self).setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
@@ -1719,26 +1744,12 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
                     self.target_id, self.target_version_at_submission,
                     self.author_id, self.edit_state_content_change_dict,
                     'test description')
-
-        job_id = (
-            suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.create_new())
-        (
-            suggestion_jobs_one_off.SuggestionLanguageCodeMigrationOneOffJob
-            .enqueue(job_id)
-        )
-        self.process_and_flush_pending_tasks()
-
-        # Verify the output from the one off job.
-        actual_output = (
-            suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id)
-        )
         expected_output = [
             '[u\'edit_exploration_state_content_suggestion_migrated\', 1]'
         ]
-        self.assertEqual(len(actual_output), 1)
-        self.assertEqual(actual_output, expected_output)
+
+        self.run_job_and_verify_output(expected_output)
+
         # Verify the language_code field was updated properly.
         suggestion = suggestion_services.get_suggestion_by_id(
             self.EXPLORATION_THREAD_ID)
@@ -1762,24 +1773,10 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
                         self.target_id, self.target_version_at_submission,
                         self.author_id, self.add_translation_change_dict,
                         'test description')
-
-        job_id = (
-            suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.create_new())
-        (
-            suggestion_jobs_one_off.SuggestionLanguageCodeMigrationOneOffJob
-            .enqueue(job_id)
-        )
-        self.process_and_flush_pending_tasks()
-
-        # Verify the output from the one off job.
-        actual_output = (
-            suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id)
-        )
         expected_output = ['[u\'translate_content_suggestion_migrated\', 1]']
-        self.assertEqual(len(actual_output), 1)
-        self.assertEqual(actual_output, expected_output)
+
+        self.run_job_and_verify_output(expected_output)
+
         # Verify the language_code field was updated properly.
         suggestion = suggestion_services.get_suggestion_by_id(
             self.EXPLORATION_THREAD_ID)
@@ -1796,24 +1793,10 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
                 'skill_1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, self.add_question_change_dict,
                 'test description')
-
-        job_id = (
-            suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.create_new())
-        (
-            suggestion_jobs_one_off.SuggestionLanguageCodeMigrationOneOffJob
-            .enqueue(job_id)
-        )
-        self.process_and_flush_pending_tasks()
-
-        # Verify the output from the one off job.
-        actual_output = (
-            suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id)
-        )
         expected_output = ['[u\'add_question_suggestion_migrated\', 1]']
-        self.assertEqual(len(actual_output), 1)
-        self.assertEqual(actual_output, expected_output)
+
+        self.run_job_and_verify_output(expected_output)
+
         # Verify the language_code field was updated properly.
         suggestion = suggestion_services.get_suggestion_by_id(
             self.SKILL_THREAD_ID)
@@ -1848,27 +1831,13 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
                         self.target_id, self.target_version_at_submission,
                         self.author_id, self.add_translation_change_dict,
                         'test description')
-
-        job_id = (
-            suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.create_new())
-        (
-            suggestion_jobs_one_off.SuggestionLanguageCodeMigrationOneOffJob
-            .enqueue(job_id)
-        )
-        self.process_and_flush_pending_tasks()
-
-        # Verify the output from the one off job.
-        actual_output = (
-            suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id)
-        )
         expected_output = [
             '[u\'add_question_suggestion_migrated\', 1]',
             '[u\'translate_content_suggestion_migrated\', 1]'
         ]
-        self.assertEqual(len(actual_output), 2)
-        self.assertEqual(actual_output, expected_output)
+
+        self.run_job_and_verify_output(expected_output)
+
         # Verify the language_code field was updated properly for the
         # question suggestion.
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -1893,28 +1862,15 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
                 'skill_1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, self.add_question_change_dict,
                 'test description')
+        expected_output = []
+
         suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
             self.SKILL_THREAD_ID
         )
-
         suggestion_model.deleted = True
         suggestion_model.put()
 
-        job_id = (
-            suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.create_new())
-        (
-            suggestion_jobs_one_off.SuggestionLanguageCodeMigrationOneOffJob
-            .enqueue(job_id)
-        )
-        self.process_and_flush_pending_tasks()
-
-        # Verify the output from the one off job.
-        actual_output = (
-            suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id)
-        )
-        self.assertEqual(actual_output, [])
+        self.run_job_and_verify_output(expected_output)
 
     def test_no_action_is_performed_for_suggestion_that_has_been_deleted(self):
         with self.swap(
@@ -1926,24 +1882,11 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
                 'skill_1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, self.add_question_change_dict,
                 'test description')
+        expected_output = []
+
         suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
             self.SKILL_THREAD_ID
         )
-
         suggestion_model.delete()
 
-        job_id = (
-            suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.create_new())
-        (
-            suggestion_jobs_one_off.SuggestionLanguageCodeMigrationOneOffJob
-            .enqueue(job_id)
-        )
-        self.process_and_flush_pending_tasks()
-
-        # Verify the output from the one off job.
-        actual_output = (
-            suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id)
-        )
-        self.assertEqual(actual_output, [])
+        self.run_job_and_verify_output(expected_output)
