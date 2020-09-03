@@ -58,23 +58,6 @@ ruleTester.run('test-message-style', rule, {
     },
     {
       code:
-        `it('should transform all key value' + ' pairs to angular constants',
-          function() {
-          for (var constantName in constants) {
-              expect($injector.has(constantName)).toBe(true);
-              expect($injector.get(constantName)).toEqual(
-                  constants[constantName]);
-          }
-          });`,
-      errors: [{
-        message: (
-          'Use space at the end of test message in case of binary ' +
-              'operator is used'),
-        type: null
-      }]
-    },
-    {
-      code:
     `it('should transform all key value pairs to angular constants ',
         function() {
         for (var constantName in constants) {
