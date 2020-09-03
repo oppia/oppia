@@ -203,11 +203,14 @@ class UserSettings(python_utils.OBJECT):
                     'Expected PIN to be a string, received %s' %
                     self.pin
                 )
-            elif (len(self.pin)!=feconf.FULL_USER_PIN_LENGTH and
-                    len(self.pin)!=feconf.PROFILE_USER_PIN_LENGTH):
+            elif (len(self.pin) != feconf.FULL_USER_PIN_LENGTH and
+                  len(self.pin) != feconf.PROFILE_USER_PIN_LENGTH):
                 raise utils.ValidationError(
                     'User PIN can only be of length %s or %s' %
-                    (feconf.FULL_USER_PIN_LENGTH, feconf.PROFILE_USER_PIN_LENGTH)
+                    (
+                        feconf.FULL_USER_PIN_LENGTH,
+                        feconf.PROFILE_USER_PIN_LENGTH
+                    )
                 )
 
         if not isinstance(self.email, python_utils.BASESTRING):

@@ -1369,13 +1369,13 @@ class UserSettingsTests(test_utils.GenericTestBase):
             self.user_settings.validate()
 
     def test_validate_valid_length_str_pin_works_fine(self):
-        valid_pin_values_list = ['123','12345']
+        valid_pin_values_list = ['123', '12345']
         for pin in valid_pin_values_list:
             self.user_settings.pin = pin
             self.user_settings.validate()
 
     def test_validate_invalid_length_str_pin_works_raises_error(self):
-        invalid_pin_values_list = ['1','12','1234','123456']
+        invalid_pin_values_list = ['1', '12', '1234', '123456']
         error_msg = (
             'User PIN can only be of length %s or %s' %
             (feconf.FULL_USER_PIN_LENGTH, feconf.PROFILE_USER_PIN_LENGTH)
