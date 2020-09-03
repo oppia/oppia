@@ -1615,57 +1615,6 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
         output = self.run_one_off_job()
         self.assertEqual(output, [u'[u\'No change\', 1]'])
 
-    def test_job_cleans_up_stats_models_for_deleted_exps(self):
-        exp_id_1 = 'EXP_ID_1'
-        exp = self.save_new_valid_exploration(exp_id_1, 'owner_id')
-        state_name = exp.init_state_name
-
-        change_list = []
-        exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
-        change_list = [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': state_name,
-                'new_state_name': 'b',
-            })
-        ]
-        exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
-
-        exp_services.revert_exploration(
-            feconf.SYSTEM_COMMITTER_ID, exp_id_1, 3, 2)
-
-        change_list = [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': state_name,
-                'new_state_name': 'b',
-            })
-        ]
-        exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
-        exp = exp_fetchers.get_exploration_by_id(exp_id_1)
-        self.assertEqual(exp.version, 5)
-
-        exp_services.delete_exploration(feconf.SYSTEM_COMMITTER_ID, exp_id_1)
-
-        # The call to delete_exploration() causes some tasks to be started. So,
-        # we flush them before running the job.
-        self.process_and_flush_pending_tasks()
-
-        output = self.run_one_off_job()
-        self.assertEqual(
-            output, [u'[u\'Deleted all stats\', [u"{u\'exp_id\': \'EXP_ID_1\', '
-                     'u\'number_of_models\': 5}"]]', u'[u\'No change\', 1]'])
-
-        all_models = (
-            stats_models.ExplorationStatsModel.get_multi_stats_models(
-                [exp_domain.ExpVersionReference(exp.id, version)
-                 for version in python_utils.RANGE(1, exp.version + 1)]))
-        for model in all_models:
-            self.assertEqual(model, None)
-
     def test_job_correctly_calculates_stats_for_missing_commit_log_models(self):
         class MockExplorationCommitLogEntryModel(
                 base_models.BaseCommitLogEntryModel):
@@ -1866,7 +1815,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
              'card appears in version: 1.' % (feconf.DEFAULT_INIT_STATE_NAME)]
         ])
 
-    def test_error_when_stats_for_state_does_not_exist(self):
+    def test_error_when_state_which_does_not_exist_has_stats(self):
         self.save_new_default_exploration('ID', 'owner_id')
         stats = stats_models.ExplorationStatsModel.get_model('ID', 1)
         stats.state_stats_mapping['Unknown State'] = (
@@ -1877,6 +1826,17 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
             ['UNEXPECTED',
              'ExplorationStats "ID" v1 has stats for card "Unknown State", but '
              'card never existed.']
+        ])
+
+    def test_no_error_when_end_state_which_does_not_exist_has_stats(self):
+        self.save_new_default_exploration('ID', 'owner_id')
+        stats = stats_models.ExplorationStatsModel.get_model('ID', 1)
+        stats.state_stats_mapping['END'] = (
+            stats_domain.StateStats.create_default().to_dict())
+        stats.put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['EXPECTED', '1 ExplorationStats model is valid'],
         ])
 
     def test_error_when_stats_for_state_no_longer_exists(self):

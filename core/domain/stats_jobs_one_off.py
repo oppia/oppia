@@ -1247,16 +1247,6 @@ class RegenerateMissingV2StatsModelsOneOffJob(
                 [exp_domain.ExpVersionReference(exp.id, version)
                  for version in python_utils.RANGE(1, exp.version + 1)]))
 
-        if exp.deleted:
-            all_existent_models = [m for m in all_models if m is not None]
-            stats_models.ExplorationStatsModel.delete_multi(all_existent_models)
-            yield (
-                'Deleted all stats', {
-                    'exp_id': exp.id,
-                    'number_of_models': len(all_existent_models)
-                })
-            return
-
         first_missing_version = None
         for version, model in enumerate(all_models):
             if model is None:
@@ -1410,7 +1400,12 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
                 yield (key.encode('utf-8'), exp_model.version)
 
             else:
-                exp_states = set(exp_model.states)
+                # In early schema versions of ExplorationModel, the END card
+                # was a persistant, implicit state present in every
+                # exploration. Because of this, it is not an error for stats to
+                # exist for END even though it does not appear in an
+                # exploration's representation.
+                exp_states = set(exp_model.states) | {'END'}
                 exp_stats_states = set(exp_stats_model.state_stats_mapping)
 
                 for state_name in exp_states - exp_stats_states:
