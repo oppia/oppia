@@ -126,6 +126,7 @@ angular.module('oppia').directive('learnerDashboardIcons', [
                     $scope.getActivityId()));
               } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
                 return (
+                  // eslint-disable-next-line max-len
                   $scope.learnerDashboardActivityIds.belongsToIncompleteCollections(
                     $scope.getActivityId()));
               }

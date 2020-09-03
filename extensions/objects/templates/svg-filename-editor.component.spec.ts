@@ -557,7 +557,7 @@ describe('SvgFilenameEditor', function() {
         // )]}' string. That's why double quotes is being used here. It's not
         // possible to use \' instead of ' so the XSSI Prefix won't be
         // evaluated correctly.
-        /* eslint-disable-next-linequotes */
+        /* eslint-disable-next-line quotes */
         responseText: ")]}'\n{ \"error\": \"" + errorMessage + "\" }"
       });
       return d.promise();
