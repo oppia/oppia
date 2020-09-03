@@ -491,7 +491,7 @@ class UtilsTests(test_utils.GenericTestBase):
         deep_encoded_value = utils.deep_encode(value)
         self.assertEqual(value, utils.deep_decode(deep_encoded_value))
 
-    def test_deep_encode_with_different_encoding(self):
+    def test_deep_encode_and_decode_with_different_encoding(self):
         value = ['🙁']
         deep_encoded_value = utils.deep_encode(value, encoding='ascii')
         self.assertEqual(deep_encoded_value, [r'\u1234'])
