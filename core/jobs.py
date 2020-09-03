@@ -32,7 +32,6 @@ import utils
 
 from google.appengine.api import app_identity
 from google.cloud import ndb
-
 from mapreduce import base_handler
 from mapreduce import context
 from mapreduce import input_readers
@@ -607,6 +606,7 @@ class BaseDeferredJobManager(BaseJobManager):
         raise NotImplementedError
 
     @classmethod
+    @taskqueue_services.context_decorator
     def _run_job(cls, job_id, additional_job_params):
         """Starts the job.
 
@@ -617,6 +617,7 @@ class BaseDeferredJobManager(BaseJobManager):
         Raises:
             PermanentTaskFailure. No further work can be scheduled.
         """
+
         logging.info(
             'Job %s started at %s' %
             (job_id, utils.get_current_time_in_millisecs()))

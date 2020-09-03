@@ -775,7 +775,7 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
         exploration_ids)
 
-
+@taskqueue_services.context_decorator
 def delete_explorations_from_subscribed_users(exploration_ids):
     """Remove explorations from all subscribers' activity_ids.
 

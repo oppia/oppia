@@ -39,7 +39,12 @@ from core.domain import takeout_domain_jobs_one_off
 from core.domain import topic_jobs_one_off
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
+from core.platform import models
 import python_utils
+
+from core.controllers import acl_decorators
+
+taskqueue_services = models.Registry.import_taskqueue_services()
 
 # List of all manager classes for one-off batch jobs for which to show controls
 # on the admin dashboard.
@@ -260,6 +265,7 @@ class ContinuousComputationEventDispatcher(python_utils.OBJECT):
     """Dispatches events to the relevant ContinuousComputation classes."""
 
     @classmethod
+    #@taskqueue_services.context_decorator
     def dispatch_event(cls, event_type, *args, **kwargs):
         """Dispatches an incoming event to the ContinuousComputation
         classes which listen to events of that type.
@@ -269,6 +275,20 @@ class ContinuousComputationEventDispatcher(python_utils.OBJECT):
             *args: list(*). Positional arguments to pass to on_incoming_event().
             **kwargs: *. Keyword arguments to pass to on_incoming_event().
         """
+        import six; reload(six);
+        from google.cloud import ndb
+        import redis
+        import feconf
+        import main
+
+        if not ndb.context.get_context(raise_context_error=False):
+            with main.client.context(global_cache=main.global_cache):
+                for klass in ALL_CONTINUOUS_COMPUTATION_MANAGERS:
+                    if event_type in klass.get_event_types_listened_to():
+                        klass.on_incoming_event(event_type, *args, **kwargs)
+                return
         for klass in ALL_CONTINUOUS_COMPUTATION_MANAGERS:
             if event_type in klass.get_event_types_listened_to():
                 klass.on_incoming_event(event_type, *args, **kwargs)
+
+
