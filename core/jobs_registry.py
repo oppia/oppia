@@ -55,7 +55,6 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
     exp_jobs_one_off.ExplorationMathSvgFilenameValidationOneOffJob,
-    exp_jobs_one_off.ExplorationMathRichTextInfoModelDeletionOneOffJob,
     exp_jobs_one_off.ExplorationMigrationAuditJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationRteMathContentValidationOneOffJob,
@@ -76,6 +75,7 @@ ONE_OFF_JOB_MANAGERS = [
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     question_jobs_one_off.RegenerateQuestionSummaryOneOffJob,
+    recommendations_jobs_one_off.DeleteAllExplorationRecommendationsOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
     stats_jobs_one_off.ExplorationMissingStatsAudit,
@@ -144,7 +144,6 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ExpUserLastPlaythroughModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationContextModelAuditOneOffJob,
-    prod_validation_jobs_one_off.ExplorationMathRichTextInfoModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
