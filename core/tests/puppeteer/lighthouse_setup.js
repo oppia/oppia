@@ -71,7 +71,7 @@ const login = async function(browser, page) {
     await page.waitForSelector('#admin', {visible: true});
     await page.click('#admin');
     await page.click('#submit-login');
-    // This is to check if the user's account was already made.
+    // Checks if the user's account was already made.
     try {
       await page.waitForSelector('#username', {visible: true});
       await page.type('#username', 'username1');
@@ -225,7 +225,7 @@ const getStoryEditorUrl = async function(browser, page) {
     await page.waitFor(5000);
     await page.click(confirmStoryCreationButton);
     await page.waitFor(15000);
-    storyEditorUrl = page.url();
+    storyEditorUrl = await page.url();
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -252,7 +252,7 @@ const getSkillEditorUrl = async function(browser, page) {
     // Doing waitFor(15000) to handle new tab being opened.
     await page.waitFor(15000);
     let pages = await browser.pages();
-    skillEditorUrl = await pages[2].url();
+    skillEditorUrl = await pages[3].url();
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -261,7 +261,7 @@ const getSkillEditorUrl = async function(browser, page) {
 
 const main = async function() {
   // Change headless to false to see the puppeteer actions.
-  const browser = await puppeteer.launch({headless: false});
+  const browser = await puppeteer.launch({headless: true});
   const page = await browser.newPage();
   await page.setViewport({
     width: 1920,
