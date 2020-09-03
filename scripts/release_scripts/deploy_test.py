@@ -230,47 +230,53 @@ class DeployTests(test_utils.GenericTestBase):
                         Exception, 'Invalid last commit message: Invalid.'):
                         deploy.execute_deployment()
 
-    def test_missing_mailgun_api(self):
-        mock_content = python_utils.open_file(
-            MOCK_FECONF_FILEPATH, 'r').read()
-        class MockFile(python_utils.OBJECT):
-            def read(self):
-                """Read content of the file object."""
-                return mock_content
-
-        def mock_open_file(unused_path, unused_mode):
-            return MockFile()
-
+    def test_mailgun_api_update_done_for_prod_server(self):
+        check_function_calls = {
+            'main_gets_called': False,
+            'prompt_value': False
+        }
+        expected_check_function_calls = {
+            'main_gets_called': True,
+            'prompt_value': True
+        }
         def mock_main(
                 unused_release_dir_path, unused_deploy_data_path,
                 unused_personal_access_token,
-                unused_prompt_for_mailgun_and_terms_update):
-            pass
-
+                prompt_for_mailgun_and_terms_update):
+            check_function_calls['main_gets_called'] = True
+            check_function_calls['prompt_value'] = (
+                prompt_for_mailgun_and_terms_update)
         config_swap = self.swap(update_configs, 'main', mock_main)
-        open_swap = self.swap(python_utils, 'open_file', mock_open_file)
 
-        with config_swap, open_swap:
-            with self.assertRaisesRegexp(
-                Exception,
-                'The mailgun API key must be added before '
-                'deployment.'):
-                deploy.update_configs_in_deploy_data(
-                    'oppiaserver', 'test-release-dir', 'test-deploy-dir',
-                    'test-token')
+        with config_swap:
+            deploy.update_configs_in_deploy_data(
+                'oppiaserver', 'test-release-dir', 'test-deploy-dir',
+                'test-token')
+        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_mailgun_api_update_not_done_for_test_server(self):
+        check_function_calls = {
+            'main_gets_called': False,
+            'prompt_value': False
+        }
+        expected_check_function_calls = {
+            'main_gets_called': True,
+            'prompt_value': False
+        }
         def mock_main(
                 unused_release_dir_path, unused_deploy_data_path,
                 unused_personal_access_token,
-                unused_prompt_for_mailgun_and_terms_update):
-            pass
+                prompt_for_mailgun_and_terms_update):
+            check_function_calls['main_gets_called'] = True
+            check_function_calls['prompt_value'] = (
+                prompt_for_mailgun_and_terms_update)
         config_swap = self.swap(update_configs, 'main', mock_main)
 
         with config_swap:
             deploy.update_configs_in_deploy_data(
                 'oppiatestserver', 'test-release-dir', 'test-deploy-dir',
                 'test-token')
+        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_missing_third_party_dir(self):
         args_swap = self.swap(

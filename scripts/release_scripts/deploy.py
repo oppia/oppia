@@ -479,15 +479,6 @@ def update_configs_in_deploy_data(
     if app_name == APP_NAME_OPPIASERVER:
         update_configs.main(
             release_dir_path, deploy_data_path, personal_access_token, True)
-
-        release_feconf_path = os.path.join(release_dir_path, common.FECONF_PATH)
-        feconf_contents = python_utils.open_file(
-            release_feconf_path, 'r').read()
-        if ('MAILGUN_API_KEY' not in feconf_contents or
-                'MAILGUN_API_KEY = None' in feconf_contents):
-            raise Exception(
-                'The mailgun API key must be added '
-                'before deployment.')
     else:
         update_configs.main(
             release_dir_path, deploy_data_path, personal_access_token, False)

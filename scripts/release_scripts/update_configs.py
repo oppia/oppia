@@ -145,6 +145,23 @@ def check_updates_to_terms_of_service(
                 f.write(line)
 
 
+def verify_feconf(release_feconf_path):
+    """Verifies that feconf is updated correctly to include
+    mailgun api key.
+
+    Args:
+        release_feconf_path: str. The path to feconf file in release
+            directory.
+    """
+    feconf_contents = python_utils.open_file(
+        release_feconf_path, 'r').read()
+    if ('MAILGUN_API_KEY' not in feconf_contents or
+            'MAILGUN_API_KEY = None' in feconf_contents):
+        raise Exception(
+            'The mailgun API key must be added '
+            'before deployment.')
+
+
 def add_mailgun_api_key(release_feconf_path):
     """Adds mailgun api key to feconf config file.
 
@@ -174,6 +191,8 @@ def add_mailgun_api_key(release_feconf_path):
             if line == 'MAILGUN_API_KEY = None\n':
                 line = line.replace('None', '\'%s\'' % mailgun_api_key)
             f.write(line)
+
+    verify_feconf(release_feconf_path)
 
 
 def main(
