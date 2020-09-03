@@ -25,7 +25,6 @@ from core.domain import exp_fetchers
 from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.platform import models
-import python_utils
 
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
