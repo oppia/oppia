@@ -143,7 +143,7 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateAlgebraicExpression(
       'tan()sin()', ['x'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'The sin,tan function(s) cannot be empty. ' +
+      'The sin, tan function(s) cannot be empty. ' +
       'Please enter a variable/number in it.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(

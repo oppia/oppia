@@ -90,7 +90,7 @@ export class MathInteractionsService {
         }
       }
       errorMessage = (
-        'The ' + emptyFunctionNames +
+        'The ' + emptyFunctionNames.join(', ') +
         ' function(s) cannot be empty. Please enter a variable/number in it.');
     }
     return errorMessage;
