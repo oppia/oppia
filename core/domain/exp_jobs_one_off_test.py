@@ -1386,31 +1386,34 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'HasElementXAtPositionY': [{
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[invalid_html_content1]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
                     'x': invalid_html_content2,
                     'y': 2
-                }],
-                'HasElementXBeforeElementY': [{
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {
+                    'x': [[invalid_html_content2]]
+                }
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
                     'x': invalid_html_content1,
                     'y': invalid_html_content1
-                }],
-                'IsEqualToOrdering': [{
-                    'x': [
-                        [invalid_html_content1]
-                    ]
-                }, {
-                    'x': [
-                        [invalid_html_content2]
-                    ]
-                }],
-                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
-                    'x': [
-                        [invalid_html_content1]
-                    ]
-                }]
-            },
+                }
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [[invalid_html_content1]]
+                }
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1688,31 +1691,34 @@ class ExplorationRteMathContentValidationOneOffJobTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'HasElementXAtPositionY': [{
+            'rule_specs': [{
+                'inputs': {
+                    'x': [[invalid_html_content1]]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }, {
+                'rule_type': 'HasElementXAtPositionY',
+                'inputs': {
                     'x': invalid_html_content2,
                     'y': 2
-                }],
-                'HasElementXBeforeElementY': [{
+                }
+            }, {
+                'rule_type': 'IsEqualToOrdering',
+                'inputs': {
+                    'x': [[invalid_html_content2]]
+                }
+            }, {
+                'rule_type': 'HasElementXBeforeElementY',
+                'inputs': {
                     'x': invalid_html_content1,
                     'y': invalid_html_content1
-                }],
-                'IsEqualToOrdering': [{
-                    'x': [
-                        [invalid_html_content1]
-                    ]
-                }, {
-                    'x': [
-                        [invalid_html_content2]
-                    ]
-                }],
-                'IsEqualToOrderingWithOneItemAtIncorrectPosition': [{
-                    'x': [
-                        [invalid_html_content1]
-                    ]
-                }]
-            },
+                }
+            }, {
+                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+                'inputs': {
+                    'x': [[invalid_html_content1]]
+                }
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }

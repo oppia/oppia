@@ -137,14 +137,10 @@ describe('Question Creation Service', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Equals: [
-                  {
-                    x: 10
-                  }
-                ]
-              }
+              rule_specs: [{
+                rule_type: 'Equals',
+                inputs: {x: 10}
+              }],
             }],
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -334,14 +330,10 @@ describe('Question Creation Service', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Equals: [
-                  {
-                    x: 10
-                  }
-                ]
-              }
+              rule_specs: [{
+                rule_type: 'Equals',
+                inputs: {x: 10}
+              }],
             }],
             confirmed_unclassified_answers: [],
             customization_args: {},
@@ -503,14 +495,10 @@ describe('Question Creation Service', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Equals: [
-                  {
-                    x: 10
-                  }
-                ]
-              }
+              rule_specs: [{
+                rule_type: 'Equals',
+                inputs: {x: 10}
+              }],
             }],
             confirmed_unclassified_answers: [],
             customization_args: {

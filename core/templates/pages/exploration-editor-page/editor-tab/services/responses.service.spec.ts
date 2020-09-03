@@ -32,7 +32,6 @@ describe('Responses Service', function() {
   var interactionData = null;
   var interactionDataWithRules = null;
   var LoggerService = null;
-  var RuleObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -58,7 +57,6 @@ describe('Responses Service', function() {
     AnswerGroupsCacheService = $injector.get('AnswerGroupsCacheService');
     AnswerGroupObjectFactory = $injector.get('AnswerGroupObjectFactory');
     LoggerService = $injector.get('LoggerService');
-    RuleObjectFactory = $injector.get('RuleObjectFactory');
 
     interactionData = InteractionObjectFactory.createFromBackendDict({
       id: 'TextInput',
@@ -70,8 +68,7 @@ describe('Responses Service', function() {
             html: ''
           },
         },
-        rule_input_translations: {},
-        rule_types_to_inputs: {},
+        rule_specs: [],
       }],
       default_outcome: {
         dest: 'Hola',
@@ -101,15 +98,13 @@ describe('Responses Service', function() {
             html: ''
           },
         },
-        rule_input_translations: {},
-        rule_types_to_inputs: {
-          '': [
-            {
-              x: ['c', 'd', 'e'],
-              y: ['a', 'b', 'c']
-            }
-          ]
-        }
+        rule_specs: [{
+          type: '',
+          inputs: {
+            x: ['c', 'd', 'e'],
+            y: ['a', 'b', 'c']
+          }
+        }],
       }],
       default_outcome: {
         dest: 'Hola',
@@ -185,12 +180,12 @@ describe('Responses Service', function() {
     StateEditorService.setInteraction(interactionData);
 
     var updatedAnswerGroup = {
-      rules: [RuleObjectFactory.createFromBackendDict({
+      rules: [{
         type: 'Contains',
         inputs: {
           x: 'correct',
         }
-      })],
+      }],
       taggedSkillMisconceptionId: '',
       feedback: 'This is a new feedback text',
       dest: 'State',
@@ -204,7 +199,7 @@ describe('Responses Service', function() {
 
     // Reassign only updated properties.
     var expectedAnswerGroup = interactionData.answerGroups;
-    expectedAnswerGroup[0].updateRuleTypesToInputs(updatedAnswerGroup.rules);
+    expectedAnswerGroup[0].rules = updatedAnswerGroup.rules;
     expectedAnswerGroup[0].taggedSkillMisconceptionId =
       updatedAnswerGroup.taggedSkillMisconceptionId;
     expectedAnswerGroup[0].outcome.feedback = updatedAnswerGroup.feedback;
@@ -226,12 +221,12 @@ describe('Responses Service', function() {
     StateEditorService.setInteraction(interactionData);
 
     var updatedAnswerGroup = {
-      rules: [RuleObjectFactory.createFromBackendDict({
+      rules: [{
         type: 'Contains',
         inputs: {
           x: 'correct',
         }
-      })],
+      }],
       taggedSkillMisconceptionId: '',
       feedback: 'This is a new feedback text',
       dest: 'State',
@@ -251,7 +246,7 @@ describe('Responses Service', function() {
 
     // Reassign only updated properties.
     var expectedAnswerGroup = interactionData.answerGroups;
-    expectedAnswerGroup[0].updateRuleTypesToInputs(updatedAnswerGroup.rules);
+    expectedAnswerGroup[0].rules = updatedAnswerGroup.rules;
     expectedAnswerGroup[0].taggedSkillMisconceptionId =
       updatedAnswerGroup.taggedSkillMisconceptionId;
     expectedAnswerGroup[0].outcome.feedback = updatedAnswerGroup.feedback;
@@ -275,12 +270,12 @@ describe('Responses Service', function() {
     StateEditorService.setInteraction(interactionData);
 
     var updatedAnswerGroup = {
-      rules: [RuleObjectFactory.createFromBackendDict({
+      rules: [{
         type: 'Contains',
         inputs: {
           x: 'correct',
         }
-      })],
+      }],
       taggedSkillMisconceptionId: '',
       feedback: 'This is a new feedback text',
       dest: 'State',
@@ -349,7 +344,7 @@ describe('Responses Service', function() {
 
     var expectedRules = ['c'];
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    expectedAnswerGroup[0].ruleTypesToInputs[''][0].x = expectedRules;
+    expectedAnswerGroup[0].rules[0].inputs.x = expectedRules;
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerGroup(0)).toEqual(
@@ -382,8 +377,8 @@ describe('Responses Service', function() {
     ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    expectedAnswerGroup[0].ruleTypesToInputs[''][0].x = ['f', 'd', 'e'];
-    expectedAnswerGroup[0].ruleTypesToInputs[''][0].y = ['d', 'e', 'f'];
+    expectedAnswerGroup[0].rules[0].inputs.x = ['f', 'd', 'e'];
+    expectedAnswerGroup[0].rules[0].inputs.y = ['d', 'e', 'f'];
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerGroup(0)).toEqual(
@@ -395,12 +390,10 @@ describe('Responses Service', function() {
     ' DragAndDropSortInput and rule type is' +
     ' HasElementXAtPositionY', function() {
     interactionDataWithRules.id = 'DragAndDropSortInput';
-    delete interactionDataWithRules.answerGroups[0].ruleTypesToInputs[''];
-    interactionDataWithRules.answerGroups[0].ruleTypesToInputs = {
-      HasElementXAtPositionY: [{
-        x: 'b', y: 3
-      }]
-    };
+    interactionDataWithRules.answerGroups[0].rules[0].type = (
+      'HasElementXAtPositionY');
+    interactionDataWithRules.answerGroups[0].rules[0].inputs.x = 'b';
+    interactionDataWithRules.answerGroups[0].rules[0].inputs.y = 3;
 
     ResponsesService.init(interactionDataWithRules);
     StateEditorService.setInteraction(interactionDataWithRules);
@@ -423,8 +416,8 @@ describe('Responses Service', function() {
     ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    expectedAnswerGroup[0].ruleTypesToInputs.HasElementXAtPositionY[0].x = 'c';
-    expectedAnswerGroup[0].ruleTypesToInputs.HasElementXAtPositionY[0].y = 1;
+    expectedAnswerGroup[0].rules[0].inputs.x = 'c';
+    expectedAnswerGroup[0].rules[0].inputs.y = 1;
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerChoices()).toEqual(newAnswerChoices);
@@ -434,12 +427,10 @@ describe('Responses Service', function() {
     ' DragAndDropSortInput and rule type is' +
     ' HasElementXBeforeElementY', function() {
     interactionDataWithRules.id = 'DragAndDropSortInput';
-    delete interactionDataWithRules.answerGroups[0].ruleTypesToInputs[''];
-    interactionDataWithRules.answerGroups[0].ruleTypesToInputs = {
-      HasElementXBeforeElementY: [{
-        x: 'a', y: 'b'
-      }]
-    };
+    interactionDataWithRules.answerGroups[0].rules[0].type = (
+      'HasElementXBeforeElementY');
+    interactionDataWithRules.answerGroups[0].rules[0].inputs.x = 'a';
+    interactionDataWithRules.answerGroups[0].rules[0].inputs.y = 'b';
 
     ResponsesService.init(interactionDataWithRules);
     StateEditorService.setInteraction(interactionDataWithRules);
@@ -465,9 +456,8 @@ describe('Responses Service', function() {
     ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    const ruleTypesToInputs = expectedAnswerGroup[0].ruleTypesToInputs;
-    ruleTypesToInputs.HasElementXBeforeElementY[0].x = 'a';
-    ruleTypesToInputs.HasElementXBeforeElementY[0].y = 'd';
+    expectedAnswerGroup[0].rules[0].inputs.x = 'a';
+    expectedAnswerGroup[0].rules[0].inputs.y = 'd';
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerChoices()).toEqual(newAnswerChoices);
@@ -477,12 +467,11 @@ describe('Responses Service', function() {
     ' DragAndDropSortInput and choices had changed', function() {
     interactionDataWithRules.id = 'DragAndDropSortInput';
     // Any other method from DragAndDropSortInputRulesService.
-    delete interactionDataWithRules.answerGroups[0].ruleTypesToInputs[''];
-    interactionDataWithRules.answerGroups[0].ruleTypesToInputs = {
-      IsEqualToOrderingWithOneItemAtIncorrectPosition: [{
-        x: [['a'], ['b'], ['c']]
-      }]
-    };
+    interactionDataWithRules.answerGroups[0].rules[0].type = (
+      'IsEqualToOrderingWithOneItemAtIncorrectPosition');
+    interactionDataWithRules.answerGroups[0].rules[0].inputs.x = [
+      ['a'], ['b'], ['c']];
+    delete interactionDataWithRules.answerGroups[0].rules[0].inputs.y;
     ResponsesService.init(interactionDataWithRules);
     StateEditorService.setInteraction(interactionDataWithRules);
     StateInteractionIdService.init('stateName', 'DragAndDropSortInput');
@@ -505,9 +494,7 @@ describe('Responses Service', function() {
     ResponsesService.handleCustomArgsUpdate(newAnswerChoices, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
-    const ruleTypesToInputs = expectedAnswerGroup[0].ruleTypesToInputs;
-    ruleTypesToInputs.IsEqualToOrderingWithOneItemAtIncorrectPosition[0].x = (
-      [['d'], ['e'], ['f']]);
+    expectedAnswerGroup[0].rules[0].inputs.x = [['d'], ['e'], ['f']];
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerChoices()).toEqual(newAnswerChoices);
@@ -643,7 +630,7 @@ describe('Responses Service', function() {
 
     var updatedAnswerGroups = [
       AnswerGroupObjectFactory.createNew(
-        OutcomeObjectFactory.createNew('Hola', '1', 'Feedback text'),
+        [], OutcomeObjectFactory.createNew('Hola', '1', 'Feedback text'),
         'Training data text', '0'
       )
     ];
@@ -675,7 +662,7 @@ describe('Responses Service', function() {
 
     var updatedAnswerGroups = [
       AnswerGroupObjectFactory.createNew(
-        OutcomeObjectFactory.createNew('Hola', '1', 'Feedback text'),
+        [], OutcomeObjectFactory.createNew('Hola', '1', 'Feedback text'),
         'Training data text', '0'
       )
     ];

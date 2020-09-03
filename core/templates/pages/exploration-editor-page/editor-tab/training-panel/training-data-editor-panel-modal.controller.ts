@@ -44,7 +44,7 @@ angular.module('oppia').controller(
       $scope.trainingData = [];
       $scope.answerGroupHasNonEmptyRules = (
         ResponsesService.getAnswerGroup(
-          answerGroupIndex).getRulesAsList().length > 0);
+          answerGroupIndex).rules.length > 0);
       $scope.inputTemplate = (
         ExplorationHtmlFormatterService.getInteractionHtml(
           StateInteractionIdService.savedMemento,
