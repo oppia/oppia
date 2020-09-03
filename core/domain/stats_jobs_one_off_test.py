@@ -216,24 +216,24 @@ class RegenerateMissingStateStatsOneOffJobTests(OneOffJobTestBase):
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, exp.id,
             [exp_domain.ExplorationChange(
-                {'cmd': 'add_state', 'state_name': 'Middle'})],
+                {'cmd': 'add_state', 'state_name': 'State 2️⃣'})],
             'Add "Middle" state')
         # Create exploration's V3.
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, exp.id,
             [exp_domain.ExplorationChange(
-                {'cmd': 'add_state', 'state_name': 'End'})],
+                {'cmd': 'add_state', 'state_name': 'State 3️⃣'})],
             'Add "End" state')
 
         # Delete stats of the "in-between" exploration version.
         v2_stats = stats_models.ExplorationStatsModel.get(
             stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
-        del v2_stats.state_stats_mapping['Middle']
+        del v2_stats.state_stats_mapping['State 2️⃣']
         v2_stats.put()
 
         self.assertEqual(self.run_one_off_job(), [
             ['ExplorationStatsModel state stats regenerated', [
-                '%s.2 Middle' % (self.EXP_ID,)
+                '%s.2 State 2️⃣' % (self.EXP_ID,)
             ]],
             ['ExplorationStatsModel with valid state(s)', 2]
         ])
