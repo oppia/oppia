@@ -116,8 +116,8 @@ def _remove_metadata(library_name, version_string):
     possible_directory_names = _get_possible_metadata_directory_names(
         library_name, version_string)
     for file_or_directory in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
-        # Python metadata directory names contain a python library name that does
-        # not have uniform case. However, python libraries are equivalent
+        # Python metadata directory names contain a python library name that
+        # does not have uniform case. However, python libraries are equivalent
         # regardless of their case. Therefore, in order to check if a python
         # library's metadata exists in a directory, we need to normalize the
         # directory name. Otherwise, we would need to check every permutation of
