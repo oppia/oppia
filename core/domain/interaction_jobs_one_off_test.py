@@ -904,10 +904,10 @@ class ContinueLabelValidationOneOffJobTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
-        exploration.add_states(['State1', 'State2'])
+        exploration.add_states(['State1', 'Stαte2'])
 
         state1 = exploration.states['State1']
-        state2 = exploration.states['State2']
+        state2 = exploration.states['Stαte2']
 
         state1.update_interaction_id('Continue')
 
@@ -984,7 +984,7 @@ class ContinueLabelValidationOneOffJobTests(test_utils.GenericTestBase):
             .ContinueLabelValidationOneOffJob.get_output(job_id))
         self.assertEqual(actual_output, [
             u'[u\'exp_id0\', '
-            u'[u\'State name: State2, Button label length: 51\']]'])
+            u'[u\'State name: St\\u03b1te2, Button label length: 51\']]'])
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""

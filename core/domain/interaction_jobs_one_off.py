@@ -25,6 +25,7 @@ from core.domain import exp_fetchers
 from core.domain import interaction_registry
 from core.domain import rights_manager
 from core.platform import models
+import python_utils
 
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
@@ -237,10 +238,11 @@ class ContinueLabelValidationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 button_text = interaction.customization_args['buttonText']
                 button_text_length = len(button_text.value.unicode_str)
                 if button_text_length > 50:
-                    yield (
-                        item.id,
+                    output_values = (
                         'State name: %s, Button label length: %s' % (
-                            state_name.encode('utf-8'), button_text_length))
+                            state_name, button_text_length
+                        ))
+                    yield (item.id, output_values.encode('utf-8'))
 
     @staticmethod
     def reduce(key, values):
