@@ -1401,7 +1401,7 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
 
             else:
                 # In early schema versions of ExplorationModel, the END card
-                # was a persistant, implicit state present in every
+                # was a persistant, _implicit_ state present in every
                 # exploration. Because of this, it is not an error for stats to
                 # exist for END even though it does not appear in an
                 # exploration's representation.
