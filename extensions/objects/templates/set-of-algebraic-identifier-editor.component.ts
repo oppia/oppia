@@ -27,8 +27,8 @@ angular.module('oppia').component('setOfAlgebraicIdentifierEditor', {
     value: '='
   },
   template: require('./set-of-algebraic-identifier-editor.component.html'),
-  controller: ['VALID_ALGEBRAIC_IDENTIFIERS', 'GuppyInitializationService',
-    function(VALID_ALGEBRAIC_IDENTIFIERS, GuppyInitializationService) {
+  controller: ['GuppyInitializationService', 'VALID_ALGEBRAIC_IDENTIFIERS',
+    function(GuppyInitializationService, VALID_ALGEBRAIC_IDENTIFIERS) {
       const ctrl = this;
 
       ctrl.$onInit = function() {

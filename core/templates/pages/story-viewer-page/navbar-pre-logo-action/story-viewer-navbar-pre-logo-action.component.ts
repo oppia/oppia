@@ -27,9 +27,9 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('storyViewerNavbarPreLogoAction', {
   template: require('./story-viewer-navbar-pre-logo-action.component.html'),
   controller: [
-    '$rootScope', 'StoryViewerBackendApiService', 'UrlInterpolationService',
+    'StoryViewerBackendApiService', 'UrlInterpolationService',
     'UrlService', 'TOPIC_VIEWER_STORY_URL_TEMPLATE', function(
-        $rootScope, StoryViewerBackendApiService, UrlInterpolationService,
+        StoryViewerBackendApiService, UrlInterpolationService,
         UrlService, TOPIC_VIEWER_STORY_URL_TEMPLATE) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();

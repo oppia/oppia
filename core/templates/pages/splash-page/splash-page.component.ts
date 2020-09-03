@@ -25,10 +25,10 @@ require('services/user.service.ts');
 angular.module('oppia').component('splashPage', {
   template: require('./splash-page.component.html'),
   controller: [
-    '$timeout', 'SiteAnalyticsService', 'LoaderService',
+    '$timeout', 'LoaderService', 'SiteAnalyticsService',
     'UrlInterpolationService', 'UserService', 'WindowRef',
     function(
-        $timeout, SiteAnalyticsService, LoaderService,
+        $timeout, LoaderService, SiteAnalyticsService,
         UrlInterpolationService, UserService, WindowRef) {
       var ctrl = this;
       ctrl.getStaticImageUrl = function(imagePath) {

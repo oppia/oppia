@@ -46,9 +46,9 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
       template: require('./graph-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'CurrentInteractionService',
+        '$attrs', 'CurrentInteractionService',
         function(
-            $scope, $attrs, CurrentInteractionService) {
+            $attrs, CurrentInteractionService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.submitGraph = function() {

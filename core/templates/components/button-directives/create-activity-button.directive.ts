@@ -35,11 +35,11 @@ angular.module('oppia').directive('createActivityButton', [
       template: require('./create-activity-button.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$timeout', '$window', '$uibModal',
+        '$timeout', '$uibModal', '$window',
         'ExplorationCreationService', 'SiteAnalyticsService',
         'UrlService', 'UserService', 'ALLOW_YAML_FILE_UPLOAD',
         function(
-            $timeout, $window, $uibModal,
+            $timeout, $uibModal, $window,
             ExplorationCreationService, SiteAnalyticsService,
             UrlService, UserService, ALLOW_YAML_FILE_UPLOAD) {
           var ctrl = this;

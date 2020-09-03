@@ -115,12 +115,9 @@ require(
   'pages/exploration-player-page/layout-directives/' +
   'learner-view-info.directive.ts');
 
-require('domain/question/question-backend-api.service.ts');
 require('domain/skill/skill-mastery-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/alerts.service.ts');
 require('services/user.service.ts');
-require('services/contextual/url.service.ts');
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
 
@@ -143,29 +140,23 @@ angular.module('oppia').directive('questionPlayer', [
         'question-player.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
-        '$scope', '$sce', '$rootScope', '$location',
-        '$sanitize', '$uibModal', '$window',
-        'AlertsService', 'ExplorationPlayerStateService', 'HtmlEscaperService',
-        'PlayerPositionService', 'QuestionBackendApiService',
+        '$location', '$sanitize', '$sce', '$scope', '$uibModal', '$window',
+        'ExplorationPlayerStateService', 'PlayerPositionService',
         'QuestionPlayerStateService', 'SkillMasteryBackendApiService',
-        'UrlService', 'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
+        'UserService', 'COLORS_FOR_PASS_FAIL_MODE', 'HASH_PARAM',
         'MAX_MASTERY_GAIN_PER_QUESTION', 'MAX_MASTERY_LOSS_PER_QUESTION',
-        'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
-        'VIEW_HINT_PENALTY_FOR_MASTERY',
-        'WRONG_ANSWER_PENALTY', 'WRONG_ANSWER_PENALTY_FOR_MASTERY',
+        'MAX_SCORE_PER_QUESTION', 'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
+        'VIEW_HINT_PENALTY_FOR_MASTERY', 'WRONG_ANSWER_PENALTY',
+        'WRONG_ANSWER_PENALTY_FOR_MASTERY',
         function(
-            HASH_PARAM, MAX_SCORE_PER_QUESTION,
-            $scope, $sce, $rootScope, $location,
-            $sanitize, $uibModal, $window,
-            AlertsService, ExplorationPlayerStateService, HtmlEscaperService,
-            PlayerPositionService, QuestionBackendApiService,
+            $location, $sanitize, $sce, $scope, $uibModal, $window,
+            ExplorationPlayerStateService, PlayerPositionService,
             QuestionPlayerStateService, SkillMasteryBackendApiService,
-            UrlService, UserService, COLORS_FOR_PASS_FAIL_MODE,
+            UserService, COLORS_FOR_PASS_FAIL_MODE, HASH_PARAM,
             MAX_MASTERY_GAIN_PER_QUESTION, MAX_MASTERY_LOSS_PER_QUESTION,
-            QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
-            VIEW_HINT_PENALTY_FOR_MASTERY,
-            WRONG_ANSWER_PENALTY, WRONG_ANSWER_PENALTY_FOR_MASTERY) {
+            MAX_SCORE_PER_QUESTION, QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
+            VIEW_HINT_PENALTY_FOR_MASTERY, WRONG_ANSWER_PENALTY,
+            WRONG_ANSWER_PENALTY_FOR_MASTERY) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var initResults = function() {

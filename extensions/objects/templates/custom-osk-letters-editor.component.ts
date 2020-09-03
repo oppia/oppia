@@ -28,13 +28,13 @@ angular.module('oppia').component('customOskLettersEditor', {
   },
   template: require('./custom-osk-letters-editor.component.html'),
   controller: [
-    '$scope', '$window', 'MAX_CUSTOM_LETTERS_FOR_OSK',
+    '$scope', '$window', 'GuppyInitializationService',
     'CUSTOM_LETTERS_GREEK_TAB', 'CUSTOM_LETTERS_LATIN_TAB',
-    'GREEK_LETTER_NAMES_TO_SYMBOLS', 'GuppyInitializationService',
+    'GREEK_LETTER_NAMES_TO_SYMBOLS', 'MAX_CUSTOM_LETTERS_FOR_OSK',
     function(
-        $scope, $window, MAX_CUSTOM_LETTERS_FOR_OSK,
+        $scope, $window, GuppyInitializationService,
         CUSTOM_LETTERS_GREEK_TAB, CUSTOM_LETTERS_LATIN_TAB,
-        GREEK_LETTER_NAMES_TO_SYMBOLS, GuppyInitializationService) {
+        GREEK_LETTER_NAMES_TO_SYMBOLS, MAX_CUSTOM_LETTERS_FOR_OSK) {
       const ctrl = this;
       ctrl.latinLowerCase = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
       ctrl.latinUpperCase = ctrl.latinLowerCase.map((x) => x.toUpperCase());

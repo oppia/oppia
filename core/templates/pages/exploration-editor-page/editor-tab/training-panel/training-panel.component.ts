@@ -40,18 +40,16 @@ angular.module('oppia').component('trainingPanel', {
   },
   template: require('./training-panel.component.html'),
   controller: [
-    '$scope', 'ExplorationHtmlFormatterService',
-    'StateEditorService', 'ExplorationStatesService',
-    'TrainingDataService', 'ResponsesService', 'StateInteractionIdService',
-    'StateCustomizationArgsService',
-    'OutcomeObjectFactory', 'GenerateContentIdService',
+    '$scope', 'ExplorationHtmlFormatterService', 'ExplorationStatesService',
+    'GenerateContentIdService', 'OutcomeObjectFactory', 'ResponsesService',
+    'StateCustomizationArgsService', 'StateEditorService',
+    'StateInteractionIdService', 'TrainingDataService',
     'COMPONENT_NAME_FEEDBACK',
     function(
-        $scope, ExplorationHtmlFormatterService,
-        StateEditorService, ExplorationStatesService,
-        TrainingDataService, ResponsesService, StateInteractionIdService,
-        StateCustomizationArgsService,
-        OutcomeObjectFactory, GenerateContentIdService,
+        $scope, ExplorationHtmlFormatterService, ExplorationStatesService,
+        GenerateContentIdService, OutcomeObjectFactory, ResponsesService,
+        StateCustomizationArgsService, StateEditorService,
+        StateInteractionIdService, TrainingDataService,
         COMPONENT_NAME_FEEDBACK) {
       var ctrl = this;
       var _updateAnswerTemplate = function() {

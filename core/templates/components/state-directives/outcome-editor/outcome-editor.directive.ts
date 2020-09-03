@@ -57,11 +57,11 @@ angular.module('oppia').directive('outcomeEditor', [
         'outcome-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'ExternalSaveService', 'StateEditorService',
+        'ExternalSaveService', 'StateEditorService',
         'StateInteractionIdService', 'ENABLE_PREREQUISITE_SKILLS',
         'INTERACTION_SPECS',
         function(
-            $scope, ExternalSaveService, StateEditorService,
+            ExternalSaveService, StateEditorService,
             StateInteractionIdService, ENABLE_PREREQUISITE_SKILLS,
             INTERACTION_SPECS) {
           var ctrl = this;

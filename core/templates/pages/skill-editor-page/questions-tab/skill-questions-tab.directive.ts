@@ -21,18 +21,11 @@ require(
   'components/question-directives/questions-list/' +
   'questions-list.directive.ts');
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/question/editable-question-backend-api.service.ts');
-require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/MisconceptionObjectFactory.ts');
-require('domain/skill/skill-backend-api.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/alerts.service.ts');
 require('services/questions-list.service.ts');
-require('services/contextual/url.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -45,20 +38,9 @@ angular.module('oppia').directive('questionsTab', [
         '/pages/skill-editor-page/questions-tab/' +
         'skill-questions-tab.directive.html'),
       controller: [
-        '$scope', '$http', '$q', '$uibModal', '$window', 'AlertsService',
-        'SkillEditorStateService', 'UrlService',
-        'EditableQuestionBackendApiService', 'SkillBackendApiService',
-        'MisconceptionObjectFactory', 'QuestionObjectFactory',
-        'QuestionsListService',
-        'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
-        'NUM_QUESTIONS_PER_PAGE', function(
-            $scope, $http, $q, $uibModal, $window, AlertsService,
-            SkillEditorStateService, UrlService,
-            EditableQuestionBackendApiService, SkillBackendApiService,
-            MisconceptionObjectFactory, QuestionObjectFactory,
-            QuestionsListService,
-            StateEditorService, QuestionUndoRedoService, UndoRedoService,
-            NUM_QUESTIONS_PER_PAGE) {
+        '$scope', 'QuestionsListService', 'SkillEditorStateService',
+        function(
+            $scope, QuestionsListService, SkillEditorStateService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _init = function() {

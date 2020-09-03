@@ -39,10 +39,10 @@ angular.module('oppia').directive('collectionEditorPage', [
         '/pages/collection-editor-page/collection-editor-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'CollectionEditorStateService', 'PageTitleService',
+        'CollectionEditorStateService', 'PageTitleService',
         'RouterService', 'UrlService',
         function(
-            $scope, CollectionEditorStateService, PageTitleService,
+            CollectionEditorStateService, PageTitleService,
             RouterService, UrlService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();

@@ -42,13 +42,11 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('translationOpportunities', {
   template: require('./translation-opportunities.component.html'),
   controller: [
-    '$rootScope', '$scope', '$uibModal',
-    'ContributionOpportunitiesService', 'TranslationLanguageService',
-    'UrlInterpolationService', 'UserService',
+    '$rootScope', '$uibModal', 'ContributionOpportunitiesService',
+    'TranslationLanguageService', 'UrlInterpolationService', 'UserService',
     function(
-        $rootScope, $scope, $uibModal,
-        ContributionOpportunitiesService, TranslationLanguageService,
-        UrlInterpolationService, UserService) {
+        $rootScope, $uibModal, ContributionOpportunitiesService,
+        TranslationLanguageService, UrlInterpolationService, UserService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var userIsLoggedIn = false;

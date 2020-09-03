@@ -87,26 +87,20 @@ angular.module('oppia').directive('stateInteractionEditor', [
         '/components/state-editor/state-interaction-editor/' +
         'state-interaction-editor.directive.html'),
       controller: [
-        '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
-        'AlertsService', 'HtmlEscaperService', 'StateEditorService',
-        'INTERACTION_SPECS', 'StateInteractionIdService',
-        'StateCustomizationArgsService', 'StateNextContentIdIndexService',
-        'EditabilityService',
-        'InteractionDetailsCacheService', 'UrlInterpolationService',
-        'ExplorationHtmlFormatterService', 'ResponsesService',
-        'SubtitledHtmlObjectFactory', 'StateSolutionService',
-        'StateHintsService', 'StateContentService',
-        'WindowDimensionsService', function(
-            $scope, $http, $rootScope, $uibModal, $injector, $filter,
-            AlertsService, HtmlEscaperService, StateEditorService,
-            INTERACTION_SPECS, StateInteractionIdService,
-            StateCustomizationArgsService, StateNextContentIdIndexService,
-            EditabilityService,
-            InteractionDetailsCacheService, UrlInterpolationService,
-            ExplorationHtmlFormatterService, ResponsesService,
-            SubtitledHtmlObjectFactory, StateSolutionService,
-            StateHintsService, StateContentService,
-            WindowDimensionsService) {
+        '$scope', '$uibModal', 'AlertsService', 'EditabilityService',
+        'ExplorationHtmlFormatterService', 'InteractionDetailsCacheService',
+        'ResponsesService', 'StateContentService',
+        'StateCustomizationArgsService', 'StateEditorService',
+        'StateInteractionIdService', 'StateNextContentIdIndexService',
+        'StateSolutionService', 'UrlInterpolationService',
+        'WindowDimensionsService', 'INTERACTION_SPECS', function(
+            $scope, $uibModal, AlertsService, EditabilityService,
+            ExplorationHtmlFormatterService, InteractionDetailsCacheService,
+            ResponsesService, StateContentService,
+            StateCustomizationArgsService, StateEditorService,
+            StateInteractionIdService, StateNextContentIdIndexService,
+            StateSolutionService, UrlInterpolationService,
+            WindowDimensionsService, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var DEFAULT_TERMINAL_STATE_CONTENT =

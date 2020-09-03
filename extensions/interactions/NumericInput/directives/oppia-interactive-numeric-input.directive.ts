@@ -26,7 +26,6 @@ require(
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveNumericInput', [
   function() {
@@ -37,11 +36,11 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
       template: require('./numeric-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'CurrentInteractionService', 'FocusManagerService',
-        'NumericInputRulesService', 'NumericInputValidationService',
+        '$attrs', 'CurrentInteractionService', 'NumericInputRulesService',
+        'NumericInputValidationService',
         function(
-            $attrs, CurrentInteractionService, FocusManagerService,
-            NumericInputRulesService, NumericInputValidationService) {
+            $attrs, CurrentInteractionService, NumericInputRulesService,
+            NumericInputValidationService) {
           var ctrl = this;
           ctrl.errorString = '';
           var isAnswerValid = function() {

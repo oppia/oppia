@@ -77,25 +77,27 @@ angular.module('oppia').directive('stateSolutionEditor', [
         '/components/state-editor/state-solution-editor/' +
         'state-solution-editor.directive.html'),
       controller: [
-        '$scope', '$uibModal', '$filter', 'StateEditorService',
-        'AlertsService', 'INTERACTION_SPECS', 'StateSolutionService',
-        'SolutionVerificationService', 'SolutionValidityService',
+        '$filter', '$scope', '$uibModal', 'AlertsService', 'EditabilityService',
         'ExplorationHtmlFormatterService', 'ExternalSaveService',
-        'StateInteractionIdService', 'StateHintsService',
-        'UrlInterpolationService', 'StateCustomizationArgsService',
-        'EditabilityService', 'WindowDimensionsService',
+        'SolutionValidityService', 'SolutionVerificationService',
+        'StateCustomizationArgsService', 'StateEditorService',
+        'StateHintsService', 'StateInteractionIdService',
+        'StateSolutionService', 'UrlInterpolationService',
+        'WindowDimensionsService',
         'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
         'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
+        'INTERACTION_SPECS',
         function(
-            $scope, $uibModal, $filter, StateEditorService,
-            AlertsService, INTERACTION_SPECS, StateSolutionService,
-            SolutionVerificationService, SolutionValidityService,
+            $filter, $scope, $uibModal, AlertsService, EditabilityService,
             ExplorationHtmlFormatterService, ExternalSaveService,
-            StateInteractionIdService, StateHintsService,
-            UrlInterpolationService, StateCustomizationArgsService,
-            EditabilityService, WindowDimensionsService,
+            SolutionValidityService, SolutionVerificationService,
+            StateCustomizationArgsService, StateEditorService,
+            StateHintsService, StateInteractionIdService,
+            StateSolutionService, UrlInterpolationService,
+            WindowDimensionsService,
             INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
-            INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION) {
+            INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION,
+            INTERACTION_SPECS) {
           var ctrl = this;
           $scope.getInvalidSolutionTooltip = function() {
             if (StateEditorService.isInQuestionMode()) {

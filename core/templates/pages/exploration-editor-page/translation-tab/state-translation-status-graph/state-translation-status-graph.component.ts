@@ -45,11 +45,11 @@ angular.module('oppia').component('stateTranslationStatusGraph', {
   },
   template: require('./state-translation-status-graph.component.html'),
   controller: [
-    '$scope', '$rootScope', 'ExplorationStatesService', 'GraphDataService',
+    '$scope', 'ExplorationStatesService', 'GraphDataService',
     'StateEditorService', 'StateRecordedVoiceoversService',
     'StateWrittenTranslationsService', 'TranslationStatusService',
     function(
-        $scope, $rootScope, ExplorationStatesService, GraphDataService,
+        $scope, ExplorationStatesService, GraphDataService,
         StateEditorService, StateRecordedVoiceoversService,
         StateWrittenTranslationsService, TranslationStatusService) {
       var ctrl = this;

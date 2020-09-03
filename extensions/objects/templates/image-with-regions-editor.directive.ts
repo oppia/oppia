@@ -37,8 +37,8 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
       template: require('./image-with-regions-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$element', '$uibModal',
-        function($scope, $element, $uibModal) {
+        '$element', '$scope', '$uibModal',
+        function($element, $scope, $uibModal) {
           var ctrl = this;
           // Dynamically defines the CSS style for the region rectangle.
           ctrl.getRegionStyle = function(index) {

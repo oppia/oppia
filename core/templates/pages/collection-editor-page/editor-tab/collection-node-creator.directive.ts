@@ -16,8 +16,6 @@
  * @fileoverview Directive for creating a new collection node.
  */
 
-require('domain/collection/collection-node-object.factory.ts');
-require('domain/collection/collection-update.service.ts');
 require('domain/collection/search-explorations-backend-api.service.ts');
 require('domain/summary/exploration-summary-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -41,19 +39,17 @@ angular.module('oppia').directive('collectionNodeCreator', [
         'collection-node-creator.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$window', '$filter', 'AlertsService',
-        'ValidatorsService', 'CollectionEditorStateService',
-        'CollectionLinearizerService', 'CollectionUpdateService',
-        'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
+        '$filter', '$http', 'AlertsService',
+        'CollectionEditorStateService', 'CollectionLinearizerService',
+        'ExplorationSummaryBackendApiService',
         'SearchExplorationsBackendApiService', 'SiteAnalyticsService',
-        'INVALID_NAME_CHARS',
+        'ValidatorsService', 'INVALID_NAME_CHARS',
         function(
-            $http, $window, $filter, AlertsService,
-            ValidatorsService, CollectionEditorStateService,
-            CollectionLinearizerService, CollectionUpdateService,
-            CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
+            $filter, $http, AlertsService,
+            CollectionEditorStateService, CollectionLinearizerService,
+            ExplorationSummaryBackendApiService,
             SearchExplorationsBackendApiService, SiteAnalyticsService,
-            INVALID_NAME_CHARS) {
+            ValidatorsService, INVALID_NAME_CHARS) {
           var ctrl = this;
           /**
            * Fetches a list of exploration metadata dicts from backend, given

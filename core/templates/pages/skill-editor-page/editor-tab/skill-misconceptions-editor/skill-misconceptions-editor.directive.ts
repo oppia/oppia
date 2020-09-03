@@ -50,9 +50,9 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
         '/pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
         'skill-misconceptions-editor.directive.html'),
       controller: [
-        '$scope', '$filter', '$uibModal', 'WindowDimensionsService',
+        '$scope', '$uibModal', 'WindowDimensionsService',
         function(
-            $scope, $filter, $uibModal, WindowDimensionsService) {
+            $scope, $uibModal, WindowDimensionsService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.isEditable = function() {

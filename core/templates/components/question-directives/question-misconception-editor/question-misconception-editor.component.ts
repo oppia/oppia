@@ -41,10 +41,10 @@ angular.module('oppia').component('questionMisconceptionEditor', {
   },
   template: require('./question-misconception-editor.component.html'),
   controller: [
-    '$rootScope', '$uibModal', 'ExternalSaveService', 'StateEditorService',
+    '$uibModal', 'ExternalSaveService', 'StateEditorService',
     'UrlInterpolationService',
     function(
-        $rootScope, $uibModal, ExternalSaveService, StateEditorService,
+        $uibModal, ExternalSaveService, StateEditorService,
         UrlInterpolationService) {
       var ctrl = this;
 

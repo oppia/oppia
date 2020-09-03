@@ -42,7 +42,6 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/alerts.service.ts');
-require('services/context.service.ts');
 require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
@@ -73,17 +72,15 @@ angular.module('oppia').directive('answerGroupEditor', [
         'answer-group-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
-        'AlertsService', 'ContextService', 'ExternalSaveService',
-        'INTERACTION_SPECS', 'StateEditorService', 'RuleObjectFactory',
+        'AlertsService', 'ExternalSaveService', 'ResponsesService',
+        'RuleObjectFactory', 'StateEditorService', 'StateInteractionIdService',
         'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
-        'ResponsesService',
+        'INTERACTION_SPECS',
         function(
-            $scope, $rootScope, $uibModal, StateInteractionIdService,
-            AlertsService, ContextService, ExternalSaveService,
-            INTERACTION_SPECS, StateEditorService, RuleObjectFactory,
+            AlertsService, ExternalSaveService, ResponsesService,
+            RuleObjectFactory, StateEditorService, StateInteractionIdService,
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
-            ResponsesService) {
+            INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
 

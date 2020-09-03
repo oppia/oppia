@@ -39,12 +39,12 @@ angular.module('oppia').component('reviewTestPage', {
   template: require('./review-test-page.component.html'),
   controller: [
     'PageTitleService', 'ReviewTestEngineService', 'UrlInterpolationService',
-    'UrlService', 'QUESTION_PLAYER_MODE', 'REVIEW_TEST_DATA_URL',
-    'REVIEW_TESTS_URL', 'STORY_VIEWER_PAGE',
+    'UrlService', 'QUESTION_PLAYER_MODE', 'REVIEW_TESTS_URL',
+    'REVIEW_TEST_DATA_URL', 'STORY_VIEWER_PAGE',
     function(
         PageTitleService, ReviewTestEngineService, UrlInterpolationService,
-        UrlService, QUESTION_PLAYER_MODE, REVIEW_TEST_DATA_URL,
-        REVIEW_TESTS_URL, STORY_VIEWER_PAGE
+        UrlService, QUESTION_PLAYER_MODE, REVIEW_TESTS_URL,
+        REVIEW_TEST_DATA_URL, STORY_VIEWER_PAGE
     ) {
       var ctrl = this;
 

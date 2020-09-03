@@ -47,11 +47,11 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
       template: require('./schema-based-unicode-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$sce', '$timeout', '$translate',
+        '$filter', '$sce', '$timeout', '$translate',
         'DeviceInfoService', 'SchemaFormSubmittedService',
         'StateCustomizationArgsService',
         function(
-            $scope, $filter, $sce, $timeout, $translate,
+            $filter, $sce, $timeout, $translate,
             DeviceInfoService, SchemaFormSubmittedService,
             StateCustomizationArgsService) {
           var ctrl = this;

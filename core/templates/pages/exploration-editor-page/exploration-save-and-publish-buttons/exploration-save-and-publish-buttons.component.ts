@@ -35,12 +35,12 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
   template: require('./exploration-save-and-publish-buttons.component.html'),
   controller: [
     '$scope', 'ChangeListService', 'EditabilityService',
-    'ExplorationRightsService', 'ExplorationWarningsService',
-    'ExplorationSaveService', 'UserExplorationPermissionsService',
+    'ExplorationRightsService', 'ExplorationSaveService',
+    'ExplorationWarningsService', 'UserExplorationPermissionsService',
     function(
         $scope, ChangeListService, EditabilityService,
-        ExplorationRightsService, ExplorationWarningsService,
-        ExplorationSaveService, UserExplorationPermissionsService) {
+        ExplorationRightsService, ExplorationSaveService,
+        ExplorationWarningsService, UserExplorationPermissionsService) {
       var ctrl = this;
       $scope.isPrivate = function() {
         return ExplorationRightsService.isPrivate();

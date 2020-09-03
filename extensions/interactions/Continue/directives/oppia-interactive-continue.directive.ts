@@ -38,9 +38,9 @@ angular.module('oppia').directive('oppiaInteractiveContinue', [
       template: require('./continue-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'CurrentInteractionService', 'ContextService',
+        '$attrs', 'ContextService', 'CurrentInteractionService',
         function(
-            $attrs, CurrentInteractionService, ContextService) {
+            $attrs, ContextService, CurrentInteractionService) {
           var ctrl = this;
           var DEFAULT_BUTTON_TEXT = 'Continue';
           var DEFAULT_HUMAN_READABLE_ANSWER = 'Please continue.';

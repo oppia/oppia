@@ -33,15 +33,15 @@ require('services/math-interactions.service.ts');
 angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
   template: require('./numeric-expression-input-interaction.component.html'),
   controller: [
-    '$scope', 'NumericExpressionInputRulesService',
-    'CurrentInteractionService', 'DeviceInfoService',
+    '$scope', 'CurrentInteractionService', 'DeviceInfoService',
     'GuppyConfigurationService', 'GuppyInitializationService',
-    'MathInteractionsService', 'MATH_INTERACTION_PLACEHOLDERS',
+    'MathInteractionsService', 'NumericExpressionInputRulesService',
+    'MATH_INTERACTION_PLACEHOLDERS',
     function(
-        $scope, NumericExpressionInputRulesService,
-        CurrentInteractionService, DeviceInfoService,
+        $scope, CurrentInteractionService, DeviceInfoService,
         GuppyConfigurationService, GuppyInitializationService,
-        MathInteractionsService, MATH_INTERACTION_PLACEHOLDERS) {
+        MathInteractionsService, NumericExpressionInputRulesService,
+        MATH_INTERACTION_PLACEHOLDERS) {
       const ctrl = this;
       ctrl.value = '';
       ctrl.hasBeenTouched = false;

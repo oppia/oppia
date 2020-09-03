@@ -42,14 +42,14 @@ angular.module('oppia').component('svgFilenameEditor', {
     'DeviceInfoService', 'ImageLocalStorageService', 'ImagePreloaderService',
     'ImageUploadHelperService', 'UrlInterpolationService',
     'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE', 'MAX_SVG_DIAGRAM_HEIGHT',
-    'MIN_SVG_DIAGRAM_HEIGHT', 'MAX_SVG_DIAGRAM_WIDTH', 'MIN_SVG_DIAGRAM_WIDTH',
+    'MAX_SVG_DIAGRAM_WIDTH', 'MIN_SVG_DIAGRAM_HEIGHT', 'MIN_SVG_DIAGRAM_WIDTH',
     function(
         $http, $q, $sce, $scope, AlertsService,
         AssetsBackendApiService, ContextService, CsrfTokenService,
         DeviceInfoService, ImageLocalStorageService, ImagePreloaderService,
         ImageUploadHelperService, UrlInterpolationService,
         IMAGE_SAVE_DESTINATION_LOCAL_STORAGE, MAX_SVG_DIAGRAM_HEIGHT,
-        MIN_SVG_DIAGRAM_HEIGHT, MAX_SVG_DIAGRAM_WIDTH, MIN_SVG_DIAGRAM_WIDTH) {
+        MAX_SVG_DIAGRAM_WIDTH, MIN_SVG_DIAGRAM_HEIGHT, MIN_SVG_DIAGRAM_WIDTH) {
       const ctrl = this;
       // These constants are used to identify the tool that is currently being
       // used so that other tools can be disabled accordingly.

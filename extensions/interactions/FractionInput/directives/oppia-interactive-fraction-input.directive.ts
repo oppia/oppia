@@ -37,13 +37,13 @@ angular.module('oppia').directive('oppiaInteractiveFractionInput', [
       template: require('./fraction-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'FractionInputRulesService',
-        'FractionObjectFactory', 'FRACTION_PARSING_ERRORS',
-        'CurrentInteractionService',
+        '$attrs', '$scope', 'CurrentInteractionService',
+        'FractionInputRulesService', 'FractionObjectFactory',
+        'FRACTION_PARSING_ERRORS',
         function(
-            $scope, $attrs, FractionInputRulesService,
-            FractionObjectFactory, FRACTION_PARSING_ERRORS,
-            CurrentInteractionService) {
+            $attrs, $scope, CurrentInteractionService,
+            FractionInputRulesService, FractionObjectFactory,
+            FRACTION_PARSING_ERRORS) {
           var ctrl = this;
           // Label for errors caused whilst parsing a fraction.
           var FORM_ERROR_TYPE = 'FRACTION_FORMAT_ERROR';

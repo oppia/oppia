@@ -30,11 +30,11 @@ angular.module('oppia').component('editorNavbarBreadcrumb', {
   template: require('./editor-navbar-breadcrumb.component.html'),
   controller: [
     '$scope', 'ExplorationPropertyService', 'ExplorationTitleService',
-    'RouterService', 'FocusManagerService',
+    'FocusManagerService', 'RouterService',
     'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
     function(
         $scope, ExplorationPropertyService, ExplorationTitleService,
-        RouterService, FocusManagerService,
+        FocusManagerService, RouterService,
         EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();

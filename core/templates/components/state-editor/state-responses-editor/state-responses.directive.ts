@@ -109,7 +109,7 @@ angular.module('oppia').directive('stateResponses', [
         '/components/state-editor/state-responses-editor/' +
         'state-responses.directive.html'),
       controller: [
-        '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        '$filter', '$scope', '$uibModal', 'AlertsService',
         'AnswerGroupObjectFactory', 'ContextService',
         'EditabilityService', 'ExternalSaveService', 'ResponsesService',
         'StateCustomizationArgsService', 'StateEditorService',
@@ -121,7 +121,7 @@ angular.module('oppia').directive('stateResponses', [
         'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
         function(
-            $filter, $rootScope, $scope, $uibModal, AlertsService,
+            $filter, $scope, $uibModal, AlertsService,
             AnswerGroupObjectFactory, ContextService,
             EditabilityService, ExternalSaveService, ResponsesService,
             StateCustomizationArgsService, StateEditorService,

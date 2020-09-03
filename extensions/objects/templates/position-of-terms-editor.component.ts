@@ -25,8 +25,8 @@ angular.module('oppia').component('positionOfTermsEditor', {
     value: '='
   },
   template: require('./position-of-terms-editor.component.html'),
-  controller: ['$scope', 'POSITION_OF_TERMS_MAPPING',
-    function($scope, POSITION_OF_TERMS_MAPPING) {
+  controller: ['POSITION_OF_TERMS_MAPPING',
+    function(POSITION_OF_TERMS_MAPPING) {
       const ctrl = this;
 
       ctrl.onChangePosition = function() {

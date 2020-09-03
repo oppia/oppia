@@ -23,8 +23,8 @@ angular.module('oppia').component('ratioExpressionEditor', {
     value: '='
   },
   template: require('./ratio-expression-editor.component.html'),
-  controller: ['$scope', 'RatioObjectFactory',
-    function($scope, RatioObjectFactory) {
+  controller: ['RatioObjectFactory',
+    function(RatioObjectFactory) {
       const ctrl = this;
       ctrl.warningText = '';
 

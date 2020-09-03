@@ -31,12 +31,12 @@ angular.module('oppia').component('algebraicExpressionEditor', {
   },
   template: require('./algebraic-expression-editor.component.html'),
   controller: [
-    '$scope', 'GuppyConfigurationService', 'GuppyInitializationService',
-    'MathInteractionsService', 'DeviceInfoService',
+    '$scope', 'DeviceInfoService', 'GuppyConfigurationService',
+    'GuppyInitializationService', 'MathInteractionsService',
     'MATH_INTERACTION_PLACEHOLDERS',
     function(
-        $scope, GuppyConfigurationService, GuppyInitializationService,
-        MathInteractionsService, DeviceInfoService,
+        $scope, DeviceInfoService, GuppyConfigurationService,
+        GuppyInitializationService, MathInteractionsService,
         MATH_INTERACTION_PLACEHOLDERS) {
       const ctrl = this;
       ctrl.warningText = '';

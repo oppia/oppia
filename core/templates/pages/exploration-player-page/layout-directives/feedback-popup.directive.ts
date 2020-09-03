@@ -19,7 +19,6 @@
 require('filters/string-utility-filters/get-abbreviated-text.filter.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
-require('services/alerts.service.ts');
 require('services/user.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/stateful/background-mask.service.ts');
@@ -42,12 +41,12 @@ angular.module('oppia').directive('feedbackPopup', [
       scope: {},
       template: require('./feedback-popup.directive.html'),
       controller: [
-        '$scope', '$element', '$filter', '$http', '$log', '$timeout',
-        'AlertsService', 'BackgroundMaskService', 'FocusManagerService',
+        '$element', '$http', '$log', '$scope', '$timeout',
+        'BackgroundMaskService', 'FocusManagerService',
         'PlayerPositionService', 'UserService', 'WindowDimensionsService',
         function(
-            $scope, $element, $filter, $http, $log, $timeout,
-            AlertsService, BackgroundMaskService, FocusManagerService,
+            $element, $http, $log, $scope, $timeout,
+            BackgroundMaskService, FocusManagerService,
             PlayerPositionService, UserService, WindowDimensionsService) {
           var ctrl = this;
           var feedbackUrl = (

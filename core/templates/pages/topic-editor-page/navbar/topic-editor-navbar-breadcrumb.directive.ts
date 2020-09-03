@@ -30,9 +30,9 @@ angular.module('oppia').directive('topicEditorNavbarBreadcrumb', [
         '/pages/topic-editor-page/navbar/' +
         'topic-editor-navbar-breadcrumb.directive.html'),
       controller: [
-        '$scope', 'TopicEditorStateService', 'TopicEditorRoutingService',
+        '$scope', 'TopicEditorRoutingService', 'TopicEditorStateService',
         function(
-            $scope, TopicEditorStateService, TopicEditorRoutingService) {
+            $scope, TopicEditorRoutingService, TopicEditorStateService) {
           var ctrl = this;
           $scope.canNavigateToTopicEditorPage = function() {
             const activeTab = TopicEditorRoutingService.getActiveTabName();

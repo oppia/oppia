@@ -41,10 +41,10 @@ angular.module('oppia').directive('solutionExplanationEditor', [
         'solution-explanation-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'ContextService', 'EditabilityService',
+        'ContextService', 'EditabilityService',
         'ExternalSaveService', 'StateSolutionService',
         function(
-            $scope, ContextService, EditabilityService,
+            ContextService, EditabilityService,
             ExternalSaveService, StateSolutionService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();

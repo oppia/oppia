@@ -32,8 +32,8 @@ angular.module('oppia').component('threadTable', {
   },
   template: require('./thread-table.component.html'),
   controller: [
-    '$scope', 'ThreadStatusDisplayService', 'DateTimeFormatService',
-    function($scope, ThreadStatusDisplayService, DateTimeFormatService) {
+    '$scope', 'DateTimeFormatService', 'ThreadStatusDisplayService',
+    function($scope, DateTimeFormatService, ThreadStatusDisplayService) {
       $scope.getLabelClass = function(status) {
         return ThreadStatusDisplayService.getLabelClass(status);
       };

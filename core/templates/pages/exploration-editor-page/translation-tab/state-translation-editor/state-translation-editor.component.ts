@@ -27,14 +27,14 @@ angular.module('oppia').component('stateTranslationEditor', {
   template: require('./state-translation-editor.component.html'),
   controller: [
     '$scope', '$uibModal', 'EditabilityService',
-    'ExternalSaveService', 'ExplorationStatesService',
+    'ExplorationStatesService', 'ExternalSaveService',
     'StateEditorService', 'StateWrittenTranslationsService',
     'TranslationLanguageService', 'TranslationStatusService',
     'TranslationTabActiveContentIdService', 'UrlInterpolationService',
     'WrittenTranslationObjectFactory',
     function(
         $scope, $uibModal, EditabilityService,
-        ExternalSaveService, ExplorationStatesService,
+        ExplorationStatesService, ExternalSaveService,
         StateEditorService, StateWrittenTranslationsService,
         TranslationLanguageService, TranslationStatusService,
         TranslationTabActiveContentIdService, UrlInterpolationService,

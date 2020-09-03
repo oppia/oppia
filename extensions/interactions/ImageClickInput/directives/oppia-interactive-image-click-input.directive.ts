@@ -54,8 +54,8 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
       template: require('./image-click-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$element', '$attrs', '$scope', 'CurrentInteractionService',
-        function($element, $attrs, $scope, CurrentInteractionService) {
+        '$attrs', '$element', 'CurrentInteractionService',
+        function($attrs, $element, CurrentInteractionService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           const {
