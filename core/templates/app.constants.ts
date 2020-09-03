@@ -157,6 +157,12 @@ export const AppConstants = {
     QUESTION: 'question',
   },
 
+  IMAGE_CONTEXT: {
+    EXPLORATION_SUGGESTIONS: 'exploration_suggestions',
+    QUESTION_SUGGESTIONS: 'question_suggestions'
+  },
+
   IMAGE_SAVE_DESTINATION_SERVER: 'imageSaveDestinationServer',
-  IMAGE_SAVE_DESTINATION_LOCAL_STORAGE: 'imageSaveDestinationLocalStorage',
+  IMAGE_SAVE_DESTINATION_LOCAL_STORAGE:
+    'imageSaveDestinationLocalStorage'
 };

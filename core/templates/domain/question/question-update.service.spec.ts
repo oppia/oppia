@@ -124,14 +124,10 @@ describe('Question update service', function() {
       param_changes: [],
       interaction: {
         answer_groups: [{
-          rule_input_translations: {},
-          rule_types_to_inputs: {
-            Contains: [
-              {
-                x: 'hola'
-              }
-            ]
-          },
+          rule_specs: [{
+            rule_type: 'Contains',
+            inputs: {x: 'hola'}
+          }],
           outcome: {
             dest: 'Me Llamo',
             feedback: {
@@ -186,14 +182,10 @@ describe('Question update service', function() {
       param_changes: [],
       interaction: {
         answer_groups: [{
-          rule_input_translations: {},
-          rule_types_to_inputs: {
-            Contains: [
-              {
-                x: 'hola'
-              }
-            ]
-          },
+          rule_specs: [{
+            rule_type: 'Contains',
+            inputs: {x: 'hola'}
+          }],
           outcome: {
             dest: 'Me Llamo',
             feedback: {

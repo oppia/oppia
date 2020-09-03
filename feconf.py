@@ -166,6 +166,9 @@ ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
 
+IMAGE_CONTEXT_QUESTION_SUGGESTIONS = 'question_suggestions'
+IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS = 'exploration_suggestions'
+
 MAX_TASK_MODELS_PER_FETCH = 25
 MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
@@ -210,7 +213,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 39
+CURRENT_STATE_SCHEMA_VERSION = 38
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
