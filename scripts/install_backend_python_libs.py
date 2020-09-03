@@ -315,9 +315,10 @@ def validate_metadata_directories():
         # If any of the possible directory metadata directory names show up in
         # the directory, that is confirmation that <library_name> was installed
         # correctly with the correct metadata.
-        if any([
-            name in file_or_directory_names
-            for name in possible_directory_names]):
+        if any(
+            [
+                name in file_or_directory_names
+                for name in possible_directory_names]):
             is_metadata_in_third_party_python_libs_directory = True
         if not is_metadata_in_third_party_python_libs_directory:
             raise Exception(
