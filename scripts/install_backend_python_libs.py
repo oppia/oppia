@@ -127,7 +127,7 @@ def _rectify_third_party_directory(mismatches):
                 }
     """
     # Handling 5 or more mismatches requires 5 or more individual `pip install`
-    # commands, which is lower than just reinstalling all of the libraries
+    # commands, which is slower than just reinstalling all of the libraries
     # using `pip install -r requirements.txt`.
     if len(mismatches) >= 5:
         if os.path.isdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
