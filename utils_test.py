@@ -473,20 +473,26 @@ class UtilsTests(test_utils.GenericTestBase):
             dt,
             datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))
 
-    def test_utf8_encode_and_decode_with_bytes(self):
+    def test_deep_encode_and_decode_with_bytes(self):
         value = {
             b'list': [b'value', 3, 4, None],
             b'bool': True,
         }
-        utf8_encoded_value = utils.utf8_encode(value)
+        deep_encoded_value = utils.deep_encode(value)
 
-        self.assertEqual(value, utf8_encoded_value)
-        self.assertEqual(value, utils.utf8_decode(utf8_encoded_value))
+        self.assertEqual(value, deep_encoded_value)
+        self.assertEqual(value, utils.deep_decode(deep_encoded_value))
 
-    def test_utf8_encode_and_decode_with_unicode(self):
+    def test_deep_encode_and_decode_with_unicode(self):
         value = {
             'sunny ☀️': ['🌇', 3, 4, None],
             '🙁': False,
         }
-        utf8_encoded_value = utils.utf8_encode(value)
-        self.assertEqual(value, utils.utf8_decode(utf8_encoded_value))
+        deep_encoded_value = utils.deep_encode(value)
+        self.assertEqual(value, utils.deep_decode(deep_encoded_value))
+
+    def test_deep_encode_with_different_encoding(self):
+        value = ['🙁']
+        deep_encoded_value = utils.deep_encode(value, encoding='ascii')
+        self.assertEqual(deep_encoded_value, [r'\u1234'])
+        self.assertEqual(value, utils.deep_decode(deep_encoded_value))

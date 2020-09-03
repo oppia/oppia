@@ -828,7 +828,7 @@ def get_hashable_value(value):
         return value
 
 
-def utf8_encode(value):
+def deep_encode(value, encoding='utf-8'):
     """This function encodes all strings of the JSON-like value as utf8.
 
     Args:
@@ -840,16 +840,16 @@ def utf8_encode(value):
         *. A new object where every string has been utf-8 encoded.
     """
     if isinstance(value, list):
-        return [utf8_encode(v) for v in value]
+        return [deep_encode(v, encoding=encoding) for v in value]
     elif isinstance(value, dict):
-        return {k.encode('utf-8'): utf8_encode(v) for k, v in value.items()}
+        return {k.encode(encoding): deep_encode(v, encoding=encoding) for k, v in value.items()}
     elif isinstance(value, python_utils.BASESTRING):
-        return value.encode('utf-8')
+        return value.encode(encoding)
     else:
         return value
 
 
-def utf8_decode(value):
+def deep_decode(value, encoding='utf-8'):
     """This function decodes all strings of the JSON-like value as utf8.
 
     Args:
@@ -861,11 +861,11 @@ def utf8_decode(value):
         *. A new object where every string has been decoded from utf-8.
     """
     if isinstance(value, list):
-        return [utf8_decode(v) for v in value]
+        return [deep_decode(v, encoding=encoding) for v in value]
     elif isinstance(value, dict):
-        return {k.decode('utf-8'): utf8_decode(v) for k, v in value.items()}
+        return {k.decode(encoding): deep_decode(v, encoding=encoding) for k, v in value.items()}
     elif isinstance(value, python_utils.BASESTRING):
-        return value.decode('utf-8')
+        return value.decode(encoding)
     else:
         return value
 
