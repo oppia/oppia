@@ -127,22 +127,22 @@ class RegenerateMissingStateStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
                 if (index > 0 and
                         state_name not in version_diff.added_state_names):
-                    prev_state_stats_mapping = (
+                    old_state_stats_mapping = (
                         all_exp_stats[index - 1] and
                         all_exp_stats[index - 1].state_stats_mapping)
-                    prev_state_name = version_diff.new_to_old_state_names.get(
+                    old_state_name = version_diff.new_to_old_state_names.get(
                         state_name, state_name)
 
-                    if (prev_state_stats_mapping and
-                            prev_state_name in prev_state_stats_mapping):
+                    if (old_state_stats_mapping and
+                            old_state_name in old_state_stats_mapping):
                         new_state_stats.aggregate_from(
-                            prev_state_stats_mapping[prev_state_name])
+                            old_state_stats_mapping[old_state_name])
                     else:
                         yield (
                             RegenerateMissingStateStatsOneOffJob
                             .REDUCE_KEY_BAD_RENAME,
                             '%s.%s "%s" -> "%s"' % (
-                                exp.id, exp.version - 1, prev_state_name,
+                                exp.id, exp.version - 1, old_state_name,
                                 state_name))
 
                 stats.state_stats_mapping[state_name] = new_state_stats
