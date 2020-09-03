@@ -6756,8 +6756,9 @@ class ExplorationRecommendationsModelValidatorTests(
         for exp in explorations:
             exp_services.save_new_exploration(self.user_id, exp)
 
-        recommendations_services.set_recommendations('0', ['3', '4'])
-        recommendations_services.set_recommendations('1', ['5'])
+        recommendations_services.set_exploration_recommendations(
+            '0', ['3', '4'])
+        recommendations_services.set_exploration_recommendations('1', ['5'])
 
         self.model_instance_0 = (
             recommendations_models.ExplorationRecommendationsModel.get_by_id(
