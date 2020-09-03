@@ -119,6 +119,13 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-new-story-description-field'));
   var storyThumbnailButton = element(
     by.css('.thumbnail-editor .protractor-test-photo-button'));
+  var topicMetaTagContentField = element(
+    by.css('.protractor-test-topic-meta-tag-content-field'));
+  var topicMetaTagContentLabel = element(
+    by.css('.protractor-test-topic-meta-tag-content-label'));
+  var easyRubricDifficulty = element(
+    by.css('.protractor-test-skill-difficulty-easy'));
+
   var dragAndDrop = async function(fromElement, toElement) {
     await browser.executeScript(dragAndDropScript, fromElement, toElement);
   };
@@ -181,6 +188,7 @@ var TopicEditorPage = function() {
     await element(by.css('option[label="' + skillDescription + '"]')).click();
 
     await action.click('Create question button', createQuestionButton);
+    await action.click('Easy difficulty for skill', easyRubricDifficulty);
   };
 
   this.moveToQuestionsTab = async function() {
@@ -409,6 +417,7 @@ var TopicEditorPage = function() {
 
   this.createStory = async function(
       storyTitle, storyUrlFragment, storyDescription, imgPath) {
+    await general.scrollToTop();
     await waitFor.elementToBeClickable(
       createStoryButton,
       'Create Story button takes too long to be clickable');
@@ -431,6 +440,12 @@ var TopicEditorPage = function() {
       'Confirm Create Story button takes too long to be clickable');
     await confirmStoryCreationButton.click();
     await waitFor.pageToFullyLoad();
+  };
+
+  this.updateMetaTagContent = async function(newMetaTagContent) {
+    await action.sendKeys(
+      'Update Meta Tag Content', topicMetaTagContentField, newMetaTagContent);
+    await action.click('Meta Tag Content label', topicMetaTagContentLabel);
   };
 
   this.changeTopicName = async function(newName) {

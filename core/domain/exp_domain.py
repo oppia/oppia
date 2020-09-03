@@ -404,102 +404,6 @@ class ExpVersionReference(python_utils.OBJECT):
                 'Expected version to be an int, received %s' % self.version)
 
 
-class ExplorationMathRichTextInfo(python_utils.OBJECT):
-    """Value object representing all the information related to math rich
-    text components in an exploration's HTML.
-    """
-
-    def __init__(
-            self, exp_id, math_images_generation_required,
-            latex_strings_without_svg):
-        """Initializes an ExplorationMathRichTextInfo domain object.
-
-        Args:
-            exp_id: str. ID of the exploration.
-            math_images_generation_required: bool. A boolean which indicates
-                whether the exploration requires images to be generated and
-                saved for the math rich-text components.
-            latex_strings_without_svg: list(str). list of unique LaTeX strings
-                from the math rich-text components having the 'svg_filename'
-                field as an empty string. Basically these are the LaTeX strings
-                for which we need to generate and save an SVG image.
-        """
-        self.exp_id = exp_id
-        self.math_images_generation_required = math_images_generation_required
-        self.latex_strings_without_svg = latex_strings_without_svg
-        self.validate()
-
-    def to_dict(self):
-        """Returns a dict representing this ExplorationMathRichTextInfo domain
-        object.
-
-        Returns:
-            dict. A dict, mapping all fields of ExplorationMathRichTextInfo
-            instance.
-        """
-        return {
-            'exp_id': self.exp_id,
-            'math_images_generation_required': (
-                self.math_images_generation_required),
-            'latex_strings_without_svg': self.latex_strings_without_svg
-        }
-
-    def validate(self):
-        """Validates properties of the ExplorationMathRichTextInfo.
-
-        Raises:
-            ValidationError. Attributes of the ExplorationMathRichTextInfo
-                are invalid.
-        """
-        if not isinstance(self.exp_id, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected exp_id to be a str, received %s' % self.exp_id)
-        if not isinstance(self.math_images_generation_required, bool):
-            raise utils.ValidationError(
-                'Expected math_images_generation_required to be an bool, '
-                'received %s' % self.math_images_generation_required)
-        if not isinstance(self.latex_strings_without_svg, list):
-            raise utils.ValidationError(
-                'Expected latex_strings to be a list, received %s' % (
-                    self.latex_strings_without_svg))
-        for latex_string in self.latex_strings_without_svg:
-            if not isinstance(latex_string, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected each element in the list of latex strings to be'
-                    ' a str, received %s' % latex_string)
-
-    def get_svg_size_in_bytes(self):
-        """Returns the approximate size of SVG images for the LaTeX strings in
-        bytes.
-
-        Returns:
-            int. The approximate size of Math SVGs in bytes.
-        """
-
-        # The approximate size for an SVG image for a LaTeX expression with one
-        # character is around 1000 Kb. But, when the number of characters
-        # increases the size of SVG per character reduces. For example: If the
-        # size of SVG for the character 'a' is 1000 bytes, the size of SVG for
-        # 'abc' will be less than 3000 bytes. So the below approximation to
-        # find the size will give us the maximum size.
-        size_in_bytes = 0
-        for latex_string in self.latex_strings_without_svg:
-            # The characters in special LaTeX keywords like 'frac' and 'sqrt'
-            # don't add up to the total size of SVG.
-            length_of_expression = len(latex_string)
-            size_in_bytes += (length_of_expression * 1000)
-        return size_in_bytes
-
-    def get_longest_latex_expression(self):
-        """Returns the longest LaTeX string among the LaTeX strings in the
-        object.
-
-        Returns:
-            str. The longest LaTeX string.
-        """
-        return max(self.latex_strings_without_svg, key=len)
-
-
 class ExplorationVersionsDiff(python_utils.OBJECT):
     """Domain object for the difference between two versions of an Oppia
     exploration.
@@ -2301,8 +2205,7 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.convert_to_textangular,
-                state_uses_old_interaction_cust_args_schema=True,
-                state_uses_old_rule_spec_schema=True)
+                state_uses_old_interaction_cust_args_schema=True)
         return states_dict
 
     @classmethod
@@ -2322,8 +2225,7 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.add_caption_attr_to_image,
-                state_uses_old_interaction_cust_args_schema=True,
-                state_uses_old_rule_spec_schema=True)
+                state_uses_old_interaction_cust_args_schema=True)
         return states_dict
 
     @classmethod
@@ -2343,8 +2245,7 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.convert_to_ckeditor,
-                state_uses_old_interaction_cust_args_schema=True,
-                state_uses_old_rule_spec_schema=True)
+                state_uses_old_interaction_cust_args_schema=True)
         return states_dict
 
     @classmethod
@@ -2368,8 +2269,7 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 add_dimensions_to_image_tags,
-                state_uses_old_interaction_cust_args_schema=True,
-                state_uses_old_rule_spec_schema=True)
+                state_uses_old_interaction_cust_args_schema=True)
             if state_dict['interaction']['id'] == 'ImageClickInput':
                 filename = state_dict['interaction']['customization_args'][
                     'imageAndRegions']['value']['imagePath']
@@ -2636,8 +2536,7 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.add_math_content_to_math_rte_components,
-                state_uses_old_interaction_cust_args_schema=True,
-                state_uses_old_rule_spec_schema=True)
+                state_uses_old_interaction_cust_args_schema=True)
 
         return states_dict
 
@@ -3018,52 +2917,6 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
-    def _convert_states_v38_dict_to_v39_dict(cls, states_dict):
-        """Converts from version 38 to 39. Version 39 removes the fields
-        rule_specs in AnswerGroups, and adds new fields rule_types_to_inputs and
-        rule_input_translations. rule_types_to_inputs is a dictionary that maps
-        rule type to a list of rule inputs that share the rule type.
-        rule_input_translations is a dict mapping abbreviated language
-        codes to a mapping of rule type to rule inputs.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        for state_dict in states_dict.values():
-            answer_group_dicts = state_dict['interaction']['answer_groups']
-            for i, answer_group_dict in enumerate(answer_group_dicts):
-                # Convert the list of rule specs into the new
-                # rule_types_to_inputs dict format. Instead of a list of
-                # dictionaries that have properties 'rule_type' and
-                # 'inputs', the new format groups rule inputs of the same
-                # rule type by mapping rule type to a list of rule inputs.
-                # E.g. Old format: rule_specs = [
-                #   {rule_type: 'Equals', 'inputs': {x: 'Yes'}},
-                #   {rule_type: 'Equals', 'inputs': {x: 'Y'}}
-                # ]
-                # New format: rule_types_to_inputs = {
-                #   'Equals': [
-                #       {x: 'Yes'}, {x: 'Y'}
-                #   ]
-                # }
-                rule_types_to_inputs = collections.defaultdict(list)
-                for rule_spec_dict in answer_group_dict['rule_specs']:
-                    rule_type = rule_spec_dict['rule_type']
-                    rule_types_to_inputs[rule_type].append(
-                        rule_spec_dict['inputs'])
-                del answer_group_dicts[i]['rule_specs']
-                answer_group_dicts[i]['rule_input_translations'] = {}
-                answer_group_dicts[i]['rule_types_to_inputs'] = dict(
-                    rule_types_to_inputs)
-
-        return states_dict
-
-    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -3098,7 +2951,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 44
+    CURRENT_EXP_SCHEMA_VERSION = 43
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -4103,32 +3956,6 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
-    def _convert_v43_dict_to_v44_dict(cls, exploration_dict):
-        """Converts a v43 exploration dict into a v44 exploration dict.
-        Removes the fields rule_specs in AnswerGroups, and adds new fields
-        rule_types_to_inputs and rule_input_translations.
-        rule_types_to_inputs is a dict mapping rule type to a list of
-        rule inputs that share the type. rule_input_translations is a dict
-        mapping abbreviated language codes to a mapping of rule_type to
-        rule_types_to_inputs.
-
-        Args:
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v43.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v44.
-        """
-        exploration_dict['schema_version'] = 44
-
-        exploration_dict['states'] = cls._convert_states_v38_dict_to_v39_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 39
-
-        return exploration_dict
-
-    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -4375,11 +4202,6 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v42_dict_to_v43_dict(
                 exploration_dict)
             exploration_schema_version = 43
-
-        if exploration_schema_version == 43:
-            exploration_dict = cls._convert_v43_dict_to_v44_dict(
-                exploration_dict)
-            exploration_schema_version = 44
 
         return (exploration_dict, initial_schema_version)
 
