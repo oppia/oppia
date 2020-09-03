@@ -262,6 +262,16 @@ class DeployTests(test_utils.GenericTestBase):
                     'oppiaserver', 'test-release-dir', 'test-deploy-dir',
                     'test-token')
 
+    def test_mailgun_api_update_not_done_for_test_server(self):
+        def mock_main(unused_release_dir_path, unused_deploy_data_path):
+            pass
+        config_swap = self.swap(update_configs, 'main', mock_main)
+
+        with config_swap:
+            deploy.update_configs_in_deploy_data(
+                'oppiatestserver', 'test-release-dir', 'test-deploy-dir',
+                'test-token')
+
     def test_missing_third_party_dir(self):
         args_swap = self.swap(
             sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
