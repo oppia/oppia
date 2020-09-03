@@ -472,3 +472,21 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             dt,
             datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))
+
+    def test_utf8_encode_and_decode_with_bytes(self):
+        value = {
+            b'list': [b'value', 3, 4, None],
+            b'bool': True,
+        }
+        utf8_encoded_value = utils.utf8_encode(value)
+
+        self.assertEqual(value, utils.utf8_encode(value))
+        self.assertEqual(value, utils.utf8_decode(utf8_encoded_value))
+
+    def test_utf8_encode_and_decode_with_unicode(self):
+        value = {
+            'sunny ☀️': ['🌇', 3, 4, None],
+            '🙁': False,
+        }
+        utf8_encoded_value = utils.utf8_encode(value)
+        self.assertEqual(value, utils.utf8_decode(utf8_encoded_value))

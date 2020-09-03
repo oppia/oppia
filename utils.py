@@ -828,6 +828,48 @@ def get_hashable_value(value):
         return value
 
 
+def utf8_encode(value):
+    """This function encodes all strings of the JSON-like value as utf8.
+
+    Args:
+        value: *. Some JSON-like object, that is, an object made-up of only:
+            lists, dicts, strings, ints, bools, None. Types can be nested in
+            each other.
+
+    Returns:
+        *. A new object where every string has been utf-8 encoded.
+    """
+    if isinstance(value, list):
+        return [utf8_encode(v) for v in value]
+    elif isinstance(value, dict):
+        return {k.encode('utf-8'): utf8_encode(v) for k, v in value.items()}
+    elif isinstance(value, python_utils.BASESTRING):
+        return value.encode('utf-8')
+    else:
+        return value
+
+
+def utf8_decode(value):
+    """This function decodes all strings of the JSON-like value as utf8.
+
+    Args:
+        value: *. Some JSON-like object, that is, an object made-up of only:
+            lists, dicts, strings, ints, bools, None. Types can be nested in
+            each other.
+
+    Returns:
+        *. A new object where every string has been decoded from utf-8.
+    """
+    if isinstance(value, list):
+        return [utf8_decode(v) for v in value]
+    elif isinstance(value, dict):
+        return {k.decode('utf-8'): utf8_decode(v) for k, v in value.items()}
+    elif isinstance(value, python_utils.BASESTRING):
+        return value.decode('utf-8')
+    else:
+        return value
+
+
 def compute_list_difference(list_a, list_b):
     """Returns the set difference of two lists.
 
