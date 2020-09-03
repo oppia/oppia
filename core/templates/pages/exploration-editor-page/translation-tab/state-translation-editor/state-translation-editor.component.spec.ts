@@ -73,8 +73,7 @@ describe('State Translation Editor Component', function() {
           param_changes: [],
           refresher_exploration_id: null
         },
-        rule_input_translations: {},
-        rule_types_to_inputs: {},
+        rule_specs: [],
         tagged_skill_misconception_id: ''
       }, {
         outcome: {
@@ -87,8 +86,7 @@ describe('State Translation Editor Component', function() {
           param_changes: [],
           refresher_exploration_id: null
         },
-        rule_input_translations: {},
-        rule_types_to_inputs: {},
+        rule_specs: [],
         tagged_skill_misconception_id: ''
       }],
       confirmed_unclassified_answers: null,
