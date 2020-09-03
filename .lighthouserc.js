@@ -72,8 +72,6 @@ module.exports = {
             'efficient-animated-content': ['error',{'minScore': 1}],
             'appcache-manifest': ['error', {'minScore': 1}],
             'errors-in-console': ['error', {'minScore': 1}],
-            // Fails on exploration_editor page.
-            'uses-passive-event-listeners': ['error', {'minScore': 0}],
             'no-document-write': ['error', {'minScore': 1}],
             'external-anchors-use-rel-noopener': ['error', {'minScore': 1}],
             'geolocation-on-start': ['error', {'minScore': 1}],
@@ -81,11 +79,8 @@ module.exports = {
             'no-vulnerable-libraries': ['off', {'minScore': 1}],
             'js-libraries': ['error', {'minScore': 1}],
             'notification-on-start': ['error', {'minScore': 1}],
-            // Fails on exploration_editor page.
-            'deprecations': ['error', {'minScore': 0}],
             'password-inputs-can-be-pasted-into': ['error', {'minScore': 1}],
             'image-aspect-ratio': ['error', {'minScore': 1}],
-            // Fails in preferences and creator-dashboard page.
             'offscreen-images': ['error', {'minScore': 0.45}],
             'is-on-https': ['off', {}],
             'time-to-first-byte': ['off', {}]
@@ -95,8 +90,10 @@ module.exports = {
           'matchingUrlPattern': 'http://[^/]+/signup?return_url=%2F$',
           'assertions': {
             'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}      
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -104,7 +101,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+          'uses-passive-event-listeners': ['error', {'minScore': 1}],
+          'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -112,7 +111,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -120,7 +121,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -128,7 +131,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -136,7 +141,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -144,7 +151,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -152,7 +161,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -160,7 +171,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -170,7 +183,9 @@ module.exports = {
             // we need to allow one image.
             'uses-webp-images': [
               'error', {'maxLength': 1, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -178,7 +193,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -186,7 +203,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -194,7 +213,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -202,7 +223,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -210,7 +233,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -218,7 +243,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -226,7 +253,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -234,7 +263,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -242,7 +273,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -250,7 +283,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -258,7 +293,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -266,7 +303,9 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         },
         {
@@ -274,7 +313,79 @@ module.exports = {
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ]
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
+          }
+        },
+        {
+          'matchingUrlPattern': 'http://[^/]+/create/.*$',
+          'assertions': {
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 0}],
+            'deprecations': ['error', {'minScore': 0}]
+          }
+        },
+        {
+          'matchingUrlPattern': 'http://[^/]+/collection_editor/create/.*$',
+          'assertions': {
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
+          }
+        },
+        {
+          'matchingUrlPattern': 'http://[^/]+/topic_editor/.*$',
+          'assertions': {
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
+          }
+        },
+        {
+          'matchingUrlPattern': 'http://[^/]+/skill_editor/.*$',
+          'assertions': {
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
+          }
+        },
+        {
+          'matchingUrlPattern': 'http://[^/]+/topics-and-skills-dashboard$',
+          'assertions': {
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
+          }
+        },
+        {
+          'matchingUrlPattern': 'http://[^/]+/emaildashboard$',
+          'assertions': {
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
+          }
+        },
+        {
+          'matchingUrlPattern': 'http://[^/]+/moderator$',
+          'assertions': {
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
           }
         }
       ]
