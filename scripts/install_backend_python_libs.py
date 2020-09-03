@@ -69,7 +69,7 @@ def _get_requirements_file_contents():
             #  in order to compare libraries without ambiguities.
             library_name = (
                 _normalize_string_that_contains_python_library_name(
-                    library_name_and_version_string[0])
+                    library_name_and_version_string[0]))
             version_string = library_name_and_version_string[1]
             requirements_contents[library_name] = version_string
     return requirements_contents
