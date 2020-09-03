@@ -22,6 +22,9 @@ const puppeteer = require('puppeteer');
 const ADMIN_URL = 'http://127.0.0.1:8181/admin';
 const CREATOR_DASHBOARD_URL = 'http://127.0.0.1:8181/creator-dashboard';
 const TOPIC_AND_SKILLS_DASHBOARD_URL = 'http://127.0.0.1:8181/topics-and-skills-dashboard';
+// Read more about networkidle0
+// https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagegotourl-options
+const networkIdle = 'networkidle0';
 
 var explorationEditorUrl = 'Exploration editor not loaded';
 var collectionEditorUrl = 'Collection editor not loaded';
@@ -67,7 +70,7 @@ const login = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
-      ADMIN_URL, { waitUntil: 'networkidle0' });
+      ADMIN_URL, { waitUntil: networkIdle});
     await page.waitForSelector('#admin', {visible: true});
     await page.click('#admin');
     await page.click('#submit-login');
@@ -94,7 +97,7 @@ const setRole = async function(browser, page, role) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
-      'http://127.0.0.1:8181/admin#/roles', { waitUntil: 'networkidle0' });
+      'http://127.0.0.1:8181/admin#/roles', { waitUntil: networkIdle });
     await page.waitForSelector('#update-role-username-input');
     await page.type('#update-role-username-input', 'username1');
     await page.select('#update-role-input', role);
@@ -107,7 +110,7 @@ const setRole = async function(browser, page, role) {
         '"successfully updated to")'
     );
     // eslint-disable-next-line dot-notation
-    await page.goto(CREATOR_DASHBOARD_URL, { waitUntil: 'networkidle0' });
+    await page.goto(CREATOR_DASHBOARD_URL, { waitUntil: networkIdle});
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('Changing role to admin failed');
@@ -120,7 +123,7 @@ const getExplorationEditorUrl = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
-      CREATOR_DASHBOARD_URL, { waitUntil: 'networkidle0' });
+      CREATOR_DASHBOARD_URL, { waitUntil: networkIdle });
 
     await page.waitForSelector(createButtonSelector, {visible: true});
     await page.click(createButtonSelector);
@@ -140,7 +143,7 @@ const getCollectionEditorUrl = async function(browser, page) {
     // Load in Collection
     // eslint-disable-next-line dot-notation
     await page.goto(
-      CREATOR_DASHBOARD_URL, { waitUntil: 'networkidle0' });
+      CREATOR_DASHBOARD_URL, { waitUntil: networkIdle });
     await page.waitForSelector(createButtonSelector, {visible: true});
     await page.click(createButtonSelector);
     await page.waitForSelector(
@@ -162,7 +165,7 @@ const getTopicEditorUrl = async function(browser, page) {
     await setRole(browser, page, 'string:ADMIN');
     // eslint-disable-next-line dot-notation
     await page.goto(
-      TOPIC_AND_SKILLS_DASHBOARD_URL, { waitUntil: 'networkidle0' });
+      TOPIC_AND_SKILLS_DASHBOARD_URL, { waitUntil: networkIdle });
     await page.waitForSelector(createTopicButtonSelector, {visible: true});
     await page.click(createTopicButtonSelector);
 
@@ -189,7 +192,7 @@ const getTopicEditorUrl = async function(browser, page) {
     // Refresh page and click on topic link.
     // eslint-disable-next-line dot-notation
     await page.goto(
-      TOPIC_AND_SKILLS_DASHBOARD_URL, { waitUntil: 'networkidle0' });
+      TOPIC_AND_SKILLS_DASHBOARD_URL, { waitUntil: networkIdle });
     await page.waitForSelector(createdTopicLink, {visible: true});
     await page.click(createdTopicLink);
     await page.waitForSelector(createStoryButtonSelector);
@@ -204,7 +207,7 @@ const getTopicEditorUrl = async function(browser, page) {
 const getStoryEditorUrl = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
-    await page.goto(topicEditorUrl, { waitUntil: 'networkidle0' });
+    await page.goto(topicEditorUrl, { waitUntil: networkIdle });
     await page.waitForSelector(createStoryButtonSelector, {visible: true});
     await page.click(createStoryButtonSelector);
 
@@ -235,7 +238,7 @@ const getStoryEditorUrl = async function(browser, page) {
 const getSkillEditorUrl = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
-    await page.goto(topicEditorUrl, { waitUntil: 'networkidle0' });
+    await page.goto(topicEditorUrl, { waitUntil: networkIdle });
     await page.waitForSelector(createSkillButtonSelector, {visible: true});
     await page.click(createSkillButtonSelector);
 
@@ -252,7 +255,7 @@ const getSkillEditorUrl = async function(browser, page) {
     // Doing waitFor(15000) to handle new tab being opened.
     await page.waitFor(15000);
     let pages = await browser.pages();
-    skillEditorUrl = await pages[3].url();
+    skillEditorUrl = await pages[2].url();
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
