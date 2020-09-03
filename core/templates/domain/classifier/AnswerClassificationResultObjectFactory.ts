@@ -25,13 +25,15 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 export class AnswerClassificationResult {
   outcome: Outcome;
   answerGroupIndex: number;
+  ruleIndex: number;
   classificationCategorization: string;
 
   constructor(
-      outcome: Outcome, answerGroupIndex: number,
+      outcome: Outcome, answerGroupIndex: number, ruleIndex: number,
       classificationCategorization: string) {
     this.outcome = outcome;
     this.answerGroupIndex = answerGroupIndex;
+    this.ruleIndex = ruleIndex;
     this.classificationCategorization = classificationCategorization;
   }
 }
@@ -41,10 +43,10 @@ export class AnswerClassificationResult {
 })
 export class AnswerClassificationResultObjectFactory {
   createNew(
-      outcome: Outcome, answerGroupIndex: number,
+      outcome: Outcome, answerGroupIndex: number, ruleIndex: number,
       classificationCategorization: string): AnswerClassificationResult {
     return new AnswerClassificationResult(
-      outcome, answerGroupIndex, classificationCategorization);
+      outcome, answerGroupIndex, ruleIndex, classificationCategorization);
   }
 }
 
