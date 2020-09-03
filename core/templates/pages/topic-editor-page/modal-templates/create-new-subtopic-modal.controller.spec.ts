@@ -96,7 +96,7 @@ describe('Create new subtopic modal', function() {
     expect(ctrl.errorMsg).toEqual(errorMessage);
   });
 
-  it('should show reset the error message ', function() {
+  it('should show reset the error message', function() {
     expect(ctrl.errorMsg).toEqual(null);
     spyOn(
       SubtopicValidationService,

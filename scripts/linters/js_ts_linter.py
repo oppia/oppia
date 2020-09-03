@@ -1089,7 +1089,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         failed = False
         name = 'ESLint'
 
-        eslint_cmd_args = [node_path, eslint_path, '--fix']
+        eslint_cmd_args = [node_path, eslint_path, '--quiet']
         result_list = []
         for _, filepath in enumerate(files_to_lint):
             proc_args = eslint_cmd_args + [filepath]

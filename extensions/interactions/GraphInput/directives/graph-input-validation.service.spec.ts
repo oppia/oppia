@@ -141,9 +141,7 @@ describe('GraphInputValidationService', () => {
       'graph, canEditEdgeWeight, canEditVertexLabel');
   });
 
-  it('The graph used in customization exceeds supported maximum number of ' +
-    'vertices of 50.',
-  () => {
+  it('should validate the maximum number of vertices in the graph', () => {
     customizationArguments.graph.value.vertices = new Array(51);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
@@ -155,9 +153,8 @@ describe('GraphInputValidationService', () => {
     }]);
   });
 
-  it('The graph used in the rule x in group y exceeds supported maximum ' +
-    'number of vertices of 10 for isomorphism check.',
-  () => {
+  it('should validate the maximum number of vertices in the graph for an ' +
+    'isomorphism check', () => {
     (
     <GraphIsomorphicRuleInputs>
       answerGroups[0].ruleTypesToInputs.IsIsomorphicTo[0]

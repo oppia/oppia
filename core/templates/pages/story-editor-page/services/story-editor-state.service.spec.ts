@@ -237,7 +237,7 @@ describe('Story editor state service', function() {
     }
   );
 
-  it('it should report that a story has loaded through loadStory()',
+  it('should report that a story has loaded through loadStory()',
     function() {
       expect(StoryEditorStateService.hasLoadedStory()).toBe(false);
 
@@ -249,7 +249,7 @@ describe('Story editor state service', function() {
     }
   );
 
-  it('it should report that a story has loaded through setStory()',
+  it('should report that a story has loaded through setStory()',
     function() {
       expect(StoryEditorStateService.hasLoadedStory()).toBe(false);
 

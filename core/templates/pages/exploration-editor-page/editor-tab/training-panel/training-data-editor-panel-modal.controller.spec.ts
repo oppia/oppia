@@ -233,7 +233,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         'The answer Answer1 has been successfully trained.', 1000);
     });
 
-    it('open train unresolved answer modal', function() {
+    it('should open train unresolved answer modal', function() {
       var addSuccessMessageSpy = spyOn(AlertsService, 'addSuccessMessage')
         .and.callThrough();
       spyOn(TrainingModalService, 'openTrainUnresolvedAnswerModal').and
@@ -371,7 +371,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         });
     }));
 
-    it('open train unresolved answer modal', function() {
+    it('should open train unresolved answer modal', function() {
       var addSuccessMessageSpy = spyOn(AlertsService, 'addSuccessMessage')
         .and.callThrough();
       spyOn(TrainingModalService, 'openTrainUnresolvedAnswerModal').and
@@ -501,7 +501,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         });
     }));
 
-    it('open train unresolved answer modal', function() {
+    it('should open train unresolved answer modal', function() {
       var openTrainUnresolvedAnswerModalSpy = spyOn(
         TrainingModalService, 'openTrainUnresolvedAnswerModal').and
         .callThrough();

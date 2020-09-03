@@ -253,7 +253,7 @@ describe('Topic editor tab directive', function() {
     expect(skillSpy).toHaveBeenCalled();
   });
 
-  it('show mark the changes in description', function() {
+  it('should show mark the changes in description', function() {
     expect($scope.topicDescriptionChanged).toEqual(false);
     $scope.updateTopicDescriptionStatus('New description');
     expect($scope.topicDescriptionChanged).toEqual(true);
