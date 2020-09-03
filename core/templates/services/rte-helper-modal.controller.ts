@@ -124,6 +124,18 @@ angular.module('oppia').controller('RteHelperModalController', [
           $uibModalInstance.dismiss('cancel');
           return;
         }
+        var resampledFile = (
+          ImageUploadHelperService.convertImageDataToImageFile(svgFile));
+        const HUNDRED_KB_IN_BYTES = 100 * 1024;
+        if (resampledFile.size > HUNDRED_KB_IN_BYTES) {
+          AlertsService.addInfoMessage(
+            'The SVG file generated exceeds 100' +
+            ' KB. Please split the expression into smaller ones.' +
+            '   Example: x^2 + y^2 + z^2 can be split as \'x^2 + y^2\' ' +
+            'and \'+ z^2\'', 5000);
+          $uibModalInstance.dismiss('cancel');
+          return;
+        }
         if (
           ContextService.getImageSaveDestination() ===
           IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
@@ -137,8 +149,6 @@ angular.module('oppia').controller('RteHelperModalController', [
           $uibModalInstance.close(customizationArgsDict);
           return;
         }
-        var resampledFile = (
-          ImageUploadHelperService.convertImageDataToImageFile(svgFile));
         AssetsBackendApiService.saveMathExpresionImage(
           resampledFile, svgFileName, ContextService.getEntityType(),
           ContextService.getEntityId()).then(function(response) {
