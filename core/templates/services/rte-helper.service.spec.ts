@@ -164,7 +164,10 @@ describe('Rte Helper Service', function() {
         name: 'text',
         description: 'The text to be displayed',
         schema: {
-          type: 'unicode'
+          type: 'unicode',
+          validators: [{
+            id: 'is_nonempty'
+          }]
         },
         default_value: 'concept card'
       }, {
