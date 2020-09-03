@@ -94,10 +94,10 @@ class RegenerateMissingStateStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         all_exps = exp_models.ExplorationModel.get_multi_versions(
             exp_model.id, exp_versions)
         all_exp_stats = [
+            None if not model or model.deleted else
             stats_services.get_exploration_stats_from_model(model)
             for model in stats_models.ExplorationStatsModel.get_multi_versions(
                 exp_model.id, exp_versions)
-            if not model.deleted
         ]
         all_exp_version_diffs = [
             exp_domain.ExplorationVersionsDiff([
@@ -123,19 +123,24 @@ class RegenerateMissingStateStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             for state_name in missing_states:
                 state_stats = stats_domain.StateStats.create_default()
 
-                old_exp_stats = None if index == 0 else all_exp_stats[index - 1]
-                if old_exp_stats is not None:
-                    old_state_name = version_diff.new_to_old_state_names.get(
+                if (index > 0 and
+                        state_name not in version_diff.added_state_names):
+                    prev_state_stats_mapping = (
+                        all_exp_stats[index - 1] and
+                        all_exp_stats[index - 1].state_stats_mapping)
+                    prev_state_name = version_diff.new_to_old_state_names.get(
                         state_name, state_name)
-                    if old_state_name in old_exp_stats.state_stats_mapping:
+
+                    if (prev_state_stats_mapping and
+                            prev_state_name in prev_state_stats_mapping):
                         state_stats.aggregate_from(
-                            old_exp_stats.state_stats_mapping[old_state_name])
+                            prev_state_stats_mapping[prev_state_name])
                     else:
                         yield (
                             RegenerateMissingStateStatsOneOffJob
                             .REDUCE_KEY_BAD_RENAME,
                             '%s.%s "%s" -> "%s"' % (
-                                exp.id, exp.version - 1, old_state_name,
+                                exp.id, exp.version - 1, prev_state_name,
                                 state_name))
 
                 exp_stats.state_stats_mapping[state_name] = state_stats
