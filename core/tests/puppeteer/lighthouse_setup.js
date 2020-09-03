@@ -69,7 +69,6 @@ var confirmStoryCreationButton =
 var createSkillButtonSelector = '.puppeteer-test-add-skill-button';
 var skillDescriptionField = '.protractor-test-new-skill-description-field';
 var skillOpenConceptCard = '.protractor-test-open-concept-card';
-var skillEditor = '.protractor-test-concept-card-text';
 var confirmSkillCreationButton =
   '.protractor-test-confirm-skill-creation-button';
 var skillReviewMaterialInput = '.oppia-rte';
