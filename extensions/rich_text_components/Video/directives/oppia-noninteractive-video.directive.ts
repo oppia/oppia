@@ -35,11 +35,11 @@ angular.module('oppia').directive('oppiaNoninteractiveVideo', [
       template: require('./video.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'ContextService', '$element',
-        'AutoplayedVideosService', 'PAGE_CONTEXT', '$window',
+        '$attrs', '$element', '$window', 'AutoplayedVideosService',
+        'ContextService', 'PAGE_CONTEXT',
         function(
-            $attrs, ContextService, $element,
-            AutoplayedVideosService, PAGE_CONTEXT, $window) {
+            $attrs, $element, $window, AutoplayedVideosService,
+            ContextService, PAGE_CONTEXT) {
           var ctrl = this;
           ctrl.$onInit = function() {
             var start = (
