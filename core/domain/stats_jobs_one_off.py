@@ -110,10 +110,12 @@ class RegenerateMissingStateStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 exp_model.id, exp_versions)
         ]
 
-        for index, (exp, version_diff, exp_stats) in enumerate(python_utils.ZIP(
+        for index, (exp, version_diff, stats) in enumerate(python_utils.ZIP(
                 all_exps, all_exp_version_diffs, all_exp_stats)):
-            missing_states = (
-                set(exp.states) - set(exp_stats.state_stats_mapping))
+            if not exp or not version_diff or not stats:
+                continue
+
+            missing_states = set(exp.states) - set(stats.state_stats_mapping)
             if not missing_states:
                 yield (
                     RegenerateMissingStateStatsOneOffJob.REDUCE_KEY_OK,
@@ -143,12 +145,12 @@ class RegenerateMissingStateStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                                 exp.id, exp.version - 1, prev_state_name,
                                 state_name))
 
-                exp_stats.state_stats_mapping[state_name] = state_stats
+                stats.state_stats_mapping[state_name] = state_stats
                 yield (
                     RegenerateMissingStateStatsOneOffJob.REDUCE_KEY_REGENERATED,
                     '%s.%s %s' % (exp.id, exp.version, state_name))
 
-            stats_services.save_stats_model_transactional(exp_stats)
+            stats_services.save_stats_model_transactional(stats)
 
     @staticmethod
     def reduce(reduce_key, values):

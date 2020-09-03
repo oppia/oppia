@@ -238,6 +238,34 @@ class RegenerateMissingStateStatsOneOffJobTests(OneOffJobTestBase):
             ['ExplorationStatsModel with valid state(s)', 2]
         ])
 
+    def test_job_ignores_missing_state_when_entire_exp_stats_is_missing(self):
+        """When entire ExplorationStatsModel is missing, responsibility for
+        regenerating falls to the RegenerateMissingV*StatsModelsOneOffJob.
+        """
+        # Create exploration's V1.
+        exp = self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
+        # Create exploration's V2.
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exp.id,
+            [exp_domain.ExplorationChange(
+                {'cmd': 'add_state', 'state_name': 'Middle'})],
+            'Add "Middle" state')
+        # Create exploration's V3.
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exp.id,
+            [exp_domain.ExplorationChange(
+                {'cmd': 'add_state', 'state_name': 'End'})],
+            'Add "End" state')
+
+        # Delete v2 stats entirely.
+        v2_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
+        v2_stats.delete()
+
+        self.assertEqual(self.run_one_off_job(), [
+            ['ExplorationStatsModel with valid state(s)', 2]
+        ])
+
 
 class RegenerateMissingV1StatsModelsOneOffJobTests(OneOffJobTestBase):
     """Unit tests for RegenerateMissingV1StatsModelsOneOffJob."""
