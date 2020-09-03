@@ -360,7 +360,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'topic-editor-state.service.ts',
     'topic-editor-stories-list.directive.ts',
     'topic-questions-tab.directive.ts',
-    'topic-selector.directive.ts',
     'topic-summary-tile.directive.ts',
     'TopicObjectFactory.ts',
     'topics-and-skills-dashboard-backend-api.service.ts',

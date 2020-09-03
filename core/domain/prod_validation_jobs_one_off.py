@@ -463,15 +463,6 @@ class ExplorationContextModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [exp_models.ExplorationContextModel]
 
 
-class ExplorationMathRichTextInfoModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
-    """Job that audits and validates ExplorationMathRichTextInfoModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationMathRichTextInfoModel]
-
-
 class QuestionSnapshotMetadataModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates QuestionSnapshotMetadataModel."""
 
