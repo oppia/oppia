@@ -122,10 +122,8 @@ def _remove_metadata(library_name, version_string):
         # library's metadata exists in a directory, we need to normalize the
         # directory name. Otherwise, we would need to check each permutation of
         # casing which is unreasonable.
-        if (
-            _normalize_string_that_contains_python_library_name(
-                file_or_directory)
-            in possible_directory_names):
+        if (_normalize_string_that_contains_python_library_name(
+                file_or_directory) in possible_directory_names):
             path_to_delete = os.path.join(
                 common.THIRD_PARTY_PYTHON_LIBS_DIR, file_or_directory)
             if os.path.isdir(path_to_delete):
