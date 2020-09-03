@@ -28,6 +28,25 @@ from scripts import common
 import pkg_resources
 
 
+def _normalize_string_that_contains_python_library_name(original_string):
+    """Python library name strings are case insensitive which means that
+    libraries are equivalent even if the casing of the library names are
+    different. This function normalizes all strings containing python library
+    names so that strings with identical libraries have identical library name
+    strings.
+
+    This is for comparing library names with different case and directory names
+    generated from installing libraries with different case.
+
+    Args:
+        original_string: str. The original string to be normalized.
+
+    Returns:
+        str. A normalized string that is all lowercase.
+    """
+    return original_string.lower()
+
+
 def _get_requirements_file_contents():
     """Returns a dictionary containing all of the required library names with
     their corresponding version strings listed in the 'requirements.txt' file.
@@ -46,10 +65,11 @@ def _get_requirements_file_contents():
                 continue
             library_name_and_version_string = l.split(' ')[0].split('==')
             # Libraries with different case are not different: e.g
-            # 'Flask' == 'flask'. Therefore, we convert all of the library names
-            # to lowercase in order to use string comparison later for library
-            # names.
-            library_name = library_name_and_version_string[0].lower()
+            # 'Flask' == 'flask'. Therefore, we normalize all library names
+            #  in order to compare libraries without ambiguities.
+            library_name = (
+                _normalize_string_that_contains_python_library_name(
+                    library_name_and_version_string[0])
             version_string = library_name_and_version_string[1]
             requirements_contents[library_name] = version_string
     return requirements_contents
@@ -68,11 +88,11 @@ def _get_third_party_python_libs_directory_contents():
         for d in pkg_resources.find_distributions(
             common.THIRD_PARTY_PYTHON_LIBS_DIR)]
     # Libraries with different case are not different: e.g
-    # 'Flask' == 'flask'. Therefore, we convert all of the library names
-    # to lowercase in order to use string comparison later for library
-    # names.
+    # 'Flask' == 'flask'. Therefore, we normalize all library names
+    #  in order to compare library names without ambiguities.
     directory_contents = {
-        library_name.lower(): version_string
+        _normalize_string_that_contains_python_library_name(
+            library_name): version_string
         for library_name, version_string in installed_packages
     }
 
@@ -96,10 +116,16 @@ def _remove_metadata(library_name, version_string):
     possible_directory_names = _get_possible_metadata_directory_names(
         library_name, version_string)
     for file_or_directory in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
-        # File or directory names may be of heterogeneous case but libraries
-        # with different case are not different: e.g 'Flask' == 'flask' so we
-        # convert the names to lowercase in order to use string comparison.
-        if file_or_directory.lower() in possible_directory_names:
+        # Python metadata directories contain a python library name that does
+        # not have uniform case. However, python libraries are equivalent
+        # regardless of their case. Therefore, in order to check if a python
+        # library's metadata exists in a directory, we need to normalize the
+        # directory name. Otherwise, we would need to check each permutation of
+        # casing which is unreasonable.
+        if (
+            _normalize_string_that_contains_python_library_name(
+                file_or_directory)
+            in possible_directory_names):
             path_to_delete = os.path.join(
                 common.THIRD_PARTY_PYTHON_LIBS_DIR, file_or_directory)
             if os.path.isdir(path_to_delete):
@@ -303,7 +329,7 @@ def validate_metadata_directories():
     # convert all of the names to lowercase in order to use string comparison.
     file_or_directory_names = set(
         [
-            name.lower()
+            _normalize_string_that_contains_python_library_name(name)
             for name in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR)
         ])
     for library_name, version_string in directory_contents.items():
