@@ -61,6 +61,8 @@ max-line-length=80
 
 indent-string='    '
 
+allowed-comment-prefixes=int,str,float,bool,v
+
 [SIMILARITIES]
 
 ignore-imports=yes
