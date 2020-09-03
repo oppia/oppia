@@ -42,6 +42,7 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 require('pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts');
+require('services/loader.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -58,11 +59,13 @@ angular.module('oppia').directive('topicEditorPage', [
       controller: [
         '$scope', '$window', 'AlertsService', 'BottomNavbarStatusService',
         'ContextService', 'PageTitleService', 'EntityCreationService',
+        'LoaderService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'UndoRedoService', 'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE',
         function(
             $scope, $window, AlertsService, BottomNavbarStatusService,
             ContextService, PageTitleService, EntityCreationService,
+            LoaderService,
             TopicEditorRoutingService, TopicEditorStateService,
             UndoRedoService, UrlService, TOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
@@ -179,9 +182,13 @@ angular.module('oppia').directive('topicEditorPage', [
 
 
           ctrl.$onInit = function() {
+            LoaderService.showLoadingScreen('Loading Topic');
             ctrl.directiveSubscriptions.add(
               TopicEditorStateService.onTopicInitialized.subscribe(
-                () => setPageTitle()
+                () => {
+                  LoaderService.hideLoadingScreen();
+                  setPageTitle();
+                }
               ));
             ctrl.directiveSubscriptions.add(
               TopicEditorStateService.onTopicReinitialized.subscribe(

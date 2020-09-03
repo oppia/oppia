@@ -52,6 +52,7 @@ require('domain/question/question-backend-api.service.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-backend-api.service.ts');
+require('base-components/loading-message.component.ts');
 
 import { Subscription } from 'rxjs';
 
