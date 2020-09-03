@@ -663,8 +663,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'rule_specs': [{
-                'rule_type': 'Contains',
-                'inputs': {'x': 'Test'}
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
             }],
             'training_data': [],
             'tagged_misconception_id': None
@@ -753,8 +755,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'rule_specs': [{
-                'rule_type': 'Contains',
-                'inputs': {'x': 'Test'}
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -860,8 +864,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'rule_specs': [{
-                'rule_type': 'HasElementsIn',
-                'inputs': {'x': ['A', 'B', 'C']}
+                'inputs': {
+                    'x': ['A', 'B', 'C']
+                },
+                'rule_type': 'HasElementsIn'
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -945,8 +951,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': ['A']}
+                'inputs': {
+                    'x': ['A']
+                },
+                'rule_type': 'Equals'
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -1036,8 +1044,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': ['A']}
+                'inputs': {
+                    'x': ['A']
+                },
+                'rule_type': 'Equals'
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -1136,11 +1146,15 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'rule_specs': [{
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': 'x+y'}
+                'inputs': {
+                    'x': 'x+y'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
             }, {
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': 'x=y'}
+                'inputs': {
+                    'x': 'x=y'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -1219,9 +1233,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(
             question.question_state_data.interaction.id, 'MathEquationInput')
-        self.assertEqual(answer_groups[0].rule_types_to_inputs, {
-            'MatchesExactlyWith': [{'x': 'x=y', 'y': 'both'}]
-        })
+        self.assertEqual(len(answer_groups[0].rule_specs), 1)
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].inputs, {'x': 'x=y', 'y': 'both'})
 
         answer_group = {
             'outcome': {
@@ -1236,11 +1252,15 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'rule_specs': [{
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': 'x+y'}
+                'inputs': {
+                    'x': 'x+y'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
             }, {
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': '1.2 + 3'}
+                'inputs': {
+                    'x': '1.2 + 3'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -1321,9 +1341,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             question.question_state_data.interaction.id,
             'AlgebraicExpressionInput')
-        self.assertEqual(answer_groups[0].rule_types_to_inputs, {
-            'MatchesExactlyWith': [{'x': 'x+y'}]
-        })
+        self.assertEqual(len(answer_groups[0].rule_specs), 1)
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
 
         answer_group = {
             'outcome': {
@@ -1338,8 +1360,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'rule_specs': [{
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': '1.2 + 3'}
+                'inputs': {
+                    'x': '1.2 + 3'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -1411,6 +1435,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
         question = question_fetchers.get_question_from_model(question_model)
+
         self.assertEqual(
             question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
@@ -1419,9 +1444,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             question.question_state_data.interaction.id,
             'NumericExpressionInput')
-        self.assertEqual(answer_groups[0].rule_types_to_inputs, {
-            'MatchesExactlyWith': [{'x': '1.2 + 3'}]
-        })
+        self.assertEqual(len(answer_groups[0].rule_specs), 1)
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].inputs, {'x': '1.2 + 3'})
 
         answer_groups_list = [{
             'outcome': {
@@ -1436,8 +1463,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'rule_specs': [{
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': 'x+y'}
+                'inputs': {
+                    'x': 'x+y'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -1454,8 +1483,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'missing_prerequisite_skill_id': None
             },
             'rule_specs': [{
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': '1.2 + 3'}
+                'inputs': {
+                    'x': '1.2 + 3'
+                },
+                'rule_type': 'IsMathematicallyEquivalentTo'
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -1530,9 +1561,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question.question_state_data.interaction.id,
             'AlgebraicExpressionInput')
         self.assertEqual(len(answer_groups), 1)
-        self.assertEqual(answer_groups[0].rule_types_to_inputs, {
-            'MatchesExactlyWith': [{'x': 'x+y'}]
-        })
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].rule_type, 'MatchesExactlyWith')
+        self.assertEqual(
+            answer_groups[0].rule_specs[0].inputs, {'x': 'x+y'})
         state_data = question.question_state_data
         self.assertEqual(sorted(
             state_data.recorded_voiceovers.voiceovers_mapping.keys()), [
@@ -1930,15 +1962,16 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        migrated_rule_types_to_inputs = (
+        migrated_rule_spec = (
             question
             .question_state_data
             .interaction.answer_groups[0]
-            .rule_types_to_inputs)
+            .rule_specs[0].to_dict())
         self.assertEqual(
-            migrated_rule_types_to_inputs,
+            migrated_rule_spec,
             {
-                'Equals': [{'x': 'test'}]
+                'inputs': {'x': 'test'},
+                'rule_type': 'Equals'
             })
 
     def test_migrate_question_state_from_v37_to_latest(self):
@@ -2027,96 +2060,3 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         cust_args = question.question_state_data.interaction.customization_args
         self.assertEqual(
             cust_args['customOskLetters'].value, ['x', 'α', 'β'])
-
-    def test_migrate_question_state_from_v38_to_latest(self):
-        answer_group = {
-            'outcome': {
-                'dest': 'abc',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': True,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': '((x)^(2))/(2.5)-(alpha)/(beta)'
-                },
-                'rule_type': 'MatchesExactlyWith'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
-        question_state_dict = {
-            'content': {
-                'content_id': 'content_1',
-                'html': 'Question 1'
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
-            },
-            'written_translations': {
-                'translations_mapping': {
-                    'explanation': {}
-                }
-            },
-            'interaction': {
-                'answer_groups': [answer_group],
-                'confirmed_unclassified_answers': [],
-                'customization_args': {
-                    'customOskLetters': {'value': ['x', 'α', 'β']}
-                },
-                'default_outcome': {
-                    'dest': None,
-                    'feedback': {
-                        'content_id': 'feedback_1',
-                        'html': 'Correct Answer'
-                    },
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'labelled_as_correct': True,
-                    'missing_prerequisite_skill_id': None
-                },
-                'hints': [{
-                    'hint_content': {
-                        'content_id': 'hint_1',
-                        'html': 'Hint 1'
-                    }
-                }],
-                'solution': {},
-                'id': 'AlgebraicExpressionInput'
-            },
-            'next_content_id_index': 3,
-            'param_changes': [],
-            'solicit_answer_details': False,
-            'classifier_model_id': None
-        }
-        question_model = question_models.QuestionModel(
-            id='question_id',
-            question_state_data=question_state_dict,
-            language_code='en',
-            version=0,
-            linked_skill_ids=['skill_id'],
-            question_state_data_schema_version=38)
-        commit_cmd = question_domain.QuestionChange({
-            'cmd': question_domain.CMD_CREATE_NEW
-        })
-        commit_cmd_dicts = [commit_cmd.to_dict()]
-        question_model.commit(
-            'user_id_admin', 'question model created', commit_cmd_dicts)
-
-        question = question_fetchers.get_question_from_model(question_model)
-        self.assertEqual(
-            question.question_state_data_schema_version,
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
-
-        answer_group = question.question_state_data.interaction.answer_groups[0]
-        self.assertEqual(
-            answer_group.rule_types_to_inputs, {
-                'MatchesExactlyWith': [{
-                    'x': '((x)^(2))/(2.5)-(alpha)/(beta)'
-                }]
-            })
