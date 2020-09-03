@@ -829,7 +829,7 @@ def get_hashable_value(value):
 
 
 def deep_encode(value, encoding='utf-8'):
-    """Returns a copy of value with all strings encoded with the given strategy.
+    """Returns a copy of value with all strings encoded by the given strategy.
 
     Args:
         value: *. Some JSON-like object, that is, an object made-up of only:
@@ -838,7 +838,7 @@ def deep_encode(value, encoding='utf-8'):
         encoding: str. Value passed to the str.encode method. Default is utf-8.
 
     Returns:
-        *. A equivalent copy of value, but with every string encoded with the
+        *. A equivalent copy of value, but with every string encoded by the
         given strategy.
     """
     if isinstance(value, list):
@@ -855,7 +855,7 @@ def deep_encode(value, encoding='utf-8'):
 
 
 def deep_decode(value, encoding='utf-8'):
-    """Returns a copy of value with all strings decoded with the given strategy.
+    """Returns a copy of value with all strings decoded by the given strategy.
 
     Args:
         value: *. Some JSON-like object, that is, an object made-up of only:
@@ -864,7 +864,7 @@ def deep_decode(value, encoding='utf-8'):
         encoding: str. Value passed to the str.encode method. Default is utf-8.
 
     Returns:
-        *. A equivalent copy of value, but with every string decoded from the
+        *. A equivalent copy of value, but with every string decoded by the
         given strategy.
     """
     if isinstance(value, list):
