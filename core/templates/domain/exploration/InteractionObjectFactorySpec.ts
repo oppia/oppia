@@ -68,8 +68,7 @@ describe('Interaction object factory', () => {
       missing_prerequisite_skill_id: null
     };
     answerGroupsDict = [{
-      rule_input_translations: {},
-      rule_types_to_inputs: {},
+      rule_specs: [],
       outcome: {
         dest: 'dest_1',
         feedback: {
@@ -444,8 +443,7 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict(interactionDict);
 
     let newAnswerGroup = {
-      rule_input_translations: {},
-      rule_types_to_inputs: {},
+      rule_specs: [],
       outcome: {
         dest: 'dest_3',
         feedback: {
@@ -461,8 +459,7 @@ describe('Interaction object factory', () => {
       tagged_skill_misconception_id: 'skill_id-1'
     };
     expect(testInteraction.answerGroups).toEqual([agof.createFromBackendDict({
-      rule_input_translations: {},
-      rule_types_to_inputs: {},
+      rule_specs: [],
       outcome: {
         dest: 'dest_1',
         feedback: {
@@ -578,8 +575,7 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict(interactionDict);
 
     const newAnswerGroups = [{
-      rule_input_translations: {},
-      rule_types_to_inputs: {},
+      rule_specs: [],
       outcome: {
         dest: 'dest_1_new',
         feedback: {
