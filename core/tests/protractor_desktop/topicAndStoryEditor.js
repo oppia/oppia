@@ -223,7 +223,7 @@ describe('Topic editor functionality', function() {
   });
 });
 
-describe('Chapter editor functionality', function() {
+fdescribe('Chapter editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
@@ -422,5 +422,6 @@ describe('Chapter editor functionality', function() {
 
   afterAll(async function() {
     await users.logout();
+    expect(false).toBe(true); // Induce failure for debugging.
   });
 });
