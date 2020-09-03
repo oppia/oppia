@@ -88,9 +88,6 @@ angular.module('oppia').directive('ratingDisplay', [
           displayValue($scope.ratingValue);
         };
 
-        $scope.getCursorStyle = function() {
-          return 'cursor: ' + ($scope.isEditable ? 'pointer' : 'auto');
-        };
         ctrl.$onInit = function() {
           $scope.stars = POSSIBLE_RATINGS.map(function(starValue) {
             return {
