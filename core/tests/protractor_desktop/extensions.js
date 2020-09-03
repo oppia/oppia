@@ -199,7 +199,7 @@ describe('Interactions', function() {
     await users.logout();
   });
 
-  it('publish and play exploration successfully', async function() {
+  it('should publish and play exploration successfully', async function() {
     /*
      * This suite should be expanded as new interaction's e2e utility is added.
      */

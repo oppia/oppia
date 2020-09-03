@@ -221,7 +221,7 @@ describe('StateTopAnswersStatsService', () => {
       expect(stateTopAnswersStatsService.hasStateStats('Me Llamo')).toBeFalse();
     }));
 
-  it('only returns state names with stats', fakeAsync(async() => {
+  it('should only returns state names with stats', fakeAsync(async() => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);

@@ -48,7 +48,7 @@ describe('State name service', () => {
     expect(sns.isStateNameEditorShown()).toBe(false);
   });
 
-  it('tests the get function', () => {
+  it('should test the get function', () => {
     expect(sns.getStateNameSavedMemento()).toBeNull();
     expect(sns.isStateNameEditorShown()).toBe(false);
     sns.setStateNameSavedMemento('SomeValue');

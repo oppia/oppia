@@ -45,7 +45,7 @@ describe('Statistics tab', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('checks statistics tab for an exploration', async function() {
+  it('should check statistics tab for an exploration', async function() {
     var EXPLORATION_TITLE = 'Exploration for stats testing';
     var EXPLORATION_OBJECTIVE = 'To explore something';
     var EXPLORATION_CATEGORY = 'Algorithms';
