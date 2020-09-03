@@ -40,8 +40,6 @@ sys.path.insert(0, _PY_GITHUB_PATH)
 
 import github  # isort:skip pylint: disable=wrong-import-position
 
-FECONF_CONFIG_PATH = os.path.join(
-    os.getcwd(), os.pardir, 'release-scripts', 'feconf_updates.config')
 CONSTANTS_CONFIG_PATH = os.path.join(
     os.getcwd(), os.pardir, 'release-scripts', 'constants_updates.config')
 FECONF_REGEX = '^([A-Z_]+ = ).*$'
@@ -178,9 +176,9 @@ def add_mailgun_api_key(release_feconf_path):
             f.write(line)
 
 
-def main(release_dir_path, personal_access_token):
-    """Updates the files corresponding to LOCAL_FECONF_PATH and
-    LOCAL_CONSTANTS_PATH after doing the prerequisite checks.
+def update_feconf_for_main_server(release_dir_path, personal_access_token):
+    """Updates feconf config specifically for main server by updating
+    REGISTRATION_PAGE_LAST_UPDATED_UTC and mailgun api key.
 
     Args:
         release_dir_path: str. Path of directory where all files are copied
@@ -188,24 +186,39 @@ def main(release_dir_path, personal_access_token):
         personal_access_token: str. The personal access token for the
             GitHub id of user.
     """
-    # Do prerequisite checks.
     try:
         python_utils.url_open(TERMS_PAGE_URL)
     except Exception:
         raise Exception('Terms mainpage does not exist on Github.')
 
     release_feconf_path = os.path.join(release_dir_path, common.FECONF_PATH)
-    release_constants_path = os.path.join(
-        release_dir_path, common.CONSTANTS_FILE_PATH)
-
     add_mailgun_api_key(release_feconf_path)
     check_updates_to_terms_of_service(
         release_feconf_path, personal_access_token)
 
+
+def main(release_dir_path, deploy_data_path):
+    """Updates the files corresponding to LOCAL_FECONF_PATH and
+    LOCAL_CONSTANTS_PATH after doing the prerequisite checks.
+
+    Args:
+        release_dir_path: str. Path of directory where all files are copied
+            for release.
+        deploy_data_path: str. Path for deploy data directory.
+    """
+    # Do prerequisite checks.
+    feconf_config_path = os.path.join(deploy_data_path, 'feconf_updates.config')
+    constants_config_path = os.path.join(
+        deploy_data_path, 'constants_updates.config')
+
+    release_feconf_path = os.path.join(release_dir_path, common.FECONF_PATH)
+    release_constants_path = os.path.join(
+        release_dir_path, common.CONSTANTS_FILE_PATH)
+
     apply_changes_based_on_config(
-        release_feconf_path, FECONF_CONFIG_PATH, FECONF_REGEX)
+        release_feconf_path, feconf_config_path, FECONF_REGEX)
     apply_changes_based_on_config(
-        release_constants_path, CONSTANTS_CONFIG_PATH, CONSTANTS_REGEX)
+        release_constants_path, constants_config_path, CONSTANTS_REGEX)
 
     common.ask_user_to_confirm(
         'Done! Please check %s and %s to ensure that '
@@ -213,4 +226,4 @@ def main(release_dir_path, personal_access_token):
         'MAILGUN_API_KEY and REDISHOST are updated correctly and '
         'other config changes are corresponding to %s and %s.\n' % (
             release_feconf_path, release_constants_path,
-            FECONF_CONFIG_PATH, CONSTANTS_CONFIG_PATH))
+            feconf_config_path, constants_config_path))
