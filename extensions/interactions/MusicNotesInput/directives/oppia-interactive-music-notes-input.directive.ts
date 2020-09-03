@@ -216,10 +216,6 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           scope.VERTICAL_GRID_SPACING = scope.CONTAINER_HEIGHT /
             verticalGridKeys.length;
 
-          // The farthest edge of the staff. If a note is placed beyond this
-          // position, it will be discarded.
-          element.find('.oppia-music-input-valid-note-area').width();
-
           clearNotesFromStaff();
           initPalette();
 
