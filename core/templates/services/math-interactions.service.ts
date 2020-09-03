@@ -138,7 +138,7 @@ export class MathInteractionsService {
     // Replacing greek names with symbols.
     for (let i = 0; i < variablesList.length; i++) {
       if (variablesList[i].length > 1) {
-        variablesList[i] = greekNameToSymbolMap[validVariablesList[i]];
+        variablesList[i] = greekNameToSymbolMap[variablesList[i]];
       }
     }
     if (variablesList.length === 0) {
