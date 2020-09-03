@@ -1607,52 +1607,6 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
         self.assertEqual(len(actual_output), 0)
 
 
-class ExplorationMathRichTextInfoModelDeletionOneOffJobTests(
-        test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(
-            ExplorationMathRichTextInfoModelDeletionOneOffJobTests,
-            self).setUp()
-        exp_models.ExplorationMathRichTextInfoModel(
-            id='user_id.exp_id',
-            math_images_generation_required=True,
-            estimated_max_size_of_images_in_bytes=1000).put()
-        exp_models.ExplorationMathRichTextInfoModel(
-            id='user_id1.exp_id1',
-            math_images_generation_required=True,
-            estimated_max_size_of_images_in_bytes=2000).put()
-        exp_models.ExplorationMathRichTextInfoModel(
-            id='user_id2.exp_id2',
-            math_images_generation_required=True,
-            estimated_max_size_of_images_in_bytes=3000).put()
-
-    def test_that_all_the_models_are_deleted(self):
-        no_of_models_before_job_is_run = (
-            exp_models.ExplorationMathRichTextInfoModel.
-            get_all().count())
-        self.assertEqual(no_of_models_before_job_is_run, 3)
-
-        job = (
-            exp_jobs_one_off.
-            ExplorationMathRichTextInfoModelDeletionOneOffJob)
-        job_id = job.create_new()
-        job.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        actual_output = job.get_output(job_id)
-        no_of_models_after_job_is_run = (
-            exp_models.ExplorationMathRichTextInfoModel.
-            get_all().count())
-        self.assertEqual(no_of_models_after_job_is_run, 0)
-
-        expected_output = (
-            [u'[u\'model_deleted\', [u\'3 models successfully delelted.\']]'])
-        self.assertEqual(actual_output, expected_output)
-
-
 class ExplorationRteMathContentValidationOneOffJobTests(
         test_utils.GenericTestBase):
 
