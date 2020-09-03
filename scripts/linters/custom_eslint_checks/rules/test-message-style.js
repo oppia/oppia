@@ -84,7 +84,7 @@ module.exports = {
         checkMessage(node.left);
         checkMessage(node.right);
       }
-    }
+    };
 
     return {
       CallExpression(node) {
