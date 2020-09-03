@@ -119,57 +119,16 @@ def get_exploration_stats(exp_id, exp_version):
 
     return exploration_stats
 
-#@acl_decorators.context_decorator
-
+@taskqueue_services.context_decorator
 def update_stats(exp_id, exp_version, aggregated_stats):
     """Updates ExplorationStatsModel according to the dict containing aggregated
     stats.
-
     Args:
         exp_id: str. ID of the exploration.
         exp_version: int. Version of the exploration.
         aggregated_stats: dict. Dict representing an ExplorationStatsModel
             instance with stats aggregated in the frontend.
     """
-    import six; reload(six);
-    from google.cloud import ndb
-    import redis
-    import feconf
-    import main
-    # global_cache = ndb.RedisCache(
-    #     redis.StrictRedis(host=feconf.REDISHOST, port=feconf.REDISPORT))
-    if not ndb.context.get_context(raise_context_error=False):
-        with main.client.context(global_cache=main.global_cache):
-            exploration_stats = get_exploration_stats_by_id(
-            exp_id, exp_version)
-
-            exploration_stats.num_starts_v2 += aggregated_stats['num_starts']
-            exploration_stats.num_completions_v2 += aggregated_stats['num_completions']
-            exploration_stats.num_actual_starts_v2 += aggregated_stats[
-                'num_actual_starts']
-
-            for state_name in aggregated_stats['state_stats_mapping']:
-                exploration_stats.state_stats_mapping[
-                    state_name].total_answers_count_v2 += aggregated_stats[
-                        'state_stats_mapping'][state_name]['total_answers_count']
-                exploration_stats.state_stats_mapping[
-                    state_name].useful_feedback_count_v2 += aggregated_stats[
-                        'state_stats_mapping'][state_name]['useful_feedback_count']
-                exploration_stats.state_stats_mapping[
-                    state_name].total_hit_count_v2 += aggregated_stats[
-                        'state_stats_mapping'][state_name]['total_hit_count']
-                exploration_stats.state_stats_mapping[
-                    state_name].first_hit_count_v2 += aggregated_stats[
-                        'state_stats_mapping'][state_name]['first_hit_count']
-                exploration_stats.state_stats_mapping[
-                    state_name].num_times_solution_viewed_v2 += aggregated_stats[
-                        'state_stats_mapping'][state_name]['num_times_solution_viewed']
-                exploration_stats.state_stats_mapping[
-                    state_name].num_completions_v2 += aggregated_stats[
-                        'state_stats_mapping'][state_name]['num_completions']
-
-            save_stats_model_transactional(exploration_stats)
-            return
     exploration_stats = get_exploration_stats_by_id(
         exp_id, exp_version)
 

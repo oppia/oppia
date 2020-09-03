@@ -617,7 +617,6 @@ class BaseDeferredJobManager(BaseJobManager):
         Raises:
             PermanentTaskFailure. No further work can be scheduled.
         """
-
         logging.info(
             'Job %s started at %s' %
             (job_id, utils.get_current_time_in_millisecs()))
@@ -659,19 +658,6 @@ class BaseDeferredJobManager(BaseJobManager):
                 pass into the job's _run() method.
             unused_shard_count: int. Number of shards used for the job.
         """
-        import six; reload(six);
-        from google.cloud import ndb
-        import redis
-        import feconf
-        import main
-        # global_cache = ndb.RedisCache(
-        #     redis.StrictRedis(host=feconf.REDISHOST, port=feconf.REDISPORT))
-        if not ndb.context.get_context(raise_context_error=False):
-            with main.client.context(global_cache=main.global_cache):
-                taskqueue_services.defer(
-                    cls._run_job, queue_name,
-                    job_id, additional_job_params)
-                return
         taskqueue_services.defer(
             cls._run_job, queue_name,
             job_id, additional_job_params)

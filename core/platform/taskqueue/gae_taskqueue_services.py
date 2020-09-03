@@ -19,12 +19,15 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from functools import wraps
 import json
 import redis
 import feconf
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import deferred
+from google.cloud import ndb
+
 import main
 
 # NOTE: The following constants should match the queue names in queue.yaml.
@@ -43,17 +46,10 @@ QUEUE_NAME_ONE_OFF_JOBS = 'one-off-jobs'
 # Taskqueue for updating stats models.
 QUEUE_NAME_STATS = 'stats'
 
-def wrapped_function(fn, *arguments, **kwarguments):
-    #(maybe need to start a new client here)
-    #from google.cloud import ndb
-    client = main.client
-    # global_cache = ndb.RedisCache(
-    #     redis.StrictRedis(host=feconf.REDISHOST, port=feconf.REDISPORT))
-    with client.context(global_cache=main.global_cache):
-        return fn(*arguments, **kwarguments)
-
 def defer(fn, queue_name, *args, **kwargs):
     """Adds a new task to a specified deferred queue.
+    NOTE: Functions that use this function MUST be decorated with the
+    context_decorator.
 
     Args:
         fn: *. The task being deferred. Will be called as: fn(*args, **kwargs).
@@ -83,13 +79,13 @@ def enqueue_email_task(url, params, countdown):
         queue_name=QUEUE_NAME_EMAILS, url=url, payload=json.dumps(params),
         countdown=countdown, target=taskqueue.DEFAULT_APP_VERSION)
 
+
 def context_decorator(handler):
+    @wraps(handler)
     def wrapper(*args, **kwargs):
-        import six; reload(six)
-        from google.cloud import ndb
         if not ndb.context.get_context(raise_context_error=False):
-            with ndb.Client().context():
-                return handler( *args, **kwargs)
+            with main.client.context(global_cache=main.global_cache):
+                return handler(*args, **kwargs)
         return handler(*args, **kwargs)
         #return handler(*args, **kwargs)
     return wrapper

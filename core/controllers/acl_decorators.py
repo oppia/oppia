@@ -1357,18 +1357,6 @@ def can_publish_collection(handler):
 
     return test_can_publish_collection
 
-def context_decorator(handler):
-    def context_wrapper(cls, *args, **kwargs):
-        import six; reload(six)
-        from google.cloud import ndb
-        if not ndb.context.get_context(raise_context_error=False):
-            with ndb.Client().context():
-                return handler(cls, *args, **kwargs)
-        return handler(cls, *args, **kwargs)
-
-    context_wrapper.__wrapped__ = True
-
-    return context_wrapper
 
 def can_unpublish_collection(handler):
     """Decorator to check whether user can unpublish a given
