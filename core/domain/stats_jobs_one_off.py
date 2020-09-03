@@ -256,7 +256,7 @@ class RegenerateMissingV1StatsModelsOneOffJob(
                             yield (
                                 'ExplorationStatsModel ignored StateStats '
                                 'regeneration due to missing historical data', (
-                                    '%s.%s "%s"' % (
+                                    '%s.%s: %s' % (
                                         exploration.id, exp_version,
                                         old_state_name)
                                     ).encode('utf-8'))
