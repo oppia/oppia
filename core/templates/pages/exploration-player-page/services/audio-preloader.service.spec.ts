@@ -348,14 +348,10 @@ describe('Audio preloader service', function() {
             },
             solution: null,
             answer_groups: [{
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Contains: [
-                  {
-                    x: '1'
-                  }
-                ]
-              },
+              rule_specs: [{
+                rule_type: 'Contains',
+                inputs: {x: '1'}
+              }],
               outcome: {
                 dest: 'State 1',
                 feedback: {
@@ -367,14 +363,10 @@ describe('Audio preloader service', function() {
                 refresher_exploration_id: null
               }
             }, {
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Contains: [
-                  {
-                    x: '2'
-                  }
-                ]
-              },
+              rule_specs: [{
+                rule_type: 'Contains',
+                inputs: {x: '2'}
+              }],
               outcome: {
                 dest: 'State 2',
                 feedback: {

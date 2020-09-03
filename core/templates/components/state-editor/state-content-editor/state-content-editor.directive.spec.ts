@@ -102,8 +102,7 @@ describe('State content editor directive', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              rule_input_translations: {},
-              rule_types_to_inputs: {},
+              rule_specs: [],
               outcome: {
                 dest: 'unused',
                 feedback: {
@@ -152,8 +151,7 @@ describe('State content editor directive', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              rule_input_translations: {},
-              rule_types_to_inputs: {},
+              rule_specs: [],
               outcome: {
                 dest: 'unused',
                 feedback: {
@@ -202,8 +200,7 @@ describe('State content editor directive', function() {
           interaction: {
             id: 'TextInput',
             answer_groups: [{
-              rule_input_translations: {},
-              rule_types_to_inputs: {},
+              rule_specs: [],
               outcome: {
                 dest: 'unused',
                 feedback: {

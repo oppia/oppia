@@ -19,7 +19,6 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import cloneDeep from 'lodash/cloneDeep';
 
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
@@ -65,10 +64,10 @@ describe('StateTopAnswersStatsService', () => {
     param_changes: [],
     interaction: {
       answer_groups: [{
-        rule_input_translations: {},
-        rule_types_to_inputs: {
-          Contains: [{x: 'hola'}]
-        },
+        rule_specs: [{
+          rule_type: 'Contains',
+          inputs: {x: 'hola'}
+        }],
         outcome: {
           dest: 'Me Llamo',
           feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
@@ -121,8 +120,7 @@ describe('StateTopAnswersStatsService', () => {
   };
 
   const makeStates = (statesBackendDict = {Hola: stateBackendDict}): States => {
-    return statesObjectFactory.createFromBackendDict(
-      cloneDeep(statesBackendDict));
+    return statesObjectFactory.createFromBackendDict(statesBackendDict);
   };
 
   const spyOnBackendApiFetchStatsAsync = (
@@ -293,7 +291,7 @@ describe('StateTopAnswersStatsService', () => {
       .toContain(joC({answer: 'adios'}));
 
     const updatedState = states.getState('Hola');
-    updatedState.interaction.answerGroups[0].addRule(
+    updatedState.interaction.answerGroups[0].rules.push(
       ruleObjectFactory.createNew('Contains', {x: 'adios'}));
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 
@@ -314,9 +312,9 @@ describe('StateTopAnswersStatsService', () => {
       .not.toContain(joC({answer: 'hola'}));
 
     const updatedState = states.getState('Hola');
-    updatedState.interaction.answerGroups[0].updateRuleTypesToInputs([
+    updatedState.interaction.answerGroups[0].rules = [
       ruleObjectFactory.createNew('Contains', {x: 'bonjour'})
-    ]);
+    ];
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))

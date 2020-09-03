@@ -192,14 +192,10 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  Equals: [
-                    {
-                      x: 0
-                    }
-                  ]
-                }
+                rule_specs: [{
+                  rule_type: 'Equals',
+                  inputs: {x: 0}
+                }],
               },
               {
                 labelled_as_correct: false,
@@ -212,14 +208,10 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  Equals: [
-                    {
-                      x: 1
-                    }
-                  ]
-                }
+                rule_specs: [{
+                  rule_type: 'Equals',
+                  inputs: {x: 1}
+                }],
               }
             ],
             hints: [],
@@ -303,18 +295,16 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  Equals: [
-                    {
-                      x: [
-                        '<p><oppia-noninteractive-image filepath-with-value' +
-                        '=\&amp;quot;s4Choice1.png&amp;quot;\></oppia-nonin' +
-                        'teractive-image></p>'
-                      ]
-                    }
-                  ]
-                }
+                rule_specs: [{
+                  rule_type: 'Equals',
+                  inputs: {
+                    x: [
+                      '<p><oppia-noninteractive-image filepath-with-value' +
+                      '=\&amp;quot;s4Choice1.png&amp;quot;\></oppia-nonin' +
+                      'teractive-image></p>'
+                    ]
+                  }
+                }],
               },
               {
                 labelled_as_correct: true,
@@ -327,18 +317,16 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  Equals: [
-                    {
-                      x: [
-                        '<p><oppia-noninteractive-image filepath-with-value=' +
-                        '"&amp;quot;s4Choice2.png&amp;quot;">' +
-                        '</oppia-noninteractive-image></p>'
-                      ]
-                    }
-                  ]
-                }
+                rule_specs: [{
+                  rule_type: 'Equals',
+                  inputs: {
+                    x: [
+                      '<p><oppia-noninteractive-image filepath-with-value=' +
+                      '"&amp;quot;s4Choice2.png&amp;quot;">' +
+                      '</oppia-noninteractive-image></p>'
+                    ]
+                  }
+                }],
               }
             ]
           },
@@ -395,14 +383,10 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  IsInRegion: [
-                    {
-                      x: 'classdef'
-                    }
-                  ]
-                }
+                rule_specs: [{
+                  rule_type: 'IsInRegion',
+                  inputs: { x: 'classdef' }
+                }]
               },
               {
                 labelled_as_correct: false,
@@ -416,14 +400,10 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  IsInRegion: [
-                    {
-                      x: 'instancefunc'
-                    }
-                  ]
-                }
+                rule_specs: [{
+                  rule_type: 'IsInRegion',
+                  inputs: { x: 'instancefunc' }
+                }]
               },
               {
                 labelled_as_correct: false,
@@ -436,14 +416,10 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  IsInRegion: [
-                    {
-                      x: 'docstring'
-                    }
-                  ]
-                }
+                rule_specs: [{
+                  rule_type: 'IsInRegion',
+                  inputs: { x: 'docstring' }
+                }]
               },
               {
                 labelled_as_correct: false,
@@ -457,14 +433,10 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  IsInRegion: [
-                    {
-                      x: 'classfunc'
-                    }
-                  ]
-                }
+                rule_specs: [{
+                  rule_type: 'IsInRegion',
+                  inputs: { x: 'classfunc' }
+                }]
               },
               {
                 labelled_as_correct: false,
@@ -478,14 +450,10 @@ describe('Extracting Image file names in the state service', () => {
                   param_changes: [],
                   refresher_exploration_id: null
                 },
-                rule_input_translations: {},
-                rule_types_to_inputs: {
-                  IsInRegion: [
-                    {
-                      x: 'ctor'
-                    }
-                  ]
-                }
+                rule_specs: [{
+                  rule_type: 'IsInRegion',
+                  inputs: { x: 'ctor' }
+                }]
               }
             ],
             customization_args: {
@@ -605,14 +573,10 @@ describe('Extracting Image file names in the state service', () => {
               }
             },
             answer_groups: [{
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Contains: [
-                  {
-                    x: '1'
-                  }
-                ]
-              },
+              rule_specs: [{
+                rule_type: 'Contains',
+                inputs: {x: '1'}
+              }],
               outcome: {
                 dest: 'State 1',
                 feedback: {
@@ -624,14 +588,10 @@ describe('Extracting Image file names in the state service', () => {
                 refresher_exploration_id: null
               }
             }, {
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Contains: [
-                  {
-                    x: '2'
-                  }
-                ]
-              },
+              rule_specs: [{
+                rule_type: 'Contains',
+                inputs: {x: '2'}
+              }],
               outcome: {
                 dest: 'State 1',
                 feedback: {

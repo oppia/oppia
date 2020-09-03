@@ -37,7 +37,7 @@ describe('Answer classification result object factory', () => {
 
   it('should create a new result', () => {
     var answerClassificationResult = acrof.createNew(
-      oof.createNew('default', '', '', []), 1, DEFAULT_OUTCOME_CLASSIFICATION
+      oof.createNew('default', '', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
     );
 
     expect(answerClassificationResult.outcome).toEqual(

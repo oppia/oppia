@@ -90,7 +90,7 @@ export class NumericInputValidationService {
       });
     };
     for (var i = 0; i < answerGroups.length; i++) {
-      var rules = answerGroups[i].getRulesAsList();
+      var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
         var range = {
@@ -138,22 +138,7 @@ export class NumericInputValidationService {
           default:
         }
         for (var k = 0; k < ranges.length; k++) {
-          // Rules inside an AnswerGroup do not have a set order. We should
-          // check for redundant rules in both directions if rules are in the
-          // same AnswerGroup.
-          const redundantWithinAnswerGroup = (
-            ranges[k].answerGroupIndex === i &&
-            (isEnclosedBy(range, ranges[k]) || isEnclosedBy(ranges[k], range))
-          );
-
-          // AnswerGroups do have a set order. If rules are not in the same
-          // AnswerGroup we only check in one direction.
-          const redundantBetweenAnswerGroups = (
-            ranges[k].answerGroupIndex !== i &&
-            isEnclosedBy(range, ranges[k])
-          );
-
-          if (redundantWithinAnswerGroup || redundantBetweenAnswerGroups) {
+          if (isEnclosedBy(range, ranges[k])) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: (

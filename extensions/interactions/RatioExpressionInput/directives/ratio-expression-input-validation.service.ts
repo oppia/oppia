@@ -106,14 +106,14 @@ export class RatioExpressionInputValidationService {
     let hasLessNumberOfTerms = function(
         currentRuleType: string,
         seenRuleType: string,
-        currentInput: number,
-        seenInput: number[]
+        currentInput: number[],
+        seenInput: number
     ): boolean {
       return (
-        currentRuleType === 'HasNumberOfTermsEqualTo' &&
-        seenRuleType !== 'HasNumberOfTermsEqualTo' &&
+        seenRuleType === 'HasNumberOfTermsEqualTo' &&
+        currentRuleType !== 'HasNumberOfTermsEqualTo' &&
         ratioRulesService.HasNumberOfTermsEqualTo(
-          seenInput, {y: currentInput})
+          currentInput, {y: seenInput})
       );
     };
 
@@ -125,7 +125,7 @@ export class RatioExpressionInputValidationService {
     let seenRules = [];
 
     for (let i = 0; i < answerGroups.length; i++) {
-      let rules = answerGroups[i].getRulesAsList();
+      let rules = answerGroups[i].rules;
       for (let j = 0; j < rules.length; j++) {
         let currentRuleType = <string> rules[j].type;
         let currentInput = null;
@@ -169,7 +169,7 @@ export class RatioExpressionInputValidationService {
           });
         }
         for (let seenRule of seenRules) {
-          let seenInput = <number[]> seenRule.inputs.x;
+          let seenInput = seenRule.inputs.x || seenRule.inputs.y;
           let seenRuleType = <string> seenRule.type;
           if (seenRuleType === 'Equals' && (
             ratioRulesService.Equals(
@@ -195,9 +195,12 @@ export class RatioExpressionInputValidationService {
                 ' be matched because it is preceded by a \'IsEquivalent\'' +
                 ' rule with a matching input.')
             });
-          } else if (hasLessNumberOfTerms(
-            currentRuleType, seenRuleType, currentInput, seenInput
-          )) {
+          } else if (
+            seenRuleType === 'HasNumberOfTermsEqualTo' &&
+            hasLessNumberOfTerms(
+              currentRuleType, seenRuleType, currentInput, seenInput
+            )
+          ) {
             // This rule will make the following inputs with
             // HasNumberOfTermsEqualTo rule obsolete.
             warningsList.push({
