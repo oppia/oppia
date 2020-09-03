@@ -480,7 +480,7 @@ class UtilsTests(test_utils.GenericTestBase):
         }
         utf8_encoded_value = utils.utf8_encode(value)
 
-        self.assertEqual(value, utils.utf8_encode(value))
+        self.assertEqual(value, utf8_encoded_value)
         self.assertEqual(value, utils.utf8_decode(utf8_encoded_value))
 
     def test_utf8_encode_and_decode_with_unicode(self):
