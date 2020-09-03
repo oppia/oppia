@@ -664,6 +664,10 @@
 # TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /package.json @seanlip
 # TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
+/requirements.txt @seanlip
+# TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
+/requirements.in @seanlip
+# TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /yarn.lock @seanlip
 # TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /scripts/install_third_party_libs.py @seanlip

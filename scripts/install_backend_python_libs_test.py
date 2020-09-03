@@ -109,7 +109,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     self.version = version_string
             return [
                 Distribution('dependency1', '1.5.1'),
-                Distribution('dependency2', '5.0.0'),
+                Distribution('dependency2', '4.9.1.2'),
                 Distribution('dependency5', '0.5.3')
             ]
 
@@ -119,9 +119,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.assertEqual(
                 {
                     u'dependency1': (u'1.6.1', u'1.5.1'),
-                    u'dependency2': (u'4.9.1', u'5.0.0'),
+                    u'dependency2': (u'4.9.1', u'4.9.1.2'),
                     u'dependency3': (u'3.1.5', None),
-                    u'dependency4': (u'0.3.0', None),
+                    u'dependency4': (u'0.3.0.1', None),
                     u'dependency5': (None, u'0.5.3')
                 },
                 install_backend_python_libs.get_mismatches())
@@ -137,11 +137,12 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_get_mismatches():
             return {
                 u'flask': (None, u'10.0.1'),
-                u'six': (None, u'10.13.0')
+                u'six': (None, u'10.13.0.1')
             }
 
         def mock_validate_metadata_directories():
             pass
+
         swap_validate_metadata_directories = self.swap(
             install_backend_python_libs, 'validate_metadata_directories',
             mock_validate_metadata_directories)
@@ -174,14 +175,15 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             ]
         )
 
-    def test_library_addition_runs_correct_commands(self):
+    def test_library_change_or_addition_runs_correct_commands(self):
         """Library is required by the 'requirements.txt' file but it doesn't
         exist in 'third_party/python_libs'.
         """
         def mock_get_mismatches():
             return {
-                u'flask': (u'1.1.1', None),
-                u'six': (u'1.15.0', None)
+                u'flask': (u'1.1.0.1', u'1.1.1.0'),
+                u'six': (u'1.15.0', None),
+                u'protobuf': (u'2.0.1.3', u'2.0.0.0')
             }
 
         def mock_validate_metadata_directories():
@@ -205,7 +207,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     'pip', 'install', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--no-dependencies',
-                    '%s==%s' % ('flask', '1.1.1'),
+                    '%s==%s' % ('flask', '1.1.0.1'),
                     '--upgrade'
                 ],
                 [
@@ -213,6 +215,13 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--no-dependencies',
                     '%s==%s' % ('six', '1.15.0'),
+                    '--upgrade'
+                ],
+                [
+                    'pip', 'install', '--target',
+                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--no-dependencies',
+                    '%s==%s' % ('protobuf', '2.0.1.3'),
                     '--upgrade'
                 ]
             ]

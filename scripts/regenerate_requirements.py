@@ -57,7 +57,7 @@ def main():
     # libraries correctly.
     sys.argv[0] = re.sub(
         r'(-script\.pyw|\.exe)?$', '',
-        common. REQUIREMENTS_FILE_PATH)
+        common.REQUIREMENTS_FILE_PATH)
     compile.cli() # pylint: disable=no-value-for-parameter
 
 

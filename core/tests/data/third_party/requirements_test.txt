@@ -5,7 +5,7 @@
 dependency1==1.6.1      # via -r requirements.in, dependency3
 dependency2==4.9.1      # via -r requirements.in
 dependency3==3.1.5      # via -r requirements.in
-dependency4==0.3.0      # via -r requirements.in, dependency3
+dependency4==0.3.0.1    # via -r requirements.in, dependency3
 
 # Developers: Please do not add to this auto-generated file. If
 # you want to add, remove, upgrade, or downgrade libraries,

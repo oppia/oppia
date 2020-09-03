@@ -41,4 +41,9 @@ if os.path.isdir(OPPIA_TOOLS_PATH):
         raise Exception('Invalid path for oppia_tools library: %s' % PIL_PATH)
     sys.path.insert(0, PIL_PATH)
 
+# Google App Engine (GAE) uses its own virtual environment that sets up the python
+# library system path using their third party python library vendor. In order to
+# inform GAE of the packages that are required for Oppia, we need to add it
+# using the vendor here. More information can be found here:
+# https://cloud.google.com/appengine/docs/standard/python/tools/using-libraries-python-27
 vendor.add(os.path.join(THIRD_PARTY_PATH, 'python_libs'))

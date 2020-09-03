@@ -33,7 +33,7 @@ def _get_requirements_file_contents():
     their corresponding version strings listed in the 'requirements.txt' file.
 
     Returns:
-        dict(string, string). Dictionary with the name of the library as the key
+        dict(str, str). Dictionary with the name of the library as the key
         and the version string of that library as the value.
     """
     requirements_contents = collections.defaultdict()
@@ -45,9 +45,10 @@ def _get_requirements_file_contents():
             if l.startswith('#') or len(l) == 0:
                 continue
             library_name_and_version_string = l.split(' ')[0].split('==')
-            # Libraries are not distinguished by case so in order to make sure
-            # the same libraries have the same library name for easy comparison,
-            # all library names are changed to lowercase.
+            # Libraries with different case are not different: e.g
+            # 'Flask' == 'flask'. Therefore, we convert all of the library names
+            # to lowercase in order to use string comparison later for library
+            # names.
             library_name = library_name_and_version_string[0].lower()
             version_string = library_name_and_version_string[1]
             requirements_contents[library_name] = version_string
@@ -59,13 +60,17 @@ def _get_third_party_python_libs_directory_contents():
     corresponding versions installed in the 'third_party/python_libs' directory.
 
     Returns:
-        dict(string, string). Dictionary with the name of the library installed
+        dict(str, str). Dictionary with the name of the library installed
         as the key and the version string of that library as the value.
     """
     installed_packages = [
         (d.project_name, d.version)
         for d in pkg_resources.find_distributions(
             common.THIRD_PARTY_PYTHON_LIBS_DIR)]
+    # Libraries with different case are not different: e.g
+    # 'Flask' == 'flask'. Therefore, we convert all of the library names
+    # to lowercase in order to use string comparison later for library
+    # names.
     directory_contents = {
         library_name.lower(): version_string
         for library_name, version_string in installed_packages
@@ -88,12 +93,15 @@ def _remove_metadata(library_name, version_string):
         version_string: str. Stringified version of the library to remove the
             metadata for.
     """
-    possible_file_names = _get_possible_metadata_directory_names(
+    possible_directory_names = _get_possible_metadata_directory_names(
         library_name, version_string)
-    for f in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
-        if f.lower() in possible_file_names:
+    for file_or_directory in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
+        # File or directory names may be of heterogeneous case but libraries
+        # with different case are not different: e.g 'Flask' == 'flask' so we
+        # convert the names to lowercase in order to use string comparison.
+        if file_or_directory.lower() in possible_directory_names:
             path_to_delete = os.path.join(
-                common.THIRD_PARTY_PYTHON_LIBS_DIR, f)
+                common.THIRD_PARTY_PYTHON_LIBS_DIR, file_or_directory)
             if os.path.isdir(path_to_delete):
                 shutil.rmtree(path_to_delete)
 
@@ -104,7 +112,7 @@ def _rectify_third_party_directory(mismatches):
     and corrects those mismatches by installing or uninstalling packages.
 
     Args:
-        mismatches: dict(string, tuple(string|None, string|None)). Dictionary
+        mismatches: dict(str, tuple(str|None, str|None)). Dictionary
             with the library names as keys and a tuple as values. The 1st
             element of the tuple is the version string of the library required
             by the requirements.txt file while the 2nd element is the version
@@ -119,7 +127,7 @@ def _rectify_third_party_directory(mismatches):
                 }
     """
     # Handling 5 or more mismatches requires 5 or more individual `pip install`
-    # commands, which is slower than just reinstalling all of the libraries
+    # commands, which is lower than just reinstalling all of the libraries
     # using `pip install -r requirements.txt`.
     if len(mismatches) >= 5:
         if os.path.isdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
@@ -136,11 +144,11 @@ def _rectify_third_party_directory(mismatches):
         # The library is installed in the directory but is not listed in
         # requirements.
         # We don't have functionality to remove a library cleanly, and if we
-        # ignore the library, This might cause issues when pushing the branch to
-        # develop as there are possible hidden use cases of a deleted library
-        # that the developer did not catch. The only way to enforce the removal
-        # of a library is to clean out the folder and reinstall everything from
-        # scratch.
+        # ignore the library, this might cause issues when pushing the branch to
+        # develop as there might be possible hidden use cases of a deleted
+        # library that the developer did not catch. The only way to enforce the
+        # removal of a library is to clean out the folder and reinstall
+        # everything from scratch.
         if not requirements_version:
             if os.path.isdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
                 shutil.rmtree(common.THIRD_PARTY_PYTHON_LIBS_DIR)
@@ -205,26 +213,24 @@ def _get_possible_metadata_directory_names(library_name, version_string):
     https://www.python.org/dev/peps/pep-0376/#how-distributions-are-installed.
 
     Args:
-        library_name: str. Name of the library.
+        library_name: str. Name of the library. Library name MUST be in
+            lowercase.
         version_string: str. Stringified version of the library.
 
     Returns:
         set(str). Set containing the possible directory name strings of metadata
         folders.
     """
-    possible_names = {
+    # Some metadata folders replace the hyphens in the library name with
+    # underscores.
+    return {
         '%s-%s.dist-info' % (library_name, version_string),
-        # Some metadata folders replace the hyphens of the library name with
-        # underscores.
         '%s-%s.dist-info' % (
             library_name.replace('-', '_'), version_string),
         '%s-%s.egg-info' % (library_name, version_string),
-        # Some metadata folders replace the hyphens of the library name with
-        # underscores.
         '%s-%s.egg-info' % (
             library_name.replace('-', '_'), version_string),
     }
-    return possible_names
 
 
 def get_mismatches():
@@ -241,7 +247,7 @@ def get_mismatches():
            listed in the requirements file.
 
     Returns:
-        dict(string, tuple(string|None, string|None)). Dictionary with the
+        dict(str, tuple(str|None, str|None)). Dictionary with the
         library names as keys and tuples as values. The 1st element of the
         tuple is the version string of the library required by the
         requirements.txt file while the 2nd element is the version string of
@@ -287,26 +293,33 @@ def validate_metadata_directories():
     the PEP-427 and PEP-376 python guidelines.
 
     Raises:
-        Exception. An installed library's metadata does not exist the
+        Exception. An installed library's metadata does not exist in the
             'third_party/python_libs' directory in the format that we expect
             (following the PEP-427 and PEP-376 python guidelines).
     """
     directory_contents = _get_third_party_python_libs_directory_contents()
-    directory_names = set(
+    # File or directory names may be of heterogeneous case but libraries
+    # with different case are not different: e.g 'Flask' == 'flask'. Therefore,
+    # convert all of the names to lowercase in order to use string comparison.
+    file_or_directory_names = set(
         [
             name.lower()
             for name in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR)
         ])
     for library_name, version_string in directory_contents.items():
-        # Possible names of the metadata directory installed.
-        possible_file_names = _get_possible_metadata_directory_names(
+        # Possible names of the metadata directory installed when <library_name>
+        # is installed.
+        possible_directory_names = _get_possible_metadata_directory_names(
             library_name, version_string)
-        has_name_in_directory = False
-        for name in possible_file_names:
-            if name in directory_names:
-                has_name_in_directory = True
-                break
-        if not has_name_in_directory:
+        is_metadata_in_third_party_python_libs_directory = False
+        # If any of the possible directory metadata directory names show up in
+        # the directory, that is confirmation that <library_name> was installed
+        # correctly with the correct metadata.
+        if any([
+            name in file_or_directory_names
+            for name in possible_directory_names]):
+            is_metadata_in_third_party_python_libs_directory = True
+        if not is_metadata_in_third_party_python_libs_directory:
             raise Exception(
                 'The python library %s was installed without the correct '
                 'metadata folders which may indicate that the convention for '

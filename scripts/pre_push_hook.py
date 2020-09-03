@@ -440,7 +440,7 @@ def check_for_backend_python_library_inconsistencies():
         sys.exit(1)
     else:
         python_utils.PRINT(
-            'No inconsistencies found in the backend python libraries.')
+            'Python dependencies consistency check succeeded.')
 
 
 def main(args=None):
