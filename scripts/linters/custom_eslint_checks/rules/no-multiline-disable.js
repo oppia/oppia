@@ -38,18 +38,14 @@ module.exports = {
 
   create: function(context) {
     const sourceCode = context.getSourceCode();
-    const lines = sourceCode.lines;
 
     var _checkNotMultilineDisableComment = function(comment) {
       if (comment.value.includes('eslint-disable ')) {
-        const line = lines[comment.loc.start.line - 1].trim();
-        if (line.startsWith('/*') || line.startsWith('//')) {
-          context.report({
-            comment,
-            loc: comment.loc,
-            messageId: 'noMultilineDisable'
-          });
-        }
+        context.report({
+          comment,
+          loc: comment.loc,
+          messageId: 'noMultilineDisable'
+        });
       }
     };
 
