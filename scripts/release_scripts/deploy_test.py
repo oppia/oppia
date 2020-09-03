@@ -245,8 +245,6 @@ class DeployTests(test_utils.GenericTestBase):
     def test_finally_block_is_executed_in_case_of_exception(self):
         args_swap = self.swap(
             sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
-        def mock_main(unused_personal_access_token):
-            pass
         def mock_get_personal_access_token():
             return 'test'
         def mock_get_organization(unused_self, unused_name):
@@ -265,7 +263,6 @@ class DeployTests(test_utils.GenericTestBase):
         def mock_check_travis_and_circleci_tests(unused_current_branch_name):
             raise Exception('Travis fails.')
 
-        config_swap = self.swap(update_configs, 'main', mock_main)
         get_token_swap = self.swap(
             common, 'get_personal_access_token', mock_get_personal_access_token)
         get_org_swap = self.swap(
@@ -285,11 +282,11 @@ class DeployTests(test_utils.GenericTestBase):
             mock_check_travis_and_circleci_tests)
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
-                with self.run_swap, self.release_doc_swap, config_swap:
+                with self.run_swap, self.release_doc_swap, args_swap:
                     with get_token_swap, get_org_swap, get_repo_swap:
                         with bug_check_swap, pr_check_swap, out_swap:
-                            with self.cd_swap, args_swap, check_tests_swap:
-                                with self.assertRaisesRegexp(
+                            with self.cd_swap, check_tests_swap:
+                                with self.rd_swap, self.assertRaisesRegexp(
                                     Exception,
                                     'Travis fails.'):
                                     deploy.execute_deployment()
