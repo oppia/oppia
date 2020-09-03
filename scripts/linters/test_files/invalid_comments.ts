@@ -33,5 +33,7 @@ require('static/diff-match-patch-1.0.0/diff_match_patch.js');
 
 // This is a comment containing url: https//:oppia.org
 
+// eslint-disable max-line
+
 // This is a two line comment. Hence, it must contain a period
 // at the end of second line but it isn't. So an error will be raised
