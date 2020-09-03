@@ -118,8 +118,8 @@ class RegenerateMissingStateStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             missing_states = set(exp.states) - set(stats.state_stats_mapping)
             if not missing_states:
                 yield (
-                    RegenerateMissingStateStatsOneOffJob.REDUCE_KEY_OK, (
-                        '%s.%s' % (exp.id, exp.version)).encode('utf-8'))
+                    RegenerateMissingStateStatsOneOffJob.REDUCE_KEY_OK,
+                    ('%s.%s' % (exp.id, exp.version)).encode('utf-8'))
                 continue
 
             for state_name in missing_states:
@@ -143,14 +143,15 @@ class RegenerateMissingStateStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             .REDUCE_KEY_BAD_RENAME, (
                                 '%s.%s "%s" -> "%s"' % (
                                     exp.id, exp.version - 1, old_state_name,
-                                    state_name)).encode('utf-8'))
+                                    state_name)
+                                ).encode('utf-8'))
 
                 stats.state_stats_mapping[state_name] = new_state_stats
                 yield (
                     RegenerateMissingStateStatsOneOffJob
                     .REDUCE_KEY_REGENERATED, (
-                        '%s.%s %s' % (
-                            exp.id, exp.version, state_name)).encode('utf-8'))
+                        '%s.%s %s' % (exp.id, exp.version, state_name)
+                        ).encode('utf-8'))
 
             stats_services.save_stats_model_transactional(stats)
 
