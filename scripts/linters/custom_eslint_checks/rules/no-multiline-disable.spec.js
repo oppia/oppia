@@ -31,6 +31,11 @@ ruleTester.run('no-multiline-disable', rule, {
     `
     /* eslint-disable-next-line max-len */
     it('should' +
+    'happen')`,
+    `
+    /* eslint-disable no-multiline-disable */
+    /* eslint-disable max-len */
+    it('should' +
     'happen')`
   ],
 
