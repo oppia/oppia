@@ -42,6 +42,8 @@ INVALID_PARENT_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_parent.html')
 INVALID_GLYPHICON_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_glyphicon.html')
+INVALID_STYLE_TAG_HTML_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_style_tag.html')
 
 # CSS filepaths.
 INVALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.css')
@@ -171,6 +173,16 @@ class HTMLLintTests(test_utils.LinterTestBase):
         self.assert_same_list_elements([
             'Line 13: Please do not access parent properties using '
             '$parent. Use the scope object for this purpose.'
+            ], lint_task_report.trimmed_messages)
+        self.assertEqual('Bad pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_invalid_use_of_style(self):
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_STYLE_TAG_HTML_FILEPATH], FILE_CACHE)
+        lint_task_report = linter.check_bad_patterns()
+        self.assert_same_list_elements([
+            'Line 2: Please do not use inline styling.'
             ], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
