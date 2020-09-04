@@ -35,12 +35,12 @@ class ExplorationOpportunitySummaryModelRegenerationJob(
 
     @classmethod
     def _pre_start_hook(cls, unused_job_id):
-        """A hook or a callback function triggered before marking a job
-        as started.
+        """A hook or a callback function triggered before marking a job as
+        started.
 
         Args:
             unused_job_id: str. The unique ID of the job to be marked as
-            started.
+                started.
         """
         opportunity_services.delete_all_exploration_opportunity_summary_models()
 
@@ -73,13 +73,13 @@ class SkillOpportunityModelRegenerationJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for regenerating SkillOpportunityModel."""
 
     @classmethod
-    def _pre_start_hook(cls, job_id):
+    def _pre_start_hook(cls, unused_job_id):
         """A hook or a callback function triggered before marking a job
         as started.
 
         Args:
             unused_job_id: str. The unique ID of the job to be marked as
-            started.
+                started.
         """
         opportunity_services.delete_all_skill_opportunity_models()
 
