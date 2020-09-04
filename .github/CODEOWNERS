@@ -56,6 +56,7 @@
 /core/templates/base-components/oppia-root.directive.ts @bansalnitish @srijanreddy98
 /core/templates/base-components/oppia-root.directive.html @bansalnitish @srijanreddy98
 /core/templates/filters/translate.pipe.ts @bansalnitish @srijanreddy98
+/core/templates/services/angular-services.index.ts @bansalnitish @srijanreddy98
 /core/templates/services/contextual/logger.service.ts @bansalnitish @srijanreddy98
 /core/templates/services/contextual/logger.service.spec.ts @bansalnitish @srijanreddy98
 /core/templates/services/i18n-language-code.service.ts @bansalnitish @srijanreddy98
@@ -65,7 +66,6 @@
 /core/templates/services/translate.service.ts @bansalnitish @srijanreddy98
 /core/templates/services/translations-backend-api.service.ts @bansalnitish @srijanreddy98
 /core/templates/services/UpgradedServices.ts @bansalnitish @srijanreddy98
-/core/templates/services/angular-services.index.ts @bansalnitish @srijanreddy98
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
 # TODO(#10538): Add @vojtechjelinek as an owner after 2020-09-06.

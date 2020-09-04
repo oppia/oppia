@@ -51,6 +51,17 @@ TS_IGNORE_EXCEPTIONS_FILEPATH = os.path.join(
 TS_IGNORE_EXCEPTIONS = json.load(python_utils.open_file(
     TS_IGNORE_EXCEPTIONS_FILEPATH, 'r'))
 
+INJECTABLES_TO_IGNORE = [
+    'ExplorationStats',
+    'InteractionAttributesExtractorService',
+    'NormalizeWhitespacePunctuationAndCasePipe\n',
+    'MockCsrfTokenService',
+    'StatePropertyService',
+    'StateNextContentIdIndexService\n',
+    'SubtitledUnicodeObjectFactory',
+    'UpgradedServices'
+]
+
 
 def _get_expression_from_node_if_one_exists(
         parsed_node, components_to_check):
@@ -967,6 +978,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         Returns:
             all_messages: str. All the messages returned by the lint checks.
         """
+        name = 'Angular Services Index file'
+        error_messages = []
         def get_injectable_class_name(file_content):
             """Extarcts the class name from a file that has an Injectable
                 class.
@@ -976,8 +989,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     Injectable class.
 
             Returns:
-                tuple(str, str). A two-tuple of class name and class name in
-                camelCase.
+                class_name: str. The name of the service.
             """
 
             # Going through all ts files and looking for @Injectable classes.
@@ -994,74 +1006,38 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         angular_services_index_path = (
             './core/templates/services/angular-services.index.ts')
-        injectables_to_ignore = [
-            'ExplorationStats',
-            'InteractionAttributesExtractorService',
-            'NormalizeWhitespacePunctuationAndCasePipe\n',
-            'MockCsrfTokenService',
-            'StatePropertyService',
-            'StateNextContentIdIndexService\n',
-            'SubtitledUnicodeObjectFactory',
-            'UpgradedServices'
-        ]
-        if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting Angular Services Index file check')
-            python_utils.PRINT('----------------------------------------')
         angular_services_index = self.file_cache.read(
             angular_services_index_path)
-        summary_messages = []
-        total_error_count = 0
-        total_files_checked = 0
+        error_messages = []
+        failed = False
         for file_path in self.ts_files:
             file_content = self.file_cache.read(file_path)
-            if '@Injectable({' in file_content:
-                total_files_checked += 1
-                class_name = get_injectable_class_name(file_content)
-                if class_name in injectables_to_ignore:
-                    continue
-                import_statement = 'import { %s' % class_name
-                if not import_statement in angular_services_index:
-                    summary_message = (
-                        'Please import %s to Angular Services Index file in %s'
-                        % (class_name, angular_services_index_path))
-                    summary_messages.append(summary_message)
-                    python_utils.PRINT(summary_message)
-                    python_utils.PRINT('')
-                    total_error_count += 1
+            if not '@Injectable({' in file_content:
+                continue
+            class_name = get_injectable_class_name(file_content)
+            if class_name in INJECTABLES_TO_IGNORE:
+                continue
+            import_statement = 'import { %s' % class_name
+            if not import_statement in angular_services_index:
+                error_message = (
+                    'Please import %s to Angular Services Index file in %s'
+                    % (class_name, angular_services_index_path))
+                error_messages.append(error_message)
+                failed = True
 
-                service_name_type_pair = (
-                    '[\'%s\', %s]' % (class_name, class_name))
+            service_name_type_pair = (
+                '[\'%s\', %s]' % (class_name, class_name))
 
-                if not service_name_type_pair in angular_services_index:
-                    summary_message = (
-                        'Please add the pair %s to the angularServices in %s'
-                        % (service_name_type_pair, angular_services_index_path)
-                    )
-                    summary_messages.append(summary_message)
-                    python_utils.PRINT(summary_message)
-                    python_utils.PRINT('')
-                    total_error_count += 1
-        with linter_utils.redirect_stdout(sys.stdout):
-            if self.verbose_mode_enabled:
-                python_utils.PRINT('----------------------------------------')
-            if total_error_count:
-                python_utils.PRINT('(%s files checked, %s errors found)' % (
-                    total_files_checked, total_error_count))
-                summary_message = (
-                    '%sAngularServicesIndexFile linting failed, fix the'
-                    ' errors listed above' % (
-                        linter_utils.FAILED_MESSAGE_PREFIX))
-            else:
-                summary_message = (
-                    '%s AngularServicesIndexFile linting linting passed' % (
-                        linter_utils.SUCCESS_MESSAGE_PREFIX))
-
-            summary_messages.append(summary_message)
-            python_utils.PRINT('')
-            python_utils.PRINT(summary_message)
-            python_utils.PRINT('AngularServicesIndexFile linting finished.')
-            python_utils.PRINT('')
-        return summary_messages
+            if not service_name_type_pair in angular_services_index:
+                error_message = (
+                    'Please add the pair %s, without line breaks in between,'
+                    ' to the angularServices in %s'
+                    % (service_name_type_pair, angular_services_index_path)
+                )
+                error_messages.append(error_message)
+                failed = True
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all

@@ -718,26 +718,27 @@ class JsTsLintTests(test_utils.LinterTestBase):
 
         compile_all_ts_files_swap = self.swap(
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
-        with self.print_swap, compile_all_ts_files_swap:
-            js_ts_linter.JsTsLintChecksManager(
-                [], [VALID_UNLISTED_SERVICE_PATH], FILE_CACHE,
-                True).perform_all_lint_checks()
 
+        with compile_all_ts_files_swap:
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
+                [], [VALID_UNLISTED_SERVICE_PATH], FILE_CACHE
+            ).perform_all_lint_checks()
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
+
         angular_services_index_path = (
             './core/templates/services/angular-services.index.ts')
         class_name = 'UnlistedService'
         service_name_type_pair = (
             '[\'%s\', %s]' % (class_name, class_name))
-        self.assert_same_list_elements([
+        expected_messages = [
             'Please import %s to Angular Services Index file in %s'
-            % (class_name, angular_services_index_path)
-        ], self.linter_stdout)
-        self.assert_same_list_elements([
-            'Please add the pair %s to the angularServices in %s'
+            % (class_name, angular_services_index_path),
+            'Please add the pair %s, without line breaks in between,'
+            ' to the angularServices in %s'
             % (service_name_type_pair, angular_services_index_path)
-        ], self.linter_stdout)
+        ]
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_angular_services_index_success(self):
         def mock_compile_all_ts_files():
@@ -753,18 +754,18 @@ class JsTsLintTests(test_utils.LinterTestBase):
 
         compile_all_ts_files_swap = self.swap(
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
-        with self.print_swap, compile_all_ts_files_swap:
-            js_ts_linter.JsTsLintChecksManager(
+        with compile_all_ts_files_swap:
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_IGNORED_SERVICE_PATH], FILE_CACHE,
-                True).perform_all_lint_checks()
+            ).perform_all_lint_checks()
 
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
 
-        self.assert_same_list_elements([
-            'AngularServicesIndexFile linting linting passed'
-        ], self.linter_stdout)
-
+        expected_messages = [
+            'SUCCESS  Angular Services Index file check passed'
+        ]
+        self.validate(lint_task_report, expected_messages, 0)
 
     def test_get_linters_with_success(self):
         custom_linter, third_party = js_ts_linter.get_linters(
