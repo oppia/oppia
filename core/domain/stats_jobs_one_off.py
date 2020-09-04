@@ -1400,15 +1400,12 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
                 yield (key.encode('utf-8'), exp_model.version)
 
             else:
-                # In early schema versions of ExplorationModel, the END card
-                # was a persistant, _implicit_ state present in every
-                # exploration. Because of this, it is not an error for stats to
-                # exist for END even though it does not appear in an
-                # exploration's representation.
-                exp_states = set(exp_model.states) | {'END'}
+                exp_states = set(exp_model.states)
                 exp_stats_states = set(exp_stats_model.state_stats_mapping)
+                issue_found = False
 
                 for state_name in exp_states - exp_stats_states:
+                    issue_found = True
                     key = '%s:%s:%s' % (
                         exp_id,
                         state_name,
@@ -1421,6 +1418,14 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
                         (exp_model.version, state_version_occurrences))
 
                 for state_name in exp_stats_states - exp_states:
+                    # In early schema versions of ExplorationModel, the END
+                    # card was a persistant, _implicit_ state present in every
+                    # exploration. Because of this, it is not an error for
+                    # stats to exist for END even though it does not appear in
+                    # an exploration's representation.
+                    if state_name == 'END':
+                        continue
+                    issue_found = True
                     key = '%s:%s:%s' % (
                         exp_id,
                         state_name,
@@ -1432,7 +1437,7 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
                         key.encode('utf-8'),
                         (exp_model.version, state_version_occurrences))
 
-                if exp_states == exp_stats_states:
+                if not issue_found:
                     key = ExplorationMissingStatsAudit.STATUS_VALID_KEY
                     yield (key, exp_model.version)
 
