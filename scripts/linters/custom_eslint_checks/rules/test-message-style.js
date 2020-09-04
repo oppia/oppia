@@ -74,7 +74,7 @@ module.exports = {
       checkMessageStartsWithShould(node);
       checkNoSpaceAtEndOfMessage(node);
       checkSpacesInMessage(node);
-    }
+    };
 
     var extractMessage = function(node) {
       if (node.type === 'Literal') {
