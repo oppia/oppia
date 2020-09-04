@@ -29,7 +29,9 @@ import pkg_resources
 
 
 def _normalize_python_library_name(library_name):
-    """Python library name strings are case insensitive which means that
+    """Returns a normalized (lowercase) version of the python library name.
+
+    Python library name strings are case insensitive which means that
     libraries are equivalent even if the casing of the library names are
     different. This function normalizes python library names such that
     identical libraries have the same library name strings.
@@ -43,7 +45,9 @@ def _normalize_python_library_name(library_name):
     return library_name.lower()
 
 def _normalize_directory_name(directory_name):
-    """Python library name strings are case insensitive which means that
+    """Returns a normalized (lowercase) version of the directory name.
+
+    Python library name strings are case insensitive which means that
     libraries are equivalent even if the casing of the library names are
     different. When python libraries are installed, the generated metadata
     directories also use the python library names as part of the directory name.
@@ -251,8 +255,8 @@ def _reinstall_all_dependencies():
 
 
 def _get_possible_metadata_directory_names(library_name, version_string):
-    """Possible metadata directory names for python libraries installed using
-    pip (following the guidelines of PEP-427 and PEP-376).
+    """Returns possible metadata directory names for python libraries installed
+    using pip (following the guidelines of PEP-427 and PEP-376).
     This ensures that our _remove_metadata() function works as intended. More
     details about the guidelines concerning the metadata folders can be found
     here:
