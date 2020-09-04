@@ -13147,8 +13147,6 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
 class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
 
-    USER_PIN = '123'
-
     def setUp(self):
         super(UserAuthDetailsModelValidatorTests, self).setUp()
 
