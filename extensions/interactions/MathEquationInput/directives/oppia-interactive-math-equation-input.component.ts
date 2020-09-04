@@ -34,17 +34,15 @@ require('services/math-interactions.service.ts');
 angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
   template: require('./math-equation-input-interaction.component.html'),
   controller: [
-    '$attrs', '$scope', 'MathEquationInputRulesService',
-    'CurrentInteractionService', 'DeviceInfoService',
+    '$attrs', '$scope', 'CurrentInteractionService', 'DeviceInfoService',
     'GuppyConfigurationService', 'GuppyInitializationService',
-    'HtmlEscaperService', 'MathInteractionsService',
-    'MATH_INTERACTION_PLACEHOLDERS',
+    'HtmlEscaperService', 'MathEquationInputRulesService',
+    'MathInteractionsService', 'MATH_INTERACTION_PLACEHOLDERS',
     function(
-        $attrs, $scope, MathEquationInputRulesService,
-        CurrentInteractionService, DeviceInfoService,
+        $attrs, $scope, CurrentInteractionService, DeviceInfoService,
         GuppyConfigurationService, GuppyInitializationService,
-        HtmlEscaperService, MathInteractionsService,
-        MATH_INTERACTION_PLACEHOLDERS) {
+        HtmlEscaperService, MathEquationInputRulesService,
+        MathInteractionsService, MATH_INTERACTION_PLACEHOLDERS) {
       const ctrl = this;
       ctrl.value = '';
       ctrl.hasBeenTouched = false;

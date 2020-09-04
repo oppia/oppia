@@ -57,9 +57,6 @@ require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/skill-editor-page/services/question-creation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/contextual/url.service.ts');
@@ -93,32 +90,24 @@ angular.module('oppia').directive('questionsList', [
         'questions-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
-        '$location', 'AlertsService', 'ContextService',
-        'EditableQuestionBackendApiService', 'ImageLocalStorageService',
-        'MisconceptionObjectFactory', 'QuestionCreationService',
-        'QuestionObjectFactory', 'QuestionsListService',
+        '$location', '$timeout', '$uibModal', 'AlertsService',
+        'ContextService', 'EditableQuestionBackendApiService',
+        'ImageLocalStorageService', 'MisconceptionObjectFactory',
+        'QuestionCreationService', 'QuestionObjectFactory',
         'QuestionUndoRedoService', 'QuestionValidationService',
-        'SkillBackendApiService',
-        'SkillDifficultyObjectFactory', 'ShortSkillSummaryObjectFactory',
-        'StateEditorService', 'UndoRedoService',
-        'WindowDimensionsService',
-        'UrlService', 'DEFAULT_SKILL_DIFFICULTY',
-        'MODE_SELECT_DIFFICULTY',
+        'QuestionsListService', 'ShortSkillSummaryObjectFactory',
+        'SkillBackendApiService', 'SkillDifficultyObjectFactory',
+        'WindowDimensionsService', 'MODE_SELECT_DIFFICULTY',
         'MODE_SELECT_SKILL', 'NUM_QUESTIONS_PER_PAGE',
         function(
-            $scope, $filter, $http, $q, $timeout, $uibModal, $window,
-            $location, AlertsService, ContextService,
-            EditableQuestionBackendApiService, ImageLocalStorageService,
-            MisconceptionObjectFactory, QuestionCreationService,
-            QuestionObjectFactory, QuestionsListService,
+            $location, $timeout, $uibModal, AlertsService,
+            ContextService, EditableQuestionBackendApiService,
+            ImageLocalStorageService, MisconceptionObjectFactory,
+            QuestionCreationService, QuestionObjectFactory,
             QuestionUndoRedoService, QuestionValidationService,
-            SkillBackendApiService,
-            SkillDifficultyObjectFactory, ShortSkillSummaryObjectFactory,
-            StateEditorService, UndoRedoService,
-            WindowDimensionsService,
-            UrlService, DEFAULT_SKILL_DIFFICULTY,
-            MODE_SELECT_DIFFICULTY,
+            QuestionsListService, ShortSkillSummaryObjectFactory,
+            SkillBackendApiService, SkillDifficultyObjectFactory,
+            WindowDimensionsService, MODE_SELECT_DIFFICULTY,
             MODE_SELECT_SKILL, NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();

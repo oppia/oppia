@@ -21,6 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
+import feconf
+import python_utils
 
 from google.appengine.ext import ndb
 
@@ -527,6 +529,26 @@ class TopicRightsModel(base_models.VersionedModel):
             post_commit_community_owned=False,
             post_commit_is_private=not topic_rights.topic_is_published
         ).put()
+
+        snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
+            self.get_snapshot_id(self.id, self.version))
+
+        snapshot_metadata_model.content_user_ids = list(sorted(set(
+            self.manager_ids)))
+
+        commit_cmds_user_ids = set()
+        for commit_cmd in commit_cmds:
+            user_id_attribute_names = python_utils.NEXT(
+                cmd['user_id_attribute_names']
+                for cmd in feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS
+                if cmd['name'] == commit_cmd['cmd']
+            )
+            for user_id_attribute_name in user_id_attribute_names:
+                commit_cmds_user_ids.add(commit_cmd[user_id_attribute_name])
+        snapshot_metadata_model.commit_cmds_user_ids = list(
+            sorted(commit_cmds_user_ids))
+
+        snapshot_metadata_model.put()
 
     @staticmethod
     def get_export_policy():

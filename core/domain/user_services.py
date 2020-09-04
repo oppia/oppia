@@ -425,7 +425,7 @@ def is_pseudonymous_id(user_id):
 
 
 def is_username_taken(username):
-    """"Returns whether the given username has already been taken.
+    """Returns whether the given username has already been taken.
 
     Args:
         username: str. Identifiable username to display in the UI.
