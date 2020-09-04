@@ -342,20 +342,24 @@ var ExplorationEditorMainTab = function() {
        */
       expectFeedbackInstructionToBe: async function(feedbackInstructionsText) {
         // The first rule block's RTE.
-        var feedbackRTE = responseBody(responseNum).
-          element(by.className('oppia-rte-editor'));
+        var feedbackRTE = responseBody(responseNum).element(
+          by.className('oppia-rte-editor'));
+        await waitFor.visibilityOf(
+          feedbackRTE, 'Feedback Rich Text Editor not showing up.');
         expect(await feedbackRTE.getText()).toEqual(
           feedbackInstructionsText);
       },
       setFeedback: async function(richTextInstructions) {
-      // Begin editing feedback.
-        await openOutcomeFeedBackEditor.click();
+        // Begin editing feedback.
+        await action.click(
+          'openOutcomeFeedBackEditor', openOutcomeFeedBackEditor);
 
         // Set feedback contents.
         await _setOutcomeFeedback(richTextInstructions);
 
         // Save feedback.
-        await saveOutcomeFeedbackButton.click();
+        await action.click(
+          'saveOutcomeFeedbackButton', saveOutcomeFeedbackButton);
       },
       // This saves the rule after the destination is selected.
       //  - destinationName: The name of the state to move to, or null to stay
@@ -364,24 +368,25 @@ var ExplorationEditorMainTab = function() {
       //    created at this point.
       setDestination: async function(
           destinationName, createNewState, refresherExplorationId) {
-      // Begin editing destination.
-        expect(await openOutcomeDestEditor.isDisplayed()).toBe(true);
-        await openOutcomeDestEditor.click();
+        // Begin editing destination.
+        await action.click(
+          'Outcome Destination Editor Open Button', openOutcomeDestEditor);
 
         // Set destination contents.
         await _setOutcomeDest(
           destinationName, createNewState, refresherExplorationId);
 
         // Save destination.
-        expect(await saveOutcomeDestButton.isDisplayed()).toBe(true);
-        await saveOutcomeDestButton.click();
+        await action.click(
+          'Outcome Destination Editor Save Button', saveOutcomeDestButton);
       },
       markAsCorrect: async function() {
-        await answerCorrectnessToggle.click();
+        await action.click(
+          'Answer Correctness Toggle', answerCorrectnessToggle);
       },
       // The current state name must be at the front of the list.
       expectAvailableDestinationsToBe: async function(stateNames) {
-      // Begin editing destination.
+        // Begin editing destination.
         await openOutcomeDestEditor.click();
 
         var expectedOptionTexts = [_CURRENT_STATE_OPTION].concat(
@@ -446,7 +451,8 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.expectTickMarkIsDisplayed = async function() {
-    expect(await correctAnswerTickMark.isDisplayed()).toBe(true);
+    await waitFor.visibilityOf(
+      correctAnswerTickMark, 'Correct answer tick mark not visible');
   };
 
   var _setOutcomeDest = async function(
@@ -567,15 +573,11 @@ var ExplorationEditorMainTab = function() {
   // ---- INTERACTIONS ----
 
   this.deleteInteraction = async function() {
-    await waitFor.elementToBeClickable(
-      deleteInteractionButton, 'Delete Interaction button is not clickable');
-    await deleteInteractionButton.click();
+    await action.click('Delete interaction button', deleteInteractionButton);
 
     // Click through the "are you sure?" warning.
-    await waitFor.elementToBeClickable(
-      confirmDeleteInteractionButton,
-      'Confirm Delete Interaction button takes too long to be clickable');
-    await confirmDeleteInteractionButton.click();
+    await action.click(
+      'Confirm Delete Interaction button', confirmDeleteInteractionButton);
 
     await waitFor.invisibilityOf(
       confirmDeleteInteractionButton,
@@ -828,13 +830,10 @@ var ExplorationEditorMainTab = function() {
     var ruleDescriptionInDropdown = ruleDescription;
     var answerDescription = element(
       by.css('.protractor-test-answer-description'));
-    expect(await answerDescription.isDisplayed()).toBe(true);
-    await answerDescription.click();
+    await action.click('Answer Description', answerDescription);
     var ruleDropdownElement = await element.all(by.cssContainingText(
       '.select2-results__option', ruleDescriptionInDropdown)).first();
-    await waitFor.visibilityOf(
-      ruleDropdownElement, 'Rule dropdown element takes too long to appear');
-    await ruleDropdownElement.click();
+    await action.click('Rule Dropdown Element', ruleDropdownElement);
   };
 
   // ---- STATE GRAPH ----

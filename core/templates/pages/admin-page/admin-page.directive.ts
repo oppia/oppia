@@ -48,10 +48,10 @@ angular.module('oppia').directive('adminPage', [
         '/pages/admin-page/admin-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$location', '$rootScope', '$scope', 'AdminDataService',
+        '$location', '$rootScope', '$scope', 'AdminDataService',
         'AdminRouterService', 'CsrfTokenService', 'DEV_MODE',
         function(
-            $http, $location, $rootScope, $scope, AdminDataService,
+            $location, $rootScope, $scope, AdminDataService,
             AdminRouterService, CsrfTokenService, DEV_MODE) {
           var ctrl = this;
           ctrl.isActivitiesTabOpen = function() {

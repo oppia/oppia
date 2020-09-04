@@ -19,6 +19,7 @@
 
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 
 var ExplorationEditorSettingsTab = function() {
   /*
@@ -77,10 +78,8 @@ var ExplorationEditorSettingsTab = function() {
 
   this.enableCorrectnessFeedback = async function() {
     expect(await enableCorrectnessFeedbackButton.isDisplayed()).toBe(true);
-    await waitFor.elementToBeClickable(
-      enableCorrectnessFeedbackButton,
-      'Enable correctness feedback button is not clickable.');
-    await enableCorrectnessFeedbackButton.click();
+    await action.click(
+      'Enable Correctness Feedback Button', enableCorrectnessFeedbackButton);
   };
 
   this.expectAvailableFirstStatesToBe = async function(names) {
