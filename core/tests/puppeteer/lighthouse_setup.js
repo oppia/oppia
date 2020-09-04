@@ -216,6 +216,7 @@ const getTopicEditorUrl = async function(browser, page) {
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getStoryEditorUrl = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
@@ -287,6 +288,9 @@ const main = async function() {
   await getCollectionEditorUrl(browser, page);
   await getTopicEditorUrl(browser, page);
   await getSkillEditorUrl(browser, page);
+  if(storyEditorUrl.includes('story_editor') {
+    getSkillEditorUrl(browser, page);
+  }
   await process.stdout.write(
     [
       new URL(explorationEditorUrl),
