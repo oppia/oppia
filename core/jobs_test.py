@@ -729,6 +729,58 @@ class ParamNameTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
 
+class UnicodeMapReduceJobManager(jobs.BaseMapReduceOneOffJobManager):
+    """Test job that produces outputs with unicode strings."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        yield (item.id, u'🤔')
+        yield (item.id, {u'🌞': u'🌇'})
+        yield (item.id, [u'🙁', u'😐', u'🙂'])
+        yield (item.id, 123)
+        yield (item.id, False)
+        yield (item.id, None)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
+class UnicodeMapReduceJobManagerTests(test_utils.GenericTestBase):
+
+    def test_unicode_outputs_are_encoded_as_bytes(self):
+        self.save_new_valid_exploration('eid', 'oid')
+        job_id = UnicodeMapReduceJobManager.create_new()
+        UnicodeMapReduceJobManager.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+
+        self.assertEqual(jobs.get_job_output(job_id), [
+            '[u\'eid\', '
+            '[u\'\\U0001f914\', ' # [u'🤔',
+            'u"{\'\\\\xf0\\\\x9f\\\\x8c\\\\x9e\': ' # {u'🌞':
+            '\'\\\\xf0\\\\x9f\\\\x8c\\\\x87\'}", ' #  u'🌇'},
+            'u"[\'\\\\xf0\\\\x9f\\\\x99\\\\x81\', ' # [u'🙁',
+            '\'\\\\xf0\\\\x9f\\\\x98\\\\x90\', ' # u'😐',
+            '\'\\\\xf0\\\\x9f\\\\x99\\\\x82\']", ' # u'🙂'],
+            'u\'123\', '
+            'u\'False\', '
+            'u\'None\']]'
+        ])
+        self.assertEqual(
+            UnicodeMapReduceJobManager.get_status_code(job_id),
+            jobs.STATUS_CODE_COMPLETED)
+
+
 class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
     """Tests MapReduce jobs end-to-end."""
 

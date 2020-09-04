@@ -753,7 +753,56 @@ class GoogleCloudStorageConsistentJsonOutputWriter(
             python_utils.convert_to_bytes('%s\n' % json.dumps(data)))
 
 
-class BaseMapReduceJobManager(BaseJobManager):
+class BaseMapReduceJobManagerMetaClass(type):
+    """Type class for map reduce jobs.
+
+    Provides classes with a "_real_map" and "_real_reduce" staticmethod, which
+    encodes all strings in utf-8 since the map reduce job pipelines can not
+    interpret unicode.
+
+    Ideally these would be implemented as class methods instead, but the map
+    reduce job pipelines do not support class methods so we must fall back to
+    using staticmethods and, thus, meta classes to implement them per-class.
+    """
+
+    def __new__(mcs, name, bases, dct):
+        new_cls = super(BaseMapReduceJobManagerMetaClass, mcs).__new__(
+            mcs, name, bases, dct)
+
+        def _real_map(item):
+            """Wrapper for the map function which encodes all strings in the
+            produced values recursively before using it.
+
+            Args:
+                item: *. A single element of the type given by entity_class().
+            """
+            raw_map_outputs = new_cls.map(item)
+            if raw_map_outputs:
+                for raw_output in raw_map_outputs:
+                    yield _deep_convert_to_bytes(raw_output)
+
+        def _real_reduce(key, values):
+            """Wrapper for the reduce function which decodes the strings in the
+            returned value recursively before passing it to the implementation.
+
+            Args:
+                key: *. A key value as emitted from the map() function, above.
+                values: list(*). A list of all values from all mappers that were
+                    tagged with the given key.
+            """
+            raw_reduce_outputs = new_cls.reduce(key, values)
+            if raw_reduce_outputs:
+                for raw_output in raw_reduce_outputs:
+                    yield _deep_convert_to_bytes(raw_output)
+
+        new_cls._real_map = staticmethod(_real_map)
+        new_cls._real_reduce = staticmethod(_real_reduce)
+        return new_cls
+
+
+class BaseMapReduceJobManager( # pylint: disable=inherit-non-class
+        python_utils.with_metaclass(
+            BaseMapReduceJobManagerMetaClass, BaseJobManager)):
     """The output for this job is a list of individual results. Each item in the
     list will be of whatever type is yielded from the 'reduce' method.
 
@@ -859,8 +908,10 @@ class BaseMapReduceJobManager(BaseJobManager):
 
         kwargs = {
             'job_name': job_id,
-            'mapper_spec': '%s.%s.map' % (cls.__module__, cls.__name__),
-            'reducer_spec': '%s.%s.reduce' % (cls.__module__, cls.__name__),
+            'mapper_spec': '%s.%s._real_map' % (
+                cls.__module__, cls.__name__),
+            'reducer_spec': '%s.%s._real_reduce' % (
+                cls.__module__, cls.__name__),
             'input_reader_spec': (
                 'core.jobs.MultipleDatastoreEntitiesInputReader'),
             'output_writer_spec': (
@@ -1655,6 +1706,32 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
         job_status = cls._register_end_of_batch_job_and_return_status()
         if job_status == job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING:
             cls._kickoff_batch_job_after_previous_one_ends()
+
+
+def _deep_convert_to_bytes(value):
+    """Returns a copy of value with all strings converted to bytes.
+
+    Args:
+        value: *. Some JSON-like object made-up of only:
+            lists, dicts, strings, ints, bools, None. Types can be nested in
+            each other.
+
+    Returns:
+        *. An equivalent copy of value, but with only byte-strings.
+    """
+    if isinstance(value, tuple):
+        return tuple(_deep_convert_to_bytes(v) for v in value)
+    elif isinstance(value, list):
+        return [_deep_convert_to_bytes(v) for v in value]
+    elif isinstance(value, dict):
+        return {
+            _deep_convert_to_bytes(key): _deep_convert_to_bytes(value)
+            for key, value in value.items()
+        }
+    elif isinstance(value, python_utils.BASESTRING):
+        return python_utils.convert_to_bytes(value)
+    else:
+        return value
 
 
 def _get_job_dict_from_job_model(model):

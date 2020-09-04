@@ -45,7 +45,8 @@ import python_utils
             models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
 
 
-class ProdValidationAuditOneOffJobMetaClass(type):
+class ProdValidationAuditOneOffJobMetaClass(
+        jobs.BaseMapReduceJobManagerMetaClass):
     """Type class for audit one off jobs. Registers classes inheriting from
     ProdValidationAuditOneOffJob in a list. With this strategy, job writers can
     define them in separate modules while allowing us to assert that each model
