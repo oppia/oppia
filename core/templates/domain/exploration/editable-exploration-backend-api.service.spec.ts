@@ -31,8 +31,6 @@ describe('Editable exploration backend API service', function() {
   var EditableExplorationBackendApiService = null;
   var ReadOnlyExplorationBackendApiService = null;
   var sampleDataResults = null;
-  var $rootScope = null;
-  var $scope = null;
   var $httpBackend = null;
   var CsrfService = null;
 
@@ -51,8 +49,6 @@ describe('Editable exploration backend API service', function() {
       'EditableExplorationBackendApiService');
     ReadOnlyExplorationBackendApiService = $injector.get(
       'ReadOnlyExplorationBackendApiService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
 

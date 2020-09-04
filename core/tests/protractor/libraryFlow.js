@@ -17,8 +17,6 @@
  */
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
-var CollectionEditorPage =
-  require('../protractor_utils/CollectionEditorPage.js');
 var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');

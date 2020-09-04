@@ -21,7 +21,6 @@ import { StoryNodeObjectFactory } from
 
 describe('Story node object factory', () => {
   let storyNodeObjectFactory: StoryNodeObjectFactory = null;
-  var _sampleSubtopic = null;
   var _sampleStoryNode = null;
 
   beforeEach(() => {

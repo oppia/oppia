@@ -97,8 +97,7 @@ angular.module('oppia').directive('questionsList', [
         'QuestionUndoRedoService', 'QuestionValidationService',
         'QuestionsListService', 'ShortSkillSummaryObjectFactory',
         'SkillBackendApiService', 'SkillDifficultyObjectFactory',
-        'WindowDimensionsService', 'MODE_SELECT_DIFFICULTY',
-        'MODE_SELECT_SKILL', 'NUM_QUESTIONS_PER_PAGE',
+        'WindowDimensionsService', 'NUM_QUESTIONS_PER_PAGE',
         function(
             $location, $timeout, $uibModal, AlertsService,
             ContextService, EditableQuestionBackendApiService,
@@ -107,8 +106,7 @@ angular.module('oppia').directive('questionsList', [
             QuestionUndoRedoService, QuestionValidationService,
             QuestionsListService, ShortSkillSummaryObjectFactory,
             SkillBackendApiService, SkillDifficultyObjectFactory,
-            WindowDimensionsService, MODE_SELECT_DIFFICULTY,
-            MODE_SELECT_SKILL, NUM_QUESTIONS_PER_PAGE) {
+            WindowDimensionsService, NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _reInitializeSelectedSkillIds = function() {
@@ -255,11 +253,9 @@ angular.module('oppia').directive('questionsList', [
 
           ctrl.createQuestion = function() {
             ctrl.newQuestionSkillIds = [];
-            var currentMode = MODE_SELECT_SKILL;
             ctrl.skillIdToRubricsObject = ctrl.getSkillIdToRubricsObject();
             if (!ctrl.selectSkillModalIsShown()) {
               ctrl.newQuestionSkillIds = ctrl.skillIds;
-              currentMode = MODE_SELECT_DIFFICULTY;
             } else {
               ctrl.newQuestionSkillIds = [ctrl.getSelectedSkillId()];
             }
@@ -344,11 +340,9 @@ angular.module('oppia').directive('questionsList', [
               return;
             }
             ctrl.newQuestionSkillIds = [];
-            var currentMode = MODE_SELECT_SKILL;
             ctrl.skillIdToRubricsObject = ctrl.getSkillIdToRubricsObject();
             if (!ctrl.selectSkillModalIsShown()) {
               ctrl.newQuestionSkillIds = ctrl.skillIds;
-              currentMode = MODE_SELECT_DIFFICULTY;
             } else {
               ctrl.newQuestionSkillIds = [ctrl.getSelectedSkillId()];
             }
@@ -406,7 +400,6 @@ angular.module('oppia').directive('questionsList', [
               return;
             }
             _reInitializeSelectedSkillIds();
-            var skillId = null;
             // For the case when, it is in the skill editor.
             if (ctrl.getAllSkillSummaries().length === 0) {
               EditableQuestionBackendApiService.editQuestionSkillLinks(
