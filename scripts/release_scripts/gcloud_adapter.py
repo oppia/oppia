@@ -36,7 +36,12 @@ sys.path.insert(0, common.GOOGLE_APP_ENGINE_SDK_HOME)
 def require_gcloud_to_be_available():
     """Check whether gcloud is installed while undergoing deployment process."""
     try:
-        subprocess.check_output([common.GCLOUD_PATH, '--version'])
+        p = subprocess.Popen(
+            [common.GCLOUD_PATH, '--version'],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _, stderr = p.communicate()
+        if p.returncode != 0:
+            raise Exception(stderr)
     except Exception:
         raise Exception(
             'gcloud required, but could not be found. Please run python -m '
