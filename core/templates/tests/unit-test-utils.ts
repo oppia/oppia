@@ -16,9 +16,8 @@
  * @fileoverview Utility functions for unit testing.
  */
 
-import { Component, NgModule, destroyPlatform } from '@angular/core';
+import { Component, NgModule } from '@angular/core';
 import { NgZone, PlatformRef, Type } from '@angular/core';
-import { async } from '@angular/core/testing';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
@@ -105,51 +104,32 @@ export const bootstrap = (
  *   one element. That element is the type of the upgraded component.
  * @param {boolean} focus - To run this test in fdescribe.
  */
-export const testUpgradeComponent = (
+export const setupAndGetUpgradedComponent = (
     kebabCaseName: string,
     camelCaseName: string,
-    upgradedComponentTypes: unknown,
-    focus?: boolean): void => {
+    upgradedComponentTypes: unknown): Promise<string> => {
   let template = '<' + kebabCaseName + '></' + kebabCaseName + '>';
   @Component({
     selector: 'mock-comp',
     template: template
   })
   class MockComponent {}
-  const test = () => {
-    beforeEach(() => destroyPlatform());
-    afterEach(() => destroyPlatform());
-    it('should cover the lines', async(() => {
-      const ng1Component = {template: 'Hello, Angular!'};
-      const ng1Module = angular.module('ng1Module', [])
-        .component(camelCaseName, ng1Component)
-        .directive('mockComp', downgradeComponent({component: MockComponent}));
-      @NgModule({
-        declarations: [upgradedComponentTypes[0], MockComponent],
-        entryComponents: [MockComponent],
-        imports: [BrowserModule, UpgradeModule]
-      })
-      class Ng2Module {
-        ngDoBootstrap() {}
-      }
-
-      // Bootstrap.
-      const element = html('<mock-comp></mock-comp>');
-      bootstrap(
-        platformBrowserDynamic(), Ng2Module, element, ng1Module).then(
-        () => {
-          expect(
-            multiTrim(element.textContent)).toBe('Hello, Angular!');
-        });
-    }));
-  };
-  if (focus) {
-    fdescribe('Upgraded component', () => {
-      test();
-    });
-  } else {
-    describe('Upgraded component', () => {
-      test();
-    });
+  const ng1Component = {template: 'Hello, Angular!'};
+  const ng1Module = angular.module('ng1Module', [])
+    .component(camelCaseName, ng1Component)
+    .directive('mockComp', downgradeComponent({component: MockComponent}));
+  @NgModule({
+    declarations: [upgradedComponentTypes[0], MockComponent],
+    entryComponents: [MockComponent],
+    imports: [BrowserModule, UpgradeModule]
+  })
+  class Ng2Module {
+    ngDoBootstrap() {}
   }
+
+  // Bootstrap.
+  const element = html('<mock-comp></mock-comp>');
+  return bootstrap(
+    platformBrowserDynamic(), Ng2Module, element, ng1Module).then(
+    () => multiTrim(element.textContent));
 };

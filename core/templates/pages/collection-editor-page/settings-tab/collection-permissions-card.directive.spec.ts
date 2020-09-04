@@ -16,17 +16,13 @@
  * @fileoverview Unit tests for collection permission card directive.
  */
 
-import { testUpgradeComponent } from 'tests/unit-test-utils';
+import { destroyPlatform } from '@angular/core';
+import { setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
 import { CollectionPermissionsCard } from
   './collection-permissions-card.directive';
-
-testUpgradeComponent(
-  'collection-permissions-card',
-  'collectionPermissionsCard',
-  [CollectionPermissionsCard]
-);
-
+import { async } from '@angular/core/testing';
 require('./collection-permissions-card.directive.ts');
+
 describe('Collection Permissions Card component', () => {
   var $rootScope = null;
   var ctrl = null;
@@ -58,4 +54,19 @@ describe('Collection Permissions Card component', () => {
     ctrl.hasPageLoaded();
     expect(hasLoadedCollection).toHaveBeenCalled();
   });
+});
+
+describe('Upgraded component', () => {
+  beforeEach(() => destroyPlatform());
+  afterEach(() => destroyPlatform());
+
+  it('should cover the lines', async(() => {
+    setupAndGetUpgradedComponent(
+      'collection-permissions-card',
+      'collectionPermissionsCard',
+      [CollectionPermissionsCard]
+    ).then(
+      textContext => expect(textContext).toBe('Hello, Angular!')
+    );
+  }));
 });
