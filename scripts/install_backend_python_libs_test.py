@@ -377,7 +377,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             ])
 
     def test_library_version_change_is_handled_correctly(self):
-        files_in_directory = [
+        directory_names = [
             'webencodings-1.1.1.dist-info',
             'webencodings-1.0.1.dist-info',
             'webencodings',
@@ -387,14 +387,12 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             'six',
             'six-1.15.0.dist-info',
             'six-10.13.0.egg-info',
-            'google_cloud_datastore-1.15.0-py3.8-nspkg.pth',
             'google_cloud_datastore-1.15.0.dist-info',
-            'google_cloud_datastore-1.13.0-py3.8-nspkg.pth',
             'google_cloud_datastore-1.13.0.dist-info',
-            'google/'
+            'google'
         ]
         def mock_list_dir(path):  # pylint: disable=unused-argument
-            return files_in_directory
+            return directory_names
 
         paths_to_delete = []
         def mock_rm(path):
@@ -402,10 +400,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 path[len(common.THIRD_PARTY_PYTHON_LIBS_DIR) + 1:])
 
         def mock_is_dir(path):
-            if (path[len(common.THIRD_PARTY_PYTHON_LIBS_DIR) + 1:]
-                    in files_in_directory):
-                return True
-            return False
+            return True
 
         def mock_get_mismatches():
             return {
@@ -416,6 +411,14 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             }
         def mock_validate_metadata_directories():
             pass
+
+        def mock_get_directory(path): # pylint: disable=unused-argument
+            return directory_names
+        swap_get_directory = self.swap(
+            install_backend_python_libs,
+            '_normalize_directory_name',
+            mock_get_directory
+        )
         swap_validate_metadata_directories = self.swap(
             install_backend_python_libs, 'validate_metadata_directories',
             mock_validate_metadata_directories)
@@ -505,10 +508,16 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 'dependency5',
                 'dependency5-0.5.3.metadata',
             ]
+
+        def mock_is_dir(path): # pylint: disable=unused-argument
+            return True
         swap_find_distributions = self.swap(
             pkg_resources, 'find_distributions', mock_find_distributions)
         swap_list_dir = self.swap(
             os, 'listdir', mock_list_dir)
+        swap_is_dir = self.swap(
+            os.path, 'isdir', mock_is_dir
+        )
 
         metadata_exception = self.assertRaisesRegexp(
             Exception,
@@ -519,4 +528,5 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             'our assumptions in the _get_possible_metadata_directory_names '
             'function for what metadata directory names can be.')
         with swap_find_distributions, swap_list_dir, metadata_exception:
-            install_backend_python_libs.validate_metadata_directories()
+            with swap_is_dir:
+                install_backend_python_libs.validate_metadata_directories()
