@@ -119,11 +119,11 @@ export class TopicViewerPageComponent implements OnInit {
     return this.windowDimensionsService.getWidth() < 500;
   }
 
-  getStaticImageUrl(imagePath) {
+  getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  setActiveTab(newActiveTabName) {
+  setActiveTab(newActiveTabName: string): void {
     this.activeTab = newActiveTabName;
   }
 }
