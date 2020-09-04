@@ -23,7 +23,7 @@ import csv
 import datetime
 import json
 
-from core.domain import rights_manager
+from core.domain import rights_domain
 from core.platform import models
 import feconf
 import python_utils
@@ -301,7 +301,7 @@ def get_item_similarity(
 
     similarity_score = 0
 
-    if compared_exp_status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+    if compared_exp_status == rights_domain.ACTIVITY_STATUS_PRIVATE:
         return 0
 
     similarity_score += get_topic_similarity(
@@ -319,9 +319,15 @@ def get_item_similarity(
     return similarity_score
 
 
-def set_recommendations(exp_id, new_recommendations):
+def set_exploration_recommendations(exp_id, new_recommendations):
     """Stores a list of exploration ids of recommended explorations to play
     after completing the exploration keyed by exp_id.
+
+    Args:
+        exp_id: str. The ID of the exploration for which to set
+            the recommendations.
+        new_recommendations: list(str). The new recommended exploration IDs
+            to set.
     """
 
     recommendations_models.ExplorationRecommendationsModel(
@@ -331,6 +337,13 @@ def set_recommendations(exp_id, new_recommendations):
 def get_exploration_recommendations(exp_id):
     """Gets a list of ids of at most 10 recommended explorations to play
     after completing the exploration keyed by exp_id.
+
+    Args:
+        exp_id: str. The ID of the exploration for which to get
+            the recommendations.
+
+    Returns:
+        list(str). List of recommended explorations IDs.
     """
 
     recommendations_model = (
@@ -340,3 +353,40 @@ def get_exploration_recommendations(exp_id):
         return []
     else:
         return recommendations_model.recommended_exploration_ids
+
+
+def delete_explorations_from_recommendations(exp_ids):
+    """Deletes explorations from recommendations.
+
+    This deletes both the recommendations for the given explorations, as well as
+    the given explorations from other explorations' recommendations.
+
+    Args:
+        exp_ids: list(str). List of exploration IDs for which to delete
+            the recommendations.
+    """
+    recs_model_class = (
+        recommendations_models.ExplorationRecommendationsModel)
+    recommendation_models = recs_model_class.get_multi(exp_ids)
+    existing_recommendation_models = [
+        model for model in recommendation_models if model is not None]
+    recs_model_class.delete_multi(existing_recommendation_models)
+
+    # We use dictionary here since we do not want to have duplicate models. This
+    # could happen when one recommendation contains ids of two explorations that
+    # are both to be deleted. We cannot use sets since they require immutable
+    # objects.
+    all_recommending_models = {}
+    for exp_id in exp_ids:
+        recommending_models = recs_model_class.query(
+            recs_model_class.recommended_exploration_ids == exp_id
+        ).fetch()
+        for recommending_model in recommending_models:
+            all_recommending_models[recommending_model.id] = (
+                recommending_model)
+
+    for recommending_model in all_recommending_models.values():
+        for exp_id in exp_ids:
+            recommending_model.recommended_exploration_ids.remove(exp_id)
+
+    recs_model_class.put_multi(list(all_recommending_models.values()))

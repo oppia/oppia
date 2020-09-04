@@ -210,6 +210,31 @@ describe('Rte Helper Modal Controller', function() {
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
 
+    it('should cancel the modal when math SVG exceeds 100 KB', function() {
+      spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+      $scope.tmpCustomizationArgs = [{
+        name: 'math_content',
+        value: {
+          raw_latex: 'x^2 + y^2 + x^2 + y^2 + x^2 + y^2 + x^2 + y^2 + x^2',
+          svgFile: 'Svg Data',
+          svg_filename: 'mathImage.svg'
+        }
+      }];
+      var response = {
+        filename: 'mathImage.svg'
+      };
+      var imageFile = (
+        new Blob(
+          [new ArrayBuffer(102 * 1024)], {type: 'application/octet-stream'}));
+      spyOn(
+        ImageUploadHelperService,
+        'convertImageDataToImageFile').and.returnValue(imageFile);
+      $scope.save();
+      $scope.$apply();
+      expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();
+      expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
+    });
+
     it('should cancel the modal when if the rawLatex or filename field is' +
        'empty for a math expression', function() {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
