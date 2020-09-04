@@ -29,7 +29,7 @@ const networkIdle = 'networkidle0';
 var explorationEditorUrl = 'Exploration editor not loaded';
 var collectionEditorUrl = 'Collection editor not loaded';
 var topicEditorUrl = 'Topic editor not loaded';
-var unusedStoryEditorUrl = 'Story editor not loaded';
+var _ = 'Story editor not loaded';
 var skillEditorUrl = 'Skill editor not loaded';
 
 var usernameInput = '.protractor-test-username-input';
@@ -216,6 +216,7 @@ const getTopicEditorUrl = async function(browser, page) {
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const unusedGetStoryEditorUrl = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
@@ -240,7 +241,7 @@ const unusedGetStoryEditorUrl = async function(browser, page) {
     await page.waitFor(5000);
     await page.click(confirmStoryCreationButton);
     await page.waitFor(15000);
-    storyEditorUrl = await page.url();
+    _ = await page.url();
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
