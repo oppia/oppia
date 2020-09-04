@@ -44,8 +44,6 @@ import { TopicViewerDomainConstants } from
   'domain/topic_viewer/topic-viewer-domain.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
-import { TopicInfoTabDirective } from
-  'pages/topic-viewer-page/info-tab/topic-info-tab.directive';
 import { TopicViewerNavbarBreadcrumbComponent } from
   // eslint-disable-next-line max-len
   'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
@@ -70,7 +68,6 @@ import { TopicViewerPageComponent } from
     PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
-    TopicInfoTabDirective,
     TopicViewerNavbarBreadcrumbComponent,
     TopicViewerPageComponent
   ],

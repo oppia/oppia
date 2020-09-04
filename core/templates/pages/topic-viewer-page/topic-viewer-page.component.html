@@ -30,24 +30,24 @@
     </div>
   </div>
   <background-banner></background-banner>
-  <div class="topic-viewer-page-content" ng-if="!topicIsLoading">
-    <div ng-if="activeTab === 'story'">
-      <stories-list [topic-name]="topicName"
-                    [topic-description]="topicDescription"
-                    [canonical-story-summaries]="canonicalStorySummaries"
-                    [classroom-url-fragment]="classroomUrlFragment"
-                    [topic-url-fragment]="topicUrlFragment">
+  <div class="topic-viewer-page-content" *ngIf="!topicIsLoading">
+    <div *ngIf="activeTab === 'story'">
+      <stories-list [topicName]="topicName"
+                    [topicDescription]="topicDescription"
+                    [canonicalStorySummaries]="canonicalStorySummaries"
+                    [classroomUrlFragment]="classroomUrlFragment"
+                    [topicUrlFragment]="topicUrlFragment">
       </stories-list>
     </div>
-    <div ng-if="activeTab === 'practice'">
-      <practice-tab ng-show="practiceTabIsDisplayed"
-                    [subtopics-list]="subtopics"
-                    [topic-name]="topicName">
+    <div *ngIf="activeTab === 'practice'">
+      <practice-tab *ngIf="practiceTabIsDisplayed"
+                    [subtopicsList]="subtopics"
+                    [topicName]="topicName">
       </practice-tab>
-      <md-card ng-show="!$ctrl.practiceTabIsDisplayed" class="oppia-page-card practice-tab-not-available-card">
+      <mat-card *ngIf="!practiceTabIsDisplayed" class="oppia-page-card practice-tab-not-available-card">
         <h2 class="tab-title">Coming Soon!</h2>
         <div class="practice-tab-not-available-text">Come back later when practice questions are available for this topic.</div>
-      </md-card>
+      </mat-card>
     </div>
     <div *ngIf="activeTab === 'subtopics'">
       <subtopics-list [classroomUrlFragment]="classroomUrlFragment"
@@ -70,7 +70,7 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.5);
   }
 
-  .topic-viewer-tabs-list {
+ .topic-viewer-tabs-list {
     margin: 0 auto;
     width: 704px;
   }
@@ -92,7 +92,6 @@
     box-shadow: 3px 3px 6px rgba(0,0,0, 0.5);
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     margin: 0 auto;
-    position: fixed;
     width: 100%;
     z-index: 1000;
   }
@@ -171,6 +170,7 @@
   }
 
   .topic-viewer-page-content .practice-tab-not-available-card {
+    margin-top: 20vh;
     width: 40vw;
   }
 
