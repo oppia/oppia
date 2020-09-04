@@ -17,6 +17,9 @@
  */
 
 /* eslint-disable max-len */
+import { ExternalRteSaveService } from './external-rte-save.service';
+import { ExternalSaveService } from './external-save.service';
+import { PlatformFeatureService } from './platform-feature.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
@@ -113,10 +116,18 @@ import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/l
 import { NonExistentActivitiesObjectFactory } from 'domain/learner_dashboard/non-existent-activities-object.factory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
+import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { ExplorationOpportunitySummaryObjectFactory } from 'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 import { FeaturedTranslationLanguageObjectFactory } from 'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 import { SkillOpportunityObjectFactory } from 'domain/opportunity/SkillOpportunityObjectFactory';
+import { ClientContextObjectFactory } from 'domain/platform_feature/client-context-object.factory';
+import { FeatureStatusSummaryObjectFactory } from 'domain/platform_feature/feature-status-summary-object.factory';
+import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformFeatureBackendApiService } from 'domain/platform_feature/platform-feature-backend-api.service';
+import { PlatformParameterFilterObjectFactory } from 'domain/platform_feature/platform-parameter-filter-object.factory';
+import { PlatformParameterObjectFactory } from 'domain/platform_feature/platform-parameter-object.factory';
+import { PlatformParameterRuleObjectFactory } from 'domain/platform_feature/platform-parameter-rule-object.factory';
 import { QuestionSummaryForOneSkillObjectFactory } from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { QuestionSummaryObjectFactory } from 'domain/question/QuestionSummaryObjectFactory';
 import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
@@ -239,6 +250,8 @@ import { NumericInputRulesService } from 'interactions/NumericInput/directives/n
 import { NumericInputValidationService } from 'interactions/NumericInput/directives/numeric-input-validation.service';
 import { PencilCodeEditorRulesService } from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import { PencilCodeEditorValidationService } from 'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
+import { RatioExpressionInputRulesService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
+import { RatioExpressionInputValidationService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import { SetInputRulesService } from 'interactions/SetInput/directives/set-input-rules.service';
 import { SetInputValidationService } from 'interactions/SetInput/directives/set-input-validation.service';
 import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
@@ -258,6 +271,7 @@ import { VersionTreeService } from 'pages/exploration-editor-page/history-tab/se
 import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { ExplorationDiffService } from 'pages/exploration-editor-page/services/exploration-diff.service';
+import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
@@ -350,8 +364,8 @@ export const angularServices: [string, unknown][] = [
   ['AngularNameService', AngularNameService],
   ['AnswerClassificationResultObjectFactory', AnswerClassificationResultObjectFactory],
   ['AnswerClassificationService', AnswerClassificationService],
-  ['AnswerGroupsCacheService', AnswerGroupsCacheService],
   ['AnswerGroupObjectFactory', AnswerGroupObjectFactory],
+  ['AnswerGroupsCacheService', AnswerGroupsCacheService],
   ['AnswerStatsObjectFactory', AnswerStatsObjectFactory],
   ['AppService', AppService],
   ['AssignedSkillObjectFactory', AssignedSkillObjectFactory],
@@ -365,7 +379,6 @@ export const angularServices: [string, unknown][] = [
   ['AutogeneratedAudioPlayerService', AutogeneratedAudioPlayerService],
   ['AutoplayedVideosService', AutoplayedVideosService],
   ['BackgroundMaskService', BackgroundMaskService],
-  ['baseInteractionValidationService', baseInteractionValidationService],
   ['BottomNavbarStatusService', BottomNavbarStatusService],
   ['BrowserCheckerService', BrowserCheckerService],
   ['CamelCaseToHyphensPipe', CamelCaseToHyphensPipe],
@@ -374,6 +387,7 @@ export const angularServices: [string, unknown][] = [
   ['ClassifierObjectFactory', ClassifierObjectFactory],
   ['ClassroomBackendApiService', ClassroomBackendApiService],
   ['ClassroomDataObjectFactory', ClassroomDataObjectFactory],
+  ['ClientContextObjectFactory', ClientContextObjectFactory],
   ['CodeNormalizerService', CodeNormalizerService],
   ['CodeReplPredictionService', CodeReplPredictionService],
   ['CodeReplRulesService', CodeReplRulesService],
@@ -391,11 +405,11 @@ export const angularServices: [string, unknown][] = [
   ['ComputeGraphService', ComputeGraphService],
   ['ConceptCardBackendApiService', ConceptCardBackendApiService],
   ['ConceptCardObjectFactory', ConceptCardObjectFactory],
+  ['ConstructTranslationIdsService', ConstructTranslationIdsService],
   ['ContextService', ContextService],
   ['ContinueRulesService', ContinueRulesService],
   ['ContinueValidationService', ContinueValidationService],
   ['ContributionOpportunitiesBackendApiService', ContributionOpportunitiesBackendApiService],
-  ['ConstructTranslationIdsService', ConstructTranslationIdsService],
   ['CountVectorizerService', CountVectorizerService],
   ['CreatorDashboardBackendApiService', CreatorDashboardBackendApiService],
   ['CreatorDashboardStatsObjectFactory', CreatorDashboardStatsObjectFactory],
@@ -408,8 +422,8 @@ export const angularServices: [string, unknown][] = [
   ['DocumentAttributeCustomizationService', DocumentAttributeCustomizationService],
   ['DragAndDropSortInputRulesService', DragAndDropSortInputRulesService],
   ['DragAndDropSortInputValidationService', DragAndDropSortInputValidationService],
-  ['EditableCollectionBackendApiService', EditableCollectionBackendApiService],
   ['EditabilityService', EditabilityService],
+  ['EditableCollectionBackendApiService', EditableCollectionBackendApiService],
   ['EditorFirstTimeEventsService', EditorFirstTimeEventsService],
   ['EmailDashboardBackendApiService', EmailDashboardBackendApiService],
   ['EmailDashboardDataService', EmailDashboardDataService],
@@ -429,7 +443,6 @@ export const angularServices: [string, unknown][] = [
   ['ExplorationMetadataObjectFactory', ExplorationMetadataObjectFactory],
   ['ExplorationObjectFactory', ExplorationObjectFactory],
   ['ExplorationOpportunitySummaryObjectFactory', ExplorationOpportunitySummaryObjectFactory],
-  ['ExpressionParserService', ExpressionParserService],
   ['ExplorationPermissionsBackendApiService', ExplorationPermissionsBackendApiService],
   ['ExplorationPermissionsObjectFactory', ExplorationPermissionsObjectFactory],
   ['ExplorationRecommendationsBackendApiService', ExplorationRecommendationsBackendApiService],
@@ -438,9 +451,13 @@ export const angularServices: [string, unknown][] = [
   ['ExplorationStatsObjectFactory', ExplorationStatsObjectFactory],
   ['ExplorationStatsService', ExplorationStatsService],
   ['ExplorationTaskObjectFactory', ExplorationTaskObjectFactory],
+  ['ExpressionParserService', ExpressionParserService],
   ['ExpressionSyntaxTreeService', ExpressionSyntaxTreeService],
   ['ExtensionTagAssemblerService', ExtensionTagAssemblerService],
+  ['ExternalRteSaveService', ExternalRteSaveService],
+  ['ExternalSaveService', ExternalSaveService],
   ['ExtractImageFilenamesFromStateService', ExtractImageFilenamesFromStateService],
+  ['FeatureStatusSummaryObjectFactory', FeatureStatusSummaryObjectFactory],
   ['FeaturedTranslationLanguageObjectFactory', FeaturedTranslationLanguageObjectFactory],
   ['FeedbackMessageSummaryObjectFactory', FeedbackMessageSummaryObjectFactory],
   ['FeedbackThreadObjectFactory', FeedbackThreadObjectFactory],
@@ -479,6 +496,7 @@ export const angularServices: [string, unknown][] = [
   ['ItemSelectionInputValidationService', ItemSelectionInputValidationService],
   ['JobDataObjectFactory', JobDataObjectFactory],
   ['JobStatusSummaryObjectFactory', JobStatusSummaryObjectFactory],
+  ['KeyboardShortcutService', KeyboardShortcutService],
   ['LanguageUtilService', LanguageUtilService],
   ['LearnerActionObjectFactory', LearnerActionObjectFactory],
   ['LearnerAnswerDetailsBackendApiService', LearnerAnswerDetailsBackendApiService],
@@ -489,8 +507,8 @@ export const angularServices: [string, unknown][] = [
   ['LearnerDashboardIdsBackendApiService', LearnerDashboardIdsBackendApiService],
   ['LearnerExplorationSummaryObjectFactory', LearnerExplorationSummaryObjectFactory],
   ['LearnerParamsService', LearnerParamsService],
-  ['LocalStorageService', LocalStorageService],
   ['LoaderService', LoaderService],
+  ['LocalStorageService', LocalStorageService],
   ['LoggerService', LoggerService],
   ['LogicProofRulesService', LogicProofRulesService],
   ['LogicProofValidationService', LogicProofValidationService],
@@ -513,13 +531,13 @@ export const angularServices: [string, unknown][] = [
   ['NormalizeWhitespacePipe', NormalizeWhitespacePipe],
   ['NormalizeWhitespacePunctuationAndCasePipe', NormalizeWhitespacePunctuationAndCasePipe],
   ['NumberAttemptsService', NumberAttemptsService],
+  ['NumberWithUnitsObjectFactory', NumberWithUnitsObjectFactory],
+  ['NumberWithUnitsRulesService', NumberWithUnitsRulesService],
+  ['NumberWithUnitsValidationService', NumberWithUnitsValidationService],
   ['NumericExpressionInputRulesService', NumericExpressionInputRulesService],
   ['NumericExpressionInputValidationService', NumericExpressionInputValidationService],
   ['NumericInputRulesService', NumericInputRulesService],
   ['NumericInputValidationService', NumericInputValidationService],
-  ['NumberWithUnitsObjectFactory', NumberWithUnitsObjectFactory],
-  ['NumberWithUnitsRulesService', NumberWithUnitsRulesService],
-  ['NumberWithUnitsValidationService', NumberWithUnitsValidationService],
   ['OutcomeObjectFactory', OutcomeObjectFactory],
   ['PageTitleService', PageTitleService],
   ['ParamChangeObjectFactory', ParamChangeObjectFactory],
@@ -530,6 +548,12 @@ export const angularServices: [string, unknown][] = [
   ['ParamTypeObjectFactory', ParamTypeObjectFactory],
   ['PencilCodeEditorRulesService', PencilCodeEditorRulesService],
   ['PencilCodeEditorValidationService', PencilCodeEditorValidationService],
+  ['PlatformFeatureAdminBackendApiService', PlatformFeatureAdminBackendApiService],
+  ['PlatformFeatureBackendApiService', PlatformFeatureBackendApiService],
+  ['PlatformFeatureService', PlatformFeatureService],
+  ['PlatformParameterFilterObjectFactory', PlatformParameterFilterObjectFactory],
+  ['PlatformParameterObjectFactory', PlatformParameterObjectFactory],
+  ['PlatformParameterRuleObjectFactory', PlatformParameterRuleObjectFactory],
   ['PlayerCorrectnessFeedbackEnabledService', PlayerCorrectnessFeedbackEnabledService],
   ['PlayerPositionService', PlayerPositionService],
   ['PlayerTranscriptService', PlayerTranscriptService],
@@ -548,8 +572,11 @@ export const angularServices: [string, unknown][] = [
   ['QuestionBackendApiService', QuestionBackendApiService],
   ['QuestionSummaryForOneSkillObjectFactory', QuestionSummaryForOneSkillObjectFactory],
   ['QuestionSummaryObjectFactory', QuestionSummaryObjectFactory],
-  ['ReadOnlyCollectionBackendApiService', ReadOnlyCollectionBackendApiService],
   ['RatingComputationService', RatingComputationService],
+  ['RatioExpressionInputRulesService', RatioExpressionInputRulesService],
+  ['RatioExpressionInputValidationService', RatioExpressionInputValidationService],
+  ['RatioObjectFactory', RatioObjectFactory],
+  ['ReadOnlyCollectionBackendApiService', ReadOnlyCollectionBackendApiService],
   ['ReadOnlyStoryNodeObjectFactory', ReadOnlyStoryNodeObjectFactory],
   ['ReadOnlySubtopicPageObjectFactory', ReadOnlySubtopicPageObjectFactory],
   ['ReadOnlyTopicObjectFactory', ReadOnlyTopicObjectFactory],
@@ -559,6 +586,7 @@ export const angularServices: [string, unknown][] = [
   ['ReviewTestObjectFactory', ReviewTestObjectFactory],
   ['RubricObjectFactory', RubricObjectFactory],
   ['RuleObjectFactory', RuleObjectFactory],
+  ['SVMPredictionService', SVMPredictionService],
   ['SchemaDefaultValueService', SchemaDefaultValueService],
   ['SchemaFormSubmittedService', SchemaFormSubmittedService],
   ['SchemaUndefinedLastElementService', SchemaUndefinedLastElementService],
@@ -566,7 +594,6 @@ export const angularServices: [string, unknown][] = [
   ['SetInputRulesService', SetInputRulesService],
   ['SetInputValidationService', SetInputValidationService],
   ['ShortSkillSummaryObjectFactory', ShortSkillSummaryObjectFactory],
-  ['SVMPredictionService', SVMPredictionService],
   ['SidebarStatusService', SidebarStatusService],
   ['SiteAnalyticsService', SiteAnalyticsService],
   ['SkillCreationBackendApiService', SkillCreationBackendApiService],
@@ -585,8 +612,8 @@ export const angularServices: [string, unknown][] = [
   ['StateClassifierMappingService', StateClassifierMappingService],
   ['StateContentService', StateContentService],
   ['StateCustomizationArgsService', StateCustomizationArgsService],
+  ['StateEditorRefreshService', StateEditorRefreshService],
   ['StateEditorService', StateEditorService],
-  ['KeyboardShortcutService', KeyboardShortcutService],
   ['StateGraphLayoutService', StateGraphLayoutService],
   ['StateHintsService', StateHintsService],
   ['StateInteractionIdService', StateInteractionIdService],
@@ -637,11 +664,11 @@ export const angularServices: [string, unknown][] = [
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
   ['TopicObjectFactory', TopicObjectFactory],
   ['TopicRightsObjectFactory', TopicRightsObjectFactory],
-  ['TopicsAndSkillsDashboardBackendApiService', TopicsAndSkillsDashboardBackendApiService],
   ['TopicSummaryObjectFactory', TopicSummaryObjectFactory],
+  ['TopicViewerBackendApiService', TopicViewerBackendApiService],
+  ['TopicsAndSkillsDashboardBackendApiService', TopicsAndSkillsDashboardBackendApiService],
   ['TopicsAndSkillsDashboardFilterObjectFactory', TopicsAndSkillsDashboardFilterObjectFactory],
   ['TopicsAndSkillsDashboardPageService', TopicsAndSkillsDashboardPageService],
-  ['TopicViewerBackendApiService', TopicViewerBackendApiService],
   ['TranslateService', TranslateService],
   ['TranslationsBackendApiService', TranslationsBackendApiService],
   ['UnitsObjectFactory', UnitsObjectFactory],
@@ -661,4 +688,5 @@ export const angularServices: [string, unknown][] = [
   ['WorkedExampleObjectFactory', WorkedExampleObjectFactory],
   ['WrittenTranslationObjectFactory', WrittenTranslationObjectFactory],
   ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory],
+  ['baseInteractionValidationService', baseInteractionValidationService],
 ];
