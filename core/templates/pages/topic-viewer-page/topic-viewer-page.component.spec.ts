@@ -21,10 +21,6 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { ReadOnlyTopicObjectFactory } from
-  'domain/topic_viewer/read-only-topic-object.factory';
-import { TopicViewerBackendApiService } from
-  'domain/topic_viewer/topic-viewer-backend-api.service';
 import { TopicViewerPageComponent } from
   'pages/topic-viewer-page/topic-viewer-page.component';
 import { AlertsService } from 'services/alerts.service';
