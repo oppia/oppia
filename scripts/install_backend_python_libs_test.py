@@ -399,7 +399,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             paths_to_delete.append(
                 path[len(common.THIRD_PARTY_PYTHON_LIBS_DIR) + 1:])
 
-        def mock_is_dir(path):
+        def mock_is_dir(path): # pylint: disable=unused-argument
             return True
 
         def mock_get_mismatches():
@@ -412,13 +412,6 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_validate_metadata_directories():
             pass
 
-        def mock_get_directory(path): # pylint: disable=unused-argument
-            return directory_names
-        swap_get_directory = self.swap(
-            install_backend_python_libs,
-            '_normalize_directory_name',
-            mock_get_directory
-        )
         swap_validate_metadata_directories = self.swap(
             install_backend_python_libs, 'validate_metadata_directories',
             mock_validate_metadata_directories)
