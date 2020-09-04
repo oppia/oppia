@@ -184,8 +184,6 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-translation-graph'));
   var feedbackList = element.all(
     by.css('li.protractor-test-translation-feedback'));
-  var hintsList = element.all(
-    by.css('li.protractor-test-translation-hint'));
   var stateBackgroundNodes = stateGraph.all(
     by.css('.protractor-test-node-background'));
   var stateNodes = stateGraph.all(
@@ -385,7 +383,6 @@ var ExplorationEditorTranslationTab = function() {
   this._isAudioPlaying = async function() {
     var firstValue = await audioMaterialSliderDiv.getAttribute(
       'aria-valuenow');
-    var audioPlaying = null;
     try {
       await waitFor.elementAttributeToBe(
         audioMaterialSliderDiv, 'aria-valuenow', firstValue + 1,

@@ -32,7 +32,6 @@ describe('Search service', function() {
   var SearchService = null;
   var $httpBackend = null;
   var $log = null;
-  var $rootScope = null;
   var $translate = null;
   var CsrfService = null;
   var results = null;
@@ -51,7 +50,6 @@ describe('Search service', function() {
     SearchService = $injector.get('SearchService');
     $log = $injector.get('$log');
     $httpBackend = $injector.get('$httpBackend');
-    $rootScope = $injector.get('$rootScope');
     $translate = $injector.get('$translate');
 
     CsrfService = $injector.get('CsrfTokenService');

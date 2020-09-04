@@ -1056,7 +1056,7 @@ AVAILABLE_LANDING_PAGES = {
 # CLASSROOM_PAGES_DATA property in config_domain.
 CLASSROOM_PAGES = ['math']
 
-# Authentication method using GAE ID (google sign in)
+# Authentication method using GAE ID (google sign in).
 AUTH_METHOD_GAE = 'gae'
 
 # TODO(#10501): Once domain objects can be imported by the storage layer, move
@@ -1206,3 +1206,7 @@ TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS = [{
     'optional_attribute_names': [],
     'user_id_attribute_names': []
 }]
+
+# Length of user PIN for different roles used on Android.
+FULL_USER_PIN_LENGTH = 5
+PROFILE_USER_PIN_LENGTH = 3
