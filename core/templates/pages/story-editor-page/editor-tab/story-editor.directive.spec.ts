@@ -1,4 +1,3 @@
-
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the skills list directive.
+ * @fileoverview Unit tests for the story editor directive.
  */
 
 import { UpgradedServices } from 'services/UpgradedServices';
