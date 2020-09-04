@@ -53,17 +53,8 @@ var thumbnailContainer = '.protractor-test-thumbnail-container';
 var confirmTopicCreationButton =
   '.protractor-test-confirm-topic-creation-button';
 var createdTopicLink = '.protractor-test-topic-name';
-
 var createStoryButtonSelector = '.protractor-test-create-story-button';
-var storyNameField = '.protractor-test-new-story-title-field';
-var storyUrlFragmentField = '.protractor-test-new-story-url-fragment-field';
-var storyDescriptionField = '.protractor-test-new-story-description-field';
-var storyThumbnailButton = '.protractor-test-photo-button';
-var storyUploadButton = '.protractor-test-photo-upload-input';
-var storyPhotoSubmit = '.protractor-test-photo-upload-submit';
 var thumbnailContainer = '.protractor-test-thumbnail-container';
-var confirmStoryCreationButton =
-  '.protractor-test-confirm-story-creation-button';
 
 var createSkillButtonSelector = '.puppeteer-test-add-skill-button';
 var skillDescriptionField = '.protractor-test-new-skill-description-field';
@@ -147,7 +138,6 @@ const getExplorationEditorUrl = async function(browser, page) {
   }
 };
 
-
 const getCollectionEditorUrl = async function(browser, page) {
   try {
     await setRole(browser, page, 'string:COLLECTION_EDITOR');
@@ -209,37 +199,6 @@ const getTopicEditorUrl = async function(browser, page) {
     await page.waitForSelector(createStoryButtonSelector);
 
     topicEditorUrl = await page.url();
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(e);
-  }
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const unusedGetStoryEditorUrl = async function(browser, page) {
-  try {
-    // eslint-disable-next-line dot-notation
-    await page.goto(topicEditorUrl, { waitUntil: networkIdle });
-    await page.waitForSelector(createStoryButtonSelector, {visible: true});
-    await page.click(createStoryButtonSelector);
-
-    await page.waitForSelector(storyNameField, {visible: true});
-    await page.type(storyNameField, 'Story TASD');
-    await page.type(storyUrlFragmentField, 'story-url-one');
-    await page.type(storyDescriptionField, 'Story 1 description');
-    await page.click(storyThumbnailButton);
-    await page.waitForSelector(storyUploadButton, {visible: true});
-
-    const elementHandle = await page.$(storyUploadButton);
-    await elementHandle.uploadFile('core/tests/data/test_svg.svg');
-
-    await page.waitForSelector(thumbnailContainer, {visible: true});
-    await page.click(storyPhotoSubmit);
-
-    await page.waitForSelector(confirmStoryCreationButton, {visible: true});
-    await page.waitFor(5000);
-    await page.click(confirmStoryCreationButton);
-    await page.waitFor(15000);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
