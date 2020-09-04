@@ -98,7 +98,13 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
             // don't have loading indicator or try again for showing images in
             // this case. So we directly assign the url to the imageUrl.
             try {
-              ctrl.imageUrl === '';
+              // For IMAGE_SAVE_DESTINATION_LOCAL_STORAGE mode we first try to
+              // fetch images through the storage and if it doesn't exist we try
+              // fetching it through server.
+              // This is required for the translation suggestion as there can be
+              // target entity's images in the translatable content which needs
+              // to be fetched from the server.
+              ctrl.imageUrl === null;
               if (
                 ContextService.getImageSaveDestination() ===
                 IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
@@ -107,7 +113,7 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
                   ctrl.filepath);
               }
 
-              if (ctrl.imageUrl === '') {
+              if (ctrl.imageUrl === null) {
                 ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
                   ContextService.getEntityType(), ContextService.getEntityId(),
                   ctrl.filepath);
