@@ -35,17 +35,17 @@ angular.module('oppia').directive('oppiaInteractiveEndExploration', [
       template: require('./end-exploration-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$attrs', '$q', 'UrlService',
-        'ContextService', 'ReadOnlyCollectionBackendApiService',
-        'PAGE_CONTEXT', 'EXPLORATION_EDITOR_TAB_CONTEXT',
+        '$attrs', '$http', 'ContextService',
         'InteractionAttributesExtractorService',
-        'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+        'ReadOnlyCollectionBackendApiService', 'UrlService',
+        'EXPLORATION_EDITOR_TAB_CONTEXT',
+        'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'PAGE_CONTEXT',
         function(
-            $http, $attrs, $q, UrlService,
-            ContextService, ReadOnlyCollectionBackendApiService,
-            PAGE_CONTEXT, EXPLORATION_EDITOR_TAB_CONTEXT,
+            $attrs, $http, ContextService,
             InteractionAttributesExtractorService,
-            EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
+            ReadOnlyCollectionBackendApiService, UrlService,
+            EXPLORATION_EDITOR_TAB_CONTEXT,
+            EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, PAGE_CONTEXT) {
           var ctrl = this;
           ctrl.$onInit = function() {
             const {

@@ -109,7 +109,7 @@ angular.module('oppia').directive('stateResponses', [
         '/components/state-editor/state-responses-editor/' +
         'state-responses.directive.html'),
       controller: [
-        '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        '$filter', '$scope', '$uibModal', 'AlertsService',
         'AnswerGroupObjectFactory', 'ContextService',
         'EditabilityService', 'ExternalSaveService', 'ResponsesService',
         'StateCustomizationArgsService', 'StateEditorService',
@@ -121,7 +121,7 @@ angular.module('oppia').directive('stateResponses', [
         'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
         function(
-            $filter, $rootScope, $scope, $uibModal, AlertsService,
+            $filter, $scope, $uibModal, AlertsService,
             AnswerGroupObjectFactory, ContextService,
             EditabilityService, ExternalSaveService, ResponsesService,
             StateCustomizationArgsService, StateEditorService,
@@ -162,9 +162,8 @@ angular.module('oppia').directive('stateResponses', [
               // Collect all answers which have been handled by at least one
               // answer group.
               for (var i = 0; i < answerGroups.length; i++) {
-                const rules = answerGroups[i].getRulesAsList();
-                for (var j = 0; j < rules.length; j++) {
-                  handledAnswersArray.push(rules[j].inputs.x);
+                for (var j = 0; j < answerGroups[i].rules.length; j++) {
+                  handledAnswersArray.push(answerGroups[i].rules[j].inputs.x);
                 }
               }
               for (var i = 0; i < numChoices; i++) {
@@ -195,7 +194,7 @@ angular.module('oppia').directive('stateResponses', [
                 });
 
                 answerGroups.forEach(function(answerGroup) {
-                  var rules = answerGroup.getRulesAsList();
+                  var rules = answerGroup.rules;
                   rules.forEach(function(rule) {
                     var ruleInputs = rule.inputs.x;
                     ruleInputs.forEach(function(ruleInput) {
@@ -324,11 +323,9 @@ angular.module('oppia').directive('stateResponses', [
               controller: 'AddAnswerGroupModalController'
             }).result.then(function(result) {
               // Create a new answer group.
-              const newAnswerGroup = AnswerGroupObjectFactory.createNew(
-                result.tmpOutcome, [],
-                result.tmpTaggedSkillMisconceptionId);
-              newAnswerGroup.addRule(result.tmpRule);
-              $scope.answerGroups.push(newAnswerGroup);
+              $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
+                [result.tmpRule], result.tmpOutcome, [],
+                result.tmpTaggedSkillMisconceptionId));
               ResponsesService.save(
                 $scope.answerGroups, $scope.defaultOutcome,
                 function(newAnswerGroups, newDefaultOutcome) {
@@ -463,11 +460,10 @@ angular.module('oppia').directive('stateResponses', [
             var outcome = answerGroup.outcome;
             var hasFeedback = outcome.hasNonemptyFeedback();
 
-            if (answerGroup.ruleTypesToInputs) {
+            if (answerGroup.rules) {
               var firstRule = $filter('convertToPlainText')(
                 $filter('parameterizeRuleDescription')(
-                  answerGroup.getRulesAsList()[0],
-                  interactionId, answerChoices));
+                  answerGroup.rules[0], interactionId, answerChoices));
               summary = 'Answer ' + firstRule;
 
               if (hasFeedback && shortenRule) {

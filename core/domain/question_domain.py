@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import collections
 import copy
 import datetime
 
@@ -90,20 +89,24 @@ class QuestionChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': [],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_UPDATE_QUESTION_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': QUESTION_PROPERTIES}
     }, {
         'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
         'required_attribute_names': ['question_dict', 'skill_id'],
-        'optional_attribute_names': ['topic_name']
+        'optional_attribute_names': ['topic_name'],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
 
@@ -120,7 +123,8 @@ class QuestionSuggestionChange(change_domain.BaseChange):
             'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'required_attribute_names': [
                 'question_dict', 'skill_id', 'skill_difficulty'],
-            'optional_attribute_names': []
+            'optional_attribute_names': [],
+            'user_id_attribute_names': []
         }
     ]
 
@@ -344,8 +348,7 @@ class Question(python_utils.OBJECT):
         question_state_dict = state_domain.State.convert_html_fields_in_state(
             question_state_dict,
             html_validation_service.add_math_content_to_math_rte_components,
-            state_uses_old_interaction_cust_args_schema=True,
-            state_uses_old_rule_spec_schema=True)
+            state_uses_old_interaction_cust_args_schema=True)
         return question_state_dict
 
     @classmethod
@@ -724,49 +727,6 @@ class Question(python_utils.OBJECT):
                 }
             })
 
-        return question_state_dict
-
-    @classmethod
-    def _convert_state_v38_dict_to_v39_dict(cls, question_state_dict):
-        """Converts from version 38 to 39. Version 39 removes the fields
-        rule_specs in AnswerGroups, and adds new fields rule_types_to_inputs and
-        rule_input_translations. rule_types_to_inputs is a dictionary that maps
-        rule type to a list of rule inputs that share the rule type.
-        rule_input_translations is a dict mapping abbreviated language
-        codes to a mapping of rule type to rule inputs.
-
-        Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
-
-        Returns:
-            dict. The converted question_state_dict.
-        """
-        answer_group_dicts = question_state_dict['interaction']['answer_groups']
-        for i, answer_group_dict in enumerate(answer_group_dicts):
-            # Convert the list of rule specs into the new
-            # rule_types_to_inputs dict format. Instead of a list of
-            # dictionaries that have properties 'rule_type' and
-            # 'inputs', the new format groups rule inputs of the same
-            # rule type by mapping rule type to a list of rule inputs.
-            # E.g. Old format: rule_specs = [
-            #   {rule_type: 'Equals', 'inputs': {x: 'Yes'}},
-            #   {rule_type: 'Equals', 'inputs': {x: 'Y'}}
-            # ]
-            # New format: rule_types_to_inputs = {
-            #   'Equals': [
-            #       {x: 'Yes'}, {x: 'Y'}
-            #   ]
-            # }
-            rule_types_to_inputs = collections.defaultdict(list)
-            for rule_spec_dict in answer_group_dict['rule_specs']:
-                rule_type = rule_spec_dict['rule_type']
-                rule_types_to_inputs[rule_type].append(rule_spec_dict['inputs'])
-            del answer_group_dicts[i]['rule_specs']
-            answer_group_dicts[i]['rule_input_translations'] = {}
-            answer_group_dicts[i]['rule_types_to_inputs'] = dict(
-                rule_types_to_inputs)
         return question_state_dict
 
     @classmethod
