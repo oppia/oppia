@@ -199,11 +199,10 @@ angular.module('oppia').directive('storyEditor', [
           };
 
           $scope.updateNotes = function(newNotes) {
-            if (newNotes === $scope.story.getNotes()) {
-              return;
+            if (newNotes !== $scope.story.getNotes()) {
+              StoryUpdateService.setStoryNotes($scope.story, newNotes);
+              _initEditor();
             }
-            StoryUpdateService.setStoryNotes($scope.story, newNotes);
-            _initEditor();
           };
 
           $scope.navigateToChapterWithId = function(id, index) {
@@ -261,10 +260,9 @@ angular.module('oppia').directive('storyEditor', [
           };
 
           $scope.updateStoryTitle = function(newTitle) {
-            if (newTitle === $scope.story.getTitle()) {
-              return;
+            if (newTitle !== $scope.story.getTitle()) {
+              StoryUpdateService.setStoryTitle($scope.story, newTitle);
             }
-            StoryUpdateService.setStoryTitle($scope.story, newTitle);
           };
 
           $scope.updateStoryUrlFragment = function(newUrlFragment) {
@@ -289,20 +287,18 @@ angular.module('oppia').directive('storyEditor', [
 
           $scope.updateStoryThumbnailFilename = function(
               newThumbnailFilename) {
-            if (newThumbnailFilename === $scope.story.getThumbnailFilename()) {
-              return;
+            if (newThumbnailFilename !== $scope.story.getThumbnailFilename()) {
+              StoryUpdateService.setThumbnailFilename(
+                $scope.story, newThumbnailFilename);
             }
-            StoryUpdateService.setThumbnailFilename(
-              $scope.story, newThumbnailFilename);
           };
 
           $scope.updateStoryThumbnailBgColor = function(
               newThumbnailBgColor) {
-            if (newThumbnailBgColor === $scope.story.getThumbnailBgColor()) {
-              return;
+            if (newThumbnailBgColor !== $scope.story.getThumbnailBgColor()) {
+              StoryUpdateService.setThumbnailBgColor(
+                $scope.story, newThumbnailBgColor);
             }
-            StoryUpdateService.setThumbnailBgColor(
-              $scope.story, newThumbnailBgColor);
           };
 
           $scope.updateStoryDescription = function(newDescription) {
@@ -322,17 +318,15 @@ angular.module('oppia').directive('storyEditor', [
           };
 
           $scope.toggleChapterLists = function() {
-            if (!WindowDimensionsService.isWindowNarrow()) {
-              return;
+            if (WindowDimensionsService.isWindowNarrow()) {
+              $scope.chaptersListIsShown = !$scope.chaptersListIsShown;
             }
-            $scope.chaptersListIsShown = !$scope.chaptersListIsShown;
           };
 
           $scope.toggleStoryEditorCard = function() {
-            if (!WindowDimensionsService.isWindowNarrow()) {
-              return;
+            if (WindowDimensionsService.isWindowNarrow()) {
+              $scope.mainStoryCardIsShown = !$scope.mainStoryCardIsShown;
             }
-            $scope.mainStoryCardIsShown = !$scope.mainStoryCardIsShown;
           };
 
           ctrl.$onInit = function() {
