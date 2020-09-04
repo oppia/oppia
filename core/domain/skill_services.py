@@ -24,6 +24,7 @@ from core.domain import caching_services
 from core.domain import config_domain
 from core.domain import html_cleaner
 from core.domain import opportunity_services
+from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
@@ -42,6 +43,7 @@ import python_utils
         models.NAMES.skill, models.NAMES.user, models.NAMES.question,
         models.NAMES.topic]))
 datastore_services = models.Registry.import_datastore_services()
+taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 # Repository GET methods.
@@ -747,6 +749,10 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
     skill = apply_change_list(skill_id, change_list, committer_id)
     _save_skill(committer_id, skill, commit_message, change_list)
     create_skill_summary(skill.id)
+    taskqueue_services.defer(
+        question_services.untag_deleted_misconceptions,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+        committer_id, skill_id, skill.description)
 
 
 def delete_skill(committer_id, skill_id, force_deletion=False):

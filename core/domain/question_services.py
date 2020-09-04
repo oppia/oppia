@@ -28,6 +28,7 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.platform import models
 import feconf
+import python_utils
 
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])
@@ -712,3 +713,60 @@ def get_interaction_id_for_question(question_id):
     if question is None:
         raise Exception('No questions exists with the given question id.')
     return question.question_state_data.interaction.id
+
+
+def untag_deleted_misconceptions(committer_id, skill_id, skill_description):
+    """Deferred task to untag deleted misconceptions from questions belonging
+    to a skill with the provided skill_id.
+
+    Args:
+        committer_id: str. The id of the user who triggered the update.
+        skill_id: str. The skill id.
+        skill_description: str. The description of the skill.
+    """
+    question_skill_link_models = get_question_skill_links_of_skill(
+        skill_id, skill_description)
+    question_ids = [model.question_id for model in question_skill_link_models]
+    questions = question_fetchers.get_questions_by_ids(question_ids)
+    skill = skill_fetchers.get_skill_by_id(skill_id)
+    skill_misconception_ids_set = (
+        set([
+            '%s-%d' % (skill_id, misconception.id)
+            for misconception in skill.misconceptions
+        ])
+    )
+    for question in questions:
+        change_list = []
+        inapplicable_misconception_ids_set = set(
+            question.inapplicable_misconception_ids)
+        deleted_inapplicable_misconception_ids = (
+            inapplicable_misconception_ids_set.difference(
+                skill_misconception_ids_set))
+        for misconception_id in deleted_inapplicable_misconception_ids:
+            old_misconception_ids = list(
+                question.inapplicable_misconception_ids)
+            question.inapplicable_misconception_ids.remove(misconception_id)
+            change_list.append(question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'inapplicable_misconception_ids',
+                'new_value': question.inapplicable_misconception_ids,
+                'old_value': old_misconception_ids
+            }))
+        old_question_state_data_dict = question.question_state_data.to_dict()
+        answer_groups = (
+            list(question.question_state_data.interaction.answer_groups))
+        for i in python_utils.RANGE(len(answer_groups)):
+            tagged_skill_misconception_id = (
+                answer_groups[i].to_dict()['tagged_skill_misconception_id'])
+            if tagged_skill_misconception_id not in skill_misconception_ids_set:
+                answer_groups[i].tagged_skill_misconception_id = None
+        question.question_state_data.interaction.answer_groups = answer_groups
+        change_list.append(question_domain.QuestionChange({
+            'cmd': 'update_question_property',
+            'property_name': 'question_state_data',
+            'new_value': question.question_state_data.to_dict(),
+            'old_value': old_question_state_data_dict
+        }))
+        update_question(
+            committer_id, question.id, change_list,
+            'Untagged deleted misconception id.')

@@ -24,7 +24,10 @@ import logging
 from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
+from core.domain import skill_fetchers
+from core.domain import skill_services
 from core.domain import skill_domain
+from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -645,6 +648,307 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.question_id), 'TextInput')
         with self.assertRaisesRegexp(Exception, 'No questions exists with'):
             question_services.get_interaction_id_for_question('fake_q_id')
+
+    def test_untag_deleted_misconceptions_on_no_change_to_skill(self):
+        misconceptions = [
+            skill_domain.Misconception(
+                0, 'misconception-name', '<p>description</p>',
+                '<p>default_feedback</p>', True),
+            skill_domain.Misconception(
+                1, 'misconception-name', '<p>description</p>',
+                '<p>default_feedback</p>', True),
+            skill_domain.Misconception(
+                2, 'misconception-name', '<p>description</p>',
+                '<p>default_feedback</p>', False),
+            skill_domain.Misconception(
+                3, 'misconception-name', '<p>description</p>',
+                '<p>default_feedback</p>', False),
+            skill_domain.Misconception(
+                4, 'misconception-name', '<p>description</p>',
+                '<p>default_feedback</p>', False)
+        ]
+        self.save_new_skill(
+            'skill_with_misconceptions', self.admin_id,
+            description='Skill with misconceptions',
+            misconceptions=misconceptions)
+
+        self.question_id = question_services.get_new_question_id()
+        question_state_data = self._create_valid_question_data('state name')
+        question_state_data.interaction.answer_groups = [
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 'Test'
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': 'skill_with_misconceptions-0'
+            }),
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 'Test'
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': 'skill_with_misconceptions-1'
+            }),
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_0',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 'Test'
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': 'skill_with_misconceptions-2'
+            })
+        ]
+        question_state_data.written_translations.translations_mapping.update({
+            'feedback_0': {},
+            'feedback_1': {},
+            'feedback_2': {}
+        })
+        question_state_data.recorded_voiceovers.voiceovers_mapping.update({
+            'feedback_0': {},
+            'feedback_1': {},
+            'feedback_2': {}
+        })
+        inapplicable_misconception_ids = [
+            'skill_with_misconceptions-3',
+            'skill_with_misconceptions-4'
+        ]
+        self.question = self.save_new_question(
+            self.question_id, self.editor_id,
+            question_state_data, ['skill_with_misconceptions'],
+            inapplicable_misconception_ids=inapplicable_misconception_ids)
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id, 'skill_with_misconceptions', 0.5)
+        answer_groups = (
+            self.question.question_state_data.interaction.answer_groups)
+        actual_misconception_ids = [
+            answer_group.to_dict()['tagged_skill_misconception_id']
+            for answer_group in answer_groups
+            if answer_group.to_dict()['tagged_skill_misconception_id']]
+        expected_misconception_ids = [
+            'skill_with_misconceptions-0',
+            'skill_with_misconceptions-1',
+            'skill_with_misconceptions-2'
+        ]
+        self.assertEqual(
+            self.question.inapplicable_misconception_ids,
+            inapplicable_misconception_ids)
+        self.assertEqual(actual_misconception_ids, expected_misconception_ids)
+        # Try to untag deleted misconceptions when there are no deleted
+        # misconceptions.
+        question_services.untag_deleted_misconceptions(
+            self.editor_id, 'skill_with_misconceptions',
+            'Skill with misconceptions')
+        # No change when misconception ids exist.
+        updated_question = question_services.get_question_by_id(
+            self.question_id)
+        self.assertEqual(
+            updated_question.inapplicable_misconception_ids,
+            inapplicable_misconception_ids)
+        self.assertEqual(actual_misconception_ids, expected_misconception_ids)
+
+    def test_untag_deleted_misconceptions_correctly_on_updating_skill(self):
+        misconceptions = [
+            skill_domain.Misconception(
+                0, 'misconception-name', '<p>description</p>',
+                '<p>default_feedback</p>', True),
+            skill_domain.Misconception(
+                1, 'misconception-name', '<p>description</p>',
+                '<p>default_feedback</p>', True),
+            skill_domain.Misconception(
+                2, 'misconception-name', '<p>description</p>',
+                '<p>default_feedback</p>', False),
+            skill_domain.Misconception(
+                3, 'misconception-name', '<p>description</p>',
+                '<p>default_feedback</p>', False),
+            skill_domain.Misconception(
+                4, 'misconception-name', '<p>description</p>',
+                '<p>default_feedback</p>', False)
+        ]
+        self.save_new_skill(
+            'skill_with_misconceptions', self.admin_id,
+            description='Skill with misconceptions',
+            misconceptions=misconceptions)
+
+        self.question_id = question_services.get_new_question_id()
+        question_state_data = self._create_valid_question_data('state name')
+        question_state_data.interaction.answer_groups = [
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 'Test'
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': 'skill_with_misconceptions-0'
+            }),
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 'Test'
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': 'skill_with_misconceptions-1'
+            }),
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_0',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': 'Test'
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': 'skill_with_misconceptions-2'
+            })
+        ]
+        question_state_data.written_translations.translations_mapping.update({
+            'feedback_0': {},
+            'feedback_1': {},
+            'feedback_2': {}
+        })
+        question_state_data.recorded_voiceovers.voiceovers_mapping.update({
+            'feedback_0': {},
+            'feedback_1': {},
+            'feedback_2': {}
+        })
+        inapplicable_misconception_ids = [
+            'skill_with_misconceptions-3',
+            'skill_with_misconceptions-4'
+        ]
+        self.question = self.save_new_question(
+            self.question_id, self.editor_id,
+            question_state_data, ['skill_with_misconceptions'],
+            inapplicable_misconception_ids=inapplicable_misconception_ids)
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id, 'skill_with_misconceptions', 0.5)
+        answer_groups = (
+            self.question.question_state_data.interaction.answer_groups)
+        actual_misconception_ids = [
+            answer_group.to_dict()['tagged_skill_misconception_id']
+            for answer_group in answer_groups
+            if answer_group.to_dict()['tagged_skill_misconception_id']]
+        expected_misconception_ids = [
+            'skill_with_misconceptions-0',
+            'skill_with_misconceptions-1',
+            'skill_with_misconceptions-2'
+        ]
+        self.assertEqual(
+            self.question.inapplicable_misconception_ids,
+            inapplicable_misconception_ids)
+        self.assertEqual(actual_misconception_ids, expected_misconception_ids)
+        # Delete few misconceptions.
+        change_list = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
+                'misconception_id': 0,
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
+                'misconception_id': 2,
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
+                'misconception_id': 4,
+            })
+        ]
+        skill_services.update_skill(
+            self.editor_id, 'skill_with_misconceptions',
+            change_list, 'Delete misconceptions.')
+        skill_fetchers.get_skill_by_id('skill_with_misconceptions')
+        self.process_and_flush_pending_tasks()
+        updated_question = question_services.get_question_by_id(
+            self.question_id)
+        updated_answer_groups = (
+            updated_question.question_state_data.interaction.answer_groups)
+        actual_misconception_ids = [
+            answer_group.to_dict()['tagged_skill_misconception_id']
+            for answer_group in updated_answer_groups
+            if answer_group.to_dict()['tagged_skill_misconception_id']]
+        expected_misconception_ids = ['skill_with_misconceptions-1']
+        actual_inapplicable_misconception_ids = (
+            updated_question.inapplicable_misconception_ids)
+        expected_inapplicable_misconception_ids = (
+            ['skill_with_misconceptions-3'])
+        self.assertEqual(
+            actual_inapplicable_misconception_ids,
+            expected_inapplicable_misconception_ids)
+        self.assertEqual(actual_misconception_ids, expected_misconception_ids)
 
 
 class QuestionMigrationTests(test_utils.GenericTestBase):
