@@ -412,16 +412,14 @@ class JsTsLintTests(test_utils.LinterTestBase):
         compile_all_ts_files_swap = self.swap(
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
 
-        with self.print_swap, compile_all_ts_files_swap:
-            js_ts_linter.JsTsLintChecksManager(
+        with compile_all_ts_files_swap:
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_APP_CONSTANTS_FILEPATH], FILE_CACHE,
             ).perform_all_lint_checks()
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-        self.assert_same_list_elements(
-            ['SUCCESS  Constants declaration check passed'],
-            self.linter_stdout)
-        self.assert_failed_messages_count(self.linter_stdout, 0)
+        expected_messages = ['SUCCESS  Constants declaration check passed']
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_check_constants_declaration_in_non_constant_file(self):
         def mock_compile_all_ts_files():
