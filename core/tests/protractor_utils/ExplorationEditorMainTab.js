@@ -499,10 +499,11 @@ var ExplorationEditorMainTab = function() {
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
     await waitFor.pageToFullyLoad();
     await action.click('stateEditButton', stateEditButton);
+    await waitFor.pageToFullyLoad();
     var stateEditorTag = element(by.tagName('state-content-editor'));
     await waitFor.visibilityOf(
       stateEditorTag, 'State editor tag not showing up');
-    var stateContentEditor = stateEditorTag.element(
+    var stateContentEditor = element(
       by.css('.protractor-test-state-content-editor'));
     await waitFor.visibilityOf(
       stateContentEditor,
