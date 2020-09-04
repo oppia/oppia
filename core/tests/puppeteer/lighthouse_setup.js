@@ -29,7 +29,7 @@ const networkIdle = 'networkidle0';
 var explorationEditorUrl = 'Exploration editor not loaded';
 var collectionEditorUrl = 'Collection editor not loaded';
 var topicEditorUrl = 'Topic editor not loaded';
-var _storyEditorUrl = 'Story editor not loaded';
+var unusedStoryEditorUrl = 'Story editor not loaded';
 var skillEditorUrl = 'Skill editor not loaded';
 
 var usernameInput = '.protractor-test-username-input';
@@ -216,7 +216,7 @@ const getTopicEditorUrl = async function(browser, page) {
   }
 };
 
-const _getStoryEditorUrl = async function(browser, page) {
+const unusedGetStoryEditorUrl = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(topicEditorUrl, { waitUntil: networkIdle });
