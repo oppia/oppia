@@ -802,8 +802,8 @@ class BaseMapReduceJobManagerMetaClass(type):
                 all strings converted to bytes.
             """
             for raw_output in new_cls.reduce(
-                    _deep_convert_to_unicode(key),
-                    _deep_convert_to_unicode(values)) or ():
+                    _deep_convert_from_bytes(key),
+                    _deep_convert_from_bytes(values)) or ():
                 yield _deep_convert_to_bytes(raw_output)
 
         new_cls._real_map = ( # pylint: disable=protected-access
@@ -1722,7 +1722,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             cls._kickoff_batch_job_after_previous_one_ends()
 
 
-def _deep_convert_to_unicode(value):
+def _deep_convert_from_bytes(value):
     """Returns a copy of value with all strings converted to bytes.
 
     Args:
@@ -1734,12 +1734,12 @@ def _deep_convert_to_unicode(value):
         *. An equivalent copy of value, but with only byte-strings.
     """
     if isinstance(value, tuple):
-        return tuple(_deep_convert_to_unicode(v) for v in value)
+        return tuple(_deep_convert_from_bytes(v) for v in value)
     elif isinstance(value, list):
-        return [_deep_convert_to_unicode(v) for v in value]
+        return [_deep_convert_from_bytes(v) for v in value]
     elif isinstance(value, dict):
         return {
-            _deep_convert_to_unicode(key): _deep_convert_to_unicode(value)
+            _deep_convert_from_bytes(key): _deep_convert_from_bytes(value)
             for key, value in value.items()
         }
     elif isinstance(value, python_utils.BASESTRING):
