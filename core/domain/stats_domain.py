@@ -342,6 +342,24 @@ class StateStats(python_utils.OBJECT):
         """Creates a StateStats domain object and sets all properties to 0."""
         return cls(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
+    def aggregate_from(self, other):
+        """Aggregates data from the other state stats into self.
+
+        Args:
+            other: StateStats. The other state stats instance to aggregate from.
+        """
+        self.total_answers_count_v1 += other.total_answers_count_v1
+        self.total_answers_count_v2 += other.total_answers_count_v2
+        self.useful_feedback_count_v1 += other.useful_feedback_count_v1
+        self.useful_feedback_count_v2 += other.useful_feedback_count_v2
+        self.total_hit_count_v1 += other.total_hit_count_v1
+        self.total_hit_count_v2 += other.total_hit_count_v2
+        self.first_hit_count_v1 += other.first_hit_count_v1
+        self.first_hit_count_v2 += other.first_hit_count_v2
+        self.num_times_solution_viewed_v2 += other.num_times_solution_viewed_v2
+        self.num_completions_v1 += other.num_completions_v1
+        self.num_completions_v2 += other.num_completions_v2
+
     def to_dict(self):
         """Returns a dict representation of the domain object."""
         state_stats_dict = {
@@ -373,6 +391,48 @@ class StateStats(python_utils.OBJECT):
             'num_completions': self.num_completions
         }
         return state_stats_dict
+
+    def __eq__(self, other):
+        """Implements == comparison between two StateStats instances, returning
+        whether they both hold the same values.
+
+        Args:
+            other: StateStats. The other instance to compare.
+
+        Returns:
+            bool. Whether the two instances have the same values.
+        """
+        if other.__class__ is self.__class__:
+            return (
+                self.total_answers_count_v1,
+                self.total_answers_count_v2,
+                self.useful_feedback_count_v1,
+                self.useful_feedback_count_v2,
+                self.total_hit_count_v1,
+                self.total_hit_count_v2,
+                self.first_hit_count_v1,
+                self.first_hit_count_v2,
+                self.num_times_solution_viewed_v2,
+                self.num_completions_v1,
+                self.num_completions_v2,
+            ) == (
+                other.total_answers_count_v1,
+                other.total_answers_count_v2,
+                other.useful_feedback_count_v1,
+                other.useful_feedback_count_v2,
+                other.total_hit_count_v1,
+                other.total_hit_count_v2,
+                other.first_hit_count_v1,
+                other.first_hit_count_v2,
+                other.num_times_solution_viewed_v2,
+                other.num_completions_v1,
+                other.num_completions_v2,
+            )
+        return NotImplemented # https://stackoverflow.com/a/44575926
+
+    def __hash__(self):
+        """Disallow hashing StateStats since they are mutable by design."""
+        raise TypeError('%s is unhashable' % self.__class__.__name__)
 
     @classmethod
     def from_dict(cls, state_stats_dict):

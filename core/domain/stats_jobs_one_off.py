@@ -63,6 +63,105 @@ def require_non_negative(
                 exp_id, exp_version, state_name, property_name, value))
 
 
+class RegenerateMissingStateStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job to regenerate individual state-stats in
+    ExplorationStatsModel.
+    """
+
+    REDUCE_KEY_BAD_RENAME = 'ExplorationStatsModel state stats has bad rename'
+    REDUCE_KEY_REGENERATED = 'ExplorationStatsModel state stats regenerated'
+    REDUCE_KEY_OK = 'ExplorationStatsModel with valid state(s)'
+
+    RELEVANT_COMMIT_CMDS = [
+        exp_domain.CMD_ADD_STATE,
+        exp_domain.CMD_RENAME_STATE,
+        exp_domain.CMD_DELETE_STATE,
+        exp_models.ExplorationModel.CMD_REVERT_COMMIT
+    ]
+
+    @staticmethod
+    def entity_classes_to_map_over():
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exp_model):
+        if exp_model.deleted:
+            return
+
+        latest_exp = exp_fetchers.get_exploration_by_id(exp_model.id)
+        exp_versions = list(python_utils.RANGE(1, latest_exp.version + 1))
+
+        all_exps = exp_models.ExplorationModel.get_multi_versions(
+            exp_model.id, exp_versions)
+        all_exp_stats = [
+            None if not model or model.deleted else
+            stats_services.get_exploration_stats_from_model(model)
+            for model in stats_models.ExplorationStatsModel.get_multi_versions(
+                exp_model.id, exp_versions)
+        ]
+        all_exp_version_diffs = [
+            exp_domain.ExplorationVersionsDiff([
+                exp_domain.ExplorationChange(commit_cmd)
+                for commit_cmd in snapshot['commit_cmds']
+                if commit_cmd['cmd'] in (
+                    RegenerateMissingStateStatsOneOffJob.RELEVANT_COMMIT_CMDS)
+            ])
+            for snapshot in exp_models.ExplorationModel.get_snapshots_metadata(
+                exp_model.id, exp_versions)
+        ]
+
+        for index, (exp, version_diff, stats) in enumerate(python_utils.ZIP(
+                all_exps, all_exp_version_diffs, all_exp_stats)):
+            if not exp or not version_diff or not stats:
+                continue
+
+            missing_states = set(exp.states) - set(stats.state_stats_mapping)
+            if not missing_states:
+                yield (RegenerateMissingStateStatsOneOffJob.REDUCE_KEY_OK, 1)
+                continue
+
+            for state_name in missing_states:
+                new_state_stats = stats_domain.StateStats.create_default()
+
+                if (index > 0 and
+                        state_name not in version_diff.added_state_names):
+                    old_state_stats_mapping = (
+                        all_exp_stats[index - 1] and
+                        all_exp_stats[index - 1].state_stats_mapping)
+                    old_state_name = version_diff.new_to_old_state_names.get(
+                        state_name, state_name)
+
+                    if (old_state_stats_mapping and
+                            old_state_name in old_state_stats_mapping):
+                        new_state_stats.aggregate_from(
+                            old_state_stats_mapping[old_state_name])
+                    else:
+                        yield (
+                            RegenerateMissingStateStatsOneOffJob
+                            .REDUCE_KEY_BAD_RENAME, (
+                                '%s.%s: "%s" -> "%s"' % (
+                                    exp.id, exp.version - 1, old_state_name,
+                                    state_name)
+                                ).encode('utf-8'))
+
+                stats.state_stats_mapping[state_name] = new_state_stats
+                yield (
+                    RegenerateMissingStateStatsOneOffJob
+                    .REDUCE_KEY_REGENERATED, (
+                        '%s.%s: %s' % (exp.id, exp.version, state_name)
+                        ).encode('utf-8'))
+
+            stats_services.save_stats_model_transactional(stats)
+
+    @staticmethod
+    def reduce(reduce_key, values):
+        if reduce_key == RegenerateMissingStateStatsOneOffJob.REDUCE_KEY_OK:
+            final_value = len(values)
+        else:
+            final_value = [v.decode('utf-8') for v in values]
+        yield (reduce_key, final_value)
+
+
 class RegenerateMissingV1StatsModelsOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """A one-off job to regenerate missing v1 stats models for explorations with
@@ -152,6 +251,16 @@ class RegenerateMissingV1StatsModelsOneOffJob(
                             old_state_name = (
                                 exp_versions_diff.new_to_old_state_names[
                                     state_name])
+                        if old_state_name not in (
+                                prev_exp_stats.state_stats_mapping):
+                            yield (
+                                'ExplorationStatsModel ignored StateStats '
+                                'regeneration due to missing historical data', (
+                                    '%s.%s: %s' % (
+                                        exploration.id, exp_version,
+                                        old_state_name)
+                                    ).encode('utf-8'))
+                            continue
                         # 'pssm' mean 'previous state stats mapping'.
                         pssm = prev_exp_stats.state_stats_mapping[
                             old_state_name]
@@ -1138,16 +1247,6 @@ class RegenerateMissingV2StatsModelsOneOffJob(
                 [exp_domain.ExpVersionReference(exp.id, version)
                  for version in python_utils.RANGE(1, exp.version + 1)]))
 
-        if exp.deleted:
-            all_existent_models = [m for m in all_models if m is not None]
-            stats_models.ExplorationStatsModel.delete_multi(all_existent_models)
-            yield (
-                'Deleted all stats', {
-                    'exp_id': exp.id,
-                    'number_of_models': len(all_existent_models)
-                })
-            return
-
         first_missing_version = None
         for version, model in enumerate(all_models):
             if model is None:
@@ -1303,8 +1402,10 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
             else:
                 exp_states = set(exp_model.states)
                 exp_stats_states = set(exp_stats_model.state_stats_mapping)
+                issue_found = False
 
                 for state_name in exp_states - exp_stats_states:
+                    issue_found = True
                     key = '%s:%s:%s' % (
                         exp_id,
                         state_name,
@@ -1317,6 +1418,14 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
                         (exp_model.version, state_version_occurrences))
 
                 for state_name in exp_stats_states - exp_states:
+                    # In early schema versions of ExplorationModel, the END
+                    # card was a persistant, _implicit_ state present in every
+                    # exploration. Because of this, it is not an error for
+                    # stats to exist for END even though it does not appear in
+                    # an exploration's representation.
+                    if state_name == 'END':
+                        continue
+                    issue_found = True
                     key = '%s:%s:%s' % (
                         exp_id,
                         state_name,
@@ -1328,7 +1437,7 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
                         key.encode('utf-8'),
                         (exp_model.version, state_version_occurrences))
 
-                if exp_states == exp_stats_states:
+                if not issue_found:
                     key = ExplorationMissingStatsAudit.STATUS_VALID_KEY
                     yield (key, exp_model.version)
 
