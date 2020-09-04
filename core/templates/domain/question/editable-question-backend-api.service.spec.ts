@@ -32,8 +32,6 @@ describe('Editable question backend API service', function() {
   var QuestionObjectFactory;
   var sampleDataResults = null;
   var sampleDataResultsObjects = null;
-  var $rootScope = null;
-  var $scope = null;
   var $httpBackend = null;
   var CsrfService = null;
 
@@ -52,8 +50,6 @@ describe('Editable question backend API service', function() {
     EditableQuestionBackendApiService = $injector.get(
       'EditableQuestionBackendApiService');
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
 

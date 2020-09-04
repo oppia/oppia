@@ -147,7 +147,6 @@ describe('Audio preloader service', function() {
   var aps, atls, eof, ecs;
   var $httpBackend = null;
   var UrlInterpolationService = null;
-  var $rootScope = null;
   var explorationDict;
   var requestUrl1, requestUrl2, requestUrl3, requestUrl4;
   beforeEach(angular.mock.inject(function($injector) {
@@ -158,7 +157,6 @@ describe('Audio preloader service', function() {
     eof = $injector.get('ExplorationObjectFactory');
     ecs = $injector.get('ContextService');
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
-    $rootScope = $injector.get('$rootScope');
     explorationDict = {
       id: 1,
       title: 'My Title',

@@ -26,7 +26,6 @@ angular.module('oppia').factory('AudioPlayerService', [
       ContextService, ngAudio) {
     var _currentTrackFilename = null;
     var _currentTrack = null;
-    var _currentTrackDuration = null;
 
     var _autoplayAudioEventEmitter = new EventEmitter();
 

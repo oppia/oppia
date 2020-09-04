@@ -24,7 +24,6 @@ require('domain/exploration/exploration-id-validation.service.ts');
 
 describe('Exploration id validation service', function() {
   var ExplorationIdValidationService = null;
-  var invalidExpResults = null;
   var validExpResults = null;
   var $httpBackend = null;
 

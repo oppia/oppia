@@ -51,7 +51,6 @@ describe('Topic update service', function() {
   var recordedVoiceoversObjectFactory = null;
   var TopicUpdateService = null;
   var TopicObjectFactory = null;
-  var subtopicObjectFactory = null;
   var skillSummaryObjectFactory = null;
   var subtitledHtmlObjectFactory = null;
   var subtopicPageObjectFactory = null;
@@ -164,7 +163,6 @@ describe('Topic update service', function() {
     TopicUpdateService = $injector.get('TopicUpdateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     subtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
-    subtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     subtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
     skillSummaryObjectFactory = $injector.get('ShortSkillSummaryObjectFactory');

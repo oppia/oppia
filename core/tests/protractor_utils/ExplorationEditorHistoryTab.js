@@ -25,8 +25,6 @@ var ExplorationEditorHistoryTab = function() {
   /*
    * Interactive elements
    */
-  var historyCheckboxSelector = element.all(by.css(
-    '.protractor-test-history-checkbox-selector'));
   var historyGraph = element(by.css('.protractor-test-history-graph'));
   var stateNodes = historyGraph.all(by.css('.protractor-test-node'));
   var stateNodeBackground = function(nodeElement) {
@@ -41,8 +39,6 @@ var ExplorationEditorHistoryTab = function() {
    */
   var closeStateHistoryButton = element(
     by.css('.protractor-test-close-history-state-modal'));
-  var showHistoryGraphButton = element(
-    by.css('.protractor-test-show-history-graph'));
   var revertVersionButton = element(by.css('.protractor-test-revert-version'));
   var resetGraphButton = element(by.css('.protractor-test-reset-graph'));
   var historyListOptions = element.all(

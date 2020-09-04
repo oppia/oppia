@@ -133,7 +133,6 @@ angular.module('oppia').factory('TrainingDataService', [
         }
 
         if (interaction.defaultOutcome) {
-          var outcome = interaction.defaultOutcome;
           potentialOutcomes.push(interaction.defaultOutcome);
         }
 

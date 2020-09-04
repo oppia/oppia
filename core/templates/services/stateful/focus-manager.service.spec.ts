@@ -32,7 +32,6 @@ describe('Focus Manager Service', function() {
   var FocusManagerService;
   var DeviceInfoService;
   var IdGenerationService;
-  var rootScope;
   var $timeout;
   var clearLabel;
   var focusLabel = 'FocusLabel';
@@ -53,7 +52,6 @@ describe('Focus Manager Service', function() {
     FocusManagerService = $injector.get('FocusManagerService');
     DeviceInfoService = $injector.get('DeviceInfoService');
     IdGenerationService = $injector.get('IdGenerationService');
-    rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
   }));
 

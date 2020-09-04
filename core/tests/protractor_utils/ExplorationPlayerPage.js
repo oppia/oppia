@@ -46,9 +46,6 @@ var ExplorationPlayerPage = function() {
   var waitingForResponseElem = element(by.css(
     '.protractor-test-input-response-loading-dots'));
   var ratingStars = element.all(by.css('.protractor-test-rating-star'));
-  var answerDetailsTextArea = element(
-    by.css('.protractor-test-answer-details-text-area'));
-
   var suggestionSubmitButton = element(
     by.css('.protractor-test-suggestion-submit-btn'));
   var feedbackCloseButton = element(
@@ -72,8 +69,6 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-cancel-redirection-button'));
   var returnToParentButton = element(
     by.css('.protractor-test-return-to-parent-button'));
-  var answerDetailsSubmitButton = element(
-    by.css('.protractor-test-answer-details-submit-button'));
   var correctFeedbackElement = element(
     by.css('.protractor-test-correct-feedback'));
 

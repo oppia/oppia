@@ -249,7 +249,6 @@ export class CodeReplPredictionService {
     const cvVocabulary = classifierData.cv_vocabulary;
 
     const fingerprintData = knnData.fingerprint_data;
-    const top = knnData.top;
     const occurrence = knnData.occurrence;
 
     const nearestNeighborsIndexes = (

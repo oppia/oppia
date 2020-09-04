@@ -44,16 +44,12 @@ var AdminPage = function() {
   var assignReviewerForm = element(
     by.css('.protractor-test-assign-reviewer-form'));
   var viewReviewerForm = element(by.css('.protractor-test-view-reviewer-form'));
-  var removeReviewerForm = element(by.css(
-    '.protractor-test-remove-reviewer-form'));
   var languageSelectCss = by.css('.protractor-test-form-language-select');
   var reviewerUsernameCss = by.css('.protractor-test-form-reviewer-username');
   var reviewCategorySelectCss = by.css(
     '.protractor-test-form-review-category-select');
   var reviewerFormSubmitButtonCss = by.css(
     '.protractor-test-reviewer-form-submit-button');
-  var userReviewRightsTable = by.css(
-    '.protractor-test-user-review-rights-table');
   var userTranslationReviewerLanguageCss = by.css(
     '.protractor-test-translation-reviewer-language');
   var userVoiceoverReviewerLanguageCss = by.css(
@@ -73,34 +69,12 @@ var AdminPage = function() {
   var unfinishedOffJobIDClassName = (
     '.protractor-test-unfinished-one-off-jobs-id');
 
-  // Adding a new community reviewer.
-  var addReviewerName = element(by.css(
-    '.protractor-test-add-reviewer-username'));
-  var selectReviewerRole = element(by.css(
-    '.protractor-test-select-reviewer-role'));
-  var addReviewerFormSubmitButton = element(by.css(
-    '.protractor-test-add-reviewer-form-submit-button'));
-
-  // Viewing community reviewers by role.
-  var reviewerMethodDropdown = element(by.css(
-    '.protractor-test-reviewer-role-method'));
-  var reviewerRoleValueOption = element(by.css(
-    '.protractor-test-reviewer-role-value'));
-  var viewReviewerRoleButton = element(by.css(
-    '.protractor-test-view-reviewer-role-button'));
-  var reviewerUsernamesResult = element(by.css(
-    '.protractor-test-reviewer-roles-result'));
-
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
   // a problem when used to run tests directly on Travis.
   if (general.isInDevMode()) {
     var explorationElements = element.all(by.css(
       '.protractor-test-reload-exploration-row'
-    ));
-
-    var reloadAllExplorationsButtons = element.all(by.css(
-      '.protractor-test-reload-all-explorations-button'
     ));
 
     var reloadCollectionButtons = element.all(by.css(

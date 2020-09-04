@@ -85,10 +85,6 @@ describe('Collection update service', function() {
       sampleCollectionBackendObject);
   }));
 
-  var _getCollectionNode = function(expId) {
-    return _sampleCollection.getCollectionNodeByExplorationId(expId);
-  };
-
   it('should add/remove a new collection node to/from a collection',
     function() {
       expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0']);

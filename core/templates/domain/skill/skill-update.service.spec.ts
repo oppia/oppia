@@ -40,7 +40,6 @@ describe('Skill update service', function() {
     subtitledHtmlObjectFactory = null,
     SkillObjectFactory = null,
     misconceptionObjectFactory = null,
-    rubricObjectFactory = null,
     skillDifficulties = null,
     UndoRedoService = null,
     workedExampleObjectFactory = null;
@@ -71,7 +70,6 @@ describe('Skill update service', function() {
     SkillObjectFactory = $injector.get('SkillObjectFactory');
     subtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
     misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
-    rubricObjectFactory = $injector.get('RubricObjectFactory');
     workedExampleObjectFactory = $injector.get('WorkedExampleObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
     skillDifficulties = $injector.get('SKILL_DIFFICULTIES');

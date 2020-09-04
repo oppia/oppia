@@ -127,7 +127,6 @@ describe('TranslatePipe', () => {
 class MockComponent { }
 /* eslint-enable max-len */
 describe('Angular', () => {
-  let component: MockComponent;
   let fixture: ComponentFixture<MockComponent>;
 
   beforeEach(async(() => {
@@ -142,7 +141,6 @@ describe('Angular', () => {
       ]
     }).compileComponents();
     fixture = TestBed.createComponent(MockComponent);
-    component = fixture.componentInstance;
   }));
 
   it('should sanitize translations', fakeAsync(() => {

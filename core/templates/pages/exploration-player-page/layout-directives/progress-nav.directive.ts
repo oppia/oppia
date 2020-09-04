@@ -64,7 +64,6 @@ angular.module('oppia').directive('progressNav', [
           ctrl.directiveSubscriptions = new Subscription();
           var transcriptLength = 0;
           var interactionIsInline = true;
-          var interactionHasNavSubmitButton = false;
           var SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE = [
             'ItemSelectionInput', 'MultipleChoiceInput'];
           var updateDisplayedCardInfo = function() {
@@ -78,17 +77,12 @@ angular.module('oppia').directive('progressNav', [
             $scope.conceptCardIsBeingShown = (
               $scope.displayedCard.getStateName() === null &&
               !ExplorationPlayerStateService.isInQuestionMode());
-            var interaction = $scope.displayedCard.getInteraction();
             if (!$scope.conceptCardIsBeingShown) {
               interactionIsInline = (
                 $scope.displayedCard.isInteractionInline());
               $scope.interactionCustomizationArgs =
                 $scope.displayedCard.getInteractionCustomizationArgs();
               $scope.interactionId = $scope.displayedCard.getInteractionId();
-              if ($scope.interactionId) {
-                interactionHasNavSubmitButton = (
-                  doesInteractionHaveNavSubmitButton());
-              }
             }
 
             $scope.helpCardHasContinueButton = false;

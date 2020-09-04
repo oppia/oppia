@@ -72,8 +72,6 @@ angular.module('oppia').directive('topNavigationBar', [
           var NAV_ELEMENTS_ORDER = [
             'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_CLASSROOM', 'I18N_TOPNAV_ABOUT',
             'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
-          var truncateNavbarDebounced =
-            DebouncerService.debounce(truncateNavbar, 500);
 
           ctrl.CLASSROOM_PROMOS_ARE_ENABLED = false;
 

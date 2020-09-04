@@ -87,8 +87,6 @@ angular.module('oppia').directive('skillConceptCardEditor', [
             };
           };
 
-          var workedExamplesMemento = null;
-
           $scope.isEditable = function() {
             return true;
           };

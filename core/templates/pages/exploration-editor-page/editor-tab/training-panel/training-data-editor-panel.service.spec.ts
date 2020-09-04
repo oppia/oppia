@@ -22,8 +22,6 @@ describe('Training Data Editor Panel Service', function() {
   var TrainingDataEditorPanelService = null;
   var $uibModal = null;
   var AlertsService = null;
-  var ExternalSaveService = null;
-  var $rootScope = null;
 
   var mockExternalSaveEventEmitter = null;
 
@@ -41,8 +39,6 @@ describe('Training Data Editor Panel Service', function() {
       'TrainingDataEditorPanelService');
     $uibModal = $injector.get('$uibModal');
     AlertsService = $injector.get('AlertsService');
-    ExternalSaveService = $injector.get('ExternalSaveService');
-    $rootScope = $injector.get('$rootScope');
     spyOn(mockExternalSaveEventEmitter, 'emit');
   }));
 

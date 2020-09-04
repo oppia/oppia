@@ -62,7 +62,7 @@ export class UrlService {
   https://github.com/oppia/oppia/pull/7834#issuecomment-547896982 */
   getUrlParams(): UrlParamsType {
     let params = {};
-    let parts = this.getCurrentQueryString().replace(
+    this.getCurrentQueryString().replace(
       /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
         return params[decodeURIComponent(key)] = decodeURIComponent(value);
       }

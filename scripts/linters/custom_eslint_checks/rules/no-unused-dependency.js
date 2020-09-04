@@ -18,8 +18,6 @@
 
 'use strict';
 
-const { param } = require('jquery');
-
 module.exports = {
   meta: {
     type: 'problem',

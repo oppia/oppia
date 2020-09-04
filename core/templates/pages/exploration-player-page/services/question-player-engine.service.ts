@@ -66,10 +66,6 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
     var currentIndex = null;
     var nextIndex = null;
 
-    var randomFromArray = function(arr) {
-      return arr[Math.floor(Math.random() * arr.length)];
-    };
-
     // Evaluate feedback.
     var makeFeedback = function(feedbackHtml, envs) {
       return ExpressionInterpolationService.processHtml(feedbackHtml, envs);
@@ -206,7 +202,6 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
         }
 
         answerIsBeingProcessed = true;
-        var oldIndex = currentIndex;
         var oldState = _getCurrentStateData();
         var recordedVoiceovers = oldState.recordedVoiceovers;
         var classificationResult = (

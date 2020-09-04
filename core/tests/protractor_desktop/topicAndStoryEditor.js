@@ -22,7 +22,6 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var Constants = require('../protractor_utils/ProtractorConstants.js');
 var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');

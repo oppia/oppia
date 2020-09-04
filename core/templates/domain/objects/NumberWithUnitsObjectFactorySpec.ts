@@ -29,14 +29,12 @@ describe('NumberWithUnitsObjectFactory', () => {
   describe('number with units object factory', () => {
     var nwuof = null;
     var uof = null;
-    var fraction = null;
     var errors = null;
 
     beforeEach(() => {
       nwuof = new NumberWithUnitsObjectFactory(
         new UnitsObjectFactory(), new FractionObjectFactory());
       uof = new UnitsObjectFactory();
-      fraction = new FractionObjectFactory();
       errors = ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS;
     });
 

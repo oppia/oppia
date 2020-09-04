@@ -313,7 +313,6 @@ angular.module('oppia').factory('StoryUpdateService', [
        * Removes a story node, and records the change in the undo/redo service.
        */
       deleteStoryNode: function(story, nodeId) {
-        var nodeIndex = story.getStoryContents().getNodeIndex(nodeId);
         _applyChange(story, CMD_DELETE_STORY_NODE, {
           node_id: nodeId
         }, function(changeDict, story) {

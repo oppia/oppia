@@ -23,7 +23,6 @@ var users = require('./users.js');
 var waitFor = require('./waitFor.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
-var LibraryPage = require('./LibraryPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
 
 var imageUploadInput = element(

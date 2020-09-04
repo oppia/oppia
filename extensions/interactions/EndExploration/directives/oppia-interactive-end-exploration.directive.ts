@@ -83,7 +83,6 @@ angular.module('oppia').directive('oppiaInteractiveEndExploration', [
             if (ctrl.isInEditorPage) {
               // Display a message if any author-recommended explorations are
               // invalid.
-              var explorationId = ContextService.getExplorationId();
               $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
                 params: {
                   stringified_exp_ids: JSON.stringify(

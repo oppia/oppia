@@ -110,7 +110,7 @@ angular.module('oppia').directive('stateResponses', [
         'state-responses.directive.html'),
       controller: [
         '$filter', '$scope', '$uibModal', 'AlertsService',
-        'AnswerGroupObjectFactory', 'ContextService',
+        'AnswerGroupObjectFactory',
         'EditabilityService', 'ExternalSaveService', 'ResponsesService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
@@ -122,7 +122,7 @@ angular.module('oppia').directive('stateResponses', [
         'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
         function(
             $filter, $scope, $uibModal, AlertsService,
-            AnswerGroupObjectFactory, ContextService,
+            AnswerGroupObjectFactory,
             EditabilityService, ExternalSaveService, ResponsesService,
             StateCustomizationArgsService, StateEditorService,
             StateInteractionIdService, StateNextContentIdIndexService,
@@ -138,8 +138,6 @@ angular.module('oppia').directive('stateResponses', [
             if (StateEditorService.isInQuestionMode()) {
               return;
             }
-            var explorationId = ContextService.getExplorationId();
-            var currentStateName = $scope.stateName;
           };
 
           $scope.isInQuestionMode = function() {

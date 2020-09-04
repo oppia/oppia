@@ -20,7 +20,6 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
-var waitFor = require('../protractor_utils/waitFor.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var ContributorDashboardPage = require(

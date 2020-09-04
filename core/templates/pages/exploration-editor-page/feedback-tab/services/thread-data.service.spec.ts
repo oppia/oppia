@@ -34,14 +34,11 @@ require('services/suggestions.service.ts');
 describe('retrieving threads service', () => {
   let $httpBackend = null;
   let $q = null;
-  let $rootScope = null;
   let ContextService = null;
   let CsrfTokenService = null;
   let FeedbackThreadObjectFactory = null;
   let SuggestionThreadObjectFactory = null;
   let ThreadDataService = null;
-
-  const expId = 'exp1';
 
   let mockFeedbackThreads;
   let mockSuggestionThreads;
@@ -140,7 +137,6 @@ describe('retrieving threads service', () => {
   beforeEach(angular.mock.inject($injector => {
     $httpBackend = $injector.get('$httpBackend');
     $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');
     CsrfTokenService = $injector.get('CsrfTokenService');
     FeedbackThreadObjectFactory = $injector.get('FeedbackThreadObjectFactory');

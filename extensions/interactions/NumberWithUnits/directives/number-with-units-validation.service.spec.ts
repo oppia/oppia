@@ -36,7 +36,6 @@ describe('NumberWithUnitsValidationService', () => {
   var answerGroups, goodDefaultOutcome;
   var equalsTwoRule, equalsTwoByThreeRule, equivalentToTwoThousandRule,
     equivalentToTwoByThreeRule, equivalentToTwoRule;
-  var createNumberWithUnitsDict;
   var oof, agof, rof;
 
   beforeEach(() => {

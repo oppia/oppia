@@ -55,7 +55,6 @@ angular.module('oppia').factory('TranslationStatusService', [
     var stateWiseStatusColor = {};
     var explorationContentRequiredCount = 0;
     var explorationContentNotAvailableCount = 0;
-    var recordedVoiceovers = StateRecordedVoiceoversService.displayed;
 
     var _getVoiceOverStatus = function(recordedVoiceovers, contentId) {
       var availabilityStatus = {

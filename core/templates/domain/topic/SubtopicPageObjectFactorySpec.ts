@@ -23,7 +23,6 @@ import { SubtopicPageObjectFactory } from
 
 describe('Subtopic page object factory', () => {
   let subtopicPageObjectFactory: SubtopicPageObjectFactory = null;
-  var _sampleSubtopic = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

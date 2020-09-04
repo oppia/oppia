@@ -34,14 +34,12 @@ describe('Subtopic validation service', function() {
 
   var TopicObjectFactory = null;
   var TopicEditorStateService = null;
-  var EntityCreationService = null;
   var SubtopicValidationService = null;
   var SubtopicObjectFactory = null;
 
   beforeEach(angular.mock.inject(function($injector) {
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
-    EntityCreationService = $injector.get('EntityCreationService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     SubtopicValidationService = $injector.get('SubtopicValidationService');
 

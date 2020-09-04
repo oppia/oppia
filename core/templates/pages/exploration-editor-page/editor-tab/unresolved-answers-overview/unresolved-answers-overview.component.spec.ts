@@ -34,7 +34,6 @@ describe('Unresolved Answers Overview Component', function() {
   var editabilityService = null;
   var explorationStatesService = null;
   var improvementsService = null;
-  var externalSaveService = null;
   var stateInteractionIdService = null;
   var stateEditorService = null;
   var stateTopAnswersStatsService = null;
@@ -65,7 +64,6 @@ describe('Unresolved Answers Overview Component', function() {
     $uibModal = $injector.get('$uibModal');
     explorationStatesService = $injector.get('ExplorationStatesService');
     improvementsService = $injector.get('ImprovementsService');
-    externalSaveService = $injector.get('ExternalSaveService');
     stateEditorService = $injector.get('StateEditorService');
     stateTopAnswersStatsService = $injector.get('StateTopAnswersStatsService');
 

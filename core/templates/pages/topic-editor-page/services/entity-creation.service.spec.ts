@@ -33,10 +33,8 @@ describe('Entity creation service', function() {
 
   var $rootScope = null;
   var $uibModal = null;
-  var $window = null;
   var $q = null;
   var $location = null;
-  var SkillCreationService = null;
   var TopicObjectFactory = null;
   var TopicEditorStateService = null;
   var TopicEditorRoutingService = null;
@@ -46,10 +44,8 @@ describe('Entity creation service', function() {
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $location = $injector.get('$location');
-    $window = $injector.get('$window');
     $q = $injector.get('$q');
     $uibModal = $injector.get('$uibModal');
-    SkillCreationService = $injector.get('SkillCreationService');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');

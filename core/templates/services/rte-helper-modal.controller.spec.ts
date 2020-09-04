@@ -23,7 +23,6 @@ describe('Rte Helper Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var $timeout = null;
-  var externalRteSaveService = null;
 
   var mockExternalRteSaveEventEmitter = null;
 
@@ -51,8 +50,6 @@ describe('Rte Helper Modal Controller', function() {
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
-
-      externalRteSaveService = $injector.get('ExternalRteSaveService');
 
       $scope = $rootScope.$new();
       $controller(
@@ -101,7 +98,6 @@ describe('Rte Helper Modal Controller', function() {
     var $q = null;
     var AssetsBackendApiService = null;
     var ImageUploadHelperService = null;
-    var ImageLocalStorageService = null;
     var ContextService = null;
     beforeEach(angular.mock.module('oppia'));
 
@@ -119,8 +115,6 @@ describe('Rte Helper Modal Controller', function() {
 
       AssetsBackendApiService = $injector.get('AssetsBackendApiService');
       ImageUploadHelperService = $injector.get('ImageUploadHelperService');
-      ImageLocalStorageService = $injector.get('ImageLocalStorageService');
-      externalRteSaveService = $injector.get('ExternalRteSaveService');
       ContextService = $injector.get('ContextService');
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -195,9 +189,6 @@ describe('Rte Helper Modal Controller', function() {
           svg_filename: 'mathImage.svg'
         }
       }];
-      var response = {
-        filename: 'mathImage.svg'
-      };
       var imageFile = new Blob();
       spyOn(AssetsBackendApiService, 'saveMathExpresionImage').and.returnValue(
         $q.reject({}));
@@ -220,9 +211,6 @@ describe('Rte Helper Modal Controller', function() {
           svg_filename: 'mathImage.svg'
         }
       }];
-      var response = {
-        filename: 'mathImage.svg'
-      };
       var imageFile = (
         new Blob(
           [new ArrayBuffer(102 * 1024)], {type: 'application/octet-stream'}));
@@ -263,9 +251,7 @@ describe('Rte Helper Modal Controller', function() {
             svg_filename: 'mathImage.svg'
           }
         }];
-        var response = {
-          filename: 'mathImage.svg'
-        };
+
         var imageFile = new Blob();
         spyOn(ContextService, 'getImageSaveDestination').and.returnValue(
           AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
@@ -309,8 +295,6 @@ describe('Rte Helper Modal Controller', function() {
 
         $uibModalInstance = jasmine.createSpyObj(
           '$uibModalInstance', ['close', 'dismiss']);
-
-        externalRteSaveService = $injector.get('ExternalRteSaveService');
 
         $scope = $rootScope.$new();
         $controller(

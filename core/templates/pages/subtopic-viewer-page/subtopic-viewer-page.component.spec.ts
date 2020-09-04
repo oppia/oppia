@@ -38,7 +38,6 @@ describe('Subtopic viewer page', function() {
   var topicName = 'Topic Name';
   var abbreviatedTopicName = 'abbrev';
   var topicId = '1';
-  var subtopicId = '1';
   var subtopicTitle = 'Subtopic Title';
   var subtopicUrlFragment = 'subtopic-title';
 

@@ -20,7 +20,6 @@
 var action = require('../protractor_utils/action.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
-var path = require('path');
 
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
@@ -28,7 +27,6 @@ var PreferencesPage = function() {
     by.css('.protractor-test-editor-role-email-checkbox'));
   var feedbackMessageEmailsCheckbox = element(
     by.css('.protractor-test-feedback-message-email-checkbox'));
-  var languageOptionsList = element.all(by.css('.select2-results'));
   var navBar = element(by.css('.oppia-navbar-dropdown-toggle'));
   var pageHeader = element(by.css('.protractor-test-preferences-title'));
   var preferredAudioLanguageSelector = element(

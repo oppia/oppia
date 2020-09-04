@@ -24,7 +24,6 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import { Subscription } from 'rxjs';
 
 describe('Training Modal Service', function() {
-  var $rootScope;
   var TrainingModalService = null;
   var AlertsService = null;
   var ExternalSaveService = null;
@@ -41,7 +40,6 @@ describe('Training Modal Service', function() {
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
-    $rootScope = $injector.get('$rootScope');
     TrainingModalService = $injector.get(
       'TrainingModalService');
     AlertsService = $injector.get('AlertsService');

@@ -30,22 +30,14 @@ describe('Subtopic editor tab', function() {
       $provide.value(key, value);
     }
   }));
-  var $scope = null;
   var ctrl = null;
-  var $rootScope = null;
-  var ContextService = null;
   var skillSummary = null;
-  var ImageUploadHelperService = null;
-  var directive = null;
   var TopicEditorStateService = null;
   var TopicUpdateService = null;
-  var EntityCreationService = null;
   var SubtopicValidationService = null;
   var TopicEditorRoutingService = null;
-  var WindowDimensionsService = null;
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
-  var QuestionBackendApiService = null;
   var ShortSkillSummaryObjectFactory = null;
   var SubtopicPageObjectFactory = null;
   var MockWindowDimensionsService = {
@@ -56,23 +48,15 @@ describe('Subtopic editor tab', function() {
   var topicReinitializedEventEmitter = null;
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    ContextService = $injector.get('ContextService');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicUpdateService = $injector.get('TopicUpdateService');
     SubtopicValidationService = $injector.get('SubtopicValidationService');
-    EntityCreationService = $injector.get('EntityCreationService');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
-    WindowDimensionsService = $injector.get('WindowDimensionsService');
     ShortSkillSummaryObjectFactory = $injector.get(
       'ShortSkillSummaryObjectFactory');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
-    ImageUploadHelperService = $injector.get('ImageUploadHelperService');
-    QuestionBackendApiService = $injector.get('QuestionBackendApiService');
-    directive = $injector.get('subtopicEditorTabDirective')[0];
 
     var MockQuestionBackendApiService = {
       fetchTotalQuestionCountForSkillIds: () => Promise.resolve(2)
