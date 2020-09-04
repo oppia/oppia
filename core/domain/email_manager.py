@@ -26,7 +26,7 @@ from constants import constants
 from core.domain import config_domain
 from core.domain import email_services
 from core.domain import html_cleaner
-from core.domain import rights_manager
+from core.domain import rights_domain
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
@@ -163,10 +163,10 @@ EXPLORATION_ROLE_VOICE_ARTIST = 'voice artist rights'
 EXPLORATION_ROLE_PLAYTESTER = 'playtest access'
 
 EDITOR_ROLE_EMAIL_HTML_ROLES = {
-    rights_manager.ROLE_OWNER: EXPLORATION_ROLE_MANAGER,
-    rights_manager.ROLE_EDITOR: EXPLORATION_ROLE_EDITOR,
-    rights_manager.ROLE_VOICE_ARTIST: EXPLORATION_ROLE_VOICE_ARTIST,
-    rights_manager.ROLE_VIEWER: EXPLORATION_ROLE_PLAYTESTER
+    rights_domain.ROLE_OWNER: EXPLORATION_ROLE_MANAGER,
+    rights_domain.ROLE_EDITOR: EXPLORATION_ROLE_EDITOR,
+    rights_domain.ROLE_VOICE_ARTIST: EXPLORATION_ROLE_VOICE_ARTIST,
+    rights_domain.ROLE_VIEWER: EXPLORATION_ROLE_PLAYTESTER
 }
 
 _EDITOR_ROLE_EMAIL_HTML_RIGHTS = {

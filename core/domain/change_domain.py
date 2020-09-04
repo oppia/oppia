@@ -93,7 +93,8 @@ class BaseChange(python_utils.OBJECT):
     # list is a dict with keys as: name (command name), required_attribute_names
     # (a list of required attribute names of a command),
     # optional_attribute_name (the list of optional attribute names of a
-    # command). There can be a optional key allowed_values which is a
+    # command), user_id_attribute_names (the list of attribute names that
+    # contain user ID). There can be a optional key allowed_values which is a
     # dict with key as attribute name and value as allowed values
     # for the attribute.
     # This list can be overriden by subclasses, if needed.
@@ -104,7 +105,8 @@ class BaseChange(python_utils.OBJECT):
     COMMON_ALLOWED_COMMANDS = [{
         'name': base_models.VersionedModel.CMD_DELETE_COMMIT,
         'required_attribute_names': [],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
     def __init__(self, change_dict):

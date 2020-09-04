@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_fetchers
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
@@ -129,7 +130,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
             self.COLLECTION_ID, self.owner_id)
         rights_manager.assign_role_for_collection(
             self.admin, self.COLLECTION_ID, self.editor_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         self.login(self.EDITOR_EMAIL)
@@ -173,7 +174,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
             self.COLLECTION_ID, self.owner_id)
         rights_manager.assign_role_for_collection(
             self.admin, self.COLLECTION_ID, self.viewer_id,
-            rights_manager.ROLE_VIEWER)
+            rights_domain.ROLE_VIEWER)
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         self.login(self.VIEWER_EMAIL)
@@ -200,7 +201,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
             self.COLLECTION_ID, self.owner_id)
         rights_manager.assign_role_for_collection(
             self.admin, self.COLLECTION_ID, self.editor_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         self.login(self.EDITOR_EMAIL)
@@ -255,7 +256,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         # Check that collection is published correctly.
         rights_manager.assign_role_for_collection(
             self.owner, collection_id, self.editor_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
         rights_manager.publish_collection(self.owner, collection_id)
 
         # Check that collection cannot be unpublished by non admin.
@@ -265,14 +266,14 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         collection_rights = rights_manager.get_collection_rights(collection_id)
         self.assertEqual(
             collection_rights.status,
-            rights_manager.ACTIVITY_STATUS_PUBLIC)
+            rights_domain.ACTIVITY_STATUS_PUBLIC)
 
         # Check that collection can be unpublished by admin.
         rights_manager.unpublish_collection(self.admin, collection_id)
         collection_rights = rights_manager.get_collection_rights(collection_id)
         self.assertEqual(
             collection_rights.status,
-            rights_manager.ACTIVITY_STATUS_PRIVATE)
+            rights_domain.ACTIVITY_STATUS_PRIVATE)
 
     def test_get_collection_rights(self):
         whitelisted_usernames = [self.OWNER_USERNAME]

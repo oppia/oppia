@@ -25,7 +25,7 @@ import datetime
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import rights_manager
+from core.domain import rights_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -133,7 +133,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             self.USER_ID_COMMITTER, 'Created new exploration right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
         exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_2,
             owner_ids=[self.USER_ID_1],
@@ -146,7 +146,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             self.USER_ID_COMMITTER, 'Created new exploration right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
         exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_3,
             owner_ids=[self.USER_ID_1],
@@ -159,7 +159,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             self.USER_ID_COMMITTER, 'Created new exploration right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
         exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_4,
             owner_ids=[self.USER_ID_4],
@@ -172,7 +172,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             first_published_msec=0.4
         ).save(
             self.USER_ID_COMMITTER, 'Created new exploration right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
 
         self.exp_1_dict = (
             exp_models.ExplorationRightsModel.get_by_id(
@@ -214,12 +214,17 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             'cid', 'Created new exploration right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
         saved_model = exp_models.ExplorationRightsModel.get('id_0')
         self.assertEqual(saved_model.id, 'id_0')
         self.assertEqual(saved_model.owner_ids, ['owner_id'])
         self.assertEqual(saved_model.voice_artist_ids, ['voice_artist_id'])
         self.assertEqual(saved_model.viewer_ids, ['viewer_id'])
+        self.assertEqual(
+            ['editor_id', 'owner_id', 'viewer_id', 'voice_artist_id'],
+            exp_models.ExplorationRightsSnapshotMetadataModel
+            .get_by_id('id_0-1').content_user_ids
+        )
 
     def test_export_data_on_highly_involved_user(self):
         """Test export data on user involved in all datastore explorations."""
@@ -306,7 +311,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
         self.exploration_model.save(
             self.USER_ID_COMMITTER, 'Created new exploration right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}]
+            [{'cmd': rights_domain.CMD_CREATE_NEW}]
         )
         self.excluded_fields = ['created_on', 'last_updated', 'version']
         # Here copy.deepcopy is needed to mitigate
@@ -316,13 +321,32 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         self.exploration_model.owner_ids = [self.USER_ID_1, self.USER_ID_3]
         self.exploration_model.save(
             self.USER_ID_COMMITTER, 'Add owner',
-            [{'cmd': rights_manager.CMD_CHANGE_ROLE}]
+            [{
+                'cmd': rights_domain.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_ID_3,
+                'old_role': rights_domain.ROLE_NONE,
+                'new_role': rights_domain.ROLE_OWNER
+            }]
         )
         self.allow_revert_swap = self.swap(
             exp_models.ExplorationRightsModel, 'ALLOW_REVERT', True)
 
+        exploration_rights_allowed_commands = copy.deepcopy(
+            feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS)
+        exploration_rights_allowed_commands.append({
+            'name': feconf.CMD_REVERT_COMMIT,
+            'required_attribute_names': [],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': []
+        })
+        self.allowed_commands_swap = self.swap(
+            feconf,
+            'EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS',
+            exploration_rights_allowed_commands
+        )
+
     def test_revert_to_valid_version_is_successful(self):
-        with self.allow_revert_swap:
+        with self.allow_revert_swap, self.allowed_commands_swap:
             exp_models.ExplorationRightsModel.revert(
                 self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
         new_collection_model = (
@@ -347,7 +371,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         snapshot_model.content = broken_dict
         snapshot_model.put()
 
-        with self.allow_revert_swap:
+        with self.allow_revert_swap, self.allowed_commands_swap:
             exp_models.ExplorationRightsModel.revert(
                 self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
         new_collection_model = (
@@ -371,7 +395,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         snapshot_model.content = broken_dict
         snapshot_model.put()
 
-        with self.allow_revert_swap:
+        with self.allow_revert_swap, self.allowed_commands_swap:
             exp_models.ExplorationRightsModel.revert(
                 self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
         new_collection_model = (
@@ -395,7 +419,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
         snapshot_model.content = broken_dict
         snapshot_model.put()
-        with self.allow_revert_swap:
+        with self.allow_revert_swap, self.allowed_commands_swap:
             exp_models.ExplorationRightsModel.revert(
                 self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
 

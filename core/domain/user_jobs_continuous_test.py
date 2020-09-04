@@ -30,6 +30,7 @@ from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rating_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import stats_domain
 from core.domain import stats_services
@@ -406,7 +407,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             # User A adds user B as an editor of the exploration.
             rights_manager.assign_role_for_exploration(
-                user_a, EXP_ID, user_b_id, rights_manager.ROLE_EDITOR)
+                user_a, EXP_ID, user_b_id, rights_domain.ROLE_EDITOR)
 
             (
                 user_jobs_continuous.DashboardRecentUpdatesAggregator
@@ -915,7 +916,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID_1, self.user_b_id,
-            rights_manager.ROLE_OWNER)
+            rights_domain.ROLE_OWNER)
 
         exp_version = self.EXP_DEFAULT_VERSION
         exp_id = self.EXP_ID_1

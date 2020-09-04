@@ -30,6 +30,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rating_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_jobs_continuous
@@ -676,11 +677,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
+                rights_domain.ROLE_EDITOR)
             # User A adds user C as a viewer of the exploration.
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID_1, self.user_c_id,
-                rights_manager.ROLE_VIEWER)
+                rights_domain.ROLE_VIEWER)
 
         self._run_one_off_job()
 
@@ -728,7 +729,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
+                rights_domain.ROLE_EDITOR)
             # The exploration becomes community-owned.
             rights_manager.publish_exploration(self.user_a, self.EXP_ID_1)
             rights_manager.release_ownership_of_exploration(
@@ -787,11 +788,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             # User A adds user B as an editor to the collection.
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
+                rights_domain.ROLE_EDITOR)
             # User A adds user C as a viewer of the collection.
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID_1, self.user_c_id,
-                rights_manager.ROLE_VIEWER)
+                rights_domain.ROLE_VIEWER)
 
         self._run_one_off_job()
 
@@ -931,7 +932,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             # User A adds user B as an editor to the collection.
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
+                rights_domain.ROLE_EDITOR)
 
             # The collection becomes community-owned.
             rights_manager.publish_collection(self.user_a, self.COLLECTION_ID_1)

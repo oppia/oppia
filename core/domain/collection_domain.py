@@ -110,49 +110,60 @@ class CollectionChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': ['category', 'title'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_COLLECTION_NODE,
         'required_attribute_names': ['exploration_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_DELETE_COLLECTION_NODE,
         'required_attribute_names': ['exploration_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_SWAP_COLLECTION_NODES,
         'required_attribute_names': ['first_index', 'second_index'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_EDIT_COLLECTION_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value'],
         'optional_attribute_names': ['old_value'],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': COLLECTION_PROPERTIES}
     }, {
         'name': CMD_EDIT_COLLECTION_NODE_PROPERTY,
         'required_attribute_names': [
             'exploration_id', 'property_name', 'new_value'],
-        'optional_attribute_names': ['old_value']
+        'optional_attribute_names': ['old_value'],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_COLLECTION_SKILL,
         'required_attribute_names': ['name'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_DELETE_COLLECTION_SKILL,
         'required_attribute_names': ['skill_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_QUESTION_ID_TO_SKILL,
         'required_attribute_names': ['question_id', 'skill_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_REMOVE_QUESTION_ID_FROM_SKILL,
         'required_attribute_names': ['question_id', 'skill_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
 

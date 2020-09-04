@@ -39,6 +39,7 @@ from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import recommendations_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_fetchers
@@ -516,7 +517,7 @@ class CollectionRightsSnapshotMetadataModelValidator(
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
-        return rights_manager.CollectionRightsChange
+        return rights_domain.CollectionRightsChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -562,7 +563,7 @@ class CollectionCommitLogEntryModelValidator(
     @classmethod
     def _get_change_domain_class(cls, item):
         if item.id.startswith('rights'):
-            return rights_manager.CollectionRightsChange
+            return rights_domain.CollectionRightsChange
         elif item.id.startswith('collection'):
             return collection_domain.CollectionChange
         else:
@@ -1496,7 +1497,7 @@ class ExplorationRightsSnapshotMetadataModelValidator(
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
-        return rights_manager.ExplorationRightsChange
+        return rights_domain.ExplorationRightsChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1542,7 +1543,7 @@ class ExplorationCommitLogEntryModelValidator(
     @classmethod
     def _get_change_domain_class(cls, item):
         if item.id.startswith('rights'):
-            return rights_manager.ExplorationRightsChange
+            return rights_domain.ExplorationRightsChange
         elif item.id.startswith('exploration'):
             return exp_domain.ExplorationChange
         else:

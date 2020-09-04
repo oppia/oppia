@@ -23,6 +23,7 @@ from core import jobs
 from core.domain import customization_args_util
 from core.domain import exp_fetchers
 from core.domain import interaction_registry
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
 
@@ -45,7 +46,7 @@ class DragAndDropSortInputInteractionOneOffJob(
         if item.deleted:
             return
         exp_status = rights_manager.get_exploration_rights(item.id).status
-        if exp_status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+        if exp_status == rights_domain.ACTIVITY_STATUS_PRIVATE:
             return
         exploration = exp_fetchers.get_exploration_from_model(item)
         validation_errors = []

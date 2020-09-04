@@ -24,6 +24,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
@@ -231,14 +232,14 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_2_id), [])
         rights_manager.assign_role_for_exploration(
-            self.owner, EXP_ID, self.owner_2_id, rights_manager.ROLE_OWNER)
+            self.owner, EXP_ID, self.owner_2_id, rights_domain.ROLE_OWNER)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_2_id), [EXP_ID])
 
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.editor_id), [])
         rights_manager.assign_role_for_exploration(
-            self.owner, EXP_ID, self.editor_id, rights_manager.ROLE_EDITOR)
+            self.owner, EXP_ID, self.editor_id, rights_domain.ROLE_EDITOR)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.editor_id), [EXP_ID])
 
@@ -249,7 +250,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.viewer_id), [])
         rights_manager.assign_role_for_exploration(
-            self.owner, EXP_ID, self.viewer_id, rights_manager.ROLE_VIEWER)
+            self.owner, EXP_ID, self.viewer_id, rights_domain.ROLE_VIEWER)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.viewer_id), [])
 
@@ -310,7 +311,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_collection_ids_subscribed_to(self.owner_2_id), [])
         rights_manager.assign_role_for_collection(
             self.owner, COLLECTION_ID, self.owner_2_id,
-            rights_manager.ROLE_OWNER)
+            rights_domain.ROLE_OWNER)
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.owner_2_id),
             [COLLECTION_ID])
@@ -319,7 +320,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_collection_ids_subscribed_to(self.editor_id), [])
         rights_manager.assign_role_for_collection(
             self.owner, COLLECTION_ID, self.editor_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.editor_id),
             [COLLECTION_ID])
@@ -332,7 +333,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_collection_ids_subscribed_to(self.viewer_id), [])
         rights_manager.assign_role_for_collection(
             self.owner, COLLECTION_ID, self.viewer_id,
-            rights_manager.ROLE_VIEWER)
+            rights_domain.ROLE_VIEWER)
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.viewer_id), [])
 

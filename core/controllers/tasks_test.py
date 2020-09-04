@@ -19,7 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import feedback_services
-from core.domain import rights_manager
+from core.domain import rights_domain
 from core.domain import suggestion_services
 from core.domain import user_services
 from core.platform import models
@@ -154,7 +154,7 @@ class TasksTests(test_utils.EmailTestBase):
                 self.owner_ids = [user_id_b]
 
         email_user_b = self.swap(
-            rights_manager, 'ActivityRights', MockActivityRights)
+            rights_domain, 'ActivityRights', MockActivityRights)
         with email_user_b, self.can_send_feedback_email_ctx:
             with self.can_send_emails_ctx:
                 change = {

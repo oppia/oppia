@@ -23,7 +23,7 @@ import csv
 import datetime
 import json
 
-from core.domain import rights_manager
+from core.domain import rights_domain
 from core.platform import models
 import feconf
 import python_utils
@@ -301,7 +301,7 @@ def get_item_similarity(
 
     similarity_score = 0
 
-    if compared_exp_status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+    if compared_exp_status == rights_domain.ACTIVITY_STATUS_PRIVATE:
         return 0
 
     similarity_score += get_topic_similarity(

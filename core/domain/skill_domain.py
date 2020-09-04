@@ -115,55 +115,67 @@ class SkillChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': [],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_SKILL_MISCONCEPTION,
         'required_attribute_names': ['new_misconception_dict'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_DELETE_SKILL_MISCONCEPTION,
         'required_attribute_names': ['misconception_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_PREREQUISITE_SKILL,
         'required_attribute_names': ['skill_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_DELETE_PREREQUISITE_SKILL,
         'required_attribute_names': ['skill_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_UPDATE_RUBRICS,
         'required_attribute_names': ['difficulty', 'explanations'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
         'required_attribute_names': [
             'misconception_id', 'property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': SKILL_MISCONCEPTIONS_PROPERTIES}
     }, {
         'name': CMD_UPDATE_SKILL_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': SKILL_PROPERTIES}
     }, {
         'name': CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': SKILL_CONTENTS_PROPERTIES}
     }, {
         'name': CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
 

@@ -28,6 +28,7 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import question_domain
 from core.domain import question_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_services
 from core.domain import state_domain
@@ -99,8 +100,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
-            self.editor, self.EXP_ID, self.owner_id,
-            rights_manager.ROLE_EDITOR)
+            self.editor, self.EXP_ID, self.owner_id, rights_domain.ROLE_EDITOR)
 
         self.new_content = state_domain.SubtitledHtml(
             'content', '<p>new content html</p>').to_dict()
