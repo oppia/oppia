@@ -52,11 +52,10 @@ require('pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts');
 angular.module('oppia').component('creatorDashboardPage', {
   template: require('./creator-dashboard-page.component.html'),
   controller: [
-    '$http', '$log', '$q', '$window', 'AlertsService',
+    '$http', '$q', '$window', 'AlertsService',
     'CreatorDashboardBackendApiService', 'DateTimeFormatService',
     'ExplorationCreationService', 'LoaderService',
     'RatingComputationService', 'SuggestionModalForCreatorDashboardService',
-    'SuggestionThreadObjectFactory', 'SuggestionsService',
     'ThreadMessageObjectFactory', 'ThreadStatusDisplayService',
     'UrlInterpolationService', 'UserService',
     'ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS',
@@ -66,11 +65,10 @@ angular.module('oppia').component('creatorDashboardPage', {
     'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
     'SUBSCRIPTION_SORT_BY_KEYS',
     function(
-        $http, $log, $q, $window, AlertsService,
+        $http, $q, $window, AlertsService,
         CreatorDashboardBackendApiService, DateTimeFormatService,
         ExplorationCreationService, LoaderService,
         RatingComputationService, SuggestionModalForCreatorDashboardService,
-        SuggestionThreadObjectFactory, SuggestionsService,
         ThreadMessageObjectFactory, ThreadStatusDisplayService,
         UrlInterpolationService, UserService,
         ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS,
