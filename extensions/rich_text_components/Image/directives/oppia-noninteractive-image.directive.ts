@@ -104,16 +104,13 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
               // This is required for the translation suggestion as there can be
               // target entity's images in the translatable content which needs
               // to be fetched from the server.
-              ctrl.imageUrl === null;
               if (
                 ContextService.getImageSaveDestination() ===
                 IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
                   ImageLocalStorageService.isInStorage(ctrl.filepath))) {
                 ctrl.imageUrl = ImageLocalStorageService.getObjectUrlForImage(
                   ctrl.filepath);
-              }
-
-              if (ctrl.imageUrl === null) {
+              } else {
                 ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
                   ContextService.getEntityType(), ContextService.getEntityId(),
                   ctrl.filepath);
