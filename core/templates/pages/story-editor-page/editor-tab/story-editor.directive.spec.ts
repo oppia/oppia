@@ -32,7 +32,6 @@ describe('Story editor Directive', function() {
   var $scope = null;
   var ctrl = null;
   var $q = null;
-  var $httpBackend = null;
   var $rootScope = null;
   var directive = null;
   var story = null;
@@ -48,7 +47,6 @@ describe('Story editor Directive', function() {
     $uibModal = $injector.get('$uibModal');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    $httpBackend = $injector.get('$httpBackend');
     WindowDimensionsService = $injector.get('WindowDimensionsService');
     StoryEditorNavigationService = $injector.get(
       'StoryEditorNavigationService');
@@ -198,12 +196,13 @@ describe('Story editor Directive', function() {
     expect($scope.getTopicUrlFragment()).toEqual('fractions');
   });
 
-  it('should not open confirm or cancel modal if the initial node is being deleted',
-    function() {
-      var modalSpy = spyOn($uibModal, 'open');
-      $scope.deleteNode('node_2');
-      expect(modalSpy).not.toHaveBeenCalled();
-    });
+  it('should not open confirm or cancel modal if the initial node is' +
+      ' being deleted',
+  function() {
+    var modalSpy = spyOn($uibModal, 'open');
+    $scope.deleteNode('node_2');
+    expect(modalSpy).not.toHaveBeenCalled();
+  });
 
   it('should open confirm or cancel modal when a node is being deleted',
     function() {
