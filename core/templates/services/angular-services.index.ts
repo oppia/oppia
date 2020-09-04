@@ -17,6 +17,7 @@
  */
 
 /* eslint-disable max-len */
+/* eslint-disable oppia/no-unused-dependency */
 import { AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
 import { AdminDataService } from
