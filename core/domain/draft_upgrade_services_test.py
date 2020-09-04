@@ -446,7 +446,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         ]
         draft_change_list_v37 = [
             exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'cmd': 'edit_state_property',
                 'state_name': 'Intro',
                 'property_name': 'content',
                 'new_value': 'new value'

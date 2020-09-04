@@ -23,6 +23,8 @@ from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_services
+from core.domain import html_cleaner
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
@@ -58,10 +60,10 @@ class BaseSuggestion(python_utils.OBJECT):
             was last updated.
     """
 
-    def __init__(self):
+    def __init__(self, status, final_reviewer_id):
         """Initializes a Suggestion object."""
-        raise NotImplementedError(
-            'Subclasses of BaseSuggestion should implement __init__.')
+        self.status = status
+        self.final_reviewer_id = final_reviewer_id
 
     def to_dict(self):
         """Returns a dict representation of a suggestion object.
@@ -113,6 +115,26 @@ class BaseSuggestion(python_utils.OBJECT):
         """
         return self.score_category.split(
             suggestion_models.SCORE_CATEGORY_DELIMITER)[1]
+
+    def set_suggestion_status_to_accepted(self):
+        """Sets the status of the suggestion to accepted."""
+        self.status = suggestion_models.STATUS_ACCEPTED
+
+    def set_suggestion_status_to_in_review(self):
+        """Sets the status of the suggestion to in review."""
+        self.status = suggestion_models.STATUS_IN_REVIEW
+
+    def set_suggestion_status_to_rejected(self):
+        """Sets the status of the suggestion to rejected."""
+        self.status = suggestion_models.STATUS_REJECTED
+
+    def set_final_reviewer_id(self, reviewer_id):
+        """Sets the final reviewer id of the suggestion to be reviewer_id.
+
+        Args:
+            reviewer_id: str. The ID of the user who completed the review.
+        """
+        self.final_reviewer_id = reviewer_id
 
     def validate(self):
         """Validates the BaseSuggestion object. Each subclass must implement
@@ -272,22 +294,22 @@ class SuggestionEditStateContent(BaseSuggestion):
     SUGGESTION_TYPE_EDIT_STATE_CONTENT.
     """
 
-    def __init__( # pylint: disable=super-init-not-called
+    def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
             change, score_category, last_updated=None):
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
         """
+        super(SuggestionEditStateContent, self).__init__(
+            status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = (
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
         self.target_type = suggestion_models.TARGET_TYPE_EXPLORATION
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
-        self.status = status
         self.author_id = author_id
-        self.final_reviewer_id = final_reviewer_id
         self.change = exp_domain.ExplorationChange(change)
         self.score_category = score_category
         self.last_updated = last_updated
@@ -414,7 +436,6 @@ class SuggestionEditStateContent(BaseSuggestion):
             html_string_list.append(self.change.old_value['html'])
         return html_string_list
 
-
     def convert_html_in_suggestion_change(self, conversion_fn):
         """Checks for HTML fields in a suggestion change and converts it
         according to the conversion function.
@@ -435,22 +456,22 @@ class SuggestionTranslateContent(BaseSuggestion):
     SUGGESTION_TYPE_TRANSLATE_CONTENT.
     """
 
-    def __init__( # pylint: disable=super-init-not-called
+    def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
             change, score_category, last_updated=None):
         """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
         """
+        super(SuggestionTranslateContent, self).__init__(
+            status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = (
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
         self.target_type = suggestion_models.TARGET_TYPE_EXPLORATION
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
-        self.status = status
         self.author_id = author_id
-        self.final_reviewer_id = final_reviewer_id
         self.change = exp_domain.ExplorationChange(change)
         self.score_category = score_category
         self.last_updated = last_updated
@@ -558,21 +579,20 @@ class SuggestionAddQuestion(BaseSuggestion):
             was last updated.
     """
 
-    def __init__( # pylint: disable=super-init-not-called
+    def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
             change, score_category, last_updated=None):
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
         """
+        super(SuggestionAddQuestion, self).__init__(status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = suggestion_models.SUGGESTION_TYPE_ADD_QUESTION
         self.target_type = suggestion_models.TARGET_TYPE_SKILL
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
-        self.status = status
         self.author_id = author_id
-        self.final_reviewer_id = final_reviewer_id
         self.change = question_domain.QuestionSuggestionChange(change)
         # Update question_state_data_schema_version here instead of surfacing
         # the version in the frontend.
@@ -631,7 +651,8 @@ class SuggestionAddQuestion(BaseSuggestion):
                 self.change.question_dict['question_state_data']),
             self.change.question_dict['question_state_data_schema_version'],
             self.change.question_dict['language_code'], None,
-            self.change.question_dict['linked_skill_ids'])
+            self.change.question_dict['linked_skill_ids'],
+            self.change.question_dict['inapplicable_misconception_ids'])
         question.partial_validate()
         question_state_data_schema_version = (
             self.change.question_dict['question_state_data_schema_version'])
@@ -679,6 +700,15 @@ class SuggestionAddQuestion(BaseSuggestion):
         question_dict['version'] = 1
         question_dict['id'] = (
             question_services.get_new_question_id())
+        html_list = self.get_all_html_content_strings()
+        filenames = (
+            html_cleaner.get_image_filenames_from_html_strings(html_list))
+        image_context = fs_services.get_image_context_for_suggestion_target(
+            self.target_type)
+        fs_services.copy_images(
+            image_context, self.target_id, feconf.ENTITY_TYPE_QUESTION,
+            self.target_id, filenames)
+
         question_dict['linked_skill_ids'] = [self.change.skill_id]
         question = question_domain.Question.from_dict(question_dict)
         question.validate()
@@ -695,7 +725,6 @@ class SuggestionAddQuestion(BaseSuggestion):
     def populate_old_value_of_change(self):
         """Populates old value of the change."""
         pass
-
 
     def pre_update_validate(self, change):
         """Performs the pre update validation. This functions need to be called

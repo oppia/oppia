@@ -45,6 +45,30 @@ class AnswerGroup(python_utils.OBJECT):
     example answers dictated by the creator.
     """
 
+    def __init__(
+            self, outcome, rule_specs, training_data,
+            tagged_skill_misconception_id):
+        """Initializes a AnswerGroup domain object.
+
+        Args:
+            outcome: Outcome. The outcome corresponding to the answer group.
+            rule_specs: list(RuleSpec). List of rule specifications.
+            training_data: list(*). List of answers belonging to training
+                data of this answer group.
+            tagged_skill_misconception_id: str or None. The format is
+                '<skill_id>-<misconception_id>', where skill_id is the skill ID
+                of the tagged misconception and misconception_id is the id of
+                the tagged misconception for the answer group. It is not None
+                only when a state is part of a Question object that
+                tests a particular skill.
+        """
+        self.rule_specs = [RuleSpec(
+            rule_spec.rule_type, rule_spec.inputs
+        ) for rule_spec in rule_specs]
+        self.outcome = outcome
+        self.training_data = training_data
+        self.tagged_skill_misconception_id = tagged_skill_misconception_id
+
     def to_dict(self):
         """Returns a dict representing this AnswerGroup domain object.
 
@@ -77,37 +101,12 @@ class AnswerGroup(python_utils.OBJECT):
             answer_group_dict['tagged_skill_misconception_id']
         )
 
-    def __init__(
-            self, outcome, rule_specs, training_data,
-            tagged_skill_misconception_id):
-        """Initializes a AnswerGroup domain object.
-
-        Args:
-            outcome: Outcome. The outcome corresponding to the answer group.
-            rule_specs: list(RuleSpec). List of rule specifications.
-            training_data: list(*). List of answers belonging to training
-                data of this answer group.
-            tagged_skill_misconception_id: str or None. The format is
-                '<skill_id>-<misconception_id>', where skill_id is the skill ID
-                of the tagged misconception and misconception_id is the id of
-                the tagged misconception for the answer group. It is not None
-                only when a state is part of a Question object that
-                tests a particular skill.
-        """
-        self.rule_specs = [RuleSpec(
-            rule_spec.rule_type, rule_spec.inputs
-        ) for rule_spec in rule_specs]
-
-        self.outcome = outcome
-        self.training_data = training_data
-        self.tagged_skill_misconception_id = tagged_skill_misconception_id
-
     def validate(self, interaction, exp_param_specs_dict):
         """Verifies that all rule classes are valid, and that the AnswerGroup
         only has one classifier rule.
 
         Args:
-            interaction: InteractionInstance. The interaction object.
+            interaction: BaseInteraction. The interaction object.
             exp_param_specs_dict: dict. A dict of all parameters used in the
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type).
@@ -145,7 +144,6 @@ class AnswerGroup(python_utils.OBJECT):
             if rule_spec.rule_type not in interaction.rules_dict:
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_spec.rule_type)
-
             rule_spec.validate(
                 interaction.get_rule_param_list(rule_spec.rule_type),
                 exp_param_specs_dict)
@@ -160,8 +158,6 @@ class AnswerGroup(python_utils.OBJECT):
         """
         html_list = []
 
-        outcome_html = self.outcome.feedback.html
-        html_list = html_list + [outcome_html]
         # TODO(#9413): Find a way to include a reference to the interaction
         # type in the Draft change lists.
         # See issue: https://github.com/oppia/oppia/issues/9413. We cannot use
@@ -169,6 +165,9 @@ class AnswerGroup(python_utils.OBJECT):
         # been fixed, because this method has no reference to the interaction
         # type and draft changes use this method. The rules_index_dict below
         # is used to figure out the assembly of the html in the rulespecs.
+
+        outcome_html = self.outcome.feedback.html
+        html_list = html_list + [outcome_html]
 
         html_field_types_to_rule_specs_dict = json.loads(
             utils.get_file_contents(
@@ -238,13 +237,14 @@ class AnswerGroup(python_utils.OBJECT):
         """
         answer_group_dict['outcome']['feedback']['html'] = conversion_fn(
             answer_group_dict['outcome']['feedback']['html'])
+
         for rule_spec_index, rule_spec in enumerate(
                 answer_group_dict['rule_specs']):
             answer_group_dict['rule_specs'][rule_spec_index] = (
                 RuleSpec.convert_html_in_rule_spec(
                     rule_spec, conversion_fn))
-        return answer_group_dict
 
+        return answer_group_dict
 
 
 class Hint(python_utils.OBJECT):
@@ -763,7 +763,7 @@ class InteractionInstance(python_utils.OBJECT):
                 feconf.DEFAULT_OUTCOME_CONTENT_ID), False, {}, None, None)
 
         return cls(
-            cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], {})
+            cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], None)
 
     def get_all_html_content_strings(self):
         """Get all html content strings in the interaction.
@@ -1926,6 +1926,22 @@ class RecordedVoiceovers(python_utils.OBJECT):
 class RuleSpec(python_utils.OBJECT):
     """Value object representing a rule specification."""
 
+    def __init__(self, rule_type, inputs):
+        """Initializes a RuleSpec domain object.
+
+        Args:
+            rule_type: str. The rule type, e.g. "CodeContains" or "Equals". A
+                full list of rule types can be found in
+                extensions/interactions/rule_templates.json.
+            inputs: dict. The values of the parameters needed in order to fully
+                specify the rule. The keys for this dict can be deduced from
+                the relevant description field in
+                extensions/interactions/rule_templates.json -- they are
+                enclosed in {{...}} braces.
+        """
+        self.rule_type = rule_type
+        self.inputs = inputs
+
     def to_dict(self):
         """Returns a dict representing this RuleSpec domain object.
 
@@ -1951,22 +1967,6 @@ class RuleSpec(python_utils.OBJECT):
             rulespec_dict['rule_type'],
             rulespec_dict['inputs']
         )
-
-    def __init__(self, rule_type, inputs):
-        """Initializes a RuleSpec domain object.
-
-        Args:
-            rule_type: str. The rule type, e.g. "CodeContains" or "Equals". A
-                full list of rule types can be found in
-                extensions/interactions/rule_templates.json.
-            inputs: dict. The values of the parameters needed in order to fully
-                specify the rule. The keys for this dict can be deduced from
-                the relevant description field in
-                extensions/interactions/rule_templates.json -- they are
-                enclosed in {{...}} braces.
-        """
-        self.rule_type = rule_type
-        self.inputs = inputs
 
     def validate(self, rule_params_list, exp_param_specs_dict):
         """Validates a RuleSpec value object. It ensures the inputs dict does
@@ -2117,7 +2117,6 @@ class RuleSpec(python_utils.OBJECT):
                     raise Exception(
                         'Rule spec should have at least one valid input '
                         'variable with Html in it.')
-
 
         return rule_spec_dict
 
@@ -2546,14 +2545,15 @@ class State(python_utils.OBJECT):
         """
         return self.written_translations.get_translation_counts()
 
-    def get_content_count(self):
-        """Returns the number of distinct content fields available in the
-        object.
+    def get_translatable_content_count(self):
+        """Returns the number of content fields available for translation in
+        the object.
 
         Returns:
-            int. The number of distinct content fields available in the state.
+            int. The number of content fields available for translation in
+            the state.
         """
-        return len(self.written_translations.translations_mapping)
+        return len(self._get_all_translatable_content())
 
     def _update_content_ids_in_assets(self, old_ids_list, new_ids_list):
         """Adds or deletes content ids in assets i.e, other parts of state
@@ -2687,7 +2687,7 @@ class State(python_utils.OBJECT):
             old_content_id_list, new_content_id_list)
 
     def update_interaction_answer_groups(self, answer_groups_list):
-        """Update the list of AnswerGroup in IteractioInstancen domain object.
+        """Update the list of AnswerGroup in InteractionInstance domain object.
 
         Args:
             answer_groups_list: list(dict). List of dicts that represent
@@ -2715,6 +2715,8 @@ class State(python_utils.OBJECT):
                 Outcome.from_dict(answer_group_dict['outcome']), [],
                 answer_group_dict['training_data'],
                 answer_group_dict['tagged_skill_misconception_id'])
+            interaction_answer_groups.append(answer_group)
+
             for rule_dict in rule_specs_list:
                 rule_spec = RuleSpec.from_dict(rule_dict)
 
@@ -2745,7 +2747,6 @@ class State(python_utils.OBJECT):
                     rule_inputs[param_name] = normalized_param
 
                 answer_group.rule_specs.append(rule_spec)
-            interaction_answer_groups.append(answer_group)
         self.interaction.answer_groups = interaction_answer_groups
 
         new_content_id_list = [
@@ -2936,7 +2937,6 @@ class State(python_utils.OBJECT):
 
         return content_id_to_html
 
-
     def to_dict(self):
         """Returns a dict representing this State domain object.
 
@@ -3036,7 +3036,8 @@ class State(python_utils.OBJECT):
                 state_dict['interaction']['answer_groups']):
             state_dict['interaction']['answer_groups'][answer_group_index] = (
                 AnswerGroup.convert_html_in_answer_group(
-                    answer_group, conversion_fn))
+                    answer_group, conversion_fn)
+            )
 
         if 'written_translations' in state_dict.keys():
             state_dict['written_translations'] = (
@@ -3057,7 +3058,6 @@ class State(python_utils.OBJECT):
                 Solution.convert_html_in_solution(
                     state_dict['interaction']['id'],
                     state_dict['interaction']['solution'], conversion_fn))
-
 
         if state_uses_old_interaction_cust_args_schema:
             # We need to retrieve an older version of interaction_specs to

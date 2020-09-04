@@ -70,25 +70,27 @@ describe('Edit Thumbnail Modal Controller', function() {
     expect($scope.updateBackgroundColor).toHaveBeenCalled();
   });
 
-  it('should init the constiables', function() {
-    expect($scope.uploadedImage).toBe(uploadedImage);
-    expect($scope.invalidImageWarningIsShown).toBe(false);
-    expect($scope.allowedBgColors).toBe(allowedBgColors);
-    expect($scope.aspectRatio).toBe(aspectRatio);
-    expect($scope.getPreviewDescription).toEqual(getPreviewDescription);
-    expect($scope.getPreviewDescriptionBgColor).toEqual(
-      getPreviewDescriptionBgColor);
-    expect($scope.getPreviewFooter).toEqual(
-      getPreviewFooter);
-    expect($scope.getPreviewTitle).toEqual(getPreviewTitle);
-  });
+  it('should initialize $scope properties after controller is initialized',
+    function() {
+      expect($scope.uploadedImage).toBe(uploadedImage);
+      expect($scope.invalidImageWarningIsShown).toBe(false);
+      expect($scope.allowedBgColors).toBe(allowedBgColors);
+      expect($scope.aspectRatio).toBe(aspectRatio);
+      expect($scope.getPreviewDescription).toEqual(getPreviewDescription);
+      expect($scope.getPreviewDescriptionBgColor).toEqual(
+        getPreviewDescriptionBgColor);
+      expect($scope.getPreviewFooter).toEqual(
+        getPreviewFooter);
+      expect($scope.getPreviewTitle).toEqual(getPreviewTitle);
+    });
 
   it('should load a image file in onchange event and save it if it\'s a' +
     ' svg file', function(done) {
     // This spy is to be sure that an image element will be returned from
     // document.querySelector method.
-    document.querySelector = jasmine.createSpy('HTMLElement').and
-      .returnValue(document.createElement('img'));
+    spyOn(document, 'querySelector').and.callFake(function() {
+      return document.createElement('img');
+    });
 
     // This is just a mocked base 64 in order to test the FileReader event
     // and its result property.

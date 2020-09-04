@@ -69,7 +69,6 @@ angular.module('oppia').factory('TrainingDataService', [
       // Remove the answer from all answer groups.
       for (var i = 0; i < answerGroups.length; i++) {
         var answerGroup = answerGroups[i];
-        var rules = answerGroup.rules;
         var trainingData = answerGroup.trainingData;
         if (trainingData &&
             _removeAnswerFromTrainingData(answer, trainingData) !== -1) {

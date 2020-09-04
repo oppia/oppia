@@ -117,8 +117,7 @@ describe('GraphInputValidationService', () => {
       })],
       goodDefaultOutcome,
       null,
-      null
-    );
+      null);
     answerGroups = [answerGroup, cloneDeep(answerGroup)];
   });
 
@@ -160,12 +159,9 @@ describe('GraphInputValidationService', () => {
   it('The graph used in the rule x in group y exceeds supported maximum ' +
     'number of vertices of 10 for isomorphism check.',
   () => {
-    (<GraphAnswer>
-      answerGroups[0].rules[0].inputs.g).vertices = new Array(11);
-    (<GraphAnswer>
-      answerGroups[0].rules[1].inputs.g).vertices = new Array(11);
-    (<GraphAnswer>
-      answerGroups[1].rules[0].inputs.g).vertices = new Array(11);
+    (<GraphAnswer> answerGroups[0].rules[0].inputs.g).vertices = new Array(11);
+    (<GraphAnswer> answerGroups[0].rules[1].inputs.g).vertices = new Array(11);
+    (<GraphAnswer> answerGroups[1].rules[0].inputs.g).vertices = new Array(11);
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);

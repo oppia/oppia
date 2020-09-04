@@ -27,6 +27,7 @@ import logging
 
 from constants import constants
 from core.domain import android_validation_constants
+from core.domain import caching_services
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import rights_manager
@@ -40,7 +41,6 @@ import utils
 
 (exp_models, story_models, user_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
-memcache_services = models.Registry.import_memcache_services()
 
 
 def get_new_story_id():
@@ -74,7 +74,8 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         notes=story.notes,
         story_contents=story.story_contents.to_dict(),
         corresponding_topic_id=story.corresponding_topic_id,
-        url_fragment=story.url_fragment
+        url_fragment=story.url_fragment,
+        meta_tag_content=story.meta_tag_content
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
@@ -185,6 +186,9 @@ def apply_change_list(story_id, change_list):
                 elif (change.property_name ==
                       story_domain.STORY_PROPERTY_URL_FRAGMENT):
                     story.update_url_fragment(change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_PROPERTY_META_TAG_CONTENT):
+                    story.update_meta_tag_content(change.new_value)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         story_domain.INITIAL_NODE_ID):
@@ -361,7 +365,8 @@ def validate_explorations_for_story(exp_ids, raise_error):
     return validation_error_messages
 
 
-def _save_story(committer_id, story, commit_message, change_list):
+def _save_story(
+        committer_id, story, commit_message, change_list, story_is_published):
     """Validates a story and commits it to persistent storage. If
     successful, increments the version number of the incoming story domain
     object by 1.
@@ -371,6 +376,7 @@ def _save_story(committer_id, story, commit_message, change_list):
         story: Story. The story domain object to be saved.
         commit_message: str. The commit message.
         change_list: list(StoryChange). List of changes applied to a story.
+        story_is_published: bool. Whether the supplied story is published.
 
     Raises:
         ValidationError. An invalid exploration was referenced in the
@@ -382,25 +388,6 @@ def _save_story(committer_id, story, commit_message, change_list):
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
             'save story %s: %s' % (story.id, change_list))
-
-    topic = topic_fetchers.get_topic_by_id(
-        story.corresponding_topic_id, strict=False)
-    if topic is None:
-        raise utils.ValidationError(
-            'Expected story to only belong to a valid topic, but found no '
-            'topic with ID: %s' % story.corresponding_topic_id)
-
-    story_is_published = False
-    story_is_present_in_topic = False
-    for story_reference in topic.get_all_story_references():
-        if story_reference.story_id == story.id:
-            story_is_present_in_topic = True
-            story_is_published = story_reference.story_is_published
-    if not story_is_present_in_topic:
-        raise Exception(
-            'Expected story to belong to the topic %s, but it is '
-            'neither a part of the canonical stories or the additional '
-            'stories of the topic.' % story.corresponding_topic_id)
 
     story.validate()
 
@@ -443,10 +430,45 @@ def _save_story(committer_id, story, commit_message, change_list):
     story_model.corresponding_topic_id = story.corresponding_topic_id
     story_model.version = story.version
     story_model.url_fragment = story.url_fragment
+    story_model.meta_tag_content = story.meta_tag_content
     change_dicts = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_dicts)
-    memcache_services.delete(story_fetchers.get_story_memcache_key(story.id))
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_STORY, None, [story.id])
     story.version += 1
+
+
+def _is_story_published_and_present_in_topic(story):
+    """Returns whether a story is published. Raises an exception if the story
+    is not present in the corresponding topic's story references.
+
+    Args:
+        story: Story. The story domain object.
+
+    Returns:
+        bool. Whether the supplied story is published.
+    """
+    topic = topic_fetchers.get_topic_by_id(
+        story.corresponding_topic_id, strict=False)
+    if topic is None:
+        raise utils.ValidationError(
+            'Expected story to only belong to a valid topic, but found no '
+            'topic with ID: %s' % story.corresponding_topic_id)
+
+    story_is_published = False
+    story_is_present_in_topic = False
+    for story_reference in topic.get_all_story_references():
+        if story_reference.story_id == story.id:
+            story_is_present_in_topic = True
+            story_is_published = story_reference.story_is_published
+
+    if not story_is_present_in_topic:
+        raise Exception(
+            'Expected story to belong to the topic %s, but it is '
+            'neither a part of the canonical stories or the additional '
+            'stories of the topic.' % story.corresponding_topic_id)
+
+    return story_is_published
 
 
 def update_story(
@@ -471,14 +493,20 @@ def update_story(
     old_story = story_fetchers.get_story_by_id(story_id)
     new_story, exp_ids_removed_from_story, exp_ids_added_to_story = (
         apply_change_list(story_id, change_list))
+    story_is_published = _is_story_published_and_present_in_topic(new_story)
+
     if (
             old_story.url_fragment != new_story.url_fragment and
             does_story_exist_with_url_fragment(new_story.url_fragment)):
         raise utils.ValidationError(
             'Story Url Fragment is not unique across the site.')
-    _save_story(committer_id, new_story, commit_message, change_list)
+    _save_story(
+        committer_id, new_story, commit_message, change_list,
+        story_is_published)
     create_story_summary(new_story.id)
-    opportunity_services.update_exploration_opportunities(old_story, new_story)
+    if story_is_published and _is_topic_published(new_story):
+        opportunity_services.update_exploration_opportunities(
+            old_story, new_story)
     suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
         exp_ids_removed_from_story)
 
@@ -505,6 +533,19 @@ def update_story(
         story_id=story_id
     ) for exp_id in exp_ids_added_to_story]
     exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
+
+
+def _is_topic_published(story):
+    """Returns whether the story's corresponding topic is published.
+
+    Args:
+        story: Story. The story domain object.
+
+    Returns:
+        bool. Whether the the story's corresponding topic is published.
+    """
+    topic_rights = topic_fetchers.get_topic_rights(story.corresponding_topic_id)
+    return topic_rights.topic_is_published
 
 
 def delete_story(committer_id, story_id, force_deletion=False):
@@ -540,8 +581,8 @@ def delete_story(committer_id, story_id, force_deletion=False):
 
     # This must come after the story is retrieved. Otherwise the memcache
     # key will be reinstated.
-    story_memcache_key = story_fetchers.get_story_memcache_key(story_id)
-    memcache_services.delete(story_memcache_key)
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_STORY, None, [story_id])
 
     # Delete the summary of the story (regardless of whether
     # force_deletion is True or not).

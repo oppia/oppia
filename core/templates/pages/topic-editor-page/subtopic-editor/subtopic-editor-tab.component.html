@@ -60,6 +60,8 @@
               <span class="oppia-input-box-subtitle">
                 <em>
                   The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most <[$ctrl.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT]> characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+                  This subtopic can be accessed at the following URL:<br>
+                  <[$ctrl.hostname]>/learn/<[$ctrl.classroomUrlFragment]>/<[$ctrl.topic.getUrlFragment()]>/revision/<[$ctrl.editableUrlFragment]>
                 </em>
               </span>
             </form>
@@ -143,13 +145,11 @@
           </i>
         </div>
         <div ng-if="$ctrl.skillsListIsShown" class="oppia-mobile-collapsible-card-content">
-          <div>
-            <button class="btn add-skill-btn" ng-click="$ctrl.createSkill()">
-              + ADD SKILL
-            </button>
+          <div ng-if="!$ctrl.subtopic.getSkillSummaries().length">
+            <span>There are no skills assigned to this subtopic.</span>
           </div>
-          <div>
-            <div class="list-header" ng-if="$ctrl.subtopic.getSkillSummaries().length">
+          <div ng-if="$ctrl.subtopic.getSkillSummaries().length">
+            <div class="list-header">
               <span>Name</span>
               <span class="number-skills-header"># of Questions</span>
             </div>
@@ -194,10 +194,6 @@
           <div class="question-count">
             <span class="question-count-value"><[$ctrl.questionCount]></span>
             <span class="question-count-text">Questions</span>
-          </div>
-          <div class="create-skill-container" ng-click="$ctrl.createSkill()">
-            <i class="fa fa-plus-circle"></i>
-            <span class="create-skill-text">Create New Skill</span>
           </div>
         </div>
       </md-card>
@@ -324,22 +320,20 @@
     height: 110px;
     justify-content: center;
     position: fixed;
-    width: 26%;
+    width: 24%;
   }
   .subtopic-content .skill-count,
-  .subtopic-content .question-count,
-  .subtopic-content .create-skill-container {
+  .subtopic-content .question-count {
     border-right: 2px solid #aaaac1;
     display: inline-block;
     text-align: center;
-    width: 33%;
+    width: 50%;
   }
   .subtopic-content .edit-icon {
     color: #595959;
   }
-  .subtopic-content .create-skill-container {
+  .subtopic-content .question-count {
     border-right: none;
-    cursor: pointer;
   }
   .subtopic-content .skill-count-value,
   .subtopic-content .question-count-value,

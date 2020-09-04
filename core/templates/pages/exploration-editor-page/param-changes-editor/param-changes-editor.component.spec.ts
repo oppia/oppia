@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for paramChangesEditor.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
@@ -24,6 +25,8 @@ import { AngularNameService } from
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -53,9 +56,12 @@ describe('Param Changes Editor Component', function() {
   var explorationStatesService = null;
   var paramChangeObjectFactory = null;
   var paramSpecsObjectFactory = null;
+  var externalSaveService = null;
   var stateParamChangesService = null;
 
   var postSaveHookSpy = jasmine.createSpy('postSaveHook', () => {});
+
+  var mockExternalSaveEventEmitter = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -78,13 +84,19 @@ describe('Param Changes Editor Component', function() {
       TestBed.get(TextInputRulesService));
     $provide.value(
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+    mockExternalSaveEventEmitter = new EventEmitter();
+    $provide.value('ExternalSaveService', {
+      onExternalSave: mockExternalSaveEventEmitter
+    });
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
-    $provide.value('StateInteractionIdService',
-      TestBed.get(StateInteractionIdService));
-    $provide.value('StateSolutionService',
-      TestBed.get(StateSolutionService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+    $provide.value(
+      'StateSolutionService', TestBed.get(StateSolutionService));
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
@@ -92,6 +104,7 @@ describe('Param Changes Editor Component', function() {
     explorationParamSpecsService = $injector.get(
       'ExplorationParamSpecsService');
     explorationStatesService = $injector.get('ExplorationStatesService');
+    externalSaveService = $injector.get('ExternalSaveService');
 
     explorationParamSpecsService.init(
       paramSpecsObjectFactory.createFromBackendDict({
@@ -108,7 +121,8 @@ describe('Param Changes Editor Component', function() {
     ctrl = $componentController('paramChangesEditor', {
       $scope: $scope,
       AlertsService: alertsService,
-      ParamChangeObjectFactory: paramChangeObjectFactory
+      ParamChangeObjectFactory: paramChangeObjectFactory,
+      ExternalSaveService: externalSaveService
     }, {
       paramChangesService: stateParamChangesService,
       postSaveHook: postSaveHookSpy,
@@ -117,15 +131,19 @@ describe('Param Changes Editor Component', function() {
     ctrl.$onInit();
   }));
 
-  it('should evaluate $scope properties after controller initialization',
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
+  it('should initialize $scope properties after controller is initialized',
     function() {
       expect($scope.isParamChangesEditorOpen).toBe(false);
       expect($scope.warningText).toBe('');
       expect($scope.paramNameChoices).toEqual([]);
     });
 
-  it('should reset customization args from param change when change generator' +
-    ' type', function() {
+  it('should reset customization args from param change when changing' +
+    ' generator type', function() {
     var paramChange = paramChangeObjectFactory.createFromBackendDict({
       customization_args: {
         list_of_values: ['first value', 'second value']
@@ -141,10 +159,11 @@ describe('Param Changes Editor Component', function() {
     });
   });
 
-  it('should get static image url', function() {
-    expect($scope.getStaticImageUrl('/path/to/image.png')).toBe(
-      '/assets/images/path/to/image.png');
-  });
+  it('should get complete image path corresponding to a given relative path',
+    function() {
+      expect($scope.getStaticImageUrl('/path/to/image.png')).toBe(
+        '/assets/images/path/to/image.png');
+    });
 
   it('should save param changes when externalSave is broadcasted', function() {
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
@@ -153,7 +172,7 @@ describe('Param Changes Editor Component', function() {
     $scope.addParamChange();
     $scope.openParamChangesEditor();
 
-    $rootScope.$broadcast('externalSave');
+    mockExternalSaveEventEmitter.emit();
 
     expect(saveParamChangesSpy).toHaveBeenCalled();
     expect(postSaveHookSpy).toHaveBeenCalled();
@@ -220,7 +239,7 @@ describe('Param Changes Editor Component', function() {
     expect(ctrl.paramChangesService.displayed.length).toBe(1);
   });
 
-  it('should check when param changes are valid', function() {
+  it('should check whenever param changes are valid', function() {
     $scope.addParamChange();
 
     expect($scope.areDisplayedParamChangesValid()).toBe(true);
@@ -298,7 +317,7 @@ describe('Param Changes Editor Component', function() {
       'Invalid parameter changes.');
   });
 
-  it('should save param changes successfully', function() {
+  it('should save param changes when it is valid', function() {
     var saveParamChangesSpy = spyOn(
       explorationStatesService, 'saveStateParamChanges').and.callFake(() => {});
     $scope.addParamChange();
@@ -308,7 +327,7 @@ describe('Param Changes Editor Component', function() {
     expect(postSaveHookSpy).toHaveBeenCalled();
   });
 
-  it('should not delete a param change if index is less than 0', function() {
+  it('should not delete a param change when index is less than 0', function() {
     $scope.addParamChange();
     expect(ctrl.paramChangesService.displayed.length).toBe(1);
 
@@ -318,7 +337,7 @@ describe('Param Changes Editor Component', function() {
       'Cannot delete parameter change at position -1: index out of range');
   });
 
-  it('should not delete a param change if index is greather than param' +
+  it('should not delete a param change when index is greather than param' +
     ' changes length', function() {
     $scope.addParamChange();
     expect(ctrl.paramChangesService.displayed.length).toBe(1);
@@ -329,7 +348,7 @@ describe('Param Changes Editor Component', function() {
       'Cannot delete parameter change at position 5: index out of range');
   });
 
-  it('should delete a param change successfully', function() {
+  it('should delete a param change', function() {
     $scope.addParamChange();
     expect(ctrl.paramChangesService.displayed.length).toBe(1);
 

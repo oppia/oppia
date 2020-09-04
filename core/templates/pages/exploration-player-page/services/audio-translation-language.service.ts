@@ -38,11 +38,12 @@ interface ExplorationLanguageInfo {
   providedIn: 'root'
 })
 export class AudioTranslationLanguageService {
-  constructor(private browserCheckerService: BrowserCheckerService,
-              private languageUtilService: LanguageUtilService) {}
+  constructor(
+    private browserCheckerService: BrowserCheckerService,
+    private languageUtilService: LanguageUtilService) {}
 
   _currentAudioLanguageCode: string = null;
-  _allAudioLanguageCodesInExploration: Array<string> = null;
+  _allAudioLanguageCodesInExploration: string[] = null;
   _explorationLanguageCode: string = null;
   _automaticTextToSpeechEnabled: boolean = null;
   _languagesInExploration: ExplorationLanguageInfo[] = [];
@@ -73,7 +74,7 @@ export class AudioTranslationLanguageService {
   }
 
   _init(
-      allAudioLanguageCodesInExploration: Array<string>,
+      allAudioLanguageCodesInExploration: string[],
       preferredAudioLanguageCode: string, explorationLanguageCode: string,
       automaticTextToSpeechEnabled: boolean): void {
     this._allAudioLanguageCodesInExploration =
@@ -136,11 +137,12 @@ export class AudioTranslationLanguageService {
   }
 
   init(
-      allAudioLanguageCodesInExploration: Array<string>,
+      allAudioLanguageCodesInExploration: string[],
       preferredAudioLanguageCode: string,
       explorationLanguageCode: string,
       automaticTextToSpeechEnabled: boolean): void {
-    this._init(allAudioLanguageCodesInExploration, preferredAudioLanguageCode,
+    this._init(
+      allAudioLanguageCodesInExploration, preferredAudioLanguageCode,
       explorationLanguageCode, automaticTextToSpeechEnabled);
   }
 
@@ -160,10 +162,10 @@ export class AudioTranslationLanguageService {
   }
 
   /**
-   * @return {Array<string>} An array of the audio language codes in
+   * @return {string[]} An array of the audio language codes in
    *  exploration.
    */
-  getAllAudioLanguageCodesInExploration(): Array<string> {
+  getAllAudioLanguageCodesInExploration(): string[] {
     return this._allAudioLanguageCodesInExploration;
   }
 

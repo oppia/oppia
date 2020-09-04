@@ -32,9 +32,11 @@ import os
 
 from constants import constants
 from core.domain import activity_services
+from core.domain import caching_services
 from core.domain import collection_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import subscription_services
@@ -47,7 +49,6 @@ import utils
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
-memcache_services = models.Registry.import_memcache_services()
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
@@ -91,23 +92,6 @@ def _migrate_collection_contents_to_latest_schema(
         collection_domain.Collection.update_collection_contents_from_model(
             versioned_collection_contents, collection_schema_version)
         collection_schema_version += 1
-
-
-# Repository GET methods.
-def _get_collection_memcache_key(collection_id, version=None):
-    """Returns a memcache key for the collection.
-
-    Args:
-        collection_id: str. ID of the collection.
-        version: int. Schema version of the collection.
-
-    Returns:
-        str. The memcache key of the collection.
-    """
-    if version:
-        return 'collection-version:%s:%s' % (collection_id, version)
-    else:
-        return 'collection:%s' % collection_id
 
 
 def get_collection_from_model(collection_model):
@@ -199,19 +183,24 @@ def get_collection_by_id(collection_id, strict=True, version=None):
         Collection or None. The domain object representing a collection with the
         given id, or None if it does not exist.
     """
-    collection_memcache_key = _get_collection_memcache_key(
-        collection_id, version=version)
-    memcached_collection = memcache_services.get_multi(
-        [collection_memcache_key]).get(collection_memcache_key)
+    sub_namespace = python_utils.convert_to_bytes(version) if version else None
+    cached_collection = caching_services.get_multi(
+        caching_services.CACHE_NAMESPACE_COLLECTION,
+        sub_namespace,
+        [collection_id]
+    ).get(collection_id)
 
-    if memcached_collection is not None:
-        return memcached_collection
+    if cached_collection is not None:
+        return cached_collection
     else:
         collection_model = collection_models.CollectionModel.get(
             collection_id, strict=strict, version=version)
         if collection_model:
             collection = get_collection_from_model(collection_model)
-            memcache_services.set_multi({collection_memcache_key: collection})
+            caching_services.set_multi(
+                caching_services.CACHE_NAMESPACE_COLLECTION,
+                sub_namespace,
+                {collection_id: collection})
             return collection
         else:
             return None
@@ -256,11 +245,10 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
         ValueError. The 'strict' is True, and one or more of the given
             collection ids are invalid.
     """
-    collection_ids = set(collection_ids)
     result = {}
     uncached = []
-    memcache_keys = [_get_collection_memcache_key(i) for i in collection_ids]
-    cache_result = memcache_services.get_multi(memcache_keys)
+    cache_result = caching_services.get_multi(
+        caching_services.CACHE_NAMESPACE_COLLECTION, None, collection_ids)
 
     for collection_obj in cache_result.values():
         result[collection_obj.id] = collection_obj
@@ -295,7 +283,8 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
     }
 
     if cache_update:
-        memcache_services.set_multi(cache_update)
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_COLLECTION, None, cache_update)
 
     result.update(db_results_dict)
     return result
@@ -699,7 +688,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
             'save collection %s: %s' % (collection.id, change_list))
 
     collection_rights = rights_manager.get_collection_rights(collection.id)
-    if collection_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
+    if collection_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
         collection.validate(strict=True)
     else:
         collection.validate(strict=False)
@@ -756,7 +745,8 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     }
     collection_model.node_count = len(collection_model.nodes)
     collection_model.commit(committer_id, commit_message, change_list)
-    memcache_services.delete(_get_collection_memcache_key(collection.id))
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_COLLECTION, None, [collection.id])
     index_collections_given_ids([collection.id])
 
     collection.version += 1
@@ -857,10 +847,8 @@ def delete_collections(committer_id, collection_ids, force_deletion=False):
 
     # This must come after the collection is retrieved. Otherwise the memcache
     # key will be reinstated.
-    collection_memcache_keys = [
-        _get_collection_memcache_key(collection_id)
-        for collection_id in collection_ids]
-    memcache_services.delete_multi(collection_memcache_keys)
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_COLLECTION, None, collection_ids)
 
     # Delete the collection from search.
     search_services.delete_collections_from_search_index(collection_ids)

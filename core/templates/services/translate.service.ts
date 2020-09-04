@@ -58,7 +58,7 @@ export interface LangChangeEvent {
 export class TranslateService {
   currentLang = 'en';
   fallbackLang = 'en';
-  translations: Array<TranslationsDict> = [];
+  translations: TranslationsDict[] = [];
   templateMatcher: RegExp = /\<\[\s?([^{}\s]*)\s?\]\>/g;
 
   private onLangChangeEventEmitter = new EventEmitter<LangChangeEvent>();
@@ -117,7 +117,8 @@ export class TranslateService {
     if (!interpolateParams) {
       return translatedValue;
     }
-    return translatedValue.replace(this.templateMatcher,
+    return translatedValue.replace(
+      this.templateMatcher,
       (substring: string, interpolateParamsKey: string) => {
         let interpolateParamsValue = interpolateParams[interpolateParamsKey];
         if (this.utilsService.isDefined(interpolateParamsValue)) {

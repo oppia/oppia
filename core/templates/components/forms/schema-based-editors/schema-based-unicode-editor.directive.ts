@@ -16,14 +16,19 @@
  * @fileoverview Directive for a schema-based editor for unicode strings.
  */
 
-require('interactions/codemirrorRequires.ts');
+require('third-party-imports/ui-codemirror.import.ts');
 
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-customization-args.service.ts');
 
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('services/contextual/device-info.service.ts');
 require('services/schema-form-submitted.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('schemaBasedUnicodeEditor', [
   function() {
@@ -42,12 +47,15 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
       template: require('./schema-based-unicode-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$sce', '$timeout', '$translate',
+        '$filter', '$sce', '$timeout', '$translate',
         'DeviceInfoService', 'SchemaFormSubmittedService',
+        'StateCustomizationArgsService',
         function(
-            $scope, $filter, $sce, $timeout, $translate,
-            DeviceInfoService, SchemaFormSubmittedService) {
+            $filter, $sce, $timeout, $translate,
+            DeviceInfoService, SchemaFormSubmittedService,
+            StateCustomizationArgsService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {
               SchemaFormSubmittedService.onSubmittedSchemaBasedForm.emit();
@@ -129,12 +137,18 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
               // When the form view is opened, flip the status flag. The
               // timeout seems to be needed for the line numbers etc. to display
               // properly.
-              $scope.$on('schemaBasedFormsShown', function() {
-                $timeout(function() {
-                  ctrl.codemirrorStatus = !ctrl.codemirrorStatus;
-                }, 200);
-              });
+              ctrl.directiveSubscriptions.add(
+                StateCustomizationArgsService.onSchemaBasedFormsShown.subscribe(
+                  () => {
+                    $timeout(function() {
+                      ctrl.codemirrorStatus = !ctrl.codemirrorStatus;
+                    }, 200);
+                  })
+              );
             }
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

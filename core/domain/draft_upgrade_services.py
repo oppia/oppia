@@ -33,6 +33,15 @@ import utils
 ])
 
 
+class InvalidDraftConversionException(Exception):
+    """Error class for invalid draft conversion. Should be raised in a draft
+    conversion function if it is not possible to upgrade a draft, and indicates
+    that try_upgrading_draft_to_exp_version should return None.
+    """
+
+    pass
+
+
 def try_upgrading_draft_to_exp_version(
         draft_change_list, current_draft_version, to_exp_version, exp_id):
     """Try upgrading a list of ExplorationChange domain objects to match the
@@ -60,7 +69,7 @@ def try_upgrading_draft_to_exp_version(
         raise utils.InvalidInputException(
             'Current draft version is greater than the exploration version.')
     if current_draft_version == to_exp_version:
-        return
+        return None
 
     exp_versions = list(
         python_utils.RANGE(current_draft_version + 1, to_exp_version + 1))
@@ -74,18 +83,18 @@ def try_upgrading_draft_to_exp_version(
                 len(commit.commit_cmds) != 1 or
                 commit.commit_cmds[0]['cmd'] !=
                 exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
-            return
+            return None
         conversion_fn_name = '_convert_states_v%s_dict_to_v%s_dict' % (
             commit.commit_cmds[0]['from_version'],
             commit.commit_cmds[0]['to_version'])
         if not hasattr(DraftUpgradeUtil, conversion_fn_name):
             logging.warning('%s is not implemented' % conversion_fn_name)
-            return
+            return None
         conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
         try:
             draft_change_list = conversion_fn(draft_change_list)
-        except Exception:
-            return
+        except InvalidDraftConversionException:
+            return None
         upgrade_times += 1
     return draft_change_list
 
@@ -218,7 +227,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             list(ExplorationChange). The converted draft_change_list.
 
         Raises:
-            Exception. Conversion cannot be completed.
+            InvalidDraftConversionException. Conversion cannot be completed.
         """
         for change in draft_change_list:
             if (change.property_name ==
@@ -230,7 +239,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                 # an exploration state of a given version into draft conversion
                 # functions, we throw an Exception to indicate that the
                 # conversion cannot be completed.
-                raise Exception('Conversion cannot be completed.')
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod
@@ -249,7 +259,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             list(ExplorationChange). The converted draft_change_list.
 
         Raises:
-            Exception. Conversion cannot be completed.
+            InvalidDraftConversionException. Conversion cannot be completed.
         """
         for change in draft_change_list:
             # We don't want to migrate any changes that involve the
@@ -265,7 +275,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         'IsMathematicallyEquivalentTo')))
             if interaction_id_change_condition or (
                     answer_groups_change_condition):
-                raise Exception('Conversion cannot be completed.')
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
 
         return draft_change_list
 
@@ -352,8 +363,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                 new_value = [
-                    (state_domain.AnswerGroup.convert_html_in_answer_group(
-                        answer_group, conversion_fn))
+                    state_domain.AnswerGroup.convert_html_in_answer_group(
+                        answer_group, conversion_fn)
                     for answer_group in new_value]
             if new_value is not None:
                 draft_change_list[i] = exp_domain.ExplorationChange({

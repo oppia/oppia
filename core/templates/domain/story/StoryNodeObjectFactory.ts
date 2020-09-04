@@ -144,7 +144,7 @@ export class StoryNode {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
-  prepublishValidate(): Array<string> {
+  prepublishValidate(): string[] {
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Chapter ' + this._title + ' should have a thumbnail.');
@@ -240,7 +240,7 @@ export class StoryNode {
     return this._acquiredSkillIds.slice();
   }
 
-  addAcquiredSkillId(acquiredSkillid): void {
+  addAcquiredSkillId(acquiredSkillid: string): void {
     if (this._acquiredSkillIds.indexOf(acquiredSkillid) !== -1) {
       throw new Error('The given skill is already an acquired skill.');
     }

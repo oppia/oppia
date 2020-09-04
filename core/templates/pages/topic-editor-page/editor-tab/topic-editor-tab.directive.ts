@@ -21,7 +21,6 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
-require('components/entity-creation-services/skill-creation.service.ts');
 require(
   'components/forms/custom-forms-directives/' +
     'edit-thumbnail-modal.controller.ts');
@@ -39,16 +38,17 @@ require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
 require(
   'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
-require('pages/topic-editor-page/modal-templates/' +
-    'preview-thumbnail.component.ts');
+require(
+  'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
 
-require('services/alerts.service.ts');
 require('services/context.service.ts');
-require('services/csrf-token.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/image-upload-helper.service.ts');
 require('services/page-title.service.ts');
 require('domain/question/question-backend-api.service.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-backend-api.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -64,23 +64,25 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
-        'CsrfTokenService', 'EntityCreationService', 'ImageUploadHelperService',
-        'PageTitleService', 'SkillCreationService', 'StoryCreationService',
+        '$rootScope', '$scope', '$uibModal', 'ContextService',
+        'EntityCreationService', 'ImageUploadHelperService',
+        'PageTitleService', 'StoryCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
-        'TopicUpdateService', 'UndoRedoService', 'UrlInterpolationService',
-        'WindowDimensionsService', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
-        'MAX_CHARS_IN_TOPIC_NAME', 'EVENT_STORY_SUMMARIES_INITIALIZED',
-        'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+        'TopicUpdateService', 'TopicsAndSkillsDashboardBackendApiService',
+        'UndoRedoService', 'UrlInterpolationService',
+        'WindowDimensionsService', 'WindowRef',
+        'MAX_CHARS_IN_META_TAG_CONTENT', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
+        'MAX_CHARS_IN_TOPIC_NAME',
         function(
-            $rootScope, $scope, $uibModal, AlertsService, ContextService,
-            CsrfTokenService, EntityCreationService, ImageUploadHelperService,
-            PageTitleService, SkillCreationService, StoryCreationService,
+            $rootScope, $scope, $uibModal, ContextService,
+            EntityCreationService, ImageUploadHelperService,
+            PageTitleService, StoryCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
-            TopicUpdateService, UndoRedoService, UrlInterpolationService,
-            WindowDimensionsService, MAX_CHARS_IN_TOPIC_DESCRIPTION,
-            MAX_CHARS_IN_TOPIC_NAME, EVENT_STORY_SUMMARIES_INITIALIZED,
-            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
+            TopicUpdateService, TopicsAndSkillsDashboardBackendApiService,
+            UndoRedoService, UrlInterpolationService,
+            WindowDimensionsService, WindowRef,
+            MAX_CHARS_IN_META_TAG_CONTENT, MAX_CHARS_IN_TOPIC_DESCRIPTION,
+            MAX_CHARS_IN_TOPIC_NAME) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
@@ -88,6 +90,7 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
           $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
             MAX_CHARS_IN_TOPIC_DESCRIPTION);
+          $scope.MAX_CHARS_IN_META_TAG_CONTENT = MAX_CHARS_IN_META_TAG_CONTENT;
           ctrl.initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.skillQuestionCountDict = (
@@ -99,6 +102,9 @@ angular.module('oppia').directive('topicEditorTab', [
               $scope.$applyAsync();
             }
             $scope.editableName = $scope.topic.getName();
+            $scope.editableMetaTagContent = $scope.topic.getMetaTagContent();
+            $scope.editablePracticeIsDisplayed = (
+              $scope.topic.getPracticeTabIsDisplayed());
             $scope.initialTopicName = $scope.topic.getName();
             $scope.initialTopicUrlFragment = $scope.topic.getUrlFragment();
             $scope.editableTopicUrlFragment = $scope.topic.getUrlFragment();
@@ -107,6 +113,7 @@ angular.module('oppia').directive('topicEditorTab', [
               topicConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
             $scope.topicNameExists = false;
             $scope.topicUrlFragmentExists = false;
+            $scope.hostname = WindowRef.nativeWindow.location.hostname;
 
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
@@ -129,6 +136,10 @@ angular.module('oppia').directive('topicEditorTab', [
                   $scope.topic.getThumbnailFilename(),
                   ContextService.getEntityType(),
                   ContextService.getEntityId()));
+          };
+
+          $scope.getClassroomUrlFragment = function() {
+            return TopicEditorStateService.getClassroomUrlFragment();
           };
 
           var _initStorySummaries = function() {
@@ -281,6 +292,23 @@ angular.module('oppia').directive('topicEditorTab', [
             }
           };
 
+          $scope.updateTopicMetaTagContent = function(newMetaTagContent) {
+            if (newMetaTagContent !== $scope.topic.getMetaTagContent()) {
+              TopicUpdateService.setMetaTagContent(
+                $scope.topic, newMetaTagContent);
+            }
+          };
+
+          $scope.updatePracticeTabIsDisplayed = function(
+              newPracticeTabIsDisplayed) {
+            if (
+              newPracticeTabIsDisplayed !==
+              $scope.topic.getPracticeTabIsDisplayed()) {
+              TopicUpdateService.setPracticeTabIsDisplayed(
+                $scope.topic, newPracticeTabIsDisplayed);
+            }
+          };
+
           $scope.deleteUncategorizedSkillFromTopic = function(skillSummary) {
             TopicUpdateService.removeUncategorizedSkill(
               $scope.topic, skillSummary);
@@ -335,7 +363,7 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.getPreviewFooter = function() {
             var canonicalStoriesLength = (
               $scope.topic.getCanonicalStoryIds().length);
-            if ( canonicalStoriesLength === 0 || canonicalStoriesLength > 1) {
+            if (canonicalStoriesLength === 0 || canonicalStoriesLength > 1) {
               return canonicalStoriesLength + ' Stories';
             }
             return '1 Story';
@@ -383,6 +411,7 @@ angular.module('oppia').directive('topicEditorTab', [
               TopicUpdateService.moveSkillToSubtopic(
                 $scope.topic, oldSubtopicId, newSubtopicId,
                 skillSummary);
+              ctrl.initEditor();
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
@@ -435,14 +464,23 @@ angular.module('oppia').directive('topicEditorTab', [
                 () => ctrl.initEditor()
               ));
             $scope.mainTopicCardIsShown = true;
-            $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
-            $scope.$on(
-              EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-              $scope.refreshTopic);
+
+            ctrl.directiveSubscriptions.add(
+              TopicEditorStateService.onStorySummariesInitialized.subscribe(
+                () => _initStorySummaries()
+              )
+            );
+            ctrl.directiveSubscriptions.add(
+              TopicsAndSkillsDashboardBackendApiService.
+                onTopicsAndSkillsDashboardReinitialized.subscribe(
+                  () => {
+                    $scope.refreshTopic();
+                  }
+                )
+            );
             ctrl.initEditor();
             _initStorySummaries();
           };
-
           ctrl.$onDestroy = function() {
             ctrl.directiveSubscriptions.unsubscribe();
           };

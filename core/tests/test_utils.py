@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
 import collections
 import contextlib
 import copy
@@ -27,11 +28,11 @@ import inspect
 import itertools
 import json
 import os
-import time
 import unittest
 
 from constants import constants
 from core.controllers import base
+from core.domain import caching_domain
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -50,6 +51,7 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 import feconf
 import main
 import main_mail
@@ -60,6 +62,7 @@ import utils
 
 from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map
+from google.appengine.api import datastore_types
 from google.appengine.api import mail
 import webtest
 
@@ -69,6 +72,7 @@ import webtest
         models.NAMES.story, models.NAMES.topic]))
 current_user_services = models.Registry.import_current_user_services()
 email_services = models.Registry.import_email_services()
+memory_cache_services = models.Registry.import_cache_services()
 
 # Prefix to append to all lines printed by tests to the console.
 # We are using the b' prefix as all the stdouts are in bytes.
@@ -164,6 +168,83 @@ def check_image_png_or_webp(image_string):
             image_string.startswith('data:image/webp')):
         return True
     return False
+
+
+class MemoryCacheServicesStub(python_utils.OBJECT):
+    """The stub class that mocks the API functionality offered by the platform
+    layer, namely the platform.cache cache services API.
+    """
+
+    cache_dict = collections.defaultdict()
+
+    def get_memory_cache_stats(self):
+        """Returns a mock profile of the cache dictionary. This mock does not
+        have the functionality to test for peak memory usage and total memory
+        usage so the values for those attributes will be 0.
+
+        Returns:
+            MemoryCacheStats. MemoryCacheStats object containing the total
+            number of keys in the cache dictionary.
+        """
+        memory_stats = caching_domain.MemoryCacheStats(
+            0,
+            0,
+            len(self.cache_dict))
+
+        return memory_stats
+
+    def flush_cache(self):
+        """Wipes the cache dictionary clean."""
+        self.cache_dict = collections.defaultdict()
+
+    def get_multi(self, keys):
+        """Looks up a list of keys in cache dictionary.
+
+        Args:
+            keys: list(str). A list of keys (strings) to look up.
+
+        Returns:
+            list(str). A list of values in the cache dictionary corresponding to
+            the keys that are passed in.
+        """
+        assert isinstance(keys, list)
+        cache_list = [
+            (self.cache_dict[key] if key in self.cache_dict else None)
+            for key in keys]
+        return cache_list
+
+    def set_multi(self, key_value_mapping):
+        """Sets multiple keys' values at once in the cache dictionary.
+
+        Args:
+            key_value_mapping: dict(str, str). Both the key and value are
+                strings. The value can either be a primitive binary-safe string
+                or the JSON-encoded string version of the object.
+
+        Returns:
+            bool. Whether the set action succeeded.
+        """
+        assert isinstance(key_value_mapping, dict)
+        for key, value in key_value_mapping.items():
+            self.cache_dict[key] = value
+        return True
+
+    def delete_multi(self, keys):
+        """Deletes multiple keys in the cache dictionary.
+
+        Args:
+            keys: list(str). The keys (strings) to delete.
+
+        Returns:
+            int. Number of successfully deleted keys.
+        """
+        number_of_deleted_keys = 0
+        for key in keys:
+            assert isinstance(key, python_utils.BASESTRING)
+            if key in self.cache_dict:
+                del self.cache_dict[key]
+                number_of_deleted_keys += 1
+        return number_of_deleted_keys
 
 
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
@@ -390,7 +471,6 @@ class TestBase(unittest.TestCase):
             'param_changes': []
         }
     }
-
 
     VERSION_1_STORY_CONTENTS_DICT = {
         'nodes': [{
@@ -1572,7 +1652,7 @@ tags: []
             self, story_id, owner_id, corresponding_topic_id,
             title='Title', description='Description', notes='Notes',
             language_code=constants.DEFAULT_LANGUAGE_CODE,
-            url_fragment='title'):
+            url_fragment='title', meta_tag_content='story meta tag content'):
         """Creates an Oppia Story and saves it.
 
         NOTE: Callers are responsible for ensuring that the
@@ -1591,6 +1671,7 @@ tags: []
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
             url_fragment: str. The url fragment of the story.
+            meta_tag_content: str. The meta tag content of the story.
 
         Returns:
             Story. A newly-created story.
@@ -1602,6 +1683,7 @@ tags: []
         story.notes = notes
         story.language_code = language_code
         story.url_fragment = url_fragment
+        story.meta_tag_content = meta_tag_content
         story_services.save_new_story(owner_id, story)
         return story
 
@@ -1610,7 +1692,8 @@ tags: []
             owner_id, title, description,
             notes, corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
-            url_fragment='story-frag'):
+            url_fragment='story-frag',
+            meta_tag_content='story meta tag content'):
         """Saves a new story with a default version 1 story contents
         data dictionary.
 
@@ -1638,6 +1721,7 @@ tags: []
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
             url_fragment: str. The URL fragment for the story.
+            meta_tag_content: str. The meta tag content of the story.
         """
         story_model = story_models.StoryModel(
             id=story_id,
@@ -1650,7 +1734,8 @@ tags: []
             notes=notes,
             corresponding_topic_id=corresponding_topic_id,
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT,
-            url_fragment=url_fragment
+            url_fragment=url_fragment,
+            meta_tag_content=meta_tag_content
         )
         commit_message = (
             'New story created with title \'%s\'.' % title)
@@ -1669,7 +1754,9 @@ tags: []
             description='description', canonical_story_ids=None,
             additional_story_ids=None, uncategorized_skill_ids=None,
             subtopics=None, next_subtopic_id=0,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            meta_tag_content='topic meta tag content',
+            practice_tab_is_displayed=False):
         """Creates an Oppia Topic and saves it.
 
         Args:
@@ -1693,6 +1780,9 @@ tags: []
             next_subtopic_id: int. The id for the next subtopic.
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
+            meta_tag_content: str. The meta tag content for the topic.
+            practice_tab_is_displayed: bool. Whether the practice tab should be
+                displayed.
 
         Returns:
             Topic. A newly-created topic.
@@ -1713,7 +1803,8 @@ tags: []
             description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
-            language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
+            meta_tag_content, practice_tab_is_displayed
         )
         topic_services.save_new_topic(owner_id, topic)
         return topic
@@ -1724,7 +1815,9 @@ tags: []
             thumbnail_bg_color, canonical_story_references,
             additional_story_references,
             uncategorized_skill_ids, next_subtopic_id,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            meta_tag_content='topic meta tag content',
+            practice_tab_is_displayed=False):
         """Saves a new topic with a default version 1 subtopic
         data dictionary.
 
@@ -1759,6 +1852,9 @@ tags: []
             next_subtopic_id: int. The id for the next subtopic.
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
+            meta_tag_content: str. The meta tag content for the topic.
+            practice_tab_is_displayed: bool. Whether the practice tab should be
+                displayed.
         """
         topic_rights_model = topic_models.TopicRightsModel(
             id=topic_id,
@@ -1782,7 +1878,9 @@ tags: []
             story_reference_schema_version=(
                 feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
             next_subtopic_id=next_subtopic_id,
-            subtopics=[self.VERSION_1_SUBTOPIC_DICT]
+            subtopics=[self.VERSION_1_SUBTOPIC_DICT],
+            meta_tag_content=meta_tag_content,
+            practice_tab_is_displayed=practice_tab_is_displayed
         )
         commit_message = (
             'New topic created with name \'%s\'.' % name)
@@ -1799,7 +1897,7 @@ tags: []
 
     def save_new_question(
             self, question_id, owner_id, question_state_data,
-            linked_skill_ids,
+            linked_skill_ids, inapplicable_misconception_ids=None,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Question and saves it.
 
@@ -1809,22 +1907,29 @@ tags: []
             question_state_data: State. The state data for the question.
             linked_skill_ids: list(str). List of skill IDs linked to the
                 question.
+            inapplicable_misconception_ids: list(str). List of misconceptions
+                ids that are not applicable to the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 
         Returns:
             Question. A newly-created question.
         """
+        # This needs to be done because default arguments can not be of list
+        # type.
+        if inapplicable_misconception_ids is None:
+            inapplicable_misconception_ids = []
         question = question_domain.Question(
             question_id, question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0,
-            linked_skill_ids)
+            linked_skill_ids, inapplicable_misconception_ids)
         question_services.add_question(owner_id, question)
         return question
 
     def save_new_question_with_state_data_schema_v27(
             self, question_id, owner_id,
             linked_skill_ids,
+            inapplicable_misconception_ids=None,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new default question with a default version 27 state
         data dictionary.
@@ -1842,16 +1947,23 @@ tags: []
             question_id: str. ID for the question to be created.
             owner_id: str. The id of the user creating the question.
             linked_skill_ids: list(str). The skill IDs linked to the question.
+            inapplicable_misconception_ids: list(str). List of misconceptions
+                ids that are not applicable to the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
+        # This needs to be done because default arguments can not be of list
+        # type.
+        if inapplicable_misconception_ids is None:
+            inapplicable_misconception_ids = []
         question_model = question_models.QuestionModel(
             id=question_id,
             question_state_data=self.VERSION_27_STATE_DICT,
             language_code=language_code,
             version=1,
             question_state_data_schema_version=27,
-            linked_skill_ids=linked_skill_ids
+            linked_skill_ids=linked_skill_ids,
+            inapplicable_misconception_ids=inapplicable_misconception_ids
         )
         question_model.commit(
             owner_id, 'New question created',
@@ -2219,6 +2331,11 @@ tags: []
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
 
+    # We can't instantiate the stub in setUp because the overrided
+    # method run() executes before setUp() and run() requires the memory
+    # cache stub.
+    memory_cache_services_stub = MemoryCacheServicesStub()
+
     def _delete_all_models(self):
         """Deletes all models from the NDB datastore."""
         from google.appengine.ext import ndb
@@ -2226,6 +2343,7 @@ class AppEngineTestBase(TestBase):
 
     def setUp(self):
         empty_environ()
+        self.memory_cache_services_stub.flush_cache()
 
         from google.appengine.datastore import datastore_stub_util
         from google.appengine.ext import testbed
@@ -2243,37 +2361,58 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_app_identity_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_datastore_v3_stub(consistency_policy=policy)
+        self.testbed.init_blobstore_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_files_stub()
-        self.testbed.init_blobstore_stub()
         self.testbed.init_search_stub()
-        self.testbed.init_images_stub()
 
         # The root path tells the testbed where to find the queue.yaml file.
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
         self.taskqueue_stub = self.testbed.get_stub(
             testbed.TASKQUEUE_SERVICE_NAME)
 
-        # Set the timezone to be UTC.
-        # Retrieve the current timezone, accounting for daylight savings
-        # as necessary.
-        self.initial_timezone = time.tzname[time.daylight]
-        os.environ['TZ'] = 'UTC'
-        time.tzset()
-
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
 
         self.signup_superadmin_user()
 
+    def run(self, result=None):
+        """Adds a context switch to all test classes. This context switch occurs
+        to allow all test classes to automatically have access to a mock version
+        of the cache services functionality. All test classes that inherit
+        AppEngineTestBase will use a mocked version of the platform.cache cache
+        services API that can be found in the MemoryCacheServicesStub class.
+
+        Args:
+            result: TestResult|None. Optional result object that, if provided,
+                will collect the results of the test and returned to the caller
+                of run(). If None is provided, a default result object is
+                created and used. More details can be found here:
+                https://docs.python.org/3/library/unittest.html#unittest.
+                TestCase.run.
+        """
+        swap_flush_cache = self.swap(
+            memory_cache_services, 'flush_cache',
+            self.memory_cache_services_stub.flush_cache)
+        swap_get_multi = self.swap(
+            memory_cache_services, 'get_multi',
+            self.memory_cache_services_stub.get_multi)
+        swap_set_multi = self.swap(
+            memory_cache_services, 'set_multi',
+            self.memory_cache_services_stub.set_multi)
+        swap_get_memory_cache_stats = self.swap(
+            memory_cache_services, 'get_memory_cache_stats',
+            self.memory_cache_services_stub.get_memory_cache_stats)
+        swap_delete_multi = self.swap(
+            memory_cache_services, 'delete_multi',
+            self.memory_cache_services_stub.delete_multi)
+        with swap_flush_cache, swap_get_multi, swap_set_multi:
+            with swap_get_memory_cache_stats, swap_delete_multi:
+                super(AppEngineTestBase, self).run(result=result)
+
     def tearDown(self):
         self.logout()
         self._delete_all_models()
-
-        # Set the timezone back to the original timezone.
-        os.environ['TZ'] = self.initial_timezone
-        time.tzset()
-
         self.testbed.deactivate()
 
     def _get_all_queue_names(self):
@@ -2499,6 +2638,120 @@ class LinterTestBase(GenericTestBase):
         """
         failed_count = sum(msg.startswith('FAILED') for msg in stdout)
         self.assertEqual(failed_count, expected_failed_count)
+
+
+class AuditJobsTestBase(GenericTestBase):
+    """Base class for audit jobs tests."""
+
+    @contextlib.contextmanager
+    def mock_datetime_for_audit(self, mocked_datetime):
+        """Mocks response from datetime.datetime.utcnow method for audit jobs.
+
+        Example usage:
+            import datetime
+            mocked_datetime_utcnow = datetime.datetime.utcnow() -
+                datetime.timedelta(days=1)
+            with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+                print datetime.datetime.utcnow() # prints time reduced by 1 day
+            print datetime.datetime.utcnow()  # prints current time.
+
+        Args:
+            mocked_datetime: datetime.datetime. The datetime which will be used
+                instead of the current UTC datetime.
+
+        Yields:
+            None. Empty yield statement.
+        """
+        from google.appengine.ext import ndb
+
+        if not isinstance(mocked_datetime, datetime.datetime):
+            raise utils.ValidationError(
+                'Expected mocked_datetime to be datetime.datetime, got %s' % (
+                    type(mocked_datetime)))
+
+        original_datetime_type = datetime.datetime
+
+        class PatchedDatetimeType(type):
+            """Validates the datetime instances."""
+
+            def __instancecheck__(cls, other):
+                """Validates whether the given instance is datetime
+                instance.
+                """
+                return isinstance(other, original_datetime_type)
+
+        class MockDatetime( # pylint: disable=inherit-non-class
+                python_utils.with_metaclass(
+                    PatchedDatetimeType, datetime.datetime)):
+            @classmethod
+            def utcnow(cls):
+                """Returns the mocked datetime."""
+
+                return mocked_datetime
+
+        setattr(datetime, 'datetime', MockDatetime)
+        setattr(ndb.DateTimeProperty, 'data_type', MockDatetime)
+
+        # Updates datastore types for MockDatetime to ensure that
+        # validation of ndb datetime properties does not fail.
+        datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime] = (  # pylint: disable=protected-access
+            datastore_types.ValidatePropertyNothing)
+        datastore_types._PACK_PROPERTY_VALUES[MockDatetime] = (  # pylint: disable=protected-access
+            datastore_types.PackDatetime)
+        datastore_types._PROPERTY_MEANINGS[MockDatetime] = (  # pylint: disable=protected-access
+            datastore_types.entity_pb.Property.GD_WHEN)
+
+        try:
+            yield
+        finally:
+            setattr(datetime, 'datetime', original_datetime_type)
+            setattr(ndb.DateTimeProperty, 'data_type', datetime.datetime)
+
+    def run_job_and_check_output(
+            self, expected_output, sort=False, literal_eval=False):
+        """Helper function to run job and compare output.
+
+        Args:
+            expected_output: list(*). The expected result of the job.
+            sort: bool. Whether to sort the outputs before comparison.
+            literal_eval: bool. Whether to use ast.literal_eval before
+                comparison.
+        """
+        job_id = self.job_class.create_new()
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+        self.job_class.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        actual_output = self.job_class.get_output(job_id)
+        if literal_eval:
+            actual_output_dict = {}
+            expected_output_dict = {}
+
+            for item in [ast.literal_eval(value) for value in actual_output]:
+                value = item[1]
+                if isinstance(value, list):
+                    value = sorted(value)
+                actual_output_dict[item[0]] = value
+
+            for item in [ast.literal_eval(value) for value in expected_output]:
+                value = item[1]
+                if isinstance(value, list):
+                    value = sorted(value)
+                expected_output_dict[item[0]] = value
+            self.assertEqual(
+                sorted(actual_output_dict.keys()),
+                sorted(expected_output_dict.keys()))
+            for key in actual_output_dict:
+                self.assertEqual(
+                    actual_output_dict[key], expected_output_dict[key])
+        elif sort:
+            self.assertEqual(sorted(actual_output), sorted(expected_output))
+        else:
+            self.assertEqual(actual_output, expected_output)
 
 
 class EmailMessageMock(python_utils.OBJECT):

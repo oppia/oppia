@@ -61,7 +61,8 @@ import { WrittenTranslationsObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('components/state-editor/state-editor-properties-services/' +
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-solicit-answer-details.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 
@@ -157,7 +158,10 @@ describe('ExplorationStatesService', function() {
         param_changes: [],
         interaction: {
           answer_groups: [{
-            rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
+            rule_specs: [{
+              rule_type: 'Contains',
+              inputs: {x: 'hola'}
+            }],
             outcome: {
               dest: 'Me Llamo',
               feedback: {

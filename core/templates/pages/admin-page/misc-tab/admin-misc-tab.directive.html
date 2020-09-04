@@ -1,4 +1,4 @@
-<md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
+<md-card class="oppia-page-card oppia-long-text oppia-long-text-card">
   <h3>Topic Similarities</h3>
   <div class="oppia-topic-similarities-container">
     Upload a csv file:<br>
@@ -9,12 +9,12 @@
   </div>
 </md-card>
 
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text" style="">
+<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Search Index</h3>
   <button ng-click="$ctrl.clearSearchIndex()">Clear Search Index</button>
 </md-card>
 
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text" style="">
+<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Flush migration bot contributions</h3>
   <button ng-click="$ctrl.flushMigrationBotContributions()">Flush contributions</button>
 </md-card>
@@ -73,44 +73,36 @@
 </md-card>
 
 <md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
-  <h3>Number of explorations left to update: <[$ctrl.numberOfExplorationsLeftToUpdate]></h3>
-  <h3>Generate and save SVGs for exploration</h3>
+  <h3>Flush the Memory Cache</h3>
   <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.fetchAndGenerateSvgsForExplorations()">
+    <form class="form" ng-submit="$ctrl.flushMemoryCache()">
       <div class="form-group row">
-        <input type="submit" value="Start">
+        <input type="submit" value="Flush Cache">
       </div>
     </form>
-
-  </div>
-  <h3>Stop generating SVGs</h3>
-  <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.stopGeneration()">
+    <form class="form" ng-submit="$ctrl.getMemoryCacheProfile()">
       <div class="form-group row">
-        <input type="submit" value="Stop">
+        <input type="submit" value="Get Memory Cache Profile">
       </div>
     </form>
   </div>
-
-</md-card>
-
-<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
-  <h3>Generate SVGs for suggestions</h3>
-  <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.fetchAndGenerateSvgsForSuggestions()">
-      <div class="form-group row">
-        <input type="submit" value="Fetch">
-      </div>
-    </form>
-
-  </div>
-  <h3>Save the SVGs for suggestions</h3>
-  <div class="oppia-query-form">
-    <form class="form" ng-submit="$ctrl.saveSuggestionSvgsToBackend()">
-      <div class="form-group row">
-        <input type="submit" value="Save">
-      </div>
-    </form>
+  <div ng-show="$ctrl.memoryCacheDataFetched">
+    <table class="table text-center view-results-table">
+      <thead>
+        <tr>
+          <td><strong>Total Memory Allocated in Bytes</strong></td>
+          <td><strong>Peak Memory Allocation in Bytes</strong></td>
+          <td><strong>Number of Keys Allocated</strong></td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><[$ctrl.result.totalAllocatedInBytes]></td>
+          <td><[$ctrl.result.peakAllocatedInBytes]></td>
+          <td><[$ctrl.result.totalKeysStored]></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </md-card>
 
@@ -132,27 +124,29 @@
     </form>
   </div>
 </md-card>
-
 <style>
-  .oppia-admin-page-card {
+  admin-misc-tab .oppia-admin-page-card {
     max-width: 700px
   }
-  .oppia-admin-page-card > button {
+  admin-misc-tab .oppia-admin-page-card > button {
     max-width: 30%;
   }
-  .oppia-admin-page-card.oppia-long-text p {
+  admin-misc-tab .oppia-admin-page-card.oppia-long-text p {
     margin: 0;
   }
-  .oppia-admin-page-card .oppia-query-form .form-group {
+  admin-misc-tab .oppia-admin-page-card .oppia-query-form .form-group {
     margin-left: 0;
   }
-  .oppia-admin-page-card .oppia-query-form label {
+  admin-misc-tab .oppia-admin-page-card .oppia-query-form label {
     font-weight: normal;
     width: 30%;
   }
-  .oppia-topic-similarities-container > input,
-  .oppia-topic-similarities-container > button {
+  admin-misc-tab .oppia-topic-similarities-container > input,
+  admin-misc-tab .oppia-topic-similarities-container > button {
     display: block;
     margin: 5px 0 5px 0;
+  }
+  admin-misc-tab .oppia-long-text-card {
+    max-width: 700px;
   }
 </style>

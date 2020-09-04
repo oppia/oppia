@@ -47,7 +47,6 @@
                         <editor-navbar-breadcrumb></editor-navbar-breadcrumb>
 
                         <exploration-save-and-publish-buttons class="ml-auto"></exploration-save-and-publish-buttons>
-                        <editor-navigation></editor-navigation>
                       </div>
                     </div>
                   </nav>
@@ -71,7 +70,8 @@
                       </div>
                     </div>
 
-                    <div ng-show="loadingMessage" class="oppia-loading-fullpage">
+                    <div ng-show="loadingMessage"
+                         class="oppia-loading-fullpage protractor-test-loading-fullpage">
                       <div class="oppia-align-center">
                         <span translate="<[loadingMessage]>"></span>
                         <span class="oppia-loading-dot-one">.</span>
@@ -103,6 +103,7 @@
                 </noscript>
 
                 <side-navigation-bar></side-navigation-bar>
+                <editor-navigation></editor-navigation>
               </div>
             </div>
           </div>

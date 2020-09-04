@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the exploration history tab.
  */
 
+import { EventEmitter } from '@angular/core';
+
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { EditabilityService } from 'services/editability.service';
@@ -58,9 +60,12 @@ describe('History tab component', function() {
   var $scope = null;
   var $uibModal = null;
   var compareVersionsService = null;
+  var editabilityService = null;
   var csrfTokenService = null;
   var dateTimeFormatService = null;
   var windowRef = null;
+
+  var mockRefreshVersionHistoryEmitter = new EventEmitter();
 
   var explorationId = 'exp1';
   var snapshots = [{
@@ -81,6 +86,7 @@ describe('History tab component', function() {
 
   beforeEach(function() {
     dateTimeFormatService = TestBed.get(DateTimeFormatService);
+    editabilityService = TestBed.get(EditabilityService);
     windowRef = TestBed.get(WindowRef);
   });
 
@@ -94,8 +100,8 @@ describe('History tab component', function() {
       TestBed.get(ExplorationDraftObjectFactory));
     $provide.value(
       'ExplorationDiffService', TestBed.get(ExplorationDiffService));
-    $provide.value('FractionObjectFactory',
-      TestBed.get(FractionObjectFactory));
+    $provide.value(
+      'FractionObjectFactory', TestBed.get(FractionObjectFactory));
     $provide.value('StatesObjectFactory', TestBed.get(StatesObjectFactory));
     $provide.value(
       'HintObjectFactory', TestBed.get(HintObjectFactory));
@@ -113,8 +119,8 @@ describe('History tab component', function() {
       'SubtitledHtmlObjectFactory', TestBed.get(SubtitledHtmlObjectFactory));
     $provide.value('UnitsObjectFactory', TestBed.get(UnitsObjectFactory));
     $provide.value('VersionTreeService', TestBed.get(VersionTreeService));
-    $provide.value('VoiceoverObjectFactory',
-      TestBed.get(VoiceoverObjectFactory));
+    $provide.value(
+      'VoiceoverObjectFactory', TestBed.get(VoiceoverObjectFactory));
     $provide.value(
       'WrittenTranslationObjectFactory',
       TestBed.get(WrittenTranslationObjectFactory));
@@ -130,6 +136,9 @@ describe('History tab component', function() {
         version: 2,
       })
     });
+    $provide.value('RouterService', {
+      onRefreshVersionHistory: mockRefreshVersionHistoryEmitter
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -142,19 +151,24 @@ describe('History tab component', function() {
 
     spyOn(csrfTokenService, 'getTokenAsync')
       .and.returnValue($q.resolve('sample-csrf-token'));
-    spyOn(dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
+    spyOn(dateTimeFormatService, 'getLocaleDateTimeHourString')
       .and.returnValue('11/21/2014');
 
     $scope = $rootScope.$new();
     ctrl = $componentController('historyTab', {
       $scope: $scope,
       DateTimeFormatService: dateTimeFormatService,
+      EditabilityService: editabilityService,
       WindowRef: windowRef
     });
     ctrl.$onInit();
   }));
 
-  it('should evaluate controller properties after its initialization',
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
+  it('should initialize controller properties after its initialization',
     function() {
       expect(ctrl.explorationId).toBe(explorationId);
       expect(ctrl.explorationAllSnapshotsUrl).toBe(
@@ -184,125 +198,13 @@ describe('History tab component', function() {
     $httpBackend.expect('GET', '/createhandler/snapshots/exp1').respond({
       snapshots: snapshots
     });
-    $rootScope.$broadcast('refreshVersionHistory', data);
+    mockRefreshVersionHistoryEmitter.emit(data);
     $scope.$apply();
 
     expect(ctrl.currentVersion).toBe(2);
     expect(ctrl.hideHistoryGraph).toBe(true);
     expect(ctrl.comparisonsAreDisabled).toBe(false);
-    expect(ctrl.versionCountPrompt).toBe('Please select any 2.');
-
-    $httpBackend.flush();
-
-    expect(ctrl.explorationVersionMetadata).toEqual({
-      1: {
-        committerId: 'committer_3',
-        createdOnMsecsStr: '11/21/2014',
-        commitMessage: 'This is the commit message',
-        versionNumber: 1
-      },
-      2: {
-        committerId: 'committer_3',
-        createdOnMsecsStr: '11/21/2014',
-        commitMessage: 'This is the commit message 2',
-        versionNumber: 2
-      }
-    });
-    expect(ctrl.versionCheckboxArray).toEqual([{
-      vnum: 2,
-      selected: false
-    }, {
-      vnum: 1,
-      selected: false
-    }]);
   });
-
-  it('should refresh version history when refreshVersionHistory flag is' +
-    ' broadcasted and force refresh is false and there ir no version metadata',
-  function() {
-    var data = {
-      forceRefresh: false
-    };
-
-    $httpBackend.expect('GET', '/createhandler/snapshots/exp1').respond({
-      snapshots: snapshots
-    });
-    $rootScope.$broadcast('refreshVersionHistory', data);
-    $scope.$apply();
-
-    expect(ctrl.currentVersion).toBe(2);
-    expect(ctrl.hideHistoryGraph).toBe(true);
-    expect(ctrl.comparisonsAreDisabled).toBe(false);
-    expect(ctrl.versionCountPrompt).toBe('Please select any 2.');
-
-    $httpBackend.flush();
-
-    expect(ctrl.explorationVersionMetadata).toEqual({
-      1: {
-        committerId: 'committer_3',
-        createdOnMsecsStr: '11/21/2014',
-        commitMessage: 'This is the commit message',
-        versionNumber: 1
-      },
-      2: {
-        committerId: 'committer_3',
-        createdOnMsecsStr: '11/21/2014',
-        commitMessage: 'This is the commit message 2',
-        versionNumber: 2
-      }
-    });
-    expect(ctrl.versionCheckboxArray).toEqual([{
-      vnum: 2,
-      selected: false
-    }, {
-      vnum: 1,
-      selected: false
-    }]);
-  });
-
-  it('should toggle selected versions and evaluate version count prompt',
-    function() {
-      $httpBackend.expect('GET', '/createhandler/snapshots/exp1').respond({
-        snapshots: snapshots
-      });
-      ctrl.refreshVersionHistory();
-      $scope.$apply();
-      $httpBackend.flush();
-
-      ctrl.changeSelectedVersions({
-        target: {
-          checked: true
-        }
-      }, 1);
-      expect(ctrl.versionCountPrompt).toBe('Please select one more.');
-      expect(ctrl.isCheckboxDisabled(1)).toBe(false);
-
-      ctrl.changeSelectedVersions({
-        target: {
-          checked: true
-        }
-      }, 2);
-      expect(ctrl.versionCountPrompt).toBe('');
-      expect(ctrl.areCompareVersionsSelected()).toBe(true);
-      expect(ctrl.isCheckboxDisabled(2)).toBe(false);
-      expect(ctrl.isCheckboxDisabled(3)).toBe(true);
-
-      ctrl.changeSelectedVersions({
-        target: {
-          checked: false
-        }
-      }, 1);
-      expect(ctrl.versionCountPrompt).toBe('Please select one more.');
-      expect(ctrl.isCheckboxDisabled(3)).toBe(false);
-
-      ctrl.changeSelectedVersions({
-        target: {
-          checked: false
-        }
-      }, 2);
-      expect(ctrl.versionCountPrompt).toBe('Please select any two.');
-      expect(ctrl.areCompareVersionsSelected()).toBe(false);
-    });
 
   it('should compare selected versions successfully', function() {
     $httpBackend.expect('GET', '/createhandler/snapshots/exp1').respond({
@@ -313,29 +215,34 @@ describe('History tab component', function() {
     $httpBackend.flush();
 
     ctrl.changeSelectedVersions({
-      target: {
-        checked: true
-      }
+      committerId: 'committer_3',
+      createdOnMsecsStr: '11/21/2014',
+      commitMessage: 'This is the commit message',
+      versionNumber: 1
     }, 1);
+
     ctrl.changeSelectedVersions({
-      target: {
-        checked: true
-      }
+      committerId: 'committer_3',
+      createdOnMsecsStr: '11/21/2014',
+      commitMessage: 'This is the commit message',
+      versionNumber: 2
     }, 2);
 
     spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
       $q.resolve({}));
     ctrl.compareSelectedVersions();
+    ctrl.changeCompareVersion();
     $scope.$apply();
 
     expect(ctrl.hideHistoryGraph).toBe(false);
-    expect(ctrl.compareVersionsButtonIsHidden).toBe(true);
     expect(ctrl.diffData).toEqual({});
 
     expect(ctrl.earlierVersionHeader).toBe(
-      'Revision #1 by committer_3 (11/21/2014): This is the commit message');
+      'Revision #2 by committer_3 (11/21/2014):' +
+        ' This is the commit message 2');
     expect(ctrl.laterVersionHeader).toBe(
-      'Revision #2 by committer_3 (11/21/2014): This is the commit message 2');
+      'Revision #1 by committer_3 (11/21/2014):' +
+        ' This is the commit message');
   });
 
   it('should open a new tab for download exploration with version', function() {
@@ -348,7 +255,7 @@ describe('History tab component', function() {
       '/createhandler/download/exp1?v=1', '&output_format=zip');
   });
 
-  it('should open revert exploration modal with $uibModal', function() {
+  it('should open revert exploration modal', function() {
     spyOn($uibModal, 'open').and.callThrough();
 
     ctrl.showRevertExplorationModal();
@@ -391,50 +298,94 @@ describe('History tab component', function() {
       expect(windowRef.nativeWindow.location.reload).not.toHaveBeenCalled();
     });
 
-  it('should get version numbers of revisions to be displayed',
-    function() {
-      ctrl.displayedCurrentPageNumber = 1;
-      ctrl.versionCheckboxArray = [
-        {vnum: 32, selected: false},
-        {vnum: 31, selected: true},
-        {vnum: 30, selected: false},
-        {vnum: 29, selected: false},
-        {vnum: 28, selected: false},
-        {vnum: 27, selected: false},
-        {vnum: 26, selected: false},
-        {vnum: 25, selected: false},
-        {vnum: 24, selected: false},
-        {vnum: 23, selected: false},
-        {vnum: 22, selected: false},
-        {vnum: 21, selected: false},
-        {vnum: 20, selected: false},
-        {vnum: 19, selected: false},
-        {vnum: 18, selected: false},
-        {vnum: 17, selected: false},
-        {vnum: 16, selected: false},
-        {vnum: 15, selected: false},
-        {vnum: 14, selected: true},
-        {vnum: 13, selected: false},
-        {vnum: 12, selected: false},
-        {vnum: 11, selected: false},
-        {vnum: 10, selected: false},
-        {vnum: 9, selected: false},
-        {vnum: 8, selected: false},
-        {vnum: 7, selected: false},
-        {vnum: 6, selected: false},
-        {vnum: 5, selected: false},
-        {vnum: 4, selected: false},
-        {vnum: 3, selected: false},
-        {vnum: 2, selected: false},
-        {vnum: 1, selected: false}
-      ];
-      ctrl.computeVersionsToDisplay();
-      expect(ctrl.versionNumbersToDisplay).toEqual([
-        32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16,
-        15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3]);
-      ctrl.displayedCurrentPageNumber = 2;
-      ctrl.computeVersionsToDisplay();
-      expect(ctrl.versionNumbersToDisplay).toEqual([2, 1]);
-    }
-  );
+  it('should return if the content is editable', function() {
+    spyOn(editabilityService, 'isEditable').and.returnValue(false);
+    expect(ctrl.isEditable()).toEqual(false);
+  });
+
+  it('should filter the history by username', function() {
+    var snapshots = [{
+      commit_message: 'This is the commit message',
+      committerId: 'committer_3',
+      commit_type: '',
+      version_number: 1,
+      created_on_ms: 1416563100000,
+      commit_cmds: []
+    }, {
+      commit_message: 'This is the commit message 2',
+      committerId: 'committer_3',
+      commit_type: '',
+      version_number: 2,
+      created_on_ms: 1416563100000,
+      commit_cmds: []
+    }, {
+      commit_message: 'This is the commit message 2',
+      committerId: 'committer_1',
+      commit_type: '',
+      version_number: 2,
+      created_on_ms: 1416563100000,
+      commit_cmds: []
+    }];
+    ctrl.totalExplorationVersionMetadata = snapshots;
+    ctrl.username = '';
+    ctrl.filterByUsername();
+    expect(ctrl.explorationVersionMetadata).toEqual(snapshots);
+
+    ctrl.username = 'committer_3';
+    ctrl.filterByUsername();
+    expect(ctrl.explorationVersionMetadata).toEqual(
+      [snapshots[0], snapshots[1]]);
+
+    ctrl.username = 'committer_1';
+    ctrl.filterByUsername();
+    expect(ctrl.explorationVersionMetadata).toEqual([snapshots[2]]);
+  });
+
+  it('should reset the graph', function() {
+    ctrl.hideHistoryGraph = false;
+    ctrl.resetGraph();
+    expect(ctrl.hideHistoryGraph).toBe(true);
+  });
+
+  it('should toggle history options', function() {
+    ctrl.toggleHistoryOptions(10);
+    expect(ctrl.highlightedIndex).toBe(10);
+    ctrl.toggleHistoryOptions(10);
+    expect(ctrl.highlightedIndex).toBe(null);
+    ctrl.toggleHistoryOptions(5);
+    expect(ctrl.highlightedIndex).toBe(5);
+  });
+
+  it('should reverse the array when the date filter is applied', function() {
+    var snapshots = [{
+      commit_message: 'This is the commit message',
+      committerId: 'committer_3',
+      commit_type: '',
+      version_number: 1,
+      created_on_ms: 1416563100000,
+      commit_cmds: []
+    }, {
+      commit_message: 'This is the commit message 2',
+      committerId: 'committer_3',
+      commit_type: '',
+      version_number: 2,
+      created_on_ms: 1416563100000,
+      commit_cmds: []
+    }, {
+      commit_message: 'This is the commit message 2',
+      committerId: 'committer_1',
+      commit_type: '',
+      version_number: 3,
+      created_on_ms: 1416563100000,
+      commit_cmds: []
+    }];
+    ctrl.explorationVersionMetadata = snapshots;
+    ctrl.reverseDateOrder();
+    expect(ctrl.explorationVersionMetadata[0].version_number).toEqual(3);
+    expect(ctrl.explorationVersionMetadata[2].version_number).toEqual(1);
+
+    ctrl.reverseDateOrder();
+    expect(ctrl.explorationVersionMetadata[0].version_number).toEqual(1);
+    expect(ctrl.explorationVersionMetadata[2].version_number).toEqual(3);
+  });
 });

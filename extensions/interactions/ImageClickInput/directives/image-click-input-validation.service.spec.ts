@@ -101,6 +101,7 @@ describe('ImageClickInputValidationService', () => {
         value: true
       }
     };
+
     goodAnswerGroups = [agof.createNew(
       [rof.createFromBackendDict({
         rule_type: 'IsInRegion',

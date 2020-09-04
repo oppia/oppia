@@ -28,7 +28,8 @@ require('services/context.service.ts');
 angular.module('oppia').factory('AudioPreloaderService', [
   'AssetsBackendApiService', 'AudioTranslationLanguageService',
   'ComputeGraphService', 'ContextService',
-  function(AssetsBackendApiService, AudioTranslationLanguageService,
+  function(
+      AssetsBackendApiService, AudioTranslationLanguageService,
       ComputeGraphService, ContextService) {
     var MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
 
@@ -82,7 +83,7 @@ angular.module('oppia').factory('AudioPreloaderService', [
         if (_audioLoadedCallback) {
           _audioLoadedCallback(loadedAudio.filename);
         }
-      });
+      }, () => {});
     };
 
     var _kickOffAudioPreloader = function(sourceStateName) {

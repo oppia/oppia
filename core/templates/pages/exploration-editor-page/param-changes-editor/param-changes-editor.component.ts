@@ -33,6 +33,9 @@ require(
   'state-editor.service.ts');
 require('services/alerts.service.ts');
 require('services/editability.service.ts');
+require('services/external-save.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('paramChangesEditor', {
   bindings: {
@@ -42,14 +45,17 @@ angular.module('oppia').component('paramChangesEditor', {
   },
   template: require('./param-changes-editor.component.html'),
   controller: [
-    '$scope', 'EditabilityService', 'ExplorationParamSpecsService',
-    'AlertsService', 'ParamChangeObjectFactory', 'ExplorationStatesService',
+    '$scope', 'AlertsService', 'EditabilityService',
+    'ExplorationParamSpecsService', 'ExplorationStatesService',
+    'ExternalSaveService', 'ParamChangeObjectFactory',
     'UrlInterpolationService', 'INVALID_PARAMETER_NAMES',
     function(
-        $scope, EditabilityService, ExplorationParamSpecsService,
-        AlertsService, ParamChangeObjectFactory, ExplorationStatesService,
+        $scope, AlertsService, EditabilityService,
+        ExplorationParamSpecsService, ExplorationStatesService,
+        ExternalSaveService, ParamChangeObjectFactory,
         UrlInterpolationService, INVALID_PARAMETER_NAMES) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       var generateParamNameChoices = function() {
         return ExplorationParamSpecsService.displayed.getParamNames().sort()
           .map(function(paramName) {
@@ -198,13 +204,13 @@ angular.module('oppia').component('paramChangesEditor', {
           Copier: 'to',
           RandomSelector: 'to one of'
         };
-
-        $scope.$on('externalSave', function() {
-          if ($scope.isParamChangesEditorOpen) {
-            $scope.saveParamChanges();
-          }
-        });
-
+        ctrl.directiveSubscriptions.add(
+          ExternalSaveService.onExternalSave.subscribe(
+            () => {
+              if ($scope.isParamChangesEditorOpen) {
+                $scope.saveParamChanges();
+              }
+            }));
         $scope.getStaticImageUrl = function(imagePath) {
           return UrlInterpolationService.getStaticImageUrl(imagePath);
         };
@@ -257,6 +263,9 @@ angular.module('oppia').component('paramChangesEditor', {
             $scope.$apply();
           }
         };
+      };
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

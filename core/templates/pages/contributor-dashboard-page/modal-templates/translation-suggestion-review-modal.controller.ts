@@ -22,7 +22,8 @@ angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
     '$scope', '$uibModalInstance', 'SuggestionModalService',
     'contentHtml', 'reviewable', 'translationHtml',
-    function($scope, $uibModalInstance, SuggestionModalService,
+    function(
+        $scope, $uibModalInstance, SuggestionModalService,
         contentHtml, reviewable, translationHtml) {
       $scope.translationHtml = translationHtml;
       $scope.contentHtml = contentHtml;

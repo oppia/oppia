@@ -34,17 +34,15 @@ require('services/math-interactions.service.ts');
 angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
   template: require('./math-equation-input-interaction.component.html'),
   controller: [
-    '$attrs', '$scope', 'MathEquationInputRulesService',
-    'CurrentInteractionService', 'DeviceInfoService',
+    '$attrs', '$scope', 'CurrentInteractionService', 'DeviceInfoService',
     'GuppyConfigurationService', 'GuppyInitializationService',
-    'HtmlEscaperService', 'MathInteractionsService',
-    'MATH_INTERACTION_PLACEHOLDERS',
+    'HtmlEscaperService', 'MathEquationInputRulesService',
+    'MathInteractionsService', 'MATH_INTERACTION_PLACEHOLDERS',
     function(
-        $attrs, $scope, MathEquationInputRulesService,
-        CurrentInteractionService, DeviceInfoService,
+        $attrs, $scope, CurrentInteractionService, DeviceInfoService,
         GuppyConfigurationService, GuppyInitializationService,
-        HtmlEscaperService, MathInteractionsService,
-        MATH_INTERACTION_PLACEHOLDERS) {
+        HtmlEscaperService, MathEquationInputRulesService,
+        MathInteractionsService, MATH_INTERACTION_PLACEHOLDERS) {
       const ctrl = this;
       ctrl.value = '';
       ctrl.hasBeenTouched = false;
@@ -59,7 +57,7 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
           ctrl.value = MathInteractionsService.replaceAbsSymbolWithText(
             ctrl.value);
           let answerIsValid = MathInteractionsService.validateEquation(
-            ctrl.value);
+            ctrl.value, GuppyInitializationService.getCustomOskLetters());
           ctrl.warningText = MathInteractionsService.getWarningText();
           return answerIsValid;
         }
@@ -86,7 +84,7 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
         GuppyInitializationService.init(
           'guppy-div-learner',
           MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
-        GuppyInitializationService.customOskLetters = (
+        GuppyInitializationService.setCustomOskLetters(
           HtmlEscaperService.escapedJsonToObj(
             $attrs.customOskLettersWithValue));
         let eventType = (

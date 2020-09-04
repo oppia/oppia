@@ -40,12 +40,8 @@ sys.path.insert(0, _PY_GITHUB_PATH)
 
 import github  # isort:skip pylint: disable=wrong-import-position
 
-FECONF_CONFIG_PATH = os.path.join(
-    os.getcwd(), os.pardir, 'release-scripts', 'feconf_updates.config')
 CONSTANTS_CONFIG_PATH = os.path.join(
     os.getcwd(), os.pardir, 'release-scripts', 'constants_updates.config')
-LOCAL_FECONF_PATH = os.path.join(os.getcwd(), 'feconf.py')
-LOCAL_CONSTANTS_PATH = os.path.join(os.getcwd(), 'assets', 'constants.ts')
 FECONF_REGEX = '^([A-Z_]+ = ).*$'
 CONSTANTS_REGEX = '^(  "[A-Z_]+": ).*$'
 TERMS_PAGE_URL = (
@@ -101,11 +97,14 @@ def apply_changes_based_on_config(
         writable_local_file.write('\n'.join(local_lines) + '\n')
 
 
-def check_updates_to_terms_of_service(personal_access_token):
+def check_updates_to_terms_of_service(
+        release_feconf_path, personal_access_token):
     """Checks if updates are made to terms of service and updates
     REGISTRATION_PAGE_LAST_UPDATED_UTC in feconf.py if there are updates.
 
     Args:
+        release_feconf_path: str. The path to feconf file in release
+            directory.
         personal_access_token: str. The personal access token for the
             GitHub id of user.
     """
@@ -134,9 +133,9 @@ def check_updates_to_terms_of_service(personal_access_token):
             commit_time.year, commit_time.month, commit_time.day,
             commit_time.hour, commit_time.minute, commit_time.second)
         feconf_lines = []
-        with python_utils.open_file(LOCAL_FECONF_PATH, 'r') as f:
+        with python_utils.open_file(release_feconf_path, 'r') as f:
             feconf_lines = f.readlines()
-        with python_utils.open_file(LOCAL_FECONF_PATH, 'w') as f:
+        with python_utils.open_file(release_feconf_path, 'w') as f:
             for line in feconf_lines:
                 if line.startswith('REGISTRATION_PAGE_LAST_UPDATED_UTC'):
                     line = (
@@ -146,61 +145,98 @@ def check_updates_to_terms_of_service(personal_access_token):
                 f.write(line)
 
 
-def add_mailgun_api_key():
-    """Adds mailgun api key to feconf.py."""
+def verify_feconf(release_feconf_path):
+    """Verifies that feconf is updated correctly to include
+    mailgun api key.
+
+    Args:
+        release_feconf_path: str. The path to feconf file in release
+            directory.
+    """
+    feconf_contents = python_utils.open_file(
+        release_feconf_path, 'r').read()
+    if ('MAILGUN_API_KEY' not in feconf_contents or
+            'MAILGUN_API_KEY = None' in feconf_contents):
+        raise Exception(
+            'The mailgun API key must be added '
+            'before deployment.')
+
+
+def add_mailgun_api_key(release_feconf_path):
+    """Adds mailgun api key to feconf config file.
+
+    Args:
+        release_feconf_path: str. The path to feconf file in release
+            directory.
+    """
     mailgun_api_key = getpass.getpass(
         prompt=('Enter mailgun api key from the release process doc.'))
+    mailgun_api_key = mailgun_api_key.strip()
 
-    if re.match('^key-[a-z0-9]{32}$', mailgun_api_key) is None:
-        raise Exception('Invalid mailgun api key.')
+    while re.match('^key-[a-z0-9]{32}$', mailgun_api_key) is None:
+        mailgun_api_key = getpass.getpass(
+            prompt=(
+                'You have entered an invalid mailgun api '
+                'key: %s, please retry.' % mailgun_api_key))
+        mailgun_api_key = mailgun_api_key.strip()
 
     feconf_lines = []
-    with python_utils.open_file(LOCAL_FECONF_PATH, 'r') as f:
+    with python_utils.open_file(release_feconf_path, 'r') as f:
         feconf_lines = f.readlines()
 
     assert 'MAILGUN_API_KEY = None\n' in feconf_lines, 'Missing mailgun API key'
 
-    with python_utils.open_file(LOCAL_FECONF_PATH, 'w') as f:
+    with python_utils.open_file(release_feconf_path, 'w') as f:
         for line in feconf_lines:
             if line == 'MAILGUN_API_KEY = None\n':
                 line = line.replace('None', '\'%s\'' % mailgun_api_key)
             f.write(line)
 
+    verify_feconf(release_feconf_path)
 
-def main(personal_access_token):
+
+def main(
+        release_dir_path, deploy_data_path, personal_access_token,
+        prompt_for_mailgun_and_terms_update):
     """Updates the files corresponding to LOCAL_FECONF_PATH and
     LOCAL_CONSTANTS_PATH after doing the prerequisite checks.
 
     Args:
+        release_dir_path: str. Path of directory where all files are copied
+            for release.
+        deploy_data_path: str. Path for deploy data directory.
         personal_access_token: str. The personal access token for the
             GitHub id of user.
+        prompt_for_mailgun_and_terms_update: bool. Whether to update mailgun api
+            and last updated time for terms page.
     """
     # Do prerequisite checks.
-    common.require_cwd_to_be_oppia()
-    assert common.is_current_branch_a_release_branch(), (
-        'Current branch is not a release branch_name')
-    common.ensure_release_scripts_folder_exists_and_is_up_to_date()
-    try:
-        python_utils.url_open(TERMS_PAGE_URL)
-    except Exception:
-        raise Exception('Terms mainpage does not exist on Github.')
+    feconf_config_path = os.path.join(deploy_data_path, 'feconf_updates.config')
+    constants_config_path = os.path.join(
+        deploy_data_path, 'constants_updates.config')
 
-    try:
-        check_updates_to_terms_of_service(personal_access_token)
-        add_mailgun_api_key()
+    release_feconf_path = os.path.join(release_dir_path, common.FECONF_PATH)
+    release_constants_path = os.path.join(
+        release_dir_path, common.CONSTANTS_FILE_PATH)
 
-        apply_changes_based_on_config(
-            LOCAL_FECONF_PATH, FECONF_CONFIG_PATH, FECONF_REGEX)
-        apply_changes_based_on_config(
-            LOCAL_CONSTANTS_PATH, CONSTANTS_CONFIG_PATH, CONSTANTS_REGEX)
-    except Exception as e:
-        common.run_cmd([
-            'git', 'checkout', '--', LOCAL_FECONF_PATH, LOCAL_CONSTANTS_PATH])
-        raise Exception(e)
+    if prompt_for_mailgun_and_terms_update:
+        try:
+            python_utils.url_open(TERMS_PAGE_URL)
+        except Exception:
+            raise Exception('Terms mainpage does not exist on Github.')
+        add_mailgun_api_key(release_feconf_path)
+        check_updates_to_terms_of_service(
+            release_feconf_path, personal_access_token)
+
+    apply_changes_based_on_config(
+        release_feconf_path, feconf_config_path, FECONF_REGEX)
+    apply_changes_based_on_config(
+        release_constants_path, constants_config_path, CONSTANTS_REGEX)
 
     common.ask_user_to_confirm(
-        'Done! Please check feconf.py and assets/constants.ts to ensure that '
+        'Done! Please check %s and %s to ensure that '
         'the changes made are correct. Specifically verify that the '
-        'MAILGUN_API_KEY is updated correctly and other config changes '
-        'are corresponding to %s and %s.\n' % (
-            FECONF_CONFIG_PATH, CONSTANTS_CONFIG_PATH))
+        'MAILGUN_API_KEY and REDISHOST are updated correctly and '
+        'other config changes are corresponding to %s and %s.\n' % (
+            release_feconf_path, release_constants_path,
+            feconf_config_path, constants_config_path))

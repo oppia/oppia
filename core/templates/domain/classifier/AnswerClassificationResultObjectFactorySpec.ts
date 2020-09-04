@@ -43,7 +43,6 @@ describe('Answer classification result object factory', () => {
     expect(answerClassificationResult.outcome).toEqual(
       oof.createNew('default', '', '', []));
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
-    expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(
       DEFAULT_OUTCOME_CLASSIFICATION);
   });

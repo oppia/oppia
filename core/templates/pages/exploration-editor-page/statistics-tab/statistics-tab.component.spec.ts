@@ -181,7 +181,7 @@ describe('Statistics Tab Component', function() {
     ctrl.$onDestroy();
   });
 
-  it('should evaluate controller properties after its initialization',
+  it('should initialize controller properties after its initialization',
     function() {
       expect(ctrl.stateStatsModalIsOpen).toBe(false);
       expect($scope.explorationHasBeenVisited).toBe(false);
@@ -217,7 +217,7 @@ describe('Statistics Tab Component', function() {
     expect($scope.explorationHasBeenVisited).toBe(true);
   });
 
-  it('should open state stats modal using $uibModal', function() {
+  it('should open state stats modal', function() {
     routerService.onRefreshStatisticsTab.emit();
 
     // Resolve promise.

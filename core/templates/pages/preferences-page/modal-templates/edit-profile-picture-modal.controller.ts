@@ -25,8 +25,10 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 
 angular.module('oppia').controller('EditProfilePictureModalController', [
-  '$controller', '$scope', '$timeout', '$uibModalInstance', function(
-      $controller, $scope, $timeout, $uibModalInstance) {
+  '$controller', '$scope', '$timeout', '$uibModalInstance',
+  'ALLOWED_IMAGE_FORMATS', function(
+      $controller, $scope, $timeout, $uibModalInstance,
+      ALLOWED_IMAGE_FORMATS) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -35,6 +37,7 @@ angular.module('oppia').controller('EditProfilePictureModalController', [
     $scope.uploadedImage = null;
     $scope.croppedImageDataUrl = '';
     $scope.invalidImageWarningIsShown = false;
+    $scope.allowedImageFormats = ALLOWED_IMAGE_FORMATS;
     let cropper = null;
 
     $scope.initialiseCropper = function() {

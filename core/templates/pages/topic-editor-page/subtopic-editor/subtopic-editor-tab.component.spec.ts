@@ -104,7 +104,8 @@ describe('Subtopic editor tab', function() {
       return subtopic;
     };
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
-    spyOn(TopicEditorStateService,
+    spyOn(
+      TopicEditorStateService,
       'getSubtopicPage').and.returnValue(subtopicPage);
     spyOn(TopicEditorRoutingService, 'getSubtopicIdFromUrl')
       .and.returnValue('1');
@@ -216,12 +217,6 @@ describe('Subtopic editor tab', function() {
     var skillSummary = ShortSkillSummaryObjectFactory.create(
       '1', 'Skill description');
     expect(ctrl.isSkillDeleted(skillSummary)).toEqual(false);
-  });
-
-  it('should call SkillCreationService to create skill', function() {
-    var skillSpy = spyOn(EntityCreationService, 'createSkill');
-    ctrl.createSkill();
-    expect(skillSpy).toHaveBeenCalled();
   });
 
   it('should call TopicUpdateService when skill is rearranged',

@@ -31,12 +31,12 @@ angular.module('oppia').component('numericExpressionEditor', {
   },
   template: require('./numeric-expression-editor.component.html'),
   controller: [
-    '$scope', 'GuppyConfigurationService', 'GuppyInitializationService',
-    'MathInteractionsService', 'DeviceInfoService',
+    '$scope', 'DeviceInfoService', 'GuppyConfigurationService',
+    'GuppyInitializationService', 'MathInteractionsService',
     'MATH_INTERACTION_PLACEHOLDERS',
     function(
-        $scope, GuppyConfigurationService, GuppyInitializationService,
-        MathInteractionsService, DeviceInfoService,
+        $scope, DeviceInfoService, GuppyConfigurationService,
+        GuppyInitializationService, MathInteractionsService,
         MATH_INTERACTION_PLACEHOLDERS) {
       const ctrl = this;
       ctrl.warningText = '';
@@ -50,8 +50,8 @@ angular.module('oppia').component('numericExpressionEditor', {
         // is not compatible with nerdamer or with the backend validations.
         ctrl.currentValue = MathInteractionsService.replaceAbsSymbolWithText(
           ctrl.currentValue);
-        var answerIsValid = MathInteractionsService.validateExpression(
-          ctrl.currentValue, false);
+        var answerIsValid = MathInteractionsService.validateNumericExpression(
+          ctrl.currentValue);
         if (GuppyInitializationService.findActiveGuppyObject() === undefined) {
           // The warnings should only be displayed when the editor is inactive
           // focus, i.e., the user is done typing.

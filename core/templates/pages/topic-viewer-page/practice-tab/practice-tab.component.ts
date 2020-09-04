@@ -20,11 +20,14 @@ import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { Subtopic } from 'domain/topic/SubtopicObjectFactory';
+import { QuestionBackendApiService } from
+  'domain/question/question-backend-api.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { PracticeSessionPageConstants } from
   'pages/practice-session-page/practice-session-page.constants.ts';
 import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'practice-tab',
@@ -33,14 +36,18 @@ import { UrlService } from 'services/contextual/url.service';
 })
 export class PracticeTabComponent implements OnInit {
   @Input() topicName: string;
-  @Input() subtopicsList: Array<Subtopic>;
-  selectedSubtopics: Array<Subtopic> = [];
-  availableSubtopics: Array<Subtopic> = [];
-  selectedSubtopicIndices: Array<Boolean> = [];
+  @Input() startButtonIsDisabled: boolean = false;
+  @Input() subtopicsList: Subtopic[];
+  selectedSubtopics: Subtopic[] = [];
+  availableSubtopics: Subtopic[] = [];
+  selectedSubtopicIndices: boolean[] = [];
+  questionsAreAvailable: boolean = false;
 
   constructor(
+    private questionBackendApiService: QuestionBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
@@ -55,12 +62,32 @@ export class PracticeTabComponent implements OnInit {
   }
 
   isStartButtonDisabled(): boolean {
+    if (this.startButtonIsDisabled) {
+      return true;
+    }
     for (var idx in this.selectedSubtopicIndices) {
       if (this.selectedSubtopicIndices[idx]) {
-        return false;
+        return !this.questionsAreAvailable;
       }
     }
     return true;
+  }
+
+  checkIfQuestionsExist(subtopicIndices: boolean[]): void {
+    const skillIds = [];
+    for (let idx in subtopicIndices) {
+      if (subtopicIndices[idx]) {
+        skillIds.push(this.availableSubtopics[idx].getSkillIds());
+      }
+    }
+    if (skillIds.length > 0) {
+      this.questionBackendApiService.fetchTotalQuestionCountForSkillIds(
+        skillIds).then(questionCount => {
+        this.questionsAreAvailable = questionCount > 0;
+      });
+    } else {
+      this.questionsAreAvailable = false;
+    }
   }
 
   openNewPracticeSession(): void {
@@ -79,7 +106,11 @@ export class PracticeTabComponent implements OnInit {
           this.urlService.getClassroomUrlFragmentFromLearnerUrl()),
         comma_separated_subtopic_ids: selectedSubtopicIds.join(',')
       });
-    window.location.href = practiceSessionsUrl;
+    this.windowRef.nativeWindow.location.href = practiceSessionsUrl;
+  }
+
+  isAtLeastOneSubtopicSelected(): boolean {
+    return this.selectedSubtopicIndices.some(item => item);
   }
 }
 

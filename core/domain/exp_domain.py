@@ -27,6 +27,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import copy
 import functools
+import json
 import re
 import string
 
@@ -253,44 +254,53 @@ class ExplorationChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': ['category', 'title'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_STATE,
         'required_attribute_names': ['state_name'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_DELETE_STATE,
         'required_attribute_names': ['state_name'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_RENAME_STATE,
         'required_attribute_names': ['new_state_name', 'old_state_name'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_TRANSLATION,
         'required_attribute_names': [
             'state_name', 'content_id', 'language_code', 'content_html',
             'translation_html'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_EDIT_STATE_PROPERTY,
         'required_attribute_names': [
             'property_name', 'state_name', 'new_value'],
         'optional_attribute_names': ['old_value'],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': STATE_PROPERTIES}
     }, {
         'name': CMD_EDIT_EXPLORATION_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value'],
         'optional_attribute_names': ['old_value'],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': EXPLORATION_PROPERTIES}
     }, {
         'name': CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': exp_models.ExplorationModel.CMD_REVERT_COMMIT,
         'required_attribute_names': ['version_number'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
 
@@ -401,102 +411,6 @@ class ExpVersionReference(python_utils.OBJECT):
         if not isinstance(self.version, int):
             raise utils.ValidationError(
                 'Expected version to be an int, received %s' % self.version)
-
-
-class ExplorationMathRichTextInfo(python_utils.OBJECT):
-    """Value object representing all the information related to math rich
-    text components in an exploration's HTML.
-    """
-
-    def __init__(
-            self, exp_id, math_images_generation_required,
-            latex_strings_without_svg):
-        """Initializes an ExplorationMathRichTextInfo domain object.
-
-        Args:
-            exp_id: str. ID of the exploration.
-            math_images_generation_required: bool. A boolean which indicates
-                whether the exploration requires images to be generated and
-                saved for the math rich-text components.
-            latex_strings_without_svg: list(str). list of unique LaTeX strings
-                from the math rich-text components having the 'svg_filename'
-                field as an empty string. Basically these are the LaTeX strings
-                for which we need to generate and save an SVG image.
-        """
-        self.exp_id = exp_id
-        self.math_images_generation_required = math_images_generation_required
-        self.latex_strings_without_svg = latex_strings_without_svg
-        self.validate()
-
-    def to_dict(self):
-        """Returns a dict representing this ExplorationMathRichTextInfo domain
-        object.
-
-        Returns:
-            dict. A dict, mapping all fields of ExplorationMathRichTextInfo
-            instance.
-        """
-        return {
-            'exp_id': self.exp_id,
-            'math_images_generation_required': (
-                self.math_images_generation_required),
-            'latex_strings_without_svg': self.latex_strings_without_svg
-        }
-
-    def validate(self):
-        """Validates properties of the ExplorationMathRichTextInfo.
-
-        Raises:
-            ValidationError. Attributes of the ExplorationMathRichTextInfo
-                are invalid.
-        """
-        if not isinstance(self.exp_id, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected exp_id to be a str, received %s' % self.exp_id)
-        if not isinstance(self.math_images_generation_required, bool):
-            raise utils.ValidationError(
-                'Expected math_images_generation_required to be an bool, '
-                'received %s' % self.math_images_generation_required)
-        if not isinstance(self.latex_strings_without_svg, list):
-            raise utils.ValidationError(
-                'Expected latex_strings to be a list, received %s' % (
-                    self.latex_strings_without_svg))
-        for latex_string in self.latex_strings_without_svg:
-            if not isinstance(latex_string, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected each element in the list of latex strings to be'
-                    ' a str, received %s' % latex_string)
-
-    def get_svg_size_in_bytes(self):
-        """Returns the approximate size of SVG images for the LaTeX strings in
-        bytes.
-
-        Returns:
-            int. The approximate size of Math SVGs in bytes.
-        """
-
-        # The approximate size for an SVG image for a LaTeX expression with one
-        # character is around 1000 Kb. But, when the number of characters
-        # increases the size of SVG per character reduces. For example: If the
-        # size of SVG for the character 'a' is 1000 bytes, the size of SVG for
-        # 'abc' will be less than 3000 bytes. So the below approximation to
-        # find the size will give us the maximum size.
-        size_in_bytes = 0
-        for latex_string in self.latex_strings_without_svg:
-            # The characters in special LaTeX keywords like 'frac' and 'sqrt'
-            # don't add up to the total size of SVG.
-            length_of_expression = len(latex_string)
-            size_in_bytes += (length_of_expression * 1000)
-        return size_in_bytes
-
-    def get_longest_latex_expression(self):
-        """Returns the longest LaTeX string among the LaTeX strings in the
-        object.
-
-        Returns:
-            str. The longest LaTeX string.
-        """
-        return max(self.latex_strings_without_svg, key=len)
 
 
 class ExplorationVersionsDiff(python_utils.OBJECT):
@@ -1573,7 +1487,7 @@ class Exploration(python_utils.OBJECT):
         """
         content_count = 0
         for state in self.states.values():
-            content_count += state.get_content_count()
+            content_count += state.get_translatable_content_count()
 
         return content_count
 
@@ -2338,7 +2252,8 @@ class Exploration(python_utils.OBJECT):
         """
         for key, state_dict in states_dict.items():
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
-                state_dict, html_validation_service.convert_to_ckeditor,
+                state_dict,
+                html_validation_service.convert_to_ckeditor,
                 state_uses_old_interaction_cust_args_schema=True)
         return states_dict
 
@@ -2358,7 +2273,7 @@ class Exploration(python_utils.OBJECT):
         """
         for key, state_dict in states_dict.items():
             add_dimensions_to_image_tags = functools.partial(
-                html_validation_service.add_dimensions_to_image_tags, # pylint: disable=line-too-long
+                html_validation_service.add_dimensions_to_image_tags,
                 exp_id)
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
@@ -4401,6 +4316,63 @@ class Exploration(python_utils.OBJECT):
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.items()}
         })
+
+    def serialize(self):
+        """Returns the object serialized as a JSON string.
+
+        Returns:
+            str. JSON-encoded utf-8 string encoding all of the information
+            composing the object.
+        """
+        exploration_dict = self.to_dict()
+        # The only reason we add the version parameter separately is that our
+        # yaml encoding/decoding of this object does not handle the version
+        # parameter.
+        # NOTE: If this changes in the future (i.e the version parameter is
+        # added as part of the yaml representation of this object), all YAML
+        # files must add a version parameter to their files with the correct
+        # version of this object. The line below must then be moved to
+        # to_dict().
+        exploration_dict['version'] = self.version
+
+        if self.created_on:
+            exploration_dict['created_on'] = (
+                utils.convert_naive_datetime_to_string(self.created_on))
+
+        if self.last_updated:
+            exploration_dict['last_updated'] = (
+                utils.convert_naive_datetime_to_string(self.last_updated))
+
+        return json.dumps(exploration_dict).encode('utf-8')
+
+    @classmethod
+    def deserialize(cls, json_string):
+        """Returns an Exploration domain object decoded from a JSON string.
+
+        Args:
+            json_string: str. A JSON-encoded utf-8 string that can be
+                decoded into a dictionary representing an Exploration. Only call
+                on strings that were created using serialize().
+
+        Returns:
+            Exploration. The corresponding Exploration domain object.
+        """
+        exploration_dict = json.loads(json_string.decode('utf-8'))
+        created_on = (
+            utils.convert_string_to_naive_datetime_object(
+                exploration_dict['created_on'])
+            if 'created_on' in exploration_dict else None)
+        last_updated = (
+            utils.convert_string_to_naive_datetime_object(
+                exploration_dict['last_updated'])
+            if 'last_updated' in exploration_dict else None)
+        exploration = cls.from_dict(
+            exploration_dict,
+            exploration_version=exploration_dict['version'],
+            exploration_created_on=created_on,
+            exploration_last_updated=last_updated)
+
+        return exploration
 
     def to_player_dict(self):
         """Returns a copy of the exploration suitable for inclusion in the

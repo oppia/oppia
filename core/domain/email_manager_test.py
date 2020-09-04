@@ -26,7 +26,7 @@ from core.domain import config_domain
 from core.domain import config_services
 from core.domain import email_manager
 from core.domain import html_cleaner
-from core.domain import rights_manager
+from core.domain import rights_domain
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
@@ -252,7 +252,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
                 feconf.EXPLORATION_RIGHTS_PREFIX, self.exploration.id), {
                     'version': self.exploration.version,
                     'new_member_username': self.NEW_USER_USERNAME,
-                    'new_member_role': rights_manager.ROLE_EDITOR,
+                    'new_member_role': rights_domain.ROLE_EDITOR,
                 }, csrf_token=csrf_token)
 
             messages = self._get_sent_email_messages(
@@ -265,7 +265,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
 
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             email_manager.send_role_notification_email(
-                self.editor_id, self.new_user_id, rights_manager.ROLE_OWNER,
+                self.editor_id, self.new_user_id, rights_domain.ROLE_OWNER,
                 self.exploration.id, self.exploration.title)
 
             messages = self._get_sent_email_messages(
@@ -275,7 +275,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
     def test_that_email_not_sent_if_can_send_emails_is_false(self):
         with self.can_not_send_emails_ctx:
             email_manager.send_role_notification_email(
-                self.editor_id, self.new_user_id, rights_manager.ROLE_OWNER,
+                self.editor_id, self.new_user_id, rights_domain.ROLE_OWNER,
                 self.exploration.id, self.exploration.title)
             messages = self._get_sent_email_messages(
                 self.NEW_USER_EMAIL)
@@ -285,7 +285,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
         with self.can_send_emails_ctx, self.can_not_send_editor_role_email_ctx:
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id,
-                rights_manager.ROLE_EDITOR, self.exploration.id,
+                rights_domain.ROLE_EDITOR, self.exploration.id,
                 self.exploration.title)
             messages = self._get_sent_email_messages(
                 self.NEW_USER_EMAIL)
@@ -294,7 +294,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
     def test_role_emails_sent_are_correct(self):
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             email_manager.send_role_notification_email(
-                self.editor_id, self.new_user_id, rights_manager.ROLE_VIEWER,
+                self.editor_id, self.new_user_id, rights_domain.ROLE_VIEWER,
                 self.exploration.id, self.exploration.title)
 
             messages = self._get_sent_email_messages(
@@ -373,7 +373,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that correct email content is sent for Manager.
             email_manager.send_role_notification_email(
-                self.editor_id, self.new_user_id, rights_manager.ROLE_OWNER,
+                self.editor_id, self.new_user_id, rights_domain.ROLE_OWNER,
                 self.exploration.id, self.exploration.title)
 
             messages = self._get_sent_email_messages(
@@ -433,7 +433,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that correct email content is sent for Editor.
             email_manager.send_role_notification_email(
-                self.editor_id, self.new_user_id, rights_manager.ROLE_EDITOR,
+                self.editor_id, self.new_user_id, rights_domain.ROLE_EDITOR,
                 self.exploration.id, self.exploration.title)
 
             messages = self._get_sent_email_messages(
@@ -494,7 +494,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             # Check that correct email content is sent for Voice Artist.
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id,
-                rights_manager.ROLE_VOICE_ARTIST, self.exploration.id,
+                rights_domain.ROLE_VOICE_ARTIST, self.exploration.id,
                 self.exploration.title)
 
             messages = self._get_sent_email_messages(
@@ -552,7 +552,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
             # Check that correct email content is sent for Playtester.
             email_manager.send_role_notification_email(
-                self.editor_id, self.new_user_id, rights_manager.ROLE_VIEWER,
+                self.editor_id, self.new_user_id, rights_domain.ROLE_VIEWER,
                 self.exploration.id, self.exploration.title)
 
             messages = self._get_sent_email_messages(
@@ -572,7 +572,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             # role is supplied.
             with self.assertRaisesRegexp(Exception, 'Invalid role'):
                 email_manager.send_role_notification_email(
-                    self.editor_id, self.new_user_id, rights_manager.ROLE_NONE,
+                    self.editor_id, self.new_user_id, rights_domain.ROLE_NONE,
                     self.exploration.id, self.exploration.title)
 
 
@@ -2975,7 +2975,6 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'Best wishes,<br>'
             'The Oppia Community')
 
-
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_contribution_reviewer(
                 self.translation_reviewer_id,
@@ -3021,7 +3020,6 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'Best wishes,<br>'
             'The Oppia Community')
 
-
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_contribution_reviewer(
                 self.voiceover_reviewer_id,
@@ -3064,7 +3062,6 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
             'Thanks, and happy contributing!<br><br>'
             'Best wishes,<br>'
             'The Oppia Community')
-
 
         with self.can_send_emails_ctx:
             email_manager.send_email_to_removed_contribution_reviewer(

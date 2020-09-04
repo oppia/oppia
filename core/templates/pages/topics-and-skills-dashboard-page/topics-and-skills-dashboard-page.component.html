@@ -1,5 +1,5 @@
 <background-banner></background-banner>
-<div class="oppia-topics-and-skills-dashboard" style="position: relative;">
+<div class="oppia-topics-and-skills-dashboard position-relative">
   <div>
     <h2 class="dashboard-title" translate="I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD"
         ng-if="($ctrl.totalTopicSummaries.length === 0 && $ctrl.untriagedSkillSummaries.length === 0)">
@@ -61,7 +61,8 @@
                 <span>Items Per Page: </span>
                 <select ng-options="choice as choice for choice in $ctrl.itemsPerPageChoice"
                         ng-model="$ctrl.itemsPerPage"
-                        ng-change="$ctrl.refreshPagination()">
+                        ng-change="$ctrl.refreshPagination()"
+                        aria-label="Items Per Page">
                 </select>
               </div>
               <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS">
@@ -264,14 +265,12 @@
       <p class="intro-card-message">
         No topics or skills have been created yet.
       </p>
-      <button class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-topic-button"
-              style="color: white; text-decoration: none;"
+      <button class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-create-button-text protractor-test-create-topic-button"
               ng-click="$ctrl.createTopic()"
               ng-if="$ctrl.userCanCreateTopic">
         Create Topic
       </button>
-      <button class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-skill-button"
-              style="color: white; text-decoration: none;"
+      <button class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-create-button-text protractor-test-create-skill-button"
               ng-click="$ctrl.createSkill()"
               ng-if="$ctrl.userCanCreateSkill">
         Create Skill
@@ -550,6 +549,10 @@
     margin-left: auto;
     margin-right: 7.5px;
     width: auto;
+  }
+  .oppia-topics-and-skills-dashboard .oppia-create-button-text {
+    color: #FFF;
+    text-decoration: none;
   }
   @media screen and (max-width: 1200px) {
     .oppia-topics-and-skills-dashboard .dashboard-content {

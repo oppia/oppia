@@ -31,7 +31,6 @@ from core.tests import test_utils
 import feconf
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
-memcache_services = models.Registry.import_memcache_services()
 
 
 class QuestionServicesUnitTest(test_utils.GenericTestBase):
@@ -72,7 +71,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.question_id = question_services.get_new_question_id()
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])
+            self._create_valid_question_data('ABC'), ['skill_1'],
+            inapplicable_misconception_ids=['skill-1', 'skill-2'])
 
         self.question_id_1 = question_services.get_new_question_id()
         self.question_1 = self.save_new_question(
@@ -169,7 +169,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             Exception, 'The given question and skill are not linked.'):
             question_services.update_question_skill_link_difficulty(
                 self.question_id, 'skill_10', 0.9)
-
 
     def test_get_questions_by_skill_ids_without_fetch_by_difficulty(self):
         question_services.create_new_question_skill_link(
@@ -493,6 +492,27 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         question = question_services.get_question_by_id(self.question_id)
         self.assertEqual(question.language_code, 'bn')
+        self.assertEqual(question.version, 2)
+
+    def test_update_inapplicable_misconception_ids(self):
+        self.assertEqual(
+            self.question.inapplicable_misconception_ids,
+            ['skill-1', 'skill-2'])
+        change_dict = {
+            'cmd': 'update_question_property',
+            'property_name': 'inapplicable_misconception_ids',
+            'new_value': ['skill-1'],
+            'old_value': []
+        }
+        change_list = [question_domain.QuestionChange(change_dict)]
+
+        question_services.update_question(
+            self.editor_id, self.question_id, change_list,
+            'updated inapplicable_misconception_ids')
+
+        question = question_services.get_question_by_id(self.question_id)
+        self.assertEqual(
+            question.inapplicable_misconception_ids, ['skill-1'])
         self.assertEqual(question.version, 2)
 
     def test_cannot_update_question_with_invalid_change_list(self):
@@ -998,7 +1018,6 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         question_model.commit(
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
-
         question = question_fetchers.get_question_from_model(question_model)
         self.assertEqual(
             question.question_state_data_schema_version,
@@ -1207,7 +1226,6 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
         question = question_fetchers.get_question_from_model(question_model)
-
         self.assertEqual(
             question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)

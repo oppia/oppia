@@ -125,24 +125,28 @@ describe('Creator dashboard controller', () => {
     });
   }));
 
-  it('should get exploration url successfully', function() {
+  it('should get the correct exploration editor page URL corresponding to a' +
+    ' given exploration ID', function() {
     var explorationId = '1';
     expect(ctrl.getExplorationUrl(explorationId)).toBe(
       '/create/' + explorationId);
   });
 
-  it('should get collection url successfully', function() {
+  it('should get the correct collection editor page URL corresponding to a' +
+    ' given collection ID', function() {
     var collectionId = '1';
     expect(ctrl.getCollectionUrl(collectionId)).toBe(
       '/collection_editor/create/' + collectionId);
   });
 
-  it('should show username popover according to its length', function() {
-    expect(ctrl.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
-    expect(ctrl.showUsernamePopover('abc')).toBe('none');
-  });
+  it('should get username popover event type according to username length',
+    function() {
+      expect(ctrl.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
+      expect(ctrl.showUsernamePopover('abc')).toBe('none');
+    });
 
-  it('should get complete thumbail icon url', function() {
+  it('should get complete thumbail icon path corresponding to a given' +
+    ' relative path', function() {
     expect(ctrl.getCompleteThumbnailIconUrl('/path/to/icon.png')).toBe(
       '/assets/images/path/to/icon.png');
   });
@@ -328,7 +332,7 @@ describe('Creator dashboard controller', () => {
         $rootScope.$apply();
       });
 
-      it('should evaluate data from backend', function() {
+      it('should evaluate dashboard data retrieved from backend', function() {
         var suggestionThreadObject = (
           SuggestionThreadObjectFactory.createFromBackendDicts(
             dashboardData.threads_for_created_suggestions_list[0],
@@ -345,13 +349,15 @@ describe('Creator dashboard controller', () => {
         expect(ctrl.relativeChangeInTotalPlays).toBe(5);
       });
 
-      it('should change active tab name', function() {
-        expect(ctrl.activeTab).toBe('myExplorations');
-        ctrl.setActiveTab('suggestions');
-        expect(ctrl.activeTab).toBe('suggestions');
-      });
+      it('should change active tab name when creator clicks on a new tab',
+        function() {
+          expect(ctrl.activeTab).toBe('myExplorations');
+          ctrl.setActiveTab('suggestions');
+          expect(ctrl.activeTab).toBe('suggestions');
+        });
 
-      it('should set my explorations view correctly', function() {
+      it('should save the exploration format view in the backend when creator' +
+        ' changes the format view', function() {
         $httpBackend.expect('POST', '/creatordashboardhandler/data')
           .respond(200);
         ctrl.setMyExplorationsView('a');
@@ -360,38 +366,52 @@ describe('Creator dashboard controller', () => {
         expect(ctrl.myExplorationsView).toBe('a');
       });
 
-      it('should set explorations sorting options', function() {
+      it('should reverse the sort order of explorations when the creator' +
+        ' re-selects the current sorting type', function() {
         expect(ctrl.isCurrentSortDescending).toBe(true);
         expect(ctrl.currentSortType).toBe('numOpenThreads');
         ctrl.setExplorationsSortingOptions('numOpenThreads');
         expect(ctrl.isCurrentSortDescending).toBe(false);
+      });
 
+      it('should update the exploration sort order based on the' +
+        ' option chosen by the creator', function() {
         ctrl.setExplorationsSortingOptions('new_open');
         expect(ctrl.currentSortType).toBe('new_open');
       });
 
-      it('should set subscription sorting options', function() {
+      it('should reverse the sort order of subscriptions when the creator' +
+        ' re-selects the current sorting type', function() {
         expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
         expect(ctrl.currentSubscribersSortType).toBe('username');
         ctrl.setSubscriptionSortingOptions('username');
         expect(ctrl.isCurrentSubscriptionSortDescending).toBe(false);
+      });
 
+      it('should update the subscription sort order based on the' +
+        ' option chosen by the creator', function() {
         ctrl.setSubscriptionSortingOptions('new_subscriber');
         expect(ctrl.currentSubscribersSortType).toBe('new_subscriber');
       });
 
-      it('should sort subscription function', function() {
+      it('should sort subscription list by username', function() {
         var entity = {
           username: 'username'
         };
+        expect(ctrl.currentSubscribersSortType).toBe('username');
         expect(ctrl.sortSubscriptionFunction(entity)).toBe(
           'username');
-
-        ctrl.setSubscriptionSortingOptions('impact');
-        expect(ctrl.sortSubscriptionFunction({})).toBe(0);
       });
 
-      it('should sort by function', function() {
+      it('should not sort subscription list by impact given empty object',
+        function() {
+          ctrl.setSubscriptionSortingOptions('impact');
+          expect(ctrl.currentSubscribersSortType).toBe('impact');
+          expect(ctrl.sortSubscriptionFunction({})).toBe(0);
+        });
+
+      it('should sort exploration list by untitled explorations when title' +
+        ' is not provided and exploration is private', function() {
         expect(ctrl.currentSortType).toBe('numOpenThreads');
         ctrl.setExplorationsSortingOptions('title');
         expect(ctrl.currentSortType).toBe('title');
@@ -400,20 +420,18 @@ describe('Creator dashboard controller', () => {
           title: '',
           status: 'private'
         })).toBe('Untitled');
+      });
 
-        ctrl.setExplorationsSortingOptions('numViews');
-        expect(ctrl.currentSortType).toBe('numViews');
-
-        expect(ctrl.sortByFunction({
-          numViews: '',
-          status: 'private'
-        })).toBe(0);
-
+      it('should not sort exploration list by rating when providing' +
+        ' a empty object', function() {
         ctrl.setExplorationsSortingOptions('ratings');
         expect(ctrl.currentSortType).toBe('ratings');
 
         expect(ctrl.sortByFunction({})).toBe(0);
+      });
 
+      it('should sort exploration list by last updated when last updated' +
+        ' value is provided', function() {
         ctrl.setExplorationsSortingOptions('lastUpdatedMsec');
         expect(ctrl.currentSortType).toBe('lastUpdatedMsec');
 
@@ -422,33 +440,46 @@ describe('Creator dashboard controller', () => {
         })).toBe(1);
       });
 
-      it('should update screen width on window resize', function() {
-        var innerWidthSpy = spyOnProperty($window, 'innerWidth');
-        $httpBackend.expect('POST', '/creatordashboardhandler/data').respond(
-          200);
-        ctrl.setMyExplorationsView('list');
-        $httpBackend.flush();
+      it('should not sort exploration list by options that is not last update' +
+        ' when trying to sort by number of views', function() {
+        ctrl.setExplorationsSortingOptions('numViews');
+        expect(ctrl.currentSortType).toBe('numViews');
 
-        expect(ctrl.myExplorationsView).toBe('list');
-
-        innerWidthSpy.and.callFake(() => 480);
-        $rootScope.$apply();
-        angular.element($window).triggerHandler('resize');
-
-        expect(ctrl.myExplorationsView).toBe('card');
-        expect(ctrl.publishText).toBe(
-          'Publish the exploration to receive statistics.');
-
-        innerWidthSpy.and.callFake(() => 768);
-        $rootScope.$apply();
-        angular.element($window).triggerHandler('resize');
-
-        expect(ctrl.myExplorationsView).toBe('list');
-        expect(ctrl.publishText).toBe(
-          'This exploration is private. Publish it to receive statistics.');
+        expect(ctrl.sortByFunction({
+          numViews: '',
+          status: 'private'
+        })).toBe(0);
       });
 
-      it('should set active thread from my suggestions list', function() {
+      it('should update exploration view and publish text on resizing page',
+        function() {
+          var innerWidthSpy = spyOnProperty($window, 'innerWidth');
+          $httpBackend.expect('POST', '/creatordashboardhandler/data').respond(
+            200);
+          ctrl.setMyExplorationsView('list');
+          $httpBackend.flush();
+
+          expect(ctrl.myExplorationsView).toBe('list');
+
+          innerWidthSpy.and.callFake(() => 480);
+          $rootScope.$apply();
+          angular.element($window).triggerHandler('resize');
+
+          expect(ctrl.myExplorationsView).toBe('card');
+          expect(ctrl.publishText).toBe(
+            'Publish the exploration to receive statistics.');
+
+          innerWidthSpy.and.callFake(() => 768);
+          $rootScope.$apply();
+          angular.element($window).triggerHandler('resize');
+
+          expect(ctrl.myExplorationsView).toBe('list');
+          expect(ctrl.publishText).toBe(
+            'This exploration is private. Publish it to receive statistics.');
+        });
+
+      it('should set active thread from my suggestions list when changing' +
+        ' active thread', function() {
         var threadId = 'exp1';
         var messages = [{
           author_username: '',
@@ -477,43 +508,45 @@ describe('Creator dashboard controller', () => {
         expect(ctrl.canReviewActiveThread).toBe(false);
       });
 
-      it('should set active thread from suggestions to review list',
-        function() {
-          var threadId = 'exp2';
-          var suggestionToReviewObject = (
-            SuggestionThreadObjectFactory.createFromBackendDicts(
-              dashboardData.threads_for_suggestions_to_review_list[0],
-              dashboardData.suggestions_to_review_list[0]));
+      it('should set active thread from suggestions to review list' +
+        ' when cleaning active thread', function() {
+        var threadId = 'exp2';
+        var suggestionToReviewObject = (
+          SuggestionThreadObjectFactory.createFromBackendDicts(
+            dashboardData.threads_for_suggestions_to_review_list[0],
+            dashboardData.suggestions_to_review_list[0]));
 
-          ctrl.clearActiveThread();
-
-          $httpBackend.expect('GET', '/threadhandler/' + threadId).respond(404);
-          ctrl.setActiveThread(threadId);
-          $httpBackend.flush();
-
-          expect(ctrl.activeThread).toEqual(suggestionToReviewObject);
-          expect(ctrl.canReviewActiveThread).toBe(true);
-        });
-
-      it('should open suggestion modal', function() {
-        var threadId = 'exp1';
+        ctrl.clearActiveThread();
 
         $httpBackend.expect('GET', '/threadhandler/' + threadId).respond(404);
         ctrl.setActiveThread(threadId);
         $httpBackend.flush();
 
-        // Method showSuggestionModal is mocked otherwise using its original
-        // implementation will throw an error: 'appendTo element not found.
-        // Make sure that the element passed is in DOM.'
-        // This error does not happen often and it's related to the usage of
-        // angular.element in above specs.
-        spyOn(SuggestionModalForCreatorDashboardService, 'showSuggestionModal')
-          .and.callFake(() => {});
-        ctrl.showSuggestionModal();
-
-        expect(SuggestionModalForCreatorDashboardService.showSuggestionModal)
-          .toHaveBeenCalled();
+        expect(ctrl.activeThread).toEqual(suggestionToReviewObject);
+        expect(ctrl.canReviewActiveThread).toBe(true);
       });
+
+      it('should open suggestion modal when clicking on show suggestion modal',
+        function() {
+          var threadId = 'exp1';
+
+          $httpBackend.expect('GET', '/threadhandler/' + threadId).respond(404);
+          ctrl.setActiveThread(threadId);
+          $httpBackend.flush();
+
+          // Method showSuggestionModal is mocked otherwise using its original
+          // implementation will throw an error: 'appendTo element not found.
+          // Make sure that the element passed is in DOM.'
+          // This error does not happen often and it's related to the usage of
+          // angular.element in above specs.
+          spyOn(
+            SuggestionModalForCreatorDashboardService, 'showSuggestionModal')
+            .and.callFake(() => {});
+          ctrl.showSuggestionModal();
+
+          expect(SuggestionModalForCreatorDashboardService.showSuggestionModal)
+            .toHaveBeenCalled();
+        });
     });
 
   describe('when on collections tab', function() {

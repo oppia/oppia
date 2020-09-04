@@ -25,14 +25,12 @@ angular.module('oppia').component('onScreenKeyboard', {
   template: require('./on-screen-keyboard.component.html'),
   controller: [
     'DeviceInfoService', 'GuppyInitializationService',
-    'UrlInterpolationService',
+    'UrlInterpolationService', 'GREEK_LETTER_NAMES_TO_SYMBOLS',
     'OSK_FUNCTIONS_TAB', 'OSK_LETTERS_TAB', 'OSK_MAIN_TAB',
-    'GREEK_LETTER_NAMES_TO_SYMBOLS',
     function(
         DeviceInfoService, GuppyInitializationService,
-        UrlInterpolationService,
-        OSK_FUNCTIONS_TAB, OSK_LETTERS_TAB, OSK_MAIN_TAB,
-        GREEK_LETTER_NAMES_TO_SYMBOLS) {
+        UrlInterpolationService, GREEK_LETTER_NAMES_TO_SYMBOLS,
+        OSK_FUNCTIONS_TAB, OSK_LETTERS_TAB, OSK_MAIN_TAB) {
       const ctrl = this;
       let engine, guppyInstance;
 
@@ -115,7 +113,7 @@ angular.module('oppia').component('onScreenKeyboard', {
           guppyInstance = activeGuppyObject.guppyInstance;
           engine = guppyInstance.engine;
           ctrl.interactionType = GuppyInitializationService.interactionType;
-          ctrl.customLetters = GuppyInitializationService.customOskLetters;
+          ctrl.customLetters = GuppyInitializationService.getCustomOskLetters();
           return true;
         }
         return false;

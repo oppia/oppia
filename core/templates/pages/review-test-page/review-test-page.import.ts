@@ -16,8 +16,6 @@
  * @fileoverview Scripts for the review tests.
  */
 
-// Jquery needs to be loaded before anything else to make angular js work.
-require('third-party-imports/jquery.import');
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/review-test-page/review-test-page.module.ts');
@@ -25,4 +23,4 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('base-components/base-content.directive.ts');
-require('pages/review-test-page/review-test-page.directive.ts');
+require('pages/review-test-page/review-test-page.component.ts');

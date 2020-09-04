@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
+from core.domain import caching_services
 from core.domain import change_domain
 from core.platform import models
 import feconf
@@ -27,7 +28,6 @@ import python_utils
 import schema_utils
 
 (config_models,) = models.Registry.import_models([models.NAMES.config])
-memcache_services = models.Registry.import_memcache_services()
 
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
@@ -158,7 +158,8 @@ class ConfigPropertyChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = [{
         'name': CMD_CHANGE_PROPERTY_VALUE,
         'required_attribute_names': ['new_value'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
 
@@ -242,15 +243,19 @@ class ConfigProperty(python_utils.OBJECT):
     def value(self):
         """Get the latest value from memcache, datastore, or use default."""
 
-        memcached_items = memcache_services.get_multi([self.name])
+        memcached_items = caching_services.get_multi(
+            caching_services.CACHE_NAMESPACE_CONFIG, None, [self.name])
         if self.name in memcached_items:
             return memcached_items[self.name]
 
         datastore_item = config_models.ConfigPropertyModel.get(
             self.name, strict=False)
         if datastore_item is not None:
-            memcache_services.set_multi({
-                datastore_item.id: datastore_item.value})
+            caching_services.set_multi(
+                caching_services.CACHE_NAMESPACE_CONFIG, None,
+                {
+                    datastore_item.id: datastore_item.value
+                })
             return datastore_item.value
 
         return self.default_value
@@ -275,8 +280,11 @@ class ConfigProperty(python_utils.OBJECT):
             }])
 
         # Set value in memcache.
-        memcache_services.set_multi({
-            model_instance.id: model_instance.value})
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_CONFIG, None,
+            {
+                model_instance.id: model_instance.value
+            })
 
     def normalize(self, value):
         """Validates the given object using the schema and normalizes if
@@ -398,9 +406,13 @@ ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
     'Always ask learners for answer details. For testing -- do not use',
     False)
 
-CLASSROOM_PAGE_IS_SHOWN = ConfigProperty(
-    'classroom_page_is_shown', BOOL_SCHEMA,
-    'Show classroom components.', False)
+CLASSROOM_PAGE_IS_ACCESSIBLE = ConfigProperty(
+    'classroom_page_is_accessible', BOOL_SCHEMA,
+    'Make classroom page accessible.', False)
+
+CLASSROOM_PROMOS_ARE_ENABLED = ConfigProperty(
+    'classroom_promos_are_enabled', BOOL_SCHEMA,
+    'Show classroom promos.', False)
 
 FEATURED_TRANSLATION_LANGUAGES = ConfigProperty(
     'featured_translation_languages',

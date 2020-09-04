@@ -35,8 +35,8 @@ require('services/alerts.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
-require('pages/topic-editor-page/modal-templates/' +
-    'preview-thumbnail.component.ts');
+require(
+  'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -52,22 +52,24 @@ angular.module('oppia').directive('storyEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/editor-tab/story-editor.directive.html'),
       controller: [
-        '$scope', '$window', 'StoryEditorStateService', 'StoryUpdateService',
-        'UndoRedoService', 'StoryEditorNavigationService',
-        'WindowDimensionsService', '$uibModal',
-        'AlertsService', 'MAX_CHARS_IN_STORY_TITLE',
-        'MAX_CHARS_IN_CHAPTER_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        'StoryEditorNavigationService', 'StoryEditorStateService',
+        'StoryUpdateService', 'UndoRedoService', 'WindowDimensionsService',
+        'WindowRef', 'MAX_CHARS_IN_META_TAG_CONTENT',
+        'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
         function(
-            $scope, $window, StoryEditorStateService, StoryUpdateService,
-            UndoRedoService, StoryEditorNavigationService,
-            WindowDimensionsService, $uibModal,
-            AlertsService, MAX_CHARS_IN_STORY_TITLE,
-            MAX_CHARS_IN_CHAPTER_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
+            $rootScope, $scope, $uibModal, AlertsService,
+            StoryEditorNavigationService, StoryEditorStateService,
+            StoryUpdateService, UndoRedoService, WindowDimensionsService,
+            WindowRef, MAX_CHARS_IN_META_TAG_CONTENT,
+            MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
           $scope.MAX_CHARS_IN_STORY_URL_FRAGMENT = (
             MAX_CHARS_IN_STORY_URL_FRAGMENT);
+          $scope.MAX_CHARS_IN_META_TAG_CONTENT = MAX_CHARS_IN_META_TAG_CONTENT;
+          $scope.hostname = WindowRef.nativeWindow.location.hostname;
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
@@ -97,6 +99,7 @@ angular.module('oppia').directive('storyEditor', [
             $scope.storyTitleEditorIsShown = false;
             $scope.editableTitle = $scope.story.getTitle();
             $scope.editableUrlFragment = $scope.story.getUrlFragment();
+            $scope.editableMetaTagContent = $scope.story.getMetaTagContent();
             $scope.initialStoryUrlFragment = $scope.story.getUrlFragment();
             $scope.editableNotes = $scope.story.getNotes();
             $scope.editableDescription = $scope.story.getDescription();
@@ -177,6 +180,13 @@ angular.module('oppia').directive('storyEditor', [
               if ($scope.story.getStoryContents().getNodes().length === 1) {
                 $scope.setNodeToEdit(
                   $scope.story.getStoryContents().getInitialNodeId());
+              } else {
+                var nodesArray = $scope.story.getStoryContents().getNodes();
+                var nodesLength = nodesArray.length;
+                var secondLastNodeId = nodesArray[nodesLength - 2].getId();
+                var lastNodeId = nodesArray[nodesLength - 1].getId();
+                StoryUpdateService.addDestinationNodeIdToNode(
+                  $scope.story, secondLastNodeId, lastNodeId);
               }
               StoryEditorStateService.onRecalculateAvailableNodes.emit();
             }, function() {
@@ -204,6 +214,13 @@ angular.module('oppia').directive('storyEditor', [
             $scope.storyDescriptionChanged = true;
           };
 
+          $scope.updateStoryMetaTagContent = function(newMetaTagContent) {
+            if (newMetaTagContent !== $scope.story.getMetaTagContent()) {
+              StoryUpdateService.setStoryMetaTagContent(
+                $scope.story, newMetaTagContent);
+            }
+          };
+
           $scope.returnToTopicEditorPage = function() {
             if (UndoRedoService.getChangeCount() > 0) {
               $uibModal.open({
@@ -220,13 +237,21 @@ angular.module('oppia').directive('storyEditor', [
             } else {
               const topicId = (
                 StoryEditorStateService.getStory().getCorrespondingTopicId());
-              $window.open(
+              WindowRef.nativeWindow.open(
                 UrlInterpolationService.interpolateUrl(
                   TOPIC_EDITOR_URL_TEMPLATE, {
                     topic_id: topicId
                   }
                 ), '_self');
             }
+          };
+
+          $scope.getClassroomUrlFragment = function() {
+            return StoryEditorStateService.getClassroomUrlFragment();
+          };
+
+          $scope.getTopicUrlFragment = function() {
+            return StoryEditorStateService.getTopicUrlFragment();
           };
 
           $scope.getTopicName = function() {
@@ -252,6 +277,7 @@ angular.module('oppia').directive('storyEditor', [
                     StoryEditorStateService.getStoryWithUrlFragmentExists());
                   StoryUpdateService.setStoryUrlFragment(
                     $scope.story, newUrlFragment);
+                  $rootScope.$apply();
                 });
             } else {
               StoryUpdateService.setStoryUrlFragment(

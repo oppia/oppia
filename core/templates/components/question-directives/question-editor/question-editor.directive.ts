@@ -21,11 +21,7 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require('components/state-editor/state-editor.directive.ts');
 
-require('domain/question/editable-question-backend-api.service.ts');
-require('domain/question/QuestionObjectFactory.ts');
 require('domain/question/question-update.service.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'solution-validity.service.ts');
@@ -34,7 +30,6 @@ require(
   'state-editor.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/alerts.service.ts');
 require('services/editability.service.ts');
 
 require('pages/interaction-specs.constants.ajs.ts');
@@ -59,19 +54,13 @@ angular.module('oppia').directive('questionEditor', [
         'question-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$rootScope', '$uibModal',
-        'AlertsService', 'EditabilityService',
-        'EditableQuestionBackendApiService', 'LoaderService',
-        'QuestionObjectFactory', 'QuestionUpdateService', 'ResponsesService',
-        'SolutionValidityService', 'StateInteractionIdService',
-        'StateEditorService', 'INTERACTION_SPECS',
+        '$uibModal', 'EditabilityService', 'LoaderService',
+        'QuestionUpdateService', 'SolutionValidityService',
+        'StateEditorService', 'StateInteractionIdService',
         function(
-            $scope, $rootScope, $uibModal,
-            AlertsService, EditabilityService,
-            EditableQuestionBackendApiService, LoaderService,
-            QuestionObjectFactory, QuestionUpdateService, ResponsesService,
-            SolutionValidityService, StateInteractionIdService,
-            StateEditorService, INTERACTION_SPECS) {
+            $uibModal, EditabilityService, LoaderService,
+            QuestionUpdateService, SolutionValidityService,
+            StateEditorService, StateInteractionIdService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.getStateContentPlaceholder = function() {
@@ -184,12 +173,16 @@ angular.module('oppia').directive('questionEditor', [
           };
 
           ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
-              contentId) {
+              contentIds) {
             var state = ctrl.question.getStateData();
             var recordedVoiceovers = state.recordedVoiceovers;
             var writtenTranslations = state.writtenTranslations;
             var updateQuestion = _updateQuestion;
-            if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
+
+            const shouldPrompt = contentIds.some(
+              contentId =>
+                recordedVoiceovers.hasUnflaggedVoiceovers(contentId));
+            if (shouldPrompt) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/components/forms/forms-templates/mark-all-audio-and-' +
@@ -198,10 +191,19 @@ angular.module('oppia').directive('questionEditor', [
                 controller: 'ConfirmOrCancelModalController'
               }).result.then(function() {
                 updateQuestion(function() {
-                  recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
-                    contentId);
-                  writtenTranslations.markAllTranslationsAsNeedingUpdate(
-                    contentId);
+                  contentIds.forEach(contentId => {
+                    if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
+                      recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
+                        contentId);
+                    }
+                    if (
+                      writtenTranslations.hasUnflaggedWrittenTranslations(
+                        contentId)
+                    ) {
+                      writtenTranslations.markAllTranslationsAsNeedingUpdate(
+                        contentId);
+                    }
+                  });
                 });
               }, function() {
                 // This callback is triggered when the Cancel button is

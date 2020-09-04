@@ -17,8 +17,8 @@
  * statistics for a particular state.
  */
 
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
@@ -64,9 +64,10 @@ describe('StateTopAnswersStatsService', () => {
     param_changes: [],
     interaction: {
       answer_groups: [{
-        rule_specs: [
-          {rule_type: 'Contains', inputs: {x: 'hola'}},
-        ],
+        rule_specs: [{
+          rule_type: 'Contains',
+          inputs: {x: 'hola'}
+        }],
         outcome: {
           dest: 'Me Llamo',
           feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},

@@ -79,8 +79,8 @@ export class NumericInputValidationService {
     };
 
     var ranges = [];
-    var raiseWarningForRuleIsInclusivelyBetween = function(ruleIndex,
-        answerGroupIndex) {
+    var raiseWarningForRuleIsInclusivelyBetween = function(
+        ruleIndex, answerGroupIndex) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (
@@ -94,8 +94,8 @@ export class NumericInputValidationService {
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
         var range = {
-          answerGroupIndex: i + 1,
-          ruleIndex: j + 1,
+          answerGroupIndex: i,
+          ruleIndex: j,
           lb: null,
           ub: null,
           lbi: false,
@@ -144,8 +144,8 @@ export class NumericInputValidationService {
               message: (
                 'Rule ' + (j + 1) + ' from answer group ' +
                 (i + 1) + ' will never be matched because it ' +
-                'is made redundant by rule ' + ranges[k].ruleIndex +
-                ' from answer group ' + ranges[k].answerGroupIndex + '.')
+                'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
+                ' from answer group ' + (ranges[k].answerGroupIndex + 1) + '.')
             });
           }
         }

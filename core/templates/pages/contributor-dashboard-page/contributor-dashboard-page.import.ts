@@ -16,12 +16,10 @@
  * @fileoverview Directive scripts for the contributor dashboard page.
  */
 
-// Jquery needs to be loaded before anything else to make angular js work.
-require('third-party-imports/jquery.import');
 require(
   'pages/contributor-dashboard-page/contributor-dashboard-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require('pages/contributor-dashboard-page/' +
-  'contributor-dashboard-page.component.ts');
+require(
+  'pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');

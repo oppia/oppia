@@ -36,11 +36,11 @@ require('services/contextual/window-dimensions.service.ts');
 angular.module('oppia').component('subtopicViewerPage', {
   template: require('./subtopic-viewer-page.component.html'),
   controller: [
-    '$rootScope', '$window', 'AlertsService', 'ContextService', 'LoaderService',
+    '$rootScope', 'AlertsService', 'ContextService', 'LoaderService',
     'PageTitleService', 'SubtopicViewerBackendApiService', 'UrlService',
     'WindowDimensionsService', 'ENTITY_TYPE', 'FATAL_ERROR_CODES',
     function(
-        $rootScope, $window, AlertsService, ContextService, LoaderService,
+        $rootScope, AlertsService, ContextService, LoaderService,
         PageTitleService, SubtopicViewerBackendApiService, UrlService,
         WindowDimensionsService, ENTITY_TYPE, FATAL_ERROR_CODES) {
       var ctrl = this;
@@ -69,7 +69,8 @@ angular.module('oppia').component('subtopicViewerPage', {
             ctrl.parentTopicId = subtopicDataObject.getParentTopicId();
             ContextService.setCustomEntityContext(
               ENTITY_TYPE.TOPIC, ctrl.parentTopicId);
-            PageTitleService.setPageTitle(ctrl.subtopicTitle + ' - Oppia');
+            PageTitleService.setPageTitle(
+              `Review ${ctrl.subtopicTitle} | Oppia`);
 
             let nextSubtopic = (
               subtopicDataObject.getNextSubtopic());

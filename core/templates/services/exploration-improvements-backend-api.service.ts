@@ -87,6 +87,9 @@ export class ExplorationImprovementsBackendApiService {
   }
 
   async postTasksAsync(expId: string, tasks: ExplorationTask[]): Promise<void> {
+    if (tasks.length === 0) {
+      return;
+    }
     const explorationImprovementsUrl = (
       this.urlInterpolationService.interpolateUrl(
         ImprovementsConstants.EXPLORATION_IMPROVEMENTS_URL, {
@@ -128,9 +131,10 @@ export class ExplorationImprovementsBackendApiService {
         }));
     return this.http.get<ExplorationImprovementsConfigBackendDict>(
       explorationImprovementsConfigUrl
-    ).toPromise().then(backendDict =>
-      this.explorationImprovementsConfigObjectFactory.createFromBackendDict(
-        backendDict));
+    ).toPromise().then(
+      backendDict =>
+        this.explorationImprovementsConfigObjectFactory.createFromBackendDict(
+          backendDict));
   }
 }
 

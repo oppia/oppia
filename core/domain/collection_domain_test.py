@@ -476,6 +476,15 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
                 versioned_collection_contents,
                 feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
+    def test_serialize_and_deserialize_returns_unchanged_collection(self):
+        """Checks that serializing and then deserializing a default collection
+        works as intended by leaving the collection unchanged.
+        """
+        self.assertEqual(
+            self.collection.to_dict(),
+            collection_domain.Collection.deserialize(
+                self.collection.serialize()).to_dict())
+
 
 class ExplorationGraphUnitTests(test_utils.GenericTestBase):
     """Test the general structure of explorations within a collection."""
@@ -557,7 +566,6 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             collection.get_next_exploration_id_in_sequence(exploration_id),
             None)
-
 
         collection.add_node('exp_id_1')
         collection.add_node('exp_id_2')
@@ -665,7 +673,6 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
             'present.'):
             collection_domain.Collection.from_yaml(
                 self.COLLECTION_ID, yaml_content)
-
 
 
 class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
