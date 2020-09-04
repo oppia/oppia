@@ -116,12 +116,6 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def _post_completed_hook(cls, job_id):
-        """A hook or a callback function triggered after marking a job as
-        completed.
-
-        Args:
-            job_id: str. The unique ID of the job marked as completed.
-        """
         job_model = job_models.JobModel.get(job_id)
         query_id = job_model.additional_job_params['query_id']
         query_model = user_models.UserQueryModel.get(query_id)
@@ -132,12 +126,6 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def _post_failure_hook(cls, job_id):
-        """A hook or a callback function triggered after marking a job as
-        failed.
-
-        Args:
-            job_id: str. The unique ID of the job marked as failed.
-        """
         job_model = job_models.JobModel.get(job_id)
         query_id = job_model.additional_job_params['query_id']
         query_model = user_models.UserQueryModel.get(query_id)
