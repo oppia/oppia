@@ -784,10 +784,8 @@ class BaseMapReduceJobManagerMetaClass(type):
                 *. The values yielded from the class's "map" method, but with
                 all strings converted to bytes.
             """
-            raw_outputs = new_cls.map(item)
-            if raw_outputs:
-                for raw_output in raw_outputs:
-                    yield _deep_convert_to_bytes(raw_output)
+            for raw_output in new_cls.map(item) or ():
+                yield _deep_convert_to_bytes(raw_output)
 
         def _real_reduce(key, values):
             """Wrapper for the reduce function which encodes all strings in the
@@ -803,10 +801,10 @@ class BaseMapReduceJobManagerMetaClass(type):
                 *. The values yielded from the class's "reduce" method, but with
                 all strings converted to bytes.
             """
-            raw_outputs = new_cls.reduce(key, values)
-            if raw_outputs:
-                for raw_output in raw_outputs:
-                    yield _deep_convert_to_bytes(raw_output)
+            for raw_output in new_cls.reduce(
+                    _deep_convert_to_unicode(key),
+                    _deep_convert_to_unicode(values)) or ():
+                yield _deep_convert_to_bytes(raw_output)
 
         new_cls._real_map = ( # pylint: disable=protected-access
             staticmethod(_real_map))
@@ -1722,6 +1720,32 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
         job_status = cls._register_end_of_batch_job_and_return_status()
         if job_status == job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING:
             cls._kickoff_batch_job_after_previous_one_ends()
+
+
+def _deep_convert_to_unicode(value):
+    """Returns a copy of value with all strings converted to bytes.
+
+    Args:
+        value: *. Some JSON-like object made-up of only:
+            lists, dicts, strings, ints, bools, None. Types can be nested in
+            each other.
+
+    Returns:
+        *. An equivalent copy of value, but with only byte-strings.
+    """
+    if isinstance(value, tuple):
+        return tuple(_deep_convert_to_unicode(v) for v in value)
+    elif isinstance(value, list):
+        return [_deep_convert_to_unicode(v) for v in value]
+    elif isinstance(value, dict):
+        return {
+            _deep_convert_to_unicode(key): _deep_convert_to_unicode(value)
+            for key, value in value.items()
+        }
+    elif isinstance(value, python_utils.BASESTRING):
+        return value.decode('utf-8')
+    else:
+        return value
 
 
 def _deep_convert_to_bytes(value):
