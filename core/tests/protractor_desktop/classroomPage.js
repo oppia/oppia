@@ -16,10 +16,8 @@
  * @fileoverview End-to-end tests for the classroom page.
  */
 
-var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
@@ -39,7 +37,7 @@ describe('Classroom page functionality', function() {
     await users.createAndLoginAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
     await adminPage.editConfigProperty(
-      'Show classroom components.',
+      'Make classroom page accessible.',
       'Boolean', async function(elem) {
         await elem.setValue(true);
       });

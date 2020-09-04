@@ -55,7 +55,6 @@ angular.module('oppia').factory('TranslationStatusService', [
     var stateWiseStatusColor = {};
     var explorationContentRequiredCount = 0;
     var explorationContentNotAvailableCount = 0;
-    var recordedVoiceovers = StateRecordedVoiceoversService.displayed;
 
     var _getVoiceOverStatus = function(recordedVoiceovers, contentId) {
       var availabilityStatus = {
@@ -84,7 +83,7 @@ angular.module('oppia').factory('TranslationStatusService', [
       if (availableLanguages.indexOf(langCode) !== -1) {
         var writtenTranslation = (
           writtenTranslations.getWrittenTranslation(contentId, langCode));
-        if (writtenTranslation.getHtml() !== '') {
+        if (writtenTranslation.translation !== '') {
           availabilityStatus.available = true;
           availabilityStatus.needsUpdate = writtenTranslation.needsUpdate;
         }

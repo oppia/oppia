@@ -63,7 +63,8 @@ class PlatformParameterChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = [{
         'name': CMD_EDIT_RULES,
         'required_attribute_names': ['new_rules'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
 
@@ -751,7 +752,7 @@ class PlatformParameter(python_utils.OBJECT):
                             SERVER_MODES.prod in server_modes):
                         raise utils.ValidationError(
                             'Feature in dev stage cannot be enabled in test or'
-                            ' production environment.')
+                            ' production environments.')
                 elif self._feature_stage == FEATURE_STAGES.test:
                     if SERVER_MODES.prod in server_modes:
                         raise utils.ValidationError(

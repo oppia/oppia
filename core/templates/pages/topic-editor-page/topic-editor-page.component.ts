@@ -25,16 +25,15 @@ require(
 require('directives/angular-html-bind.directive.ts');
 require('services/bottom-navbar-status.service.ts');
 require('pages/topic-editor-page/editor-tab/topic-editor-tab.directive.ts');
-require('pages/topic-editor-page/subtopic-editor/' +
-    'subtopic-preview-tab.component.ts');
-require('pages/topic-editor-page/subtopic-editor/' +
-    'subtopic-editor-tab.component.ts');
+require(
+  'pages/topic-editor-page/subtopic-editor/subtopic-preview-tab.component.ts');
+require(
+  'pages/topic-editor-page/subtopic-editor/subtopic-editor-tab.component.ts');
 require(
   'pages/topic-editor-page/questions-tab/topic-questions-tab.directive.ts');
 
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('pages/topic-editor-page/services/entity-creation.service.ts');
 require('services/context.service.ts');
 require('services/contextual/url.service.ts');
 require('services/page-title.service.ts');
@@ -56,14 +55,13 @@ angular.module('oppia').directive('topicEditorPage', [
         '/pages/topic-editor-page/topic-editor-page.component.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$window', 'AlertsService', 'BottomNavbarStatusService',
-        'ContextService', 'PageTitleService', 'EntityCreationService',
+        'BottomNavbarStatusService', 'ContextService', 'PageTitleService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
-        'UndoRedoService', 'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE',
-        function($scope, $window, AlertsService, BottomNavbarStatusService,
-            ContextService, PageTitleService, EntityCreationService,
+        'UndoRedoService', 'UrlService',
+        function(
+            BottomNavbarStatusService, ContextService, PageTitleService,
             TopicEditorRoutingService, TopicEditorStateService,
-            UndoRedoService, UrlService, TOPIC_VIEWER_URL_TEMPLATE) {
+            UndoRedoService, UrlService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.getActiveTabName = function() {

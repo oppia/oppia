@@ -19,9 +19,11 @@
  * oppia's feedback and customization_args.
  */
 
+var action = require('../protractor_utils/action.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var CreatorDashboardPage =
@@ -31,6 +33,7 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+
 
 describe('Enable correctness feedback and set correctness', function() {
   var explorationEditorPage = null;
@@ -64,8 +67,7 @@ describe('Enable correctness feedback and set correctness', function() {
   };
 
   beforeAll(async function() {
-    await users.createUser('user@markCorrect.com', 'userMarkCorrect');
-    await users.login('user@markCorrect.com');
+    await users.createAndLoginUser('user@markCorrect.com', 'userMarkCorrect');
   });
 
   beforeEach(async function() {
@@ -73,9 +75,9 @@ describe('Enable correctness feedback and set correctness', function() {
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     await workflow.createExploration();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(explorationTitle);
@@ -342,8 +344,8 @@ describe('Core exploration functionality', function() {
       await explorationEditorMainTab.setContent(
         await forms.toRichText('some content'));
       await explorationEditorMainTab.setInteraction('NumericInput');
-      await explorationEditorMainTab.addResponse('NumericInput',
-        async function(richTextEditor) {
+      await explorationEditorMainTab.addResponse(
+        'NumericInput', async function(richTextEditor) {
           await richTextEditor.appendBoldText('correct');
         }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
       var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
@@ -409,11 +411,11 @@ describe('Core exploration functionality', function() {
     // does not have any customization options. To dismiss this modal, user
     // clicks 'Okay' implying that he/she has got the message.
     await explorationEditorMainTab.setInteraction('NumericInput');
-    await element(by.css('.protractor-test-interaction')).click();
+    var testInteractionButton = element(by.css('.protractor-test-interaction'));
+    await action.click('Test Interaction Button', testInteractionButton);
     var okayBtn = element(
       by.css('.protractor-test-close-no-customization-modal'));
-    expect(await okayBtn.isPresent()).toBe(true);
-    await okayBtn.click();
+    await action.click('Close \'No customization modal\' button', okayBtn);
 
     // Continue input has customization options. Therefore, on re-clicking, a
     // modal opens up containing the customization arguments for this input.
@@ -421,11 +423,10 @@ describe('Core exploration functionality', function() {
     // button.
     await explorationEditorMainTab.deleteInteraction();
     await explorationEditorMainTab.setInteraction('Continue');
-    await element(by.css('.protractor-test-interaction')).click();
+    await action.click('Test interaction button', testInteractionButton);
     var saveInteractionBtn = element(
       by.css('.protractor-test-save-interaction'));
-    expect(await saveInteractionBtn.isPresent()).toBe(true);
-    await saveInteractionBtn.click();
+    await action.click('Save interaction button', saveInteractionBtn);
   });
 
   it('should correctly display contents, rule parameters, feedback' +
@@ -469,6 +470,8 @@ describe('Core exploration functionality', function() {
     await explorationEditorSettingsTab.expectTitleToBe('');
     await explorationEditorSettingsTab.setTitle('title1');
     await explorationEditorPage.navigateToMainTab();
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.expectTitleToBe('title1');
   });
@@ -479,6 +482,8 @@ describe('Core exploration functionality', function() {
     await explorationEditorSettingsTab.expectObjectiveToBe('');
     await explorationEditorSettingsTab.setObjective('It is just a test.');
     await explorationEditorPage.navigateToMainTab();
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.expectObjectiveToBe(
       'It is just a test.');
@@ -502,6 +507,8 @@ describe('Core exploration functionality', function() {
       await explorationEditorSettingsTab.expectCategoryToBe('');
       await explorationEditorSettingsTab.setCategory('Biology');
       await explorationEditorPage.navigateToMainTab();
+      await browser.refresh();
+      await waitFor.pageToFullyLoad();
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.expectCategoryToBe('Biology');
     });
@@ -513,6 +520,8 @@ describe('Core exploration functionality', function() {
     await explorationEditorSettingsTab.expectCategoryToBe('');
     await explorationEditorSettingsTab.setCategory('New');
     await explorationEditorPage.navigateToMainTab();
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.expectCategoryToBe('New');
   });
@@ -523,6 +532,8 @@ describe('Core exploration functionality', function() {
       await explorationEditorSettingsTab.expectLanguageToBe('English');
       await explorationEditorSettingsTab.setLanguage('italiano (Italian)');
       await explorationEditorPage.navigateToMainTab();
+      await browser.refresh();
+      await waitFor.pageToFullyLoad();
       await explorationEditorPage.navigateToSettingsTab();
       await explorationEditorSettingsTab.expectLanguageToBe(
         'italiano (Italian)');
@@ -541,6 +552,8 @@ describe('Core exploration functionality', function() {
     await explorationEditorSettingsTab.expectFirstStateToBe('card 1');
     await explorationEditorSettingsTab.setFirstState('card 2');
     await explorationEditorPage.navigateToMainTab();
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.expectFirstStateToBe('card 2');
   });

@@ -41,10 +41,10 @@ angular.module('oppia').directive('solutionExplanationEditor', [
         'solution-explanation-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'ContextService', 'EditabilityService',
+        'ContextService', 'EditabilityService',
         'ExternalSaveService', 'StateSolutionService',
         function(
-            $scope, ContextService, EditabilityService,
+            ContextService, EditabilityService,
             ExternalSaveService, StateSolutionService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
@@ -62,7 +62,7 @@ angular.module('oppia').directive('solutionExplanationEditor', [
               var solutionContentId = StateSolutionService.displayed.explanation
                 .getContentId();
               ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
-                solutionContentId);
+                [solutionContentId]);
             }
             StateSolutionService.saveDisplayedValue();
             ctrl.onSaveSolution(StateSolutionService.displayed);

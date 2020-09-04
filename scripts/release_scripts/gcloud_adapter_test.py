@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
 import os
 import subprocess
 
@@ -43,22 +44,29 @@ class GcloudAdapterTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output)
 
     def test_require_gcloud_to_be_available_with_missing_gcloud(self):
-        def mock_check_output(unused_cmd_tokens):
-            raise Exception('Missing Gcloud')
+        mock_invalid_process = subprocess.Popen(
+            ['echo', 'hi'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        mock_invalid_process.returncode = 2
+        def mock_popen(unused_cmd_tokens, stdout, stderr): # pylint: disable=unused-argument
+            return mock_invalid_process
 
-        check_output_swap = self.swap(
-            subprocess, 'check_output', mock_check_output)
-        with check_output_swap, self.assertRaisesRegexp(
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        with popen_swap, self.assertRaisesRegexp(
             Exception,
             'gcloud required, but could not be found. Please run python -m '
             'scripts.start to install gcloud.'):
             gcloud_adapter.require_gcloud_to_be_available()
 
     def test_require_gcloud_to_be_available_with_available_gcloud(self):
-        with self.check_output_swap:
+        mock_valid_process = subprocess.Popen(
+            ['echo', 'hi'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        mock_valid_process.returncode = 0
+        def mock_popen(unused_cmd_tokens, stdout, stderr): # pylint: disable=unused-argument
+            return mock_valid_process
+
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        with popen_swap:
             gcloud_adapter.require_gcloud_to_be_available()
-        self.assertEqual(
-            self.check_function_calls, self.expected_check_function_calls)
 
     def test_update_indexes_with_missing_indexes_file(self):
         def mock_isfile(unused_path):
@@ -148,8 +156,65 @@ class GcloudAdapterTests(test_utils.GenericTestBase):
                 gcloud_adapter.get_currently_served_version('app name'),
                 '2-1-1')
 
+    def test_get_latest_deployed_version(self):
+        def mock_check_output(unused_cmd_tokens):
+            return json.dumps([{
+                'project': 'test-app', 'service': 'test-service',
+                'environment': {'name': 'STANDARD', 'value': 1},
+                'version': {
+                    'runtimeApiVersion': '1',
+                    'versionUrl': (
+                        'https://20190216t114801-dot-test-app-dot-test-service.'
+                        'appspot.com'), 'createdBy': 'user1@gmail.com',
+                    'threadsafe': True, 'servingStatus': 'SERVING',
+                    'createTime': '2019-02-16T06:19:34Z',
+                    'network': {}, 'instanceClass': 'F1', 'env': 'standard',
+                    'diskUsageBytes': '5902', 'runtime': 'python27',
+                    'id': '20190216t114801',
+                    'name': (
+                        'apps/test-app/services/test-service/versions/'
+                        '20190216t114801')},
+                'last_deployed_time': {
+                    'hour': 11, 'datetime': '2019-02-16 11:49:34+05:30',
+                    'fold': 0, 'second': 34, 'microsecond': 0, 'year': 2019,
+                    'month': 2, 'day': 16, 'minute': 49},
+                'traffic_split': 1.0, 'id': '20190216t114801'
+            }, {
+                'project': 'test-app', 'service': 'test-service',
+                'environment': {'name': 'STANDARD', 'value': 1},
+                'version': {
+                    'runtimeApiVersion': '1',
+                    'versionUrl': (
+                        'https://20200216t114801-dot-test-app-dot-test-'
+                        'service.appspot.com'), 'createdBy': 'user2@gmail.com',
+                    'threadsafe': True, 'servingStatus': 'SERVING',
+                    'createTime': '2020-02-16T06:19:34Z',
+                    'network': {}, 'instanceClass': 'F1', 'env': 'standard',
+                    'diskUsageBytes': '5902', 'runtime': 'python27',
+                    'id': '20200216t114801',
+                    'name': (
+                        'apps/test-app/services/test-service/'
+                        'versions/20200216t114801')},
+                'last_deployed_time': {
+                    'hour': 11, 'datetime': '2020-02-16 11:49:34+05:30',
+                    'fold': 0, 'second': 34, 'microsecond': 0, 'year': 2020,
+                    'month': 2, 'day': 16, 'minute': 49},
+                'traffic_split': 1.0, 'id': '20200216t114801'}])
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        with check_output_swap:
+            self.assertEqual(
+                gcloud_adapter.get_latest_deployed_version(
+                    'test-app', 'test-service'), '20200216t114801')
+
     def test_switch_version(self):
-        with self.check_output_swap:
+        def mock_get_latest_deployed_version(
+                unused_app_name, unused_service_name):
+            return 'test-version'
+        latest_version_swap = self.swap(
+            gcloud_adapter, 'get_latest_deployed_version',
+            mock_get_latest_deployed_version)
+        with self.check_output_swap, latest_version_swap:
             gcloud_adapter.switch_version('app name', '2.1.1')
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)

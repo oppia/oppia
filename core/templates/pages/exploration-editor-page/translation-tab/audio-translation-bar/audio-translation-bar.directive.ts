@@ -136,20 +136,20 @@ angular.module('oppia').directive('audioTranslationBar', [
         '/pages/exploration-editor-page/translation-tab/' +
         'audio-translation-bar/audio-translation-bar.directive.html'),
       controller: [
-        '$filter', '$interval', '$rootScope', '$scope', '$uibModal', '$window',
+        '$filter', '$interval', '$scope', '$uibModal', '$window',
         'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
         'ContextService', 'EditabilityService',
-        'ExternalSaveService', 'ExplorationStatesService',
+        'ExplorationStatesService', 'ExternalSaveService',
         'IdGenerationService', 'SiteAnalyticsService',
         'StateEditorService', 'StateRecordedVoiceoversService',
         'TranslationLanguageService', 'TranslationStatusService',
         'TranslationTabActiveContentIdService', 'VoiceoverRecordingService',
         'RECORDING_TIME_LIMIT',
         function(
-            $filter, $interval, $rootScope, $scope, $uibModal, $window,
+            $filter, $interval, $scope, $uibModal, $window,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService,
-            ExternalSaveService, ExplorationStatesService,
+            ExplorationStatesService, ExternalSaveService,
             IdGenerationService, SiteAnalyticsService,
             StateEditorService, StateRecordedVoiceoversService,
             TranslationLanguageService, TranslationStatusService,
@@ -387,10 +387,10 @@ angular.module('oppia').directive('audioTranslationBar', [
           $scope.getUploadedAudioTimer = function() {
             if (AudioPlayerService.isTrackLoaded()) {
               $scope.audioTimerIsShown = true;
-              var currentTime = $filter('formatTimer')(AudioPlayerService
-                .getCurrentTime());
-              var duration = $filter('formatTimer')(AudioPlayerService
-                .getAudioDuration());
+              var currentTime = $filter('formatTimer')(
+                AudioPlayerService.getCurrentTime());
+              var duration = $filter('formatTimer')(
+                AudioPlayerService.getAudioDuration());
               return currentTime + ' / ' + duration;
             } else {
               $scope.audioTimerIsShown = false;

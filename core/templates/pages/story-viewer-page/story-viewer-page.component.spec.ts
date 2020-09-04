@@ -19,7 +19,6 @@
 import { TestBed } from '@angular/core/testing';
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
-import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';
 import { StoryPlaythroughObjectFactory } from
@@ -37,7 +36,6 @@ describe('Story Viewer Page component', function() {
   var readOnlyStoryNodeObjectFactory = null;
   var pageTitleService = null;
   var storyNodeObjectFactory = null;
-  var storyObjectFactory = null;
   var storyPlaythroughObjectFactory = null;
   var storyViewerBackendApiService = null;
   var urlService = null;
@@ -55,7 +53,6 @@ describe('Story Viewer Page component', function() {
     readOnlyStoryNodeObjectFactory = TestBed.get(
       ReadOnlyStoryNodeObjectFactory);
     storyNodeObjectFactory = TestBed.get(StoryNodeObjectFactory);
-    storyObjectFactory = TestBed.get(StoryObjectFactory);
     storyPlaythroughObjectFactory = TestBed.get(StoryPlaythroughObjectFactory);
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
   });
@@ -79,7 +76,7 @@ describe('Story Viewer Page component', function() {
     ctrl = $componentController('storyViewerPage', {
       $rootScope: $rootScope,
       AlertsService: alertsService,
-      PageTitleService: pageTitleService
+      PageTitleService: pageTitleService,
     });
 
     // This approach was choosen because spyOn() doesn't work on properties

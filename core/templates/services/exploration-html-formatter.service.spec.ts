@@ -61,7 +61,8 @@ describe('Exploration Html Formatter Service', () => {
       var expectedHtmlTag = '<oppia-interactive-text-input ' +
         'last-answer="null" label-for-focus-target="' + focusLabel + '">' +
         '</oppia-interactive-text-input>';
-      expect(ehfs.getInteractionHtml(interactionId, {}, false, focusLabel)
+      expect(
+        ehfs.getInteractionHtml(interactionId, {}, false, focusLabel)
       ).toBe(expectedHtmlTag);
     });
 
@@ -77,8 +78,8 @@ describe('Exploration Html Formatter Service', () => {
       'answer="&amp;quot;' + answer + '&amp;quot;" ' +
       'choices="[&amp;quot;sampleChoice' +
       '&amp;quot;]"></oppia-response-sample-id>';
-    expect(ehfs.getAnswerHtml(answer, interactionId,
-      interactionCustomizationArgs)
+    expect(ehfs.getAnswerHtml(
+      answer, interactionId, interactionCustomizationArgs)
     ).toBe(expectedHtmlTag);
   });
 
@@ -94,8 +95,8 @@ describe('Exploration Html Formatter Service', () => {
       'answer="&amp;quot;' + answer + '&amp;quot;" ' +
       'choices="[&amp;quot;sampleChoice' +
       '&amp;quot;]"></oppia-short-response-sample-id>';
-    expect(ehfs.getShortAnswerHtml(answer, interactionId,
-      interactionCustomizationArgs)
+    expect(ehfs.getShortAnswerHtml(
+      answer, interactionId, interactionCustomizationArgs)
     ).toBe(expectedHtmlTag);
   });
 });

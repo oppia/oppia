@@ -57,7 +57,7 @@ export class TopicViewerPageComponent implements OnInit {
   degreesOfMastery: DegreesOfMastery = {};
   subtopics: Subtopic[] = [];
   skillDescriptions: SkillIdToDescriptionMap = {};
-  trainTabShouldBeDisplayed: boolean = false;
+  practiceTabIsDisplayed: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -74,10 +74,8 @@ export class TopicViewerPageComponent implements OnInit {
       this.setActiveTab('subtopics');
     } else if (this.urlService.getPathname().endsWith('practice')) {
       this.setActiveTab('practice');
-    } else if (this.urlService.getPathname().endsWith('story')) {
-      this.setActiveTab('story');
     } else {
-      this.setActiveTab('info');
+      this.setActiveTab('story');
     }
     this.topicUrlFragment = (
       this.urlService.getTopicUrlFragmentFromLearnerUrl());
@@ -105,13 +103,8 @@ export class TopicViewerPageComponent implements OnInit {
         this.skillDescriptions = readOnlyTopic.getSkillDescriptions();
         this.topicIsLoading = false;
         this.loaderService.hideLoadingScreen();
-        this.trainTabShouldBeDisplayed = (
-          readOnlyTopic.getTrainTabShouldBeDisplayed());
-        if (
-          !this.trainTabShouldBeDisplayed &&
-          this.activeTab === 'practice') {
-          this.setActiveTab('info');
-        }
+        this.practiceTabIsDisplayed = (
+          readOnlyTopic.getPracticeTabIsDisplayed());
       },
       errorResponse => {
         let errorCodes = AppConstants.FATAL_ERROR_CODES;

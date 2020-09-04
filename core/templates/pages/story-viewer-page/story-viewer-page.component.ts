@@ -28,7 +28,7 @@ require(
 
 require(
   'pages/story-viewer-page/navbar-breadcrumb/' +
-  'story-viewer-navbar-breadcrumb.directive.ts');
+  'story-viewer-navbar-breadcrumb.component.ts');
 require(
   'pages/story-viewer-page/navbar-pre-logo-action/' +
   'story-viewer-navbar-pre-logo-action.component.ts');
@@ -44,12 +44,12 @@ angular.module('oppia').component('storyViewerPage', {
   template: require('./story-viewer-page.component.html'),
   controller: [
     '$rootScope', 'AlertsService', 'AssetsBackendApiService',
-    'PageTitleService', 'LoaderService',
+    'LoaderService', 'PageTitleService', 'StoryViewerBackendApiService',
     'UrlInterpolationService', 'UrlService', 'ENTITY_TYPE',
     'FATAL_ERROR_CODES',
     function(
         $rootScope, AlertsService, AssetsBackendApiService,
-        PageTitleService, LoaderService,
+        LoaderService, PageTitleService, StoryViewerBackendApiService,
         UrlInterpolationService, UrlService, ENTITY_TYPE,
         FATAL_ERROR_CODES) {
       var ctrl = this;
@@ -145,7 +145,7 @@ angular.module('oppia').component('storyViewerPage', {
             ctrl.storyTitle = storyDataDict.title;
             ctrl.storyDescription = storyDataDict.description;
 
-            $rootScope.$broadcast('storyData', {
+            StoryViewerBackendApiService.onSendStoryData.emit({
               topicName: topicName,
               storyTitle: ctrl.storyTitle
             });

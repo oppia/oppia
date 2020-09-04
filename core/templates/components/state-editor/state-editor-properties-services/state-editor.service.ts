@@ -37,6 +37,7 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { State } from 'domain/state/StateObjectFactory';
 
 interface AnswerChoice {
   val: string | number;
@@ -49,13 +50,16 @@ interface AnswerChoice {
 export class StateEditorService {
   constructor(private solutionValidityService: SolutionValidityService) {}
 
-  private _stateEditorInitializedEventEmitter = new EventEmitter();
-  private _stateEditorDirectiveInitializedEventEmitter = new EventEmitter();
-  private _interactionEditorInitializedEventEmitter = new EventEmitter();
-  private _showTranslationTabBusyModalEventEmitter = new EventEmitter();
-  private _refreshStateTranslationEventEmitter = new EventEmitter();
-  private _updateAnswerChoicesEventEmitter = new EventEmitter();
-  private _saveOutcomeDestDetailsEventEmitter = new EventEmitter();
+  private _stateEditorInitializedEventEmitter = new EventEmitter<State>();
+  private _stateEditorDirectiveInitializedEventEmitter =
+    new EventEmitter<void>();
+  private _interactionEditorInitializedEventEmitter = new EventEmitter<void>();
+  private _showTranslationTabBusyModalEventEmitter = new EventEmitter<void>();
+  private _refreshStateTranslationEventEmitter = new EventEmitter<void>();
+  private _updateAnswerChoicesEventEmitter = new EventEmitter<AnswerChoice[]>();
+  private _saveOutcomeDestDetailsEventEmitter = new EventEmitter<void>();
+  private _handleCustomArgsUpdateEventEmitter =
+    new EventEmitter<AnswerChoice[]>();
 
   activeStateName: string = null;
   stateNames: string[] = [];
@@ -75,6 +79,7 @@ export class StateEditorService {
   stateHintsEditorInitialised: boolean = false;
   stateSolutionEditorInitialised: boolean = false;
   stateEditorDirectiveInitialised: boolean = false;
+  currentRuleInputIsValid: boolean = false;
 
   updateStateContentEditorInitialised(): void {
     this.stateContentEditorInitialised = true;
@@ -98,6 +103,14 @@ export class StateEditorService {
 
   updateStateEditorDirectiveInitialised(): void {
     this.stateEditorDirectiveInitialised = true;
+  }
+
+  updateCurrentRuleInputIsValid(value: boolean): void {
+    this.currentRuleInputIsValid = value;
+  }
+
+  checkCurrentRuleInputIsValid(): boolean {
+    return this.currentRuleInputIsValid;
   }
 
   checkEventListenerRegistrationStatus(): boolean {
@@ -135,7 +148,7 @@ export class StateEditorService {
     return this.misconceptionsBySkill;
   }
 
-  setInteraction(newInteraction): void {
+  setInteraction(newInteraction: Interaction): void {
     this.interaction = newInteraction;
   }
 
@@ -248,32 +261,36 @@ export class StateEditorService {
     this.solutionValidityService.deleteSolutionValidity(this.activeStateName);
   }
 
-  get onStateEditorInitialized() {
+  get onStateEditorInitialized(): EventEmitter<State> {
     return this._stateEditorInitializedEventEmitter;
   }
 
-  get onStateEditorDirectiveInitialized() {
+  get onStateEditorDirectiveInitialized(): EventEmitter<void> {
     return this._stateEditorDirectiveInitializedEventEmitter;
   }
 
-  get onInteractionEditorInitialized() {
+  get onInteractionEditorInitialized(): EventEmitter<void> {
     return this._interactionEditorInitializedEventEmitter;
   }
 
-  get onShowTranslationTabBusyModal() {
+  get onShowTranslationTabBusyModal(): EventEmitter<void> {
     return this._showTranslationTabBusyModalEventEmitter;
   }
 
-  get onRefreshStateTranslation() {
+  get onRefreshStateTranslation(): EventEmitter<void> {
     return this._refreshStateTranslationEventEmitter;
   }
 
-  get onUpdateAnswerChoices() {
+  get onUpdateAnswerChoices(): EventEmitter<AnswerChoice[]> {
     return this._updateAnswerChoicesEventEmitter;
   }
 
-  get onSaveOutcomeDestDetails() {
+  get onSaveOutcomeDestDetails(): EventEmitter<void> {
     return this._saveOutcomeDestDetailsEventEmitter;
+  }
+
+  get onHandleCustomArgsUpdate(): EventEmitter<AnswerChoice[]> {
+    return this._handleCustomArgsUpdateEventEmitter;
   }
 }
 

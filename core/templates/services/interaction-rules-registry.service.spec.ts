@@ -50,9 +50,6 @@ import { LogicProofRulesService } from
 import { MathEquationInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/MathEquationInput/directives/math-equation-input-rules.service';
-import { MathExpressionInputRulesService } from
-  // eslint-disable-next-line max-len
-  'interactions/MathExpressionInput/directives/math-expression-input-rules.service';
 import { MultipleChoiceInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
@@ -72,12 +69,39 @@ import { NumericInputRulesService } from
   'interactions/NumericInput/directives/numeric-input-rules.service';
 import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
+import { RatioExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
 import { SetInputRulesService } from
   'interactions/SetInput/directives/set-input-rules.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 
 describe('Interaction Rules Registry Service', () => {
+  let interactionRulesRegistryService: InteractionRulesRegistryService;
+  let algebraicExpressionInputRulesService:
+    AlgebraicExpressionInputRulesService;
+  let codeReplRulesService: CodeReplRulesService;
+  let continueRulesService: ContinueRulesService;
+  let dragAndDropSortInputRulesService: DragAndDropSortInputRulesService;
+  let endExplorationRulesService: EndExplorationRulesService;
+  let fractionInputRulesService: FractionInputRulesService;
+  let graphInputRulesService: GraphInputRulesService;
+  let imageClickInputRulesService: ImageClickInputRulesService;
+  let interactiveMapRulesService: InteractiveMapRulesService;
+  let itemSelectionInputRulesService: ItemSelectionInputRulesService;
+  let logicProofRulesService: LogicProofRulesService;
+  let mathEquationInputRulesService: MathEquationInputRulesService;
+  let multipleChoiceInputRulesService: MultipleChoiceInputRulesService;
+  let musicNotesInputRulesService: MusicNotesInputRulesService;
+  let numberWithUnitsRulesService: NumberWithUnitsRulesService;
+  let numericExpressionInputRulesService: NumericExpressionInputRulesService;
+  let numericInputRulesService: NumericInputRulesService;
+  let pencilCodeEditorRulesService: PencilCodeEditorRulesService;
+  let ratioExpressionInputRulesService: RatioExpressionInputRulesService;
+  let setInputRulesService: SetInputRulesService;
+  let textInputRulesService: TextInputRulesService;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -86,170 +110,217 @@ describe('Interaction Rules Registry Service', () => {
       ],
     });
 
-    this.registry = TestBed.get(InteractionRulesRegistryService);
+    interactionRulesRegistryService = (
+      TestBed.get(InteractionRulesRegistryService));
 
-    this.algebraicExpressionInputRulesService = (
+    algebraicExpressionInputRulesService = (
       TestBed.get(AlgebraicExpressionInputRulesService));
-    this.codeReplRulesService = TestBed.get(CodeReplRulesService);
-    this.continueRulesService = TestBed.get(ContinueRulesService);
-    this.dragAndDropSortInputRulesService = (
+    codeReplRulesService = TestBed.get(CodeReplRulesService);
+    continueRulesService = TestBed.get(ContinueRulesService);
+    dragAndDropSortInputRulesService = (
       TestBed.get(DragAndDropSortInputRulesService));
-    this.endExplorationRulesService = TestBed.get(EndExplorationRulesService);
-    this.fractionInputRulesService = TestBed.get(FractionInputRulesService);
-    this.graphInputRulesService = TestBed.get(GraphInputRulesService);
-    this.imageClickInputRulesService = TestBed.get(ImageClickInputRulesService);
-    this.interactiveMapRulesService = TestBed.get(InteractiveMapRulesService);
-    this.itemSelectionInputRulesService = (
+    endExplorationRulesService = TestBed.get(EndExplorationRulesService);
+    fractionInputRulesService = TestBed.get(FractionInputRulesService);
+    graphInputRulesService = TestBed.get(GraphInputRulesService);
+    imageClickInputRulesService = TestBed.get(ImageClickInputRulesService);
+    interactiveMapRulesService = TestBed.get(InteractiveMapRulesService);
+    itemSelectionInputRulesService = (
       TestBed.get(ItemSelectionInputRulesService));
-    this.logicProofRulesService = TestBed.get(LogicProofRulesService);
-    this.mathEquationInputRulesService = (
+    logicProofRulesService = TestBed.get(LogicProofRulesService);
+    mathEquationInputRulesService = (
       TestBed.get(MathEquationInputRulesService));
-    this.mathExpressionInputRulesService = (
-      TestBed.get(MathExpressionInputRulesService));
-    this.multipleChoiceInputRulesService = (
+    multipleChoiceInputRulesService = (
       TestBed.get(MultipleChoiceInputRulesService));
-    this.musicNotesInputRulesService = TestBed.get(MusicNotesInputRulesService);
-    this.numberWithUnitsRulesService = TestBed.get(NumberWithUnitsRulesService);
-    this.numericExpressionInputRulesService = (
+    musicNotesInputRulesService = TestBed.get(MusicNotesInputRulesService);
+    numberWithUnitsRulesService = TestBed.get(NumberWithUnitsRulesService);
+    numericExpressionInputRulesService = (
       TestBed.get(NumericExpressionInputRulesService));
-    this.numericInputRulesService = TestBed.get(NumericInputRulesService);
-    this.pencilCodeEditorRulesService = (
+    numericInputRulesService = TestBed.get(NumericInputRulesService);
+    pencilCodeEditorRulesService = (
       TestBed.get(PencilCodeEditorRulesService));
-    this.setInputRulesService = TestBed.get(SetInputRulesService);
-    this.textInputRulesService = TestBed.get(TextInputRulesService);
+    ratioExpressionInputRulesService = (
+      TestBed.get(RatioExpressionInputRulesService));
+    setInputRulesService = TestBed.get(SetInputRulesService);
+    textInputRulesService = TestBed.get(TextInputRulesService);
   });
 
   it('should throw an error for falsey interaction ids', () => {
-    expect(() => this.registry.getRulesServiceByInteractionId(''))
-      .toThrowError('Interaction ID must not be empty');
-    expect(() => this.registry.getRulesServiceByInteractionId(null))
-      .toThrowError('Interaction ID must not be empty');
-    expect(() => this.registry.getRulesServiceByInteractionId(undefined))
-      .toThrowError('Interaction ID must not be empty');
-    expect(() => this.registry.getRulesServiceByInteractionId())
-      .toThrowError('Interaction ID must not be empty');
+    expect(
+      () => interactionRulesRegistryService.getRulesServiceByInteractionId('')
+    ).toThrowError('Interaction ID must not be empty');
+    expect(
+      () => interactionRulesRegistryService.getRulesServiceByInteractionId(null)
+    ).toThrowError('Interaction ID must not be empty');
+    expect(
+      () => interactionRulesRegistryService.getRulesServiceByInteractionId(
+        undefined)
+    ).toThrowError('Interaction ID must not be empty');
   });
 
   it('should throw an error for an interaction id that does not exist', () => {
-    expect(() => this.registry.getRulesServiceByInteractionId('FakeInput'))
-      .toThrowError('Unknown interaction ID: FakeInput');
+    expect(
+      () => interactionRulesRegistryService.getRulesServiceByInteractionId(
+        'FakeInput')
+    ).toThrowError('Unknown interaction ID: FakeInput');
   });
 
   it('should return a non-null service for each interaction spec', () => {
     for (const interactionId in InteractionSpecsConstants.INTERACTION_SPECS) {
-      expect(() => this.registry.getRulesServiceByInteractionId(interactionId))
-        .not.toThrowError();
+      expect(
+        () => interactionRulesRegistryService.getRulesServiceByInteractionId(
+          interactionId)
+      ).not.toThrowError();
     }
   });
 
   it('should return the correct rules service for AlgebraicExpressionInput',
     () => {
-      expect(this.registry.getRulesServiceByInteractionId(
+      expect(interactionRulesRegistryService.getRulesServiceByInteractionId(
         'AlgebraicExpressionInput')).toBe(
-        this.algebraicExpressionInputRulesService);
+        algebraicExpressionInputRulesService);
     }
   );
 
   it('should return the correct rules service for CodeRepl', () => {
-    expect(this.registry.getRulesServiceByInteractionId('CodeRepl'))
-      .toBe(this.codeReplRulesService);
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId('CodeRepl')
+    ).toBe(codeReplRulesService);
   });
 
   it('should return the correct rules service for Continue', () => {
-    expect(this.registry.getRulesServiceByInteractionId('Continue'))
-      .toBe(this.continueRulesService);
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId('Continue')
+    ).toBe(continueRulesService);
   });
 
   it('should return the correct rules service for DragAndDropSortInput', () => {
-    expect(this.registry.getRulesServiceByInteractionId('DragAndDropSortInput'))
-      .toBe(this.dragAndDropSortInputRulesService);
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId('DragAndDropSortInput')
+    ).toBe(dragAndDropSortInputRulesService);
   });
 
   it('should return the correct rules service for EndExploration', () => {
-    expect(this.registry.getRulesServiceByInteractionId('EndExploration'))
-      .toBe(this.endExplorationRulesService);
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId('EndExploration')
+    ).toBe(endExplorationRulesService);
   });
 
   it('should return the correct rules service for FractionInput', () => {
-    expect(this.registry.getRulesServiceByInteractionId('FractionInput'))
-      .toBe(this.fractionInputRulesService);
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId('FractionInput')
+    ).toBe(fractionInputRulesService);
   });
 
   it('should return the correct rules service for GraphInput', () => {
-    expect(this.registry.getRulesServiceByInteractionId('GraphInput'))
-      .toBe(this.graphInputRulesService);
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId('GraphInput')
+    ).toBe(graphInputRulesService);
   });
 
   it('should return the correct rules service for ImageClickInput', () => {
-    expect(this.registry.getRulesServiceByInteractionId('ImageClickInput'))
-      .toBe(this.imageClickInputRulesService);
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId('ImageClickInput')
+    ).toBe(imageClickInputRulesService);
   });
 
   it('should return the correct rules service for InteractiveMap', () => {
-    expect(this.registry.getRulesServiceByInteractionId('InteractiveMap'))
-      .toBe(this.interactiveMapRulesService);
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId('InteractiveMap')
+    ).toBe(interactiveMapRulesService);
   });
 
   it('should return the correct rules service for ItemSelectionInput', () => {
-    expect(this.registry.getRulesServiceByInteractionId('ItemSelectionInput'))
-      .toBe(this.itemSelectionInputRulesService);
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId('ItemSelectionInput')
+    ).toBe(itemSelectionInputRulesService);
   });
 
   it('should return the correct rules service for LogicProof', () => {
-    expect(this.registry.getRulesServiceByInteractionId('LogicProof'))
-      .toBe(this.logicProofRulesService);
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId('LogicProof')
+    ).toBe(logicProofRulesService);
   });
 
   it('should return the correct rules service for MathEquationInput', () => {
-    expect(this.registry.getRulesServiceByInteractionId('MathEquationInput'))
-      .toBe(this.mathEquationInputRulesService);
-  });
-
-  it('should return the correct rules service for MathExpressionInput', () => {
-    expect(this.registry.getRulesServiceByInteractionId('MathExpressionInput'))
-      .toBe(this.mathExpressionInputRulesService);
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId('MathEquationInput')
+    ).toBe(mathEquationInputRulesService);
   });
 
   it('should return the correct rules service for MultipleChoiceInput', () => {
-    expect(this.registry.getRulesServiceByInteractionId('MultipleChoiceInput'))
-      .toBe(this.multipleChoiceInputRulesService);
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId('MultipleChoiceInput')
+    ).toBe(multipleChoiceInputRulesService);
   });
 
   it('should return the correct rules service for MusicNotesInput', () => {
-    expect(this.registry.getRulesServiceByInteractionId('MusicNotesInput'))
-      .toBe(this.musicNotesInputRulesService);
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId('MusicNotesInput')
+    ).toBe(musicNotesInputRulesService);
   });
 
   it('should return the correct rules service for NumberWithUnits', () => {
-    expect(this.registry.getRulesServiceByInteractionId('NumberWithUnits'))
-      .toBe(this.numberWithUnitsRulesService);
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId('NumberWithUnits')
+    ).toBe(numberWithUnitsRulesService);
   });
 
   it('should return the correct rules service for NumericExpressionInput',
     () => {
-      expect(this.registry.getRulesServiceByInteractionId(
-        'NumericExpressionInput')).toBe(
-        this.numericExpressionInputRulesService);
+      expect(
+        interactionRulesRegistryService
+          .getRulesServiceByInteractionId('NumericExpressionInput')
+      ).toBe(numericExpressionInputRulesService);
     }
   );
 
   it('should return the correct rules service for NumericInput', () => {
-    expect(this.registry.getRulesServiceByInteractionId('NumericInput'))
-      .toBe(this.numericInputRulesService);
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId('NumericInput')
+    ).toBe(numericInputRulesService);
   });
 
   it('should return the correct rules service for PencilCodeEditor', () => {
-    expect(this.registry.getRulesServiceByInteractionId('PencilCodeEditor'))
-      .toBe(this.pencilCodeEditorRulesService);
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId('PencilCodeEditor')
+    ).toBe(pencilCodeEditorRulesService);
   });
 
+  it('should return the correct rules service for RatioExpressionInput',
+    () => {
+      expect(
+        interactionRulesRegistryService
+          .getRulesServiceByInteractionId('RatioExpressionInput')
+      ).toBe(ratioExpressionInputRulesService);
+    }
+  );
+
   it('should return the correct rules service for SetInput', () => {
-    expect(this.registry.getRulesServiceByInteractionId('SetInput'))
-      .toBe(this.setInputRulesService);
+    expect(
+      interactionRulesRegistryService.getRulesServiceByInteractionId('SetInput')
+    ).toBe(setInputRulesService);
   });
 
   it('should return the correct rules service for TextInput', () => {
-    expect(this.registry.getRulesServiceByInteractionId('TextInput'))
-      .toBe(this.textInputRulesService);
+    expect(
+      interactionRulesRegistryService
+        .getRulesServiceByInteractionId('TextInput')
+    ).toBe(textInputRulesService);
   });
 });

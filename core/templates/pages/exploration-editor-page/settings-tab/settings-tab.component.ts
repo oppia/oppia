@@ -92,8 +92,7 @@ angular.module('oppia').component('settingsTab', {
   },
   template: require('./settings-tab.component.html'),
   controller: [
-    '$http', '$rootScope', '$scope', '$uibModal',
-    'AlertsService', 'ChangeListService',
+    '$http', '$uibModal', 'AlertsService', 'ChangeListService',
     'EditabilityService', 'EditableExplorationBackendApiService',
     'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
@@ -108,8 +107,7 @@ angular.module('oppia').component('settingsTab', {
     'WindowRef', 'ALL_CATEGORIES',
     'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
     function(
-        $http, $rootScope, $scope, $uibModal,
-        AlertsService, ChangeListService,
+        $http, $uibModal, AlertsService, ChangeListService,
         EditabilityService, EditableExplorationBackendApiService,
         ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
@@ -200,7 +198,7 @@ angular.module('oppia').component('settingsTab', {
 
         ExplorationInitStateNameService.saveDisplayedValue();
 
-        $rootScope.$broadcast('refreshGraph');
+        ExplorationStatesService.onRefreshGraph.emit();
       };
 
       ctrl.postSaveParamChangesHook = function() {

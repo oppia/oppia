@@ -20,7 +20,6 @@
 // Note: Instantiating some of the editors, e.g. RichTextEditor, occurs
 // asynchronously and so must be prefixed by "await".
 
-var interactions = require('../../../extensions/interactions/protractor.js');
 var richTextComponents = require(
   '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
@@ -148,8 +147,7 @@ var ListEditor = function(elem) {
   return {
     editItem: async function(index, objectType) {
       var item = await elem.element(
-        await by.repeater('item in localValue track by $index'
-        ).row(index));
+        await by.repeater('item in localValue track by $index').row(index));
       var editor = getEditor(objectType);
       return await editor(item);
     },
@@ -373,8 +371,6 @@ var MultiSelectEditor = function(elem) {
     await elem.element(by.css(
       '.protractor-test-search-bar-dropdown-toggle')).click();
 
-    var allElements = elem.all(
-      by.css('.protractor-test-search-bar-dropdown-menu span'));
     var filteredElementsCount = 0;
     for (var i = 0; i < texts.length; i++) {
       var filteredElement = elem.element(
@@ -445,6 +441,8 @@ var MultiSelectEditor = function(elem) {
 //   handler.readRteComponent('Math', ...);
 var expectRichText = function(elem) {
   var toMatch = async function(richTextInstructions) {
+    // TODO(#9821): Find a better way to parse through the tags rather than
+    // using xpath.
     // We select all top-level non-paragraph elements, as well as all children
     // of paragraph elements. (Note that it is possible for <p> elements to
     // surround, e.g., <i> tags, so we can't just ignore the <p> elements
@@ -538,21 +536,7 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      // TODO(#9821) :The Math rich text components are now rendered as SVGs by
-      // Math-Jax, and the XPATH_SELECTOR defined in the method expectRichText()
-      // cannot effectively parse the SVG tags, hence the elem.getText() won't
-      // work for Math components.
-      if (componentName === 'Math') {
-        // Math-Jax renders the equations with the help of a script having
-        // innerHTML equal to the latex value. In future we will have to remove
-        // the checks below because Math-Jax will be removed from learner view.
-        var mathScriptTag = elem.element(by.tagName('script'));
-        expect(await mathScriptTag.isPresent()).toBe(true);
-        expect(args.length).toBe(2);
-        expect(await mathScriptTag.getAttribute('innerHTML')).toBe(args[1]);
-      } else {
-        expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
-      }
+      expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
 
       await richTextComponents.getComponent(componentName).
         expectComponentDetailsToMatch.apply(null, args);

@@ -46,10 +46,11 @@ angular.module('oppia').directive('skillEditorMainTab', [
         '/pages/skill-editor-page/editor-tab/' +
         'skill-editor-main-tab.directive.html'),
       controller: [
-        '$scope', 'PageTitleService', 'SkillEditorStateService',
-        'QuestionCreationService',
-        function($scope, PageTitleService, SkillEditorStateService,
-            QuestionCreationService) {
+        '$scope', 'PageTitleService', 'QuestionCreationService',
+        'SkillEditorStateService',
+        function(
+            $scope, PageTitleService, QuestionCreationService,
+            SkillEditorStateService) {
           var ctrl = this;
           $scope.createQuestion = function() {
             QuestionCreationService.createQuestion();

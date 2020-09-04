@@ -78,7 +78,7 @@ export class StoryContents {
     return null;
   }
 
-  rearrangeNodeInStory(fromIndex, toIndex) {
+  rearrangeNodeInStory(fromIndex: number, toIndex: number): void {
     const nodeToMove = this._nodes[fromIndex];
     this._nodes.splice(fromIndex, 1);
     this._nodes.splice(toIndex, 0, nodeToMove);
@@ -108,7 +108,7 @@ export class StoryContents {
     });
   }
 
-  getNodeIndex(nodeId: string) {
+  getNodeIndex(nodeId: string): number {
     for (var i = 0; i < this._nodes.length; i++) {
       if (this._nodes[i].getId() === nodeId) {
         return i;
@@ -133,9 +133,6 @@ export class StoryContents {
     // valid.
     var nodeIds = nodes.map((node: StoryNode) => {
       return node.getId();
-    });
-    var nodeTitles = nodes.map((node: StoryNode) => {
-      return node.getTitle();
     });
     for (var i = 0; i < nodeIds.length; i++) {
       var nodeId = nodeIds[i];

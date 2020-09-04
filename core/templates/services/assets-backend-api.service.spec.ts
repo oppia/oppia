@@ -37,7 +37,6 @@ require('services/csrf-token.service.ts');
 describe('Assets Backend API Service', function() {
   describe('on dev mode', function() {
     var AssetsBackendApiService = null;
-    var fileDownloadRequestObjectFactory = null;
     var UrlInterpolationService = null;
     var audioFileObjectFactory = null;
     var imageFileObjectFactory = null;
@@ -67,8 +66,6 @@ describe('Assets Backend API Service', function() {
     beforeEach(angular.mock.inject(function($injector) {
       AssetsBackendApiService = $injector.get(
         'AssetsBackendApiService');
-      fileDownloadRequestObjectFactory = $injector.get(
-        'FileDownloadRequestObjectFactory');
       audioFileObjectFactory = $injector.get('AudioFileObjectFactory');
       imageFileObjectFactory = $injector.get('ImageFileObjectFactory');
       UrlInterpolationService = $injector.get(
@@ -139,11 +136,13 @@ describe('Assets Backend API Service', function() {
 
       AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
         successHandler, failHandler);
-      expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
-        .audio.length).toBe(1);
+      expect(
+        (AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+          .audio.length).toBe(1);
       $httpBackend.flush();
-      expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
-        .audio.length).toBe(0);
+      expect(
+        (AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+          .audio.length).toBe(0);
       expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(true);
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
@@ -340,11 +339,13 @@ describe('Assets Backend API Service', function() {
       AssetsBackendApiService.loadImage(
         ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
         successHandler, failHandler);
-      expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
-        .image.length).toBe(1);
+      expect(
+        (AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+          .image.length).toBe(1);
       $httpBackend.flush();
-      expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
-        .image.length).toBe(0);
+      expect(
+        (AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+          .image.length).toBe(0);
       expect(AssetsBackendApiService.isCached('myfile.png')).toBe(true);
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
@@ -420,13 +421,15 @@ describe('Assets Backend API Service', function() {
         AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
           successHandler, failHandler);
 
-        expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
-          .audio.length).toBe(1);
+        expect(
+          AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
+            .audio.length).toBe(1);
 
         AssetsBackendApiService.abortAllCurrentAudioDownloads();
         $httpBackend.verifyNoOutstandingRequest();
-        expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
-          .audio.length).toBe(0);
+        expect(
+          AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
+            .audio.length).toBe(0);
         expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
       });
 
@@ -441,13 +444,15 @@ describe('Assets Backend API Service', function() {
           ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
           successHandler, failHandler);
 
-        expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
-          .image.length).toBe(1);
+        expect(
+          AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
+            .image.length).toBe(1);
 
         AssetsBackendApiService.abortAllCurrentImageDownloads();
         $httpBackend.verifyNoOutstandingRequest();
-        expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
-          .image.length).toBe(0);
+        expect(
+          AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
+            .image.length).toBe(0);
         expect(AssetsBackendApiService.isCached('myfile.png')).toBe(false);
       });
 
@@ -459,11 +464,13 @@ describe('Assets Backend API Service', function() {
         201, {type: 'audio/mpeg'});
       AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
         successHandler, failHandler);
-      expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
-        .audio.length).toBe(1);
+      expect(
+        (AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+          .audio.length).toBe(1);
       $httpBackend.flush();
-      expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
-        .audio.length).toBe(0);
+      expect(
+        (AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+          .audio.length).toBe(0);
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
@@ -494,7 +501,7 @@ describe('Assets Backend API Service', function() {
       ' Service bucket name is not set', angular.mock.inject(
       function($injector) {
         expect(function() {
-          var service = $injector.get(
+          $injector.get(
             'AssetsBackendApiService');
         }).toThrowError('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
       }));
@@ -531,8 +538,8 @@ describe('Assets Backend API Service', function() {
       expect(
         AssetsBackendApiService.getAudioDownloadUrl(
           ENTITY_TYPE.EXPLORATION, 'expid12345', 'a.mp3')
-      ).toEqual(gcsPrefix +
-        '/exploration/expid12345/assets/audio/a.mp3');
+      ).toEqual(
+        gcsPrefix + '/exploration/expid12345/assets/audio/a.mp3');
     });
 
     it('should correctly formulate the preview URL for images', function() {
@@ -546,8 +553,8 @@ describe('Assets Backend API Service', function() {
       expect(
         AssetsBackendApiService.getThumbnailUrlForPreview(
           ENTITY_TYPE.EXPLORATION, 'expid12345', 'thumbnail.png')
-      ).toEqual(gcsPrefix +
-        '/exploration/expid12345/assets/thumbnail/thumbnail.png');
+      ).toEqual(
+        gcsPrefix + '/exploration/expid12345/assets/thumbnail/thumbnail.png');
     });
   });
 });

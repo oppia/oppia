@@ -54,7 +54,6 @@ describe('Topic editor state service', function() {
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
   var subtopicPageObjectFactory = null;
-  var rubricObjectFactory = null;
   var topicRightsObjectFactory = null;
   var TopicUpdateService = null;
   var fakeEditableTopicBackendApiService = null;
@@ -63,7 +62,6 @@ describe('Topic editor state service', function() {
   var secondBackendTopicObject = null;
   var secondTopicRightsObject = null;
   var $rootScope = null;
-  var $scope = null;
   var $q = null;
 
   var testSubscriptions = null;
@@ -218,7 +216,6 @@ describe('Topic editor state service', function() {
     TopicUpdateService = $injector.get('TopicUpdateService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
 
     fakeEditableTopicBackendApiService.newBackendTopicObject = {
       topicDict: {
@@ -450,8 +447,6 @@ describe('Topic editor state service', function() {
 
   it('should correctly delete new subtopic pages without changing already ' +
     'existing subtopic pages from the local cache', function() {
-    spyOn($rootScope, '$broadcast').and.callThrough();
-
     var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     subtopicPage.setId('validTopicId-1');
@@ -475,8 +470,6 @@ describe('Topic editor state service', function() {
 
   it('should correctly delete already existing subtopic pages without ' +
     'changing newly created subtopic pages from the local cache', function() {
-    spyOn($rootScope, '$broadcast').and.callThrough();
-
     var subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     subtopicPage.setId('validTopicId-1');
@@ -532,8 +525,6 @@ describe('Topic editor state service', function() {
     // Load initial topic.
     TopicEditorStateService.loadTopic(5);
     $rootScope.$apply();
-
-    spyOn($rootScope, '$broadcast').and.callThrough();
 
     // Load a second topic.
     TopicEditorStateService.loadTopic(1);
@@ -663,11 +654,8 @@ describe('Topic editor state service', function() {
     function() {
       TopicEditorStateService.loadTopic(5);
       $rootScope.$apply();
-
-      spyOn($rootScope, '$broadcast').and.callThrough();
       expect(TopicEditorStateService.saveTopic(
         'Commit message')).toBe(false);
-      expect($rootScope.$broadcast).not.toHaveBeenCalled();
     }
   );
 

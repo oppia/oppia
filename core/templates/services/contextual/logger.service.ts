@@ -24,25 +24,25 @@ import { Injectable } from '@angular/core';
 export class LoggerService {
   constructor() {}
 
-  debug(msg: string) {
+  debug(msg: string): void {
     // eslint-disable-next-line no-console
     console.debug(msg);
   }
 
-  info(msg: string) {
+  info(msg: string): void {
     // eslint-disable-next-line no-console
     console.info(msg);
   }
 
-  warn(msg: string) {
+  warn(msg: string): void {
     console.warn(msg);
   }
 
-  error(msg: string) {
+  error(msg: string): void {
     console.error(msg);
   }
 
-  log(msg: string) {
+  log(msg: string): void {
     // eslint-disable-next-line no-console
     console.log(msg);
   }

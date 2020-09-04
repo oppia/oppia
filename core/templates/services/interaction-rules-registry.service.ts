@@ -47,9 +47,6 @@ import { LogicProofRulesService } from
 import { MathEquationInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/MathEquationInput/directives/math-equation-input-rules.service';
-import { MathExpressionInputRulesService } from
-  // eslint-disable-next-line max-len
-  'interactions/MathExpressionInput/directives/math-expression-input-rules.service';
 import { MultipleChoiceInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
@@ -64,10 +61,20 @@ import { NumericInputRulesService } from
   'interactions/NumericInput/directives/numeric-input-rules.service';
 import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
+import { RatioExpressionInputRulesService } from
+  // eslint-disable-next-line max-len
+  'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
 import { SetInputRulesService } from
   'interactions/SetInput/directives/set-input-rules.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+
+interface InteractionRulesService {
+  [ruleName: string]: (
+    answer: InteractionAnswer, ruleInputs: InteractionRuleInputs) => boolean;
+}
 
 @Injectable({providedIn: 'root'})
 export class InteractionRulesRegistryService {
@@ -88,7 +95,6 @@ export class InteractionRulesRegistryService {
       private itemSelectionInputRulesService: ItemSelectionInputRulesService,
       private logicProofRulesService: LogicProofRulesService,
       private mathEquationInputRulesService: MathEquationInputRulesService,
-      private mathExpressionInputRulesService: MathExpressionInputRulesService,
       private multipleChoiceInputRulesService: MultipleChoiceInputRulesService,
       private musicNotesInputRulesService: MusicNotesInputRulesService,
       private numberWithUnitsRulesService: NumberWithUnitsRulesService,
@@ -96,6 +102,8 @@ export class InteractionRulesRegistryService {
         NumericExpressionInputRulesService,
       private numericInputRulesService: NumericInputRulesService,
       private pencilCodeEditorRulesService: PencilCodeEditorRulesService,
+      private ratioExpressionInputRulesService:
+       RatioExpressionInputRulesService,
       private setInputRulesService: SetInputRulesService,
       private textInputRulesService: TextInputRulesService) {
     this.rulesServiceRegistry = new Map(Object.entries({
@@ -112,7 +120,6 @@ export class InteractionRulesRegistryService {
       ItemSelectionInputRulesService: this.itemSelectionInputRulesService,
       LogicProofRulesService: this.logicProofRulesService,
       MathEquationInputRulesService: this.mathEquationInputRulesService,
-      MathExpressionInputRulesService: this.mathExpressionInputRulesService,
       MultipleChoiceInputRulesService: this.multipleChoiceInputRulesService,
       MusicNotesInputRulesService: this.musicNotesInputRulesService,
       NumberWithUnitsRulesService: this.numberWithUnitsRulesService,
@@ -120,12 +127,14 @@ export class InteractionRulesRegistryService {
         this.numericExpressionInputRulesService,
       NumericInputRulesService: this.numericInputRulesService,
       PencilCodeEditorRulesService: this.pencilCodeEditorRulesService,
+      RatioExpressionInputRulesService: this.ratioExpressionInputRulesService,
       SetInputRulesService: this.setInputRulesService,
       TextInputRulesService: this.textInputRulesService,
     }));
   }
 
-  getRulesServiceByInteractionId(interactionId: string): object {
+  getRulesServiceByInteractionId(
+      interactionId: string): InteractionRulesService {
     if (!interactionId) {
       throw new Error('Interaction ID must not be empty');
     }
@@ -133,7 +142,9 @@ export class InteractionRulesRegistryService {
     if (!this.rulesServiceRegistry.has(rulesServiceName)) {
       throw new Error('Unknown interaction ID: ' + interactionId);
     }
-    return this.rulesServiceRegistry.get(rulesServiceName);
+    return (
+      <InteractionRulesService> this.rulesServiceRegistry.get(
+        rulesServiceName));
   }
 }
 

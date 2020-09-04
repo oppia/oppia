@@ -41,6 +41,7 @@ from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
+from core.controllers import platform_feature
 from core.controllers import practice_sessions
 from core.controllers import profile
 from core.controllers import question_editor
@@ -216,10 +217,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(
         r'/memorycacheadminhandler', admin.MemoryCacheAdminHandler),
-    get_redirect_route(
-        r'/explorationslatexsvghandler', admin.ExplorationsLatexSvgHandler),
-    get_redirect_route(
-        r'/suggestionslatexsvghandler', admin.SuggestionsLatexSvgHandler),
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
@@ -763,7 +760,8 @@ URLS = MAPREDUCE_HANDLERS + [
         story_editor.ValidateExplorationsHandler),
 
     get_redirect_route(
-        '/classroom_page_status_handler', classroom.ClassroomPageStatusHandler),
+        '/classroom_promos_status_handler',
+        classroom.ClassroomPromosStatusHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
@@ -824,6 +822,10 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
+
+    get_redirect_route(
+        r'/platform_features_evaluation_handler',
+        platform_feature.PlatformFeaturesEvaluationHandler),
 
     get_redirect_route(
         r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),

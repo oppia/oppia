@@ -50,7 +50,6 @@ describe('Collection editor state service', function() {
   var secondBackendCollectionObject = null;
   var unpublishablePublicCollectionRightsObject = null;
   var $rootScope = null;
-  var $scope = null;
   var $q = null;
   var testSubscriptions: Subscription;
 
@@ -154,7 +153,6 @@ describe('Collection editor state service', function() {
     CollectionUpdateService = $injector.get('CollectionUpdateService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
 
     fakeEditableCollectionBackendApiService.newBackendCollectionObject = {
       id: '0',
@@ -441,10 +439,8 @@ describe('Collection editor state service', function() {
       CollectionEditorStateService.loadCollection(5);
       $rootScope.$apply();
 
-      spyOn($rootScope, '$broadcast').and.callThrough();
       expect(CollectionEditorStateService.saveCollection(
         'Commit message')).toBe(false);
-      expect($rootScope.$broadcast).not.toHaveBeenCalled();
     }
   );
 

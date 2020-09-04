@@ -32,11 +32,12 @@ import { LoadingDotsComponent } from
   './common-layout-directives/common-elements/loading-dots.component';
 import { MaterialModule } from './material.module';
 import { TranslatePipe } from 'filters/translate.pipe';
-import { SafePipe } from 'filters/safe-pipe';
 import { SkillMasteryViewerComponent } from
   './skill-mastery/skill-mastery.component';
 import { ExplorationEmbedButtonModalComponent } from
   './button-directives/exploration-embed-button-modal.component';
+import { KeyboardShortcutHelpModalComponent } from
+  'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
 import { SharingLinksComponent } from
   './common-layout-directives/common-elements/sharing-links.component';
 import { StorySummaryTileDirective } from
@@ -61,11 +62,11 @@ import { ProfileLinkTextComponent } from
     BackgroundBannerComponent,
     ExplorationEmbedButtonModalComponent,
     ExplorationSummaryTileDirective,
+    KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
-    SafePipe,
     SharingLinksComponent,
     SkillMasteryViewerComponent,
     StorySummaryTileDirective,
@@ -82,6 +83,7 @@ import { ProfileLinkTextComponent } from
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
+    KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
     SocialButtonsComponent
   ],
@@ -93,7 +95,6 @@ import { ProfileLinkTextComponent } from
     // Components, directives, and pipes.
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
-    SafePipe,
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,

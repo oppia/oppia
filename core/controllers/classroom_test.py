@@ -38,24 +38,14 @@ class ClassroomPageTests(BaseClassroomControllerTests):
 
     def test_any_user_can_access_classroom_page(self):
         config_property = config_domain.Registry.get_config_property(
-            'classroom_page_is_shown')
+            'classroom_page_is_accessible')
         config_property.set_value('committer_id', True)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            response = self.get_html_response('/learn/math')
-            self.assertIn('<classroom-page></classroom-page>', response)
+        response = self.get_html_response('/learn/math')
+        self.assertIn('<classroom-page></classroom-page>', response)
         config_property.set_value('committer_id', False)
 
-    def test_get_fails_when_new_structures_not_enabled(self):
-        config_property = config_domain.Registry.get_config_property(
-            'classroom_page_is_shown')
-        config_property.set_value('committer_id', True)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            self.get_html_response('/learn/math', expected_status_int=404)
-        config_property.set_value('committer_id', False)
-
-    def test_get_fails_when_classroom_page_is_shown_not_enabled(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_html_response('/learn/math', expected_status_int=404)
+    def test_get_fails_when_classroom_page_is_accessible_not_enabled(self):
+        self.get_html_response('/learn/math', expected_status_int=404)
 
 
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):
@@ -78,6 +68,13 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         public_topic.thumbnail_filename = 'Topic.svg'
         public_topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        public_topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1', 'skill_id_2', 'skill_id_3'],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-three')]
+        public_topic.next_subtopic_id = 2
         topic_services.save_new_topic(admin_id, public_topic)
         topic_services.publish_topic(topic_id_2, admin_id)
 
@@ -100,49 +97,43 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         self.post_json('/adminhandler', payload, csrf_token=csrf_token)
         self.logout()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            json_response = self.get_json(
-                '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
-            topic_summary_dict = (
-                topic_services.get_topic_summary_by_id(topic_id_2).to_dict())
+        json_response = self.get_json(
+            '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
+        topic_summary_dict = (
+            topic_services.get_topic_summary_by_id(topic_id_2).to_dict())
 
-            expected_dict = {
-                'name': 'math',
-                'topic_summary_dicts': [topic_summary_dict],
-                'course_details': 'Course details for classroom.',
-                'topic_list_intro': 'Topics covered for classroom'
-            }
-            self.assertDictContainsSubset(expected_dict, json_response)
+        expected_dict = {
+            'name': 'math',
+            'topic_summary_dicts': [topic_summary_dict],
+            'course_details': 'Course details for classroom.',
+            'topic_list_intro': 'Topics covered for classroom'
+        }
+        self.assertDictContainsSubset(expected_dict, json_response)
 
     def test_get_fails_for_invalid_classroom_name(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_json(
-                '%s/%s' % (
-                    feconf.CLASSROOM_DATA_HANDLER, 'invalid_subject'),
-                expected_status_int=404)
-
-    def test_get_fails_when_new_structures_not_enabled(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            self.get_json(
-                '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'),
-                expected_status_int=404)
+        self.get_json(
+            '%s/%s' % (
+                feconf.CLASSROOM_DATA_HANDLER, 'invalid_subject'),
+            expected_status_int=404)
 
 
-class ClassroomPageStatusHandlerTests(BaseClassroomControllerTests):
-    """Unit test for ClassroomPageStatusHandler."""
+class ClassroomPromosStatusHandlerTests(BaseClassroomControllerTests):
+    """Unit test for ClassroomPromosStatusHandler."""
 
     def test_get_request_returns_correct_status(self):
-        self.set_config_property(config_domain.CLASSROOM_PAGE_IS_SHOWN, False)
+        self.set_config_property(
+            config_domain.CLASSROOM_PROMOS_ARE_ENABLED, False)
 
-        response = self.get_json('/classroom_page_status_handler')
+        response = self.get_json('/classroom_promos_status_handler')
         self.assertEqual(
             response, {
-                'classroom_page_is_shown': False
+                'classroom_promos_are_enabled': False
             })
 
-        self.set_config_property(config_domain.CLASSROOM_PAGE_IS_SHOWN, True)
-        response = self.get_json('/classroom_page_status_handler')
+        self.set_config_property(
+            config_domain.CLASSROOM_PROMOS_ARE_ENABLED, True)
+        response = self.get_json('/classroom_promos_status_handler')
         self.assertEqual(
             response, {
-                'classroom_page_is_shown': True,
+                'classroom_promos_are_enabled': True,
             })
