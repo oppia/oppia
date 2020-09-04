@@ -286,12 +286,12 @@ def _get_possible_normalized_metadata_directory_names(
             '%s-%s.dist-info' % (library_name, version_string)),
         _normalize_directory_name(
             '%s-%s.dist-info' % (
-            library_name.replace('-', '_'), version_string)),
+                library_name.replace('-', '_'), version_string)),
         _normalize_directory_name(
             '%s-%s.egg-info' % (library_name, version_string)),
         _normalize_directory_name(
             '%s-%s.egg-info' % (
-            library_name.replace('-', '_'), version_string)),
+                library_name.replace('-', '_'), version_string)),
     }
 
 
