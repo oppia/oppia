@@ -70,7 +70,7 @@ describe('Topic viewer page', () => {
     subtopics: [],
     degrees_of_mastery: {},
     skill_descriptions: {},
-    train_tab_should_be_displayed: true
+    practice_tab_is_displayed: true
   };
 
   beforeEach(() => {
@@ -99,14 +99,12 @@ describe('Topic viewer page', () => {
       topicUrlFragment);
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'math');
-<<<<<<< HEAD
 
     spyOn(pageTitleService, 'setPageTitle').and.callThrough();
 
     topicViewerPageComponent.ngOnInit();
     expect(topicViewerPageComponent.canonicalStorySummaries).toEqual([]);
-    expect(topicViewerPageComponent.activeTab).toBe('info');
-    expect(topicViewerPageComponent.topicIsLoading).toBe(true);
+    expect(topicViewerPageComponent.activeTab).toBe('story');
 
     var req = httpTestingController.expectOne(
       `/topic_data_handler/math/${topicUrlFragment}`);
@@ -125,55 +123,8 @@ describe('Topic viewer page', () => {
     expect(topicViewerPageComponent.subtopics).toEqual([]);
     expect(topicViewerPageComponent.skillDescriptions).toEqual({});
     expect(topicViewerPageComponent.topicIsLoading).toBe(false);
-    expect(topicViewerPageComponent.trainTabShouldBeDisplayed).toBe(true);
+    expect(topicViewerPageComponent.practiceTabIsDisplayed).toBe(true);
   }));
-=======
-    var topicDataObject = (
-      ReadOnlyTopicObjectFactory.createFromBackendDict({
-        topic_id: '1',
-        topic_name: 'Topic Name',
-        topic_description: 'Topic Description',
-        canonical_story_dicts: [{
-          id: '2',
-          title: 'Story Title',
-          node_titles: ['Node title 1', 'Node title 2'],
-          thumbnail_filename: '',
-          thumbnail_bg_color: '',
-          description: 'Story Description',
-          story_is_published: true
-        }],
-        additional_story_dicts: [],
-        uncategorized_skill_ids: [],
-        subtopics: [],
-        degrees_of_mastery: {},
-        skill_descriptions: {},
-        practice_tab_is_displayed: true
-      }));
-    spyOn(TopicViewerBackendApiService, 'fetchTopicData').and.returnValue(
-      $q.resolve(topicDataObject));
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
-
-    ctrl.$onInit();
-
-    expect(ctrl.canonicalStorySummaries).toEqual([]);
-    expect(ctrl.activeTab).toBe('story');
-    expect(ctrl.topicIsLoading).toBe(true);
-    $scope.$apply();
-
-    expect(ctrl.topicId).toBe('1');
-    expect(ctrl.topicName).toBe('Topic Name');
-    expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
-      `Learn ${topicName} | Topic Description | Oppia`);
-    expect(ctrl.topicDescription).toBe('Topic Description');
-    expect(ctrl.canonicalStorySummaries.length).toBe(1);
-    expect(ctrl.chapterCount).toBe(2);
-    expect(ctrl.degreesOfMastery).toEqual({});
-    expect(ctrl.subtopics).toEqual([]);
-    expect(ctrl.skillDescriptions).toEqual({});
-    expect(ctrl.topicIsLoading).toBe(false);
-    expect(ctrl.practiceTabIsDisplayed).toBe(true);
-  });
->>>>>>> upstream/develop
 
   it('should set story tab correctly', fakeAsync(() => {
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
@@ -218,51 +169,6 @@ describe('Topic viewer page', () => {
     expect(topicViewerPageComponent.activeTab).toBe('practice');
   }));
 
-<<<<<<< HEAD
-  it('should switch to info tab if practice tab is hidden', fakeAsync(() => {
-    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-      topicUrlFragment);
-    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
-      'math');
-    spyOn(urlService, 'getPathname').and.returnValue(
-      `/learn/math/${topicUrlFragment}/practice`);
-    let topicDataDict = {
-      topic_id: '1',
-      topic_name: 'Topic Name',
-      topic_description: 'Topic Description',
-      canonical_story_dicts: [{
-        id: '2',
-        title: 'Story Title',
-        node_titles: ['Node title 1', 'Node title 2'],
-        thumbnail_filename: '',
-        thumbnail_bg_color: '',
-        description: 'Story Description',
-        story_is_published: true
-      }],
-      additional_story_dicts: [],
-      uncategorized_skill_ids: [],
-      subtopics: [],
-      degrees_of_mastery: {},
-      skill_descriptions: {},
-      train_tab_should_be_displayed: false
-    };
-    spyOn(pageTitleService, 'setPageTitle').and.callThrough();
-
-    topicViewerPageComponent.ngOnInit();
-    expect(topicViewerPageComponent.canonicalStorySummaries).toEqual([]);
-    expect(topicViewerPageComponent.activeTab).toBe('practice');
-
-    let req = httpTestingController.expectOne(
-      `/topic_data_handler/math/${topicUrlFragment}`);
-    req.flush(topicDataDict);
-    flushMicrotasks();
-
-    expect(topicViewerPageComponent.trainTabShouldBeDisplayed).toBe(false);
-    expect(topicViewerPageComponent.activeTab).toBe('info');
-  }));
-
-=======
->>>>>>> upstream/develop
   it('should use reject handler when fetching subtopic data fails',
     fakeAsync(() => {
       spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
