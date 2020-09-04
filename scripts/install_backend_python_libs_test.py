@@ -514,12 +514,13 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         metadata_exception = self.assertRaisesRegexp(
             Exception,
-            'The python library dependency5 was installed without the '
-            'correct metadata folders which may indicate that the '
-            'convention for naming the metadata folders have changed. '
-            'Please go to `scripts/install_backend_python_libs` and modify '
-            'our assumptions in the _get_possible_metadata_directory_names '
-            'function for what metadata directory names can be.')
+            'The python library dependency5 was installed without the correct '
+            'metadata folders which may indicate that the convention for '
+            'naming the metadata folders have changed. Please go to '
+            '`scripts/install_backend_python_libs` and modify our '
+            'assumptions in the '
+            '_get_possible_normalized_metadata_directory_names'
+            ' function for what metadata directory names can be.')
         with swap_find_distributions, swap_list_dir, metadata_exception:
             with swap_is_dir:
                 install_backend_python_libs.validate_metadata_directories()
