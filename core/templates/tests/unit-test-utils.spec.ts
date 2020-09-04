@@ -30,7 +30,7 @@ export class MockNg2Component extends UpgradeComponent {
     super('mockNg2Component', elementRef, injector);
   }
 }
-fdescribe('setupAndGetUpgradedComponent function', () => {
+describe('setupAndGetUpgradedComponent function', () => {
   beforeEach(() => destroyPlatform());
   afterEach(() => destroyPlatform());
   it('should setup component and return the proper text context', async(() => {
