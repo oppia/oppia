@@ -32,7 +32,7 @@
         <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/no_explorations_found.png')]>">
         <img ng-if="!$ctrl.profilePictureDataUrl" ng-src="<[$ctrl.getStaticImageUrl('/general/no_explorations_found.png')]>">
       </picture>
-      <p style="text-center">
+      <p class="text-center">
         <span translate="I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY"></span><br><br>
         <a ng-if="!$ctrl.userIsLoggedIn" href="" ng-click="$ctrl.onRedirectToLogin('/creator-dashboard?mode=create')"
            translate="I18N_LIBRARY_CREATE_EXPLORATION_QUESTION">

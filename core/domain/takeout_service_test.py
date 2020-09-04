@@ -24,7 +24,7 @@ from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import rights_manager
+from core.domain import rights_domain
 from core.domain import takeout_domain
 from core.domain import takeout_service
 from core.domain import topic_domain
@@ -261,7 +261,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             'cid', 'Created new collection right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
 
         # Setup for GeneralSuggestionModel.
         suggestion_models.GeneralSuggestionModel.create(
@@ -303,7 +303,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             first_published_msec=0.0
         ).save(
             'cid', 'Created new exploration right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
 
         # Setup for UserSettingsModel.
         user_models.UserSettingsModel(
@@ -377,14 +377,14 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             can_review_voiceover_for_language_codes=['hi'],
             can_review_questions=True).put()
 
-        user_models.UserContributionScoringModel(
+        user_models.UserContributionProficiencyModel(
             id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_ID_1),
             user_id=self.USER_ID_1,
             score_category=self.SCORE_CATEGORY_1,
             score=1.5,
             onboarding_email_sent=False
         ).put()
-        user_models.UserContributionScoringModel(
+        user_models.UserContributionProficiencyModel(
             id='%s.%s' % (self.SCORE_CATEGORY_2, self.USER_ID_1),
             user_id=self.USER_ID_1,
             score_category=self.SCORE_CATEGORY_2,
@@ -557,7 +557,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
 
         expected_voiceover_application_data = {}
-        expected_contrib_score_data = {}
+        expected_contrib_proficiency_data = {}
         expected_contribution_rights_data = {}
         expected_collection_rights_sm = {}
         expected_collection_sm = {}
@@ -597,7 +597,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_feedback_email_reply_to_id': reply_to_data,
             'general_voiceover_application':
                 expected_voiceover_application_data,
-            'user_contribution_scoring': expected_contrib_score_data,
+            'user_contribution_proficiency': expected_contrib_proficiency_data,
             'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
                 expected_collection_rights_sm,
@@ -863,7 +863,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'can_review_questions': True
         }
 
-        expected_contrib_score_data = {
+        expected_contrib_proficiency_data = {
             self.SCORE_CATEGORY_1: {
                 'onboarding_email_sent': False,
                 'score': 1.5
@@ -984,7 +984,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_feedback_email_reply_to_id': expected_reply_to_data,
             'general_voiceover_application':
                 expected_voiceover_application_data,
-            'user_contribution_scoring': expected_contrib_score_data,
+            'user_contribution_proficiency': expected_contrib_proficiency_data,
             'user_contribution_rights': expected_contribution_rights_data,
             'collection_rights_snapshot_metadata':
                 expected_collection_rights_sm,

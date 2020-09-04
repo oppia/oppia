@@ -47,13 +47,13 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('storyEditorPage', {
   template: require('./story-editor-page.component.html'),
   controller: [
-    '$scope', '$uibModal', '$window', 'BottomNavbarStatusService',
+    '$uibModal', '$window', 'BottomNavbarStatusService',
     'EditableStoryBackendApiService',
     'PageTitleService', 'StoryEditorNavigationService',
     'StoryEditorStateService', 'UndoRedoService',
     'UrlInterpolationService', 'UrlService',
     function(
-        $scope, $uibModal, $window, BottomNavbarStatusService,
+        $uibModal, $window, BottomNavbarStatusService,
         EditableStoryBackendApiService,
         PageTitleService, StoryEditorNavigationService,
         StoryEditorStateService, UndoRedoService,
