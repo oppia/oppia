@@ -287,9 +287,6 @@ const main = async function() {
   await getCollectionEditorUrl(browser, page);
   await getTopicEditorUrl(browser, page);
   await getSkillEditorUrl(browser, page);
-  if (storyEditorUrl.includes('story_editor')) {
-    getSkillEditorUrl(browser, page);
-  }
   await process.stdout.write(
     [
       new URL(explorationEditorUrl),
