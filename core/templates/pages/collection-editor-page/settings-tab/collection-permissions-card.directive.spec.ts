@@ -36,8 +36,8 @@ describe('Collection Permissions Card component', () => {
     const mockCollectionEditorStateService = {
       getCollectionRights, hasLoadedCollection
     };
-    $provide.value('CollectionEditorStateService',
-      mockCollectionEditorStateService);
+    $provide.value(
+      'CollectionEditorStateService', mockCollectionEditorStateService);
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
