@@ -38,9 +38,10 @@ module.exports = {
 
   create: function(context) {
     var nodePos = {};
+    var testMessage = '';
 
     var checkMessageStartsWithShould = function(testMessageNode) {
-      if (!testMessageNode.value.startsWith('should ')) {
+      if (!testMessage.startsWith('should ')) {
         context.report({
           testMessageNode,
           loc: testMessageNode.loc,
@@ -50,7 +51,7 @@ module.exports = {
     };
 
     var checkSpacesInMessage = function(testMessageNode) {
-      if (testMessageNode.value.includes('  ')) {
+      if (testMessage.includes('  ')) {
         context.report({
           testMessageNode,
           loc: testMessageNode.loc,
@@ -60,7 +61,7 @@ module.exports = {
     };
 
     var checkNoSpaceAtEndOfMessage = function(testMessageNode) {
-      if (testMessageNode.value.endsWith(' ')) {
+      if (testMessage.endsWith(' ')) {
         context.report({
           testMessageNode,
           loc: testMessageNode.loc,
@@ -70,19 +71,21 @@ module.exports = {
     };
 
     var checkMessage = function(node) {
+      checkMessageStartsWithShould(node);
+      checkNoSpaceAtEndOfMessage(node);
+      checkSpacesInMessage(node);
+    }
+
+    var extractMessage = function(node) {
       if (node.type === 'Literal') {
-        if (node.loc.start.line === nodePos.start.line &&
-            node.loc.start.column === nodePos.start.column) {
-          checkMessageStartsWithShould(node);
-        }
+        testMessage += node.value;
         if (node.loc.end.line === nodePos.end.line &&
             node.loc.end.column === nodePos.end.column) {
-          checkNoSpaceAtEndOfMessage(node);
+          checkMessage(node);
         }
-        checkSpacesInMessage(node);
       } else if (node.type === 'BinaryExpression') {
-        checkMessage(node.left);
-        checkMessage(node.right);
+        extractMessage(node.left);
+        extractMessage(node.right);
       }
     };
 
@@ -91,7 +94,7 @@ module.exports = {
         if (node.callee.name === 'it') {
           const testMessageNode = node.arguments[0];
           nodePos = testMessageNode.loc;
-          checkMessage(testMessageNode);
+          extractMessage(testMessageNode);
         }
       }
     };
