@@ -775,6 +775,9 @@ class BaseMapReduceJobManagerMetaClass(type):
 
             Args:
                 item: *. A single element of the type given by entity_class().
+
+            Yields:
+                *. The values yielded from the class's map static method.
             """
             raw_map_outputs = new_cls.map(item)
             if raw_map_outputs:
@@ -789,14 +792,19 @@ class BaseMapReduceJobManagerMetaClass(type):
                 key: *. A key value as emitted from the map() function, above.
                 values: list(*). A list of all values from all mappers that were
                     tagged with the given key.
+
+            Yields:
+                *. The values yielded from the class's reduce static method.
             """
             raw_reduce_outputs = new_cls.reduce(key, values)
             if raw_reduce_outputs:
                 for raw_output in raw_reduce_outputs:
                     yield _deep_convert_to_bytes(raw_output)
 
-        new_cls._real_map = staticmethod(_real_map)
-        new_cls._real_reduce = staticmethod(_real_reduce)
+        new_cls._real_map = ( # pylint: disable=protected-access
+            staticmethod(_real_map))
+        new_cls._real_reduce = ( # pylint: disable=protected-access
+            staticmethod(_real_reduce))
         return new_cls
 
 
@@ -1151,33 +1159,34 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
         return job_queued_msec >= created_on_msec
 
     @classmethod
-    def _post_completed_hook(cls, job_id):
+    def _post_completed_hook(cls, unused_job_id):
         """A hook or a callback function triggered after marking a job as
         completed.
 
         Args:
-            job_id: str. The unique ID of the job marked as completed.
+            unused_job_id: str. The unique ID of the job marked as completed.
         """
         cls._get_continuous_computation_class().on_batch_job_completion()
 
     @classmethod
-    def _post_cancel_hook(cls, job_id, cancel_message):
+    def _post_cancel_hook(cls, unused_job_id, unused_cancel_message):
         """A hook or a callback function triggered after marking a job as
         cancelled.
 
         Args:
-            job_id: str. The unique ID of the job marked as cancelled.
-            cancel_message: str. The message to be displayed after cancellation.
+            unused_job_id: str. The unique ID of the job marked as cancelled.
+            unused_cancel_message: str. The message to be displayed after
+                cancellation.
         """
         cls._get_continuous_computation_class().on_batch_job_canceled()
 
     @classmethod
-    def _post_failure_hook(cls, job_id):
+    def _post_failure_hook(cls, unused_job_id):
         """A hook or a callback function triggered after marking a job as
         failed.
 
         Args:
-            job_id: str. The unique ID of the job marked as failed.
+            unused_job_id: str. The unique ID of the job marked as failed.
         """
         cls._get_continuous_computation_class().on_batch_job_failure()
 
