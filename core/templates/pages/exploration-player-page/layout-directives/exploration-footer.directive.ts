@@ -31,13 +31,11 @@ angular.module('oppia').directive('explorationFooter', [
       restrict: 'E',
       template: require('./exploration-footer.directive.html'),
       controller: [
-        '$scope', '$http', '$log', 'ContextService',
-        'ExplorationSummaryBackendApiService', 'UrlService',
-        'WindowDimensionsService',
+        '$scope', 'ContextService', 'ExplorationSummaryBackendApiService',
+        'UrlService', 'WindowDimensionsService',
         function(
-            $scope, $http, $log, ContextService,
-            ExplorationSummaryBackendApiService, UrlService,
-            WindowDimensionsService) {
+            $scope, ContextService, ExplorationSummaryBackendApiService,
+            UrlService, WindowDimensionsService) {
           var ctrl = this;
           $scope.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
