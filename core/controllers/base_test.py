@@ -33,6 +33,7 @@ from constants import constants
 from core.controllers import base
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -317,7 +318,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             category='Test', language_code='en')
         rights_manager.assign_role_for_exploration(
             creator, exploration_id, editor_user_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
         self.logout()
         self.login(self.TEST_EDITOR_EMAIL)
         exp_services.update_exploration(
