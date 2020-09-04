@@ -30,8 +30,6 @@ var explorationEditorUrl = 'Exploration editor not loaded';
 var collectionEditorUrl = 'Collection editor not loaded';
 var topicEditorUrl = 'Topic editor not loaded';
 var skillEditorUrl = 'Skill editor not loaded';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-var unusedStoryEditorURL = 'Story editor not loaded';
 
 var usernameInput = '.protractor-test-username-input';
 var agreeToTermsCheckBox = '.protractor-test-agree-to-terms-checkbox';
@@ -242,7 +240,6 @@ const unusedGetStoryEditorUrl = async function(browser, page) {
     await page.waitFor(5000);
     await page.click(confirmStoryCreationButton);
     await page.waitFor(15000);
-    unusedStoryEditorURL = await page.url();
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
