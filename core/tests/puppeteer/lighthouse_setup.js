@@ -242,7 +242,7 @@ const unusedGetStoryEditorUrl = async function(browser, page) {
     await page.waitFor(5000);
     await page.click(confirmStoryCreationButton);
     await page.waitFor(15000);
-    unusedGetStoryEditorUrl = await page.url();
+    unusedStoryEditorURL = await page.url();
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
