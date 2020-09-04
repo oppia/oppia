@@ -17,7 +17,6 @@
  */
 
 require('domain/skill/concept-card-backend-api.service.ts');
-require('domain/skill/ConceptCardObjectFactory.ts');
 require('directives/angular-html-bind.directive.ts');
 require('filters/format-rte-preview.filter.ts');
 
@@ -34,11 +33,9 @@ angular.module('oppia').directive('conceptCard', [
         '/components/concept-card/concept-card.template.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$rootScope',
-        'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
+        '$rootScope', '$scope', 'ConceptCardBackendApiService',
         function(
-            $scope, $filter, $rootScope,
-            ConceptCardBackendApiService, ConceptCardObjectFactory) {
+            $rootScope, $scope, ConceptCardBackendApiService) {
           var ctrl = this;
           ctrl.isLastWorkedExample = function() {
             return ctrl.numberOfWorkedExamplesShown ===

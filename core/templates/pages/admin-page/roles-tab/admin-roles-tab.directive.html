@@ -1,19 +1,19 @@
 <style>
-  .oppia-static-graph path.link {
+  admin-roles-tab .oppia-static-graph path.link {
     fill: none;
     stroke: rgb(179, 179, 179);
     stroke-width: 3px;
   }
-  .oppia-static-graph text {
+  admin-roles-tab .oppia-static-graph text {
     font: 12px sans-serif;
     pointer-events: none;
   }
-  .oppia-static-graph text.shadow {
+  admin-roles-tab .oppia-static-graph text.shadow {
     stroke: #fff;
     stroke-width: 3px;
     stroke-opacity: .8;
   }
-  .oppia-static-graph .node rect {
+  admin-roles-tab .oppia-static-graph .node rect {
     fill: #fff;
     pointer-events: all;
     stroke: rgb(0, 0, 0);
@@ -22,9 +22,12 @@
     -o-transition: all 0.15s;
     transition: all 0.15s;
   }
+  admin-roles-tab .oppia-graph-container {
+    height: <[$ctrl.getGraphHeightInPixels()]>px;
+  }
 </style>
 
-<div style="height: <[$ctrl.getGraphHeightInPixels()]>px;">
+<div class="oppia-graph-container">
 
   <svg class="oppia-static-graph" width="100%" height="100%">
     <g>
