@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Angular services barrel file.
+ * @fileoverview Angular services index file.
  */
 
 /* eslint-disable max-len */
