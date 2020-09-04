@@ -216,7 +216,6 @@ const getTopicEditorUrl = async function(browser, page) {
   }
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getStoryEditorUrl = async function(browser, page) {
   try {
     // eslint-disable-next-line dot-notation
