@@ -101,7 +101,7 @@ def _get_requirements_file_contents():
 
 def _get_third_party_python_libs_directory_contents():
     """Returns a dictionary containing all of the normalized libraries name
-    strings  with their corresponding version strings installed in the
+    strings with their corresponding version strings installed in the
     'third_party/python_libs' directory.
 
     Returns:
@@ -125,7 +125,7 @@ def _get_third_party_python_libs_directory_contents():
     return directory_contents
 
 
-def _remove_metadata(normalized_library_name, version_string):
+def _remove_metadata(library_name, version_string):
     """Removes the residual metadata files pertaining to a specific library that
     was reinstalled with a new version. The reason we need this function is
     because `pip install --upgrade` upgrades libraries to a new version but
@@ -135,14 +135,13 @@ def _remove_metadata(normalized_library_name, version_string):
     this installation script to behave incorrectly.
 
     Args:
-        normalized_library_name: str. Name of the library to remove the metadata
-            for. Must be normalized by _normalize_python_library_name().
+        library_name: str. Name of the library to remove the metadata for.
         version_string: str. Stringified version of the library to remove the
             metadata for.
     """
     possible_normalized_directory_names = (
         _get_possible_normalized_metadata_directory_names(
-            normalized_library_name, version_string))
+            library_name, version_string))
     normalized_directory_names = [
         _normalize_directory_name(name)
         for name in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR)
