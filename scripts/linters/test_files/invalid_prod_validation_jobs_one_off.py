@@ -56,7 +56,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
 }
 
 
-class ProdValidationAuditOneOffJobMetaClass(type):
+class ProdValidationAuditOneOffJobMetaClass(
+        jobs.BaseMapReduceJobManagerMetaClass):
     _MODEL_AUDIT_ONE_OFF_JOB_NAMES = set()
 
 
