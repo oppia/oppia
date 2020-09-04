@@ -46,16 +46,12 @@ var AdminPage = function() {
   var assignReviewerForm = element(
     by.css('.protractor-test-assign-reviewer-form'));
   var viewReviewerForm = element(by.css('.protractor-test-view-reviewer-form'));
-  var removeReviewerForm = element(by.css(
-    '.protractor-test-remove-reviewer-form'));
   var languageSelectCss = by.css('.protractor-test-form-language-select');
   var reviewerUsernameCss = by.css('.protractor-test-form-reviewer-username');
   var reviewCategorySelectCss = by.css(
     '.protractor-test-form-review-category-select');
   var reviewerFormSubmitButtonCss = by.css(
     '.protractor-test-reviewer-form-submit-button');
-  var userReviewRightsTable = by.css(
-    '.protractor-test-user-review-rights-table');
   var userTranslationReviewerLanguageCss = by.css(
     '.protractor-test-translation-reviewer-language');
   var userVoiceoverReviewerLanguageCss = by.css(
@@ -138,10 +134,6 @@ var AdminPage = function() {
   if (general.isInDevMode()) {
     var explorationElements = element.all(by.css(
       '.protractor-test-reload-exploration-row'
-    ));
-
-    var reloadAllExplorationsButtons = element.all(by.css(
-      '.protractor-test-reload-all-explorations-button'
     ));
 
     var reloadCollectionButtons = element.all(by.css(

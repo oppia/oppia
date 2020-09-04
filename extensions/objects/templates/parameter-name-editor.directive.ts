@@ -30,8 +30,8 @@ angular.module('oppia').directive('parameterNameEditor', [
       template: require('./parameter-name-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'ExplorationParamSpecsService',
-        function($scope, $attrs, ExplorationParamSpecsService) {
+        '$scope', 'ExplorationParamSpecsService',
+        function($scope, ExplorationParamSpecsService) {
           var ctrl = this;
           ctrl.validate = function() {
             return (ctrl.availableParamNames.length === 0) ? false : true;

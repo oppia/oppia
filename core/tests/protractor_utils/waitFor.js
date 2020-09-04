@@ -125,8 +125,6 @@ var elementAttributeToBe = async function(
 * Wait for new tab is opened
 */
 var newTabToBeCreated = async function(errorMessage, urlToMatch) {
-  var currentHandles = [];
-
   await browser.wait(async function() {
     var handles = await browser.driver.getAllWindowHandles();
     await browser.waitForAngularEnabled(false);
