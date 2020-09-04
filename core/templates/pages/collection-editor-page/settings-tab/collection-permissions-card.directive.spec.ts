@@ -66,7 +66,7 @@ describe('Upgraded component', () => {
       'collectionPermissionsCard',
       [CollectionPermissionsCard]
     ).then(
-      textContext => expect(textContext).toBe('Hello, Angular!')
+      textContext => expect(textContext).toBe('Hello Oppia!')
     );
   }));
 });

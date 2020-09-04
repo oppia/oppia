@@ -100,7 +100,7 @@ export const bootstrap = (
  * A utility function to get coverage of the upgraded component class.
  * @param {string} kebabCaseName - Name of the upgraded component in kebab-case.
  * @param {string} camelCaseName - Name of the upgraded component in camelCase.
- * @param {unkownn} upgradedComponentTypes - An array consisting of only
+ * @param {unknown} upgradedComponentTypes - An array consisting of only
  *   one element. That element is the type of the upgraded component.
  * @param {boolean} focus - To run this test in fdescribe.
  */
@@ -114,7 +114,10 @@ export const setupAndGetUpgradedComponent = (
     template: template
   })
   class MockComponent {}
-  const ng1Component = {template: 'Hello, Angular!'};
+  // The template in the next line is what is rendered. The text of the rendered
+  // component should contain "Hello Oppia!". This text context is return
+  // value.
+  const ng1Component = {template: 'Hello Oppia!'};
   const ng1Module = angular.module('ng1Module', [])
     .component(camelCaseName, ng1Component)
     .directive('mockComp', downgradeComponent({component: MockComponent}));
