@@ -33,7 +33,7 @@ angular.module('oppia').component('opportunitiesListItem', {
   },
   template: require('./opportunities-list-item.component.html'),
   controller: [
-    '$scope', function($scope) {
+    function() {
       var ctrl = this;
       ctrl.$onInit = function() {
         ctrl.opportunityDataIsLoading = false;

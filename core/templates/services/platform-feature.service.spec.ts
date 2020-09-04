@@ -41,7 +41,6 @@ describe('PlatformFeatureService', () => {
 
   let mockSessionStore: (obj: object) => void;
   let mockCookie: (cookieStr: string) => void;
-  let mockUserAgent: (ua: string) => void;
   let mockPathName: (pathName: string) => void;
 
   let apiSpy: jasmine.Spy;

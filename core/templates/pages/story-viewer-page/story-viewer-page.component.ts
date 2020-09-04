@@ -44,12 +44,12 @@ angular.module('oppia').component('storyViewerPage', {
   template: require('./story-viewer-page.component.html'),
   controller: [
     '$rootScope', 'AlertsService', 'AssetsBackendApiService',
-    'PageTitleService', 'LoaderService', 'StoryViewerBackendApiService',
+    'LoaderService', 'PageTitleService', 'StoryViewerBackendApiService',
     'UrlInterpolationService', 'UrlService', 'ENTITY_TYPE',
     'FATAL_ERROR_CODES',
     function(
         $rootScope, AlertsService, AssetsBackendApiService,
-        PageTitleService, LoaderService, StoryViewerBackendApiService,
+        LoaderService, PageTitleService, StoryViewerBackendApiService,
         UrlInterpolationService, UrlService, ENTITY_TYPE,
         FATAL_ERROR_CODES) {
       var ctrl = this;

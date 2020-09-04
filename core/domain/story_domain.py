@@ -126,38 +126,46 @@ class StoryChange(change_domain.BaseChange):
         'name': CMD_UPDATE_STORY_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': STORY_PROPERTIES}
     }, {
         'name': CMD_UPDATE_STORY_NODE_PROPERTY,
         'required_attribute_names': [
             'node_id', 'property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': STORY_NODE_PROPERTIES}
     }, {
         'name': CMD_UPDATE_STORY_CONTENTS_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': STORY_CONTENTS_PROPERTIES}
     }, {
         'name': CMD_ADD_STORY_NODE,
         'required_attribute_names': ['node_id', 'title'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_DELETE_STORY_NODE,
         'required_attribute_names': ['node_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
         'required_attribute_names': ['node_id', 'old_value', 'new_value'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_CREATE_NEW,
         'required_attribute_names': ['title'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
 

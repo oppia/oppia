@@ -22,6 +22,7 @@ import logging
 from constants import constants
 from core.domain import question_domain
 from core.domain import question_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
@@ -232,11 +233,11 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         user_1_actions = user_services.UserActionsInfo(self.user_1_id)
         self.save_new_valid_exploration('exp_id', self.user_1_id)
         rights_manager.assign_role_for_exploration(
-            user_1_actions, 'exp_id', self.user_2_id, rights_manager.ROLE_OWNER)
+            user_1_actions, 'exp_id', self.user_2_id, rights_domain.ROLE_OWNER)
         self.save_new_valid_collection(
             'col_id', self.user_1_id, exploration_id='exp_id')
         rights_manager.assign_role_for_collection(
-            user_1_actions, 'col_id', self.user_2_id, rights_manager.ROLE_OWNER)
+            user_1_actions, 'col_id', self.user_2_id, rights_domain.ROLE_OWNER)
 
         wipeout_service.pre_delete_user(self.user_1_id)
 

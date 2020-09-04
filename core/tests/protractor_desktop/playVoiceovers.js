@@ -23,14 +23,11 @@ var workflow = require('../protractor_utils/workflow.js');
 
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
-var CreatorDashboardPage = require(
-  '../protractor_utils/CreatorDashboardPage.js');
 var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Voiceover player', function() {
-  var creatorDashboardPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorTranslationTab = null;
@@ -39,7 +36,6 @@ describe('Voiceover player', function() {
   var libraryPage = null;
 
   beforeAll(async function() {
-    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorTranslationTab = (

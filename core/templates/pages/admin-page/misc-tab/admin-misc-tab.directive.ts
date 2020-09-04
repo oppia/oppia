@@ -40,7 +40,7 @@ angular.module('oppia').directive('adminMiscTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin-page/misc-tab/admin-misc-tab.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$scope', function($scope) {
+      controller: [function() {
         var ctrl = this;
         var DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
@@ -209,8 +209,6 @@ angular.module('oppia').directive('adminMiscTab', [
         ctrl.submitQuery = function() {
           var STATUS_PENDING = (
             'Data extraction query has been submitted. Please wait.');
-          var STATUS_FINISHED = 'Loading the extracted data ...';
-          var STATUS_FAILED = 'Error, ';
 
           setDataExtractionQueryStatusMessage(STATUS_PENDING);
 

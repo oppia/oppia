@@ -57,9 +57,6 @@ require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/skill-editor-page/services/question-creation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/contextual/url.service.ts');
@@ -93,33 +90,23 @@ angular.module('oppia').directive('questionsList', [
         'questions-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
-        '$location', 'AlertsService', 'ContextService',
-        'EditableQuestionBackendApiService', 'ImageLocalStorageService',
-        'MisconceptionObjectFactory', 'QuestionCreationService',
-        'QuestionObjectFactory', 'QuestionsListService',
+        '$location', '$timeout', '$uibModal', 'AlertsService',
+        'ContextService', 'EditableQuestionBackendApiService',
+        'ImageLocalStorageService', 'MisconceptionObjectFactory',
+        'QuestionCreationService', 'QuestionObjectFactory',
         'QuestionUndoRedoService', 'QuestionValidationService',
-        'SkillBackendApiService',
-        'SkillDifficultyObjectFactory', 'ShortSkillSummaryObjectFactory',
-        'StateEditorService', 'UndoRedoService',
-        'WindowDimensionsService',
-        'UrlService', 'DEFAULT_SKILL_DIFFICULTY',
-        'MODE_SELECT_DIFFICULTY',
-        'MODE_SELECT_SKILL', 'NUM_QUESTIONS_PER_PAGE',
+        'QuestionsListService', 'ShortSkillSummaryObjectFactory',
+        'SkillBackendApiService', 'SkillDifficultyObjectFactory',
+        'WindowDimensionsService', 'NUM_QUESTIONS_PER_PAGE',
         function(
-            $scope, $filter, $http, $q, $timeout, $uibModal, $window,
-            $location, AlertsService, ContextService,
-            EditableQuestionBackendApiService, ImageLocalStorageService,
-            MisconceptionObjectFactory, QuestionCreationService,
-            QuestionObjectFactory, QuestionsListService,
+            $location, $timeout, $uibModal, AlertsService,
+            ContextService, EditableQuestionBackendApiService,
+            ImageLocalStorageService, MisconceptionObjectFactory,
+            QuestionCreationService, QuestionObjectFactory,
             QuestionUndoRedoService, QuestionValidationService,
-            SkillBackendApiService,
-            SkillDifficultyObjectFactory, ShortSkillSummaryObjectFactory,
-            StateEditorService, UndoRedoService,
-            WindowDimensionsService,
-            UrlService, DEFAULT_SKILL_DIFFICULTY,
-            MODE_SELECT_DIFFICULTY,
-            MODE_SELECT_SKILL, NUM_QUESTIONS_PER_PAGE) {
+            QuestionsListService, ShortSkillSummaryObjectFactory,
+            SkillBackendApiService, SkillDifficultyObjectFactory,
+            WindowDimensionsService, NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _reInitializeSelectedSkillIds = function() {
@@ -266,11 +253,9 @@ angular.module('oppia').directive('questionsList', [
 
           ctrl.createQuestion = function() {
             ctrl.newQuestionSkillIds = [];
-            var currentMode = MODE_SELECT_SKILL;
             ctrl.skillIdToRubricsObject = ctrl.getSkillIdToRubricsObject();
             if (!ctrl.selectSkillModalIsShown()) {
               ctrl.newQuestionSkillIds = ctrl.skillIds;
-              currentMode = MODE_SELECT_DIFFICULTY;
             } else {
               ctrl.newQuestionSkillIds = [ctrl.getSelectedSkillId()];
             }
@@ -355,11 +340,9 @@ angular.module('oppia').directive('questionsList', [
               return;
             }
             ctrl.newQuestionSkillIds = [];
-            var currentMode = MODE_SELECT_SKILL;
             ctrl.skillIdToRubricsObject = ctrl.getSkillIdToRubricsObject();
             if (!ctrl.selectSkillModalIsShown()) {
               ctrl.newQuestionSkillIds = ctrl.skillIds;
-              currentMode = MODE_SELECT_DIFFICULTY;
             } else {
               ctrl.newQuestionSkillIds = [ctrl.getSelectedSkillId()];
             }
@@ -417,7 +400,6 @@ angular.module('oppia').directive('questionsList', [
               return;
             }
             _reInitializeSelectedSkillIds();
-            var skillId = null;
             // For the case when, it is in the skill editor.
             if (ctrl.getAllSkillSummaries().length === 0) {
               EditableQuestionBackendApiService.editQuestionSkillLinks(
