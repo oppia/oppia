@@ -106,7 +106,6 @@ angular.module('oppia').factory('ImageUploadHelperService', [
         // We need to modify/remove unnecessary attributes added by mathjax
         // from the svg tag.
         var domParser = new DOMParser();
-        var cleanedSvgString = '';
         var doc = domParser.parseFromString(svgString, 'image/svg+xml');
         doc.querySelectorAll('*').forEach((node) => {
           if (node.tagName.toLowerCase() === 'svg') {
@@ -168,7 +167,6 @@ angular.module('oppia').factory('ImageUploadHelperService', [
 
       generateMathExpressionImageFilename: function(
           height, width, verticalPadding) {
-        var date = new Date();
         var filename = (
           'mathImg_' +
             _generateDateTimeStringForFilename() +

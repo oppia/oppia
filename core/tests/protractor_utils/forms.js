@@ -20,7 +20,6 @@
 // Note: Instantiating some of the editors, e.g. RichTextEditor, occurs
 // asynchronously and so must be prefixed by "await".
 
-var interactions = require('../../../extensions/interactions/protractor.js');
 var richTextComponents = require(
   '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
@@ -372,8 +371,6 @@ var MultiSelectEditor = function(elem) {
     await elem.element(by.css(
       '.protractor-test-search-bar-dropdown-toggle')).click();
 
-    var allElements = elem.all(
-      by.css('.protractor-test-search-bar-dropdown-menu span'));
     var filteredElementsCount = 0;
     for (var i = 0; i < texts.length; i++) {
       var filteredElement = elem.element(

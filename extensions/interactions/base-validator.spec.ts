@@ -39,10 +39,10 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 describe('Interaction validator', function() {
-  var scope, filter, bivs, WARNING_TYPES, agof;
+  var bivs, WARNING_TYPES, agof;
 
   var currentState, otherState, goodOutcomeDest, goodOutcomeFeedback;
-  var badOutcome, goodAnswerGroups, goodDefaultOutcome;
+  var badOutcome, goodAnswerGroups;
   var agof, oof;
 
   beforeEach(function() {
@@ -71,8 +71,6 @@ describe('Interaction validator', function() {
   }));
 
   beforeEach(angular.mock.inject(function($injector, $rootScope) {
-    scope = $rootScope.$new();
-    filter = $injector.get('$filter');
     bivs = $injector.get('baseInteractionValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     agof = $injector.get('AnswerGroupObjectFactory');
@@ -118,7 +116,6 @@ describe('Interaction validator', function() {
       agof.createNew([], goodOutcomeDest, false, null),
       agof.createNew([], goodOutcomeFeedback, false, null)
     ];
-    goodDefaultOutcome = goodOutcomeDest;
   }));
 
   describe('baseValidator', function() {
