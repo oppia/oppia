@@ -52,12 +52,12 @@ angular.module('oppia').component('contributionsAndReview', {
     '$filter', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'MisconceptionObjectFactory',
     'QuestionObjectFactory', 'SkillBackendApiService',
-    'UrlInterpolationService', 'UserService', 'ENTITY_TYPE', 'IMAGE_CONTEXT',
+    'UrlInterpolationService', 'UserService', 'IMAGE_CONTEXT',
     function(
         $filter, $uibModal, AlertsService, ContextService,
         ContributionAndReviewService, MisconceptionObjectFactory,
         QuestionObjectFactory, SkillBackendApiService,
-        UrlInterpolationService, UserService, ENTITY_TYPE, IMAGE_CONTEXT) {
+        UrlInterpolationService, UserService, IMAGE_CONTEXT) {
       var ctrl = this;
       var SUGGESTION_LABELS = {
         review: {
