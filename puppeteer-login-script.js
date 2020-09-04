@@ -25,8 +25,6 @@ module.exports = async(browser, context) => {
   // Sign into Oppia.
   if (context.url.includes('admin')) {
     await login(context, page);
-  } else if (context.url.includes('emaildashboard')) {
-    await setRoleAdmin(context, page);
   } else if (context.url.includes('collection/0')) {
     await createCollections(context, page);
   } else if (context.url.includes('explore/0')) {
@@ -35,7 +33,7 @@ module.exports = async(browser, context) => {
   await page.close();
 };
 
-
+// Needed to relogin after lighthouse_setup.js.
 const login = async function(context, page) {
   try {
     // eslint-disable-next-line no-console
@@ -51,41 +49,8 @@ const login = async function(context, page) {
     await page.waitForSelector('#signup-submit');
     await page.click('#signup-submit');
     await page.waitForSelector('.oppia-navbar-dropdown-toggle');
-    // eslint-disable-next-line no-console
-    console.log('Successfully Logged in');
   } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('Login Failed');
-    // eslint-disable-next-line no-console
-    console.log(e);
-  }
-};
-
-
-const setRoleAdmin = async function(context, page) {
-  try {
-    // eslint-disable-next-line no-console
-    console.log('Changing role to admin...');
-    // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin#/roles', { waitUntil: 'networkidle0' });
-    await page.waitForSelector('#update-role-username-input');
-    await page.type('#update-role-username-input', 'username1');
-    await page.select('#update-role-input', 'string:ADMIN');
-    await page.waitForSelector('#update-button-id');
-    await page.click('#update-button-id');
-    await page.waitForSelector('.protractor-test-status-message');
-    await page.waitForFunction(
-      'document.querySelector(' +
-        '".protractor-test-status-message").innerText.includes(' +
-        '"successfully updated to")'
-    );
-    // eslint-disable-next-line no-console
-    console.log('Role changed to admin');
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('Changing role to admin failed');
-    // eslint-disable-next-line no-console
-    console.log(e);
+    // Already Signed in.
   }
 };
 
