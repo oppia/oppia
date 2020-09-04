@@ -853,7 +853,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             node.expression.right.arguments[1].properties
                             if filepath.endswith('app.constants.ts') else
                             node.expression.right.properties)
-                    except Exception:
+                    except (AttributeError, IndexError, TypeError):
                         continue
 
                 for angular_constant_node in angular_constants_nodes:
