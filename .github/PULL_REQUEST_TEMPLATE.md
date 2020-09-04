@@ -21,5 +21,5 @@ If there is no corresponding issue number, fill in N/A where it says [fill_in_nu
 - Oppiabot will notify you when you don't add a PR_CHANGELOG label. If you are unable to do so, please @-mention a code owner (who will be in the Reviewers list), or ask on [Gitter](https://gitter.im/oppia/oppia-chat).
 - For what code owners will expect, see the [Code Owner's wiki page](https://github.com/oppia/oppia/wiki/Oppia%27s-code-owners-and-checks-to-be-carried-out-by-developers).
 - Make sure your PR follows conventions in the [style guide](https://github.com/oppia/oppia/wiki/Coding-style-guide), otherwise this will lead to review delays.
-- Follow the instructions for making [making a code change](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change).
+- Make sure to follow the instructions for [making a code change](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change).
 - Never force push. If you do, your PR will be closed.
