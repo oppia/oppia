@@ -90,6 +90,11 @@ VALID_IGNORED_SERVICE_PATH = os.path.join(
 VALID_UNLISTED_SERVICE_PATH = os.path.join(
     LINTER_TESTS_DIR, 'valid_unlisted.service.ts')
 
+# Note: Almost all test functions have a subprocess call. This call is to mock
+# the compile function used in js_ts_linter. The tests require fewer files to
+# be compiled instead of all files as done in js_ts_linter. Mocking the
+# compile method reduces the compile time as fewer files are compiled
+# thereby making the tests run faster.
 
 class JsTsLintTests(test_utils.LinterTestBase):
     """Tests for js_ts_linter file."""
