@@ -749,10 +749,15 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
     skill = apply_change_list(skill_id, change_list, committer_id)
     _save_skill(committer_id, skill, commit_message, change_list)
     create_skill_summary(skill.id)
-    taskqueue_services.defer(
-        question_services.untag_deleted_misconceptions,
-        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
-        committer_id, skill_id, skill.description)
+    misconception_is_deleted = any([
+        change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION
+        for change in change_list
+    ])
+    if misconception_is_deleted:
+        taskqueue_services.defer(
+            question_services.untag_deleted_misconceptions,
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+            committer_id, skill_id, skill.description)
 
 
 def delete_skill(committer_id, skill_id, force_deletion=False):
