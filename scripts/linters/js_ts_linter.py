@@ -51,9 +51,10 @@ TS_IGNORE_EXCEPTIONS_FILEPATH = os.path.join(
 TS_IGNORE_EXCEPTIONS = json.load(python_utils.open_file(
     TS_IGNORE_EXCEPTIONS_FILEPATH, 'r'))
 
+# Don't add anymore files to this list.
 INJECTABLES_TO_IGNORE = [
     'MockIgnoredService', # This file is required for the js-ts-linter-test.
-    'UpgradedServices'
+    'UpgradedServices' # We don't want this service to be present in the index.
 ]
 
 
