@@ -160,50 +160,46 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.invalidExpErrorIsShown = false;
           };
           $scope.updateTitle = function(newTitle) {
-            if (newTitle === $scope.currentTitle) {
-              return;
-            }
-            var titleIsValid = true;
-            for (var idx in $scope.story.getStoryContents().getNodes()) {
-              var node = $scope.story.getStoryContents().getNodes()[idx];
-              if (node.getTitle() === newTitle) {
-                titleIsValid = false;
-                AlertsService.addInfoMessage(
-                  'A chapter already exists with given title.', 5000);
+            if (newTitle !== $scope.currentTitle) {
+              var titleIsValid = true;
+              for (var idx in $scope.story.getStoryContents().getNodes()) {
+                var node = $scope.story.getStoryContents().getNodes()[idx];
+                if (node.getTitle() === newTitle) {
+                  titleIsValid = false;
+                  AlertsService.addInfoMessage(
+                    'A chapter already exists with given title.', 5000);
+                }
               }
-            }
-            if (titleIsValid) {
-              StoryUpdateService.setStoryNodeTitle(
-                $scope.story, $scope.getId(), newTitle);
-              $scope.currentTitle = newTitle;
+              if (titleIsValid) {
+                StoryUpdateService.setStoryNodeTitle(
+                  $scope.story, $scope.getId(), newTitle);
+                $scope.currentTitle = newTitle;
+              }
             }
           };
 
           $scope.updateDescription = function(newDescription) {
-            if (newDescription === $scope.currentDescription) {
-              return;
+            if (newDescription !== $scope.currentDescription) {
+              StoryUpdateService.setStoryNodeDescription(
+                $scope.story, $scope.getId(), newDescription);
+              $scope.currentDescription = newDescription;
             }
-            StoryUpdateService.setStoryNodeDescription(
-              $scope.story, $scope.getId(), newDescription);
-            $scope.currentDescription = newDescription;
           };
 
           $scope.updateThumbnailFilename = function(newThumbnailFilename) {
-            if (newThumbnailFilename === $scope.editableThumbnailFilename) {
-              return;
+            if (newThumbnailFilename !== $scope.editableThumbnailFilename) {
+              StoryUpdateService.setStoryNodeThumbnailFilename(
+                $scope.story, $scope.getId(), newThumbnailFilename);
+              $scope.editableThumbnailFilename = newThumbnailFilename;
             }
-            StoryUpdateService.setStoryNodeThumbnailFilename(
-              $scope.story, $scope.getId(), newThumbnailFilename);
-            $scope.editableThumbnailFilename = newThumbnailFilename;
           };
 
           $scope.updateThumbnailBgColor = function(newThumbnailBgColor) {
-            if (newThumbnailBgColor === $scope.editableThumbnailBgColor) {
-              return;
+            if (newThumbnailBgColor !== $scope.editableThumbnailBgColor) {
+              StoryUpdateService.setStoryNodeThumbnailBgColor(
+                $scope.story, $scope.getId(), newThumbnailBgColor);
+              $scope.editableThumbnailBgColor = newThumbnailBgColor;
             }
-            StoryUpdateService.setStoryNodeThumbnailBgColor(
-              $scope.story, $scope.getId(), newThumbnailBgColor);
-            $scope.editableThumbnailBgColor = newThumbnailBgColor;
           };
 
           $scope.viewNodeEditor = function(nodeId) {
@@ -351,12 +347,11 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.updateOutline = function(newOutline) {
-            if (!$scope.isOutlineModified(newOutline)) {
-              return;
+            if ($scope.isOutlineModified(newOutline)) {
+              StoryUpdateService.setStoryNodeOutline(
+                $scope.story, $scope.getId(), newOutline);
+              $scope.oldOutline = newOutline;
             }
-            StoryUpdateService.setStoryNodeOutline(
-              $scope.story, $scope.getId(), newOutline);
-            $scope.oldOutline = newOutline;
           };
 
           $scope.togglePreview = function() {
@@ -365,34 +360,30 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.togglePrerequisiteSkillsList = function() {
-            if (!WindowDimensionsService.isWindowNarrow()) {
-              return;
+            if (WindowDimensionsService.isWindowNarrow()) {
+              $scope.prerequisiteSkillIsShown =
+                  !$scope.prerequisiteSkillIsShown;
             }
-            $scope.prerequisiteSkillIsShown = !$scope.prerequisiteSkillIsShown;
           };
           $scope.toggleChapterOutline = function() {
-            if (!WindowDimensionsService.isWindowNarrow()) {
-              return;
+            if (WindowDimensionsService.isWindowNarrow()) {
+              $scope.chapterOutlineIsShown = !$scope.chapterOutlineIsShown;
             }
-            $scope.chapterOutlineIsShown = !$scope.chapterOutlineIsShown;
           };
           $scope.toggleAcquiredSkillsList = function() {
-            if (!WindowDimensionsService.isWindowNarrow()) {
-              return;
+            if (WindowDimensionsService.isWindowNarrow()) {
+              $scope.acquiredSkillIsShown = !$scope.acquiredSkillIsShown;
             }
-            $scope.acquiredSkillIsShown = !$scope.acquiredSkillIsShown;
           };
           $scope.toggleChapterCard = function() {
-            if (!WindowDimensionsService.isWindowNarrow()) {
-              return;
+            if (WindowDimensionsService.isWindowNarrow()) {
+              $scope.mainChapterCardIsShown = !$scope.mainChapterCardIsShown;
             }
-            $scope.mainChapterCardIsShown = !$scope.mainChapterCardIsShown;
           };
           $scope.toggleChapterTodoCard = function() {
-            if (!WindowDimensionsService.isWindowNarrow()) {
-              return;
+            if (WindowDimensionsService.isWindowNarrow()) {
+              $scope.chapterTodoCardIsShown = !$scope.chapterTodoCardIsShown;
             }
-            $scope.chapterTodoCardIsShown = !$scope.chapterTodoCardIsShown;
           };
           $scope.toggleExplorationInputButtons = function() {
             $scope.explorationInputButtonsAreShown = (
