@@ -37,7 +37,6 @@ require('services/csrf-token.service.ts');
 describe('Assets Backend API Service', function() {
   describe('on dev mode', function() {
     var AssetsBackendApiService = null;
-    var fileDownloadRequestObjectFactory = null;
     var UrlInterpolationService = null;
     var audioFileObjectFactory = null;
     var imageFileObjectFactory = null;
@@ -67,8 +66,6 @@ describe('Assets Backend API Service', function() {
     beforeEach(angular.mock.inject(function($injector) {
       AssetsBackendApiService = $injector.get(
         'AssetsBackendApiService');
-      fileDownloadRequestObjectFactory = $injector.get(
-        'FileDownloadRequestObjectFactory');
       audioFileObjectFactory = $injector.get('AudioFileObjectFactory');
       imageFileObjectFactory = $injector.get('ImageFileObjectFactory');
       UrlInterpolationService = $injector.get(
@@ -504,7 +501,7 @@ describe('Assets Backend API Service', function() {
       ' Service bucket name is not set', angular.mock.inject(
       function($injector) {
         expect(function() {
-          var service = $injector.get(
+          $injector.get(
             'AssetsBackendApiService');
         }).toThrowError('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
       }));

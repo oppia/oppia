@@ -43,10 +43,6 @@ var LearnerDashboardPage = function() {
     element(by.css('.protractor-test-subscriptions-section'));
   var subscriptionName =
     element.all(by.css('.protractor-test-subscription-name'));
-  var titleOfExplorationSummaryTile =
-    element.all(by.css('.protractor-test-exp-summary-tile-title'));
-  var titleOfCollectionSummaryTile =
-    element.all(by.css('.protractor-test-collection-summary-tile-title'));
   var feedbackExplorationTitle =
     element.all(by.css('.protractor-test-feedback-exploration'));
   var feedbackMessage =

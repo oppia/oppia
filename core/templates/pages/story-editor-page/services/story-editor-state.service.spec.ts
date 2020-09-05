@@ -41,7 +41,6 @@ describe('Story editor state service', function() {
   var fakeEditableStoryBackendApiService = null;
   var secondBackendStoryObject = null;
   var $rootScope = null;
-  var $scope = null;
   var $q = null;
   var testSubscriptions: Subscription;
 
@@ -137,7 +136,6 @@ describe('Story editor state service', function() {
     StoryUpdateService = $injector.get('StoryUpdateService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
 
     fakeEditableStoryBackendApiService.newBackendStoryObject = {
       id: 'storyId_0',
@@ -320,7 +318,6 @@ describe('Story editor state service', function() {
     $rootScope.$apply();
 
     var expectedId = 'storyId_0';
-    var expectedTopicId = 'topicId_1';
     var expectedVersion = '1';
     var expectedCommitMessage = 'Commit message';
     var updateStorySpy = (

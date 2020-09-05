@@ -57,7 +57,6 @@ describe('ExplorationImprovementsService', function() {
   let $uibModal;
   let changeListService;
   let explorationStatesService;
-  let playthroughIssuesService;
   let explorationRightsService;
 
   let explorationImprovementsTaskRegistryService:
@@ -171,7 +170,6 @@ describe('ExplorationImprovementsService', function() {
       $injector.get('PlaythroughIssuesBackendApiService'));
     highBounceRateTaskObjectFactory = (
       $injector.get('HighBounceRateTaskObjectFactory'));
-    playthroughIssuesService = $injector.get('PlaythroughIssuesService');
     playthroughObjectFactory = $injector.get('PlaythroughObjectFactory');
     stateTopAnswersStatsService = $injector.get('StateTopAnswersStatsService');
     userExplorationPermissionsService = (

@@ -21,7 +21,6 @@ var general = require('../protractor_utils/general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
-var waitFor = require('../protractor_utils/waitFor.js');
 
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');

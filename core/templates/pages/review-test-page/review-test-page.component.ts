@@ -40,11 +40,11 @@ angular.module('oppia').component('reviewTestPage', {
   controller: [
     'PageTitleService', 'ReviewTestEngineService', 'UrlInterpolationService',
     'UrlService', 'QUESTION_PLAYER_MODE', 'REVIEW_TESTS_URL',
-    'REVIEW_TEST_DATA_URL', 'STORY_VIEWER_PAGE',
+    'STORY_VIEWER_PAGE',
     function(
         PageTitleService, ReviewTestEngineService, UrlInterpolationService,
         UrlService, QUESTION_PLAYER_MODE, REVIEW_TESTS_URL,
-        REVIEW_TEST_DATA_URL, STORY_VIEWER_PAGE
+        STORY_VIEWER_PAGE
     ) {
       var ctrl = this;
 
@@ -58,12 +58,6 @@ angular.module('oppia').component('reviewTestPage', {
           UrlService.getStoryUrlFragmentFromLearnerUrl());
         var classroomUrlFragment = (
           UrlService.getClassroomUrlFragmentFromLearnerUrl());
-        var reviewTestsDataUrl = UrlInterpolationService.interpolateUrl(
-          REVIEW_TEST_DATA_URL, {
-            topic_url_fragment: topicUrlFragment,
-            classroom_url_fragment: classroomUrlFragment,
-            story_url_fragment: storyUrlFragment
-          });
         var reviewTestsUrl = UrlInterpolationService.interpolateUrl(
           REVIEW_TESTS_URL, {
             topic_url_fragment: topicUrlFragment,
