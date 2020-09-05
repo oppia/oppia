@@ -58,7 +58,6 @@ describe('Customize Interaction Modal Controller', function() {
   var stateEditorService = null;
   var stateInteractionIdService = null;
   var stateNextContentIdIndexService = null;
-  const showMarkAllAudioAsNeedingUpdateModalIfRequired = () => {};
   var testSubscriptions: Subscription;
   const schemaBasedFormsSpy = jasmine.createSpy(
     'schemaBasedFormsSpy');

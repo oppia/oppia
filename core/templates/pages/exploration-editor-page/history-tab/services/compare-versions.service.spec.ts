@@ -63,7 +63,6 @@ describe('Compare versions service', function() {
   describe('compare versions service', function() {
     var cvs = null;
     let vts: VersionTreeService = null;
-    var treeParents = null;
     var $httpBackend = null;
     var mockExplorationData = null;
 

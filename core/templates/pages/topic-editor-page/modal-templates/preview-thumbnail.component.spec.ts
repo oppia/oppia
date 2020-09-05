@@ -28,17 +28,9 @@ describe('Preview Thumbnail Directive', function() {
       $provide.value(key, value);
     }
   }));
-  var $scope = null;
   var ctrl = null;
-  var $rootScope = null;
-  var ContextService = null;
-  var ImageUploadHelperService = null;
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    ContextService = $injector.get('ContextService');
-    ImageUploadHelperService = $injector.get('ImageUploadHelperService');
     var MockContextSerivce = {
       getEntityType: () => 'topic',
       getEntityId: () => '1'
