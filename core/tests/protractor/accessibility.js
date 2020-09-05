@@ -25,7 +25,7 @@ var workflow = require('../protractor_utils/workflow.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 const { browser } = require('protractor');
 
-var backButton = element(by.css('#backButtonId'));
+var backButton = element(by.css('.protractor-test-back-button'));
 var categoryBar = element(by.css(
   '.protractor-test-search-bar-dropdown-toggle'));
 var continueButton = element(by.css('.protractor-test-continue-button'));
@@ -74,8 +74,6 @@ describe('screenreader and keyboard user accessibility features', function() {
 
   var checkActionShortcuts = async function(key, elementToFocus) {
     await waitFor.presenceOf(elementToFocus, 'Element took too long to load');
-
-    if (await elementToFocus.getAttribute('id') === '') {
       // Should move the focus to the elementToFocus.
       await browser.actions().sendKeys(key).perform();
       expect(
@@ -99,25 +97,6 @@ describe('screenreader and keyboard user accessibility features', function() {
         await browser.driver.switchTo().activeElement()
           .getAttribute('class')).toEqual(
         await (await elementToFocus.getAttribute('class')));
-    } else {
-      // Should move the focus to the elementToFocus.
-      await browser.actions().sendKeys(key).perform();
-      expect(await elementToFocus.getAttribute('id')).toEqual(
-        await (await browser.driver.switchTo().activeElement())
-          .getAttribute('id'));
-
-      // Should move the focus away from the elementToFocus.
-      await browser.actions().sendKeys(protractor.Key.TAB).perform();
-      expect(await elementToFocus.getAttribute('id')).not.toEqual(
-        await (await browser.driver.switchTo().activeElement())
-          .getAttribute('id'));
-
-      // Should move the focus back to the elementToFocus.
-      await browser.actions().sendKeys(key).perform();
-      expect(await elementToFocus.getAttribute('id')).toEqual(
-        await (await browser.driver.switchTo().activeElement())
-          .getAttribute('id'));
-    }
   };
 
   it('should skip to the main content element', async function() {
@@ -125,9 +104,9 @@ describe('screenreader and keyboard user accessibility features', function() {
     await browser.actions().sendKeys(protractor.Key.TAB).perform();
     await waitFor.elementToBeClickable(skipLink, 'Could not click skip link');
     await skipLink.click();
-    expect(await mainContent.getAttribute('id')).toEqual(
+    expect(await mainContent.getAttribute('class')).toEqual(
       await (await browser.driver.switchTo().activeElement())
-        .getAttribute('id'));
+        .getAttribute('class'));
   });
 
   it('should navigate to the get-started page when ctrl+0 is pressed',
