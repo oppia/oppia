@@ -241,7 +241,7 @@ const getStoryEditorUrl = async function(browser, page) {
     await page.waitFor(15000);
     storyEditorUrl = await page.url();
   } catch (e) {
-    // eslint-disable-next-line no-console	
+    // eslint-disable-next-line no-console
     console.log(e);
   }
 };
