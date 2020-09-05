@@ -35,6 +35,7 @@ export class EditableStoryBackendApiService {
     private http: HttpClient,
     private urlInterpolation: UrlInterpolationService) {}
   private storyDataDict = null;
+    
   private _fetchStory(
       storyId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
@@ -48,7 +49,8 @@ export class EditableStoryBackendApiService {
       (response) => {
         this.storyDataDict = cloneDeep(response.body);
         if (successCallback) {
-          successCallback(this.storyDataDict);
+          successCallback(this.storyDataDict
+            );
         }
       }, (errorResponse) => {
         if (errorCallback) {
