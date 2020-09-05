@@ -60,7 +60,7 @@ describe('Upgraded component', () => {
   beforeEach(() => destroyPlatform());
   afterEach(() => destroyPlatform());
 
-  it('should cover the lines', async(() => {
+  it('should create the upgraded component', async(() => {
     setupAndGetUpgradedComponent(
       'collection-permissions-card',
       'collectionPermissionsCard',
