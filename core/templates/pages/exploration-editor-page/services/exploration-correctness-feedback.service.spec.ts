@@ -20,10 +20,9 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 /* eslint-disable-next-line max-len */
 require('pages/exploration-editor-page/services/exploration-correctness-feedback.service');
-require('pages/exploration-editor-page/services/exploration-property.service');
 
 describe('Exploration Correctness Feedback Service', function() {
-  var ExplorationCorrectnessFeedbackService, ExplorationPropertyService;
+  var ExplorationCorrectnessFeedbackService;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
@@ -40,7 +39,6 @@ describe('Exploration Correctness Feedback Service', function() {
     }
   }));
   beforeEach(angular.mock.inject(function($injector) {
-    ExplorationPropertyService = $injector.get('ExplorationPropertyService');
     ExplorationCorrectnessFeedbackService = $injector.get(
       'ExplorationCorrectnessFeedbackService');
   }));

@@ -129,7 +129,6 @@ class MockComponent { }
 /* eslint-enable max-len */
 /* eslint-enable oppia/no-multiline-disable */
 describe('Angular', () => {
-  let component: MockComponent;
   let fixture: ComponentFixture<MockComponent>;
 
   beforeEach(async(() => {
@@ -144,7 +143,6 @@ describe('Angular', () => {
       ]
     }).compileComponents();
     fixture = TestBed.createComponent(MockComponent);
-    component = fixture.componentInstance;
   }));
 
   it('should sanitize translations', fakeAsync(() => {

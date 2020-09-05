@@ -36,7 +36,6 @@ describe('Topic editor page', function() {
   var UrlService = null;
   var SubtopicObjectFactory = null;
   var TopicObjectFactory = null;
-  var SkillSummaryObjectFactory = null;
   var StoryReferenceObjectFactory = null;
   var topic = null;
   var ShortSkillSummaryObjectFactory = null;
@@ -58,7 +57,6 @@ describe('Topic editor page', function() {
     UrlService = $injector.get('UrlService');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
-    SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
     ShortSkillSummaryObjectFactory = $injector.get(
       'ShortSkillSummaryObjectFactory');

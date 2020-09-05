@@ -49,7 +49,6 @@ describe('Question misconception editor component', function() {
   var ctrl = null;
   var misconceptionObjectFactory = null;
   var mockMisconceptionObject = null;
-  var externalSaveService = null;
   var ses = null;
 
   var mockExternalSaveEventEmitter = null;
@@ -74,7 +73,6 @@ describe('Question misconception editor component', function() {
       $q = _$q_;
       $rootScope = _$rootScope_;
       misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
-      externalSaveService = $injector.get('ExternalSaveService');
       ses = $injector.get('StateEditorService');
     }));
 

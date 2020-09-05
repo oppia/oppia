@@ -155,7 +155,6 @@ export class PythonProgramTokenizer {
 
   generateTokens(program: string[]): string[][] {
     const tokenizedProgram = [];
-    const lnum = 0;
     let parenlev = 0;
     let continued = 0;
     const namechars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_';
@@ -352,6 +351,7 @@ export class PythonProgramTokenizer {
     }
 
     // Pop remaining indent levels.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (let indent in indents.slice(1)) {
       tokenizedProgram.push([this.PythonProgramTokenType.DEDENT, '']);
     }

@@ -284,8 +284,6 @@ describe('Pencil Code Editor rules service', () => {
   });
 
   describe('\'results in error\' rule', () => {
-    var RULE_INPUT = null;
-
     it('should check if error is not empty', () => {
       expect(pcers.ResultsInError({
         error: '',
