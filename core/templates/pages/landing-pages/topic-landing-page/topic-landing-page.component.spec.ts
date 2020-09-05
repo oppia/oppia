@@ -112,7 +112,7 @@ describe('Topic Landing Page', () => {
     fixture.detectChanges();
 
     expect(windowRef.nativeWindow.location.href).toBe(
-      '/collection/' + ratiosCollectionId);
+      '/learn/math/ratios');
   }));
 
   it('should click learn more button', fakeAsync(() => {
