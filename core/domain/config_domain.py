@@ -452,3 +452,7 @@ MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
     'The maximum number of explorations that can be send in a batch of math '
     'rich text svgs.',
     2)
+
+CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
+    'contributor_dashboard_is_enabled', BOOL_SCHEMA,
+    'Enable contributor dashboard page.', False)
