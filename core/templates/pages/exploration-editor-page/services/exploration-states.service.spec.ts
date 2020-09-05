@@ -205,7 +205,7 @@ describe('ExplorationStatesService', function() {
 
   describe('Callback Registration', function() {
     describe('.registerOnStateAddedCallback', function() {
-      it('should callsback when a new state is added', function() {
+      it('should callback when a new state is added', function() {
         var spy = jasmine.createSpy('callback');
         spyOn(ChangeListService, 'addState');
 
@@ -217,7 +217,7 @@ describe('ExplorationStatesService', function() {
     });
 
     describe('.registerOnStateDeletedCallback', function() {
-      it('should callsback when a state is deleted', function(done) {
+      it('should callback when a state is deleted', function(done) {
         spyOn($uibModal, 'open').and.callFake(function() {
           return {result: $q.resolve()};
         });
@@ -234,7 +234,7 @@ describe('ExplorationStatesService', function() {
     });
 
     describe('.registerOnStateRenamedCallback', function() {
-      it('should callsback when a state is renamed', function() {
+      it('should callback when a state is renamed', function() {
         var spy = jasmine.createSpy('callback');
         spyOn(ChangeListService, 'renameState');
 
@@ -246,7 +246,7 @@ describe('ExplorationStatesService', function() {
     });
 
     describe('.registerOnStateInteractionSaved', function() {
-      it('should callsback when answer groups of a state are saved',
+      it('should callback when answer groups of a state are saved',
         function() {
           var spy = jasmine.createSpy('callback');
           spyOn(ChangeListService, 'editStateProperty');

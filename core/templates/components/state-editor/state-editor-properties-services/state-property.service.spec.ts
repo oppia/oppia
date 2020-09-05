@@ -260,7 +260,7 @@ describe('Exploration title service', function() {
       $httpBackend = $injector.get('$httpBackend');
     }));
 
-    it('should correctly initializes the service', function() {
+    it('should correctly initialize the service', function() {
       expect(ets.displayed).toBeUndefined();
       expect(ets.savedMemento).toBeUndefined();
       ets.init('A title');

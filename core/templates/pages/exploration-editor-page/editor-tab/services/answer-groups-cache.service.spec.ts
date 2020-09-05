@@ -59,7 +59,7 @@ describe('Answer Groups Cache Service', () => {
       expect(agcs.get('InteractionId')).toEqual(answerGroup);
     });
 
-    it('should successfully checks if the value is available in cache', () => {
+    it('should check if the value is available in cache', () => {
       agcs.set('InteractionId', answerGroup);
       expect(agcs.contains('InteractionId')).toBe(true);
       expect(agcs.contains('NonPresentInteractionId')).toBe(false);
@@ -67,7 +67,7 @@ describe('Answer Groups Cache Service', () => {
       expect(agcs.contains('1')).toBe(false);
     });
 
-    it('should resets the cache', () => {
+    it('should reset the cache', () => {
       agcs.set('InteractionId', answerGroup);
       expect(agcs.contains('InteractionId')).toBe(true);
       agcs.reset();
