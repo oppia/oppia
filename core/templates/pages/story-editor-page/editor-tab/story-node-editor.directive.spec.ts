@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the story editor directive.
+ * @fileoverview Unit tests for the story node editor directive.
  */
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
-describe('Story editor Directive', function() {
+describe('Story node editor directive', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
