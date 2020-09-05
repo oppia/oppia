@@ -153,8 +153,9 @@ module.exports = function(config) {
         extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
         alias: {
           // This is needed because in app.constants.ts we need to import
-          // assets/consants.ts. We can't directly write import 'constants'
-          // because there is a package is node_modules with name constants.
+          // assets/constants.ts. We can't directly write import 'constants'
+          // because a module named 'constants' is defined in '@types/node'
+          // package.
           'assets/constants': 'constants.ts'
         }
       },

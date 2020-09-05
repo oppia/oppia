@@ -853,7 +853,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             node.expression.right.arguments[1].properties
                             if filepath.endswith('app.constants.ts') else
                             node.expression.right.properties)
-                    # We need try-except block here beacuse we need a node
+                    # We need a try-except block here beacuse we need a node
                     # that has properties exactly as we have defined above.
                     # And some nodes may not have those properties and may
                     # raise the following errors. So, we need to ignore
