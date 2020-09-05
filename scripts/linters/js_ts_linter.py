@@ -52,13 +52,7 @@ TS_IGNORE_EXCEPTIONS = json.load(python_utils.open_file(
     TS_IGNORE_EXCEPTIONS_FILEPATH, 'r'))
 
 INJECTABLES_TO_IGNORE = [
-    'ExplorationStats',
-    'InteractionAttributesExtractorService',
-    'NormalizeWhitespacePunctuationAndCasePipe\n',
-    'MockCsrfTokenService',
-    'StatePropertyService',
-    'StateNextContentIdIndexService\n',
-    'SubtitledUnicodeObjectFactory',
+    'MockIgnoredService', # This file is required for the js-ts-linter-test.
     'UpgradedServices'
 ]
 
@@ -980,30 +974,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         """
         name = 'Angular Services Index file'
         error_messages = []
-        def get_injectable_class_name(file_content):
-            """Extarcts the class name from a file that has an Injectable
-                class.
-
-            Args:
-                file_content: str. File content of the file that has an
-                    Injectable class.
-
-            Returns:
-                class_name: str. The name of the service.
-            """
-
-            # Going through all ts files and looking for @Injectable classes.
-            class_name = file_content.split(
-                '@Injectable({')[1].split(
-                    'export class ')[1].split('{')[0].replace(' ', '')
-            if 'extends' in class_name:
-                class_name = class_name.split('extends')[0]
-            if 'implements' in class_name:
-                class_name = class_name.split('implements')[0]
-            if '<' in class_name:
-                class_name = class_name.split('<')[0]
-            return class_name
-
+        injectable_pattern = '%s%s' % (
+            'Injectable\\({\\n*\\s*providedIn: \'root\'\\n*}\\)\\n',
+            'export class ([A-Za-z]*)')
         angular_services_index_path = (
             './core/templates/services/angular-services.index.ts')
         angular_services_index = self.file_cache.read(
@@ -1014,28 +987,32 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             file_content = self.file_cache.read(file_path)
             if not '@Injectable({' in file_content:
                 continue
-            class_name = get_injectable_class_name(file_content)
-            if class_name in INJECTABLES_TO_IGNORE:
-                continue
-            import_statement = 'import { %s' % class_name
-            if not import_statement in angular_services_index:
-                error_message = (
-                    'Please import %s to Angular Services Index file in %s'
-                    % (class_name, angular_services_index_path))
-                error_messages.append(error_message)
-                failed = True
+            class_names = re.findall(injectable_pattern, file_content)
+            for class_name in class_names:
+                if class_name in INJECTABLES_TO_IGNORE:
+                    continue
+                import_statement_regex = 'import {[\\s*\\w+,]*%s' % class_name
+                if not re.search(
+                        import_statement_regex, angular_services_index):
+                    error_message = (
+                        'Please import %s to Angular Services Index file in %s'
+                        % (class_name, angular_services_index_path))
+                    error_messages.append(error_message)
+                    failed = True
 
-            service_name_type_pair = (
-                '[\'%s\', %s]' % (class_name, class_name))
+                service_name_type_pair_regex = (
+                    '\\[\'%s\',\\n*\\s*%s\\]' % (class_name, class_name))
+                service_name_type_pair = (
+                    '[\'%s\', %s]' % (class_name, class_name))
 
-            if not service_name_type_pair in angular_services_index:
-                error_message = (
-                    'Please add the pair %s, without line breaks in between,'
-                    ' to the angularServices in %s'
-                    % (service_name_type_pair, angular_services_index_path)
-                )
-                error_messages.append(error_message)
-                failed = True
+                if not re.search(
+                        service_name_type_pair_regex, angular_services_index):
+                    error_message = (
+                        'Please add the pair %s, to the angularServices in %s'
+                        % (service_name_type_pair, angular_services_index_path)
+                    )
+                    error_messages.append(error_message)
+                    failed = True
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
