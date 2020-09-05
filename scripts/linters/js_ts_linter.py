@@ -247,6 +247,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         http_client_pattern = r':\n? *HttpClient'
 
         excluded_files = [
+            'core/templates/services/http.service.ts',
             'core/templates/services/request-interceptor.service.spec.ts'
         ]
 
