@@ -30,7 +30,7 @@ var explorationEditorUrl = 'Exploration editor not loaded';
 var collectionEditorUrl = 'Collection editor not loaded';
 var topicEditorUrl = 'Topic editor not loaded';
 var skillEditorUrl = 'Skill editor not loaded';
-var storyEditorUrl = 'Story editor not loaded'
+var storyEditorUrl = 'Story editor not loaded';
 
 var usernameInput = '.protractor-test-username-input';
 var agreeToTermsCheckBox = '.protractor-test-agree-to-terms-checkbox';
@@ -56,14 +56,14 @@ var confirmTopicCreationButton =
 var createdTopicLink = '.protractor-test-topic-name';
 
 var createStoryButtonSelector = '.protractor-test-create-story-button';
-var storyNameField = '.protractor-test-new-story-title-field';	
-var storyUrlFragmentField = '.protractor-test-new-story-url-fragment-field';	
-var storyDescriptionField = '.protractor-test-new-story-description-field';	
-var storyThumbnailButton = '.protractor-test-photo-button';	
-var storyUploadButton = '.protractor-test-photo-upload-input';	
-var storyPhotoSubmit = '.protractor-test-photo-upload-submit';	
+var storyNameField = '.protractor-test-new-story-title-field';
+var storyUrlFragmentField = '.protractor-test-new-story-url-fragment-field';
+var storyDescriptionField = '.protractor-test-new-story-description-field';
+var storyThumbnailButton = '.protractor-test-photo-button';
+var storyUploadButton = '.protractor-test-photo-upload-input';
+var storyPhotoSubmit = '.protractor-test-photo-upload-submit';
 var thumbnailContainer = '.protractor-test-thumbnail-container';
-var confirmStoryCreationButton =	
+var confirmStoryCreationButton =
   '.protractor-test-confirm-story-creation-button';
 
 var createSkillButtonSelector = '.puppeteer-test-add-skill-button';
@@ -215,35 +215,35 @@ const getTopicEditorUrl = async function(browser, page) {
   }
 };
 
-const getStoryEditorUrl = async function(browser, page) {	
-  try {	
-    // eslint-disable-next-line dot-notation	
-    await page.goto(topicEditorUrl, { waitUntil: networkIdle });	
-    await page.waitForSelector(createStoryButtonSelector, {visible: true});	
-    await page.click(createStoryButtonSelector);	
+const getStoryEditorUrl = async function(browser, page) {
+  try {
+    // eslint-disable-next-line dot-notation
+    await page.goto(topicEditorUrl, { waitUntil: networkIdle });
+    await page.waitForSelector(createStoryButtonSelector, {visible: true});
+    await page.click(createStoryButtonSelector);
 
-    await page.waitForSelector(storyNameField, {visible: true});	
-    await page.type(storyNameField, 'Story TASD');	
-    await page.type(storyUrlFragmentField, 'story-url-one');	
-    await page.type(storyDescriptionField, 'Story 1 description');	
-    await page.click(storyThumbnailButton);	
-    await page.waitForSelector(storyUploadButton, {visible: true});	
+    await page.waitForSelector(storyNameField, {visible: true});
+    await page.type(storyNameField, 'Story TASD');
+    await page.type(storyUrlFragmentField, 'story-url-one');
+    await page.type(storyDescriptionField, 'Story 1 description');
+    await page.click(storyThumbnailButton);
+    await page.waitForSelector(storyUploadButton, {visible: true});
 
-    const elementHandle = await page.$(storyUploadButton);	
-    await elementHandle.uploadFile('core/tests/data/test_svg.svg');	
+    const elementHandle = await page.$(storyUploadButton);
+    await elementHandle.uploadFile('core/tests/data/test_svg.svg');
 
-    await page.waitForSelector(thumbnailContainer, {visible: true});	
-    await page.click(storyPhotoSubmit);	
+    await page.waitForSelector(thumbnailContainer, {visible: true});
+    await page.click(storyPhotoSubmit);
 
-    await page.waitForSelector(confirmStoryCreationButton, {visible: true});	
-    await page.waitFor(5000);	
-    await page.click(confirmStoryCreationButton);	
+    await page.waitForSelector(confirmStoryCreationButton, {visible: true});
+    await page.waitFor(5000);
+    await page.click(confirmStoryCreationButton);
     await page.waitFor(15000);
     storyEditorUrl = await page.url();
-  } catch (e) {	
+  } catch (e) {
     // eslint-disable-next-line no-console	
-    console.log(e);	
-  }	
+    console.log(e);
+  }
 };
 
 const getSkillEditorUrl = async function(browser, page) {
