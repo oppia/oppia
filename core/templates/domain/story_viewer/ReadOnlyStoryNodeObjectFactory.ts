@@ -57,7 +57,8 @@ export class ReadOnlyStoryNode {
   thumbnailBgColor: string;
   thumbnailFilename: string;
 
-  constructor(id: string, title: string, description: string,
+  constructor(
+      id: string, title: string, description: string,
       destinationNodeIds: string[], prerequisiteSkillIds: string[],
       acquiredSkillIds: string[], outline: string,
       outlineIsFinalized: boolean, explorationId: string,
@@ -132,7 +133,8 @@ export class ReadOnlyStoryNodeObjectFactory {
     let explorationSummary = this.learnerExplorationSummaryObjectFactory
       .createFromBackendDict(storyNodeBackendDict.exp_summary_dict);
 
-    return new ReadOnlyStoryNode(storyNodeBackendDict.id,
+    return new ReadOnlyStoryNode(
+      storyNodeBackendDict.id,
       storyNodeBackendDict.title,
       storyNodeBackendDict.description,
       storyNodeBackendDict.destination_node_ids,

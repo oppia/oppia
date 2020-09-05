@@ -24,8 +24,8 @@ require('services/contextual/window-ref.service.ts');
 angular.module('oppia').component('notificationsDashboardPage', {
   template: require('./notifications-dashboard-page.component.html'),
   controller: [
-    '$http', 'LoaderService', 'DateTimeFormatService', 'WindowRef',
-    function($http, LoaderService, DateTimeFormatService, WindowRef) {
+    '$http', 'DateTimeFormatService', 'LoaderService', 'WindowRef',
+    function($http, DateTimeFormatService, LoaderService, WindowRef) {
       var ctrl = this;
       ctrl.getItemUrl = function(activityId, notificationType) {
         return (

@@ -390,23 +390,18 @@ describe('Exploration editor page component', function() {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('editor')
       });
-      spyOn($rootScope, '$broadcast');
       ctrl.showUserHelpModal();
       $rootScope.$apply();
       expect($uibModal.open).toHaveBeenCalled();
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('openEditorTutorial');
     });
 
     it('should show the user help modal for editor tutorial', () => {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('translation')
       });
-      spyOn($rootScope, '$broadcast');
       ctrl.showUserHelpModal();
       $rootScope.$apply();
       expect($uibModal.open).toHaveBeenCalled();
-      expect($rootScope.$broadcast).toHaveBeenCalledWith(
-        'openTranslationTutorial');
     });
   });
 
@@ -505,8 +500,6 @@ describe('Exploration editor page component', function() {
 
       var successCallback = jasmine.createSpy('success');
       mockInitExplorationPageEmitter.emit(successCallback);
-      $rootScope.$broadcast('initExplorationPage', successCallback);
-
       // Need to flush and $apply twice to fire the callback. In practice, this
       // will occur seamlessly.
       flushMicrotasks();

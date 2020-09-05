@@ -66,7 +66,8 @@ export class ConceptCard {
     };
   }
 
-  _getElementsInFirstSetButNotInSecond(setA: Set<string>,
+  _getElementsInFirstSetButNotInSecond(
+      setA: Set<string>,
       setB: Set<string>): string[] {
     let diffList = Array.from(setA).filter((element) => {
       return !setB.has(element);
@@ -151,8 +152,7 @@ export class ConceptCardObjectFactory {
     };
     return new ConceptCard(
       this.subtitledHtmlObjectFactory.createDefault(
-        'Loading review material',
-        AppConstants.COMPONENT_NAME_EXPLANATION), [],
+        'Loading review material', AppConstants.COMPONENT_NAME_EXPLANATION), [],
       this.recordedVoiceoversObjectFactory.createFromBackendDict(
         recordedVoiceoversDict)
     );

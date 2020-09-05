@@ -16,34 +16,19 @@
  * @fileoverview End-to-end tests for the learner dashboard page.
  */
 
-var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
-var CreatorDashboardPage =
-  require('../protractor_utils/CreatorDashboardPage.js');
-var CollectionEditorPage =
-  require('../protractor_utils/CollectionEditorPage.js');
-var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LearnerDashboardPage =
   require('../protractor_utils/LearnerDashboardPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
 
 describe('Learner dashboard functionality', function() {
-  var creatorDashboardPage = null;
-  var collectionEditorPage = null;
-  var explorationEditorPage = null;
-  var explorationEditorMainTab = null;
-  var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
   var libraryPage = null;
   var learnerDashboardPage = null;
@@ -52,24 +37,19 @@ describe('Learner dashboard functionality', function() {
   beforeAll(function() {
     libraryPage = new LibraryPage.LibraryPage();
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
-    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
-    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-    explorationEditorMainTab = explorationEditorPage.getMainTab();
-    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     subscriptionDashboardPage =
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
   it('displays learners subscriptions', async function() {
-    await users.createUser('learner1@learnerDashboard.com',
-      'learner1learnerDashboard');
+    await users.createUser(
+      'learner1@learnerDashboard.com', 'learner1learnerDashboard');
     var creator1Id = 'creatorName';
     await users.createUser(creator1Id + '@learnerDashboard.com', creator1Id);
     var creator2Id = 'collectionAdm';
-    await users.createUser(creator2Id + '@learnerDashboard.com',
-      creator2Id);
+    await users.createUser(
+      creator2Id + '@learnerDashboard.com', creator2Id);
     await users.login(creator1Id + '@learnerDashboard.com');
     await workflow.createAndPublishExploration(
       'Activations',
@@ -107,8 +87,8 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('displays learner feedback threads', async function() {
-    await users.createUser('learner2@learnerDashboard.com',
-      'learner2learnerDashboard');
+    await users.createUser(
+      'learner2@learnerDashboard.com', 'learner2learnerDashboard');
     await users.createUser(
       'feedbackAdm@learnerDashboard.com', 'feedbackAdmlearnerDashboard');
     await users.login('feedbackAdm@learnerDashboard.com');

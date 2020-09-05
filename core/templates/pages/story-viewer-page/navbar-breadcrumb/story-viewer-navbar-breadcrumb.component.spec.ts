@@ -16,30 +16,39 @@
  * @fileoverview Unit tests for storyViewerNavbarBreadcrumb.
  */
 
+import { EventEmitter } from '@angular/core';
+
 describe('Story viewer navbar breadcrumb component', function() {
   var ctrl = null;
-  var $rootScope = null;
   var urlService = null;
+  var storyViewerBackendApiService = null;
+  var mockSendStoryDataEventEmitter = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
     urlService = $injector.get('UrlService');
+    storyViewerBackendApiService = $injector.get(
+      'StoryViewerBackendApiService');
 
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       'topic1');
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
       'classroom1');
+    mockSendStoryDataEventEmitter = new EventEmitter();
+    spyOnProperty(
+      storyViewerBackendApiService,
+      'onSendStoryData').and.returnValue(mockSendStoryDataEventEmitter);
 
-    $rootScope = $rootScope.$new();
-    ctrl = $componentController('storyViewerNavbarBreadcrumb', {
-      $rootScope: $rootScope
-    });
+    ctrl = $componentController('storyViewerNavbarBreadcrumb', { });
     ctrl.$onInit();
   }));
 
+  afterEach(() => {
+    ctrl.$onDestroy();
+  });
+
   it('should get topic url when story data is already loaded', function() {
-    $rootScope.$broadcast('storyData', {
+    mockSendStoryDataEventEmitter.emit({
       topicName: 'topic_1',
       storyTitle: 'Story title'
     });

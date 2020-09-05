@@ -35,12 +35,10 @@ angular.module('oppia').directive('learnerDashboardIcons', [
         'learner-dashboard-icons.directive.html'),
       controller: [
         '$scope', 'LearnerDashboardIdsBackendApiService',
-        'LearnerDashboardActivityIdsObjectFactory',
         'LearnerPlaylistService', 'ACTIVITY_TYPE_COLLECTION',
         'ACTIVITY_TYPE_EXPLORATION',
         function(
             $scope, LearnerDashboardIdsBackendApiService,
-            LearnerDashboardActivityIdsObjectFactory,
             LearnerPlaylistService, ACTIVITY_TYPE_COLLECTION,
             ACTIVITY_TYPE_EXPLORATION) {
           $scope.activityIsCurrentlyHoveredOver = true;
@@ -151,14 +149,6 @@ angular.module('oppia').directive('learnerDashboardIcons', [
               }
               $scope.disablePlaylistTooltip();
             }
-          };
-
-          $scope.removeFromLearnerPlaylist = function(
-              activityId, activityTitle, activityType) {
-            var isSuccessfullyRemoved = (
-              LearnerPlaylistService.removeFromLearnerPlaylist(
-                activityId, activityTitle, activityType,
-                $scope.learnerDashboardActivityIds));
           };
         }
       ]

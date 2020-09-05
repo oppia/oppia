@@ -441,6 +441,11 @@ import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import { PencilCodeEditorValidationService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
+import { PlatformFeatureAdminBackendApiService } from
+  'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformFeatureBackendApiService } from
+  'domain/platform_feature/platform-feature-backend-api.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 import { PlatformParameterFilterObjectFactory } from
   'domain/platform_feature/platform-parameter-filter-object.factory';
 import { PlatformParameterObjectFactory } from
@@ -483,6 +488,11 @@ import { QuestionSummaryObjectFactory } from
   'domain/question/QuestionSummaryObjectFactory';
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
+import { RatioExpressionInputRulesService } from
+  'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
+import { RatioExpressionInputValidationService } from
+  'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
+import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
 import { ReadOnlyStoryNodeObjectFactory } from
@@ -552,6 +562,8 @@ import { StateContentService } from
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -901,6 +913,9 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static pencilCodeEditorRulesService: PencilCodeEditorRulesService;
   static pencilCodeEditorValidationService: PencilCodeEditorValidationService;
   static playerCorrectnessFeedbackEnabledService: PlayerCorrectnessFeedbackEnabledService;
+  static platformFeatureAdminBackendApiService: PlatformFeatureAdminBackendApiService;
+  static platformFeatureBackendApiService: PlatformFeatureBackendApiService;
+  static platformFeatureService: PlatformFeatureService;
   static platformParameterFilterObjectFactory: PlatformParameterFilterObjectFactory;
   static platformParameterObjectFactory: PlatformParameterObjectFactory;
   static platformParameterRuleObjectFactory: PlatformParameterRuleObjectFactory;
@@ -922,6 +937,9 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static questionSummaryForOneSkillObjectFactory: QuestionSummaryForOneSkillObjectFactory;
   static questionSummaryObjectFactory: QuestionSummaryObjectFactory;
   static readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService;
+  static ratioExpressionInputRulesService: RatioExpressionInputRulesService;
+  static ratioExpressionInputValidationService: RatioExpressionInputValidationService;
+  static ratioObjectFactory: RatioObjectFactory;
   static ratingComputationService: RatingComputationService;
   static readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory;
   static readOnlySubtopicPageObjectFactory: ReadOnlySubtopicPageObjectFactory;
@@ -958,6 +976,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static stateClassifierMappingService: StateClassifierMappingService;
   static stateContentService: StateContentService;
   static stateCustomizationArgsService: StateCustomizationArgsService;
+  static stateEditorRefreshService: StateEditorRefreshService;
   static stateEditorService: StateEditorService;
   static keyboardShortcutService: KeyboardShortcutService;
   static stateGraphLayoutService: StateGraphLayoutService;
@@ -1228,6 +1247,9 @@ private paramSpecsObjectFactory: ParamSpecsObjectFactory,
 private paramTypeObjectFactory: ParamTypeObjectFactory,
 private pencilCodeEditorRulesService: PencilCodeEditorRulesService,
 private pencilCodeEditorValidationService: PencilCodeEditorValidationService,
+private platformFeatureAdminBackendApiService: PlatformFeatureAdminBackendApiService,
+private platformFeatureBackendApiService: PlatformFeatureBackendApiService,
+private platformFeatureService: PlatformFeatureService,
 private platformParameterFilterObjectFactory: PlatformParameterFilterObjectFactory,
 private platformParameterObjectFactory: PlatformParameterObjectFactory,
 private platformParameterRuleObjectFactory: PlatformParameterRuleObjectFactory,
@@ -1250,6 +1272,9 @@ private questionBackendApiService: QuestionBackendApiService,
 private questionSummaryForOneSkillObjectFactory: QuestionSummaryForOneSkillObjectFactory,
 private questionSummaryObjectFactory: QuestionSummaryObjectFactory,
 private readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService,
+private ratioExpressionInputRulesService: RatioExpressionInputRulesService,
+private ratioExpressionInputValidationService: RatioExpressionInputValidationService,
+private ratioObjectFactory: RatioObjectFactory,
 private ratingComputationService: RatingComputationService,
 private readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory,
 private readOnlySubtopicPageObjectFactory: ReadOnlySubtopicPageObjectFactory,
@@ -1286,6 +1311,7 @@ private stateCardObjectFactory: StateCardObjectFactory,
 private stateClassifierMappingService: StateClassifierMappingService,
 private stateContentService: StateContentService,
 private stateCustomizationArgsService: StateCustomizationArgsService,
+private stateEditorRefreshService: StateEditorRefreshService,
 private stateEditorService: StateEditorService,
 private keyboardShortcutService: KeyboardShortcutService,
 private stateGraphLayoutService: StateGraphLayoutService,
@@ -1557,6 +1583,9 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.paramTypeObjectFactory = this.paramTypeObjectFactory;
     OppiaAngularRootComponent.pencilCodeEditorRulesService = this.pencilCodeEditorRulesService;
     OppiaAngularRootComponent.pencilCodeEditorValidationService = this.pencilCodeEditorValidationService;
+    OppiaAngularRootComponent.platformFeatureAdminBackendApiService = this.platformFeatureAdminBackendApiService;
+    OppiaAngularRootComponent.platformFeatureBackendApiService = this.platformFeatureBackendApiService;
+    OppiaAngularRootComponent.platformFeatureService = this.platformFeatureService;
     OppiaAngularRootComponent.platformParameterFilterObjectFactory = this.platformParameterFilterObjectFactory;
     OppiaAngularRootComponent.platformParameterObjectFactory = this.platformParameterObjectFactory;
     OppiaAngularRootComponent.platformParameterRuleObjectFactory = this.platformParameterRuleObjectFactory;
@@ -1579,6 +1608,9 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.questionSummaryForOneSkillObjectFactory = this.questionSummaryForOneSkillObjectFactory;
     OppiaAngularRootComponent.questionSummaryObjectFactory = this.questionSummaryObjectFactory;
     OppiaAngularRootComponent.readOnlyCollectionBackendApiService = this.readOnlyCollectionBackendApiService;
+    OppiaAngularRootComponent.ratioExpressionInputRulesService = this.ratioExpressionInputRulesService;
+    OppiaAngularRootComponent.ratioExpressionInputValidationService = this.ratioExpressionInputValidationService;
+    OppiaAngularRootComponent.ratioObjectFactory = this.ratioObjectFactory;
     OppiaAngularRootComponent.ratingComputationService = this.ratingComputationService;
     OppiaAngularRootComponent.readOnlyStoryNodeObjectFactory = this.readOnlyStoryNodeObjectFactory;
     OppiaAngularRootComponent.readOnlySubtopicPageObjectFactory = this.readOnlySubtopicPageObjectFactory;
@@ -1615,6 +1647,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.stateClassifierMappingService = this.stateClassifierMappingService;
     OppiaAngularRootComponent.stateContentService = this.stateContentService;
     OppiaAngularRootComponent.stateCustomizationArgsService = this.stateCustomizationArgsService;
+    OppiaAngularRootComponent.stateEditorRefreshService = this.stateEditorRefreshService;
     OppiaAngularRootComponent.stateEditorService = this.stateEditorService;
     OppiaAngularRootComponent.keyboardShortcutService = this.keyboardShortcutService;
     OppiaAngularRootComponent.stateGraphLayoutService = this.stateGraphLayoutService;
@@ -1690,6 +1723,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.workedExampleObjectFactory = this.workedExampleObjectFactory;
     OppiaAngularRootComponent.writtenTranslationObjectFactory = this.writtenTranslationObjectFactory;
     OppiaAngularRootComponent.writtenTranslationsObjectFactory = this.writtenTranslationsObjectFactory;
+
     // This emit triggers ajs to start its app.
     this.initialized.emit();
   }

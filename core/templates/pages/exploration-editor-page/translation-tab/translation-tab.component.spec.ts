@@ -50,6 +50,8 @@ import { StateWrittenTranslationsService } from
 import { ContextService } from 'services/context.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service.ts';
 import { ExternalSaveService } from 'services/external-save.service';
 
 import $ from 'jquery';
@@ -88,10 +90,11 @@ describe('Translation tab component', function() {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
       'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
-    $provide.value('ExplorationImprovementsTaskRegistryService',
+    $provide.value(
+      'ExplorationImprovementsTaskRegistryService',
       TestBed.get(ExplorationImprovementsTaskRegistryService));
-    $provide.value('ExplorationStatsService',
-      TestBed.get(ExplorationStatsService));
+    $provide.value(
+      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
     $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
     $provide.value(
       'TextInputRulesService',
@@ -101,12 +104,16 @@ describe('Translation tab component', function() {
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
-    $provide.value('StateInteractionIdService',
-      TestBed.get(StateInteractionIdService));
-    $provide.value('StateRecordedVoiceoversService',
+    $provide.value(
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateRecordedVoiceoversService',
       TestBed.get(StateRecordedVoiceoversService));
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
-    $provide.value('StateWrittenTranslationsService',
+    $provide.value(
+      'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
   }));
 
@@ -148,8 +155,7 @@ describe('Translation tab component', function() {
             rows: {value: 1}
           },
           answer_groups: [{
-            rule_types_to_inputs: {},
-            rule_input_translations: {},
+            rule_specs: [],
             outcome: {
               dest: 'unused',
               feedback: {

@@ -17,6 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
+require('third-party-imports/leaflet.import');
 
 angular.module('oppia').directive('coordTwoDimEditor', [
   'UrlInterpolationService',
@@ -30,7 +31,8 @@ angular.module('oppia').directive('coordTwoDimEditor', [
           ctrl.mapMarkers.mainMarker.lng = lng;
         };
         ctrl.$onInit = function() {
-          $scope.$on('leafletDirectiveMap.coordTwoDimEditor.click',
+          $scope.$on(
+            'leafletDirectiveMap.coordTwoDimEditor.click',
             function(evt, args) {
               var newLat = args.leafletEvent.latlng.lat;
               var newLng = args.leafletEvent.latlng.lng;
@@ -38,7 +40,8 @@ angular.module('oppia').directive('coordTwoDimEditor', [
               updateMarker(newLat, newLng);
             });
 
-          $scope.$on('leafletDirectiveMarker.coordTwoDimEditor.dragend',
+          $scope.$on(
+            'leafletDirectiveMarker.coordTwoDimEditor.dragend',
             function(evt, args) {
               ctrl.value = [args.model.lat, args.model.lng];
             });

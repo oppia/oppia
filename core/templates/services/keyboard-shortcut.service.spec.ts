@@ -17,29 +17,72 @@
  */
 import 'mousetrap';
 
+import { ApplicationRef } from '@angular/core';
+import { async, TestBed } from '@angular/core/testing';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
+import { KeyboardShortcutHelpModalComponent } from
+  // eslint-disable-next-line max-len
+  'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component.ts';
+import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
+class MockActiveModal {
+  dismiss(): void {
+    return;
+  }
+}
 describe('Keyboard Shortcuts', () => {
-  var skipButton = document.createElement('button');
-  var nextButton = document.createElement('button');
-  var continueToNextCardButton = document.createElement('button');
-  var continueButton = document.createElement('button');
-  var backButton = document.createElement('button');
-  var searchBar = document.createElement('input');
-  var categoryBar = document.createElement('select');
+  let skipButton = document.createElement('button');
+  let nextButton = document.createElement('button');
+  let continueButton = document.createElement('button');
+  let backButton = document.createElement('button');
+  let searchBar = document.createElement('input');
+  let categoryBar = document.createElement('select');
 
-  const keyboardShortcutService = new KeyboardShortcutService();
+  let openQuickReferenceSpy;
+
+  let mockWindow = {
+    location: {
+      href: ''
+    }
+  };
+
+  let windowRef;
+  let appRef: ApplicationRef;
+  let keyboardShortcutService;
+  let ngbModal: NgbModal;
+
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [KeyboardShortcutHelpModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        }
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(async() => {
+    ngbModal = TestBed.get(NgbModal);
+    windowRef = new WindowRef();
+    appRef = TestBed.get(ApplicationRef);
+    keyboardShortcutService = new KeyboardShortcutService(
+      windowRef,
+      ngbModal,
+      appRef
+    );
+  });
 
   beforeAll(() => {
     skipButton.setAttribute('id', 'skipToMainContentId');
     backButton.setAttribute('id', 'backButtonId');
-    nextButton.setAttribute('class', 'protractor-test-next-button');
-    continueButton.setAttribute('class', 'protractor-test-continue-button');
-    continueToNextCardButton.setAttribute(
-      'class', 'protractor-test-continue-to-next-card-button');
-    searchBar.setAttribute(
-      'class', 'protractor-test-search-input');
-    categoryBar.setAttribute('id', 'categoryBar');
+    nextButton.setAttribute('class', 'oppia-next-button');
+    continueButton.setAttribute('class', 'oppia-learner-confirm-button');
+    searchBar.setAttribute('class', 'oppia-search-bar-text-input');
+    categoryBar.setAttribute('class', 'oppia-search-bar-dropdown-toggle');
     document.body.append(skipButton);
     document.body.append(continueButton);
     document.body.append(backButton);
@@ -47,40 +90,59 @@ describe('Keyboard Shortcuts', () => {
     document.body.append(categoryBar);
   });
 
+
   it('should navigate to the corresponding page' +
     ' when the navigation key is pressed', () => {
-    var hrefValue = '';
-
-    keyboardShortcutService.setHref('#foo');
-    spyOn(keyboardShortcutService, 'setHref').and.callFake(function(href) {
-      hrefValue = href;
-    });
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue(mockWindow);
     keyboardShortcutService.bindNavigationShortcuts();
 
+    mockWindow.location.href = '';
+    expect(windowRef.nativeWindow.location.href).toBe('');
+
     Mousetrap.trigger('ctrl+0');
-    expect(hrefValue).toEqual('/get-started');
+    expect(windowRef.nativeWindow.location.href).toEqual('/get-started');
+    mockWindow.location.href = '';
+    expect(windowRef.nativeWindow.location.href).toBe('');
 
     Mousetrap.trigger('ctrl+1');
-    expect(hrefValue).toEqual('/community-library');
+    expect(windowRef.nativeWindow.location.href).toEqual('/community-library');
+    mockWindow.location.href = '';
+    expect(windowRef.nativeWindow.location.href).toBe('');
 
     Mousetrap.trigger('ctrl+2');
-    expect(hrefValue).toEqual('/learner-dashboard');
+    expect(windowRef.nativeWindow.location.href).toEqual('/learner-dashboard');
+    mockWindow.location.href = '';
+    expect(windowRef.nativeWindow.location.href).toBe('');
 
     Mousetrap.trigger('ctrl+3');
-    expect(hrefValue).toEqual('/creator-dashboard');
+    expect(windowRef.nativeWindow.location.href).toEqual('/creator-dashboard');
+    mockWindow.location.href = '';
+    expect(windowRef.nativeWindow.location.href).toBe('');
 
     Mousetrap.trigger('ctrl+4');
-    expect(hrefValue).toEqual('/about');
+    expect(windowRef.nativeWindow.location.href).toEqual('/about');
+    mockWindow.location.href = '';
+    expect(windowRef.nativeWindow.location.href).toBe('');
 
     Mousetrap.trigger('ctrl+5');
-    expect(hrefValue).toEqual('/notifications');
+    expect(windowRef.nativeWindow.location.href).toEqual('/notifications');
+    mockWindow.location.href = '';
+    expect(windowRef.nativeWindow.location.href).toBe('');
 
     Mousetrap.trigger('ctrl+6');
-    expect(hrefValue).toEqual('/preferences');
+    expect(windowRef.nativeWindow.location.href).toEqual('/preferences');
+    mockWindow.location.href = '';
+    expect(windowRef.nativeWindow.location.href).toBe('');
   });
 
   it('should move the focus to the corresponding element' +
     ' when the action key is pressed', () => {
+    openQuickReferenceSpy = spyOn(
+      keyboardShortcutService, 'openQuickReference').and.callThrough();
+    spyOn(ngbModal, 'open');
+    spyOn(ngbModal, 'dismissAll');
+    spyOn(appRef, 'tick');
+
     keyboardShortcutService.bindLibraryPageShortcuts();
 
     Mousetrap.trigger('s');
@@ -91,6 +153,9 @@ describe('Keyboard Shortcuts', () => {
 
     Mousetrap.trigger('c');
     expect(categoryBar.isEqualNode(document.activeElement));
+
+    Mousetrap.trigger('?');
+    expect(openQuickReferenceSpy).toHaveBeenCalled();
 
     keyboardShortcutService.bindExplorationPlayerShortcuts();
 
@@ -103,12 +168,11 @@ describe('Keyboard Shortcuts', () => {
     Mousetrap.trigger('j');
     expect(continueButton.isEqualNode(document.activeElement));
 
-    document.body.append(continueToNextCardButton);
-    Mousetrap.trigger('j');
-    expect(continueToNextCardButton.isEqualNode(document.activeElement));
-
     document.body.append(nextButton);
     Mousetrap.trigger('j');
     expect(nextButton.isEqualNode(document.activeElement));
+
+    Mousetrap.trigger('?');
+    expect(openQuickReferenceSpy).toHaveBeenCalled();
   });
 });

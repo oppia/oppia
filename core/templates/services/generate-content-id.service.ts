@@ -33,7 +33,8 @@ export class GenerateContentIdService {
       private stateNextContentIdIndexService: StateNextContentIdIndexService
   ) {}
 
-  generateIdForComponent(existingComponentIds: string[],
+  generateIdForComponent(
+      existingComponentIds: string[],
       componentName: string): string {
     let contentIdList = JSON.parse(JSON.stringify(existingComponentIds));
     let searchKey = componentName + '_';
@@ -51,7 +52,8 @@ export class GenerateContentIdService {
     return (searchKey + String(count + 1));
   }
 
-  _getNextId(existingComponentIds: string[],
+  _getNextId(
+      existingComponentIds: string[],
       componentName: string): string {
     // Worked example questions and explanations do not live in the State domain
     // so they do not use next content id index.
@@ -72,7 +74,8 @@ export class GenerateContentIdService {
     return `${prefix}_${contentIdIndex}`;
   }
 
-  getNextId(existingComponentIds: string[],
+  getNextId(
+      existingComponentIds: string[],
       componentName: string): string {
     return this._getNextId(existingComponentIds, componentName);
   }

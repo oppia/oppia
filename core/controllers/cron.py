@@ -26,17 +26,14 @@ from core.domain import activity_jobs_one_off
 from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import recommendations_jobs_one_off
-from core.domain import suggestion_services
 from core.domain import user_jobs_one_off
 from core.domain import wipeout_jobs_one_off
 from core.platform import models
-import feconf
 import utils
 
 from pipeline import pipeline
 
-(job_models, suggestion_models) = models.Registry.import_models([
-    models.NAMES.job, models.NAMES.suggestion])
+(job_models,) = models.Registry.import_models([models.NAMES.job])
 
 # The default retention time is 2 days.
 MAX_MAPREDUCE_METADATA_RETENTION_MSECS = 2 * 24 * 60 * 60 * 1000
@@ -207,28 +204,22 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
         logging.warning('%s MR jobs cleaned up.' % num_cleaned)
 
         if job_models.JobModel.do_unfinished_jobs_exist(
-                cron_services.JobCleanupManager.__name__):
+                cron_services.MapReduceStateModelsCleanupManager.__name__):
             logging.warning('A previous cleanup job is still running.')
         else:
-            cron_services.JobCleanupManager.enqueue(
-                cron_services.JobCleanupManager.create_new(),
+            cron_services.MapReduceStateModelsCleanupManager.enqueue(
+                cron_services.MapReduceStateModelsCleanupManager.create_new(),
                 additional_job_params={
                     jobs.MAPPER_PARAM_MAX_START_TIME_MSEC: max_start_time_msec
                 })
-            logging.warning('Deletion jobs for auxiliary entities kicked off.')
+            logging.warning(
+                'Deletion jobs for auxiliary MapReduce entities kicked off.')
 
-
-class CronAcceptStaleSuggestionsHandler(base.BaseHandler):
-    """Handler to accept suggestions that have no activity on them for
-    THRESHOLD_TIME_BEFORE_ACCEPT time.
-    """
-
-    @acl_decorators.can_perform_cron_tasks
-    def get(self):
-        """Handles get requests."""
-        if feconf.ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS:
-            suggestions = suggestion_services.get_all_stale_suggestions()
-            for suggestion in suggestions:
-                suggestion_services.accept_suggestion(
-                    suggestion, feconf.SUGGESTION_BOT_USER_ID,
-                    suggestion_models.DEFAULT_SUGGESTION_ACCEPT_MESSAGE, None)
+        if job_models.JobModel.do_unfinished_jobs_exist(
+                cron_services.JobModelsCleanupManager.__name__):
+            logging.warning(
+                'A previous JobModels cleanup job is still running.')
+        else:
+            cron_services.JobModelsCleanupManager.enqueue(
+                cron_services.JobModelsCleanupManager.create_new())
+            logging.warning('Deletion jobs for JobModels entities kicked off.')

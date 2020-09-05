@@ -22,15 +22,6 @@ var waitFor = require('../protractor_utils/waitFor.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
-var CreatorDashboardPage =
-  require('../protractor_utils/CreatorDashboardPage.js');
-var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
-var ExplorationPlayerPage = require(
-  '../protractor_utils/ExplorationPlayerPage.js');
-var LearnerDashboardPage =
-  require('../protractor_utils/LearnerDashboardPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 const { browser } = require('protractor');
 
@@ -55,14 +46,7 @@ describe('screenreader and keyboard user accessibility features', function() {
   var oppiaContentContainer = element(
     by.css('.protractor-test-content-container'));
   var ERROR_MESSAGE = 'Content container taking too long to load';
-  var adminPage = null;
-  var creatorDashboardPage = null;
-  var explorationEditorPage = null;
-  var explorationEditorMainTab = null;
-  var explorationEditorSettingsTab = null;
-  var explorationPlayerPage = null;
   var libraryPage = null;
-  var learnerDashboardPage = null;
   var GET_STARTED_URL = 'http://localhost:9001/get-started';
   var COMMUNITY_LIBRARY_URL = 'http://localhost:9001/community-library';
   var LEARNER_DASHBOARD_URL = 'http://localhost:9001/learner-dashboard';
@@ -85,17 +69,7 @@ describe('screenreader and keyboard user accessibility features', function() {
   });
 
   beforeAll(function() {
-    adminPage = new AdminPage.AdminPage();
     libraryPage = new LibraryPage.LibraryPage();
-    learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
-    // The editor and player page objects are only required for desktop testing.
-    if (!browser.isMobile) {
-      creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-      explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-      explorationEditorMainTab = explorationEditorPage.getMainTab();
-      explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-      explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-    }
   });
 
   var checkActionShortcuts = async function(key, elementToFocus) {
@@ -104,20 +78,26 @@ describe('screenreader and keyboard user accessibility features', function() {
     if (await elementToFocus.getAttribute('id') === '') {
       // Should move the focus to the elementToFocus.
       await browser.actions().sendKeys(key).perform();
-      expect(await browser.driver.switchTo().activeElement()
-        .getAttribute('class')).toEqual(
+      expect(
+        await browser.driver.switchTo().activeElement()
+          .getAttribute('class')).toEqual(
         await (await elementToFocus.getAttribute('class')));
 
       // Should move the focus away from the elementToFocus.
+      // Tab must be pressed twice to move focus away from categoryBar.
+      // The categoryBar shares the same class as the next element in DOM order.
       await browser.actions().sendKeys(protractor.Key.TAB).perform();
-      expect(await browser.driver.switchTo().activeElement()
-        .getAttribute('class')).not.toEqual(
+      await browser.actions().sendKeys(protractor.Key.TAB).perform();
+      expect(
+        await browser.driver.switchTo().activeElement()
+          .getAttribute('class')).not.toEqual(
         await (await elementToFocus.getAttribute('class')));
 
       // Should move the focus back to the elementToFocus.
       await browser.actions().sendKeys(key).perform();
-      expect(await browser.driver.switchTo().activeElement()
-        .getAttribute('class')).toEqual(
+      expect(
+        await browser.driver.switchTo().activeElement()
+          .getAttribute('class')).toEqual(
         await (await elementToFocus.getAttribute('class')));
     } else {
       // Should move the focus to the elementToFocus.

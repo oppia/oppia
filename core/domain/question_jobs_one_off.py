@@ -23,7 +23,6 @@ import ast
 import logging
 
 from core import jobs
-from core.domain import html_validation_service
 from core.domain import question_domain
 from core.domain import question_services
 from core.platform import models
@@ -94,73 +93,50 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class QuestionsMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that checks for existence of math components in the questions."""
+class RegenerateQuestionSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to regenerate question summaries."""
 
-    _LATEX_STRINGS_WITHOUT_SVG = 'latex-strings-without-svg'
-    _LATEX_STRINGS_HAVING_SVG = 'latex-strings-having-svg'
+    _DELETED_KEY = 'question_deleted'
+    _PROCESSED_KEY = 'question_processed'
+    _ERROR_KEY = 'question_errored'
+
+    @classmethod
+    def _pre_start_hook(cls, job_id):
+        """A hook or a callback function triggered before marking a job
+        as started.
+
+        Args:
+            job_id: str. The unique ID of the job to be marked as started.
+        """
+        pass
 
     @classmethod
     def entity_classes_to_map_over(cls):
         return [question_models.QuestionModel]
 
     @staticmethod
-    def map(item):
-        if item.deleted:
+    def map(question_model):
+        if question_model.deleted:
+            yield (RegenerateQuestionSummaryOneOffJob._DELETED_KEY, 1)
             return
-        question = question_services.get_question_by_id(item.id)
-        html_string = ''.join(
-            question.question_state_data.
-            get_all_html_content_strings())
-        list_of_latex_strings_without_svg = (
-            html_validation_service.get_latex_strings_without_svg_from_html(
-                html_string))
-        latex_string_to_filename_mapping = (
-            html_validation_service.
-            extract_svg_filename_latex_mapping_in_math_rte_components(
-                html_string))
-        if len(latex_string_to_filename_mapping) > 0:
-            latex_strings_with_svg = [
-                latex_string_to_filename[1] for latex_string_to_filename in (
-                    latex_string_to_filename_mapping)]
+        try:
+            question_services.create_question_summary(question_model.id)
+        except Exception as e:
             yield (
-                QuestionsMathRteAuditOneOffJob._LATEX_STRINGS_HAVING_SVG,
-                (item.id, latex_strings_with_svg))
+                RegenerateQuestionSummaryOneOffJob._ERROR_KEY,
+                'Failed to create question summary %s: %s' % (
+                    question_model.id, e))
+            return
 
-        if len(list_of_latex_strings_without_svg) > 0:
-            yield (
-                QuestionsMathRteAuditOneOffJob._LATEX_STRINGS_WITHOUT_SVG,
-                (item.id, list_of_latex_strings_without_svg))
+        yield (RegenerateQuestionSummaryOneOffJob._PROCESSED_KEY, 1)
 
     @staticmethod
     def reduce(key, values):
-        if key == QuestionsMathRteAuditOneOffJob._LATEX_STRINGS_WITHOUT_SVG:
-            final_values = [ast.literal_eval(value) for value in values]
-            total_number_of_latex_strings_without_svg = 0
-            questions_latex_strings = []
-            for question_id, latex_strings in final_values:
-                total_number_of_latex_strings_without_svg += len(latex_strings)
-                questions_latex_strings.append({
-                    'question_id': question_id,
-                    'latex_strings_without_svg': latex_strings
-                })
-            yield (
-                'Overall result.', {
-                    'total_number_questions_requiring_svgs': len(final_values),
-                    'total_number_of_latex_strings_without_svg': (
-                        total_number_of_latex_strings_without_svg)
-                })
-            yield (
-                'Latex strings without SVGs in each question',
-                questions_latex_strings)
-        elif key == QuestionsMathRteAuditOneOffJob._LATEX_STRINGS_HAVING_SVG:
-            final_values = [ast.literal_eval(value) for value in values]
-            questions_latex_strings = []
-            for question_id, latex_strings in final_values:
-                questions_latex_strings.append({
-                    'question_id': question_id,
-                    'latex_strings_with_svg': latex_strings
-                })
-            yield (
-                'Latex strings with SVGs in each question',
-                questions_latex_strings)
+        if key == RegenerateQuestionSummaryOneOffJob._DELETED_KEY:
+            yield (key, ['Encountered %d deleted questions.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        elif key == RegenerateQuestionSummaryOneOffJob._PROCESSED_KEY:
+            yield (key, ['Successfully processed %d questions.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        else:
+            yield (key, values)

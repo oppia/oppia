@@ -43,6 +43,8 @@ def cleanup():
     replace = '"ENABLE_ACCOUNT_DELETION": false,'
     common.inplace_replace_file(CONSTANTS_FILE_PATH, pattern, replace)
 
+    build.set_constants_to_default()
+
     google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
     processes_to_kill = [
         '.*%s.*' % re.escape(google_app_engine_path),
@@ -52,12 +54,50 @@ def cleanup():
 
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
-    build.set_constants_to_default()
+
     common.stop_redis_server()
 
 
+def run_lighthouse_puppeteer_script():
+    """Runs puppeteer script to collect dynamic urls."""
+    node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
+    puppeteer_path = os.path.join(
+        'core', 'tests', 'puppeteer', 'lighthouse_setup.js')
+    bash_command = [node_path, puppeteer_path]
+
+    try:
+        script_output = subprocess.check_output(bash_command).split('\n')
+        python_utils.PRINT(script_output)
+        for url in script_output:
+            export_url(url)
+        python_utils.PRINT(
+            'Puppeteer script completed successfully.')
+
+    except subprocess.CalledProcessError:
+        python_utils.PRINT(
+            'Puppeteer script failed. More details can be found above.')
+        sys.exit(1)
+
+
+def export_url(url):
+    """Exports the url to an environmental variable."""
+    url_list = url.split('/')
+    if 'collection_editor' in url:
+        os.environ['collection_editor'] = url_list[5]
+    elif 'create' in url:
+        os.environ['exploration_editor'] = url_list[4]
+    elif 'topic_editor' in url:
+        os.environ['topic_editor'] = url_list[4]
+    elif 'story_editor' in url:
+        os.environ['story_editor'] = url_list[4]
+    elif 'skill_editor' in url:
+        os.environ['skill_editor'] = url_list[4]
+    else:
+        return
+
+
 def run_lighthouse_checks():
-    """Runs the lighthhouse checks through the lighthouserc.json config."""
+    """Runs the lighthouse checks through the .lighthouserc.js config."""
 
     node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
@@ -110,10 +150,10 @@ def main():
     # that builds using source maps in prod env. This is to ensure that
     # there are no issues while deploying oppia.
     build.main(args=['--prod_env', '--source_maps'])
-    build.modify_constants(prod_env=True)
     common.start_redis_server()
     start_google_app_engine_server()
     common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
+    run_lighthouse_puppeteer_script()
     run_lighthouse_checks()
 
 

@@ -61,7 +61,8 @@ import { WrittenTranslationsObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('components/state-editor/state-editor-properties-services/' +
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-solicit-answer-details.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 
@@ -72,7 +73,6 @@ describe('ExplorationStatesService', function() {
   var ChangeListService = null;
   var ContextService = null;
   var ExplorationStatesService = null;
-  var StateSolicitAnswerDetailsService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(function($provide) {
@@ -137,7 +137,6 @@ describe('ExplorationStatesService', function() {
     ChangeListService = _ChangeListService_;
     ContextService = _ContextService_;
     ExplorationStatesService = _ExplorationStatesService_;
-    StateSolicitAnswerDetailsService = _StateSolicitAnswerDetailsService_;
   }));
 
   beforeEach(function() {
@@ -157,14 +156,10 @@ describe('ExplorationStatesService', function() {
         param_changes: [],
         interaction: {
           answer_groups: [{
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Contains: [
-                {
-                  x: 'hola'
-                }
-              ]
-            },
+            rule_specs: [{
+              rule_type: 'Contains',
+              inputs: {x: 'hola'}
+            }],
             outcome: {
               dest: 'Me Llamo',
               feedback: {

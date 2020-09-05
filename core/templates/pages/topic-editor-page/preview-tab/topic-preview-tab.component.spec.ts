@@ -22,7 +22,6 @@ import { StorySummaryObjectFactory } from
 
 describe('Topic preview tab', function() {
   var ctrl = null;
-  var $q = null;
   var $rootScope = null;
   var $scope = null;
   var TopicEditorStateService = null;
@@ -30,7 +29,6 @@ describe('Topic preview tab', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     storySummaryObjectFactory = TestBed.get(StorySummaryObjectFactory);
@@ -57,7 +55,7 @@ describe('Topic preview tab', function() {
   }));
 
   it('should initialize the variables', function() {
-    expect(ctrl.activeTab).toEqual('info');
+    expect(ctrl.activeTab).toEqual('story');
   });
 
   it('should return the static image url', function() {
@@ -69,13 +67,9 @@ describe('Topic preview tab', function() {
   it('should change the preview tab', function() {
     ctrl.changePreviewTab('story');
     expect(ctrl.activeTab).toEqual('story');
-    ctrl.changePreviewTab('info');
-    expect(ctrl.activeTab).toEqual('info');
     ctrl.changePreviewTab('subtopic');
     expect(ctrl.activeTab).toEqual('subtopic');
     ctrl.changePreviewTab('practice');
     expect(ctrl.activeTab).toEqual('practice');
-    ctrl.changePreviewTab('info');
-    expect(ctrl.activeTab).toEqual('info');
   });
 });

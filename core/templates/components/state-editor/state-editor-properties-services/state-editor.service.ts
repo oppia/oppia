@@ -58,6 +58,8 @@ export class StateEditorService {
   private _refreshStateTranslationEventEmitter = new EventEmitter<void>();
   private _updateAnswerChoicesEventEmitter = new EventEmitter<AnswerChoice[]>();
   private _saveOutcomeDestDetailsEventEmitter = new EventEmitter<void>();
+  private _handleCustomArgsUpdateEventEmitter =
+    new EventEmitter<AnswerChoice[]>();
 
   activeStateName: string = null;
   stateNames: string[] = [];
@@ -77,6 +79,7 @@ export class StateEditorService {
   stateHintsEditorInitialised: boolean = false;
   stateSolutionEditorInitialised: boolean = false;
   stateEditorDirectiveInitialised: boolean = false;
+  currentRuleInputIsValid: boolean = false;
 
   updateStateContentEditorInitialised(): void {
     this.stateContentEditorInitialised = true;
@@ -100,6 +103,14 @@ export class StateEditorService {
 
   updateStateEditorDirectiveInitialised(): void {
     this.stateEditorDirectiveInitialised = true;
+  }
+
+  updateCurrentRuleInputIsValid(value: boolean): void {
+    this.currentRuleInputIsValid = value;
+  }
+
+  checkCurrentRuleInputIsValid(): boolean {
+    return this.currentRuleInputIsValid;
   }
 
   checkEventListenerRegistrationStatus(): boolean {
@@ -276,6 +287,10 @@ export class StateEditorService {
 
   get onSaveOutcomeDestDetails(): EventEmitter<void> {
     return this._saveOutcomeDestDetailsEventEmitter;
+  }
+
+  get onHandleCustomArgsUpdate(): EventEmitter<AnswerChoice[]> {
+    return this._handleCustomArgsUpdateEventEmitter;
   }
 }
 

@@ -41,7 +41,7 @@
                    aria-label="edit interaction">
               </div>
               <div>
-                <angular-html-bind html-data="interactionPreviewHtml" style="padding: 5px; pointer-events: none;">
+                <angular-html-bind html-data="interactionPreviewHtml" class="oppia-interaction-preview-container">
                 </angular-html-bind>
               </div>
             </div>
@@ -69,13 +69,17 @@
     display: none;
   }
   state-interaction-editor .oppia-exp-interaction-container {
-    border: 1.5px solid #707070;
+    border: 1.5px solid #d3d1d1;
     border-radius: 4px;
     margin: 15px auto 30px;
     width: 87%;
   }
   state-interaction-editor .oppia-state-interaction-content {
     margin-top: 0;
+  }
+  state-interaction-editor .oppia-interaction-preview-container {
+    padding: 5px;
+    pointer-events: none;
   }
   @media screen and (max-width: 768px) {
     state-interaction-editor .oppia-exp-interaction-card-header {

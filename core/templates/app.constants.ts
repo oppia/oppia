@@ -103,23 +103,21 @@ export class AppConstants {
   // displayed.
   public static FATAL_ERROR_CODES = [400, 401, 404, 500];
 
-  // Do not modify these, for backwards-compatibility reasons.
+  // Do not modify these, for backwards-compatibility reasons. These strings are
+  // used to identify components, to generate content ids, and to determine what
+  // type of content a given content id is associated with. If you wish to
+  // change one of these, a state migration of all existing content ids is
+  // required.
   public static COMPONENT_NAME_CONTENT = 'content';
-  public static COMPONENT_NAME_HINT = 'hint';
-  public static COMPONENT_NAME_SOLUTION = 'solution';
   public static COMPONENT_NAME_FEEDBACK = 'feedback';
+  public static COMPONENT_NAME_HINT = 'hint';
+  public static COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS = 'ca';
+  public static COMPONENT_NAME_SOLUTION = 'solution';
   public static COMPONENT_NAME_EXPLANATION = 'explanation';
   public static COMPONENT_NAME_WORKED_EXAMPLE = {
     QUESTION: 'worked_example_question',
     EXPLANATION: 'worked_example_explanation'
   };
-
-  // Do not modify these without a state migration of all existing content ids.
-  // Content id prefixes should indicate what type of content they are
-  // associated with.
-  public static CONTENT_ID_PREFIX_CUSTOMIZATION_ARGS = 'ca';
-  public static CONTENT_ID_PREFIX_HINT = 'hint';
-  public static CONTENT_ID_PREFIX_FEEDBACK = 'feedback';
 
   public static ACTION_TYPE_EXPLORATION_START: 'ExplorationStart' =
     'ExplorationStart';
@@ -164,6 +162,11 @@ export class AppConstants {
     SKILL: 'skill',
     STORY: 'story',
     QUESTION: 'question'
+  };
+
+  public static IMAGE_CONTEXT = {
+    EXPLORATION_SUGGESTIONS: 'exploration_suggestions',
+    QUESTION_SUGGESTIONS: 'question_suggestions'
   };
 
   public static IMAGE_SAVE_DESTINATION_SERVER = 'imageSaveDestinationServer';

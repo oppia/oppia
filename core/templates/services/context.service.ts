@@ -109,6 +109,10 @@ export class ContextService {
           this.pageContext = (
             ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD);
           return ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD;
+        } else if (pathnameArray[i] === 'contributor-dashboard') {
+          this.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD);
+          return ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD;
         }
       }
 
@@ -146,10 +150,11 @@ export class ContextService {
   }
 
   isInExplorationContext(): boolean {
-    return (this.getPageContext() ===
-        ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR ||
-        this.getPageContext() ===
-        ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
+    return (
+      this.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR ||
+      this.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
   }
 
   // This function is used in cases where the URL does not specify the
@@ -242,10 +247,11 @@ export class ContextService {
   // Following method helps to know whether exploration editor is
   // in main editing mode or preview mode.
   isInExplorationEditorMode(): boolean {
-    return (this.getPageContext() ===
-        ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR &&
-        this.getEditorTabContext() === (
-          ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR));
+    return (
+      this.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR &&
+      this.getEditorTabContext() === (
+        ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR));
   }
 
   isInQuestionPlayerMode(): boolean {
@@ -253,6 +259,12 @@ export class ContextService {
       this.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER ||
         this.questionPlayerIsManuallySet);
+  }
+
+  isInExplorationPlayerPage(): boolean {
+    return (
+      this.getPageContext() ===
+        ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
   }
 
   isInExplorationEditorPage(): boolean {
@@ -270,7 +282,8 @@ export class ContextService {
       ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR,
       ServicesConstants.PAGE_CONTEXT.STORY_EDITOR,
       ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR,
-      ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD
+      ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD,
+      ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD
     ];
     return (allowedPageContext.includes(currentPageContext));
   }

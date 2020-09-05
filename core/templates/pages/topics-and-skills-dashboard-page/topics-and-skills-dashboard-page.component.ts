@@ -27,8 +27,9 @@ require('components/entity-creation-services/topic-creation.service.ts');
 require('components/rubrics-editor/rubrics-editor.directive.ts');
 
 require('domain/skill/RubricObjectFactory.ts');
-require('domain/topics_and_skills_dashboard/' +
-    'TopicsAndSkillsDashboardFilterObjectFactory.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'TopicsAndSkillsDashboardFilterObjectFactory.ts');
 require('domain/skill/SkillObjectFactory.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
@@ -59,29 +60,19 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('topicsAndSkillsDashboardPage', {
   template: require('./topics-and-skills-dashboard-page.component.html'),
   controller: [
-    '$timeout', '$http', '$rootScope', '$scope', '$uibModal', '$window',
-    'AlertsService', 'ContextService', 'WindowDimensionsService',
-    'ImageLocalStorageService', 'TopicsAndSkillsDashboardFilterObjectFactory',
-    'RubricObjectFactory', 'SkillCreationService',
-    'SkillObjectFactory', 'TopicCreationService',
-    'TopicsAndSkillsDashboardBackendApiService',
-    'TopicsAndSkillsDashboardPageService', 'UrlInterpolationService',
-    'FATAL_ERROR_CODES', 'SKILL_DIFFICULTIES',
-    'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
-    'SKILL_STATUS_OPTIONS', 'TOPIC_FILTER_CLASSROOM_ALL',
-    'TOPIC_SORT_OPTIONS', 'TOPIC_PUBLISHED_OPTIONS',
+    '$rootScope', '$scope', '$timeout', 'AlertsService', 'SkillCreationService',
+    'TopicCreationService', 'TopicsAndSkillsDashboardBackendApiService',
+    'TopicsAndSkillsDashboardFilterObjectFactory',
+    'TopicsAndSkillsDashboardPageService', 'WindowDimensionsService',
+    'FATAL_ERROR_CODES', 'SKILL_STATUS_OPTIONS', 'TOPIC_FILTER_CLASSROOM_ALL',
+    'TOPIC_PUBLISHED_OPTIONS', 'TOPIC_SORT_OPTIONS',
     function(
-        $timeout, $http, $rootScope, $scope, $uibModal, $window,
-        AlertsService, ContextService, WindowDimensionsService,
-        ImageLocalStorageService, TopicsAndSkillsDashboardFilterObjectFactory,
-        RubricObjectFactory, SkillCreationService,
-        SkillObjectFactory, TopicCreationService,
-        TopicsAndSkillsDashboardBackendApiService,
-        TopicsAndSkillsDashboardPageService, UrlInterpolationService,
-        FATAL_ERROR_CODES, SKILL_DIFFICULTIES,
-        MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES,
-        SKILL_STATUS_OPTIONS, TOPIC_FILTER_CLASSROOM_ALL,
-        TOPIC_SORT_OPTIONS, TOPIC_PUBLISHED_OPTIONS) {
+        $rootScope, $scope, $timeout, AlertsService, SkillCreationService,
+        TopicCreationService, TopicsAndSkillsDashboardBackendApiService,
+        TopicsAndSkillsDashboardFilterObjectFactory,
+        TopicsAndSkillsDashboardPageService, WindowDimensionsService,
+        FATAL_ERROR_CODES, SKILL_STATUS_OPTIONS, TOPIC_FILTER_CLASSROOM_ALL,
+        TOPIC_PUBLISHED_OPTIONS, TOPIC_SORT_OPTIONS) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var TOPIC_CLASSROOM_UNASSIGNED = 'Unassigned';
@@ -323,7 +314,8 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
 
       ctrl.getUpperLimitValueForPagination = function() {
         return (
-          Math.min(((ctrl.pageNumber * ctrl.itemsPerPage) +
+          Math.min((
+            (ctrl.pageNumber * ctrl.itemsPerPage) +
             ctrl.itemsPerPage), ctrl.currentCount));
       };
 

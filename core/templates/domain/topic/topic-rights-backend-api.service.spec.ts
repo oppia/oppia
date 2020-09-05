@@ -29,7 +29,6 @@ require('services/csrf-token.service.ts');
 describe('Topic rights backend API service', function() {
   var TopicRightsBackendApiService = null;
   var $rootScope = null;
-  var $scope = null;
   var $httpBackend = null;
   var CsrfService = null;
   var topicId = '0';
@@ -49,7 +48,6 @@ describe('Topic rights backend API service', function() {
       'TopicRightsBackendApiService');
     CsrfService = $injector.get('CsrfTokenService');
     $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
 
     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
@@ -197,8 +195,8 @@ describe('Topic rights backend API service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('PUT', '/rightshandler/send_topic_publish_mail/' +
-      topicId).respond(200);
+    $httpBackend.expect(
+      'PUT', '/rightshandler/send_topic_publish_mail/' + topicId).respond(200);
     TopicRightsBackendApiService.sendMail(topicId).then(
       successHandler, failHandler);
     $httpBackend.flush();
@@ -211,8 +209,8 @@ describe('Topic rights backend API service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('PUT', '/rightshandler/send_topic_publish_mail/' +
-      topicId).respond(404);
+    $httpBackend.expect(
+      'PUT', '/rightshandler/send_topic_publish_mail/' + topicId).respond(404);
     TopicRightsBackendApiService.sendMail(topicId).then(
       successHandler, failHandler);
     $httpBackend.flush();

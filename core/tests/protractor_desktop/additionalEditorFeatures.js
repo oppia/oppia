@@ -25,12 +25,6 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-
-var AdminPage = require('../protractor_utils/AdminPage.js');
-var CollectionEditorPage =
-  require('../protractor_utils/CollectionEditorPage.js');
-var CreatorDashboardPage =
-  require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
@@ -38,24 +32,18 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Full exploration editor', function() {
-  var adminPage = null;
-  var collectionEditorPage = null;
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
-  var creatorDashboardPage = null;
   var libraryPage = null;
 
   beforeAll(function() {
-    adminPage = new AdminPage.AdminPage();
-    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     libraryPage = new LibraryPage.LibraryPage();
-    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
   });
 
   it('should walk through the tutorial when user repeatedly clicks Next',
@@ -267,8 +255,8 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('You must be happy!'),
       null, false, 'Equals', 'happy');
-    await explorationEditorMainTab.addResponse('TextInput',
-      await forms.toRichText('No being sad!'),
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('No being sad!'),
       null, false, 'Contains', 'sad');
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
@@ -309,8 +297,8 @@ describe('Full exploration editor', function() {
     await libraryPage.findExploration('Testing multiple rules');
     await libraryPage.playExploration('Testing multiple rules');
     var explorationId = await general.getExplorationIdFromPlayer();
-    await browser.get(general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
-        explorationId);
+    await browser.get(
+      general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId);
     await explorationEditorMainTab.exitTutorial();
 
     // Verify nothing can change with this user.

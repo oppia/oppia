@@ -20,14 +20,13 @@
  * followed by the name of the arg.
  */
 
-require('interactions/codemirrorRequires.ts');
+require('third-party-imports/ui-codemirror.import.ts');
 
 require('interactions/CodeRepl/directives/code-repl-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
   'interactions/interaction-attributes-extractor.service.ts');
-require('services/contextual/window-dimensions.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 
 import { Subscription } from 'rxjs';
@@ -47,11 +46,9 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
       template: require('./code-repl-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'WindowDimensionsService',
-        'CurrentInteractionService',
+        '$attrs', '$scope', 'CurrentInteractionService',
         function(
-            $scope, $attrs, WindowDimensionsService,
-            CurrentInteractionService) {
+            $attrs, $scope, CurrentInteractionService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.initCodeEditor = function(editor) {
@@ -171,7 +168,8 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
                 markOptions);
 
               for (var i = 0; i < postCodeNumLines; i++) {
-                editor.addLineClass(preCodeNumLines + userCodeNumLines + i,
+                editor.addLineClass(
+                  preCodeNumLines + userCodeNumLines + i,
                   'text', 'code-repl-noneditable-line');
               }
             }

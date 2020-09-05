@@ -19,7 +19,6 @@
 require('components/summary-tile/subtopic-summary-tile.directive.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts');
-require('pages/topic-viewer-page/info-tab/topic-info-tab.directive.ts');
 require(
   'pages/topic-viewer-page/stories-list/' +
     'topic-viewer-stories-list.component.ts');
@@ -32,10 +31,9 @@ require(
 angular.module('oppia').component('topicPreviewTab', {
   template: require('./topic-preview-tab.component.html'),
   controllerAs: '$ctrl',
-  controller: ['$scope', 'TopicEditorStateService', 'UrlInterpolationService',
-    function($scope, TopicEditorStateService, UrlInterpolationService) {
+  controller: ['TopicEditorStateService', 'UrlInterpolationService',
+    function(TopicEditorStateService, UrlInterpolationService) {
       var ctrl = this;
-      var TAB_INFO = 'info';
       var TAB_STORY = 'story';
       var TAB_SUBTOPIC = 'subtopic';
       var TAB_PRACTICE = 'practice';
@@ -43,7 +41,7 @@ angular.module('oppia').component('topicPreviewTab', {
         ctrl.topic = TopicEditorStateService.getTopic();
         ctrl.topicName = ctrl.topic.getName();
         ctrl.subtopics = ctrl.topic.getSubtopics();
-        ctrl.activeTab = TAB_INFO;
+        ctrl.activeTab = TAB_STORY;
         ctrl.canonicalStorySummaries = (
           TopicEditorStateService.getCanonicalStorySummaries());
         ctrl.chapterCount = 0;
@@ -57,7 +55,6 @@ angular.module('oppia').component('topicPreviewTab', {
       };
       ctrl.changePreviewTab = function(tabName) {
         switch (tabName) {
-          case TAB_INFO: ctrl.activeTab = TAB_INFO; break;
           case TAB_STORY: ctrl.activeTab = TAB_STORY; break;
           case TAB_SUBTOPIC: ctrl.activeTab = TAB_SUBTOPIC; break;
           case TAB_PRACTICE: ctrl.activeTab = TAB_PRACTICE; break;

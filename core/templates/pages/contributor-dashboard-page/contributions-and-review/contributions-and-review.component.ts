@@ -52,12 +52,12 @@ angular.module('oppia').component('contributionsAndReview', {
     '$filter', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'MisconceptionObjectFactory',
     'QuestionObjectFactory', 'SkillBackendApiService',
-    'UrlInterpolationService', 'UserService', 'ENTITY_TYPE',
+    'UrlInterpolationService', 'UserService', 'ENTITY_TYPE', 'IMAGE_CONTEXT',
     function(
         $filter, $uibModal, AlertsService, ContextService,
         ContributionAndReviewService, MisconceptionObjectFactory,
         QuestionObjectFactory, SkillBackendApiService,
-        UrlInterpolationService, UserService, ENTITY_TYPE) {
+        UrlInterpolationService, UserService, ENTITY_TYPE, IMAGE_CONTEXT) {
       var ctrl = this;
       var SUGGESTION_LABELS = {
         review: {
@@ -107,7 +107,8 @@ angular.module('oppia').component('contributionsAndReview', {
           var requiredData = {
             id: suggestion.suggestion_id,
             heading: $filter('formatRtePreview')(change.translation_html),
-            subheading: (details.topic_name + ' / ' + details.story_title +
+            subheading: (
+              details.topic_name + ' / ' + details.story_title +
               ' / ' + details.chapter_title),
             labelText: SUGGESTION_LABELS[suggestion.status].text,
             labelColor: SUGGESTION_LABELS[suggestion.status].color,
@@ -235,6 +236,8 @@ angular.module('oppia').component('contributionsAndReview', {
           var contributionDetails = (
             ctrl.contributions[suggestionId].details);
           var skillId = suggestion.change.skill_id;
+          ContextService.setCustomEntityContext(
+            IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
           SkillBackendApiService.fetchSkill(skillId).then((skillDict) => {
             var misconceptionsBySkill = {};
             var skill = skillDict.skill;
