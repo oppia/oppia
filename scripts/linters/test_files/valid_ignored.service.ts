@@ -21,4 +21,4 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-export class MockCsrfTokenService extends SomeService {}
+export class MockIgnoredService extends SomeService {}

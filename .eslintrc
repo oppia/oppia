@@ -121,7 +121,8 @@
       "error",
       {
         "code": 80,
-        "ignoreUrls": true
+        "ignoreUrls": true,
+        "ignorePattern: '
       }
     ],
     "no-compare-neg": "off",

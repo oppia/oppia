@@ -734,8 +734,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         expected_messages = [
             'Please import %s to Angular Services Index file in %s'
             % (class_name, angular_services_index_path),
-            'Please add the pair %s, without line breaks in between,'
-            ' to the angularServices in %s'
+            'Please add the pair %s, to the angularServices in %s'
             % (service_name_type_pair, angular_services_index_path)
         ]
         self.validate(lint_task_report, expected_messages, 1)

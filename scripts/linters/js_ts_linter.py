@@ -985,8 +985,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         failed = False
         for file_path in self.ts_files:
             file_content = self.file_cache.read(file_path)
-            if not '@Injectable({' in file_content:
-                continue
             class_names = re.findall(injectable_pattern, file_content)
             for class_name in class_names:
                 if class_name in INJECTABLES_TO_IGNORE:
