@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
 
@@ -84,7 +85,7 @@ def _should_index_exploration(exp_summary):
         search queries.
     """
     rights = rights_manager.get_exploration_rights(exp_summary.id)
-    return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
+    return rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
 
 
 def get_search_rank_from_exp_summary(exp_summary):
@@ -160,7 +161,7 @@ def _should_index_collection(collection):
         bool. Whether a particular collection should be indexed.
     """
     rights = rights_manager.get_collection_rights(collection.id)
-    return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
+    return rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
 
 
 def search_explorations(query, limit, sort=None, cursor=None):

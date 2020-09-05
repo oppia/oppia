@@ -20,8 +20,6 @@ import { TestBed } from '@angular/core/testing';
 
 import { GuppyInitializationService } from
   'services/guppy-initialization.service';
-import { MathInteractionsService } from
-  'services/math-interactions.service';
 
 declare global {
   interface Window {
@@ -52,11 +50,9 @@ class MockGuppy {
 
 describe('GuppyInitializationService', () => {
   let guppyInitializationService: GuppyInitializationService = null;
-  let mathInteractionsService: MathInteractionsService = null;
 
   beforeEach(() => {
     guppyInitializationService = TestBed.get(GuppyInitializationService);
-    mathInteractionsService = TestBed.get(MathInteractionsService);
     window.Guppy = MockGuppy;
   });
 
