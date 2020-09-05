@@ -27,6 +27,7 @@ module.exports = {
         `http://127.0.0.1:8181/collection_editor/create/${process.env.collection_editor}`,
         `http://127.0.0.1:8181/topic_editor/${process.env.topic_editor}`,
         `http://127.0.0.1:8181/skill_editor/${process.env.skill_editor}`,
+        `http://127.0.0.1:8181/story_editor/${process.env.story_editor}`,
         'http://127.0.0.1:8181/about',
         'http://127.0.0.1:8181/community-library',
         'http://127.0.0.1:8181/contact',
