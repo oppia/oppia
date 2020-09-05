@@ -105,7 +105,7 @@ const createCollections = async function(context, page) {
   try {
     // eslint-disable-next-line no-console
     console.log('Creating Collections...');
-    setRole(page, 'string:COLLECTION_EDITOR')
+    await setRole(page, 'string:COLLECTION_EDITOR');
     // Load in Collection
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin');

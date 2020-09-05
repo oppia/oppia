@@ -73,7 +73,7 @@ describe('screenreader and keyboard user accessibility features', function() {
   });
 
   var checkActionShortcuts = async function(key, elementToFocus) {
-  await waitFor.presenceOf(elementToFocus, 'Element took too long to load');
+    await waitFor.presenceOf(elementToFocus, 'Element took too long to load');
     // Should move the focus to the elementToFocus.
     await browser.actions().sendKeys(key).perform();
     expect(
