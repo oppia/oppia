@@ -79,7 +79,7 @@ describe('screenreader and keyboard user accessibility features', function() {
     expect(
       await browser.driver.switchTo().activeElement()
         .getAttribute('class')).toEqual(
-      await (await elementToFocus.getAttribute('class')));
+      await elementToFocus.getAttribute('class'));
 
     // Should move the focus away from the elementToFocus.
     // Tab must be pressed twice to move focus away from categoryBar.
@@ -89,14 +89,14 @@ describe('screenreader and keyboard user accessibility features', function() {
     expect(
       await browser.driver.switchTo().activeElement()
         .getAttribute('class')).not.toEqual(
-      await (await elementToFocus.getAttribute('class')));
+      await elementToFocus.getAttribute('class'));
 
     // Should move the focus back to the elementToFocus.
     await browser.actions().sendKeys(key).perform();
     expect(
       await browser.driver.switchTo().activeElement()
         .getAttribute('class')).toEqual(
-      await (await elementToFocus.getAttribute('class')));
+      await elementToFocus.getAttribute('class'));
   };
 
   it('should skip to the main content element', async function() {
