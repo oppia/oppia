@@ -102,7 +102,6 @@ export const bootstrap = (
  * @param {string} camelCaseName - Name of the upgraded component in camelCase.
  * @param {unknown} upgradedComponentTypes - An array consisting of only
  *   one element. That element is the type of the upgraded component.
- * @param {boolean} focus - To run this test in fdescribe.
  */
 export const setupAndGetUpgradedComponent = (
     kebabCaseName: string,
