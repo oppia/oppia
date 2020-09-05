@@ -16,7 +16,6 @@
  * @fileoverview Angular services index file.
  */
 
-/* eslint-disable max-len */
 import { ExternalRteSaveService } from './external-rte-save.service';
 import { ExternalSaveService } from './external-save.service';
 import { PlatformFeatureService } from './platform-feature.service';
@@ -352,7 +351,7 @@ import { TranslateService } from 'services/translate.service';
 import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
-/* eslint-enable max-len */
+
 export const angularServices: [string, unknown][] = [
   ['AdminBackendApiService', AdminBackendApiService],
   ['AdminDataService', AdminDataService],
