@@ -21,7 +21,6 @@ var Constants = require('./ProtractorConstants');
 
 var until = protractor.ExpectedConditions;
 var fs = require('fs');
-var path = require('path');
 
 // When running tests on mobile via browserstack, the localhost
 // might take some time to establish a connection with the

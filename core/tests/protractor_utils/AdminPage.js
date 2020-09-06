@@ -373,15 +373,15 @@ var AdminPage = function() {
   };
 
   this.uploadTopicSimilarities = async function(
-    relativePathToSimilaritiesFile) {
-      var absPath = path.resolve(__dirname, relativePathToSimilaritiesFile);
-      await waitFor.visibilityOf(
-        chooseSimilarityFileInput,
-        'Similarity upload form taking too long to appear');
-      await chooseSimilarityFileInput.sendKeys(absPath);
-      await action.click(
-        'Similarity file upload button', similarityFileUploadButton);
-    };
+      relativePathToSimilaritiesFile) {
+    var absPath = path.resolve(__dirname, relativePathToSimilaritiesFile);
+    await waitFor.visibilityOf(
+      chooseSimilarityFileInput,
+      'Similarity upload form taking too long to appear');
+    await chooseSimilarityFileInput.sendKeys(absPath);
+    await action.click(
+      'Similarity file upload button', similarityFileUploadButton);
+  };
 
   this.expectSimilarityUploadSuccess = async function() {
     var text = 'Topic similarities uploaded successfully.';
@@ -454,8 +454,8 @@ var AdminPage = function() {
     await action.sendKeys(
       'Current username input', oldUsernameInput, oldUsername);
     await action.sendKeys('New username input', newUsernameInput, newUsername);
-    await action.click('Username change submit button',
-      usernameChangeSubmitButton);
+    await action.click(
+      'Username change submit button', usernameChangeSubmitButton);
     var text = 'Successfully renamed ' + oldUsername + ' to ' + newUsername;
     await waitFor.textToBePresentInElement(
       statusMessage, text, 'Username was not successfully changed');
@@ -466,38 +466,38 @@ var AdminPage = function() {
   };
 
   this.extractData = async function(
-    expID, expVersion, stateName, numberOfAnswers, isMeantToFail) {
-      await browser.refresh();
-      await waitFor.pageToFullyLoad();
-      await action.sendKeys(
-        'Extract Data Exploration ID Input', extractDataExplorationIdInput,
-        expID);
-      await action.sendKeys(
-        'Extract Data Exploration Version Input',
-        extractDataExplorationVersionInput, expVersion);
-      await action.sendKeys(
-        'Extract Data State Name Input', extractDataStateNameInput,
-        stateName);
-      await action.sendKeys(
-        'Extract Data Number Of Answers Input', extractDataNumAnswersInput,
-        numberOfAnswers);
+      expID, expVersion, stateName, numberOfAnswers, isMeantToFail) {
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+    await action.sendKeys(
+      'Extract Data Exploration ID Input', extractDataExplorationIdInput,
+      expID);
+    await action.sendKeys(
+      'Extract Data Exploration Version Input',
+      extractDataExplorationVersionInput, expVersion);
+    await action.sendKeys(
+      'Extract Data State Name Input', extractDataStateNameInput,
+      stateName);
+    await action.sendKeys(
+      'Extract Data Number Of Answers Input', extractDataNumAnswersInput,
+      numberOfAnswers);
+    await action.click(
+      'Extract Data Form Submit Button', extractDataFormSubmitButton);
+    if (isMeantToFail) {
+      numExtractionHandles = await browser.driver.getAllWindowHandles();
+      numExtractionHandles = numExtractionHandles.length;
       await action.click(
-        'Extract Data Form Submit Button', extractDataFormSubmitButton);
-      if (isMeantToFail) {
-        numExtractionHandles = await browser.driver.getAllWindowHandles();
-        numExtractionHandles = numExtractionHandles.length;
-        await action.click(
-          'Extract Data Submit Button', extractDataFormSubmitButton);
-        await waitFor.pageToFullyLoad();
-      } else {
-        await waitFor.visibilityOf(
-          extractDataStatusMessage,
-          'Data extraction status message taking too long to appear.');
-        await waitFor.textToBePresentInElement(
-          extractDataStatusMessage,
-          'Status: Data extraction query has been submitted. Please wait.');
-      }
-    };
+        'Extract Data Submit Button', extractDataFormSubmitButton);
+      await waitFor.pageToFullyLoad();
+    } else {
+      await waitFor.visibilityOf(
+        extractDataStatusMessage,
+        'Data extraction status message taking too long to appear.');
+      await waitFor.textToBePresentInElement(
+        extractDataStatusMessage,
+        'Status: Data extraction query has been submitted. Please wait.');
+    }
+  };
 
   this.expectExtractionFailure = async function() {
     var newNumExtractionHandles = await browser.driver.getAllWindowHandles();

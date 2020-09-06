@@ -24,7 +24,6 @@ var workflow = require('../protractor_utils/workflow.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var TopicsAndSkillsDashboardPage = require(
   '../protractor_utils/TopicsAndSkillsDashboardPage.js');
-var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage = require(
@@ -35,7 +34,6 @@ var LibraryPage = require(
 describe('Admin misc tab', function() {
   var adminPage = null;
   var topicsAndSkillsDashboardPage = null;
-  var topicEditorPage = null;
   var topicId = null;
   var explorationId = null;
   var explorationEditorPage = null;
@@ -174,11 +172,11 @@ describe('Admin misc tab', function() {
     await adminPage.getMiscTab();
     await adminPage.extractData(explorationId, '2', 'First', '0', false);
     await adminPage.expectExtractionSuccess();
-    // await browser.refresh();
-    // await waitFor.pageToFullyLoad();
-    // await adminPage.extractData('0', '0', '0', '0', true);
+    // Await browser.refresh();
+    // Await waitFor.pageToFullyLoad();
+    // Await adminPage.extractData('0', '0', '0', '0', true);
     // We expect errors because we inputted an invalid exploration ID.
-    // await adminPage.expectExtractionFailure();
+    // Await adminPage.expectExtractionFailure();
     allowedErrors.push('rejection', '400', '500');
   });
 
