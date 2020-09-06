@@ -67,7 +67,7 @@ export class ObjectsDomainConstants {
 
   public static RATIO_PARSING_ERRORS = {
     INVALID_COLONS:
-      'Your answer has two colons (:) next to each other.',
+      'Your answer has multiple colons (:) next to each other.',
     INVALID_CHARS:
       'Please write a ratio that consists of digits separated by colons' +
       '(e.g. 1:2 or 1:2:3).',

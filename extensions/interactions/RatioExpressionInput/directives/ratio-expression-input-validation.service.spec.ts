@@ -197,8 +197,8 @@ describe('RatioExpressionInputValidationService', () => {
     }, {
       type: WARNING_TYPES.ERROR,
       message: 'Rule 3 from answer group 1 will never be matched because' +
-      ' it is preceded by a \'HasNumberOfTermsEqualTo\' rule with a matching' +
-      ' input.'
+      ' the \'HasNumberOfTermsEqualTo\' rule is preceded by a rule with a ' +
+      'matching input.'
     }]);
   });
 
