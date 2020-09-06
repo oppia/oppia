@@ -42,8 +42,6 @@ describe('Topic editor tab directive', function() {
   var skillSummary = null;
   var story1 = null;
   var story2 = null;
-  var ContextService = null;
-  var ImageUploadHelperService = null;
   var directive = null;
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
@@ -55,7 +53,6 @@ describe('Topic editor tab directive', function() {
   var SubtopicObjectFactory = null;
   var StoryReferenceObjectFactory = null;
   var UndoRedoService = null;
-  var WindowDimensionsService = null;
   var TopicEditorRoutingService = null;
   var mockStorySummariesInitializedEventEmitter = new EventEmitter();
 
@@ -75,11 +72,8 @@ describe('Topic editor tab directive', function() {
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    ContextService = $injector.get('ContextService');
     $uibModalInstance = $injector.get('$uibModal');
     $q = $injector.get('$q');
-    ImageUploadHelperService = $injector.get('ImageUploadHelperService');
-    WindowDimensionsService = $injector.get('WindowDimensionsService');
     directive = $injector.get('topicEditorTabDirective')[0];
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
@@ -347,6 +341,40 @@ describe('Topic editor tab directive', function() {
       $scope.updateTopicDescription('New description');
       expect(topicDescriptionSpy).not.toHaveBeenCalled();
     });
+
+  it('should call the TopicUpdateService if topic meta tag content is updated',
+    function() {
+      var topicMetaTagContentSpy = (
+        spyOn(TopicUpdateService, 'setMetaTagContent'));
+      $scope.updateTopicMetaTagContent('new meta tag content');
+      expect(topicMetaTagContentSpy).toHaveBeenCalled();
+    });
+
+  it('should not call the TopicUpdateService if topic description is same',
+    function() {
+      $scope.updateTopicMetaTagContent('New meta tag content');
+      var topicMetaTagContentSpy = (
+        spyOn(TopicUpdateService, 'setMetaTagContent'));
+      $scope.updateTopicMetaTagContent('New meta tag content');
+      expect(topicMetaTagContentSpy).not.toHaveBeenCalled();
+    });
+
+  it('should call the TopicUpdateService if practice tab is displayed ' +
+    'property is updated', function() {
+    var topicPracticeTabSpy = (
+      spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
+    $scope.updatePracticeTabIsDisplayed(true);
+    expect(topicPracticeTabSpy).toHaveBeenCalled();
+  });
+
+  it('should not call the TopicUpdateService if practice tab is displayed ' +
+   'property is same', function() {
+    $scope.updatePracticeTabIsDisplayed(true);
+    var topicPracticeTabSpy = (
+      spyOn(TopicUpdateService, 'setPracticeTabIsDisplayed'));
+    $scope.updatePracticeTabIsDisplayed(true);
+    expect(topicPracticeTabSpy).not.toHaveBeenCalled();
+  });
 
   it('should call the TopicUpdateService if skill is deleted from topic',
     function() {

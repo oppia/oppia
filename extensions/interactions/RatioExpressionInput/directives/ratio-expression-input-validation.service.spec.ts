@@ -101,7 +101,7 @@ describe('RatioExpressionInputValidationService', () => {
       }
     });
 
-    answerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
+    answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
   });
 
   it('should be able to perform basic validation', () => {
@@ -112,8 +112,7 @@ describe('RatioExpressionInputValidationService', () => {
 
   it('should catch redundancy of rules with matching inputs', () => {
     // The third rule will never get matched.
-    answerGroups[0].updateRuleTypesToInputs(
-      [isEquivalent, equals]);
+    answerGroups[0].rules = [equals, isEquivalent];
 
     warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
@@ -131,8 +130,7 @@ describe('RatioExpressionInputValidationService', () => {
     });
 
     // The second rule will never get matched.
-    answerGroups[0].updateRuleTypesToInputs(
-      [isEquivalent, isEquivalentNonSimplified]);
+    answerGroups[0].rules = [isEquivalent, isEquivalentNonSimplified];
 
     warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
@@ -156,14 +154,13 @@ describe('RatioExpressionInputValidationService', () => {
     });
 
     // The second rule will never get matched.
-    answerGroups[0].updateRuleTypesToInputs(
-      [hasNumberOfTermsEqualTo, equals, equalFourTerms]);
+    answerGroups[0].rules = [hasNumberOfTermsEqualTo, equals, equalFourTerms];
 
     warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 3 from answer group 1 will never be matched because' +
+      message: 'Rule 2 from answer group 1 will never be matched because' +
       ' it is preceded by a \'HasNumberOfTermsEqualTo\' rule with a matching' +
       ' input.'
     }]);
@@ -182,8 +179,8 @@ describe('RatioExpressionInputValidationService', () => {
     });
 
     // The second rule will never get matched.
-    answerGroups[0].updateRuleTypesToInputs(
-      [equalsTwoTerms, equals, hasNumberOfTermsEqualToLength2]);
+    answerGroups[0].rules = [
+      equalsTwoTerms, equals, hasNumberOfTermsEqualToLength2];
     warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -194,11 +191,6 @@ describe('RatioExpressionInputValidationService', () => {
       type: WARNING_TYPES.ERROR,
       message: 'Rule 3 from answer group 1 will never be matched because' +
       ' it has fewer number of terms than required.'
-    }, {
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 3 from answer group 1 will never be matched because' +
-      ' the \'HasNumberOfTermsEqualTo\' rule is preceded by a rule with a ' +
-      'matching input.'
     }]);
   });
 

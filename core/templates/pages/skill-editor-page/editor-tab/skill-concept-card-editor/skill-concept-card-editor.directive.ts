@@ -67,8 +67,8 @@ angular.module('oppia').directive('skillConceptCardEditor', [
         '/pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
         'skill-concept-card-editor.directive.html'),
       controller: [
-        '$scope', '$filter', '$uibModal',
-        function($scope, $filter, $uibModal) {
+        '$filter', '$scope', '$uibModal',
+        function($filter, $scope, $uibModal) {
           var ctrl = this;
 
           $scope.getStaticImageUrl = function(imagePath) {
@@ -86,8 +86,6 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                 $scope.skill.getConceptCard().getWorkedExamples()
             };
           };
-
-          var workedExamplesMemento = null;
 
           $scope.isEditable = function() {
             return true;

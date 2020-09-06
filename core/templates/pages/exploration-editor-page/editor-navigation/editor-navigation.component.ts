@@ -41,8 +41,8 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('editorNavigation', {
   template: require('./editor-navigation.component.html'),
   controller: [
-    '$q', '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
-    'ChangeListService', 'EditabilityService',
+    '$q', '$scope', '$timeout', '$uibModal', 'ChangeListService',
+    'ContextService', 'EditabilityService',
     'ExplorationImprovementsService', 'ExplorationRightsService',
     'ExplorationSaveService',
     'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
@@ -51,8 +51,8 @@ angular.module('oppia').component('editorNavigation', {
     'UserExplorationPermissionsService', 'UserService',
     'WindowDimensionsService',
     function(
-        $q, $rootScope, $scope, $timeout, $uibModal, ContextService,
-        ChangeListService, EditabilityService,
+        $q, $scope, $timeout, $uibModal, ChangeListService,
+        ContextService, EditabilityService,
         ExplorationImprovementsService, ExplorationRightsService,
         ExplorationSaveService,
         ExplorationWarningsService, RouterService, SiteAnalyticsService,

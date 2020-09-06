@@ -21,7 +21,6 @@ require(
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
-require('components/entity-creation-services/skill-creation.service.ts');
 require(
   'components/forms/custom-forms-directives/' +
     'edit-thumbnail-modal.controller.ts');
@@ -42,9 +41,7 @@ require(
 require(
   'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
 
-require('services/alerts.service.ts');
 require('services/context.service.ts');
-require('services/csrf-token.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/image-upload-helper.service.ts');
 require('services/page-title.service.ts');
@@ -67,23 +64,25 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
-        'CsrfTokenService', 'EntityCreationService', 'ImageUploadHelperService',
-        'PageTitleService', 'SkillCreationService', 'StoryCreationService',
+        '$rootScope', '$scope', '$uibModal', 'ContextService',
+        'EntityCreationService', 'ImageUploadHelperService',
+        'PageTitleService', 'StoryCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
-        'TopicsAndSkillsDashboardBackendApiService',
-        'TopicUpdateService', 'UndoRedoService', 'UrlInterpolationService',
+        'TopicUpdateService', 'TopicsAndSkillsDashboardBackendApiService',
+        'UndoRedoService', 'UrlInterpolationService',
         'WindowDimensionsService', 'WindowRef',
-        'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
+        'MAX_CHARS_IN_META_TAG_CONTENT', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
+        'MAX_CHARS_IN_TOPIC_NAME',
         function(
-            $rootScope, $scope, $uibModal, AlertsService, ContextService,
-            CsrfTokenService, EntityCreationService, ImageUploadHelperService,
-            PageTitleService, SkillCreationService, StoryCreationService,
+            $rootScope, $scope, $uibModal, ContextService,
+            EntityCreationService, ImageUploadHelperService,
+            PageTitleService, StoryCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
-            TopicsAndSkillsDashboardBackendApiService,
-            TopicUpdateService, UndoRedoService, UrlInterpolationService,
+            TopicUpdateService, TopicsAndSkillsDashboardBackendApiService,
+            UndoRedoService, UrlInterpolationService,
             WindowDimensionsService, WindowRef,
-            MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME) {
+            MAX_CHARS_IN_META_TAG_CONTENT, MAX_CHARS_IN_TOPIC_DESCRIPTION,
+            MAX_CHARS_IN_TOPIC_NAME) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
@@ -91,6 +90,7 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
           $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
             MAX_CHARS_IN_TOPIC_DESCRIPTION);
+          $scope.MAX_CHARS_IN_META_TAG_CONTENT = MAX_CHARS_IN_META_TAG_CONTENT;
           ctrl.initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.skillQuestionCountDict = (
@@ -102,6 +102,9 @@ angular.module('oppia').directive('topicEditorTab', [
               $scope.$applyAsync();
             }
             $scope.editableName = $scope.topic.getName();
+            $scope.editableMetaTagContent = $scope.topic.getMetaTagContent();
+            $scope.editablePracticeIsDisplayed = (
+              $scope.topic.getPracticeTabIsDisplayed());
             $scope.initialTopicName = $scope.topic.getName();
             $scope.initialTopicUrlFragment = $scope.topic.getUrlFragment();
             $scope.editableTopicUrlFragment = $scope.topic.getUrlFragment();
@@ -286,6 +289,23 @@ angular.module('oppia').directive('topicEditorTab', [
             if (newDescription !== $scope.topic.getDescription()) {
               TopicUpdateService.setTopicDescription(
                 $scope.topic, newDescription);
+            }
+          };
+
+          $scope.updateTopicMetaTagContent = function(newMetaTagContent) {
+            if (newMetaTagContent !== $scope.topic.getMetaTagContent()) {
+              TopicUpdateService.setMetaTagContent(
+                $scope.topic, newMetaTagContent);
+            }
+          };
+
+          $scope.updatePracticeTabIsDisplayed = function(
+              newPracticeTabIsDisplayed) {
+            if (
+              newPracticeTabIsDisplayed !==
+              $scope.topic.getPracticeTabIsDisplayed()) {
+              TopicUpdateService.setPracticeTabIsDisplayed(
+                $scope.topic, newPracticeTabIsDisplayed);
             }
           };
 

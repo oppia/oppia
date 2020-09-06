@@ -147,7 +147,6 @@ describe('Audio preloader service', function() {
   var aps, atls, eof, ecs;
   var $httpBackend = null;
   var UrlInterpolationService = null;
-  var $rootScope = null;
   var explorationDict;
   var requestUrl1, requestUrl2, requestUrl3, requestUrl4;
   beforeEach(angular.mock.inject(function($injector) {
@@ -158,7 +157,6 @@ describe('Audio preloader service', function() {
     eof = $injector.get('ExplorationObjectFactory');
     ecs = $injector.get('ContextService');
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
-    $rootScope = $injector.get('$rootScope');
     explorationDict = {
       id: 1,
       title: 'My Title',
@@ -348,14 +346,10 @@ describe('Audio preloader service', function() {
             },
             solution: null,
             answer_groups: [{
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Contains: [
-                  {
-                    x: '1'
-                  }
-                ]
-              },
+              rule_specs: [{
+                rule_type: 'Contains',
+                inputs: {x: '1'}
+              }],
               outcome: {
                 dest: 'State 1',
                 feedback: {
@@ -367,14 +361,10 @@ describe('Audio preloader service', function() {
                 refresher_exploration_id: null
               }
             }, {
-              rule_input_translations: {},
-              rule_types_to_inputs: {
-                Contains: [
-                  {
-                    x: '2'
-                  }
-                ]
-              },
+              rule_specs: [{
+                rule_type: 'Contains',
+                inputs: {x: '2'}
+              }],
               outcome: {
                 dest: 'State 2',
                 feedback: {

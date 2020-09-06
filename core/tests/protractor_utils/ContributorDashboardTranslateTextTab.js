@@ -24,8 +24,6 @@ var ContributorDashboardTranslateTextTab = function() {
     by.css('.protractor-test-language-selector'));
   var selectedLanguageElement = selectorContainer.element(
     by.css('.protractor-test-language-selector-selected'));
-  var dropdown = selectorContainer.element(
-    by.css('.protractor-test-language-selector-dropdown'));
   var featuredLanguageContainer = selectorContainer.element(
     by.css('.protractor-test-featured-language-container'));
   var featuredLanguageElements = selectorContainer.all(

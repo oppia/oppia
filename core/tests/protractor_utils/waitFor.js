@@ -61,7 +61,7 @@ var pageToFullyLoad = async function() {
   // https://github.com/angular/angular.js/issues/14219#issuecomment-251605766
   // and browser.waitForAngular's flakiness
   // https://github.com/angular/protractor/issues/2954.
-  var loadingMessage = element(by.css('[ng-show="loadingMessage"]'));
+  var loadingMessage = element(by.css('protractor-test-loading-fullpage'));
   await browser.driver.wait(
     until.invisibilityOf(loadingMessage), 15000,
     'Page takes more than 15 secs to load');
@@ -120,8 +120,6 @@ var elementAttributeToBe = async function(
 * Wait for new tab is opened
 */
 var newTabToBeCreated = async function(errorMessage, urlToMatch) {
-  var currentHandles = [];
-
   await browser.wait(async function() {
     var handles = await browser.driver.getAllWindowHandles();
     await browser.waitForAngularEnabled(false);
