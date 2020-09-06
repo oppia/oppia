@@ -576,8 +576,10 @@
 /core/templates/third-party-imports/ @nishantwrp
 /jinja_utils*.py @jameesjohn
 /.lighthouserc.js @jimbyo @jameesjohn
+/.lighthouserc-a11y.js @jimbyo
 /puppeteer-login-script.js @jimbyo
 /scripts/run_lighthouse_tests.py @jameesjohn
+/scripts/run_lighthouse_a11y_tests.py @jimbyo
 /webpack.*.ts @nishantwrp
 
 # Typings.

@@ -19,4 +19,3 @@ jobs:
         run: python -m scripts.run_lighthouse_tests
       - name: Run lighthouse accessibility checks
         run: python -m scripts.run_lighthouse_a11y_tests
-
