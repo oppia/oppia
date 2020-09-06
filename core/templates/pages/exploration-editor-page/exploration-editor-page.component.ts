@@ -174,12 +174,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
     'LoaderService', 'PageTitleService', 'ParamChangesObjectFactory',
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
-<<<<<<< HEAD
     'StateEditorRefreshService', 'StateEditorService',
-=======
-    'StateClassifierMappingService', 'StateEditorRefreshService',
-    'StateEditorService',
->>>>>>> 6ebcf4a5c503e7de79a8463b4721819b0a4e8aa4
     'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
     'ThreadDataService', 'UrlInterpolationService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
@@ -200,12 +195,7 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationTitleService, ExplorationWarningsService, GraphDataService,
         LoaderService, PageTitleService, ParamChangesObjectFactory,
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
-<<<<<<< HEAD
         StateEditorRefreshService, StateEditorService,
-=======
-        StateClassifierMappingService, StateEditorRefreshService,
-        StateEditorService,
->>>>>>> 6ebcf4a5c503e7de79a8463b4721819b0a4e8aa4
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
         ThreadDataService, UrlInterpolationService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
