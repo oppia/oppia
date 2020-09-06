@@ -85,6 +85,16 @@ INVALID_TS_EXPECT_ERROR_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_ts_expect_error.ts')
 VALID_TS_EXPECT_ERROR_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid_ts_expect_error.spec.ts')
+VALID_IGNORED_SERVICE_PATH = os.path.join(
+    LINTER_TESTS_DIR, 'valid_ignored.service.ts')
+VALID_UNLISTED_SERVICE_PATH = os.path.join(
+    LINTER_TESTS_DIR, 'valid_unlisted.service.ts')
+
+# Note: Almost all test functions have a subprocess call. This call is to mock
+# the compile function used in js_ts_linter. The tests require fewer files to
+# be compiled instead of all files as done in js_ts_linter. Mocking the
+# compile method reduces the compile time as fewer files are compiled
+# thereby making the tests run faster.
 
 
 class JsTsLintTests(test_utils.LinterTestBase):
@@ -699,6 +709,72 @@ class JsTsLintTests(test_utils.LinterTestBase):
             'Line 39: Invalid punctuation used at '
             'the end of the comment.']
         self.validate(lint_task_report, expected_messages, 1)
+
+    def test_angular_services_index_error(self):
+        def mock_compile_all_ts_files():
+            cmd = (
+                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
+                '%s -target %s -typeRoots %s %s typings/*') % (
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
+                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
+                    'true', 'es5', './node_modules/@types',
+                    VALID_UNLISTED_SERVICE_PATH)
+            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+
+        compile_all_ts_files_swap = self.swap(
+            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
+
+        with compile_all_ts_files_swap:
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
+                [], [VALID_UNLISTED_SERVICE_PATH], FILE_CACHE
+            ).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
+
+        angular_services_index_path = (
+            './core/templates/services/angular-services.index.ts')
+        class_name = 'UnlistedService'
+        service_name_type_pair = (
+            '[\'%s\', %s]' % (class_name, class_name))
+        expected_messages = [
+            'Please import %s to Angular Services Index file in %s'
+            'from %s'
+            % (
+                class_name,
+                angular_services_index_path,
+                VALID_UNLISTED_SERVICE_PATH),
+            'Please add the pair %s to the angularServices in %s'
+            % (service_name_type_pair, angular_services_index_path)
+        ]
+        self.validate(lint_task_report, expected_messages, 1)
+
+    def test_angular_services_index_success(self):
+        def mock_compile_all_ts_files():
+            cmd = (
+                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
+                '%s -target %s -typeRoots %s %s typings/*') % (
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
+                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
+                    'true', 'es5', './node_modules/@types',
+                    VALID_IGNORED_SERVICE_PATH)
+            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+
+        compile_all_ts_files_swap = self.swap(
+            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
+        with compile_all_ts_files_swap:
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
+                [], [VALID_IGNORED_SERVICE_PATH], FILE_CACHE,
+            ).perform_all_lint_checks()
+
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
+
+        expected_messages = [
+            'SUCCESS  Angular Services Index file check passed'
+        ]
+        self.validate(lint_task_report, expected_messages, 0)
 
     def test_get_linters_with_success(self):
         custom_linter, third_party = js_ts_linter.get_linters(

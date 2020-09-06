@@ -21,13 +21,13 @@ require('base-components/base-content.directive.ts');
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { TopicLandingPageConstants } from
-  'pages/landing-pages/topic-landing-page/topic-landing-page.constants';
-
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { TopicLandingPageConstants } from
+  'pages/landing-pages/topic-landing-page/topic-landing-page.constants';
+import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { PageTitleService } from 'services/page-title.service';
 
 
@@ -63,7 +63,8 @@ export class TopicLandingPageComponent implements OnInit {
     private pageTitleService: PageTitleService,
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef) {}
+    private windowRef: WindowRef,
+    private urlService: UrlService) {}
 
   getLessonQualities(): LessonsQuality[] {
     return [{
@@ -144,10 +145,8 @@ export class TopicLandingPageComponent implements OnInit {
     this.siteAnalyticsService.registerOpenCollectionFromLandingPageEvent(
       collectionId);
     setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = this.urlInterpolationService
-        .interpolateUrl('/collection/<collectionId>', {
-          collectionId: collectionId
-        });
+      this.windowRef.nativeWindow.location.href = (
+        `/learn${this.urlService.getPathname()}`);
     }, 150);
   }
 
