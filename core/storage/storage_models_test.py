@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
+import python_utils
 
 from core.domain import takeout_service
 from core.platform import models
@@ -169,9 +170,11 @@ class StorageModelsTest(test_utils.GenericTestBase):
             if not clazz.__name__ in self.BASE_CLASSES
         ]
         for model in all_models:
+            export_policy = model.get_export_policy()
             self.assertEqual(
-                sorted(model._properties),
-                sorted([str(key) for key in export_policy.keys()])
+                sorted([
+                    python_utils.UNICODE(prop) for prop in model._properties]),
+                sorted(export_policy.keys())
             )
             self.assertTrue(
                 set(export_policy.values()).issubset(
