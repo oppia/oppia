@@ -71,8 +71,6 @@ const login = async function(context, page) {
     }
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log('Login Failed');
-    // eslint-disable-next-line no-console
     console.log(e);
   }
 };

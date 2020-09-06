@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Configuration for accessibility.
+ * @fileoverview Configuration for lighthouse-ci.
  */
 
 module.exports = {
