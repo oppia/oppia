@@ -169,10 +169,6 @@ class StorageModelsTest(test_utils.GenericTestBase):
             if not clazz.__name__ in self.BASE_CLASSES
         ]
         for model in all_models:
-            print(model.__name__)
-            export_policy = model.get_export_policy()
-            print(sorted(model._properties))
-            print(sorted([str(key) for key in export_policy.keys()]))
             self.assertEqual(
                 sorted(model._properties),
                 sorted([str(key) for key in export_policy.keys()])
