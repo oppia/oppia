@@ -41,4 +41,4 @@ export const TopicsAndSkillsDashboardPageConstants = {
   TOPIC_PUBLISHED_OPTIONS: ETopicPublishedOptions,
   TOPIC_FILTER_CLASSROOM_ALL: 'All',
   SKILL_STATUS_OPTIONS: constants.SKILL_STATUS_OPTIONS
-};
+} as const;

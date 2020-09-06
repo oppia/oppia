@@ -30,4 +30,4 @@ export const SkillMasteryListConstants = {
     // Color red.
     BAD_MASTERY_COLOR: 'rgb(201, 80, 66)'
   },
-};
+} as const;

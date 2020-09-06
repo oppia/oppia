@@ -26,4 +26,4 @@ export const CollectionEditorPageConstants = {
 
   COLLECTION_TITLE_INPUT_FOCUS_LABEL:
     'collectionTitleInputFocusLabel'
-};
+} as const;

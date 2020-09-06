@@ -25,4 +25,4 @@ export const SvgFilenameEditorConstants = {
   MAX_SVG_DIAGRAM_HEIGHT: 450,
   MIN_SVG_DIAGRAM_WIDTH: 30,
   MIN_SVG_DIAGRAM_HEIGHT: 30
-};
+} as const;

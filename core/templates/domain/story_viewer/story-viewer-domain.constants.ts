@@ -24,4 +24,4 @@ export const StoryViewerDomainConstants = {
   STORY_PROGRESS_URL_TEMPLATE: (
     '/story_progress_handler/<classroom_url_fragment>/' +
     '<topic_url_fragment>/<story_url_fragment>/<node_id>')
-};
+} as const;

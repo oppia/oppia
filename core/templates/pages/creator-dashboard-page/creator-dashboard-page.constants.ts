@@ -46,4 +46,4 @@ export const CreatorDashboardConstants = {
     USERNAME: 'Username',
     IMPACT: 'Impact'
   }
-};
+} as const;

@@ -36,4 +36,4 @@ export const LibraryPageConstants = {
 
   SEARCH_EXPLORATION_URL_TEMPLATE:
     '/exploration/metadata_search?q=<query>'
-};
+} as const;

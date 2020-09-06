@@ -25,4 +25,4 @@ export const ClassroomDomainConstants = {
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision'),
   TOPIC_VIEWER_STORY_URL_TEMPLATE: (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/story')
-};
+} as const;

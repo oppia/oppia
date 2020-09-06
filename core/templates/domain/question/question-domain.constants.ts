@@ -41,4 +41,4 @@ export const QuestionDomainConstants = {
   QUESTION_PROPERTY_QUESTION_STATE_DATA: 'question_state_data',
 
   CMD_UPDATE_QUESTION_PROPERTY: 'update_question_property',
-};
+} as const;

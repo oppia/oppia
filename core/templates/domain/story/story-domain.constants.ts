@@ -59,4 +59,4 @@ export const StoryDomainConstants = {
   STORY_NODE_PROPERTY_DESTINATION_NODE_IDS: 'destination_node_ids',
   STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS: 'acquired_skill_ids',
   STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS: 'prerequisite_skill_ids',
-};
+} as const;

@@ -66,4 +66,4 @@ export const LearnerDashboardPageConstants = {
       i18nId: 'I18N_DASHBOARD_TABLE_HEADING_EXPLORATION'
     }
   }
-};
+} as const;

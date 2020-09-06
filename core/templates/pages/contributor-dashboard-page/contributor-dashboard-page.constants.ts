@@ -41,4 +41,4 @@ export const ContributorDashboardConstants = {
   },
 
   DEFAULT_OPPORTUNITY_LANGUAGE_CODE: 'hi'
-};
+} as const;

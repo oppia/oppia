@@ -70,4 +70,4 @@ export const ServicesConstants = {
 
   RTE_COMPONENT_SPECS: (
     require('rich_text_components_definitions.ts')),
-};
+} as const;

@@ -391,4 +391,4 @@ export const AboutPageConstants = {
     'Zhu Chu',
     'Zoe Madden-Wood',
   ]
-};
+} as const;

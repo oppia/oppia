@@ -28,4 +28,4 @@ export const ReviewTestPageConstants = {
   STORY_VIEWER_PAGE: (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/' +
     'story/<story_url_fragment>')
-};
+} as const;

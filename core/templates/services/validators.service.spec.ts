@@ -32,11 +32,21 @@ describe('Validators service', () => {
       providers: [AlertsService, NormalizeWhitespacePipe]
     });
     vs = TestBed.get(ValidatorsService);
+    // This throws "Cannot assign to 'INVALID_NAME_CHARS' because it
+    // is a read-only property.". We need to suppress this error because
+    // we need to change the value of 'INVALID_NAME_CHARS' for testing
+    // purposes.
+    // @ts-expect-error
     AppConstants.INVALID_NAME_CHARS = ['#', 'x', 'y', 'z'];
   });
 
 
   afterAll(() => {
+    // This throws "Cannot assign to 'INVALID_NAME_CHARS' because it
+    // is a read-only property.". We need to suppress this error because
+    // we need to change the value of 'INVALID_NAME_CHARS' for testing
+    // purposes.
+    // @ts-expect-error
     AppConstants.INVALID_NAME_CHARS = INVALID_NAME_CHARS_COPY;
   });
 

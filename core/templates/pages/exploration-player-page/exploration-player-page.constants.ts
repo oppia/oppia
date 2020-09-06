@@ -93,4 +93,4 @@ export const ExplorationPlayerConstants = {
   FEEDBACK_POPOVER_PATH:
     '/pages/exploration-player-page/templates/' +
     'feedback-popup-container.template.html',
-};
+} as const;

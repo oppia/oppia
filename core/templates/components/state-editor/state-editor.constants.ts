@@ -19,4 +19,4 @@
 export const StateEditorConstants = {
   INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION:
     'The current solution does not correspond to a correct answer.'
-};
+} as const;

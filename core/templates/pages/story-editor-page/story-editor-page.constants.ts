@@ -18,4 +18,4 @@
 
 export const StoryEditorPageConstants = {
   NODE_ID_PREFIX: 'node_'
-};
+} as const;

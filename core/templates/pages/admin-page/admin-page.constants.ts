@@ -33,4 +33,4 @@ export const AdminPageConstants = {
   },
 
   PROFILE_URL_TEMPLATE: '/profile/<username>'
-};
+} as const;

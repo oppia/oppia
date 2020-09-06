@@ -28,4 +28,4 @@ export const TopicViewerDomainConstants = {
   REVIEW_TESTS_URL_TEMPLATE: (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/review-test/' +
     '<story_url_fragment>')
-};
+} as const;

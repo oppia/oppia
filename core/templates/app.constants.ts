@@ -165,4 +165,4 @@ export const AppConstants = {
   IMAGE_SAVE_DESTINATION_SERVER: 'imageSaveDestinationServer',
   IMAGE_SAVE_DESTINATION_LOCAL_STORAGE:
     'imageSaveDestinationLocalStorage'
-};
+} as const;

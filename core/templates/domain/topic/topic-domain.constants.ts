@@ -66,4 +66,4 @@ export const TopicDomainConstants = {
 
   SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML: 'page_contents_html',
   SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO: 'page_contents_audio'
-};
+} as const;

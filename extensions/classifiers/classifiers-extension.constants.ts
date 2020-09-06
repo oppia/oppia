@@ -29,4 +29,4 @@ export const ClassifiersExtensionConstants = {
     OP: 'OP',
     ERRORTOKEN: 'ERRORTOKEN'
   }
-};
+} as const;

@@ -57,4 +57,4 @@ export const ExplorationEditorPageConstants = {
   STATUS_IGNORED: 'ignored',
   STATUS_NOT_ACTIONABLE: 'not_actionable',
   STATUS_OPEN: 'open'
-};
+} as const;

@@ -45,4 +45,4 @@ export const QuestionPlayerConstants = {
   WRONG_ANSWER_PENALTY_FOR_MASTERY: 0.05,
 
   WRONG_ANSWER_PENALTY: 0.1,
-};
+} as const;

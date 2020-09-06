@@ -59,4 +59,4 @@ export const SkillDomainConstants = {
     'delete_prerequisite_skill',
 
   CMD_UPDATE_RUBRICS: 'update_rubrics'
-};
+} as const;

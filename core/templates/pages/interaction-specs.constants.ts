@@ -16,8 +16,8 @@
  * @fileoverview Constant file for the INTERACTION_SPECS constant.
  */
 
-const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+import * as INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 export const InteractionSpecsConstants = {
   INTERACTION_SPECS: INTERACTION_SPECS
-};
+} as const;

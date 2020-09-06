@@ -24,4 +24,4 @@ export const StatisticsDomainConstants = {
   SUBMIT_LEARNER_ANSWER_DETAILS_URL:
     '/learneranswerdetailshandler/<entity_type>/<entity_id>',
   SUGGESTION_IMPROVEMENT_TASK_TYPE: 'suggestion',
-};
+} as const;

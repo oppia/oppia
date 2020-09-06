@@ -22,4 +22,4 @@ export const SubtopicViewerDomainConstants = {
     '<topic_url_fragment>/<subtopic_url_fragment>'),
   TOPIC_VIEWER_URL_TEMPLATE: (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>')
-};
+} as const;

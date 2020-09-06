@@ -43,4 +43,4 @@ export const TopicLandingPageConstants = {
       }
     }
   }
-};
+} as const;

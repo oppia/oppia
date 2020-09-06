@@ -81,4 +81,4 @@ export const ObjectsDomainConstants = {
     EMPTY_STRING:
       'Please enter a valid ratio (e.g. 1:2 or 1:2:3).',
   }
-};
+} as const;
