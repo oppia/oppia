@@ -97,6 +97,7 @@ def export_url(url):
     elif 'skill_editor' in url:
         os.environ['skill_editor'] = url_list[4]
 
+
 def run_webpack_compilation(source_maps=False):
     """Runs webpack compilation."""
     max_tries = 5
@@ -119,6 +120,7 @@ def run_webpack_compilation(source_maps=False):
         python_utils.PRINT(
             'Failed to complete webpack compilation, exiting ...')
         sys.exit(1)
+
 
 def run_lighthouse_checks():
     """Runs the lighthouse accessibility checks."""
