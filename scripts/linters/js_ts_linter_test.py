@@ -96,6 +96,7 @@ VALID_UNLISTED_SERVICE_PATH = os.path.join(
 # compile method reduces the compile time as fewer files are compiled
 # thereby making the tests run faster.
 
+
 class JsTsLintTests(test_utils.LinterTestBase):
     """Tests for js_ts_linter file."""
 
@@ -738,8 +739,12 @@ class JsTsLintTests(test_utils.LinterTestBase):
             '[\'%s\', %s]' % (class_name, class_name))
         expected_messages = [
             'Please import %s to Angular Services Index file in %s'
-            % (class_name, angular_services_index_path),
-            'Please add the pair %s, to the angularServices in %s'
+            'from %s'
+            % (
+                class_name,
+                angular_services_index_path,
+                VALID_UNLISTED_SERVICE_PATH),
+            'Please add the pair %s to the angularServices in %s'
             % (service_name_type_pair, angular_services_index_path)
         ]
         self.validate(lint_task_report, expected_messages, 1)

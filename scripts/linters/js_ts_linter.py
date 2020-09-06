@@ -51,7 +51,12 @@ TS_IGNORE_EXCEPTIONS_FILEPATH = os.path.join(
 TS_IGNORE_EXCEPTIONS = json.load(python_utils.open_file(
     TS_IGNORE_EXCEPTIONS_FILEPATH, 'r'))
 
-# Don't add anymore files to this list.
+# The INJECTABLES_TO_IGNORE contains a list of services that are not supposed
+# to be included in angular-services.index.ts. These services are not required
+# for our application to run but are only present to aid tests or belong to a
+# class of legacy services that will soon be removed from the codebase.
+# NOTE TO DEVELOPERS: Don't add any more files to this list. If you have any
+# questions, please talk to @srijanreddy98.
 INJECTABLES_TO_IGNORE = [
     'MockIgnoredService', # This file is required for the js-ts-linter-test.
     'UpgradedServices' # We don't want this service to be present in the index.
@@ -977,7 +982,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         error_messages = []
         injectable_pattern = '%s%s' % (
             'Injectable\\({\\n*\\s*providedIn: \'root\'\\n*}\\)\\n',
-            'export class ([A-Za-z]*)')
+            'export class ([A-Za-z0-9]*)')
         angular_services_index_path = (
             './core/templates/services/angular-services.index.ts')
         angular_services_index = self.file_cache.read(
@@ -995,7 +1000,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         import_statement_regex, angular_services_index):
                     error_message = (
                         'Please import %s to Angular Services Index file in %s'
-                        % (class_name, angular_services_index_path))
+                        'from %s'
+                        % (class_name, angular_services_index_path, file_path))
                     error_messages.append(error_message)
                     failed = True
 
@@ -1007,7 +1013,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 if not re.search(
                         service_name_type_pair_regex, angular_services_index):
                     error_message = (
-                        'Please add the pair %s, to the angularServices in %s'
+                        'Please add the pair %s to the angularServices in %s'
                         % (service_name_type_pair, angular_services_index_path)
                     )
                     error_messages.append(error_message)
