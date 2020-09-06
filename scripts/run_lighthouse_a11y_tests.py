@@ -23,7 +23,6 @@ import os
 import re
 import subprocess
 import sys
-import time
 
 import python_utils
 from scripts import build
@@ -127,7 +126,7 @@ def run_lighthouse_checks():
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
     bash_command = [
         common.NODE_BIN_PATH, lhci_path, 'autorun',
-         '--config=.lighthouserc-a11y.js']
+        '--config=.lighthouserc-a11y.js']
 
     try:
         subprocess.check_call(bash_command)
@@ -136,7 +135,7 @@ def run_lighthouse_checks():
     except subprocess.CalledProcessError:
         python_utils.PRINT(
             'Lighthouse accessibility checks failed.' +
-             'More details can be found above.')
+            'More details can be found above.')
         sys.exit(1)
 
 
