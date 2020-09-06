@@ -158,10 +158,8 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     base_models.EXPORT_POLICY.EXPORTED in export_policy.values()
                 )
             else:
-                self.assertTrue(
-                    base_models.EXPORT_POLICY.EXPORTED
-                    not in export_policy.values()
-                )
+                self.assertNotIn(
+                    base_models.EXPORT_POLICY.EXPORTED, export_policy.values())
 
     def test_all_fields_have_export_policy(self):
         """Ensure every field in every model has an export policy defined."""
@@ -172,13 +170,20 @@ class StorageModelsTest(test_utils.GenericTestBase):
         ]
         for model in all_models:
             export_policy = model.get_export_policy()
-            for field in model._properties: #pylint: disable=protected-access
-                self.assertTrue(
-                    field in export_policy.keys()
-                )
-                self.assertTrue(
-                    export_policy[field] in {
-                        base_models.EXPORT_POLICY.EXPORTED,
-                        base_models.EXPORT_POLICY.NOT_EXPORTED
-                    }
-                )
+            # if (sorted(model._properties) !=
+            #     sorted([str(key) for key in export_policy.keys()])):
+            #     self.assertEqual(model.__name__, model._properties)
+            print(model.__name__)
+            print(sorted(model._properties))
+            print(sorted([str(key) for key in export_policy.keys()]))
+            self.assertEqual(
+                sorted(model._properties),
+                sorted([str(key) for key in export_policy.keys()])
+            )
+            self.assertTrue(
+                set(export_policy.values()).issubset(
+                {
+                    base_models.EXPORT_POLICY.EXPORTED,
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                })
+            )

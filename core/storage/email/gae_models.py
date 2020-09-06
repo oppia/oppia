@@ -91,15 +91,15 @@ class SentEmailModel(base_models.BaseModel):
         to them.
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'recipient_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'recipient_email': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'sender_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'sender_email': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'intent': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'subject': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'html_body': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'sent_datetime': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'email_hash': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'recipient_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'recipient_email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sender_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sender_email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'intent': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subject': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'html_body': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sent_datetime': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'email_hash': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -318,13 +318,13 @@ class BulkEmailModel(base_models.BaseModel):
         to them.
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'recipient_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'sender_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'sender_email': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'intent': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'subject': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'html_body': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'sent_datetime': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'recipient_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sender_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sender_email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'intent': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subject': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'html_body': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sent_datetime': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -393,7 +393,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'user_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thread_id': base_models.EXPORT_POLICY.EXPORTED,
             'reply_to_id': base_models.EXPORT_POLICY.EXPORTED
         })

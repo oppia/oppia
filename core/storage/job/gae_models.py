@@ -101,16 +101,16 @@ class JobModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'job_type': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'time_queued_msec': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'time_started_msec': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'time_finished_msec': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'status_code': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'metadata': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'output': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'error': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'has_been_cleaned_up': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'additional_job_params': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'job_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_queued_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_started_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_finished_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'metadata': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'output': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'error': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'has_been_cleaned_up': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'additional_job_params': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @property
@@ -229,10 +229,10 @@ class ContinuousComputationModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'status_code': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'status_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'active_realtime_layer_index':
-                base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'last_started_msec': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'last_finished_msec': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'last_stopped_msec': base_models.EXPORT_POLICY.NOT_EXPORTED
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_started_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_finished_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_stopped_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })

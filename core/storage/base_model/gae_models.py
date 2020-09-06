@@ -48,7 +48,7 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
 
 EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'EXPORTED',
-    'NOT_EXPORTED'
+    'NOT_APPLICABLE'
 )
 
 # Constant used when retrieving big number of models.
@@ -128,9 +128,9 @@ class BaseModel(ndb.Model):
     def get_export_policy(cls):
         """Model creation time is not relevant to user data."""
         return {
-            'created_on': EXPORT_POLICY.NOT_EXPORTED,
-            'last_updated': EXPORT_POLICY.NOT_EXPORTED,
-            'deleted': EXPORT_POLICY.NOT_EXPORTED
+            'created_on': EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': EXPORT_POLICY.NOT_APPLICABLE
         }
 
     @classmethod
@@ -401,15 +401,15 @@ class BaseCommitLogEntryModel(BaseModel):
         Takeout.
         """
         return dict(BaseModel.get_export_policy(), **{
-            'user_id': EXPORT_POLICY.NOT_EXPORTED,
-            'commit_type': EXPORT_POLICY.NOT_EXPORTED,
-            'commit_message': EXPORT_POLICY.NOT_EXPORTED,
-            'commit_cmds': EXPORT_POLICY.NOT_EXPORTED,
-            'post_commit_status': EXPORT_POLICY.NOT_EXPORTED,
+            'user_id': EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_type': EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_message': EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_cmds': EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_status': EXPORT_POLICY.NOT_APPLICABLE,
             'post_commit_community_owned':
-                EXPORT_POLICY.NOT_EXPORTED,
-            'post_commit_is_private': EXPORT_POLICY.NOT_EXPORTED,
-            'version': EXPORT_POLICY.NOT_EXPORTED
+                EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_is_private': EXPORT_POLICY.NOT_APPLICABLE,
+            'version': EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -439,7 +439,7 @@ class BaseCommitLogEntryModel(BaseModel):
             committer_id: str. The user_id of the user who committed the
                 change.
             commit_type: str. The type of commit. Possible values are in
-                core.storage.COMMIT_TYPE_CHOICES.
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
             commit_message: str. The commit description message.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
@@ -1081,7 +1081,7 @@ class VersionedModel(BaseModel):
         Takeout.
         """
         return dict(BaseModel.get_export_policy(), **{
-            'version': EXPORT_POLICY.NOT_EXPORTED
+            'version': EXPORT_POLICY.NOT_APPLICABLE
         })
 
 
@@ -1106,10 +1106,10 @@ class BaseSnapshotMetadataModel(BaseModel):
     def get_export_policy(cls):
         """Snapshot Metadata is relevant to the user for Takeout."""
         return dict(BaseModel.get_export_policy(), **{
-            'committer_id': EXPORT_POLICY.NOT_EXPORTED,
+            'committer_id': EXPORT_POLICY.NOT_APPLICABLE,
             'commit_type': EXPORT_POLICY.EXPORTED,
             'commit_message': EXPORT_POLICY.EXPORTED,
-            'commit_cmds': EXPORT_POLICY.NOT_EXPORTED
+            'commit_cmds': EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -1138,7 +1138,7 @@ class BaseSnapshotMetadataModel(BaseModel):
             committer_id: str. The user_id of the user who committed the
                 change.
             commit_type: str. The type of commit. Possible values are in
-                core.storage.COMMIT_TYPE_CHOICES.
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
             commit_message: str. The commit description message.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
@@ -1202,7 +1202,7 @@ class BaseSnapshotContentModel(BaseModel):
         Takeout.
         """
         return dict(BaseModel.get_export_policy(), **{
-            'content': EXPORT_POLICY.NOT_EXPORTED
+            'content': EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod

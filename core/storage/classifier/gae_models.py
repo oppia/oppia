@@ -75,15 +75,15 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'algorithm_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'interaction_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'exp_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'exp_version': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'state_name': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'status': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'training_data': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'next_scheduled_check_time': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'data_schema_version': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'algorithm_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'training_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_scheduled_check_time': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'data_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -240,10 +240,10 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'exp_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'exp_version': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'state_name': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'job_id': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'job_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod

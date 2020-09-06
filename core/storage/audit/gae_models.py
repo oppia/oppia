@@ -58,10 +58,10 @@ class RoleQueryAuditModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'user_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'intent': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'role': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'username': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'intent': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'role': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'username': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -102,9 +102,9 @@ class UsernameChangeAuditModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'committer_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'old_username': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'new_username': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'committer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'old_username': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'new_username': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod

@@ -79,11 +79,13 @@ class QuestionModel(base_models.VersionedModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'question_state_data': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'question_state_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'question_state_data_schema_version':
-                base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'language_code': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'linked_skill_ids': base_models.EXPORT_POLICY.NOT_EXPORTED
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'linked_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'inapplicable_misconception_ids':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -219,9 +221,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'question_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'skill_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'skill_difficulty': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_difficulty': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -645,7 +647,7 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'question_id': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -711,9 +713,12 @@ class QuestionSummaryModel(base_models.BaseModel):
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'question_model_last_updated':
-                base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'question_model_created_on': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'question_content': base_models.EXPORT_POLICY.NOT_EXPORTED
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_model_created_on':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'misconception_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod

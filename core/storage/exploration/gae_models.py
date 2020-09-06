@@ -112,24 +112,24 @@ class ExplorationModel(base_models.VersionedModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'title': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'category': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'objective': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'language_code': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'tags': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'blurb': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'author_notes': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'states_schema_version': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'init_state_name': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'states': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'param_specs': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'param_changes': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'auto_tts_enabled': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'blurb': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'author_notes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'states_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'init_state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'states': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'param_specs': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'param_changes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'auto_tts_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'correctness_feedback_enabled':
-                base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'skill_tags': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'default_skin': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'skin_customizations': base_models.EXPORT_POLICY.NOT_EXPORTED
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'default_skin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skin_customizations': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -243,7 +243,7 @@ class ExplorationContextModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'story_id': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -331,12 +331,12 @@ class ExplorationRightsModel(base_models.VersionedModel):
             'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
             'voice_artist_ids': base_models.EXPORT_POLICY.EXPORTED,
             'viewer_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'community_owned': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'cloned_from': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'viewable_if_private': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'first_published_msec': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'status': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'translator_ids': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'cloned_from': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -520,7 +520,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'exploration_id': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -805,26 +805,26 @@ class ExpSummaryModel(base_models.BaseModel):
         function.
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'title': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'category': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'objective': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'language_code': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'tags': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'ratings': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'scaled_average_rating': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'ratings': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'scaled_average_rating': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_model_last_updated':
-                base_models.EXPORT_POLICY.NOT_EXPORTED,
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_model_created_on':
-                base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'first_published_msec': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'status': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'community_owned': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'owner_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'editor_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'voice_artist_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'viewer_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'contributor_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'contributors_summary': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'version': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'translator_ids': base_models.EXPORT_POLICY.NOT_EXPORTED
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'owner_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'editor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'voice_artist_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'viewer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'contributor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'contributors_summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })

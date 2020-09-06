@@ -134,7 +134,7 @@ class UserSettingsModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'gae_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'email': base_models.EXPORT_POLICY.EXPORTED,
             'role': base_models.EXPORT_POLICY.EXPORTED,
             'last_agreed_to_terms': base_models.EXPORT_POLICY.EXPORTED,
@@ -165,7 +165,7 @@ class UserSettingsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_msec':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'gae_user_id': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'gae_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -497,7 +497,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'user_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id': base_models.EXPORT_POLICY.EXPORTED,
             'last_played_exp_version':
                 base_models.EXPORT_POLICY.EXPORTED,
@@ -802,13 +802,13 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'site_updates': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'site_updates': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'editor_role_notifications':
-                base_models.EXPORT_POLICY.NOT_EXPORTED,
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'feedback_message_notifications':
-                base_models.EXPORT_POLICY.NOT_EXPORTED,
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'subscription_notifications':
-                base_models.EXPORT_POLICY.NOT_EXPORTED
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
 
@@ -965,7 +965,7 @@ class UserSubscribersModel(base_models.BaseModel):
         users.
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'subscriber_ids': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'subscriber_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
 
@@ -1014,8 +1014,8 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'output': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'job_queued_msec': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'output': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'job_queued_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
 
@@ -1086,7 +1086,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
             'average_ratings': base_models.EXPORT_POLICY.EXPORTED,
             'num_ratings': base_models.EXPORT_POLICY.EXPORTED,
             'weekly_creator_stats_list': base_models.EXPORT_POLICY.EXPORTED,
-            'schema_version': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -1222,7 +1222,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'user_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id': base_models.EXPORT_POLICY.EXPORTED,
             'rating': base_models.EXPORT_POLICY.EXPORTED,
             'rated_on': base_models.EXPORT_POLICY.EXPORTED,
@@ -1393,7 +1393,7 @@ class CollectionProgressModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'user_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'collection_id': base_models.EXPORT_POLICY.EXPORTED,
             'completed_explorations': base_models.EXPORT_POLICY.EXPORTED
         })
@@ -1562,7 +1562,7 @@ class StoryProgressModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'user_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'story_id': base_models.EXPORT_POLICY.EXPORTED,
             'completed_node_ids': base_models.EXPORT_POLICY.EXPORTED
         })
@@ -1759,17 +1759,17 @@ class UserQueryModel(base_models.BaseModel):
         and the information already exists in other exported models.
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'inactive_in_last_n_days': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'inactive_in_last_n_days': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'has_not_logged_in_for_n_days':
-                base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'created_at_least_n_exps': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'created_fewer_than_n_exps': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'edited_at_least_n_exps': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'edited_fewer_than_n_exps': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'user_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'submitter_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'sent_email_model_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'query_status': base_models.EXPORT_POLICY.NOT_EXPORTED
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_at_least_n_exps': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_fewer_than_n_exps': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'edited_at_least_n_exps': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'edited_fewer_than_n_exps': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'submitter_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sent_email_model_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'query_status': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -1856,7 +1856,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'sent_email_model_ids': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'sent_email_model_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
 
@@ -1886,7 +1886,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'user_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'skill_id': base_models.EXPORT_POLICY.EXPORTED,
             'degree_of_mastery': base_models.EXPORT_POLICY.EXPORTED
         })
@@ -1976,10 +1976,10 @@ class UserContributionProficiencyModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'user_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'score_category': base_models.EXPORT_POLICY.EXPORTED,
             'score': base_models.EXPORT_POLICY.EXPORTED,
-            'has_email_been_sent': base_models.EXPORT_POLICY.EXPORTED
+            'onboarding_email_sent': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -2311,11 +2311,11 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         relevant to the user for data export.
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'email': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'deletion_complete': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'exploration_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'collection_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'story_mappings': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deletion_complete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'collection_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'activity_mappings': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -2342,10 +2342,7 @@ class PseudonymizedUserModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls):
         """PseudonymizedUserModel contains only pseudonymous ids."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'gae_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'pin': base_models.EXPORT_POLICY.NOT_EXPORTED
-        })
+        return dict(super(cls, cls).get_export_policy(), **{})
 
     @classmethod
     def get_new_id(cls, unused_entity_name):
@@ -2408,8 +2405,9 @@ class UserAuthDetailsModel(base_models.BaseModel):
         the future.
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'gae_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'pin': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'parent_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod

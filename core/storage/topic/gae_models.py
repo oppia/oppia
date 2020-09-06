@@ -180,23 +180,27 @@ class TopicModel(base_models.VersionedModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'name': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'canonical_name': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'abbreviated_name': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'description': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'abbreviated_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'canonical_story_references':
-                base_models.EXPORT_POLICY.NOT_EXPORTED,
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'additional_story_references':
-                base_models.EXPORT_POLICY.NOT_EXPORTED,
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'story_reference_schema_version':
-                base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'uncategorized_skill_ids': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'subtopics': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'subtopic_schema_version': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'next_subtopic_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'language_code': base_models.EXPORT_POLICY.NOT_EXPORTED
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'uncategorized_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subtopics': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subtopic_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_subtopic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'meta_tag_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'practice_tab_is_displayed':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         })
 
 
@@ -239,7 +243,7 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'topic_id': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
 
@@ -315,20 +319,21 @@ class TopicSummaryModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'name': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'canonical_name': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'language_code': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'description': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'topic_model_last_updated': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'topic_model_created_on': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'canonical_story_count': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'additional_story_count': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'total_skill_count': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'uncategorized_skill_count': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'subtopic_count': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'version': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_model_last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_model_created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'canonical_story_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'additional_story_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'total_skill_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'uncategorized_skill_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subtopic_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
 
@@ -414,11 +419,11 @@ class SubtopicPageModel(base_models.VersionedModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'topic_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'page_contents': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'page_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'page_contents_schema_version':
-                base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'language_code': base_models.EXPORT_POLICY.NOT_EXPORTED
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
 
@@ -463,7 +468,7 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'subtopic_page_id': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'subtopic_page_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
 
@@ -576,7 +581,7 @@ class TopicRightsModel(base_models.VersionedModel):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'manager_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'topic_is_published': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'topic_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod

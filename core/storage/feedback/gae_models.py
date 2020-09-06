@@ -540,7 +540,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'user_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thread_id': base_models.EXPORT_POLICY.EXPORTED,
             'message_ids_read_by_user':
                 base_models.EXPORT_POLICY.EXPORTED
@@ -689,8 +689,8 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
     def get_export_policy(cls):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'num_open_threads': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'num_total_threads': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'num_open_threads': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_total_threads': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -756,8 +756,8 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'feedback_message_references':
-                base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'retries': base_models.EXPORT_POLICY.NOT_EXPORTED
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'retries': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod

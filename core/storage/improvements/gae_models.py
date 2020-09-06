@@ -136,17 +136,17 @@ class TaskEntryModel(base_models.BaseModel):
     def get_export_policy(cls):
         """TaskEntryModel contains the user ID that acted on a task."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'composite_entity_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'entity_type': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'entity_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'entity_version': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'task_type': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'target_type': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'target_id': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'issue_description': base_models.EXPORT_POLICY.NOT_EXPORTED,
-            'status': base_models.EXPORT_POLICY.NOT_EXPORTED,
+            'composite_entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'task_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'target_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'target_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'issue_description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'resolver_id': base_models.EXPORT_POLICY.EXPORTED,
-            'resolved_on': base_models.EXPORT_POLICY.NOT_EXPORTED
+            'resolved_on': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @staticmethod
