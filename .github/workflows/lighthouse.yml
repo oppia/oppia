@@ -17,3 +17,6 @@ jobs:
         run: python -m scripts.install_third_party_libs
       - name: Run lighthouse checks
         run: python -m scripts.run_lighthouse_tests
+      - name: Run lighthouse accessibility checks
+        run: python -m scripts.run_lighthouse_a11y_tests
+

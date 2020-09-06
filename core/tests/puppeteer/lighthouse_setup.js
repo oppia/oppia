@@ -275,7 +275,7 @@ const getSkillEditorUrl = async function(browser, page) {
 
 const main = async function() {
   // Change headless to false to see the puppeteer actions.
-  const browser = await puppeteer.launch({headless: true});
+  const browser = await puppeteer.launch({headless: false});
   const page = await browser.newPage();
   await page.setViewport({
     width: 1920,
@@ -289,11 +289,11 @@ const main = async function() {
   await getSkillEditorUrl(browser, page);
   await process.stdout.write(
     [
-      new URL(explorationEditorUrl),
-      new URL(collectionEditorUrl),
-      new URL(topicEditorUrl),
-      new URL(storyEditorUrl),
-      new URL(skillEditorUrl),
+      explorationEditorUrl,
+      collectionEditorUrl,
+      topicEditorUrl,
+      storyEditorUrl,
+      skillEditorUrl,
     ].join('\n')
   );
   await page.close();

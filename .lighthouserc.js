@@ -26,8 +26,6 @@ module.exports = {
         `http://127.0.0.1:8181/create/${process.env.exploration_editor}`,
         `http://127.0.0.1:8181/collection_editor/create/${process.env.collection_editor}`,
         `http://127.0.0.1:8181/topic_editor/${process.env.topic_editor}`,
-        `http://127.0.0.1:8181/skill_editor/${process.env.skill_editor}`,
-        `http://127.0.0.1:8181/story_editor/${process.env.story_editor}`,
         'http://127.0.0.1:8181/about',
         'http://127.0.0.1:8181/community-library',
         'http://127.0.0.1:8181/contact',
@@ -58,7 +56,6 @@ module.exports = {
         {
           'matchingUrlPattern': '.*',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 1}],
             'first-contentful-paint': [ 'warn', {'maxNumericValue': 1230000}],
             'first-meaningful-paint': ['warn', {'maxNumericValue': 1280000}],
             'first-cpu-idle': ['warn', {'maxNumericValue': 1460000}],

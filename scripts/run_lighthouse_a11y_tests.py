@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""This script performs lighthouse checks and creates lighthouse reports."""
+"""This script runs lighthouse accessibility checks in the development
+environment.
+"""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -21,10 +23,12 @@ import os
 import re
 import subprocess
 import sys
+import time
 
 import python_utils
 from scripts import build
 from scripts import common
+
 
 FECONF_FILE_PATH = os.path.join('feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets/constants.ts')
@@ -101,7 +105,7 @@ def run_lighthouse_checks():
 
     node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
-    bash_command = [node_path, lhci_path, 'autorun']
+    bash_command = [node_path, lhci_path, 'autorun','--config=.lighthouserc-a11y.js']
 
     try:
         subprocess.check_call(bash_command)
@@ -127,7 +131,7 @@ def enable_webpages():
 def start_google_app_engine_server():
     """Start the Google App Engine server."""
 
-    app_yaml_filepath = 'app.yaml'
+    app_yaml_filepath = 'app_dev.yaml'
     p = subprocess.Popen(
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=critical '
@@ -145,11 +149,19 @@ def main():
     enable_webpages()
     atexit.register(cleanup)
 
-    python_utils.PRINT('Building files in production mode.')
-    # We are using --source_maps here, so that we have at least one CI check	
-    # that builds using source maps in prod env. This is to ensure that	
-    # there are no issues while deploying oppia.	
-    build.main(args=['--prod_env', '--source_maps'])
+    build.main(args=[])
+    background_processes = []
+    python_utils.PRINT('Compiling webpack...')
+    webpack_config_file = build.WEBPACK_DEV_CONFIG
+    background_processes.append(subprocess.Popen([
+        common.NODE_BIN_PATH,
+        os.path.join(
+            common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
+        '--config', webpack_config_file, '--watch']))
+
+    # Give webpack few seconds to do the initial compilation.
+    time.sleep(10)
+
     common.start_redis_server()
     start_google_app_engine_server()
     common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
