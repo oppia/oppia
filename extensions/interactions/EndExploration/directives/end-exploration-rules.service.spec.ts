@@ -21,7 +21,7 @@ import { EndExplorationRulesService } from
   'interactions/EndExploration/directives/end-exploration-rules.service';
 
 describe('End exploration rules service', () => {
-    let endExplorationRulesService: EndExplorationRulesService = null;
+  let endExplorationRulesService: EndExplorationRulesService = null;
 
   beforeEach(() => {
     endExplorationRulesService = new EndExplorationRulesService();
