@@ -168,7 +168,8 @@ class UserSettingsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_msec':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'gae_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'gae_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -2407,7 +2408,6 @@ class UserAuthDetailsModel(base_models.BaseModel):
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'parent_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 

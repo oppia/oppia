@@ -598,8 +598,8 @@ class TopicRightsModel(base_models.VersionedModel):
 
         snapshot_metadata_model.put()
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'manager_ids': base_models.EXPORT_POLICY.EXPORTED,

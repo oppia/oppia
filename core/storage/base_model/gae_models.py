@@ -1115,7 +1115,9 @@ class BaseSnapshotMetadataModel(BaseModel):
             'committer_id': EXPORT_POLICY.NOT_APPLICABLE,
             'commit_type': EXPORT_POLICY.EXPORTED,
             'commit_message': EXPORT_POLICY.EXPORTED,
-            'commit_cmds': EXPORT_POLICY.NOT_APPLICABLE
+            'commit_cmds': EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_cmds_user_ids': EXPORT_POLICY.NOT_APPLICABLE,
+            'content_user_ids': EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
