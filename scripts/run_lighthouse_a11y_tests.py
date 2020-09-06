@@ -30,8 +30,10 @@ from scripts import build
 from scripts import common
 
 
-FECONF_FILE_PATH = os.path.join('feconf.py')
-CONSTANTS_FILE_PATH = os.path.join('assets/constants.ts')
+FECONF_FILE_PATH = common.FECONF_PATH
+CONSTANTS_FILE_PATH = common.CONSTANTS_FILE_PATH
+WEBPACK_BIN_PATH = os.path.join(
+    common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
 GOOGLE_APP_ENGINE_PORT = 8181
 SUBPROCESSES = []
 
@@ -64,10 +66,9 @@ def cleanup():
 
 def run_lighthouse_puppeteer_script():
     """Runs puppeteer script to collect dynamic urls."""
-    node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
     puppeteer_path = os.path.join(
         'core', 'tests', 'puppeteer', 'lighthouse_setup.js')
-    bash_command = [node_path, puppeteer_path]
+    bash_command = [common.NODE_BIN_PATH, puppeteer_path]
 
     try:
         script_output = subprocess.check_output(bash_command).split('\n')
@@ -96,24 +97,46 @@ def export_url(url):
         os.environ['story_editor'] = url_list[4]
     elif 'skill_editor' in url:
         os.environ['skill_editor'] = url_list[4]
-    else:
-        return
 
+def run_webpack_compilation(source_maps=False):
+    """Runs webpack compilation."""
+    max_tries = 5
+    webpack_bundles_dir_name = 'webpack_bundles'
+    for _ in python_utils.RANGE(max_tries):
+        try:
+            webpack_config_file = (
+                build.WEBPACK_DEV_SOURCE_MAPS_CONFIG if source_maps
+                else build.WEBPACK_DEV_CONFIG)
+            subprocess.check_call([
+                common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
+                webpack_config_file])
+        except subprocess.CalledProcessError as error:
+            python_utils.PRINT(error.output)
+            sys.exit(error.returncode)
+            return
+        if os.path.isdir(webpack_bundles_dir_name):
+            break
+    if not os.path.isdir(webpack_bundles_dir_name):
+        python_utils.PRINT(
+            'Failed to complete webpack compilation, exiting ...')
+        sys.exit(1)
 
 def run_lighthouse_checks():
-    """Runs the lighthouse checks through the .lighthouserc.js config."""
+    """Runs the lighthouse accessibility checks."""
 
-    node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
     bash_command = [
-        node_path, lhci_path, 'autorun', '--config=.lighthouserc-a11y.js']
+        common.NODE_BIN_PATH, lhci_path, 'autorun',
+         '--config=.lighthouserc-a11y.js']
 
     try:
         subprocess.check_call(bash_command)
-        python_utils.PRINT('Lighthouse checks completed successfully.')
+        python_utils.PRINT(
+            'Lighthouse accessibility checks completed successfully.')
     except subprocess.CalledProcessError:
         python_utils.PRINT(
-            'Lighthouse checks failed. More details can be found above.')
+            'Lighthouse accessibility checks failed.' +
+             'More details can be found above.')
         sys.exit(1)
 
 
@@ -151,17 +174,7 @@ def main():
     atexit.register(cleanup)
 
     build.main(args=[])
-    background_processes = []
-    python_utils.PRINT('Compiling webpack...')
-    webpack_config_file = build.WEBPACK_DEV_CONFIG
-    background_processes.append(subprocess.Popen([
-        common.NODE_BIN_PATH,
-        os.path.join(
-            common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
-        '--config', webpack_config_file, '--watch']))
-
-    # Give webpack few seconds to do the initial compilation.
-    time.sleep(10)
+    run_webpack_compilation()
 
     common.start_redis_server()
     start_google_app_engine_server()

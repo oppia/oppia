@@ -165,8 +165,6 @@ const getCollectionEditorUrl = async function(browser, page) {
     collectionEditorUrl = await page.url();
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log('Creating Collections Failed');
-    // eslint-disable-next-line no-console
     console.log(e);
   }
 };
