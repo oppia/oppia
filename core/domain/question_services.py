@@ -29,6 +29,7 @@ from core.domain import state_domain
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])
@@ -716,7 +717,7 @@ def get_interaction_id_for_question(question_id):
 
 
 def untag_deleted_misconceptions(committer_id, skill_id, skill_description):
-    """Deferred task to untag deleted misconceptions from questions belonging
+    """Untags deleted misconceptions from questions belonging
     to a skill with the provided skill_id.
 
     Args:
@@ -724,24 +725,23 @@ def untag_deleted_misconceptions(committer_id, skill_id, skill_description):
         skill_id: str. The skill id.
         skill_description: str. The description of the skill.
     """
-    question_skill_link_models = get_question_skill_links_of_skill(
+    question_skill_links = get_question_skill_links_of_skill(
         skill_id, skill_description)
-    question_ids = [model.question_id for model in question_skill_link_models]
+    question_ids = [model.question_id for model in question_skill_links]
     questions = question_fetchers.get_questions_by_ids(question_ids)
     skill = skill_fetchers.get_skill_by_id(skill_id)
-    skill_misconception_ids_set = (
-        set([
+    skill_misconception_ids = (
+        [
             '%s-%d' % (skill_id, misconception.id)
             for misconception in skill.misconceptions
-        ])
+        ]
     )
     for question in questions:
         change_list = []
-        inapplicable_misconception_ids_set = set(
+        inapplicable_misconception_ids = (
             question.inapplicable_misconception_ids)
-        deleted_inapplicable_misconception_ids = (
-            inapplicable_misconception_ids_set.difference(
-                skill_misconception_ids_set))
+        deleted_inapplicable_misconception_ids = utils.compute_list_difference(
+            inapplicable_misconception_ids, skill_misconception_ids)
         for misconception_id in deleted_inapplicable_misconception_ids:
             old_misconception_ids = list(
                 question.inapplicable_misconception_ids)
@@ -758,7 +758,7 @@ def untag_deleted_misconceptions(committer_id, skill_id, skill_description):
         for i in python_utils.RANGE(len(answer_groups)):
             tagged_skill_misconception_id = (
                 answer_groups[i].to_dict()['tagged_skill_misconception_id'])
-            if tagged_skill_misconception_id not in skill_misconception_ids_set:
+            if tagged_skill_misconception_id not in skill_misconception_ids:
                 answer_groups[i].tagged_skill_misconception_id = None
         question.question_state_data.interaction.answer_groups = answer_groups
         change_list.append(question_domain.QuestionChange({
