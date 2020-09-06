@@ -22,7 +22,6 @@ import { StorySummaryObjectFactory } from
 
 describe('Topic preview tab', function() {
   var ctrl = null;
-  var $q = null;
   var $rootScope = null;
   var $scope = null;
   var TopicEditorStateService = null;
@@ -30,7 +29,6 @@ describe('Topic preview tab', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     storySummaryObjectFactory = TestBed.get(StorySummaryObjectFactory);

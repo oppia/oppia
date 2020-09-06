@@ -83,7 +83,6 @@ angular.module('oppia').directive('selectSkill', [
             // The folowing function is called when the subtopic filter changes.
             // This updates the list of Skills displayed in the selector.
             $scope.updateSkillsListOnSubtopicFilterChange = function() {
-              var skills = $scope.getSortedSkillSummaries();
               var updatedSkillsDict = {};
               var isAnySubTopicChecked = false;
               for (var topicName in $scope.subTopicFilterDict) {

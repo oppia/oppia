@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for SkillBackendApiService.
  */
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('services/csrf-token.service.ts');
 // TODO(#7222): Remove the following block of unnnecessary imports once
@@ -27,7 +26,6 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Skill backend API service', function() {
   var SkillBackendApiService = null;
-  var UndoRedoService = null;
   var $httpBackend = null;
   var sampleResponse = null;
   var CsrfService = null;
@@ -44,7 +42,6 @@ describe('Skill backend API service', function() {
   beforeEach(angular.mock.inject(function($injector, $q) {
     SkillBackendApiService = $injector.get(
       'SkillBackendApiService');
-    UndoRedoService = $injector.get('UndoRedoService');
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
 

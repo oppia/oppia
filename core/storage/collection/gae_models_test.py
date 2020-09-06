@@ -25,7 +25,7 @@ import datetime
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import rights_manager
+from core.domain import rights_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -110,7 +110,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             first_published_msec=0.1
         ).save(
             self.USER_ID_COMMITTER, 'Created new collection right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
         collection_models.CollectionRightsModel(
             id=self.COLLECTION_ID_2,
             owner_ids=[self.USER_ID_1],
@@ -123,7 +123,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             first_published_msec=0.2
         ).save(
             self.USER_ID_COMMITTER, 'Created new collection right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
         collection_models.CollectionRightsModel(
             id=self.COLLECTION_ID_3,
             owner_ids=[self.USER_ID_1],
@@ -136,7 +136,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             first_published_msec=0.3
         ).save(
             self.USER_ID_COMMITTER, 'Created new collection right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
         collection_models.CollectionRightsModel(
             id=self.COLLECTION_ID_4,
             owner_ids=[self.USER_ID_4],
@@ -149,7 +149,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             first_published_msec=0.4
         ).save(
             self.USER_ID_COMMITTER, 'Created new collection right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
 
         self.col_1_dict = (
             collection_models.CollectionRightsModel.get_by_id(
@@ -191,9 +191,14 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             first_published_msec=0.0
             ).save(
                 self.USER_ID_COMMITTER, 'Created new collection',
-                [{'cmd': rights_manager.CMD_CREATE_NEW}])
+                [{'cmd': rights_domain.CMD_CREATE_NEW}])
         collection_model = collection_models.CollectionRightsModel.get('id')
         self.assertEqual('id', collection_model.id)
+        self.assertEqual(
+            ['editor_ids', 'owner_ids', 'viewer_ids', 'voice_artist_ids'],
+            collection_models.CollectionRightsSnapshotMetadataModel
+            .get_by_id('id-1').content_user_ids
+        )
 
     def test_export_data_on_highly_involved_user(self):
         """Test export data on user involved in all datastore collections."""
@@ -281,7 +286,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
         self.collection_model.save(
             self.USER_ID_COMMITTER, 'Created new collection right',
-            [{'cmd': rights_manager.CMD_CREATE_NEW}]
+            [{'cmd': rights_domain.CMD_CREATE_NEW}]
         )
         self.excluded_fields = ['created_on', 'last_updated', 'version']
         # Here copy.deepcopy is needed to mitigate
@@ -291,13 +296,32 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         self.collection_model.owner_ids = [self.USER_ID_1, self.USER_ID_3]
         self.collection_model.save(
             self.USER_ID_COMMITTER, 'Add owner',
-            [{'cmd': rights_manager.CMD_CHANGE_ROLE}]
+            [{
+                'cmd': rights_domain.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_ID_3,
+                'old_role': rights_domain.ROLE_NONE,
+                'new_role': rights_domain.ROLE_OWNER
+            }]
         )
         self.allow_revert_swap = self.swap(
             collection_models.CollectionRightsModel, 'ALLOW_REVERT', True)
 
+        collection_rights_allowed_commands = copy.deepcopy(
+            feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS)
+        collection_rights_allowed_commands.append({
+            'name': feconf.CMD_REVERT_COMMIT,
+            'required_attribute_names': [],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': []
+        })
+        self.allowed_commands_swap = self.swap(
+            feconf,
+            'COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS',
+            collection_rights_allowed_commands
+        )
+
     def test_revert_to_valid_version_is_successful(self):
-        with self.allow_revert_swap:
+        with self.allow_revert_swap, self.allowed_commands_swap:
             collection_models.CollectionRightsModel.revert(
                 self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
 
@@ -321,7 +345,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
         snapshot_model.content = broken_dict
         snapshot_model.put()
-        with self.allow_revert_swap:
+        with self.allow_revert_swap, self.allowed_commands_swap:
             collection_models.CollectionRightsModel.revert(
                 self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
 
@@ -346,7 +370,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
         snapshot_model.content = broken_dict
         snapshot_model.put()
-        with self.allow_revert_swap:
+        with self.allow_revert_swap, self.allowed_commands_swap:
             collection_models.CollectionRightsModel.revert(
                 self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
 

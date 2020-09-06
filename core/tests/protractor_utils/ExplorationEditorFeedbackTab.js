@@ -17,15 +17,12 @@
  * use in Protractor tests.
  */
 
-var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
 var ExplorationEditorFeedbackTab = function() {
   /*
    * Interactive elements
    */
-  var explorationFeedbackSubject = element(
-    by.css('.protractor-test-exploration-feedback-subject'));
   var feedbackTabRow = element(
     by.css('.protractor-test-oppia-feedback-tab-row'));
   var explorationFeedback = element(
