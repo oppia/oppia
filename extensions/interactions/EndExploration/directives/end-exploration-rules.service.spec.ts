@@ -24,6 +24,7 @@ describe('End exploration rules service', () => {
   let endExplorationRulesService: EndExplorationRulesService = null;
 
   beforeEach(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     endExplorationRulesService = new EndExplorationRulesService();
   });
 });
