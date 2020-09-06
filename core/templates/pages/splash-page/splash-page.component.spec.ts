@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the splash page.
  */
 
-const constants = require('constants.ts');
-
 require('pages/splash-page/splash-page.component.ts');
 
 describe('Splash Page', function() {

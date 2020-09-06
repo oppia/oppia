@@ -26,6 +26,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classifier_services
 from core.domain import question_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_services
 from core.domain import story_services
@@ -982,7 +983,7 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
 class VoiceoverExplorationTests(test_utils.GenericTestBase):
     """Tests for can_voiceover_exploration decorator."""
 
-    role = rights_manager.ROLE_VOICE_ARTIST
+    role = rights_domain.ROLE_VOICE_ARTIST
     username = 'user'
     user_email = 'user@example.com'
     banned_username = 'banneduser'
@@ -3320,7 +3321,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
 class SaveExplorationTests(test_utils.GenericTestBase):
     """Tests for can_save_exploration decorator."""
 
-    role = rights_manager.ROLE_VOICE_ARTIST
+    role = rights_domain.ROLE_VOICE_ARTIST
     username = 'user'
     user_email = 'user@example.com'
     banned_username = 'banneduser'

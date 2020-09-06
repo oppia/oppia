@@ -27,8 +27,6 @@ require('domain/story/editable-story-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('pages/story-editor-page/services/story-editor-navigation.service.ts');
-require('services/alerts.service.ts');
-require('services/contextual/url.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
@@ -41,13 +39,13 @@ angular.module('oppia').directive('storyEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/navbar/story-editor-navbar.directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', 'AlertsService',
-        'EditableStoryBackendApiService', 'UndoRedoService',
-        'StoryEditorStateService', 'StoryEditorNavigationService', 'UrlService',
+        '$scope', '$uibModal', 'EditableStoryBackendApiService',
+        'StoryEditorNavigationService', 'StoryEditorStateService',
+        'UndoRedoService',
         function(
-            $scope, $rootScope, $uibModal, AlertsService,
-            EditableStoryBackendApiService, UndoRedoService,
-            StoryEditorStateService, StoryEditorNavigationService, UrlService) {
+            $scope, $uibModal, EditableStoryBackendApiService,
+            StoryEditorNavigationService, StoryEditorStateService,
+            UndoRedoService) {
           var ctrl = this;
           var EDITOR = 'Editor';
           var PREVIEW = 'Preview';
@@ -93,6 +91,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
               $scope.validationIssues.push(
                 'Story URL fragment already exists.');
             }
+            $scope.forceValidateExplorations = true;
             _validateExplorations();
             var nodes = $scope.story.getStoryContents().getNodes();
             var storyPrepublishValidationIssues = (

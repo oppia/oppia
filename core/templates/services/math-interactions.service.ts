@@ -81,11 +81,22 @@ export class MathInteractionsService {
         'Your answer has two symbols next to each other: "' + symbol1 +
         '" and "' + symbol2 + '".');
     }
+    if (
+      errorMessage === 'Cannot read property \'parent\' of undefined.') {
+      let emptyFunctionNames = [];
+      for (let functionName of this.mathFunctionNames) {
+        if (expressionString.includes(functionName + '()')) {
+          emptyFunctionNames.push(functionName);
+        }
+      }
+      errorMessage = (
+        'The ' + emptyFunctionNames.join(', ') +
+        ' function(s) cannot be empty. Please enter a variable/number in it.');
+    }
     return errorMessage;
   }
 
-  _validateExpression(
-      expressionString: string, validVariablesList: string[]): boolean {
+  _validateExpression(expressionString: string): boolean {
     expressionString = expressionString.replace(/\s/g, '');
     if (expressionString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
@@ -119,12 +130,27 @@ export class MathInteractionsService {
 
   validateAlgebraicExpression(
       expressionString: string, validVariablesList: string[]): boolean {
-    if (!this._validateExpression(expressionString, validVariablesList)) {
+    if (!this._validateExpression(expressionString)) {
       return false;
     }
 
-    let variablesList = nerdamer(this.insertMultiplicationSigns(
-      expressionString)).variables();
+    expressionString = this.insertMultiplicationSigns(expressionString);
+    let variablesList = nerdamer(expressionString).variables();
+    // Explicitly checking for presence of constants (pi and e).
+    if (expressionString.match(/(^|[^a-zA-Z])e($|[^a-zA-Z])/g)) {
+      variablesList.push('e');
+    }
+    if (expressionString.match(/(^|[^a-zA-Z])pi($|[^a-zA-Z])/g)) {
+      variablesList.push('pi');
+    }
+    // Replacing greek names with symbols.
+    for (let i = 0; i < variablesList.length; i++) {
+      if (variablesList[i].length > 1) {
+        // eslint-disable-next-line dot-notation
+        variablesList[i] = AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS'][
+          variablesList[i]];
+      }
+    }
     if (variablesList.length === 0) {
       this.warningText = 'It looks like you have entered only ' +
       'numbers. Make sure to include the necessary variables' +
@@ -134,8 +160,8 @@ export class MathInteractionsService {
       for (let variable of variablesList) {
         if (validVariablesList.indexOf(variable) === -1) {
           this.warningText = (
-            'You have entered an invalid character: ' + variable +
-            '. Please use only the characters ' + validVariablesList.join() +
+            'You have entered an invalid variable: ' + variable +
+            '. Please use only the variables ' + validVariablesList.join() +
             ' in your answer.');
           return false;
         }
@@ -145,7 +171,7 @@ export class MathInteractionsService {
   }
 
   validateNumericExpression(expressionString: string): boolean {
-    if (!this._validateExpression(expressionString, [])) {
+    if (!this._validateExpression(expressionString)) {
       return false;
     }
     for (let functionName of this.mathFunctionNames) {

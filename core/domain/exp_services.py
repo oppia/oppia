@@ -47,6 +47,8 @@ from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import opportunity_services
 from core.domain import param_domain
+from core.domain import recommendations_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
@@ -535,7 +537,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             stored exploration model do not match.
     """
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
+    if exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
         exploration.validate(strict=True)
     else:
         exploration.validate()
@@ -760,9 +762,12 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
     # Delete the explorations from search.
     search_services.delete_explorations_from_search_index(exploration_ids)
 
-    # Delete the exploration summaries, regardless of whether or not
-    # force_deletion is True.
+    # Delete the exploration summaries, recommendations and opportunities
+    # regardless of whether or not force_deletion is True.
     delete_exploration_summaries(exploration_ids)
+    recommendations_services.delete_explorations_from_recommendations(
+        exploration_ids)
+    opportunity_services.delete_exploration_opportunities(exploration_ids)
 
     # Remove the explorations from the featured activity references, if
     # necessary.
@@ -1172,7 +1177,7 @@ def revert_exploration(
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=revert_to_version)
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
+    if exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
         exploration.validate(strict=True)
     else:
         exploration.validate()

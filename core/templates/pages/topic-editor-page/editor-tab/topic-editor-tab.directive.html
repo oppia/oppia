@@ -159,10 +159,10 @@
           </label>
           <i class="fas fa-info-circle practice-tab-info-circle" title="This setting show/hides the practice tab in the topic viewer page. It is recommended that this option be enabled only if there are at least 5 questions attached to the topic"></i>
         </div>
-        <button class="btn add-subtopic-btn protractor-test-add-subtopic-button" ng-click="createSubtopic()">
+        <button class="btn add-subtopic-btn protractor-test-add-subtopic-button puppeteer-test-add-subtopic-button" ng-click="createSubtopic()">
           + ADD SUBTOPIC
         </button>
-        <button class="btn add-skill-btn" ng-click="createSkill()">
+        <button class="btn add-skill-btn protractor-test-add-skill-button puppeteer-test-add-skill-button" ng-click="createSkill()">
           + ADD SKILL
         </button>
         <div ng-if="(subtopics.length || uncategorizedSkillSummaries.length) && subtopicsListIsShown">
@@ -186,7 +186,7 @@
                  ng-click="toggleUncategorizedSkillOptions(null)">
               <div class="uncategorized-skill-edit-option" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)">
                 <i class="fa fa-trash"></i>
-                <span>Delete skill</span>
+                <span>Remove from topic</span>
               </div>
               <div class="uncategorized-skill-edit-option edit-option-assign" ng-click="changeSubtopicAssignment(null, skillSummary)">
                 <i class="fa fa-plus"></i>

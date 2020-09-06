@@ -159,7 +159,7 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$q', '$scope', '$rootScope', '$templateCache', '$timeout', '$uibModal',
+    '$q', '$scope', '$templateCache', '$timeout', '$uibModal',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
     'ChangeListService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
@@ -172,15 +172,20 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
-    'PageTitleService', 'LoaderService', 'ParamChangesObjectFactory',
+    'LoaderService', 'PageTitleService', 'ParamChangesObjectFactory',
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
+<<<<<<< HEAD
     'StateEditorRefreshService', 'StateEditorService',
+=======
+    'StateClassifierMappingService', 'StateEditorRefreshService',
+    'StateEditorService',
+>>>>>>> 6ebcf4a5c503e7de79a8463b4721819b0a4e8aa4
     'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
     'ThreadDataService', 'UrlInterpolationService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'WindowDimensionsService',
     function(
-        $q, $scope, $rootScope, $templateCache, $timeout, $uibModal,
+        $q, $scope, $templateCache, $timeout, $uibModal,
         AutosaveInfoModalsService, BottomNavbarStatusService,
         ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
@@ -193,9 +198,14 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationRightsService, ExplorationSaveService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService, GraphDataService,
-        PageTitleService, LoaderService, ParamChangesObjectFactory,
+        LoaderService, PageTitleService, ParamChangesObjectFactory,
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
+<<<<<<< HEAD
         StateEditorRefreshService, StateEditorService,
+=======
+        StateClassifierMappingService, StateEditorRefreshService,
+        StateEditorService,
+>>>>>>> 6ebcf4a5c503e7de79a8463b4721819b0a4e8aa4
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
         ThreadDataService, UrlInterpolationService,
         UserEmailPreferencesService, UserExplorationPermissionsService,

@@ -116,10 +116,10 @@ HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
 USER_PREFERENCES = {'open_new_tab_in_browser': None}
 
-FECONF_PATH = os.path.join('.', 'feconf.py')
+FECONF_PATH = os.path.join('feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
 MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
-REDIS_CONF_PATH = os.path.join('.', 'redis.conf')
+REDIS_CONF_PATH = os.path.join('redis.conf')
 # Path for the dump file the redis server autogenerates. It contains data
 # used by the Redis server.
 REDIS_DUMP_PATH = os.path.join(CURR_DIR, 'dump.rdb')

@@ -42,7 +42,6 @@ describe('Profile Link Backend Api Service', () => {
 
   it('should fetch profile photo details', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
-    let username = 'user';
     profileLinkImageBackendApiService.fetchProfilePictureData(
       '/preferenceshandler/profile_picture_by_username/user').then(
       successHandler);
@@ -56,6 +55,7 @@ describe('Profile Link Backend Api Service', () => {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleData);
+    expect(successHandler).toHaveBeenCalledWith(
+      sampleData.profile_picture_data_url_for_username);
   }));
 });

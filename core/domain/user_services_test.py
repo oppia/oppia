@@ -76,12 +76,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertTrue(
             user_services.is_user_id_correct(feconf.SUGGESTION_BOT_USER_ID))
         self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
-        self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
-        self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
         self.assertFalse(
             user_services.is_user_id_correct('uid_' + 'a' * 31 + 'A'))
         self.assertFalse(user_services.is_user_id_correct('uid_' + 'a' * 31))
         self.assertFalse(user_services.is_user_id_correct('a' * 36))
+
+    def test_is_pseudonymous_id(self):
+        self.assertTrue(user_services.is_pseudonymous_id('pid_' + 'a' * 32))
+        self.assertFalse(user_services.is_pseudonymous_id('uid_' + 'a' * 32))
+        self.assertFalse(
+            user_services.is_pseudonymous_id('uid_' + 'a' * 31 + 'A'))
+        self.assertFalse(user_services.is_pseudonymous_id('uid_' + 'a' * 31))
+        self.assertFalse(user_services.is_pseudonymous_id('a' * 36))
 
     def test_set_and_get_username(self):
         gae_id = 'someUser'
@@ -104,25 +110,20 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             feconf.MIGRATION_BOT_USERNAME,
             user_services.get_username(feconf.MIGRATION_BOT_USER_ID))
 
-    def test_get_usernames(self):
-        gae_ids = ['test1', 'test2']
-        usernames = ['name1', 'name2']
-        user_emails = ['test1@email.com', 'test2@email.com']
+    def test_get_username_for_pseudonymous_id(self):
+        self.assertEqual(
+            'UserAaaaaaaa',
+            user_services.get_username('pid_' + 'a' * 32))
+        self.assertEqual(
+            'UserBbbbbbbb',
+            user_services.get_username('pid_' + 'b' * 32))
 
-        user_ids = []
-        for gae_id, email, name in python_utils.ZIP(
-                gae_ids, user_emails, usernames):
-            user_id = user_services.create_new_user(gae_id, email).user_id
-            user_services.set_username(user_id, name)
-            user_ids.append(user_id)
+    def test_get_usernames_for_pseudonymous_ids(self):
 
         # Handle usernames that exists.
-        self.assertEqual(usernames, user_services.get_usernames(user_ids))
-
-        # Return None for usernames that don't exists.
         self.assertEqual(
-            [None, 'name1'],
-            user_services.get_usernames(['fakeUser', user_ids[0]]))
+            ['UserAaaaaaaa', 'UserBbbbbbbb'],
+            user_services.get_usernames(['pid_' + 'a' * 32, 'pid_' + 'b' * 32]))
 
     def test_get_usernames_empty_list(self):
         # Return empty list when no user id passed.
@@ -135,7 +136,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_usernames([feconf.SYSTEM_COMMITTER_ID]))
 
     def test_get_username_for_nonexistent_user(self):
-        with self.assertRaisesRegexp(Exception, 'User not found.'):
+        with self.assertRaisesRegexp(
+            Exception,
+            'User with ID \'fakeUser\' not found.'
+        ):
             user_services.get_username('fakeUser')
 
     def test_get_username_none(self):
@@ -1357,6 +1361,42 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
+    def test_validate_non_str_pin_id(self):
+        self.user_settings.pin = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected PIN to be a string'
+        ):
+            self.user_settings.validate()
+
+    def test_validate_invalid_length_pin_raises_error(self):
+        invalid_pin_values_list = ['1', '12', '1234', '123@#6', 'ABCa', '1!#a']
+        error_msg = (
+            'User PIN can only be of length %s or %s' %
+            (feconf.FULL_USER_PIN_LENGTH, feconf.PROFILE_USER_PIN_LENGTH)
+        )
+        for pin in invalid_pin_values_list:
+            with self.assertRaisesRegexp(
+                utils.ValidationError, error_msg
+            ):
+                self.user_settings.pin = pin
+                self.user_settings.validate()
+
+    def test_validate_valid_length_with_numeric_char_pin_works_fine(self):
+        valid_pin_values_list = ['123', '12345', '764', '42343']
+        for pin in valid_pin_values_list:
+            self.user_settings.pin = pin
+            self.user_settings.validate()
+
+    def test_validate_valid_length_pin_with_non_numeric_char_raises_error(self):
+        valid_pin_values_list = ['AbC', '123A}', '1!2', 'AB!', '[123]']
+        error_msg = 'Only numeric characters are allowed in PIN'
+        for pin in valid_pin_values_list:
+            with self.assertRaisesRegexp(
+                utils.ValidationError, error_msg
+            ):
+                self.user_settings.pin = pin
+                self.user_settings.validate()
+
     def test_validate_empty_user_id(self):
         self.user_settings.user_id = ''
         with self.assertRaisesRegexp(
@@ -1546,13 +1586,6 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
         self.user_auth_details.gae_id = 0
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected gae_id to be a string'
-        ):
-            self.user_auth_details.validate()
-
-    def test_validate_non_str_pin_id(self):
-        self.user_auth_details.pin = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected PIN to be a string'
         ):
             self.user_auth_details.validate()
 
