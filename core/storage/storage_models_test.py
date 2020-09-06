@@ -18,11 +18,11 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
-import python_utils
 
 from core.domain import takeout_service
 from core.platform import models
 from core.tests import test_utils
+import python_utils
 
 (
     base_models, collection_models, email_models,
@@ -173,13 +173,14 @@ class StorageModelsTest(test_utils.GenericTestBase):
             export_policy = model.get_export_policy()
             self.assertEqual(
                 sorted([
-                    python_utils.UNICODE(prop) for prop in model._properties]),
+                    python_utils.UNICODE(prop) for prop
+                    in model._properties]), # pylint: disable=protected-access
                 sorted(export_policy.keys())
             )
             self.assertTrue(
                 set(export_policy.values()).issubset(
-                {
-                    base_models.EXPORT_POLICY.EXPORTED,
-                    base_models.EXPORT_POLICY.NOT_APPLICABLE
-                })
+                    {
+                        base_models.EXPORT_POLICY.EXPORTED,
+                        base_models.EXPORT_POLICY.NOT_APPLICABLE
+                    })
             )

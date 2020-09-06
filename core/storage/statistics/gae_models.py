@@ -121,7 +121,8 @@ class StateCounterModel(base_models.BaseModel):
         """Model does not contain user data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'first_entry_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'subsequent_entries_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subsequent_entries_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'resolved_answer_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'active_answer_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
@@ -190,7 +191,8 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'time_spent_in_state_secs': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_spent_in_state_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'is_feedback_useful': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
@@ -318,7 +320,8 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'time_spent_in_state_secs': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_spent_in_state_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -437,7 +440,8 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
             'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'client_time_spent_in_secs': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'client_time_spent_in_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -571,7 +575,8 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'client_time_spent_in_secs': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'client_time_spent_in_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -699,7 +704,8 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'client_time_spent_in_secs': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'client_time_spent_in_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -965,7 +971,8 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'time_spent_in_state_secs': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_spent_in_state_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -1427,7 +1434,8 @@ class PlaythroughModel(base_models.BaseModel):
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'issue_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'issue_customization_args': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'issue_customization_args':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'actions': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -1589,7 +1597,8 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             'state_reference': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'learner_answer_info_list': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'learner_answer_info_list':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'learner_answer_info_schema_version':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'accumulated_answer_info_json_size_bytes':

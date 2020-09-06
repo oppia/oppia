@@ -262,7 +262,8 @@ class StorySummaryModel(base_models.BaseModel):
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'story_model_last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_model_last_updated':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'story_model_created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'node_titles': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,

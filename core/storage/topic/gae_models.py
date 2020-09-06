@@ -325,12 +325,14 @@ class TopicSummaryModel(base_models.BaseModel):
             'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'topic_model_last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_model_last_updated':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'topic_model_created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'canonical_story_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'additional_story_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'total_skill_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'uncategorized_skill_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'uncategorized_skill_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'subtopic_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,

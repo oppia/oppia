@@ -82,7 +82,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'training_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'next_scheduled_check_time': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_scheduled_check_time':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'data_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 

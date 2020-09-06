@@ -261,7 +261,8 @@ class SkillSummaryModel(base_models.BaseModel):
             'misconception_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'worked_examples_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'skill_model_last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_model_last_updated':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'skill_model_created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
