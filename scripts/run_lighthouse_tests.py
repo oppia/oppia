@@ -111,7 +111,7 @@ def run_webpack_compilation(source_maps=False):
 
     Args:
         source_maps: bool. Represents whether the source_maps webpack
-        or the default webpack will be built.
+            or the default webpack will be built.
     """
     max_tries = 5
     webpack_bundles_dir_name = 'webpack_bundles'
@@ -154,14 +154,14 @@ def export_url(url):
 
 def run_lighthouse_checks(lighthouse_mode):
     """Runs the lighthouse checks through the .lighthouserc.js config.
-    
+
     Args:
         lighthouse_mode: int. Represents whether the lighthouse checks are in
-        accessibility mode or performance mode
+            accessibility mode or performance mode.
     """
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
     bash_command = [common.NODE_BIN_PATH, lhci_path, 'autorun',
-                        LIGHTHOUSE_CONFIG_PATHS[lighthouse_mode]]
+                    LIGHTHOUSE_CONFIG_PATHS[lighthouse_mode]]
 
     try:
         subprocess.check_call(bash_command)
@@ -185,10 +185,10 @@ def enable_webpages():
 
 def start_google_app_engine_server(server_mode):
     """Start the Google App Engine server.
-    
+
     Args:
         server_mode: int. Represents whether the server will be run in
-        dev mode or production mode.
+            dev mode or production mode.
     """
     app_yaml_filepath = SERVER_MODE_PATHS[server_mode]
     p = subprocess.Popen(
