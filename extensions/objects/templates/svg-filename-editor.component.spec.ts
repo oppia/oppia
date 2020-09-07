@@ -662,7 +662,7 @@ describe('SvgFilenameEditor with image save destination as ' +
       return 'Image file is deleted.';
     },
     isInStorage: function(filename) {
-      return false;
+      return true;
     }
   };
 
