@@ -57,8 +57,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             'interaction_id': 'TextInput',
             'training_data': self.training_data,
             'status': 'NEW',
-            'classifier_data': None,
-            'data_schema_version': 1
+            'algorithm_version': 1
         }
 
     def _get_training_job_from_dict(self, training_job_dict):
@@ -75,8 +74,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             training_job_dict['state_name'],
             training_job_dict['status'],
             training_job_dict['training_data'],
-            training_job_dict['classifier_data'],
-            training_job_dict['data_schema_version'])
+            training_job_dict['algorithm_version'])
 
         return training_job
 
@@ -102,50 +100,13 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
                     'answers': ['a2', 'a3']
                 }
             ],
-            'classifier_data': {},
-            'data_schema_version': 1
+            'algorithm_version': 1
         }
         observed_training_job = self._get_training_job_from_dict(
             expected_training_job_dict)
         self.assertDictEqual(
             expected_training_job_dict,
             observed_training_job.to_dict())
-
-    def test_to_player_dict(self):
-        expected_training_job_dict = {
-            'job_id': 'exp_id1.SOME_RANDOM_STRING',
-            'algorithm_id': 'TextClassifier',
-            'interaction_id': 'TextInput',
-            'exp_id': 'exp_id1',
-            'exp_version': 1,
-            'next_scheduled_check_time':
-                datetime.datetime.strptime(
-                    '2017-08-11 12:42:31', '%Y-%m-%d %H:%M:%S'),
-            'state_name': 'a state name',
-            'status': 'NEW',
-            'training_data': [
-                {
-                    'answer_group_index': 1,
-                    'answers': ['a1', 'a2']
-                },
-                {
-                    'answer_group_index': 2,
-                    'answers': ['a2', 'a3']
-                }
-            ],
-            'classifier_data': {},
-            'data_schema_version': 1
-        }
-        expected_training_job_player_dict = {
-            'algorithm_id': 'TextClassifier',
-            'classifier_data': {},
-            'data_schema_version': 1
-        }
-        observed_training_job = self._get_training_job_from_dict(
-            expected_training_job_dict)
-        self.assertDictEqual(
-            expected_training_job_player_dict,
-            observed_training_job.to_player_dict())
 
     def test_validation_exp_id(self):
         self.training_job_dict['exp_id'] = 1
@@ -192,19 +153,12 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Expected algorithm_id to be a string'):
             training_job.validate()
 
-    def test_validation_data_schema_version(self):
-        self.training_job_dict['data_schema_version'] = 'invalid_schema_version'
+    def test_validation_algorithm_version(self):
+        self.training_job_dict['algorithm_version'] = (
+            'invalid_algorithm_version')
         training_job = self._get_training_job_from_dict(self.training_job_dict)
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected data_schema_version to be an int'):
-            training_job.validate()
-
-    def test_validation_classifier_data(self):
-        self.training_job_dict['classifier_data'] = 'invalid_classifier_data'
-        training_job = self._get_training_job_from_dict(self.training_job_dict)
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected classifier_data to be a dict|None'):
+            utils.ValidationError, 'Expected algorithm_version to be an int'):
             training_job.validate()
 
     def test_validation_training_data_without_answer_group_index(self):
@@ -305,28 +259,28 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             training_job.validate()
 
 
-class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
-    """Tests for the TrainingJobExplorationMapping domain."""
+class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
+    """Tests for the StateTrainingJobsMapping domain."""
 
     def setUp(self):
-        super(TrainingJobExplorationMappingDomainTests, self).setUp()
+        super(StateTrainingJobsMappingDomainTests, self).setUp()
 
         self.mapping_dict = {
             'exp_id': 'exp_id1',
             'exp_version': 2,
             'state_name': u'網站有中',
-            'job_id': 'job_id1'
+            'algorithm_ids_to_job_ids': {'TextClassifier': 'job_id1'}
         }
 
     def _get_mapping_from_dict(self, mapping_dict):
-        """Returns the TrainingJobExplorationMapping object after receiving the
+        """Returns the StateTrainingJobsMapping object after receiving the
         content from the mapping_dict.
         """
-        mapping = classifier_domain.TrainingJobExplorationMapping(
+        mapping = classifier_domain.StateTrainingJobsMapping(
             mapping_dict['exp_id'],
             mapping_dict['exp_version'],
             mapping_dict['state_name'],
-            mapping_dict['job_id'])
+            mapping_dict['algorithm_ids_to_job_ids'])
 
         return mapping
 
@@ -335,7 +289,7 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
             'exp_id': 'exp_id1',
             'exp_version': 2,
             'state_name': u'網站有中',
-            'job_id': 'job_id1'
+            'algorithm_ids_to_job_ids': {'TextClassifier': 'job_id1'}
         }
         observed_mapping = self._get_mapping_from_dict(
             expected_mapping_dict)
@@ -361,16 +315,31 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Expected exp_version to be an int'):
             mapping.validate()
 
-    def test_validation_with_invalid_job_id(self):
-        self.mapping_dict['job_id'] = 0
-        mapping = self._get_mapping_from_dict(self.mapping_dict)
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected job_id to be a string'):
-            mapping.validate()
-
     def test_validation_with_invalid_state_name(self):
         self.mapping_dict['state_name'] = 0
         mapping = self._get_mapping_from_dict(self.mapping_dict)
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected state_name to be a string'):
+            mapping.validate()
+
+    def test_validation_with_invalid_algorithm_ids_to_job_ids(self):
+        self.mapping_dict['algorithm_ids_to_job_ids'] = 0
+        mapping = self._get_mapping_from_dict(self.mapping_dict)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected algorithm_ids_to_job_ids to be a dict'):
+            mapping.validate()
+
+    def test_validation_with_invalid_algorithm_id_in_algorithm_to_job_map(self):
+        self.mapping_dict['algorithm_ids_to_job_ids'] = {123: 'job_id'}
+        mapping = self._get_mapping_from_dict(self.mapping_dict)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected algorithm_id to be str'):
+            mapping.validate()
+
+    def test_validation_with_invalid_job_id_in_algorithm_to_job_map(self):
+        self.mapping_dict['algorithm_ids_to_job_ids'] = {'algorithm_id': 12}
+        mapping = self._get_mapping_from_dict(self.mapping_dict)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected job_id to be str'):
             mapping.validate()

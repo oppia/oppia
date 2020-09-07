@@ -20,7 +20,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 
 from constants import constants
-from core.domain import classifier_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -180,67 +179,6 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         )
 
         self.logout()
-
-
-class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
-    """Test the handler for initialising exploration with
-    state_classifier_mapping.
-    """
-
-    def test_creation_of_state_classifier_mapping(self):
-        super(ExplorationStateClassifierMappingTests, self).setUp()
-        exploration_id = '15'
-
-        self.login(self.VIEWER_EMAIL)
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-
-        exp_services.delete_demo(exploration_id)
-        # We enable ENABLE_ML_CLASSIFIERS so that the subsequent call to
-        # save_exploration handles job creation for trainable states.
-        # Since only one demo exploration has a trainable state, we modify our
-        # values for MIN_ASSIGNED_LABELS and MIN_TOTAL_TRAINING_EXAMPLES to let
-        # the classifier_demo_exploration.yaml be trainable. This is
-        # completely for testing purposes.
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 5):
-                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
-                    exp_services.load_demo(exploration_id)
-
-        # Retrieve job_id of created job (because of save_exp).
-        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
-        self.assertEqual(all_jobs.count(), 1)
-        for job in all_jobs:
-            job_id = job.id
-
-        classifier_services.store_classifier_data(job_id, {})
-
-        expected_state_classifier_mapping = {
-            'text': {
-                'algorithm_id': 'TextClassifier',
-                'classifier_data': {},
-                'data_schema_version': 1
-            }
-        }
-        # Call the handler.
-        exploration_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exploration_id))
-        retrieved_state_classifier_mapping = exploration_dict[
-            'state_classifier_mapping']
-
-        self.assertEqual(
-            expected_state_classifier_mapping,
-            retrieved_state_classifier_mapping)
-
-    def test_exploration_handler_raises_error_with_invalid_version(self):
-        exploration_id = '15'
-
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.login(self.VIEWER_EMAIL)
-
-        exp_services.load_demo(exploration_id)
-        self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exploration_id),
-            params={'v': 10}, expected_status_int=404)
 
 
 class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
