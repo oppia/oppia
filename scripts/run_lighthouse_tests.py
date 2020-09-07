@@ -141,10 +141,10 @@ def export_url(url):
         return
 
 
-def run_lighthouse_checks(parsed_args):
+def run_lighthouse_checks(performance_mode_setting):
     """Runs the lighthouse checks through the .lighthouserc.js config."""
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
-    if parsed_args.performance:
+    if performance_mode_setting:
         bash_command = [common.NODE_BIN_PATH, lhci_path, 'autorun']
     else:
         bash_command = [common.NODE_BIN_PATH, lhci_path, 'autorun',
@@ -171,10 +171,10 @@ def enable_webpages():
     common.inplace_replace_file(common.CONSTANTS_FILE_PATH, pattern, replace)
 
 
-def start_google_app_engine_server():
+def start_google_app_engine_server(performance_mode_setting):
     """Start the Google App Engine server."""
 
-    app_yaml_filepath = 'app.yaml'
+    app_yaml_filepath = 'app.yaml' if performance_mode_setting else 'app_dev.yaml'
     p = subprocess.Popen(
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=critical '
@@ -196,8 +196,9 @@ def main(args=None):
 
     enable_webpages()
     atexit.register(cleanup)
+    performance_mode = parsed_args.performance
 
-    if parsed_args.performance:
+    if performance_mode:
         python_utils.PRINT('Building files in production mode.')
         # We are using --source_maps here, so that we have at least one CI check
         # that builds using source maps in prod env. This is to ensure that
@@ -208,10 +209,10 @@ def main(args=None):
         run_webpack_compilation()
 
     common.start_redis_server()
-    start_google_app_engine_server()
+    start_google_app_engine_server(performance_mode)
     common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
     run_lighthouse_puppeteer_script()
-    run_lighthouse_checks(parsed_args)
+    run_lighthouse_checks(performance_mode)
 
 
 if __name__ == '__main__':
