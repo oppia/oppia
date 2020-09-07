@@ -481,7 +481,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         suggestion.
 
         Returns:
-            list(str). The list of tml content strings from target entity used
+            list(str). The list of html content strings from target entity used
             in the suggestion.
         """
         if self.change.old_value is not None:
@@ -602,6 +602,10 @@ class SuggestionTranslateContent(BaseSuggestion):
     def get_target_entity_html_strings(self):
         """Gets all html content strings from target entity used in the
         suggestion.
+
+        Returns:
+            list(str). The list of html content strings from target entity used
+            in the suggestion.
         """
         return [self.change.content_html]
 
