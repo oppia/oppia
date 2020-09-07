@@ -884,6 +884,19 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         '%s --> Duplicate constant declaration found.'
                         % filepath)
                     error_messages.append(error_message)
+
+            # Check that the *constants.ts files have a 'as const' at the end.
+            if filepath.endswith('.constants.ts'):
+                file_content = self.file_cache.read(filepath)
+                if not file_content.endswith('} as const;\n'):
+                    failed = True
+                    error_message = (
+                        '%s --> This constants file doesn\'t have \'as const\' '
+                        'at the end. A constants file should have the '
+                        'following structure.\nexport const SomeConstants = '
+                        '{ ... } as const;' % filepath)
+                    error_messages.append(error_message)
+
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 

@@ -21,4 +21,4 @@
 
  export const InteractionSpecsConstants = {
    INTERACTION_SPECS: INTERACTION_SPECS
- };
+ } as const;

@@ -22,4 +22,4 @@ import commonConstants from 'assets/constants';
 export const AppConstants = {
   ...commonConstants,
   ACTIVITY_STATUS_PRIVATE: 'private'
-};
+} as const;
