@@ -243,12 +243,6 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadExtensions"
       - run:
-          name: Run e2e admin misc tab test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="adminMiscTab"
-      - store_artifacts:
-          path: /home/circleci/oppia/core/protractor-screenshots
-      - run:
           name: Run e2e contributor dashboard test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --contributor_dashboard_enabled
