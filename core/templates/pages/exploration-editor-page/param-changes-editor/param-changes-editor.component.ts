@@ -45,14 +45,14 @@ angular.module('oppia').component('paramChangesEditor', {
   },
   template: require('./param-changes-editor.component.html'),
   controller: [
-    '$scope', 'EditabilityService', 'ExplorationParamSpecsService',
-    'AlertsService', 'ParamChangeObjectFactory', 'ExplorationStatesService',
-    'ExternalSaveService',
+    '$scope', 'AlertsService', 'EditabilityService',
+    'ExplorationParamSpecsService', 'ExplorationStatesService',
+    'ExternalSaveService', 'ParamChangeObjectFactory',
     'UrlInterpolationService', 'INVALID_PARAMETER_NAMES',
     function(
-        $scope, EditabilityService, ExplorationParamSpecsService,
-        AlertsService, ParamChangeObjectFactory, ExplorationStatesService,
-        ExternalSaveService,
+        $scope, AlertsService, EditabilityService,
+        ExplorationParamSpecsService, ExplorationStatesService,
+        ExternalSaveService, ParamChangeObjectFactory,
         UrlInterpolationService, INVALID_PARAMETER_NAMES) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();

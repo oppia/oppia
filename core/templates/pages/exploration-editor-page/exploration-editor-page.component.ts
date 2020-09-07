@@ -159,7 +159,7 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$q', '$scope', '$rootScope', '$templateCache', '$timeout', '$uibModal',
+    '$q', '$scope', '$templateCache', '$timeout', '$uibModal',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
     'ChangeListService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
@@ -172,16 +172,16 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
-    'PageTitleService', 'LoaderService', 'ParamChangesObjectFactory',
+    'LoaderService', 'PageTitleService', 'ParamChangesObjectFactory',
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
-    'StateEditorRefreshService',
-    'StateClassifierMappingService', 'StateEditorService',
+    'StateClassifierMappingService', 'StateEditorRefreshService',
+    'StateEditorService',
     'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
     'ThreadDataService', 'UrlInterpolationService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'WindowDimensionsService',
     function(
-        $q, $scope, $rootScope, $templateCache, $timeout, $uibModal,
+        $q, $scope, $templateCache, $timeout, $uibModal,
         AutosaveInfoModalsService, BottomNavbarStatusService,
         ChangeListService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
@@ -194,10 +194,10 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationRightsService, ExplorationSaveService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService, GraphDataService,
-        PageTitleService, LoaderService, ParamChangesObjectFactory,
+        LoaderService, PageTitleService, ParamChangesObjectFactory,
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
-        StateEditorRefreshService,
-        StateClassifierMappingService, StateEditorService,
+        StateClassifierMappingService, StateEditorRefreshService,
+        StateEditorService,
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
         ThreadDataService, UrlInterpolationService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
@@ -497,9 +497,9 @@ angular.module('oppia').component('explorationEditorPage', {
           windowClass: 'oppia-help-modal'
         }).result.then(mode => {
           if (mode === EDITOR_TUTORIAL_MODE) {
-            $rootScope.$broadcast('openEditorTutorial');
+            StateTutorialFirstTimeService.onOpenEditorTutorial.emit();
           } else if (mode === TRANSLATION_TUTORIAL_MODE) {
-            $rootScope.$broadcast('openTranslationTutorial');
+            StateTutorialFirstTimeService.onOpenTranslationTutorial.emit();
           }
         }, () => {
           // Note to developers:

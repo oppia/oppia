@@ -689,7 +689,8 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         """Sets the recommendations in the exploration corresponding to the
         given exploration id.
         """
-        recommendations_services.set_recommendations(exp_id, recommended_ids)
+        recommendations_services.set_exploration_recommendations(
+            exp_id, recommended_ids)
 
     def _complete_exploration_in_collection(self, exp_id):
         """Completes the exploration within the collection. Records that the

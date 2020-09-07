@@ -31,7 +31,6 @@ require(
 
 require('directives/angular-html-bind.directive.ts');
 require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
-require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts');
 require('domain/learner_dashboard/learner-dashboard-backend-api.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/' +
@@ -50,28 +49,26 @@ angular.module('oppia').component('learnerDashboardPage', {
   template: require('./learner-dashboard-page.component.html'),
   controller: [
     '$http', '$q', '$scope', '$uibModal', '$window', 'AlertsService',
-    'LoaderService', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
-    'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
-    'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
-    'LearnerDashboardBackendApiService', 'UrlInterpolationService',
+    'DateTimeFormatService', 'FeedbackMessageSummaryObjectFactory',
+    'LearnerDashboardBackendApiService', 'LoaderService',
+    'SuggestionModalForLearnerDashboardService', 'ThreadStatusDisplayService',
+    'UrlInterpolationService', 'UserService', 'ACTIVITY_TYPE_COLLECTION',
+    'ACTIVITY_TYPE_EXPLORATION', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
+    'FATAL_ERROR_CODES', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
     'LEARNER_DASHBOARD_SECTION_I18N_IDS',
-    'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'ThreadStatusDisplayService',
-    'DateTimeFormatService', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
-    'FeedbackThreadSummaryObjectFactory',
-    'FeedbackMessageSummaryObjectFactory',
-    'SuggestionModalForLearnerDashboardService', 'UserService',
+    'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS',
+    'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS',
     function(
         $http, $q, $scope, $uibModal, $window, AlertsService,
-        LoaderService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
-        ACTIVITY_TYPE_COLLECTION, ACTIVITY_TYPE_EXPLORATION,
-        SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
-        LearnerDashboardBackendApiService, UrlInterpolationService,
+        DateTimeFormatService, FeedbackMessageSummaryObjectFactory,
+        LearnerDashboardBackendApiService, LoaderService,
+        SuggestionModalForLearnerDashboardService, ThreadStatusDisplayService,
+        UrlInterpolationService, UserService, ACTIVITY_TYPE_COLLECTION,
+        ACTIVITY_TYPE_EXPLORATION, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
+        FATAL_ERROR_CODES, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
         LEARNER_DASHBOARD_SECTION_I18N_IDS,
-        LEARNER_DASHBOARD_SUBSECTION_I18N_IDS, ThreadStatusDisplayService,
-        DateTimeFormatService, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
-        FeedbackThreadSummaryObjectFactory,
-        FeedbackMessageSummaryObjectFactory,
-        SuggestionModalForLearnerDashboardService, UserService) {
+        LEARNER_DASHBOARD_SUBSECTION_I18N_IDS,
+        SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS) {
       var ctrl = this;
       var threadIndex = null;
 
@@ -248,13 +245,13 @@ angular.module('oppia').component('learnerDashboardPage', {
           },
           update: function(e, ui) {
             var insertExpInLearnerPlaylistUrl = (
-              UrlInterpolationService.interpolateUrl(
-                ('/learnerplaylistactivityhandler/<activityType>/' +
+              UrlInterpolationService.interpolateUrl((
+                '/learnerplaylistactivityhandler/<activityType>/' +
                 '<activityId>'), {
-                  activityType: activityType,
-                  activityId: (
-                    ctrl.explorationPlaylist[ui.item.sortable.index].id)
-                }));
+                activityType: activityType,
+                activityId: (
+                  ctrl.explorationPlaylist[ui.item.sortable.index].id)
+              }));
 
             $http.post(insertExpInLearnerPlaylistUrl, {
               index: ui.item.sortable.dropindex

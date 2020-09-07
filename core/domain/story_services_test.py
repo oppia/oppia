@@ -145,6 +145,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR),
                 'old_value': None,
                 'new_value': constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0]
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_PROPERTY_META_TAG_CONTENT),
+                'old_value': None,
+                'new_value': 'new story meta tag content'
             })
         ]
         story_services.update_story(
@@ -158,6 +165,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story.thumbnail_bg_color,
             constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])
         self.assertEqual(story.version, 3)
+        self.assertEqual(story.meta_tag_content, 'new story meta tag content')
 
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.title, 'New Title')

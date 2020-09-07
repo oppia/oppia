@@ -6,7 +6,6 @@
     "noImplicitUseStrict": true,
     "outDir": "local_compiled_js_for_test",
     "rootDir": ".",
-    "skipLibCheck": true,
     "target": "es5",
     "sourceMap": true,
     "typeRoots": ["./node_modules/@types"],

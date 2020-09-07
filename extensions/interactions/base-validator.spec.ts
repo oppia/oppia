@@ -39,10 +39,10 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 describe('Interaction validator', function() {
-  var scope, filter, bivs, WARNING_TYPES, agof;
+  var bivs, WARNING_TYPES, agof;
 
   var currentState, otherState, goodOutcomeDest, goodOutcomeFeedback;
-  var badOutcome, goodAnswerGroups, goodDefaultOutcome;
+  var badOutcome, goodAnswerGroups;
   var agof, oof;
 
   beforeEach(function() {
@@ -71,8 +71,6 @@ describe('Interaction validator', function() {
   }));
 
   beforeEach(angular.mock.inject(function($injector, $rootScope) {
-    scope = $rootScope.$new();
-    filter = $injector.get('$filter');
     bivs = $injector.get('baseInteractionValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     agof = $injector.get('AnswerGroupObjectFactory');
@@ -115,10 +113,9 @@ describe('Interaction validator', function() {
     });
 
     goodAnswerGroups = [
-      agof.createNew(goodOutcomeDest, false, null),
-      agof.createNew(goodOutcomeFeedback, false, null)
+      agof.createNew([], goodOutcomeDest, false, null),
+      agof.createNew([], goodOutcomeFeedback, false, null)
     ];
-    goodDefaultOutcome = goodOutcomeDest;
   }));
 
   describe('baseValidator', function() {
@@ -132,9 +129,9 @@ describe('Interaction validator', function() {
     it('should have a warning for an answer group with a confusing outcome',
       function() {
         var answerGroups = [
-          agof.createNew(goodOutcomeDest, false, null),
-          agof.createNew(badOutcome, false, null),
-          agof.createNew(goodOutcomeFeedback, false, null)
+          agof.createNew([], goodOutcomeDest, false, null),
+          agof.createNew([], badOutcome, false, null),
+          agof.createNew([], goodOutcomeFeedback, false, null)
         ];
         var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
         expect(warnings).toEqual([{
@@ -174,9 +171,9 @@ describe('Interaction validator', function() {
     it('should be able to concatenate warnings for both answer groups and ' +
         'the default outcome', function() {
       var badAnswerGroups = [
-        agof.createNew(goodOutcomeDest, false, null),
-        agof.createNew(badOutcome, false, null),
-        agof.createNew(badOutcome, false, null)
+        agof.createNew([], goodOutcomeDest, false, null),
+        agof.createNew([], badOutcome, false, null),
+        agof.createNew([], badOutcome, false, null)
       ];
       var warnings = bivs.getAllOutcomeWarnings(
         badAnswerGroups, badOutcome, currentState);

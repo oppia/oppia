@@ -42,10 +42,11 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
       template: require('./schema-based-float-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', 'FocusManagerService',
-        'NumericInputValidationService', 'SchemaFormSubmittedService',
-        function($scope, $timeout, FocusManagerService,
-            NumericInputValidationService, SchemaFormSubmittedService) {
+        '$timeout', 'FocusManagerService', 'NumericInputValidationService',
+        'SchemaFormSubmittedService',
+        function(
+            $timeout, FocusManagerService, NumericInputValidationService,
+            SchemaFormSubmittedService) {
           var ctrl = this;
           ctrl.validate = function(localValue) {
             return (

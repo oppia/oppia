@@ -27,14 +27,14 @@ angular.module('oppia').component('stateTranslationEditor', {
   template: require('./state-translation-editor.component.html'),
   controller: [
     '$scope', '$uibModal', 'EditabilityService',
-    'ExternalSaveService', 'ExplorationStatesService',
+    'ExplorationStatesService', 'ExternalSaveService',
     'StateEditorService', 'StateWrittenTranslationsService',
     'TranslationLanguageService', 'TranslationStatusService',
     'TranslationTabActiveContentIdService', 'UrlInterpolationService',
     'WrittenTranslationObjectFactory',
     function(
         $scope, $uibModal, EditabilityService,
-        ExternalSaveService, ExplorationStatesService,
+        ExplorationStatesService, ExternalSaveService,
         StateEditorService, StateWrittenTranslationsService,
         TranslationLanguageService, TranslationStatusService,
         TranslationTabActiveContentIdService, UrlInterpolationService,
@@ -101,12 +101,14 @@ angular.module('oppia').component('stateTranslationEditor', {
         languageCode = TranslationLanguageService.getActiveLanguageCode();
         if (StateWrittenTranslationsService
           .savedMemento.hasWrittenTranslation(contentId, languageCode)) {
-          var writtenTranslation = (StateWrittenTranslationsService
-            .savedMemento.getWrittenTranslation(contentId, languageCode));
+          var writtenTranslation = (
+            StateWrittenTranslationsService
+              .savedMemento.getWrittenTranslation(contentId, languageCode));
           oldWrittenTranslation = writtenTranslation;
         }
-        var writtenTranslation = (StateWrittenTranslationsService
-          .displayed.getWrittenTranslation(contentId, languageCode));
+        var writtenTranslation = (
+          StateWrittenTranslationsService
+            .displayed.getWrittenTranslation(contentId, languageCode));
         var newWrittenTranslation = writtenTranslation;
         if (oldWrittenTranslation === null || (
           (oldWrittenTranslation.translation !==

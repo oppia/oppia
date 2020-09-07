@@ -10,7 +10,8 @@
     "angular",
     "html",
     "unused-imports",
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "oppia"
   ],
   "overrides": [{
     // We exclude test files from dependency injection format checks because
@@ -21,6 +22,8 @@
     }
   }],
   "rules": {
+    "oppia/break-after-parens": "error",
+    "oppia/no-unused-dependency": "error",
     "angular/di": [
       "error",
       "array"
@@ -118,7 +121,8 @@
       "error",
       {
         "code": 80,
-        "ignoreUrls": true
+        "ignoreUrls": true,
+        "ignorePattern": "^import \\{"
       }
     ],
     "no-compare-neg": "off",
@@ -279,6 +283,12 @@
     "@typescript-eslint/adjacent-overload-signatures": ["error"],
     "@typescript-eslint/no-extra-non-null-assertion": ["error"],
     "@typescript-eslint/no-misused-new": ["error"],
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "args": "none"
+      }
+    ],
     "@typescript-eslint/explicit-module-boundary-types": ["error"],
     "@typescript-eslint/prefer-as-const": ["error"],
     "@typescript-eslint/no-array-constructor": ["error"],

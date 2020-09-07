@@ -239,59 +239,6 @@ class ExplorationContextModel(base_models.BaseModel):
         return False
 
 
-class ExplorationMathRichTextInfoModel(base_models.BaseModel):
-    """Temporary Storage model for storing information useful while
-    generating images for math rich-text components in explorations.
-
-    TODO(#9952): This model needs to removed once we generate SVG images for
-    all the math rich text componets in old explorations.
-
-    The id of each instance is the id of the corresponding exploration.
-    """
-
-    # A boolean which indicates whether the exploration requires images to be
-    # generated and saved for the math rich-text components. If this field is
-    # False, we will need to generate math rich-text component images for the
-    # exploration. The field will be true only if for each math rich-text
-    # components there is a valid image stored in the datastore.
-    math_images_generation_required = ndb.BooleanProperty(
-        indexed=True, required=True)
-    # Approximate maximum size of Math rich-text components SVG images that
-    # would be generated for the exploration according to the length of
-    # raw_latex string.
-    estimated_max_size_of_images_in_bytes = ndb.IntegerProperty(
-        indexed=True, required=True)
-    # List of unique LaTeX strings without an SVG saved from all the math-rich
-    # text components of the exploration.
-    latex_strings_without_svg = ndb.StringProperty(repeated=True)
-
-    @staticmethod
-    def get_deletion_policy():
-        """ExplorationMathRichTextInfoModel are temporary model that will be
-        deleted after user migration.
-        """
-        return base_models.DELETION_POLICY.DELETE
-
-    @staticmethod
-    def get_export_policy():
-        """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether ExplorationMathRichTextInfoModel references the given
-        user.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data should
-                be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
-
-
 class ExplorationRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration rights snapshot."""
@@ -400,6 +347,43 @@ class ExplorationRightsModel(base_models.VersionedModel):
         super(ExplorationRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
 
+    @staticmethod
+    def convert_to_valid_dict(model_dict):
+        """Replace invalid fields and values in the ExplorationRightsModel dict.
+
+        Some old ExplorationRightsSnapshotContentModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a ExplorationRightsModel from
+        them. We need to remove or replace these fields and values.
+
+        Args:
+            model_dict: dict. The content of the model. Some fields and field
+                values might no longer exist in the ExplorationRightsModel
+                schema.
+
+        Returns:
+            dict. The content of the model. Only valid fields and values are
+            present.
+        """
+        # The all_viewer_ids field was previously used in some versions of the
+        # model, we need to remove it.
+        if 'all_viewer_ids' in model_dict:
+            del model_dict['all_viewer_ids']
+
+        # The status field could historically take the value 'publicized', this
+        # value is now equivalent to 'public'.
+        if model_dict['status'] == 'publicized':
+            model_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
+
+        # The voice_artist_ids field was previously named translator_ids. We
+        # need to move the values from translator_ids field to voice_artist_ids
+        # and delete translator_ids.
+        if 'translator_ids' in model_dict and model_dict['translator_ids']:
+            model_dict['voice_artist_ids'] = model_dict['translator_ids']
+            model_dict['translator_ids'] = []
+
+        return model_dict
+
     def _reconstitute(self, snapshot_dict):
         """Populates the model instance with the snapshot.
 
@@ -416,27 +400,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
             VersionedModel. The instance of the VersionedModel class populated
             with the the snapshot.
         """
-        # The all_viewer_ids field was previously used in some versions of the
-        # model, we need to remove it.
-        if 'all_viewer_ids' in snapshot_dict:
-            del snapshot_dict['all_viewer_ids']
-
-        # The status field could historically take the value 'publicized', this
-        # value is now equivalent to 'public'.
-        if snapshot_dict['status'] == 'publicized':
-            snapshot_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
-
-        # The voice_artist_ids field was previously named translator_ids. We
-        # need to move the values from translator_ids field to voice_artist_ids
-        # and delete translator_ids.
-        if (
-                'translator_ids' in snapshot_dict and
-                snapshot_dict['translator_ids']
-        ):
-            snapshot_dict['voice_artist_ids'] = snapshot_dict['translator_ids']
-            snapshot_dict['translator_ids'] = []
-
-        self.populate(**snapshot_dict)
+        self.populate(
+            **ExplorationRightsModel.convert_to_valid_dict(snapshot_dict))
         return self
 
     def _trusted_commit(
@@ -480,6 +445,29 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
+
+        snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
+            self.get_snapshot_id(self.id, self.version))
+        snapshot_metadata_model.content_user_ids = list(sorted(
+            set(self.owner_ids) |
+            set(self.editor_ids) |
+            set(self.voice_artist_ids) |
+            set(self.viewer_ids)
+        ))
+
+        commit_cmds_user_ids = set()
+        for commit_cmd in commit_cmds:
+            user_id_attribute_names = python_utils.NEXT(
+                cmd['user_id_attribute_names']
+                for cmd in feconf.EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS
+                if cmd['name'] == commit_cmd['cmd']
+            )
+            for user_id_attribute_name in user_id_attribute_names:
+                commit_cmds_user_ids.add(commit_cmd[user_id_attribute_name])
+        snapshot_metadata_model.commit_cmds_user_ids = list(
+            sorted(commit_cmds_user_ids))
+
+        snapshot_metadata_model.put()
 
     @classmethod
     def export_data(cls, user_id):

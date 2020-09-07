@@ -25,8 +25,6 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
 var CreatorDashboardPage =
@@ -38,7 +36,6 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Full exploration editor', function() {
-  var adminPage = null;
   var collectionEditorPage = null;
   var creatorDashboardPage = null;
   var explorationEditorPage = null;
@@ -49,7 +46,6 @@ describe('Full exploration editor', function() {
   var explorationEditorSettingsTab = null;
 
   beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -123,8 +119,9 @@ describe('Full exploration editor', function() {
     await users.createUser(
       'creator2@editorAndPlayer.com', 'creator2EditorAndPlayer');
     await users.login('creator2@editorAndPlayer.com');
-    await workflow.createAndPublishExploration('Adding Fractions',
-      'Mathematics', 'Let us learn how to add fractions', 'English');
+    await workflow.createAndPublishExploration(
+      'Adding Fractions', 'Mathematics', 'Let us learn how to add fractions',
+      'English');
     await users.logout();
 
     await users.createUser('learner2@editorAndPlayer.com', 'learner2');
@@ -465,8 +462,8 @@ describe('Full exploration editor', function() {
 
   it('should play the recommended exploration successfully', async function() {
     await users.createUser('user9@editorAndPlayer.com', 'user9editorAndPlayer');
-    await users.createUser('user10@editorAndPlayer.com',
-      'user10editorAndPlayer');
+    await users.createUser(
+      'user10@editorAndPlayer.com', 'user10editorAndPlayer');
     await users.login('user9@editorAndPlayer.com');
     // Publish new exploration.
     await workflow.createExploration();

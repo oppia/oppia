@@ -74,7 +74,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'subtopic_schema_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             'story_reference_schema_version': (
                 feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
-            'version': 0
+            'version': 0,
+            'practice_tab_is_displayed': False,
+            'meta_tag_content': ''
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
 
@@ -489,6 +491,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_strict_validation_error(
             'Subtopic with title Title does not have any skills linked')
 
+        self.topic.subtopics = []
+        self._assert_strict_validation_error(
+            'Topic should have at least 1 subtopic.')
+
     def test_subtopic_title_validation(self):
         self.topic.subtopics[0].title = 1
         self._assert_validation_error('Expected subtopic title to be a string')
@@ -569,6 +575,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Subtopic thumbnail background color is not specified.')
 
+    def test_topic_practice_tab_is_displayed_validation(self):
+        self.topic.practice_tab_is_displayed = 0
+        self._assert_validation_error(
+            'Practice tab is displayed property should be a boolean.'
+            'Received 0.')
+
     def test_subtopic_skill_ids_validation(self):
         self.topic.subtopics[0].skill_ids = 'abc'
         self._assert_validation_error('Expected skill ids to be a list')
@@ -605,7 +617,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, validation_message):
             self.topic.validate()
 
-    def test_validation_fails_with_lenghty_url_fragment(self):
+    def test_validation_fails_with_lengthy_url_fragment(self):
         self.topic.url_fragment = 'a' * 25
         url_fragment_char_limit = constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
         validation_message = (
