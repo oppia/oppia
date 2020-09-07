@@ -66,12 +66,6 @@ describe('Contributor dashboard page', function() {
     await users.createUser(USER_EMAILS[1], 'user1');
     await users.createAndLoginAdminUser(ADMIN_EMAIL, 'management');
 
-    await adminPage.editConfigProperty(
-      'Enable contributor dashboard page.',
-      'Boolean', async function(elem) {
-        await elem.setValue(true);
-      });
-
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
       TOPIC_NAMES[0], 'community-topic-one', 'Topic description 1', false);
