@@ -64,6 +64,9 @@ angular.module('oppia').component('subtopicEditorTab', {
           TopicEditorStateService.getClassroomUrlFragment());
         ctrl.subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
         ctrl.subtopic = ctrl.topic.getSubtopicById(ctrl.subtopicId);
+        if (!ctrl.subtopic) {
+          TopicEditorRoutingService.navigateToMainTab();
+        }
         ctrl.errorMsg = null;
         ctrl.subtopicUrlFragmentExists = false;
         ctrl.subtopicUrlFragmentIsValid = false;
@@ -289,8 +292,6 @@ angular.module('oppia').component('subtopicEditorTab', {
           TopicEditorStateService.onTopicReinitialized.subscribe(
             () => ctrl.initEditor()
           ));
-
-        ctrl.initEditor();
       };
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();
