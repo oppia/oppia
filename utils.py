@@ -30,7 +30,6 @@ import string
 import sys
 import time
 import unicodedata
-import zlib
 
 from constants import constants
 import feconf
@@ -827,30 +826,6 @@ def get_hashable_value(value):
             (k, get_hashable_value(v)) for k, v in value.items()))
     else:
         return value
-
-
-def compress_to_zlib(data):
-    """Compress the data to zlib format for efficient storage and communication.
-
-    Args:
-        data: str. Data to be compressed.
-
-    Returns:
-        str. Compressed data string.
-    """
-    return zlib.compress(data)
-
-
-def decompress_from_zlib(data):
-    """Decompress the zlib compressed data.
-
-    Args:
-        data: str. Data to be decompressed.
-
-    Returns:
-        str. Decompressed data string.
-    """
-    return zlib.decompress(data)
 
 
 def compute_list_difference(list_a, list_b):
