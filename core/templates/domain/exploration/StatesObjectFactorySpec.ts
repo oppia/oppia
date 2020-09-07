@@ -30,7 +30,6 @@ import { VoiceoverObjectFactory } from
 const constants = require('constants.ts');
 
 describe('States Object Factory', () => {
-  let scope = null;
   let sof = null;
   let ssof = null;
   let statesDict = null;

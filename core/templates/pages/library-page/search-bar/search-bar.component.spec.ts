@@ -40,7 +40,6 @@ describe('Search bar component', function() {
   var constructTranslationIdsService = null;
   var i18nLanguageCodeService = null;
   var navigationService = null;
-  var searchService = null;
   var urlService = null;
 
   var initTranslationEmitter = new EventEmitter();
@@ -64,7 +63,6 @@ describe('Search bar component', function() {
     $rootScope = $injector.get('$rootScope');
     classroomBackendApiService = $injector.get('ClassroomBackendApiService');
     navigationService = $injector.get('NavigationService');
-    searchService = $injector.get('SearchService');
     urlService = $injector.get('UrlService');
 
     $scope = $rootScope.$new();
