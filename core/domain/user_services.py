@@ -38,6 +38,7 @@ from google.appengine.api import urlfetch
 current_user_services = models.Registry.import_current_user_services()
 (user_models, audit_models) = models.Registry.import_models(
     [models.NAMES.user, models.NAMES.audit])
+transaction_services = models.Registry.import_transaction_services()
 
 # Size (in px) of the gravatar being retrieved.
 GRAVATAR_SIZE_PX = 150
@@ -165,8 +166,8 @@ class UserSettings(python_utils.OBJECT):
         self.deleted = deleted
 
     def validate(self):
-        """Checks that user_id and email fields of this UserSettings domain
-        object are valid.
+        """Checks that the user_id, gae_id, email, role and display_alias
+        fields of this UserSettings domain object are valid.
 
         Raises:
             ValidationError. The user_id is not str.
@@ -175,6 +176,7 @@ class UserSettings(python_utils.OBJECT):
             ValidationError. The email is invalid.
             ValidationError. The role is not str.
             ValidationError. Given role does not exist.
+            ValidationError. The display alias is not str.
         """
         if not isinstance(self.user_id, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -183,6 +185,12 @@ class UserSettings(python_utils.OBJECT):
             raise utils.ValidationError('No user id specified.')
         if not is_user_id_correct(self.user_id):
             raise utils.ValidationError('The user ID is in a wrong format.')
+
+        if not isinstance(self.role, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected role to be a string, received %s' % self.role)
+        if self.role not in role_services.PARENT_ROLES:
+            raise utils.ValidationError('Role %s does not exist.' % self.role)
 
         if (self.gae_id is not None and
                 not isinstance(self.gae_id, python_utils.BASESTRING)):
@@ -240,6 +248,76 @@ class UserSettings(python_utils.OBJECT):
             raise utils.ValidationError(
                 '%s is not a valid value for the dashboard display '
                 'preferences.' % (self.creator_dashboard_display_pref))
+
+    def populate_from_user_data(self, modifiable_user_data):
+        """Populate the UserSettings domain object using the user data in
+            modifiable_user_data.
+
+        Args:
+            modifiable_user_data: ModifiableUserData. The modifiable user
+                data version_1 object with the data information to be updated.
+
+        Raises:
+            ValidationError. None or empty value is provided for display alias
+                attribute.
+        """
+        if (not modifiable_user_data.display_alias or
+                not isinstance(
+                    modifiable_user_data.display_alias,
+                    python_utils.BASESTRING
+                )
+           ):
+            raise utils.ValidationError(
+                'Expected display_alias to be a string, received %s.' %
+                modifiable_user_data.display_alias
+            )
+        self.display_alias = modifiable_user_data.display_alias
+        self.preferred_language_codes = (
+            modifiable_user_data.preferred_language_codes)
+        self.preferred_site_language_code = (
+            modifiable_user_data.preferred_site_language_code)
+        self.preferred_audio_language_code = (
+            modifiable_user_data.preferred_audio_language_code)
+
+    def to_dict(self):
+        """Convert the UserSettings domain instance into a dictionary form
+        with its keys as the attributes of this class.
+
+        Rerurns:
+            dict. A dictionary containing the UserSettings class information
+            in a dictionary form.
+        """
+        return {
+            'gae_id': self.gae_id,
+            'email': self.email,
+            'role': self.role,
+            'username': self.username,
+            'normalized_username': self.normalized_username,
+            'last_agreed_to_terms': self.last_agreed_to_terms,
+            'last_started_state_editor_tutorial': (
+                self.last_started_state_editor_tutorial),
+            'last_started_state_translation_tutorial': (
+                self.last_started_state_translation_tutorial),
+            'last_logged_in': self.last_logged_in,
+            'last_edited_an_exploration': (
+                self.last_edited_an_exploration),
+            'last_created_an_exploration': (
+                self.last_created_an_exploration),
+            'profile_picture_data_url': self.profile_picture_data_url,
+            'default_dashboard': self.default_dashboard,
+            'creator_dashboard_display_pref': (
+                self.creator_dashboard_display_pref),
+            'user_bio': self.user_bio,
+            'subject_interests': self.subject_interests,
+            'first_contribution_msec': self.first_contribution_msec,
+            'preferred_language_codes': self.preferred_language_codes,
+            'preferred_site_language_code': (
+                self.preferred_site_language_code),
+            'preferred_audio_language_code': (
+                self.preferred_audio_language_code),
+            'display_alias': self.display_alias,
+            'deleted': self.deleted
+        }
 
     @property
     def truncated_email(self):
@@ -350,8 +428,8 @@ class UserAuthDetails(python_utils.OBJECT):
         self.deleted = deleted
 
     def validate(self):
-        """Checks that user_id, gae_id and email fields of this UserAuthDetails
-        domain object are valid.
+        """Checks that user_id, gae_id, pin and parent_user_id fields of this
+        UserAuthDetails domain object are valid.
 
         Raises:
             ValidationError. The user_id is not str.
@@ -645,9 +723,11 @@ def get_user_settings_by_gae_id(gae_id, strict=False):
     Raises:
         Exception. The value of strict is True and given gae_id does not exist.
     """
-    user_settings_model = user_models.UserSettingsModel.get_by_gae_id(gae_id)
-    if user_settings_model is not None:
-        user_settings = _transform_user_settings(user_settings_model)
+    user_auth_details_model = user_models.UserAuthDetailsModel.get_by_auth_id(
+        feconf.AUTH_METHOD_GAE, gae_id)
+    if user_auth_details_model is not None:
+        user_settings = _transform_user_settings(
+            user_models.UserSettingsModel.get_by_id(user_auth_details_model.id))
         return user_settings
     elif strict:
         logging.error('Could not find user with id %s' % gae_id)
@@ -827,36 +907,7 @@ def _save_user_settings(user_settings):
     """
     user_settings.validate()
 
-    user_settings_dict = {
-        'gae_id': user_settings.gae_id,
-        'email': user_settings.email,
-        'role': user_settings.role,
-        'username': user_settings.username,
-        'normalized_username': user_settings.normalized_username,
-        'last_agreed_to_terms': user_settings.last_agreed_to_terms,
-        'last_started_state_editor_tutorial': (
-            user_settings.last_started_state_editor_tutorial),
-        'last_started_state_translation_tutorial': (
-            user_settings.last_started_state_translation_tutorial),
-        'last_logged_in': user_settings.last_logged_in,
-        'last_edited_an_exploration': user_settings.last_edited_an_exploration,
-        'last_created_an_exploration': (
-            user_settings.last_created_an_exploration),
-        'profile_picture_data_url': user_settings.profile_picture_data_url,
-        'default_dashboard': user_settings.default_dashboard,
-        'creator_dashboard_display_pref': (
-            user_settings.creator_dashboard_display_pref),
-        'user_bio': user_settings.user_bio,
-        'subject_interests': user_settings.subject_interests,
-        'first_contribution_msec': user_settings.first_contribution_msec,
-        'preferred_language_codes': user_settings.preferred_language_codes,
-        'preferred_site_language_code': (
-            user_settings.preferred_site_language_code),
-        'preferred_audio_language_code': (
-            user_settings.preferred_audio_language_code),
-        'pin': user_settings.pin,
-        'deleted': user_settings.deleted
-    }
+    user_settings_dict = user_settings.to_dict()
 
     # If user with the given user_id already exists, update that model
     # with the given user settings, otherwise, create a new one.
@@ -960,8 +1011,36 @@ def has_fully_registered_account(user_id):
         feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC)
 
 
+def get_all_profiles_auth_details_by_parent_user_id(parent_user_id):
+    """Gets domain objects representing the auth details for all profiles
+    associated with the user having the given parent_user_id.
+
+    Args:
+        parent_user_id: str. User id of the parent_user whose associated
+            profiles we are querying for.
+
+    Returns:
+        list(UserAuthDetails). The UserAuthDetails domain objects
+        corresponding to the profiles linked to given parent_user_id. If that
+        parent user does not have any profiles linked to it, the
+        returned list will be empty.
+
+    Raises:
+        Exception. Parent user with the given parent_user_id not found.
+    """
+    if user_models.UserAuthDetailsModel.has_reference_to_user_id(
+            parent_user_id) is False:
+        raise Exception('Parent user not found.')
+
+    return [
+        _get_user_auth_details_from_model(model) for model in
+        user_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
+            parent_user_id) if not model.deleted
+    ]
+
+
 def create_new_user(gae_id, email):
-    """Creates a new user.
+    """Creates a new user and commits it to the datastore.
 
     Args:
         gae_id: str. The unique GAE user ID of the user.
@@ -971,22 +1050,178 @@ def create_new_user(gae_id, email):
         UserSettings. The newly-created user settings domain object.
 
     Raises:
-        Exception. If a user with the given gae_id already exists.
+        Exception. A user with the given gae_id already exists.
     """
+    def _create_new_user_transactional(user_settings, user_auth_details):
+        """Save user models for new users as a transaction.
+
+        Args:
+            user_settings: UserSettings. The user settings domain object
+                corresponding to the newly created user.
+            user_auth_details: UserAuthDetails. The user auth details domain
+                object corresponding to the newly created user.
+        """
+        _save_user_auth_details(user_auth_details)
+        _save_user_settings(user_settings)
+        create_user_contributions(user_settings.user_id, [], [])
+
     user_settings = get_user_settings_by_gae_id(gae_id, strict=False)
     if user_settings is not None:
         raise Exception(
             'User %s already exists for gae_id %s.'
             % (user_settings.user_id, gae_id))
-
     user_id = user_models.UserSettingsModel.get_new_id('')
     user_settings = UserSettings(
         user_id, gae_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
-    _save_user_auth_details(UserAuthDetails(user_id, gae_id))
-    _save_user_settings(user_settings)
-    create_user_contributions(user_id, [], [])
+    user_auth_details = UserAuthDetails(user_id, gae_id)
+    transaction_services.run_in_transaction(
+        _create_new_user_transactional, user_settings, user_auth_details)
     return user_settings
+
+
+def create_new_profiles(gae_id, email, modifiable_user_data_list):
+    """Creates new profiles for the users specified in the
+    modifiable_user_data_list and commits them to the datastore.
+
+    Args:
+        gae_id: str. The GAE ID of the full (parent) user trying to create new
+            profiles.
+        email: str. The email address of the full (parent) user trying to create
+            new profiles.
+        modifiable_user_data_list: list(ModifiableUserData). The list of
+            modifiable user data objects used for creation of new profiles.
+
+    Returns:
+        list(UserSettings). List of UserSettings objects created for the new
+        users.
+
+    Raises:
+        Exception. The pin for parent user trying to create a new profile
+            must be set.
+        Exception. The user_id is already set for any user in its corresponding
+            modifiable_user_data object.
+    """
+
+    def _create_new_profile_transactional(
+            user_settings, user_auth_details):
+        """Save user models for new users as a transaction.
+
+        Args:
+            user_settings: UserSettings. The user settings domain object
+                corresponding to the newly created user.
+            user_auth_details: UserAuthDetails. The user auth details domain
+                object corresponding to the newly created list of users.
+        """
+        _save_user_auth_details(user_auth_details)
+        _save_user_settings(user_settings)
+
+    # As new profile user creation is done by a full (parent) user only.
+    parent_user_auth_details = get_auth_details_by_gae_id(gae_id, strict=True)
+    if parent_user_auth_details.pin is None:
+        raise Exception(
+            'Pin must be set for a full user before creating a profile.')
+    parent_user_id = parent_user_auth_details.user_id
+    user_settings_list = []
+    for modifiable_user_data in modifiable_user_data_list:
+        if modifiable_user_data.user_id is not None:
+            raise Exception('User id cannot already exist for a new user.')
+        user_id = user_models.UserSettingsModel.get_new_id('')
+        user_settings = UserSettings(
+            user_id, gae_id, email, feconf.ROLE_ID_LEARNER,
+            preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE]
+        )
+        user_settings.populate_from_user_data(modifiable_user_data)
+
+        user_auth_details = UserAuthDetails(
+            user_id, None, modifiable_user_data.pin, parent_user_id)
+
+        # Each new profile user must be written to the datastore first and
+        # because if we convert it into a batch write request, then calling
+        # get_new_id() in a loop can possibly create same user_id for 2 users
+        # because it internally uses UserSettingsModel.get_by_id method to
+        # check if user_id does not exist already.
+        transaction_services.run_in_transaction(
+            _create_new_profile_transactional, user_settings,
+            user_auth_details
+        )
+        user_settings_list.append(user_settings)
+    return user_settings_list
+
+
+def update_multiple_users_data(modifiable_user_data_list):
+    """Updates user settings and user auth model details for the users
+    specified in the modifiable_user_data_list.
+
+    Args:
+        modifiable_user_data_list: list(ModifiableUserData). The list of
+            modifiable_user_data entries corresponding to the users whose
+            data has to be updated.
+
+    Raises:
+        Exception. A user id is None.
+        Exception. UserSettings or UserAuthDetail for a given user_id is
+            not found.
+    """
+    user_ids = [user.user_id for user in modifiable_user_data_list]
+    user_settings_list = get_users_settings(user_ids)
+    user_auth_details_list = get_multiple_user_auth_details(user_ids)
+    for (modifiable_user_data, user_settings, user_auth_details) in (
+            python_utils.ZIP(
+                modifiable_user_data_list, user_settings_list,
+                user_auth_details_list
+            )
+        ):
+        user_id = modifiable_user_data.user_id
+        if user_id is None:
+            raise Exception('Missing user ID.')
+        if not user_settings or not user_auth_details:
+            raise Exception('User not found.')
+        user_settings.populate_from_user_data(modifiable_user_data)
+        user_auth_details.pin = modifiable_user_data.pin
+
+    _save_existing_users_settings(user_settings_list)
+    _save_existing_users_auth_details(user_auth_details_list)
+
+
+def _save_existing_users_settings(user_settings_list):
+    """Commits a list of existing users' UserSettings objects to the datastore.
+
+    Args:
+        user_settings_list: list(UserSettings). The list of UserSettings
+            objects to be saved.
+    """
+    user_ids = [user.user_id for user in user_settings_list]
+    user_settings_models = user_models.UserSettingsModel.get_multi(
+        user_ids, include_deleted=True)
+    for user_model, user_settings in python_utils.ZIP(
+            user_settings_models, user_settings_list):
+        user_settings.validate()
+        user_model.populate(**user_settings.to_dict())
+    user_models.UserSettingsModel.put_multi(user_settings_models)
+
+
+def _save_existing_users_auth_details(user_auth_details_list):
+    """Commits a list of existing users' UserAuthDetails objects to the
+    datastore.
+
+    Args: user_auth_details_list. list(UserAuthDetails). The list of
+            UserAuthDetails objects to be saved.
+    """
+    user_ids = [user.user_id for user in user_auth_details_list]
+    user_auth_models = user_models.UserAuthDetailsModel.get_multi(
+        user_ids, include_deleted=True)
+    for user_auth_details_model, user_auth_details in python_utils.ZIP(
+            user_auth_models, user_auth_details_list):
+        user_auth_details.validate()
+        user_auth_details_dict = {
+            'gae_id': user_auth_details.gae_id,
+            'pin': user_auth_details.pin,
+            'parent_user_id': user_auth_details.parent_user_id,
+            'deleted': user_auth_details.deleted
+        }
+        user_auth_details_model.populate(**user_auth_details_dict)
+    user_models.UserAuthDetailsModel.put_multi(user_auth_models)
 
 
 def _save_user_auth_details(user_auth_details):
@@ -1014,6 +1249,82 @@ def _save_user_auth_details(user_auth_details):
     else:
         user_auth_details_dict['id'] = user_auth_details.user_id
         user_models.UserAuthDetailsModel(**user_auth_details_dict).put()
+
+
+def get_multiple_user_auth_details(user_ids):
+    """Gets domain objects representing the auth details
+    for the given user_ids.
+
+    Args:
+        user_ids: list(str). The list of user_ids for which we need to fetch
+            the user auth details.
+
+    Returns:
+        list(UserAuthDetails|None). The UserAuthDetails domain objects
+        corresponding to the given user ids. If the given user_id does not
+        exist, the corresponding entry in the returned list is None.
+    """
+    user_settings_models = user_models.UserAuthDetailsModel.get_multi(user_ids)
+    return [
+        _get_user_auth_details_from_model(model)
+        if model is not None else None for model in user_settings_models
+    ]
+
+
+def get_auth_details_by_user_id(user_id, strict=False):
+    """Return the user auth details for a single user.
+
+    Args:
+        user_id: str. The unique user ID of the user.
+        strict: bool. Whether to fail noisily if no user with the given
+            id exists in the datastore. Defaults to False.
+
+    Returns:
+        UserAuthDetails or None. If the given user_id does not exist and
+        strict is False, returns None. Otherwise, returns the corresponding
+        UserAuthDetails domain object.
+
+    Raises:
+        Exception. The value of strict is True and given user_id does not exist.
+    """
+    user_auth_details_model = user_models.UserAuthDetailsModel.get_by_id(
+        user_id)
+    if (user_auth_details_model is not None) and (
+            user_auth_details_model.deleted is False):
+        return _get_user_auth_details_from_model(user_auth_details_model)
+    elif strict:
+        logging.error('Could not find user with id %s' % user_id)
+        raise Exception('User not found.')
+    else:
+        return None
+
+
+def get_auth_details_by_gae_id(gae_id, strict=False):
+    """Return the user auth details for a single user.
+
+    Args:
+        gae_id: str. The unique GAE ID of the user.
+        strict: bool. Whether to fail noisily if no user with the given
+            id exists in the datastore. Defaults to False.
+
+    Returns:
+        UserAuthDetails or None. If a user does not exist with given gae_id and
+        strict is False, returns None. Otherwise, returns the corresponding
+        UserAuthDetails domain object.
+
+    Raises:
+        Exception. The value of strict is True and given user_id does not exist.
+    """
+    user_auth_details_model = user_models.UserAuthDetailsModel.get_by_auth_id(
+        feconf.AUTH_METHOD_GAE, gae_id)
+    if (user_auth_details_model is not None) and (
+            user_auth_details_model.deleted is False):
+        return _get_user_auth_details_from_model(user_auth_details_model)
+    elif strict:
+        logging.error('Could not find user with id %s' % gae_id)
+        raise Exception('User not found.')
+    else:
+        return None
 
 
 def _get_user_auth_details_from_model(user_auth_details_model):
@@ -1293,6 +1604,10 @@ def update_user_role(user_id, role):
     if role not in role_services.PARENT_ROLES:
         raise Exception('Role %s does not exist.' % role)
     user_settings = get_user_settings(user_id, strict=True)
+    if user_settings.role == feconf.ROLE_ID_LEARNER:
+        raise Exception('The role of a Learner cannot be changed.')
+    if role == feconf.ROLE_ID_LEARNER:
+        raise Exception('Updating to a Learner role is not allowed.')
     user_settings.role = role
     _save_user_settings(user_settings)
 

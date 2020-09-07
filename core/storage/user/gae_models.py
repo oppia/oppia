@@ -290,19 +290,6 @@ class UserSettingsModel(base_models.BaseModel):
             cls.normalized_username == normalized_username).get())
 
     @classmethod
-    def get_by_gae_id(cls, gae_id):
-        """Returns a user model with given GAE user ID.
-
-        Args:
-            gae_id: str. The GAE user ID that is being queried for.
-
-        Returns:
-            UserSettingsModel. The UserSettingsModel instance which has the same
-            GAE user ID.
-        """
-        return cls.query(cls.gae_id == gae_id).get()
-
-    @classmethod
     def get_by_normalized_username(cls, normalized_username):
         """Returns a user model given a normalized username.
 
@@ -2278,6 +2265,9 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     # The email of the user.
     email = ndb.StringProperty(required=True)
+    # Role of the user. Needed to decide which storage models have to be deleted
+    # for it.
+    role = ndb.StringProperty(required=True)
     # Whether the deletion is completed.
     deletion_complete = ndb.BooleanProperty(default=False, indexed=True)
 
@@ -2452,3 +2442,17 @@ class UserAuthDetailsModel(base_models.BaseModel):
         if auth_service == feconf.AUTH_METHOD_GAE:
             return cls.query(cls.gae_id == auth_id).get()
         return None
+
+    @classmethod
+    def get_all_profiles_by_parent_user_id(cls, parent_user_id):
+        """Fetch all user entries with the given parent_user_id.
+
+        Args:
+            parent_user_id: str. User id of the parent_user whose associated
+                profiles we are querying for.
+
+        Returns:
+            list(UserAuthDetailsModel). List of UserAuthDetailsModel instances
+            mapped to the queried parent_user_id.
+        """
+        return cls.query(cls.parent_user_id == parent_user_id).fetch()

@@ -2252,6 +2252,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_1_id'
     USER_1_EMAIL = 'email@email.com'
+    USER_1_ROLE = feconf.ROLE_ID_LEARNER
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -2260,6 +2261,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
         user_models.PendingDeletionRequestModel(
             id=self.USER_1_ID,
             email=self.USER_1_EMAIL,
+            role=self.USER_1_ROLE,
             exploration_ids=[],
             collection_ids=[],
         ).put()
@@ -2397,3 +2399,14 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             user_models.UserAuthDetailsModel.get_by_auth_id(
                 feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
         )
+
+    def test_get_all_profiles_for_parent_user_id_returns_all_profiles(self):
+        user_auth_details_models = [
+            user_models.UserAuthDetailsModel.get_by_id(self.PROFILE_ID),
+            user_models.UserAuthDetailsModel.get_by_id(self.PROFILE_2_ID)
+        ]
+        fetched_output = (
+            user_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
+                self.USER_ID)
+        )
+        self.assertItemsEqual(user_auth_details_models, fetched_output)
