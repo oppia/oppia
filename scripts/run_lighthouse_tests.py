@@ -141,10 +141,10 @@ def export_url(url):
         return
 
 
-def run_lighthouse_checks(performance_mode_setting):
+def run_lighthouse_checks(is_performance_mode):
     """Runs the lighthouse checks through the .lighthouserc.js config."""
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
-    if performance_mode_setting:
+    if is_performance_mode:
         bash_command = [common.NODE_BIN_PATH, lhci_path, 'autorun']
     else:
         bash_command = [common.NODE_BIN_PATH, lhci_path, 'autorun',
@@ -171,10 +171,10 @@ def enable_webpages():
     common.inplace_replace_file(common.CONSTANTS_FILE_PATH, pattern, replace)
 
 
-def start_google_app_engine_server(performance_mode_setting):
+def start_google_app_engine_server(is_performance_mode):
     """Start the Google App Engine server."""
 
-    app_yaml_filepath = 'app.yaml' if performance_mode_setting else 'app_dev.yaml'
+    app_yaml_filepath = 'app.yaml' if is_performance_mode else 'app_dev.yaml'
     p = subprocess.Popen(
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=critical '
