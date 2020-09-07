@@ -47,6 +47,8 @@ import { StoriesListComponent } from
 import { SubtopicsListComponent } from
   'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { TopicViewerPageComponent } from
+  'pages/topic-viewer-page/topic-viewer-page.component';
 
 @NgModule({
   imports: [
@@ -59,14 +61,16 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
     PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
-    TopicViewerNavbarBreadcrumbComponent
+    TopicViewerNavbarBreadcrumbComponent,
+    TopicViewerPageComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
-    TopicViewerNavbarBreadcrumbComponent
+    TopicViewerNavbarBreadcrumbComponent,
+    TopicViewerPageComponent
   ],
   providers: [
     {

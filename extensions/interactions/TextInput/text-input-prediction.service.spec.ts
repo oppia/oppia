@@ -28,9 +28,6 @@ import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 // ^^^ This block is to be removed.
 
 describe('Text Input Prediction Service', () => {
-  let $rootScope = null;
-  let $scope = null;
-
   beforeEach(angular.mock.module('oppia'));
 
   describe('Test text prediction service', () => {
@@ -41,10 +38,6 @@ describe('Text Input Prediction Service', () => {
         new SVMPredictionService(new PredictionResultObjectFactory()),
         new TextInputTokenizer());
     });
-    beforeEach(angular.mock.inject(($injector) => {
-      $rootScope = $injector.get('$rootScope');
-      $scope = $rootScope.$new();
-    }));
     it('should predict the same as oppia-ml', () => {
       const classifierData =
           window.__fixtures__['core/tests/data/text_input_classifier_data'];

@@ -51,6 +51,17 @@ TS_IGNORE_EXCEPTIONS_FILEPATH = os.path.join(
 TS_IGNORE_EXCEPTIONS = json.load(python_utils.open_file(
     TS_IGNORE_EXCEPTIONS_FILEPATH, 'r'))
 
+# The INJECTABLES_TO_IGNORE contains a list of services that are not supposed
+# to be included in angular-services.index.ts. These services are not required
+# for our application to run but are only present to aid tests or belong to a
+# class of legacy services that will soon be removed from the codebase.
+# NOTE TO DEVELOPERS: Don't add any more files to this list. If you have any
+# questions, please talk to @srijanreddy98.
+INJECTABLES_TO_IGNORE = [
+    'MockIgnoredService', # This file is required for the js-ts-linter-test.
+    'UpgradedServices' # We don't want this service to be present in the index.
+]
+
 
 def _get_expression_from_node_if_one_exists(
         parsed_node, components_to_check):
@@ -966,6 +977,56 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
+    def _check_angular_services_index(self):
+        """Finds all @Injectable classes and makes sure that they are added to
+            Oppia root and Angular Services Index.
+
+        Returns:
+            all_messages: str. All the messages returned by the lint checks.
+        """
+        name = 'Angular Services Index file'
+        error_messages = []
+        injectable_pattern = '%s%s' % (
+            'Injectable\\({\\n*\\s*providedIn: \'root\'\\n*}\\)\\n',
+            'export class ([A-Za-z0-9]*)')
+        angular_services_index_path = (
+            './core/templates/services/angular-services.index.ts')
+        angular_services_index = self.file_cache.read(
+            angular_services_index_path)
+        error_messages = []
+        failed = False
+        for file_path in self.ts_files:
+            file_content = self.file_cache.read(file_path)
+            class_names = re.findall(injectable_pattern, file_content)
+            for class_name in class_names:
+                if class_name in INJECTABLES_TO_IGNORE:
+                    continue
+                import_statement_regex = 'import {[\\s*\\w+,]*%s' % class_name
+                if not re.search(
+                        import_statement_regex, angular_services_index):
+                    error_message = (
+                        'Please import %s to Angular Services Index file in %s'
+                        'from %s'
+                        % (class_name, angular_services_index_path, file_path))
+                    error_messages.append(error_message)
+                    failed = True
+
+                service_name_type_pair_regex = (
+                    '\\[\'%s\',\\n*\\s*%s\\]' % (class_name, class_name))
+                service_name_type_pair = (
+                    '[\'%s\', %s]' % (class_name, class_name))
+
+                if not re.search(
+                        service_name_type_pair_regex, angular_services_index):
+                    error_message = (
+                        'Please add the pair %s to the angularServices in %s'
+                        % (service_name_type_pair, angular_services_index_path)
+                    )
+                    error_messages.append(error_message)
+                    failed = True
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -1003,6 +1064,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         linter_stdout.append(self._check_comments())
         linter_stdout.append(self._check_ts_ignore())
         linter_stdout.append(self._check_ts_expect_error())
+        linter_stdout.append(self._check_angular_services_index())
 
         # Clear temp compiled typescipt files.
         shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)

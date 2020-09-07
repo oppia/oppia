@@ -70,7 +70,6 @@ describe('State Interaction controller', function() {
     }));
 
     var scope, ecs, cls, ess, siis, scas, scs, idc, IS;
-    var $httpBackend;
     var mockExplorationData;
     var outerScope, directiveScope;
     var $componentController;
@@ -101,7 +100,6 @@ describe('State Interaction controller', function() {
       scas = $injector.get('StateCustomizationArgsService');
       idc = $injector.get('InteractionDetailsCacheService');
       IS = $injector.get('INTERACTION_SPECS');
-      $httpBackend = $injector.get('$httpBackend');
       scope.StateInteractionIdService = siis;
       scope.StateCustomizationArgsService = scas;
       scope.InteractionDetailsCacheService = idc;
