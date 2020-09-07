@@ -40,29 +40,29 @@
        ng-style="$ctrl.imageContainerStyle">
   <div ng-if="$ctrl.highlightRegionsOnHover">
     <div ng-repeat="region in $ctrl.allRegions"
-         style="
-           height: <[$ctrl.getRegionDimensions($index).height]>px;
-           width: <[$ctrl.getRegionDimensions($index).width]>px;
-           left: <[$ctrl.getRegionDimensions($index).left]>px;
-           top: <[$ctrl.getRegionDimensions($index).top]>px;
-           pointer-events: none;
-           position: absolute;
-           display: <[$ctrl.getRegionDisplay(region.label)]>;
-           background: rgba(0,0,255,0.5);
-           z-index: 10;">
+         ng-style="{
+           'height': $ctrl.getRegionDimensions($index).height + 'px',
+           'width': $ctrl.getRegionDimensions($index).width + 'px',
+           'left': $ctrl.getRegionDimensions($index).left + 'px',
+           'top': $ctrl.getRegionDimensions($index).top + 'px',
+           'pointer-events': 'none',
+           'position': 'absolute',
+           'display': $ctrl.getRegionDisplay(region.label),
+           'background': 'rgba(0,0,255,0.5)',
+           'z-index': '10'}">
     </div>
   </div>
   <div ng-if="!$ctrl.highlightRegionsOnHover && !$ctrl.interactionIsActive"
-       style="
-       border-radius: 50%;
-       width: 10px;
-       height: 10px;
-       background: red;
-       border: 1px solid #000;
-       z-index: 10;
-       position: absolute;
-       display: <[$ctrl.getDotDisplay()]>;
-       left: <[$ctrl.getDotLocation().left]>px;
-       top: <[$ctrl.getDotLocation().top]>px;">
+       ng-style="{
+       'border-radius': '50%',
+       'width': '10px',
+       'height': '10px',
+       'background': 'red',
+       'border': '1px solid #000',
+       'z-index': '10',
+       'position': 'absolute',
+       'display': $ctrl.getDotDisplay(),
+       'left': $ctrl.getDotLocation().left + 'px',
+       'top': $ctrl.getDotLocation().top + 'px'}">
   </div>
 </div>

@@ -1,4 +1,4 @@
-<div class="modal-header" ng-class="{'modal-header-blue': StateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)}" style="border-bottom: 0; padding-bottom: 0;">
+<div class="modal-header oppia-modal-header" ng-class="{'modal-header-blue': StateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)}">
   <h3 ng-if="!StateInteractionIdService.displayed">
     Choose Interaction
   </h3>
@@ -37,7 +37,7 @@
                            schema="customizationArgSpec.schema">
       </schema-based-editor>
       <div ng-if="customizationArgSpec.schema.type === 'bool'" class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
-      <div style="margin-bottom: 15px;"></div>
+      <div class="oppia-interaction-customization-label-container"></div>
     </div>
     <div ng-if="getCustomizationArgsWarningMessage()" class="alert alert-danger oppia-units-input-error">
       <[getCustomizationArgsWarningMessage()]>
@@ -52,7 +52,7 @@
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()" ng-if="!hasCustomizationArgs">Cancel</button>
   <!-- Do not show this button if an interaction is already selected. -->
-  <button class="btn btn-secondary" style="float: left;" ng-click="returnToInteractionSelector()" ng-if="StateInteractionIdService.displayed && !StateInteractionIdService.savedMemento && hasCustomizationArgs">Change Interaction</button>
+  <button class="btn btn-secondary float-left" ng-click="returnToInteractionSelector()" ng-if="StateInteractionIdService.displayed && !StateInteractionIdService.savedMemento && hasCustomizationArgs">Change Interaction</button>
 
   <button class="btn btn-secondary" ng-click="cancel()" ng-if="hasCustomizationArgs">Cancel</button>
   <div class="btn-group"
@@ -93,6 +93,13 @@
   }
   .customize-interaction-modal .modal-header i {
     display: none;
+  }
+  .oppia-modal-header {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  .oppia-interaction-customization-label-container {
+    margin-bottom: 15px;
   }
   @media screen and (max-width: 768px) {
     .customize-interaction-modal .modal-content {

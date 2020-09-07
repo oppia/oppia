@@ -35,7 +35,7 @@
       </li>
 
       <ul layout="row" layout-align="space-between center" class="oppia-info-card-exploration-contributors-profile">
-        <i class="material-icons" uib-tooltip="<['I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate]>" tooltip-placement="top" style="cursor: default; margin-right: 5px;">&#xE7EF;</i>
+        <i class="material-icons oppia-contributors-icon" uib-tooltip="<['I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate]>" tooltip-placement="top">&#xE7EF;</i>
         <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate]></span>
         <li ng-repeat="name in contributorNames| limitTo: 2"
             tooltip="<[name]>" tooltip-placement="top">
@@ -92,7 +92,7 @@
     </div>
   </div>
   <button type="button" class="oppia-close-popover-button" ng-click="cancel()">
-    <i class="material-icons md-18" style="color: white;">&#xE5CD;</i>
+    <i class="material-icons md-18 text-white">&#xE5CD;</i>
     <span class="oppia-icon-accessibility-label">Close</span>
   </button>
 </md-card>
@@ -103,5 +103,9 @@
   }
   .oppia-info-card-bottom-row em {
     font-size: 12px;
+  }
+  .oppia-contributors-icon {
+    cursor: default;
+    margin-right: 5px;
   }
 </style>

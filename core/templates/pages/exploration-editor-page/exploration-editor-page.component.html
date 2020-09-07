@@ -5,7 +5,7 @@
     </div>
     <div class="navbar-icons">
       <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.countWarnings()}" ng-click="$ctrl.selectMainTab()"
-          class = "nav-item icon nav-list-item" style="position: relative">
+          class = "nav-item icon nav-list-item position-relative">
         <a href="#" class="nav-link navbar-tab protractor-test-main-tab" uib-tooltip="Editor" tooltip-placement="<[$ctrl.countWarnings() ? 'left' : 'bottom']>">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'main'}">&#xE254;</i>
         </a>
@@ -93,7 +93,7 @@
   <div class="container-fluid oppia-editor-page-container" ng-joy-ride="$ctrl.tutorialInProgress" config="$ctrl.EDITOR_TUTORIAL_OPTIONS" on-finish="$ctrl.onFinishTutorial()" on-skip="$ctrl.onSkipTutorial()">
     <div class="row" ng-if="$ctrl.ExplorationRightsService.isCloned()">
       <div class="col-lg-12 col-md-12 col-sm-12">
-        <div class="oppia-align-center uib-alert alert-warning" style="padding: 2px; width: 90%;">
+        <div class="oppia-align-center uib-alert alert-warning oppia-alert-warning">
           <strong>Note:</strong> This is a private, unpublishable copy of a
           <a ng-href="<[$ctrl.getExplorationUrl($ctrl.ExplorationRightsService.clonedFrom())]>" target="_blank" rel="noopener">public exploration</a>.
         </div>
@@ -144,8 +144,8 @@
       <path d="M 0 0 L 10 4 L 0 8 z" fill="#B22222"></path>
     </marker>
     <linearGradient id="nodegradient" x1="0%" x2="100%" y1="0%" y2="0%">
-      <stop offset="0%" style="stop-opacity: 1; stop-color: darkseagreen;"></stop>
-      <stop offset="100%" style="stop-opacity: 0.1; stop-color: darkseagreen;"></stop>
+      <stop offset="0%" class="oppia-stop"></stop>
+      <stop offset="100%" class="oppia-stop"></stop>
     </linearGradient>
   </defs>
 </svg>
@@ -246,6 +246,14 @@
   }
   exploration-editor-page .navbar-icons li:hover {
     background-color: #4eb0c0;
+  }
+  .oppia-alert-warning {
+    padding: 2px;
+    width: 90%;
+  }
+  .oppia-stop {
+    stop-color: darkseagreen;
+    stop-opacity: 1;
   }
 
   @media screen and (max-width: 800px) {
