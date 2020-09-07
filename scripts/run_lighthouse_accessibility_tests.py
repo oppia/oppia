@@ -128,7 +128,7 @@ def run_lighthouse_checks():
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
     bash_command = [
         common.NODE_BIN_PATH, lhci_path, 'autorun',
-        '--config=.lighthouserc-a11y.js']
+        '--config=.lighthouserc-accessibility.js']
 
     try:
         subprocess.check_call(bash_command)
