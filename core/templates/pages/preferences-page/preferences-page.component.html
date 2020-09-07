@@ -40,9 +40,9 @@
       </div>
 
       <div class="form-group row">
-        <label for="preferencesBioId" class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_BIO"></label>
+        <label for="label-target-user-bio" class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_BIO"></label>
         <div class="col-lg-10 col-md-10 col-sm-10">
-          <textarea id="preferencesBioId" class="oppia-bio-border protractor-test-user-bio" ng-model="$ctrl.userBio" ng-blur="$ctrl.saveUserBio($ctrl.userBio)" rows="5" maxlength="2000"></textarea>
+          <textarea id="label-target-user-bio" class="oppia-bio-border protractor-test-user-bio" ng-model="$ctrl.userBio" ng-blur="$ctrl.saveUserBio($ctrl.userBio)" rows="5" maxlength="2000"></textarea>
           <span class="form-text oppia-form-text" translate="I18N_PREFERENCES_BIO_EXPLAIN_TEXT"></span>
         </div>
       </div>
@@ -69,10 +69,10 @@
     </div>
 
     <div class="form-group row">
-      <label for="subjectInterestsId" class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_SUBJECT_INTERESTS"></label>
+      <label for="label-target-interests-dropdown" class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_SUBJECT_INTERESTS"></label>
       <div class="col-lg-10 col-md-10 col-sm-10">
         <div ng-if="$ctrl.hasPageLoaded && $ctrl.select2DropdownIsShown">
-          <select2-dropdown id="subjectInterestsId"
+          <select2-dropdown id="label-target-interests-dropdown"
                             item="$ctrl.subjectInterests"
                             class="protractor-test-interests-dropdown"
                             choices="$ctrl.subjectInterests"

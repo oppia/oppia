@@ -77,8 +77,8 @@ describe('Keyboard Shortcuts', () => {
   });
 
   beforeAll(() => {
-    skipButton.setAttribute('id', 'skipToMainContentId');
-    backButton.setAttribute('id', 'backButtonId');
+    skipButton.setAttribute('class', 'oppia-skip-to-content');
+    backButton.setAttribute('class', 'oppia-back-button');
     nextButton.setAttribute('class', 'oppia-next-button');
     continueButton.setAttribute('class', 'oppia-learner-confirm-button');
     searchBar.setAttribute('class', 'oppia-search-bar-text-input');
