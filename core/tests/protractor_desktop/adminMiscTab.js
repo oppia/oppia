@@ -98,7 +98,6 @@ describe('Admin misc tab', function() {
     adminPage = new AdminPage.AdminPage();
     topicsAndSkillsDashboardPage = (
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
-    topicEditorPage = new TopicEditorPage.TopicEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
