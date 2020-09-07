@@ -106,20 +106,13 @@ def run_lighthouse_puppeteer_script():
         sys.exit(1)
 
 
-def run_webpack_compilation(source_maps=False):
-    """Runs webpack compilation.
-
-    Args:
-        source_maps: bool. Represents whether the source_maps webpack
-            or the default webpack will be built.
-    """
+def run_webpack_compilation():
+    """Runs webpack compilation."""
     max_tries = 5
     webpack_bundles_dir_name = 'webpack_bundles'
     for _ in python_utils.RANGE(max_tries):
         try:
-            webpack_config_file = (
-                build.WEBPACK_DEV_SOURCE_MAPS_CONFIG if source_maps
-                else build.WEBPACK_DEV_CONFIG)
+            webpack_config_file = (build.WEBPACK_DEV_CONFIG)
             subprocess.check_call([
                 common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
                 webpack_config_file])
@@ -215,8 +208,8 @@ def main(args=None):
         server_mode = SERVER_MODE_PROD
     else:
         raise Exception(
-            'Invalid parameter passed in: %s, please choose'
-            'from accessibility or performance' % parsed_args.mode)
+            'Invalid parameter passed in: \'%s\', please choose'
+            'from \'accessibility\' or \'performance\'' % parsed_args.mode)
 
     enable_webpages()
     atexit.register(cleanup)
@@ -232,8 +225,8 @@ def main(args=None):
         run_webpack_compilation()
     else:
         raise Exception(
-            'Invalid lighthouse mode: %s, please choose'
-            'from accessibility or performance' % lighthouse_mode)
+            'Invalid lighthouse mode: \'%s\', please choose'
+            'from \'accessibility\' or \'performance\'' % lighthouse_mode)
 
     common.start_redis_server()
     start_google_app_engine_server(server_mode)
