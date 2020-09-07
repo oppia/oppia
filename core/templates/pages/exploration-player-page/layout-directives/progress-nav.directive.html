@@ -4,10 +4,9 @@
   <div>
     <!-- ng-if on this second wrapping div because ng-if lags on buttons. -->
     <div ng-if="hasPrevious && !helpCardHasContinueButton">
-      <md-button id="backButtonId"
-                 aria-label="Previous Card"
+      <md-button aria-label="Previous Card"
                  ng-click="changeCard(displayedCardIndex-1)"
-                 class="md-raised protractor-test-back-button oppia-nav-button">
+                 class="md-raised protractor-test-back-button oppia-back-button oppia-nav-button">
         <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
       </md-button>
     </div>
