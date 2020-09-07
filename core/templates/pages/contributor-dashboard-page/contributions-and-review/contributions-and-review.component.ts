@@ -52,12 +52,12 @@ angular.module('oppia').component('contributionsAndReview', {
     '$filter', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'MisconceptionObjectFactory',
     'QuestionObjectFactory', 'SkillBackendApiService',
-    'UrlInterpolationService', 'UserService', 'ENTITY_TYPE', 'IMAGE_CONTEXT',
+    'UrlInterpolationService', 'UserService', 'IMAGE_CONTEXT',
     function(
         $filter, $uibModal, AlertsService, ContextService,
         ContributionAndReviewService, MisconceptionObjectFactory,
         QuestionObjectFactory, SkillBackendApiService,
-        UrlInterpolationService, UserService, ENTITY_TYPE, IMAGE_CONTEXT) {
+        UrlInterpolationService, UserService, IMAGE_CONTEXT) {
       var ctrl = this;
       var SUGGESTION_LABELS = {
         review: {
@@ -193,10 +193,6 @@ angular.module('oppia').component('contributionsAndReview', {
       var _showTranslationSuggestionModal = function(
           targetId, suggestionId, contentHtml, translationHtml,
           reviewable) {
-        // We need to set the context here so that the rte fetches images
-        // for the given ENTITY_TYPE and targetId.
-        ContextService.setCustomEntityContext(
-          ENTITY_TYPE.EXPLORATION, targetId);
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/contributor-dashboard-page/modal-templates/' +
           'translation-suggestion-review.directive.html');
@@ -254,8 +250,10 @@ angular.module('oppia').component('contributionsAndReview', {
           });
         }
         if (suggestion.suggestion_type === ctrl.SUGGESTION_TYPE_TRANSLATE) {
-          var reviewable =
-            ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_TRANSLATE;
+          var reviewable = (
+            ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_TRANSLATE);
+          ContextService.setCustomEntityContext(
+            IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS, suggestion.target_id);
           _showTranslationSuggestionModal(
             suggestion.target_id, suggestion.suggestion_id,
             suggestion.change.content_html,

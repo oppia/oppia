@@ -46,17 +46,6 @@ class FileSystemServicesTests(test_utils.GenericTestBase):
                 file_system(feconf.ENTITY_TYPE_EXPLORATION, 'entity_id'),
                 fs_domain.GcsFileSystem)
 
-    def test_get_image_context_for_suggestion_target(self):
-        self.assertEqual(
-            fs_services.get_image_context_for_suggestion_target('skill'),
-            'question_suggestions')
-        self.assertEqual(
-            fs_services.get_image_context_for_suggestion_target('exploration'),
-            'exploration_suggestions')
-        with self.assertRaisesRegexp(
-            Exception, 'Invalid suggestion target type.'):
-            fs_services.get_image_context_for_suggestion_target('invalid')
-
 
 class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
     """Test for saving the three versions of the image file."""
