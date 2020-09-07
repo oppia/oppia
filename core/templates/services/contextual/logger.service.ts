@@ -24,24 +24,44 @@ import { Injectable } from '@angular/core';
 export class LoggerService {
   constructor() {}
 
+  /**
+   * Logs a message to console at the debug level.
+   * @param msg - A message to log.
+   */
   debug(msg: string): void {
     // eslint-disable-next-line no-console
     console.debug(msg);
   }
 
+  /**
+   * Logs a message to console at the info level.
+   * @param msg - A message to log.
+   */
   info(msg: string): void {
     // eslint-disable-next-line no-console
     console.info(msg);
   }
 
+  /**
+   * Logs a message to console at the warning level.
+   * @param msg - A message to log.
+   */
   warn(msg: string): void {
     console.warn(msg);
   }
 
+  /**
+   * Logs a message to console at the error level.
+   * @param msg - A message to log.
+   */
   error(msg: string): void {
     console.error(msg);
   }
 
+  /**
+   * Logs a message to console.
+   * @param msg - A message to log.
+   */
   log(msg: string): void {
     // eslint-disable-next-line no-console
     console.log(msg);
