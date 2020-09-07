@@ -31,8 +31,20 @@ from scripts import common
 
 WEBPACK_BIN_PATH = os.path.join(
     common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
+LIGHTHOUSE_MODE_PERFORMANCE = 0
+LIGHTHOUSE_MODE_ACCESSIBILITY = 1
+SERVER_MODE_PROD = 2
+SERVER_MODE_DEV = 3
 GOOGLE_APP_ENGINE_PORT = 8181
 SUBPROCESSES = []
+LIGHTHOUSE_CONFIG_PATHS = {
+    LIGHTHOUSE_MODE_PERFORMANCE: '--config=.lighthouserc.js',
+    LIGHTHOUSE_MODE_ACCESSIBILITY: '--config=.lighthouserc-accessibility.js'
+}
+SERVER_MODE_PATHS = {
+    SERVER_MODE_PROD: 'app.yaml',
+    SERVER_MODE_DEV: 'app_dev.yaml'
+}
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -42,16 +54,10 @@ Note that the root folder MUST be named 'oppia'.
 """)
 
 _PARSER.add_argument(
-    '--accessibility',
-    help='Runs the lighthouse tests in dev mode'
-         ' and conducts accessibility audits.',
-    action='store_true')
-
-_PARSER.add_argument(
-    '--performance',
-    help='Runs the lighthouse tests in prod mode'
-         ' and conducts speed and performance audits',
-    action='store_true')
+    '--mode',
+    help='Sets the mode for the lighthouse tests',
+    required=True,
+    choices=['accessibility', 'performance'],)
 
 
 def cleanup():
@@ -101,7 +107,12 @@ def run_lighthouse_puppeteer_script():
 
 
 def run_webpack_compilation(source_maps=False):
-    """Runs webpack compilation."""
+    """Runs webpack compilation.
+
+    Args:
+        source_maps: bool. Represents whether the source_maps webpack
+        or the default webpack will be built.
+    """
     max_tries = 5
     webpack_bundles_dir_name = 'webpack_bundles'
     for _ in python_utils.RANGE(max_tries):
@@ -141,14 +152,16 @@ def export_url(url):
         return
 
 
-def run_lighthouse_checks(is_performance_mode):
-    """Runs the lighthouse checks through the .lighthouserc.js config."""
+def run_lighthouse_checks(lighthouse_mode):
+    """Runs the lighthouse checks through the .lighthouserc.js config.
+    
+    Args:
+        lighthouse_mode: int. Represents whether the lighthouse checks are in
+        accessibility mode or performance mode
+    """
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
-    if is_performance_mode:
-        bash_command = [common.NODE_BIN_PATH, lhci_path, 'autorun']
-    else:
-        bash_command = [common.NODE_BIN_PATH, lhci_path, 'autorun',
-                        '--config=.lighthouserc-accessibility.js']
+    bash_command = [common.NODE_BIN_PATH, lhci_path, 'autorun',
+                        LIGHTHOUSE_CONFIG_PATHS[lighthouse_mode]]
 
     try:
         subprocess.check_call(bash_command)
@@ -161,7 +174,6 @@ def run_lighthouse_checks(is_performance_mode):
 
 def enable_webpages():
     """Enables deactivated webpages for testing."""
-
     pattern = 'CONTRIBUTOR_DASHBOARD_ENABLED = .*'
     replace = 'CONTRIBUTOR_DASHBOARD_ENABLED = True'
     common.inplace_replace_file(common.FECONF_PATH, pattern, replace)
@@ -171,10 +183,14 @@ def enable_webpages():
     common.inplace_replace_file(common.CONSTANTS_FILE_PATH, pattern, replace)
 
 
-def start_google_app_engine_server(is_performance_mode):
-    """Start the Google App Engine server."""
-
-    app_yaml_filepath = 'app.yaml' if is_performance_mode else 'app_dev.yaml'
+def start_google_app_engine_server(server_mode):
+    """Start the Google App Engine server.
+    
+    Args:
+        server_mode: int. Represents whether the server will be run in
+        dev mode or production mode.
+    """
+    app_yaml_filepath = SERVER_MODE_PATHS[server_mode]
     p = subprocess.Popen(
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=critical '
@@ -190,29 +206,31 @@ def main(args=None):
     """Runs lighthouse checks and deletes reports."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    if not (parsed_args.accessibility or parsed_args.performance):
-        _PARSER.error(
-            'Must pass either --accessibility or --performance flag')
+    if parsed_args.mode == 'accessibility':
+        lighthouse_mode = LIGHTHOUSE_MODE_ACCESSIBILITY
+        server_mode = SERVER_MODE_DEV
+    elif parsed_args.mode == 'performance':
+        lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE
+        server_mode = SERVER_MODE_PROD
 
     enable_webpages()
     atexit.register(cleanup)
-    performance_mode = parsed_args.performance
 
-    if performance_mode:
+    if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
         python_utils.PRINT('Building files in production mode.')
         # We are using --source_maps here, so that we have at least one CI check
         # that builds using source maps in prod env. This is to ensure that
         # there are no issues while deploying oppia.
         build.main(args=['--prod_env', '--source_maps'])
-    else:
+    elif lighthouse_mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
         build.main(args=[])
         run_webpack_compilation()
 
     common.start_redis_server()
-    start_google_app_engine_server(performance_mode)
+    start_google_app_engine_server(server_mode)
     common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
     run_lighthouse_puppeteer_script()
-    run_lighthouse_checks(performance_mode)
+    run_lighthouse_checks(lighthouse_mode)
 
 
 if __name__ == '__main__':
