@@ -160,8 +160,9 @@ def run_lighthouse_checks(lighthouse_mode):
             accessibility mode or performance mode.
     """
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
-    bash_command = [common.NODE_BIN_PATH, lhci_path, 'autorun',
-                    '--config=' + LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode]]
+    bash_command = [
+        common.NODE_BIN_PATH, lhci_path, 'autorun',
+        '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode]]
 
     try:
         subprocess.check_call(bash_command)
@@ -213,7 +214,9 @@ def main(args=None):
         lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE
         server_mode = SERVER_MODE_PROD
     else:
-        raise Exception('Invalid param passed in')
+        raise Exception(
+            'Invalid parameter passed in: %s, please choose'
+            'from accessibility or performance' % parsed_args.mode)
 
     enable_webpages()
     atexit.register(cleanup)
@@ -228,7 +231,9 @@ def main(args=None):
         build.main(args=[])
         run_webpack_compilation()
     else:
-        raise Exception('Failed to build files')
+        raise Exception(
+            'Invalid lighthouse mode: %s, please choose'
+            'from accessibility or performance' % lighthouse_mode)
 
     common.start_redis_server()
     start_google_app_engine_server(server_mode)
