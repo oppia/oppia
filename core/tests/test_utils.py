@@ -38,8 +38,6 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
-from core.domain import fs_services
 from core.domain import interaction_registry
 from core.domain import question_domain
 from core.domain import question_services
@@ -52,7 +50,6 @@ from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
-from core.domain.proto import text_classifier_pb2
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 import feconf
@@ -2902,78 +2899,6 @@ class GenericEmailTestBase(GenericTestBase):
 
 
 EmailTestBase = GenericEmailTestBase
-
-
-class ClassifierTestBase(GenericEmailTestBase):
-    """Base class for classifier test classes that need common functions
-    for related to reading classifier data and mocking the flow of the
-    storing the trained models through post request.
-
-    This class is derived from GenericEmailTestBase because the
-    TrainedClassifierHandlerTests test suite requires email services test
-    functions in addition to the classifier functions defined below.
-    """
-
-    def post_blob(self, url, payload, expected_status_int=200):
-        """Post a BLOB object to the server; return the received object.
-
-        Note that this method should only be used for
-        classifier.TrainedClassifierHandler handler and for no one else. The
-        reason being, we don't have any general mechanism for security for
-        transferring binary data. TrainedClassifierHandler implements a
-        specific mechanism which is restricted to the handler.
-
-        Args:
-            url: str. The URL to which BLOB object in payload should be sent
-                through a post request.
-            payload: bytes. Binary data which needs to be sent.
-            expected_status_int: int. The status expected as a response of post
-                request.
-
-        Returns:
-            dict. Parsed JSON response received upon invoking the post request.
-        """
-        data = payload
-
-        expect_errors = False
-        if expected_status_int >= 400:
-            expect_errors = True
-        response = self._send_post_request(
-            self.testapp, url, data,
-            expect_errors, expected_status_int=expected_status_int,
-            headers={b'content-type': b'application/octet-stream'})
-        # Testapp takes in a status parameter which is the expected status of
-        # the response. However this expected status is verified only when
-        # expect_errors=False. For other situations we need to explicitly check
-        # the status.
-        # Reference URL:
-        # https://github.com/Pylons/webtest/blob/
-        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
-
-        self.assertEqual(response.status_int, expected_status_int)
-        return self._parse_json_response(response, expect_errors)
-
-    def _get_classifier_data_from_classifier_training_job(
-            self, classifier_training_job):
-        """Retrieves classifier training job from GCS using metadata stored in
-        classifier_training_job.
-
-        Args:
-            classifier_training_job: ClassifierTrainingJob. Domain object
-                containing metadata of the training job which is used to
-                retrieve the trained model.
-
-        Returns:
-            FrozenModel. Protobuf object containing classifier data.
-        """
-        filename = classifier_training_job.classifier_data_filename
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id))
-        classifier_data = utils.decompress_from_zlib(fs.get(filename))
-        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
-        classifier_data_proto.ParseFromString(classifier_data)
-        return classifier_data_proto
 
 
 class FunctionWrapper(python_utils.OBJECT):
