@@ -17,7 +17,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Title, Meta } from '@angular/platform-browser';
+import { Meta, Title } from '@angular/platform-browser';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 @Injectable({
@@ -27,8 +27,8 @@ export class PageTitleService {
   pageTitleForMobile: string = null;
   pageSubtitleForMobile: string = null;
   constructor(
-    private titleService: Title,
-    private metaTagService: Meta) {}
+    private metaTagService: Meta,
+    private titleService: Title) {}
 
   setPageTitle(title: string): void {
     this.titleService.setTitle(title);
