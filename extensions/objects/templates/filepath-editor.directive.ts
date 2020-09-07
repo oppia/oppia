@@ -353,7 +353,8 @@ angular.module('oppia').directive('filepathEditor', [
         var getTrustedResourceUrlForImageFileName = function(imageFileName) {
           if (
             ContextService.getImageSaveDestination() ===
-            IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+            IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
+            ImageLocalStorageService.isInStorage(imageFileName)) {
             var imageUrl = ImageLocalStorageService.getObjectUrlForImage(
               imageFileName);
             return $sce.trustAsResourceUrl(imageUrl);
@@ -366,9 +367,12 @@ angular.module('oppia').directive('filepathEditor', [
 
         ctrl.resetFilePathEditor = function() {
           if (
-            ctrl.data.metadata.savedImageFilename &&
-            ContextService.getImageSaveDestination() ===
-            IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+            ctrl.data.metadata.savedImageFilename && (
+              ContextService.getImageSaveDestination() ===
+              IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) &&
+            ImageLocalStorageService.isInStorage(
+              ctrl.data.metadata.savedImageFilename)
+          ) {
             ImageLocalStorageService.deleteImage(
               ctrl.data.metadata.savedImageFilename);
           }

@@ -108,9 +108,9 @@ angular.module('oppia').factory('TranslateTextService', [
         };
       },
       suggestTranslatedText: function(
-          translationHtml, languageCode, successCallback) {
+          translationHtml, languageCode, imagesData, successCallback) {
         const url = '/suggestionhandler/';
-        const data = {
+        const postData = {
           suggestion_type: 'translate_content',
           target_type: 'exploration',
           description: 'Adds translation',
@@ -125,7 +125,28 @@ angular.module('oppia').factory('TranslateTextService', [
             translation_html: translationHtml
           }
         };
-        $http.post(url, data).then(successCallback);
+
+        let body = new FormData();
+        body.append('payload', JSON.stringify(postData));
+        let filenames = imagesData.map(obj => obj.filename);
+        let imageBlobs = imagesData.map(obj => obj.imageBlob);
+        for (let idx in imageBlobs) {
+          body.append(filenames[idx], imageBlobs[idx]);
+        }
+        $http.post(url, body, {
+          // The actual header to be added is 'multipart/form-data', But
+          // adding it manually won't work because we will miss the boundary
+          // parameter. When we keep 'Content-Type' as undefined the browser
+          // automatically fills the boundary parameter according to the form
+          // data. Refer https://stackoverflow.com/questions/37039852/. and
+          // https://stackoverflow.com/questions/34983071/.
+          // Note: This should be removed and a convetion similar to
+          // SkillCreationBackendApiService should be followed once this service
+          // is migrated to Angular 8.
+          headers: {
+            'Content-Type': undefined
+          }
+        }).then(successCallback);
       }
     };
   }]);

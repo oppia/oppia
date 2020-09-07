@@ -24,12 +24,15 @@
       </div>
     </div>
     <div ng-if="!loadingData && !uploadingTranslation">
-      <angular-html-bind html-data="textToTranslate"
+      <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                         ng-click="onContentClick($event)"
+                         html-data="textToTranslate"
                          class="oppia-rte-editor">
       </angular-html-bind>
     </div>
     <div class="oppia-translation-editor-section">
       <div class="protractor-test-state-translation-editor">
+        <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
         <schema-based-editor schema="HTML_SCHEMA" local-value="activeWrittenTranslation.html">
         </schema-based-editor>
       </div>
@@ -83,5 +86,35 @@
   }
   .oppia-upload-translated-text-button {
     min-width: 200px;
+  }
+  .oppia-rte-editor-focused:focus > p {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > ol {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > ul {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > pre {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > blockquote {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-tabs > div {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-collapsible > uib-accordion > div {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-image > figure {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-video > center {
+    outline: solid 2px #009688;
+  }
+  .oppia-rte-editor-focused *:hover {
+    background-color: rgba(233, 241, 242);
   }
 </style>
