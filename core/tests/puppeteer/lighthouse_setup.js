@@ -264,7 +264,10 @@ const getSkillEditorUrl = async function(browser, page) {
     // Doing waitFor(15000) to handle new tab being opened.
     await page.waitFor(15000);
     let pages = await browser.pages();
-    skillEditorUrl = await pages[3].url();
+    skillEditorUrl = await pages[2].url();
+    if (await skillEditorUrl.includes('topic_editor')) {
+      skillEditorUrl = await pages[3].url();
+    }
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);

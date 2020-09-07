@@ -579,7 +579,6 @@
 /.lighthouserc-accessibility.js @jimbyo
 /puppeteer-login-script.js @jimbyo
 /scripts/run_lighthouse_tests.py @jameesjohn
-/scripts/run_lighthouse_accessibility_tests.py @jimbyo
 /webpack.*.ts @nishantwrp
 
 # Typings.

@@ -11,11 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""This script performs lighthouse checks and creates lighthouse reports."""
+"""This script performs lighthouse checks and creates lighthouse reports.
+Any callers must pass in a flag, either --accessibility or --performance.
+"""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import argparse
 import atexit
 import os
 import re
@@ -26,10 +29,29 @@ import python_utils
 from scripts import build
 from scripts import common
 
-FECONF_FILE_PATH = os.path.join('feconf.py')
-CONSTANTS_FILE_PATH = os.path.join('assets/constants.ts')
+WEBPACK_BIN_PATH = os.path.join(
+    common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
 GOOGLE_APP_ENGINE_PORT = 8181
 SUBPROCESSES = []
+
+_PARSER = argparse.ArgumentParser(
+    description="""
+Run the script from the oppia root folder:
+    python -m scripts.run_lighthouse_tests
+Note that the root folder MUST be named 'oppia'.
+""")
+
+_PARSER.add_argument(
+    '--accessibility',
+    help='Runs the lighthouse tests in dev mode'
+         ' and conducts accessibility audits.',
+    action='store_true')
+
+_PARSER.add_argument(
+    '--performance',
+    help='Runs the lighthouse tests in prod mode'
+         ' and conducts speed and performance audits',
+    action='store_true')
 
 
 def cleanup():
@@ -37,11 +59,11 @@ def cleanup():
 
     pattern = 'CONTRIBUTOR_DASHBOARD_ENABLED = .*'
     replace = 'CONTRIBUTOR_DASHBOARD_ENABLED = False'
-    common.inplace_replace_file(FECONF_FILE_PATH, pattern, replace)
+    common.inplace_replace_file(common.FECONF_PATH, pattern, replace)
 
     pattern = '"ENABLE_ACCOUNT_DELETION": .*'
     replace = '"ENABLE_ACCOUNT_DELETION": false,'
-    common.inplace_replace_file(CONSTANTS_FILE_PATH, pattern, replace)
+    common.inplace_replace_file(common.CONSTANTS_FILE_PATH, pattern, replace)
 
     build.set_constants_to_default()
 
@@ -60,10 +82,9 @@ def cleanup():
 
 def run_lighthouse_puppeteer_script():
     """Runs puppeteer script to collect dynamic urls."""
-    node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
     puppeteer_path = os.path.join(
         'core', 'tests', 'puppeteer', 'lighthouse_setup.js')
-    bash_command = [node_path, puppeteer_path]
+    bash_command = [common.NODE_BIN_PATH, puppeteer_path]
 
     try:
         script_output = subprocess.check_output(bash_command).split('\n')
@@ -76,6 +97,30 @@ def run_lighthouse_puppeteer_script():
     except subprocess.CalledProcessError:
         python_utils.PRINT(
             'Puppeteer script failed. More details can be found above.')
+        sys.exit(1)
+
+
+def run_webpack_compilation(source_maps=False):
+    """Runs webpack compilation."""
+    max_tries = 5
+    webpack_bundles_dir_name = 'webpack_bundles'
+    for _ in python_utils.RANGE(max_tries):
+        try:
+            webpack_config_file = (
+                build.WEBPACK_DEV_SOURCE_MAPS_CONFIG if source_maps
+                else build.WEBPACK_DEV_CONFIG)
+            subprocess.check_call([
+                common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
+                webpack_config_file])
+        except subprocess.CalledProcessError as error:
+            python_utils.PRINT(error.output)
+            sys.exit(error.returncode)
+            return
+        if os.path.isdir(webpack_bundles_dir_name):
+            break
+    if not os.path.isdir(webpack_bundles_dir_name):
+        python_utils.PRINT(
+            'Failed to complete webpack compilation, exiting ...')
         sys.exit(1)
 
 
@@ -96,12 +141,14 @@ def export_url(url):
         return
 
 
-def run_lighthouse_checks():
+def run_lighthouse_checks(parsed_args):
     """Runs the lighthouse checks through the .lighthouserc.js config."""
-
-    node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
-    bash_command = [node_path, lhci_path, 'autorun']
+    if parsed_args.performance:
+        bash_command = [common.NODE_BIN_PATH, lhci_path, 'autorun']
+    else:
+        bash_command = [common.NODE_BIN_PATH, lhci_path, 'autorun',
+                        '--config=.lighthouserc-accessibility.js']
 
     try:
         subprocess.check_call(bash_command)
@@ -117,11 +164,11 @@ def enable_webpages():
 
     pattern = 'CONTRIBUTOR_DASHBOARD_ENABLED = .*'
     replace = 'CONTRIBUTOR_DASHBOARD_ENABLED = True'
-    common.inplace_replace_file(FECONF_FILE_PATH, pattern, replace)
+    common.inplace_replace_file(common.FECONF_PATH, pattern, replace)
 
     pattern = '"ENABLE_ACCOUNT_DELETION": .*'
     replace = '"ENABLE_ACCOUNT_DELETION": true,'
-    common.inplace_replace_file(CONSTANTS_FILE_PATH, pattern, replace)
+    common.inplace_replace_file(common.CONSTANTS_FILE_PATH, pattern, replace)
 
 
 def start_google_app_engine_server():
@@ -139,22 +186,32 @@ def start_google_app_engine_server():
     SUBPROCESSES.append(p)
 
 
-def main():
+def main(args=None):
     """Runs lighthouse checks and deletes reports."""
+    parsed_args = _PARSER.parse_args(args=args)
+
+    if not (parsed_args.accessibility or parsed_args.performance):
+        _PARSER.error(
+            'Must pass either --accessibility or --performance flag')
 
     enable_webpages()
     atexit.register(cleanup)
 
-    python_utils.PRINT('Building files in production mode.')
-    # We are using --source_maps here, so that we have at least one CI check
-    # that builds using source maps in prod env. This is to ensure that
-    # there are no issues while deploying oppia.
-    build.main(args=['--prod_env', '--source_maps'])
+    if parsed_args.performance:
+        python_utils.PRINT('Building files in production mode.')
+        # We are using --source_maps here, so that we have at least one CI check
+        # that builds using source maps in prod env. This is to ensure that
+        # there are no issues while deploying oppia.
+        build.main(args=['--prod_env', '--source_maps'])
+    else:
+        build.main(args=[])
+        run_webpack_compilation()
+
     common.start_redis_server()
     start_google_app_engine_server()
     common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
     run_lighthouse_puppeteer_script()
-    run_lighthouse_checks()
+    run_lighthouse_checks(parsed_args)
 
 
 if __name__ == '__main__':

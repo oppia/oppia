@@ -1,4 +1,4 @@
-name: Lighthouse CI tests
+name: Lighthouse CI performance tests
 on: [pull_request]
 
 jobs:
@@ -16,6 +16,4 @@ jobs:
       - name: Install Third Party Dependencies
         run: python -m scripts.install_third_party_libs
       - name: Run lighthouse checks
-        run: python -m scripts.run_lighthouse_tests
-      - name: Run lighthouse accessibility checks
-        run: python -m scripts.run_lighthouse_accessibility_tests
+        run: python -m scripts.run_lighthouse_tests --performance
