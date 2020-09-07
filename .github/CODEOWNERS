@@ -75,9 +75,11 @@
 # Answer classification team.
 /core/controllers/classifier*.py @prasanna08
 /core/domain/classifier*.py @prasanna08
+/core/domain/proto/ @prasanna08
 /core/storage/classifier/ @prasanna08
 /core/templates/domain/classifier/ @prasanna08
 /extensions/classifiers/ @prasanna08
+/prototool.yaml @prasanna08
 
 
 # Audio and Translation team.
@@ -146,8 +148,7 @@
 
 
 # Dev workflow team.
-# TODO(#10472): Revert ownership to @vinitamurthi after 2020-09-05.
-/.circleci/ @BenHenning @U8NWXD @kevintab95
+/.circleci/ @BenHenning @U8NWXD @kevintab95 @vinitamurthi
 /.eslintignore @bansalnitish @Hudda
 /.eslintrc @bansalnitish @Hudda
 /.htmllintrc @bansalnitish @Hudda
@@ -157,7 +158,7 @@
 /.isort.cfg @bansalnitish @Hudda
 /.pylintrc @bansalnitish @Hudda
 /.stylelintrc @bansalnitish @Hudda
-/.travis.yml @BenHenning @U8NWXD @kevintab95
+/.travis.yml @BenHenning @vinitamurthi @U8NWXD @kevintab95
 /.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @bansalnitish @Hudda
@@ -606,14 +607,13 @@
 
 
 # Dynamic Feature Gating project
-# TODO(#10472): Revert ownership to @vinitamurthi after 2020-09-05.
-/core/controllers/platform_feature*.py @BenHenning 
-/core/domain/platform_feature_services*.py @BenHenning 
-/core/domain/platform_parameter*.py @BenHenning 
-/core/platform_feature*.py @BenHenning 
-/core/storage/config/ @BenHenning 
-/core/templates/domain/platform_feature/ @BenHenning 
-/core/templates/services/platform-feature*.ts @BenHenning
+/core/controllers/platform_feature*.py @BenHenning @vinitamurthi
+/core/domain/platform_feature_services*.py @BenHenning @vinitamurthi
+/core/domain/platform_parameter*.py @BenHenning @vinitamurthi
+/core/platform_feature*.py @BenHenning @vinitamurthi
+/core/storage/config/ @BenHenning @vinitamurthi
+/core/templates/domain/platform_feature/ @BenHenning @vinitamurthi
+/core/templates/services/platform-feature*.ts @BenHenning @vinitamurthi
 
 
 # Frontend unit tests
@@ -672,5 +672,4 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796
-# TODO(#10472): Revert ownership to @vinitamurthi after 2020-09-05.
-/.github/workflows/ @BenHenning
+/.github/workflows/ @BenHenning @vinitamurthi

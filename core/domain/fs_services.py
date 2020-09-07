@@ -19,12 +19,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import json
-
 from core.domain import fs_domain
 from core.domain import image_services
 from core.platform import models
 import feconf
+import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -92,42 +91,23 @@ def save_original_and_compressed_versions_of_image(
             micro_image_content, mimetype=mimetype)
 
 
-def save_classifier_data(exp_id, job_id, classifier_data):
+def save_classifier_data(exp_id, job_id, classifier_data_proto):
     """Store classifier model data in a file.
 
     Args:
         exp_id: str. The id of the exploration.
         job_id: str. The id of the classifier training job model.
-        classifier_data: dict. Classifier data to be stored.
+        classifier_data_proto: Object. Protobuf object of the classifier data
+            to be stored.
     """
-    filepath = '%s-classifier-data.json' % (job_id)
+    filepath = '%s-classifier-data.pb.xz' % (job_id)
     file_system_class = get_entity_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(
         feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+    content = utils.compress_to_zlib(
+        classifier_data_proto.SerializeToString())
     fs.commit(
-        filepath, json.dumps(classifier_data),
-        mimetype='application/json')
-
-
-def read_classifier_data(exp_id, job_id):
-    """Read the classifier data from file.
-
-    Args:
-        exp_id: str. The id of the exploration.
-        job_id: str. The id of the classifier training job model.
-
-    Returns:
-        dict|None. The classifier data read from the file. Returns None
-        if no classifier data is stored for the given job.
-    """
-    filepath = '%s-classifier-data.json' % (job_id)
-    file_system_class = get_entity_file_system_class()
-    fs = fs_domain.AbstractFileSystem(file_system_class(
-        feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-    if not fs.isfile(filepath):
-        return None
-    classifier_data = fs.get(filepath)
-    return json.loads(classifier_data)
+        filepath, content, mimetype='application/octet-stream')
 
 
 def delete_classifier_data(exp_id, job_id):
@@ -137,11 +117,12 @@ def delete_classifier_data(exp_id, job_id):
         exp_id: str. The id of the exploration.
         job_id: str. The id of the classifier training job model.
     """
-    filepath = '%s-classifier-data.json' % (job_id)
+    filepath = '%s-classifier-data.pb.xz' % (job_id)
     file_system_class = get_entity_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(
         feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-    fs.delete(filepath)
+    if fs.isfile(filepath):
+        fs.delete(filepath)
 
 
 def get_entity_file_system_class():
@@ -151,24 +132,6 @@ def get_entity_file_system_class():
         class. GcsFileSystem class.
     """
     return fs_domain.GcsFileSystem
-
-
-def get_image_context_for_suggestion_target(suggestion_target_type):
-    """Returns the image context for a particular suggestion target type.
-
-    Args:
-        suggestion_target_type: str. The entity type of the target of the
-            suggestion.
-
-    Returns:
-        str. The image context for the given suggestion target type.
-    """
-    if suggestion_target_type == suggestion_models.TARGET_TYPE_SKILL:
-        return feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
-    elif suggestion_target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-        return feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
-    else:
-        raise Exception('Invalid suggestion target type.')
 
 
 def copy_images(

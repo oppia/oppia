@@ -18,9 +18,8 @@
  * @param {puppeteer.Browser} browser
  * @param {{url: string, options: LHCI.CollectCommand.Options}} context
  */
-
-const CREATOR_DASHBOARD_URL = 'http://127.0.0.1:8181/creator-dashboard';
 const ADMIN_URL = 'http://127.0.0.1:8181/admin';
+const CREATOR_DASHBOARD_URL = 'http://127.0.0.1:8181/creator-dashboard';
 const networkIdle = 'networkidle0';
 
 var usernameInput = '.protractor-test-username-input';
@@ -40,7 +39,7 @@ module.exports = async(browser, context) => {
   if (context.url.includes('admin')) {
     await login(context, page);
   } else if (context.url.includes('emaildashboard')) {
-    await setRole(context, page, 'string:ADMIN');
+    await setRole(page, 'string:ADMIN');
   } else if (context.url.includes('collection/0')) {
     await createCollections(context, page);
   } else if (context.url.includes('explore/0')) {
@@ -75,7 +74,7 @@ const login = async function(context, page) {
   }
 };
 
-const setRole = async function(context, page, role) {
+const setRole = async function(page, role) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
@@ -104,14 +103,7 @@ const createCollections = async function(context, page) {
   try {
     // eslint-disable-next-line no-console
     console.log('Creating Collections...');
-    // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin#/roles', { waitUntil: 'networkidle0' });
-    await page.waitFor(2000);
-    await page.type('#update-role-username-textbook', 'username1');
-    await page.select('#update-role-input', 'string:COLLECTION_EDITOR');
-    await page.waitFor(5000);
-    await page.click('#update-button-id');
-    await page.waitFor(2000);
+    await setRole(page, 'string:COLLECTION_EDITOR');
     // Load in Collection
     // eslint-disable-next-line dot-notation
     await page.goto('http://127.0.0.1:8181/admin');
