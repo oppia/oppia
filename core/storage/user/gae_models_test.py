@@ -2325,11 +2325,6 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             parent_user_id=self.USER_ID
         ).put()
 
-    def test_get_export_policy_is_not_applicable(self):
-        self.assertEqual(
-            user_models.UserAuthDetailsModel.get_export_policy(),
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-
     def test_get_deletion_policy_is_delete(self):
         self.assertEqual(
             user_models.UserAuthDetailsModel.get_deletion_policy(),

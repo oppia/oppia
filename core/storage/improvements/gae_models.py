@@ -132,10 +132,22 @@ class TaskEntryModel(base_models.BaseModel):
         """
         cls.delete_multi(cls.query(cls.resolver_id == user_id))
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """TaskEntryModel contains the user ID that acted on a task."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'composite_entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'task_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'target_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'target_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'issue_description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'resolver_id': base_models.EXPORT_POLICY.EXPORTED,
+            'resolved_on': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @staticmethod
     def export_data(user_id):
