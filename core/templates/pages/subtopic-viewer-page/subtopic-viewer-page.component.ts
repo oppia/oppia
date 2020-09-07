@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { OppiaAngularRootComponent } from "components/oppia-angular-root.component";
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
 
 /**
  * @fileoverview Component for the subtopic viewer.
@@ -74,7 +75,7 @@ angular.module('oppia').component('subtopicViewerPage', {
             ctrl.pageTitleService.setPageTitle(
               `Review ${ctrl.subtopicTitle} | Oppia`);
             ctrl.pageTitleService.updateMetaTag(
-              `Review the skill of ${ctrl.subtopicTitle.toLowerCase()}.`)
+              `Review the skill of ${ctrl.subtopicTitle.toLowerCase()}.`);
 
             let nextSubtopic = (
               subtopicDataObject.getNextSubtopic());
