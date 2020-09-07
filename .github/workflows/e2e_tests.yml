@@ -26,7 +26,7 @@ jobs:
         run: python -m scripts.install_third_party_libs
       - name: Run Exploration Translation Tab E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --suite="explorationTranslationTab" --prod_env
+        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationTranslationTab" --prod_env
       - name: Run Learner Dashboard E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learnerDashboard" --prod_env
