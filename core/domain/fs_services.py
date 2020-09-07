@@ -134,24 +134,6 @@ def get_entity_file_system_class():
     return fs_domain.GcsFileSystem
 
 
-def get_image_context_for_suggestion_target(suggestion_target_type):
-    """Returns the image context for a particular suggestion target type.
-
-    Args:
-        suggestion_target_type: str. The entity type of the target of the
-            suggestion.
-
-    Returns:
-        str. The image context for the given suggestion target type.
-    """
-    if suggestion_target_type == suggestion_models.TARGET_TYPE_SKILL:
-        return feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
-    elif suggestion_target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-        return feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
-    else:
-        raise Exception('Invalid suggestion target type.')
-
-
 def copy_images(
         source_entity_type, source_entity_id, destination_entity_type,
         destination_entity_id, filenames):
