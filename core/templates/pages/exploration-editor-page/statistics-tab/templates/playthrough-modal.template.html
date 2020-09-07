@@ -4,7 +4,7 @@
 
 <div class="modal-body">
   <div ng-if="canExpandActions()" class="row oppia-pt2">
-    <button type="button" name="button" ng-click="expandActionsToRender()" class="oppia-issues-btn-arrow oppia-playthrough-modal-arrow-btn" id="arrowDiv"><i class="fas fa-arrow-up"></i></button>
+    <button type="button" name="button" ng-click="expandActionsToRender()" class="oppia-issues-btn-arrow d-block" id="arrowDiv"><i class="fas fa-arrow-up"></i></button>
   </div>
   <div class="row oppia-pt2 playthrough-modal-row">
     <div ng-repeat="action in getActionsToRender() track by $index" class="oppia-issues-learner-action oppia-playthrough-learner-action">
@@ -33,9 +33,6 @@
     margin-left: 0.5rem;
     margin-right: 0.5rem;
     padding-bottom: 8rem;
-  }
-  .oppia-improvement-playthrough-modal .oppia-playthrough-modal-arrow-btn {
-    display: block;
   }
   .oppia-improvement-playthrough-modal .playthrough-modal-row {
     margin-top: 0.5rem;
