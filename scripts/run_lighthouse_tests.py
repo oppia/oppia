@@ -31,17 +31,17 @@ from scripts import common
 
 WEBPACK_BIN_PATH = os.path.join(
     common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
-LIGHTHOUSE_MODE_PERFORMANCE = 0
-LIGHTHOUSE_MODE_ACCESSIBILITY = 1
-SERVER_MODE_PROD = 2
-SERVER_MODE_DEV = 3
+LIGHTHOUSE_MODE_PERFORMANCE = 'performance'
+LIGHTHOUSE_MODE_ACCESSIBILITY = 'accessibility'
+SERVER_MODE_PROD = 'dev'
+SERVER_MODE_DEV = 'prod'
 GOOGLE_APP_ENGINE_PORT = 8181
 SUBPROCESSES = []
-LIGHTHOUSE_CONFIG_PATHS = {
-    LIGHTHOUSE_MODE_PERFORMANCE: '--config=.lighthouserc.js',
-    LIGHTHOUSE_MODE_ACCESSIBILITY: '--config=.lighthouserc-accessibility.js'
+LIGHTHOUSE_CONFIG_FILENAMES = {
+    LIGHTHOUSE_MODE_PERFORMANCE: '.lighthouserc.js',
+    LIGHTHOUSE_MODE_ACCESSIBILITY: '.lighthouserc-accessibility.js'
 }
-SERVER_MODE_PATHS = {
+APP_YAML_FILENAMES = {
     SERVER_MODE_PROD: 'app.yaml',
     SERVER_MODE_DEV: 'app_dev.yaml'
 }
@@ -156,12 +156,12 @@ def run_lighthouse_checks(lighthouse_mode):
     """Runs the lighthouse checks through the .lighthouserc.js config.
 
     Args:
-        lighthouse_mode: int. Represents whether the lighthouse checks are in
+        lighthouse_mode: str. Represents whether the lighthouse checks are in
             accessibility mode or performance mode.
     """
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
     bash_command = [common.NODE_BIN_PATH, lhci_path, 'autorun',
-                    LIGHTHOUSE_CONFIG_PATHS[lighthouse_mode]]
+                    '--config=' + LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode]]
 
     try:
         subprocess.check_call(bash_command)
@@ -187,10 +187,10 @@ def start_google_app_engine_server(server_mode):
     """Start the Google App Engine server.
 
     Args:
-        server_mode: int. Represents whether the server will be run in
+        server_mode: str. Represents whether the server will be run in
             dev mode or production mode.
     """
-    app_yaml_filepath = SERVER_MODE_PATHS[server_mode]
+    app_yaml_filepath = APP_YAML_FILENAMES[server_mode]
     p = subprocess.Popen(
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=critical '
@@ -206,12 +206,14 @@ def main(args=None):
     """Runs lighthouse checks and deletes reports."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    if parsed_args.mode == 'accessibility':
+    if parsed_args.mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
         lighthouse_mode = LIGHTHOUSE_MODE_ACCESSIBILITY
         server_mode = SERVER_MODE_DEV
-    elif parsed_args.mode == 'performance':
+    elif parsed_args.mode == LIGHTHOUSE_MODE_PERFORMANCE:
         lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE
         server_mode = SERVER_MODE_PROD
+    else:
+        raise Exception('Invalid param passed in')
 
     enable_webpages()
     atexit.register(cleanup)
@@ -225,6 +227,8 @@ def main(args=None):
     elif lighthouse_mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
         build.main(args=[])
         run_webpack_compilation()
+    else:
+        raise Exception('Failed to build files')
 
     common.start_redis_server()
     start_google_app_engine_server(server_mode)
