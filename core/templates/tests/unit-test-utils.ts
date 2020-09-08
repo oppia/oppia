@@ -77,7 +77,6 @@ export const bootstrap = (
   return platform.bootstrapModule(Ng2Module).then(ref => {
     const ngZone = ref.injector.get<NgZone>(NgZone);
     const upgrade = ref.injector.get(UpgradeModule);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const failHardModule = ($provide) => {
       $provide.value('$exceptionHandler', (err) => {
         throw err;
