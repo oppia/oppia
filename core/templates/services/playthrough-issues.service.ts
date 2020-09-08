@@ -33,10 +33,8 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
       ImprovementModalService, PlaythroughIssuesBackendApiService,
       ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, ISSUE_TYPE_EARLY_QUIT,
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
-    var issues = null;
     var explorationId = null;
     var explorationVersion = null;
-    var currentPlaythrough = null;
 
     var renderEarlyQuitIssueStatement = function() {
       return 'Several learners exited the exploration in less than a minute.';

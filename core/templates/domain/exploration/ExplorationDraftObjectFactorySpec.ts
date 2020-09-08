@@ -22,7 +22,6 @@ import { ExplorationDraftObjectFactory, ExplorationDraft } from
 describe('ExplorationDraftObjectFactory', () => {
   describe('exploration draft object factory', () => {
     let explorationDraftObjectFactory: ExplorationDraftObjectFactory;
-    var explorationId = '100';
     var draftChangeListId = 2;
     var changeList = [];
     var draftDict = {

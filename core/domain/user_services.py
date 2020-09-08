@@ -82,6 +82,7 @@ class UserSettings(python_utils.OBJECT):
             preferences specified by the user.
         preferred_site_language_code: str or None. System language preference.
         preferred_audio_language_code: str or None. Audio language preference.
+        pin: str or None. The PIN of the user's profile for android.
     """
 
     def __init__(
@@ -94,7 +95,7 @@ class UserSettings(python_utils.OBJECT):
                 constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
             user_bio='', subject_interests=None, first_contribution_msec=None,
             preferred_language_codes=None, preferred_site_language_code=None,
-            preferred_audio_language_code=None, deleted=False):
+            preferred_audio_language_code=None, pin=None, deleted=False):
         """Constructs a UserSettings domain object.
 
         Args:
@@ -132,6 +133,7 @@ class UserSettings(python_utils.OBJECT):
                 preference.
             preferred_audio_language_code: str or None. Default language used
                 for audio translations preference.
+            pin: str or None. The PIN of the user's profile for android.
             deleted: bool. Whether the user has requested removal of their
                 account.
         """
@@ -159,6 +161,7 @@ class UserSettings(python_utils.OBJECT):
             preferred_language_codes if preferred_language_codes else [])
         self.preferred_site_language_code = preferred_site_language_code
         self.preferred_audio_language_code = preferred_audio_language_code
+        self.pin = pin
         self.deleted = deleted
 
     def validate(self):
@@ -188,6 +191,34 @@ class UserSettings(python_utils.OBJECT):
                 self.gae_id
             )
 
+        if not isinstance(self.role, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected role to be a string, received %s' % self.role)
+        if self.role not in role_services.PARENT_ROLES:
+            raise utils.ValidationError('Role %s does not exist.' % self.role)
+
+        if self.pin is not None:
+            if not isinstance(self.pin, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected PIN to be a string, received %s' %
+                    self.pin
+                )
+            elif (len(self.pin) != feconf.FULL_USER_PIN_LENGTH and
+                  len(self.pin) != feconf.PROFILE_USER_PIN_LENGTH):
+                raise utils.ValidationError(
+                    'User PIN can only be of length %s or %s' %
+                    (
+                        feconf.FULL_USER_PIN_LENGTH,
+                        feconf.PROFILE_USER_PIN_LENGTH
+                    )
+                )
+            else:
+                for character in self.pin:
+                    if character < '0' or character > '9':
+                        raise utils.ValidationError(
+                            'Only numeric characters are allowed in PIN.'
+                        )
+
         if not isinstance(self.email, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected email to be a string, received %s' % self.email)
@@ -197,12 +228,6 @@ class UserSettings(python_utils.OBJECT):
                 or self.email.endswith('@')):
             raise utils.ValidationError(
                 'Invalid email address: %s' % self.email)
-
-        if not isinstance(self.role, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected role to be a string, received %s' % self.role)
-        if self.role not in role_services.PARENT_ROLES:
-            raise utils.ValidationError('Role %s does not exist.' % self.role)
 
         if not isinstance(
                 self.creator_dashboard_display_pref, python_utils.BASESTRING):
@@ -303,20 +328,17 @@ class UserAuthDetails(python_utils.OBJECT):
     Attributes:
         user_id: str. The unique ID of the user.
         gae_id: str. The ID of the user retrieved from GAE.
-        pin: str or None. The PIN of the user's profile for android.
         parent_user_id: str or None. For profile users, the user ID of the full
             user associated with that profile. None for full users.
     """
 
     def __init__(
-            self, user_id, gae_id, pin=None, parent_user_id=None,
-            deleted=False):
+            self, user_id, gae_id, parent_user_id=None, deleted=False):
         """Constructs a UserAuthDetails domain object.
 
         Args:
             user_id: str. The unique ID of the user.
             gae_id: str. The ID of the user retrieved from GAE.
-            pin: str or None. The PIN of the user's profile for android.
             parent_user_id: str or None. For profile users, the user ID of the
                 full user associated with that profile. None for full users.
             deleted: bool. Whether the user has requested removal of their
@@ -324,7 +346,6 @@ class UserAuthDetails(python_utils.OBJECT):
         """
         self.user_id = user_id
         self.gae_id = gae_id
-        self.pin = pin
         self.parent_user_id = parent_user_id
         self.deleted = deleted
 
@@ -335,7 +356,6 @@ class UserAuthDetails(python_utils.OBJECT):
         Raises:
             ValidationError. The user_id is not str.
             ValidationError. The gae_id is not str.
-            ValidationError. The pin is not str.
             ValidationError. The parent_user_id is not str.
         """
         if not isinstance(self.user_id, python_utils.BASESTRING):
@@ -351,13 +371,6 @@ class UserAuthDetails(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected gae_id to be a string, received %s' %
                 self.gae_id
-            )
-
-        if (self.pin is not None and
-                not isinstance(self.pin, python_utils.BASESTRING)):
-            raise utils.ValidationError(
-                'Expected PIN to be a string, received %s' %
-                self.pin
             )
 
         if (self.parent_user_id is not None and
@@ -396,8 +409,23 @@ def is_user_id_correct(user_id):
         len(user_id) == user_models.USER_ID_LENGTH))
 
 
+def is_pseudonymous_id(user_id):
+    """Check that the ID is a pseudonymous one.
+
+    Args:
+        user_id: str. The ID to be checked.
+
+    Returns:
+        bool. Whether the ID represents a pseudonymous user.
+    """
+    return all((
+        user_id.islower(),
+        user_id.startswith('pid_'),
+        len(user_id) == user_models.USER_ID_LENGTH))
+
+
 def is_username_taken(username):
-    """"Returns whether the given username has already been taken.
+    """Returns whether the given username has already been taken.
 
     Args:
         username: str. Identifiable username to display in the UI.
@@ -479,19 +507,29 @@ def get_user_settings_from_username(username):
         return get_user_settings(user_model.id)
 
 
-def get_users_settings(user_ids):
+def get_users_settings(user_ids, strict=False):
     """Gets domain objects representing the settings for the given user_ids.
 
     Args:
         user_ids: list(str). The list of user_ids to get UserSettings
             domain objects for.
+        strict: bool. Whether to fail noisily if one or more user IDs don't
+            exist in the datastore. Defaults to False.
 
     Returns:
         list(UserSettings|None). The UserSettings domain objects corresponding
         to the given user ids. If the given user_id does not exist, the
         corresponding entry in the returned list is None.
+
+    Raises:
+        Exception. When strict mode is enabled and some user is not found.
     """
     user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
+    if strict:
+        for user_id, user_settings_model in python_utils.ZIP(
+                user_ids, user_settings_models):
+            if user_settings_model is None:
+                raise Exception('User with ID \'%s\' not found.' % user_id)
     result = []
     for i, model in enumerate(user_settings_models):
         if user_ids[i] == feconf.SYSTEM_COMMITTER_ID:
@@ -816,6 +854,7 @@ def _save_user_settings(user_settings):
             user_settings.preferred_site_language_code),
         'preferred_audio_language_code': (
             user_settings.preferred_audio_language_code),
+        'pin': user_settings.pin,
         'deleted': user_settings.deleted
     }
 
@@ -870,6 +909,7 @@ def _transform_user_settings(user_settings_model):
             user_settings_model.preferred_site_language_code),
         preferred_audio_language_code=(
             user_settings_model.preferred_audio_language_code),
+        pin=user_settings_model.pin,
         deleted=user_settings_model.deleted
     )
 
@@ -960,7 +1000,6 @@ def _save_user_auth_details(user_auth_details):
 
     user_auth_details_dict = {
         'gae_id': user_auth_details.gae_id,
-        'pin': user_auth_details.pin,
         'parent_user_id': user_auth_details.parent_user_id,
         'deleted': user_auth_details.deleted
     }
@@ -990,10 +1029,24 @@ def _get_user_auth_details_from_model(user_auth_details_model):
     return UserAuthDetails(
         user_id=user_auth_details_model.id,
         gae_id=user_auth_details_model.gae_id,
-        pin=user_auth_details_model.pin,
         parent_user_id=user_auth_details_model.parent_user_id,
         deleted=user_auth_details_model.deleted
     )
+
+
+def _get_pseudonymous_username(pseudonymous_id):
+    """Get the username from pseudonymous ID.
+
+    Args:
+        pseudonymous_id: str. The pseudonymous ID from which to generate
+            the username.
+
+    Returns:
+        str. The pseudonymous username, starting with 'User' and ending with
+        the last eight letters from the pseudonymous_id.
+    """
+    return 'User%s%s' % (
+        pseudonymous_id[-8].upper(), pseudonymous_id[-7:])
 
 
 def get_username(user_id):
@@ -1005,17 +1058,16 @@ def get_username(user_id):
     Returns:
         str. Username corresponding to the given user_id.
     """
-    if user_id in feconf.SYSTEM_USERS:
-        return feconf.SYSTEM_USERS[user_id]
-
-    return get_user_settings(user_id, strict=True).username
+    return get_usernames([user_id], strict=True)[0]
 
 
-def get_usernames(user_ids):
+def get_usernames(user_ids, strict=False):
     """Gets usernames corresponding to the given user_ids.
 
     Args:
         user_ids: list(str). The list of user_ids to get usernames for.
+        strict: bool. Whether to fail noisily if no user with the given ID
+            exists in the datastore. Defaults to False.
 
     Returns:
         list(str|None). Containing usernames based on given user_ids.
@@ -1028,11 +1080,14 @@ def get_usernames(user_ids):
     for index, user_id in enumerate(user_ids):
         if user_id in feconf.SYSTEM_USERS:
             usernames[index] = feconf.SYSTEM_USERS[user_id]
+        elif is_pseudonymous_id(user_id):
+            usernames[index] = _get_pseudonymous_username(user_id)
         else:
             non_system_user_indices.append(index)
             non_system_user_ids.append(user_id)
 
-    non_system_users_settings = get_users_settings(non_system_user_ids)
+    non_system_users_settings = get_users_settings(
+        non_system_user_ids, strict=strict)
 
     for index, user_settings in enumerate(non_system_users_settings):
         if user_settings:
