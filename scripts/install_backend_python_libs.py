@@ -366,7 +366,10 @@ def validate_metadata_directories():
     # library's metadata exists in a directory, we need to normalize the
     # directory name. Otherwise, we would need to check every permutation of
     # the casing for metadata directories generated with the naming convention:
-    # <library_name>-<library-version>.
+    # <library_name>-<library-version>. This is because we cannot guarantee the
+    # casing of the directory names generated and there are no options that we
+    # can provide to `pip install` to actually guarantee that a certain casing
+    # format is used to create the directory names.
     normalized_directory_names = set(
         [
             _normalize_directory_name(name)
