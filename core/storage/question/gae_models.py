@@ -67,7 +67,7 @@ class QuestionModel(base_models.VersionedModel):
     linked_skill_ids = ndb.StringProperty(
         indexed=True, repeated=True)
     # The optional misconception ids marked as not relevant to the question.
-    inapplicable_misconception_ids = ndb.StringProperty(
+    inapplicable_skill_misconception_ids = ndb.StringProperty(
         indexed=True, repeated=True)
 
     @staticmethod
@@ -84,7 +84,7 @@ class QuestionModel(base_models.VersionedModel):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'linked_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'inapplicable_misconception_ids':
+            'inapplicable_skill_misconception_ids':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -156,7 +156,7 @@ class QuestionModel(base_models.VersionedModel):
     @classmethod
     def create(
             cls, question_state_data, language_code, version, linked_skill_ids,
-            inapplicable_misconception_ids):
+            inapplicable_skill_misconception_ids):
         """Creates a new QuestionModel entry.
 
         Args:
@@ -166,7 +166,7 @@ class QuestionModel(base_models.VersionedModel):
                 question is written in.
             version: str. The version of the question.
             linked_skill_ids: list(str). The skill ids linked to the question.
-            inapplicable_misconception_ids: list(str). The optional
+            inapplicable_skill_misconception_ids: list(str). The optional
                 misconception ids marked as not applicable to the question.
 
         Returns:
@@ -182,7 +182,8 @@ class QuestionModel(base_models.VersionedModel):
             language_code=language_code,
             version=version,
             linked_skill_ids=linked_skill_ids,
-            inapplicable_misconception_ids=inapplicable_misconception_ids)
+            inapplicable_skill_misconception_ids=(
+                inapplicable_skill_misconception_ids))
 
         return question_model_instance
 

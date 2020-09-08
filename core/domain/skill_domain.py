@@ -920,6 +920,20 @@ class Skill(python_utils.OBJECT):
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0, 0, None, False, [])
 
+    def generate_skill_misconception_id(self, misconception_id):
+        """Given a misconception id, it returns the skill-misconception-id.
+        It is of the form <skill_id>-<misconception_id>.
+
+        Args:
+            misconception_id: int. The id of the misconception.
+
+        Returns:
+            str. The format is '<skill_id>-<misconception_id>', where skill_id
+            is the skill ID of the misconception and misconception_id is
+            the id of the misconception.
+        """
+        return '%s-%d' % (self.id, misconception_id)
+
     @classmethod
     def _convert_skill_contents_v1_dict_to_v2_dict(cls, skill_contents_dict):
         """Converts v1 skill contents to the v2 schema. In the v2 schema,

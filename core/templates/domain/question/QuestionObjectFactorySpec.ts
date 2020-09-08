@@ -201,7 +201,7 @@ describe('Question object factory', function() {
         },
         solicit_answer_details: false
       },
-      inapplicable_misconception_ids: ['a-1', 'b-2'],
+      inapplicable_skill_misconception_ids: ['a-1', 'b-2'],
       language_code: 'en',
       version: 1
     };
@@ -218,10 +218,10 @@ describe('Question object factory', function() {
     sampleQuestion.setLinkedSkillIds(['skill_id1', 'skill_id2']);
     expect(sampleQuestion.getLinkedSkillIds()).toEqual(
       ['skill_id1', 'skill_id2']);
-    expect(sampleQuestion.getInApplicableMisconceptionIds()).toEqual(
+    expect(sampleQuestion.getInApplicableSkillMisconceptionIds()).toEqual(
       ['a-1', 'b-2']);
-    sampleQuestion.setInApplicableMisconceptionIds(['abc-123']);
-    expect(sampleQuestion.getInApplicableMisconceptionIds()).toEqual(
+    sampleQuestion.setInApplicableSkillMisconceptionIds(['abc-123']);
+    expect(sampleQuestion.getInApplicableSkillMisconceptionIds()).toEqual(
       ['abc-123']);
     var stateData = sampleQuestion.getStateData();
     expect(stateData.name).toEqual('question');
@@ -242,7 +242,7 @@ describe('Question object factory', function() {
     var newQuestionBackendDict = sampleQuestion.toBackendDict(true);
     expect(newQuestionBackendDict.id).toEqual(null);
     expect(newQuestionBackendDict.linked_skill_ids).not.toBeDefined();
-    expect(newQuestionBackendDict.inapplicable_misconception_ids).toEqual(
+    expect(newQuestionBackendDict.inapplicable_skill_misconception_ids).toEqual(
       ['a-1', 'b-2']);
     expect(newQuestionBackendDict.version).toEqual(0);
     expect(sampleQuestion.toBackendDict(false).id).toEqual('question_id');
@@ -299,7 +299,7 @@ describe('Question object factory', function() {
     expect(sampleQuestion1.getStateData()).toEqual(state);
     expect(sampleQuestion1.getLinkedSkillIds()).toEqual(
       ['skill_id3', 'skill_id4']);
-    expect(sampleQuestion.getInApplicableMisconceptionIds()).toEqual(
+    expect(sampleQuestion.getInApplicableSkillMisconceptionIds()).toEqual(
       ['a-1', 'b-2']);
   });
 });
