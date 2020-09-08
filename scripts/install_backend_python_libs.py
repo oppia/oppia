@@ -360,16 +360,16 @@ def validate_metadata_directories():
             (following the PEP-427 and PEP-376 python guidelines).
     """
     directory_contents = _get_third_party_python_libs_directory_contents()
-    # Python metadata directory names contain a python library name that does
-    # not have uniform case. However, python libraries are equivalent
-    # regardless of their case. Therefore, in order to check if a python
-    # library's metadata exists in a directory, we need to normalize the
-    # directory name. Otherwise, we would need to check every permutation of
-    # the casing for metadata directories generated with the naming convention:
-    # <library_name>-<library-version>. This is because we cannot guarantee the
+    # EAch python metadata directory name contains a python library name that
+    # does not have uniform case. This is because we cannot guarantee the
     # casing of the directory names generated and there are no options that we
     # can provide to `pip install` to actually guarantee that a certain casing
-    # format is used to create the directory names.
+    # format is used to create the directory names. The only official guidelines
+    # for naming directories is that it must start with the string:
+    # <library_name>-<library-version> but no casing guidelines are specified.
+    # Therefore, in order to efficiently check if a python library's metadata
+    # exists in a directory, we need to normalize the directory name. Otherwise,
+    # we would need to check every permutation of the casing.
     normalized_directory_names = set(
         [
             _normalize_directory_name(name)
