@@ -37,12 +37,12 @@ angular.module('oppia').component('signupPage', {
     '$http', '$uibModal', '$window', 'AlertsService',
     'FocusManagerService', 'LoaderService', 'SiteAnalyticsService',
     'UrlInterpolationService', 'UrlService', 'DASHBOARD_TYPE_CREATOR',
-    'DASHBOARD_TYPE_LEARNER', 'SITE_NAME', 'MAX_USERNAME_LENGTH',
+    'DASHBOARD_TYPE_LEARNER', 'MAX_USERNAME_LENGTH', 'SITE_NAME',
     function(
         $http, $uibModal, $window, AlertsService,
         FocusManagerService, LoaderService, SiteAnalyticsService,
         UrlInterpolationService, UrlService, DASHBOARD_TYPE_CREATOR,
-        DASHBOARD_TYPE_LEARNER, SITE_NAME, MAX_USERNAME_LENGTH) {
+        DASHBOARD_TYPE_LEARNER, MAX_USERNAME_LENGTH, SITE_NAME) {
       var ctrl = this;
       var _SIGNUP_DATA_URL = '/signuphandler/data';
       ctrl.MAX_USERNAME_LENGTH = MAX_USERNAME_LENGTH;

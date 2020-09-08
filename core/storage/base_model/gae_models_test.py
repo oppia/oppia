@@ -81,13 +81,6 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             r'derived class. It should be implemented in the derived class.'):
             base_models.BaseModel.export_data('user_id')
 
-    def test_get_export_policy(self):
-        with self.assertRaisesRegexp(
-            NotImplementedError,
-            r'The get_export_policy\(\) method is missing from the '
-            r'derived class. It should be implemented in the derived class.'):
-            base_models.BaseModel.get_export_policy()
-
     def test_generic_query_put_get_and_delete_operations(self):
         model = base_models.BaseModel()
 
@@ -341,11 +334,28 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
 
     def test_exists_for_user_id(self):
         model1 = base_models.BaseSnapshotMetadataModel(
-            id='model_id-1', committer_id='committer_id', commit_type='create')
+            id='model_id-1',
+            committer_id='committer_id',
+            commit_type='create',
+            commit_cmds_user_ids=[
+                'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
+            content_user_ids=['content_user_1_id', 'content_user_2_id'])
         model1.put()
         self.assertTrue(
             base_models.BaseSnapshotMetadataModel
             .exists_for_user_id('committer_id'))
+        self.assertTrue(
+            base_models.BaseSnapshotMetadataModel
+            .exists_for_user_id('commit_cmds_user_1_id'))
+        self.assertTrue(
+            base_models.BaseSnapshotMetadataModel
+            .exists_for_user_id('commit_cmds_user_2_id'))
+        self.assertTrue(
+            base_models.BaseSnapshotMetadataModel
+            .exists_for_user_id('content_user_1_id'))
+        self.assertTrue(
+            base_models.BaseSnapshotMetadataModel
+            .exists_for_user_id('content_user_2_id'))
         self.assertFalse(
             base_models.BaseSnapshotMetadataModel
             .exists_for_user_id('x_id'))

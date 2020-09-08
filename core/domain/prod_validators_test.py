@@ -42,6 +42,7 @@ from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
@@ -1086,10 +1087,10 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             collection_services.save_new_collection(self.owner_id, collection)
 
         rights_manager.assign_role_for_collection(
-            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+            self.owner, '0', self.editor_id, rights_domain.ROLE_EDITOR)
 
         rights_manager.assign_role_for_collection(
-            self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
+            self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
 
         self.model_instance_0 = (
             collection_models.CollectionRightsModel.get_by_id('0'))
@@ -1177,7 +1178,7 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_collection(
-            self.owner, '0', self.user_id, rights_manager.ROLE_OWNER)
+            self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
@@ -1398,7 +1399,7 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
             'cmd': 'change_collection_status',
-            'old_status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'old_status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, {
             'cmd': 'release_ownership',
             'invalid_attribute': 'invalid'
@@ -1873,7 +1874,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             collection_services.save_new_collection(self.owner_id, collection)
 
         rights_manager.assign_role_for_collection(
-            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+            self.owner, '0', self.editor_id, rights_domain.ROLE_EDITOR)
         collection_services.update_collection(
             self.contributor_id, '0', [{
                 'cmd': 'edit_collection_property',
@@ -1882,7 +1883,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             }], 'Changes.')
 
         rights_manager.assign_role_for_collection(
-            self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
+            self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
 
         self.model_instance_0 = (
             collection_models.CollectionSummaryModel.get_by_id('0'))
@@ -1961,7 +1962,7 @@ class CollectionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_collection(
-            self.owner, '0', self.user_id, rights_manager.ROLE_OWNER)
+            self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
@@ -3724,10 +3725,10 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+            self.owner, '0', self.editor_id, rights_domain.ROLE_EDITOR)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
+            self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
 
         self.model_instance_0 = exp_models.ExplorationRightsModel.get_by_id('0')
         self.model_instance_1 = exp_models.ExplorationRightsModel.get_by_id('1')
@@ -3827,7 +3828,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_exploration(
-            self.owner, '0', self.user_id, rights_manager.ROLE_OWNER)
+            self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
@@ -4033,7 +4034,7 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance_0.commit_cmds = [{
             'cmd': 'change_exploration_status',
-            'old_status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'old_status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, {
             'cmd': 'release_ownership',
             'invalid_attribute': 'invalid'
@@ -4473,7 +4474,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+            self.owner, '0', self.editor_id, rights_domain.ROLE_EDITOR)
         exp_services.update_exploration(
             self.contributor_id, '0', [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
@@ -4482,7 +4483,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             })], 'Changes.')
 
         rights_manager.assign_role_for_exploration(
-            self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
+            self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
 
         rating_services.assign_rating_to_exploration(self.user_id, '0', 3)
         rating_services.assign_rating_to_exploration(self.viewer_id, '0', 4)
@@ -4584,7 +4585,7 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_owner_user_model_failure(self):
         rights_manager.assign_role_for_exploration(
-            self.owner, '0', self.user_id, rights_manager.ROLE_OWNER)
+            self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
@@ -13146,8 +13147,6 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
 class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
 
-    USER_PIN = '123'
-
     def setUp(self):
         super(UserAuthDetailsModelValidatorTests, self).setUp()
 
@@ -14737,25 +14736,28 @@ class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
+class UserContributionProficiencyModelValidatorTests(
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
-        super(UserContributionScoringModelValidatorTests, self).setUp()
+        super(UserContributionProficiencyModelValidatorTests, self).setUp()
 
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
         score_category = 'content.Art'
-        self.model_instance = user_models.UserContributionScoringModel.create(
-            self.user_id, score_category, 10
+        self.model_instance = (
+            user_models.UserContributionProficiencyModel.create(
+                self.user_id, score_category, 10
+            )
         )
         self.job_class = (
             prod_validation_jobs_one_off
-            .UserContributionScoringModelAuditOneOffJob)
+            .UserContributionProficiencyModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
-            u'[u\'fully-validated UserContributionScoringModel\', 1]']
+            u'[u\'fully-validated UserContributionProficiencyModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -14765,7 +14767,7 @@ class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
-            'of UserContributionScoringModel\', '
+            'of UserContributionProficiencyModel\', '
             '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
@@ -14778,7 +14780,7 @@ class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
-            'UserContributionScoringModel\', '
+            'UserContributionProficiencyModel\', '
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
@@ -14794,7 +14796,7 @@ class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
-                'field check of UserContributionScoringModel\', '
+                'field check of UserContributionProficiencyModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
                 '%s, expect model UserSettingsModel '
@@ -14808,7 +14810,7 @@ class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for score check of '
-            'UserContributionScoringModel\', [u\'Entity id %s: '
+            'UserContributionProficiencyModel\', [u\'Entity id %s: '
             'Expected score to be non-negative, received -1.0\']]') % (
                 self.model_instance.id)]
         self.run_job_and_check_output(

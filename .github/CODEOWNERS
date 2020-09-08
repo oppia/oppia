@@ -56,6 +56,7 @@
 /core/templates/base-components/oppia-root.directive.ts @bansalnitish @srijanreddy98
 /core/templates/base-components/oppia-root.directive.html @bansalnitish @srijanreddy98
 /core/templates/filters/translate.pipe.ts @bansalnitish @srijanreddy98
+/core/templates/services/angular-services.index.ts @bansalnitish @srijanreddy98
 /core/templates/services/contextual/logger.service.ts @bansalnitish @srijanreddy98
 /core/templates/services/contextual/logger.service.spec.ts @bansalnitish @srijanreddy98
 /core/templates/services/i18n-language-code.service.ts @bansalnitish @srijanreddy98
@@ -145,8 +146,7 @@
 
 
 # Dev workflow team.
-# TODO(#10472): Revert ownership to @vinitamurthi after 2020-09-05.
-/.circleci/ @BenHenning @U8NWXD @kevintab95
+/.circleci/ @BenHenning @U8NWXD @kevintab95 @vinitamurthi
 /.eslintignore @bansalnitish @Hudda
 /.eslintrc @bansalnitish @Hudda
 /.htmllintrc @bansalnitish @Hudda
@@ -156,7 +156,7 @@
 /.isort.cfg @bansalnitish @Hudda
 /.pylintrc @bansalnitish @Hudda
 /.stylelintrc @bansalnitish @Hudda
-/.travis.yml @BenHenning @U8NWXD @kevintab95
+/.travis.yml @BenHenning @vinitamurthi @U8NWXD @kevintab95
 /.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @bansalnitish @Hudda
@@ -604,14 +604,13 @@
 
 
 # Dynamic Feature Gating project
-# TODO(#10472): Revert ownership to @vinitamurthi after 2020-09-05.
-/core/controllers/platform_feature*.py @BenHenning 
-/core/domain/platform_feature_services*.py @BenHenning 
-/core/domain/platform_parameter*.py @BenHenning 
-/core/platform_feature*.py @BenHenning 
-/core/storage/config/ @BenHenning 
-/core/templates/domain/platform_feature/ @BenHenning 
-/core/templates/services/platform-feature*.ts @BenHenning
+/core/controllers/platform_feature*.py @BenHenning @vinitamurthi
+/core/domain/platform_feature_services*.py @BenHenning @vinitamurthi
+/core/domain/platform_parameter*.py @BenHenning @vinitamurthi
+/core/platform_feature*.py @BenHenning @vinitamurthi
+/core/storage/config/ @BenHenning @vinitamurthi
+/core/templates/domain/platform_feature/ @BenHenning @vinitamurthi
+/core/templates/services/platform-feature*.ts @BenHenning @vinitamurthi
 
 
 # Frontend unit tests
@@ -670,5 +669,4 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796
-# TODO(#10472): Revert ownership to @vinitamurthi after 2020-09-05.
-/.github/workflows/ @BenHenning
+/.github/workflows/ @BenHenning @vinitamurthi

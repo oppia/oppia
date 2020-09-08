@@ -65,6 +65,208 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
         return self.ONE_OFF_JOB_CLASS.get_output(job_id)
 
 
+class RegenerateMissingStateStatsOneOffJobTests(OneOffJobTestBase):
+    """Unit tests for RegenerateMissingStateStatsOneOffJob."""
+
+    ONE_OFF_JOB_CLASS = stats_jobs_one_off.RegenerateMissingStateStatsOneOffJob
+
+    EXP_ID = 'eid'
+    OWNER_ID = 'uid'
+
+    def run_one_off_job(self):
+        """Begins the one off job and returns its decoded values.
+
+        Returns:
+            list(*). The output of the one off job.
+        """
+        raw_output = super(
+            RegenerateMissingStateStatsOneOffJobTests, self).run_one_off_job()
+        return [ast.literal_eval(o) for o in raw_output]
+
+    def test_job_yields_nothing_when_all_explorations_are_deleted(self):
+        exp = self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
+        exp_models.ExplorationModel.get(exp.id).delete(
+            self.OWNER_ID, feconf.COMMIT_MESSAGE_EXPLORATION_DELETED)
+
+        self.assertEqual(self.run_one_off_job(), [])
+
+    def test_job_yields_success_when_all_state_stats_exist(self):
+        exp = self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exp.id, [], 'Trivial change')
+
+        self.assertEqual(self.run_one_off_job(), [
+            ['ExplorationStatsModel with valid state(s)', 2]
+        ])
+
+    def test_job_regenerates_state_with_same_stats_from_previous_version(self):
+        exp = self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
+        state_name = exp.init_state_name
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exp.id, [], 'Trivial change')
+
+        state_stats = stats_domain.StateStats(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+
+        v1_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 1))
+        v1_stats.state_stats_mapping[state_name] = state_stats.to_dict()
+        v1_stats.put()
+
+        v2_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
+        del v2_stats.state_stats_mapping[state_name]
+        v2_stats.put()
+
+        self.assertEqual(self.run_one_off_job(), [
+            ['ExplorationStatsModel state stats regenerated', [
+                '%s.2: %s' % (self.EXP_ID, state_name)
+            ]],
+            ['ExplorationStatsModel with valid state(s)', 1]
+        ])
+
+        v1_stats = stats_services.get_exploration_stats_by_id(self.EXP_ID, 1)
+        v2_stats = stats_services.get_exploration_stats_by_id(self.EXP_ID, 2)
+        self.assertEqual(
+            v1_stats.state_stats_mapping[state_name],
+            v2_stats.state_stats_mapping[state_name])
+
+    def test_job_regenerates_renamed_state_with_same_stats(self):
+        exp = self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
+        old_state_name = exp.init_state_name
+        new_state_name = 'Welcome!'
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': old_state_name,
+                'new_state_name': new_state_name,
+            })
+        ]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exp.id, change_list, 'Use Welcome!')
+
+        state_stats = stats_domain.StateStats(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+
+        v1_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 1))
+        v1_stats.state_stats_mapping[old_state_name] = state_stats.to_dict()
+        v1_stats.put()
+
+        v2_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
+        del v2_stats.state_stats_mapping[new_state_name]
+        v2_stats.put()
+
+        self.assertEqual(self.run_one_off_job(), [
+            ['ExplorationStatsModel state stats regenerated', [
+                '%s.2: %s' % (self.EXP_ID, new_state_name)
+            ]],
+            ['ExplorationStatsModel with valid state(s)', 1]
+        ])
+
+        v1_stats = stats_services.get_exploration_stats_by_id(self.EXP_ID, 1)
+        v2_stats = stats_services.get_exploration_stats_by_id(self.EXP_ID, 2)
+        self.assertEqual(
+            v1_stats.state_stats_mapping[old_state_name],
+            v2_stats.state_stats_mapping[new_state_name])
+
+    def test_job_regenerates_renamed_state_when_original_state_is_missing(self):
+        exp = self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
+        real_old_state_name = exp.init_state_name
+        fake_old_state_name = 'Fake Introduction'
+        new_state_name = 'Welcome!'
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': real_old_state_name,
+                'new_state_name': new_state_name,
+            })
+        ]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exp.id, change_list, 'Use Welcome!')
+
+        snapshot = exp_models.ExplorationModel.SNAPSHOT_METADATA_CLASS.get(
+            exp_models.ExplorationModel.get_snapshot_id(exp.id, 2))
+        snapshot.commit_cmds[0]['old_state_name'] = fake_old_state_name
+        snapshot.put()
+
+        v2_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
+        del v2_stats.state_stats_mapping[new_state_name]
+        v2_stats.put()
+
+        self.assertEqual(self.run_one_off_job(), [
+            ['ExplorationStatsModel state stats has bad rename', [
+                'eid.1: "Fake Introduction" -> "Welcome!"'
+            ]],
+            ['ExplorationStatsModel state stats regenerated', [
+                '%s.2: %s' % (self.EXP_ID, new_state_name)
+            ]],
+            ['ExplorationStatsModel with valid state(s)', 1]
+        ])
+
+        v2_stats = stats_services.get_exploration_stats_by_id(self.EXP_ID, 2)
+        self.assertEqual(
+            v2_stats.state_stats_mapping[new_state_name],
+            stats_domain.StateStats.create_default())
+
+    def test_job_regenerates_state_when_missing_from_in_between_versions(self):
+        # Create exploration's V1.
+        exp = self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
+        # Create exploration's V2.
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exp.id,
+            [exp_domain.ExplorationChange(
+                {'cmd': 'add_state', 'state_name': 'State 2️⃣'})],
+            'Add "Middle" state')
+        # Create exploration's V3.
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exp.id,
+            [exp_domain.ExplorationChange(
+                {'cmd': 'add_state', 'state_name': 'State 3️⃣'})],
+            'Add "End" state')
+
+        # Delete stats of the "in-between" exploration version.
+        v2_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
+        del v2_stats.state_stats_mapping['State 2️⃣']
+        v2_stats.put()
+
+        self.assertEqual(self.run_one_off_job(), [
+            ['ExplorationStatsModel state stats regenerated', [
+                '%s.2: State 2️⃣' % (self.EXP_ID,)
+            ]],
+            ['ExplorationStatsModel with valid state(s)', 2]
+        ])
+
+    def test_job_ignores_missing_state_when_entire_exp_stats_is_missing(self):
+        """When entire ExplorationStatsModel is missing, responsibility for
+        regenerating falls to the RegenerateMissingV*StatsModelsOneOffJob.
+        """
+        # Create exploration's V1.
+        exp = self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
+        # Create exploration's V2.
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exp.id,
+            [exp_domain.ExplorationChange(
+                {'cmd': 'add_state', 'state_name': 'Middle'})],
+            'Add "Middle" state')
+        # Create exploration's V3.
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exp.id,
+            [exp_domain.ExplorationChange(
+                {'cmd': 'add_state', 'state_name': 'End'})],
+            'Add "End" state')
+
+        # Delete v2 stats entirely.
+        v2_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
+        v2_stats.delete()
+
+        self.assertEqual(self.run_one_off_job(), [
+            ['ExplorationStatsModel with valid state(s)', 2]
+        ])
+
+
 class RegenerateMissingV1StatsModelsOneOffJobTests(OneOffJobTestBase):
     """Unit tests for RegenerateMissingV1StatsModelsOneOffJob."""
 
@@ -168,6 +370,24 @@ class RegenerateMissingV1StatsModelsOneOffJobTests(OneOffJobTestBase):
             output,
             ['[u\'ExplorationStatsModel for missing versions regenerated: \', '
              '[u\'EXP_ID1 v2\']]'])
+
+    def test_job_successfully_regenerates_stats_with_missing_state_stats(self):
+        # Delete the stats of the initial state.
+        v1_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.exp1.id, 1))
+        del v1_stats.state_stats_mapping[self.exp1.init_state_name]
+        v1_stats.put()
+
+        v2_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.exp1.id, 2))
+        v2_stats.delete()
+
+        self.assertEqual(
+            self.run_one_off_job(),
+            ['[u\'ExplorationStatsModel for missing versions regenerated: \', '
+             '[u\'EXP_ID1 v2\']]',
+             '[u\'ExplorationStatsModel ignored StateStats regeneration due '
+             'to missing historical data\', [u\'EXP_ID1.2: Introduction\']]'])
 
 
 class RecomputeStateCompleteStatisticsTests(OneOffJobTestBase):
@@ -1377,56 +1597,23 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
         output = self.run_one_off_job()
         self.assertEqual(output, [u'[u\'No change\', 1]'])
 
-    def test_job_cleans_up_stats_models_for_deleted_exps(self):
-        exp_id_1 = 'EXP_ID_1'
-        exp = self.save_new_valid_exploration(exp_id_1, 'owner_id')
-        state_name = exp.init_state_name
+    def test_job_successfully_regenerates_stats_with_missing_state_stats(self):
+        v1_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 1))
+        del v1_stats.state_stats_mapping[self.state_name]
+        v1_stats.put()
 
-        change_list = []
-        exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
-        change_list = [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': state_name,
-                'new_state_name': 'b',
-            })
-        ]
-        exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
+        v2_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
+        v2_stats.delete()
 
-        exp_services.revert_exploration(
-            feconf.SYSTEM_COMMITTER_ID, exp_id_1, 3, 2)
+        self.assertEqual(self.run_one_off_job(), [u'[u\'Success\', 1]'])
 
-        change_list = [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': state_name,
-                'new_state_name': 'b',
-            })
-        ]
-        exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
-        exp = exp_fetchers.get_exploration_by_id(exp_id_1)
-        self.assertEqual(exp.version, 5)
-
-        exp_services.delete_exploration(feconf.SYSTEM_COMMITTER_ID, exp_id_1)
-
-        # The call to delete_exploration() causes some tasks to be started. So,
-        # we flush them before running the job.
-        self.process_and_flush_pending_tasks()
-
-        output = self.run_one_off_job()
+        v2_stats = stats_models.ExplorationStatsModel.get(
+            stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
         self.assertEqual(
-            output, [u'[u\'Deleted all stats\', [u"{u\'exp_id\': \'EXP_ID_1\', '
-                     'u\'number_of_models\': 5}"]]', u'[u\'No change\', 1]'])
-
-        all_models = (
-            stats_models.ExplorationStatsModel.get_multi_stats_models(
-                [exp_domain.ExpVersionReference(exp.id, version)
-                 for version in python_utils.RANGE(1, exp.version + 1)]))
-        for model in all_models:
-            self.assertEqual(model, None)
+            v2_stats.state_stats_mapping[self.state_name],
+            stats_domain.StateStats.create_default().to_dict())
 
     def test_job_correctly_calculates_stats_for_missing_commit_log_models(self):
         class MockExplorationCommitLogEntryModel(
@@ -1628,7 +1815,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
              'card appears in version: 1.' % (feconf.DEFAULT_INIT_STATE_NAME)]
         ])
 
-    def test_error_when_stats_for_state_does_not_exist(self):
+    def test_error_when_state_which_does_not_exist_has_stats(self):
         self.save_new_default_exploration('ID', 'owner_id')
         stats = stats_models.ExplorationStatsModel.get_model('ID', 1)
         stats.state_stats_mapping['Unknown State'] = (
@@ -1639,6 +1826,17 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
             ['UNEXPECTED',
              'ExplorationStats "ID" v1 has stats for card "Unknown State", but '
              'card never existed.']
+        ])
+
+    def test_no_error_when_end_state_which_does_not_exist_has_stats(self):
+        self.save_new_default_exploration('ID', 'owner_id')
+        stats = stats_models.ExplorationStatsModel.get_model('ID', 1)
+        stats.state_stats_mapping['END'] = (
+            stats_domain.StateStats.create_default().to_dict())
+        stats.put()
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['EXPECTED', '1 ExplorationStats model is valid'],
         ])
 
     def test_error_when_stats_for_state_no_longer_exists(self):
