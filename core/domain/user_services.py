@@ -84,6 +84,9 @@ class UserSettings(python_utils.OBJECT):
         preferred_site_language_code: str or None. System language preference.
         preferred_audio_language_code: str or None. Audio language preference.
         pin: str or None. The PIN of the user's profile for android.
+        display_alias: str or None. Display name of a user who is logged
+            into the Android app. None when the request in coming from web
+            because we don't use it there.
     """
 
     def __init__(
@@ -96,7 +99,8 @@ class UserSettings(python_utils.OBJECT):
                 constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
             user_bio='', subject_interests=None, first_contribution_msec=None,
             preferred_language_codes=None, preferred_site_language_code=None,
-            preferred_audio_language_code=None, pin=None, deleted=False):
+            preferred_audio_language_code=None, pin=None, display_alias=None,
+            deleted=False):
         """Constructs a UserSettings domain object.
 
         Args:
@@ -135,6 +139,9 @@ class UserSettings(python_utils.OBJECT):
             preferred_audio_language_code: str or None. Default language used
                 for audio translations preference.
             pin: str or None. The PIN of the user's profile for android.
+            display_alias: str or None. Display name of a user who is logged
+                into the Android app. None when the request in coming from
+                web because we don't use it there.
             deleted: bool. Whether the user has requested removal of their
                 account.
         """
@@ -163,10 +170,11 @@ class UserSettings(python_utils.OBJECT):
         self.preferred_site_language_code = preferred_site_language_code
         self.preferred_audio_language_code = preferred_audio_language_code
         self.pin = pin
+        self.display_alias = display_alias
         self.deleted = deleted
 
     def validate(self):
-        """Checks that the user_id, gae_id, email, role and display_alias
+        """Checks that the user_id, gae_id, email, role, pin and display_alias
         fields of this UserSettings domain object are valid.
 
         Raises:
@@ -176,6 +184,7 @@ class UserSettings(python_utils.OBJECT):
             ValidationError. The email is invalid.
             ValidationError. The role is not str.
             ValidationError. Given role does not exist.
+            ValidationError. The pin is not str.
             ValidationError. The display alias is not str.
         """
         if not isinstance(self.user_id, python_utils.BASESTRING):
@@ -226,6 +235,13 @@ class UserSettings(python_utils.OBJECT):
                         raise utils.ValidationError(
                             'Only numeric characters are allowed in PIN.'
                         )
+
+        if (self.display_alias is not None and
+                not isinstance(self.display_alias, python_utils.BASESTRING)):
+            raise utils.ValidationError(
+                'Expected display_alias to be a string, received %s' %
+                self.display_alias
+            )
 
         if not isinstance(self.email, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -278,6 +294,7 @@ class UserSettings(python_utils.OBJECT):
             modifiable_user_data.preferred_site_language_code)
         self.preferred_audio_language_code = (
             modifiable_user_data.preferred_audio_language_code)
+        self.pin = modifiable_user_data.pin
 
     def to_dict(self):
         """Convert the UserSettings domain instance into a dictionary form
@@ -315,6 +332,7 @@ class UserSettings(python_utils.OBJECT):
                 self.preferred_site_language_code),
             'preferred_audio_language_code': (
                 self.preferred_audio_language_code),
+            'pin': self.pin,
             'display_alias': self.display_alias,
             'deleted': self.deleted
         }
@@ -428,7 +446,7 @@ class UserAuthDetails(python_utils.OBJECT):
         self.deleted = deleted
 
     def validate(self):
-        """Checks that user_id, gae_id, pin and parent_user_id fields of this
+        """Checks that user_id, gae_id, and parent_user_id fields of this
         UserAuthDetails domain object are valid.
 
         Raises:
@@ -961,6 +979,7 @@ def _transform_user_settings(user_settings_model):
         preferred_audio_language_code=(
             user_settings_model.preferred_audio_language_code),
         pin=user_settings_model.pin,
+        display_alias=user_settings_model.display_alias,
         deleted=user_settings_model.deleted
     )
 
@@ -1117,11 +1136,11 @@ def create_new_profiles(gae_id, email, modifiable_user_data_list):
         _save_user_settings(user_settings)
 
     # As new profile user creation is done by a full (parent) user only.
-    parent_user_auth_details = get_auth_details_by_gae_id(gae_id, strict=True)
-    if parent_user_auth_details.pin is None:
+    parent_user_settings = get_user_settings_by_gae_id(gae_id, strict=True)
+    if parent_user_settings.pin is None:
         raise Exception(
             'Pin must be set for a full user before creating a profile.')
-    parent_user_id = parent_user_auth_details.user_id
+    parent_user_id = parent_user_settings.user_id
     user_settings_list = []
     for modifiable_user_data in modifiable_user_data_list:
         if modifiable_user_data.user_id is not None:
@@ -1129,12 +1148,13 @@ def create_new_profiles(gae_id, email, modifiable_user_data_list):
         user_id = user_models.UserSettingsModel.get_new_id('')
         user_settings = UserSettings(
             user_id, gae_id, email, feconf.ROLE_ID_LEARNER,
-            preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE]
+            preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
+            pin=modifiable_user_data.pin
         )
         user_settings.populate_from_user_data(modifiable_user_data)
 
         user_auth_details = UserAuthDetails(
-            user_id, None, modifiable_user_data.pin, parent_user_id)
+            user_id, None, parent_user_id)
 
         # Each new profile user must be written to the datastore first and
         # because if we convert it into a batch write request, then calling
@@ -1178,7 +1198,6 @@ def update_multiple_users_data(modifiable_user_data_list):
         if not user_settings or not user_auth_details:
             raise Exception('User not found.')
         user_settings.populate_from_user_data(modifiable_user_data)
-        user_auth_details.pin = modifiable_user_data.pin
 
     _save_existing_users_settings(user_settings_list)
     _save_existing_users_auth_details(user_auth_details_list)
@@ -1216,7 +1235,6 @@ def _save_existing_users_auth_details(user_auth_details_list):
         user_auth_details.validate()
         user_auth_details_dict = {
             'gae_id': user_auth_details.gae_id,
-            'pin': user_auth_details.pin,
             'parent_user_id': user_auth_details.parent_user_id,
             'deleted': user_auth_details.deleted
         }

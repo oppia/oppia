@@ -25,9 +25,9 @@ import feconf
 import utils
 
 
-# This class will not be needed once the original class ModifiableUserData
-# itself has been modified to have greater than equal to 2 versions. Also
-# modify the tests using this mock class currently.
+# This mock class will not be needed once the schema version is >=2 for the
+# original class ModifiableUserData. Tests below using this class should also
+# be modified then.
 class MockModifiableUserData(user_domain.ModifiableUserData):
     """A mock ModifiableUserData class that adds a new attribute to the original
     class to create a new version of the schema for testing migration of old
@@ -650,7 +650,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
         self.assertEqual(modifiable_user_data.version, schema_version)
 
     # This test should be modified to use the original class ModifiableUserData
-    # itself when the CURRENT_SCHEMA_VERSION is updated to 2 or higher.
+    # itself when the CURRENT_SCHEMA_VERSION has been updated to 2 or higher.
     def test_mock_modifiable_user_data_class_with_all_attributes_given(self):
         user_data_dict = {
             'schema_version': 2,
@@ -677,7 +677,7 @@ class ModifiableUserDataTests(test_utils.GenericTestBase):
         self.assertEqual(modifiable_user_data.version, 2)
 
     # This test should be modified to use the original class ModifiableUserData
-    # itself when the CURRENT_SCHEMA_VERSION is updated to 2 or higher.
+    # itself when the CURRENT_SCHEMA_VERSION has been updated to 2 or higher.
     def test_mock_migration_from_old_version_to_new_works_correctly(self):
         user_data_dict = {
             'schema_version': 1,

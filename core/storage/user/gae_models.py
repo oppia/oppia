@@ -63,6 +63,9 @@ class UserSettingsModel(base_models.BaseModel):
     # When the user last logged in. This may be out-of-date by up to
     # feconf.PROXIMAL_TIMEDELTA_SECS seconds.
     last_logged_in = ndb.DateTimeProperty(default=None)
+    # A code associated with profile and full user on Android to provide a PIN
+    # based authentication within the account.
+    pin = ndb.StringProperty(default=None)
     # Name of a user displayed in Android UI. Unlike username, it can be
     # edited and is unique only among the profiles of the corresponding
     # regular user account.
@@ -119,9 +122,6 @@ class UserSettingsModel(base_models.BaseModel):
     # The time, in milliseconds, when the user first contributed to Oppia.
     # May be None.
     first_contribution_msec = ndb.FloatProperty(default=None)
-    # A code associated with profile and full user on Android to provide a PIN
-    # based authentication within the account.
-    pin = ndb.StringProperty(default=None)
 
     # DEPRECATED in 2.8.7. Do not use.
     gae_user_id = ndb.StringProperty(required=False, indexed=False)

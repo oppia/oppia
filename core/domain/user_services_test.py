@@ -733,8 +733,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_auth_details.gae_id, user_auth_details_model.gae_id)
         self.assertEqual(
-            user_auth_details.pin, user_auth_details_model.pin)
-        self.assertEqual(
             user_auth_details.parent_user_id,
             user_auth_details_model.parent_user_id
         )
@@ -784,7 +782,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 user_id)
         )
         self.assertEqual(len(user_auth_details_models), 1)
-        self.assertEqual(user_auth_details_models[0].pin, profile_pin)
         self.assertEqual(user_auth_details_models[0].parent_user_id, user_id)
         self.assertIsNone(user_auth_details_models[0].gae_id)
 
@@ -838,28 +835,54 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             {
                 'id': model.id,
                 'gae_id': model.gae_id,
-                'pin': model.pin,
                 'parent_user_id': model.parent_user_id
             } for model in
             user_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
                 user_id)
         ]
 
-        expected_output = [
+        expected_user_auth_output = [
             {
                 'id': profile_1_id,
                 'gae_id': None,
-                'pin': profile_pin,
                 'parent_user_id': user_id
             },
             {
                 'id': profile_2_id,
                 'gae_id': None,
-                'pin': None,
                 'parent_user_id': user_id
             }
         ]
-        self.assertItemsEqual(user_auth_details_models, expected_output)
+        self.assertItemsEqual(
+            user_auth_details_models, expected_user_auth_output)
+
+        user_settings_models = [
+            {
+                'id': model.id,
+                'display_alias': model.display_alias,
+                'pin': model.pin,
+                'role': model.role
+            } for model in
+            user_models.UserSettingsModel.get_multi(
+                [profile_1_id, profile_2_id])
+        ]
+
+        expected_user_settings_output = [
+            {
+                'id': profile_1_id,
+                'display_alias': display_alias_2,
+                'pin': profile_pin,
+                'role': feconf.ROLE_ID_LEARNER
+            },
+            {
+                'id': profile_2_id,
+                'display_alias': display_alias_3,
+                'pin': None,
+                'role': feconf.ROLE_ID_LEARNER
+            }
+        ]
+        self.assertItemsEqual(
+            user_settings_models, expected_user_settings_output)
 
     def test_create_new_profile_with_nonexistent_user_raises_error(self):
         non_existent_gae_id = 'gae_id_x'
@@ -979,7 +1002,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             {
                 'id': model.id,
                 'gae_id': model.gae_id,
-                'pin': model.pin,
                 'parent_user_id': model.parent_user_id
             } for model in
             user_models.UserAuthDetailsModel.get_multi(profile_user_ids)
@@ -989,13 +1011,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             {
                 'id': profile_user_ids[0],
                 'gae_id': None,
-                'pin': profile_pin,
                 'parent_user_id': user_id
             },
             {
                 'id': profile_user_ids[1],
                 'gae_id': None,
-                'pin': '345',
                 'parent_user_id': user_id
             }
         ]
@@ -1006,6 +1026,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             {
                 'id': model.id,
                 'display_alias': model.display_alias,
+                'pin': model.pin
             } for model in
             user_models.UserSettingsModel.get_multi(profile_user_ids)
         ]
@@ -1013,11 +1034,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         expected_user_settings_output = [
             {
                 'id': profile_user_ids[0],
-                'display_alias': 'xyz'
+                'display_alias': 'xyz',
+                'pin': profile_pin
             },
             {
                 'id': profile_user_ids[1],
-                'display_alias': display_alias_3
+                'display_alias': display_alias_3,
+                'pin': '345'
             }
         ]
         self.assertItemsEqual(
@@ -1841,7 +1864,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
                 self.user_settings.pin = pin
                 self.user_settings.validate()
 
-    def test_validate_empty_user_id(self):
+    def test_validate_empty_user_id_raises_exception(self):
         self.user_settings.user_id = ''
         with self.assertRaisesRegexp(
             utils.ValidationError, 'No user id specified.'

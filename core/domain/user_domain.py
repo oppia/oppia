@@ -377,7 +377,7 @@ class UserContributionRights(python_utils.OBJECT):
 
 class ModifiableUserData(python_utils.OBJECT):
     """Domain object to represent change in allowed attributes for UserSettings
-    and UserAuthDetails domain object.
+    domain object.
     """
 
     def __init__(
@@ -413,7 +413,7 @@ class ModifiableUserData(python_utils.OBJECT):
 
     @classmethod
     def from_dict(cls, modifiable_user_data_dict):
-        """Return a Modifiable user data domain object from a dict.
+        """Return a ModifiableUserData domain object from a dict.
 
         Args:
             modifiable_user_data_dict: dict. The dict representation of
