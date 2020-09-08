@@ -58,9 +58,9 @@ class BaseSuggestion(python_utils.OBJECT):
         score_category: str. The scoring category for the suggestion.
         last_updated: datetime.datetime. Date and time when the suggestion
             was last updated.
-        language_code: str| None. The ISO 639-1 code used to query suggestions
-            by language. It is set to None for edit state content suggestions,
-            since they are not queryable by language.
+        language_code: str|None. The ISO 639-1 code used to query suggestions
+            by language. It is set to None for "edit state content"
+            suggestions, since they are not queryable by language.
     """
 
     def __init__(self, status, final_reviewer_id):
@@ -392,9 +392,8 @@ class SuggestionEditStateContent(BaseSuggestion):
                     exp_domain.STATE_PROPERTY_CONTENT,
                     self.change.property_name))
 
-        # The language_code field is used for querying purposes. We do not want
-        # to query suggestions of this type by language. Therefore, the
-        # language_code field is set to None.
+        # Suggestions of this type do not have an associated language code,
+        # since they are not translation-related.
         if self.language_code != None:
             raise utils.ValidationError(
                 'Expected language_code to be None, received %s' % (
@@ -578,6 +577,9 @@ class SuggestionTranslateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.change.language_code)
 
+        if self.language_code is None:
+            raise utils.ValidationError('language_code cannot be None')
+
         if self.language_code != self.change.language_code:
             raise utils.ValidationError(
                 'Expected language_code to be %s, received %s' % (
@@ -720,6 +722,9 @@ class SuggestionAddQuestion(BaseSuggestion):
         if not self.change.question_dict:
             raise utils.ValidationError(
                 'Expected change to contain question_dict')
+
+        if self.language_code is None:
+            raise utils.ValidationError('language_code cannot be None')
 
         if self.language_code != self.change.question_dict['language_code']:
             raise utils.ValidationError(

@@ -297,6 +297,21 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             len(suggestion_models.GeneralSuggestionModel.query_suggestions(
                 queries)), 1)
 
+    def test_query_suggestions_by_language(self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_6', self.translation_language_code)
+            
+        queries = [('language_code', self.translation_language_code)]
+
+        self.assertEqual(
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 1)
+
     def test_get_translation_suggestion_ids_with_exp_ids_with_one_exp(self):
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,

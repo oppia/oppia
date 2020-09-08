@@ -187,7 +187,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
     to suggestions that do not have that field yet. The language_code field
     allows question and translation suggestions to be queried by language.
     This job will load all existing suggestions from the data store, update
-    them and immediately store them back into the data store.
+    them, if needed, and immediately store them back into the data store.
     """
 
     @classmethod
@@ -195,10 +195,14 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
         return [suggestion_models.GeneralSuggestionModel]
 
     @staticmethod
-    # Do nothing if the suggestion has been marked deleted or if the suggestion
-    # already has the language code property.
     def map(item):
-        if item.deleted or item.language_code:
+        # Do nothing if the suggestion has been marked deleted or if the
+        # suggestion has already set the language code property or if the
+        # suggestion is of type "edit state content". The language code for
+        # "edit state content" suggestions is always set to None, which is the
+        # default value for a ndb model field that hasn't been set.
+        if item.deleted or item.language_code or item.suggestion_type == (
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
             return
 
         # Getting the suggestion from the model creates the corresponding

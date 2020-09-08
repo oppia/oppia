@@ -306,6 +306,12 @@ indexes:
   - name: commit_message
   - name: commit_type
 
+- kind: UserContributionProficiencyModel
+  properties:
+  - name: deleted
+  - name: user_id
+  - name: score
+
 - kind: UserContributionScoringModel
   properties:
   - name: deleted

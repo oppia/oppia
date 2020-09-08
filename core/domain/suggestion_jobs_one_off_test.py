@@ -1623,9 +1623,11 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
 
     target_id = 'exp1'
     target_version_at_submission = 1
+    exploration_category = 'Algebra'
     EXPLORATION_THREAD_ID = 'exploration.exp1.thread_1'
     SKILL_THREAD_ID = 'skill1.thread1'
     AUTHOR_EMAIL = 'author1@example.com'
+    REVIEWER_EMAIL = 'reviewer@example.com'
 
     edit_state_content_change_dict = {
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1705,7 +1707,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         """
         job_id = (
             suggestion_jobs_one_off
-            .PoluateSuggestionLanguageCodeMigrationOneOffJob.create_new())
+            .PopulateSuggestionLanguageCodeMigrationOneOffJob.create_new())
         (
             suggestion_jobs_one_off
             .PopulateSuggestionLanguageCodeMigrationOneOffJob
@@ -1722,64 +1724,87 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         self.assertEqual(len(actual_output), len(expected_output))
         self.assertEqual(actual_output, expected_output)
 
+    def _create_score_category_for_suggestion_type(self, suggestion_type):
+        """Creates a valid score category based on the suggestion type.
+
+        Args:
+            suggestion_type: str. The type of suggestion for the score
+                category.
+
+        Returns:
+            str. The score category.
+        """
+        score_type = ''
+        score_subtype = ''
+        if suggestion_type == (
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
+            score_type = suggestion_models.SCORE_TYPE_CONTENT
+            score_subtype = self.exploration_category
+        elif suggestion_type == (
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            score_type = suggestion_models.SCORE_TYPE_TRANSLATION
+            score_subtype = self.exploration_category
+        elif suggestion_type == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
+            score_type = suggestion_models.SCORE_TYPE_QUESTION
+            score_subtype = self.target_id
+        return '%s%s%s' % (
+            score_type, suggestion_models.SCORE_CATEGORY_DELIMITER,
+            score_subtype
+        )
+
     def setUp(self):
         super(
             PopulateSuggestionLanguageCodeMigrationOneOffJobTests,
             self).setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.signup(self.REVIEWER_EMAIL, 'reviewer')
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         # Add valid question state data to the question dict.
         self.add_question_change_dict['question_dict'][
             'question_state_data'] = self._create_valid_question_data(
                 'default_state').to_dict()
         self.process_and_flush_pending_tasks()
 
-    def test_migrate_language_code_for_edit_state_content_suggestions(self):
-        with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id',
-            self.mock_generate_new_exploration_thread_id):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id, self.target_version_at_submission,
-                    self.author_id, self.edit_state_content_change_dict,
-                    'test description')
-        expected_output = [
-            '[u\'edit_exploration_state_content_suggestion_migrated\', 1]'
-        ]
-
-        self.run_job_and_verify_output(expected_output)
-
-        # Verify the language_code field was updated properly.
-        suggestion = suggestion_services.get_suggestion_by_id(
+    def test_migrate_edit_state_content_suggestions_does_nothing(
+            self):
+        suggestion_models.GeneralSuggestionModel(
+            id=self.EXPLORATION_THREAD_ID,
+            suggestion_type=(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id=self.author_id,
+            final_reviewer_id=self.reviewer_id,
+            change_cmd=self.edit_state_content_change_dict,
+            score_category=self._create_score_category_for_suggestion_type(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)).put()
+        expected_output = []
+        # Verify the language_code field is set to None by default.
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
             self.EXPLORATION_THREAD_ID)
-        expected_language_code = None
-        self.assertEqual(suggestion.language_code, expected_language_code)
+        self.assertEqual(suggestion_model.language_code, None)
+
+        self._run_job_and_verify_output(expected_output)
 
     def test_migrate_language_code_for_translation_suggestions(self):
-        with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id',
-            self.mock_generate_new_exploration_thread_id):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                with self.swap(
-                    exp_domain.Exploration, 'get_content_html',
-                    self.MockExploration.get_content_html):
-                    suggestion_services.create_suggestion(
-                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                        suggestion_models.TARGET_TYPE_EXPLORATION,
-                        self.target_id, self.target_version_at_submission,
-                        self.author_id, self.add_translation_change_dict,
-                        'test description')
+        suggestion_models.GeneralSuggestionModel(
+            id=self.EXPLORATION_THREAD_ID,
+            suggestion_type=suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id=self.author_id,
+            final_reviewer_id=self.reviewer_id,
+            change_cmd=self.add_translation_change_dict,
+            score_category=self._create_score_category_for_suggestion_type(
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)).put()
         expected_output = ['[u\'translate_content_suggestion_migrated\', 1]']
 
-        self.run_job_and_verify_output(expected_output)
+        self._run_job_and_verify_output(expected_output)
 
         # Verify the language_code field was updated properly.
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -1788,18 +1813,21 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         self.assertEqual(suggestion.language_code, expected_language_code)
 
     def test_migrate_language_code_for_question_suggestions(self):
-        with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
-            suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-                suggestion_models.TARGET_TYPE_SKILL,
-                'skill_1', feconf.CURRENT_STATE_SCHEMA_VERSION,
-                self.author_id, self.add_question_change_dict,
-                'test description')
+        suggestion_models.GeneralSuggestionModel(
+            id=self.SKILL_THREAD_ID,
+            suggestion_type=suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=suggestion_models.TARGET_TYPE_SKILL,
+            target_id='skill_1',
+            target_version_at_submission=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id=self.author_id,
+            final_reviewer_id=self.reviewer_id,
+            change_cmd=self.add_question_change_dict,
+            score_category=self._create_score_category_for_suggestion_type(
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)).put()
         expected_output = ['[u\'add_question_suggestion_migrated\', 1]']
 
-        self.run_job_and_verify_output(expected_output)
+        self._run_job_and_verify_output(expected_output)
 
         # Verify the language_code field was updated properly.
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -1809,38 +1837,37 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
 
     def test_migrate_language_code_for_multiple_suggestions(self):
         # Create an add question suggestion.
-        with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
-            suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-                suggestion_models.TARGET_TYPE_SKILL,
-                'skill_1', feconf.CURRENT_STATE_SCHEMA_VERSION,
-                self.author_id, self.add_question_change_dict,
-                'test description')
+        suggestion_models.GeneralSuggestionModel(
+            id=self.SKILL_THREAD_ID,
+            suggestion_type=suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=suggestion_models.TARGET_TYPE_SKILL,
+            target_id='skill_1',
+            target_version_at_submission=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id=self.author_id,
+            final_reviewer_id=self.reviewer_id,
+            change_cmd=self.add_question_change_dict,
+            score_category=self._create_score_category_for_suggestion_type(
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)).put()
         # Create a translate content suggestion.
-        with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id',
-            self.mock_generate_new_exploration_thread_id):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                with self.swap(
-                    exp_domain.Exploration, 'get_content_html',
-                    self.MockExploration.get_content_html):
-                    suggestion_services.create_suggestion(
-                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                        suggestion_models.TARGET_TYPE_EXPLORATION,
-                        self.target_id, self.target_version_at_submission,
-                        self.author_id, self.add_translation_change_dict,
-                        'test description')
+        suggestion_models.GeneralSuggestionModel(
+            id=self.EXPLORATION_THREAD_ID,
+            suggestion_type=suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id=self.author_id,
+            final_reviewer_id=self.reviewer_id,
+            change_cmd=self.add_translation_change_dict,
+            score_category=self._create_score_category_for_suggestion_type(
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)).put()
         expected_output = [
             '[u\'add_question_suggestion_migrated\', 1]',
             '[u\'translate_content_suggestion_migrated\', 1]'
         ]
 
-        self.run_job_and_verify_output(expected_output)
+        self._run_job_and_verify_output(expected_output)
 
         # Verify the language_code field was updated properly for the
         # question suggestion.
@@ -1874,7 +1901,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         suggestion_model.deleted = True
         suggestion_model.put()
 
-        self.run_job_and_verify_output(expected_output)
+        self._run_job_and_verify_output(expected_output)
 
     def test_no_action_is_performed_for_suggestion_that_has_been_deleted(self):
         with self.swap(
@@ -1893,4 +1920,60 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         )
         suggestion_model.delete()
 
-        self.run_job_and_verify_output(expected_output)
+        self._run_job_and_verify_output(expected_output)
+
+    def test_do_nothing_for_edit_state_content_suggestions_that_have_the_field(
+            self):
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id',
+            self.mock_generate_new_exploration_thread_id):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, self.edit_state_content_change_dict,
+                    'test description')
+        expected_output = []
+
+        self._run_job_and_verify_output(expected_output)
+
+    def test_do_nothing_for_translation_suggestions_that_have_a_language_code(
+            self):
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id',
+            self.mock_generate_new_exploration_thread_id):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                with self.swap(
+                    exp_domain.Exploration, 'get_content_html',
+                    self.MockExploration.get_content_html):
+                    suggestion_services.create_suggestion(
+                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                        suggestion_models.TARGET_TYPE_EXPLORATION,
+                        self.target_id, self.target_version_at_submission,
+                        self.author_id, self.add_translation_change_dict,
+                        'test description')
+        expected_output = []
+
+        self._run_job_and_verify_output(expected_output)
+
+    def test_do_nothing_for_question_suggestions_that_have_a_language_code(
+            self):
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+                suggestion_models.TARGET_TYPE_SKILL,
+                'skill_1', feconf.CURRENT_STATE_SCHEMA_VERSION,
+                self.author_id, self.add_question_change_dict,
+                'test description')
+        expected_output = []
+
+        self._run_job_and_verify_output(expected_output)

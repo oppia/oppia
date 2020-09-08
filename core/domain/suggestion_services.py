@@ -222,10 +222,10 @@ def update_suggestion(suggestion):
         suggestion: Suggestion. The suggestion to be updated.
     """
 
-    update_suggestions([suggestion])
+    _update_suggestions([suggestion])
 
 
-def update_suggestions(suggestions, update_last_updated_time=True):
+def _update_suggestions(suggestions, update_last_updated_time=True):
     """Updates the given suggestions.
 
     Args:
@@ -409,7 +409,7 @@ def reject_suggestions(suggestion_ids, reviewer_id, review_message):
         suggestion.set_suggestion_status_to_rejected()
         suggestion.set_final_reviewer_id(reviewer_id)
 
-    update_suggestions(suggestions)
+    _update_suggestions(suggestions)
 
     feedback_services.create_messages(
         suggestion_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,

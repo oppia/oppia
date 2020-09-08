@@ -1128,6 +1128,24 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
                 expected_language_code)):
             suggestion.validate()
 
+    def test_validate_language_code_fails_when_language_code_is_set_to_none(
+            self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+        suggestion.validate()
+
+        suggestion.language_code = None
+
+        with self.assertRaisesRegexp(
+            Exception, 'language_code cannot be None'):
+            suggestion.validate()
+
     def test_validate_change_with_invalid_language_code_fails_validation(self):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -1834,6 +1852,24 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             Exception,
             'Expected language_code to be %s, received wrong_language_code' % (
                 expected_language_code)):
+            suggestion.validate()
+
+    def test_validate_language_code_fails_when_language_code_is_set_to_none(
+            self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+        suggestion.validate()
+
+        suggestion.language_code = None
+
+        with self.assertRaisesRegexp(
+            Exception, 'language_code cannot be None'):
             suggestion.validate()
 
     def test_get_all_html_content_strings(self):
