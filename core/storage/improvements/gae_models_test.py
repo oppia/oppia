@@ -73,11 +73,6 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
         self.assertFalse(
             improvements_models.TaskEntryModel.has_reference_to_user_id('uid'))
 
-    def test_get_export_policy(self):
-        self.assertEqual(
-            improvements_models.TaskEntryModel.get_export_policy(),
-            base_models.EXPORT_POLICY.CONTAINS_USER_DATA)
-
     def test_export_data_without_any_tasks(self):
         self.assertEqual(
             improvements_models.TaskEntryModel.export_data('uid'),

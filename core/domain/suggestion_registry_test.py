@@ -93,6 +93,13 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
             ' get_all_html_content_strings.'):
             self.base_suggestion.get_all_html_content_strings()
 
+    def test_base_class_get_target_entity_html_strings(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Subclasses of BaseSuggestion should implement'
+            ' get_target_entity_html_strings.'):
+            self.base_suggestion.get_target_entity_html_strings()
+
     def test_base_class_convert_html_in_suggestion_change(self):
         def conversion_fn():
             """Temporary function."""
@@ -681,6 +688,54 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion.change.old_value['html'], expected_html_content)
 
+    def test_get_target_entity_html_strings_returns_expected_strings(self):
+        change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': {
+                'content_id': 'content',
+                'html': 'new suggestion content'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': 'Old content.'
+            }
+        }
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id, change_dict,
+            self.suggestion_dict['score_category'], self.fake_date)
+
+        actual_outcome_list = suggestion.get_target_entity_html_strings()
+        expected_outcome_list = [u'Old content.']
+        self.assertEqual(expected_outcome_list, actual_outcome_list)
+
+    def test_get_target_entity_html_with_none_old_value(self):
+        change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': {
+                'content_id': 'content',
+                'html': 'new suggestion content'
+            },
+            'old_value': None
+        }
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id, change_dict,
+            self.suggestion_dict['score_category'], self.fake_date)
+
+        actual_outcome_list = suggestion.get_target_entity_html_strings()
+        self.assertEqual(actual_outcome_list, [])
+
 
 class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
     """Tests for the SuggestionEditStateContent class."""
@@ -1156,6 +1211,19 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         actual_outcome_list = suggestion.get_all_html_content_strings()
         expected_outcome_list = [
             u'<p>This is translated html.</p>', u'<p>This is a content.</p>']
+        self.assertEqual(expected_outcome_list, actual_outcome_list)
+
+    def test_get_target_entity_html_strings_returns_expected_strings(self):
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'], self.author_id,
+            self.reviewer_id, self.suggestion_dict['change'],
+            self.suggestion_dict['score_category'], self.fake_date)
+
+        actual_outcome_list = suggestion.get_target_entity_html_strings()
+        expected_outcome_list = [self.suggestion_dict['change']['content_html']]
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
     def test_convert_html_in_suggestion_change(self):
@@ -1863,8 +1931,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
-        image_context = fs_services.get_image_context_for_suggestion_target(
-            'skill')
+        image_context = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
         fs_services.save_original_and_compressed_versions_of_image(
             'img.svg', image_context, 'skill1',
             raw_image, 'image', False)
