@@ -46,7 +46,6 @@ describe('Skill editor page', function() {
     SkillObjectFactory = $injector.get('SkillObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
     UrlService = $injector.get('UrlService');
-
     ctrl = $componentController('skillEditorPage');
   }));
 
@@ -58,6 +57,15 @@ describe('Skill editor page', function() {
       ctrl.$onInit();
       expect(SkillEditorStateService.loadSkill).toHaveBeenCalledWith('skill_1');
     });
+
+  it('should call confirm before leaving', function() {
+    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
+    spyOn(window, 'addEventListener');
+    ctrl.setUpBeforeUnload();
+    ctrl.confirmBeforeLeaving({returnValue: ''});
+    expect(window.addEventListener).toHaveBeenCalledWith(
+      'beforeunload', ctrl.confirmBeforeLeaving);
+  });
 
   it('should get active tab name from skill editor routing service',
     function() {
