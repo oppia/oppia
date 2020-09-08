@@ -294,7 +294,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     EXP_VERSION = 1
     STATE_NAME = 'state_name'
     STORY_ID_1 = 'story_id_1'
+    STORY_ID_2 = 'story_id_2'
     COMPLETED_NODE_IDS_1 = ['node_id_1', 'node_id_2']
+    COMPLETED_NODE_IDS_2 = ['node_id_3', 'node_id_4']
     THREAD_ENTITY_TYPE = feconf.ENTITY_TYPE_EXPLORATION
     THREAD_ENTITY_ID = 'exp_id_2'
     THREAD_STATUS = 'open'
@@ -438,8 +440,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS).put()
         user_models.LearnerPlaylistModel(
             id=self.PROFILE_ID_1,
-            exploration_ids=self.EXPLORATION_IDS,
-            collection_ids=self.COLLECTION_IDS).put()
+            exploration_ids=self.EXPLORATION_IDS_2,
+            collection_ids=self.COLLECTION_IDS_2).put()
 
         # Setup for CollectionProgressModel.
         user_models.CollectionProgressModel(
@@ -448,10 +450,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             collection_id=self.COLLECTION_IDS[0],
             completed_explorations=self.EXPLORATION_IDS).put()
         user_models.CollectionProgressModel(
-            id='%s.%s' % (self.PROFILE_ID_1, self.COLLECTION_IDS[0]),
+            id='%s.%s' % (self.PROFILE_ID_1, self.COLLECTION_IDS_2[0]),
             user_id=self.PROFILE_ID_1,
-            collection_id=self.COLLECTION_IDS[0],
-            completed_explorations=self.EXPLORATION_IDS).put()
+            collection_id=self.COLLECTION_IDS_2[0],
+            completed_explorations=self.EXPLORATION_IDS_2).put()
 
         # Setup for StoryProgressModel.
         user_models.StoryProgressModel(
@@ -460,10 +462,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             story_id=self.STORY_ID_1,
             completed_node_ids=self.COMPLETED_NODE_IDS_1).put()
         user_models.StoryProgressModel(
-            id='%s.%s' % (self.PROFILE_ID_1, self.STORY_ID_1),
+            id='%s.%s' % (self.PROFILE_ID_1, self.STORY_ID_2),
             user_id=self.PROFILE_ID_1,
-            story_id=self.STORY_ID_1,
-            completed_node_ids=self.COMPLETED_NODE_IDS_1).put()
+            story_id=self.STORY_ID_2,
+            completed_node_ids=self.COMPLETED_NODE_IDS_2).put()
 
         # Setup for CollectionRightsModel.
         collection_models.CollectionRightsModel(
@@ -1280,3 +1282,67 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_images[i].image_export_path,
                 observed_images[i].image_export_path
             )
+
+    def test_export_for_full_user_does_not_export_profile_data(self):
+        """Test that exporting data for a full user does not export
+        data for any profile user, atleast for the models that were
+        populated for the profile user.
+        """
+        self.set_up_non_trivial()
+        profile_user_settings_data = {
+            'email': self.USER_1_EMAIL,
+            'role': self.PROFILE_1_ROLE,
+            'username': None,
+            'normalized_username': None,
+            'last_agreed_to_terms': self.GENERIC_DATE,
+            'last_started_state_editor_tutorial': None,
+            'last_started_state_translation_tutorial': None,
+            'last_logged_in': self.GENERIC_DATE,
+            'last_created_an_exploration': None,
+            'last_edited_an_exploration': None,
+            'profile_picture_data_url': None,
+            'default_dashboard': 'learner',
+            'creator_dashboard_display_pref': 'card',
+            'user_bio': self.GENERIC_USER_BIO,
+            'subject_interests': self.GENERIC_SUBJECT_INTERESTS,
+            'first_contribution_msec': None,
+            'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
+            'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
+            'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
+            'display_alias': self.GENERIC_DISPLAY_ALIAS_2
+        }
+        user_skill_data = {
+            self.SKILL_ID_3: self.DEGREE_OF_MASTERY_2
+        }
+        completed_activities_data = {
+            'completed_exploration_ids': self.EXPLORATION_IDS_2,
+            'completed_collection_ids': self.COLLECTION_IDS_2
+        }
+        incomplete_activities_data = {}
+        last_playthrough_data = {}
+        learner_playlist_data = {
+            'playlist_exploration_ids': self.EXPLORATION_IDS_2,
+            'playlist_collection_ids': self.COLLECTION_IDS_2
+        }
+        collection_progress_data = {
+            self.COLLECTION_IDS_2[0]: self.EXPLORATION_IDS_2
+        }
+        story_progress_data = {
+            self.STORY_ID_2: self.COMPLETED_NODE_IDS_2
+        }
+        profile_user_data = {
+            'user_settings': profile_user_settings_data,
+            'user_skill_mastery': user_skill_data,
+            'completed_activities': completed_activities_data,
+            'incomplete_activities': incomplete_activities_data,
+            'exp_user_last_playthrough': last_playthrough_data,
+            'learner_playlist': learner_playlist_data,
+            'collection_progress': collection_progress_data,
+            'story_progress': story_progress_data,
+        }
+
+        user_takeout_object = takeout_service.export_data_for_user(
+            self.USER_ID_1)
+        observed_data = user_takeout_object.user_data
+        for key, value in profile_user_data.items():
+            self.assertNotEqual(value, observed_data[key])
