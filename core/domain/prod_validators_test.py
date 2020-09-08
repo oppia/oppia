@@ -9219,7 +9219,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['0'],
-                'inapplicable_misconception_ids': ['skillid-0']
+                'inapplicable_skill_misconception_ids': ['skillid-0']
             },
             'skill_id': '0',
             'skill_difficulty': 0.3,

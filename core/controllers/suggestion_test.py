@@ -308,7 +308,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': ['skill_id'],
-            'inapplicable_misconception_ids': ['skillid-1']
+            'inapplicable_skill_misconception_ids': ['skillid-1']
         }
 
         exp_id = 'new_exp_id'
@@ -756,7 +756,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': [self.SKILL_ID],
-            'inapplicable_misconception_ids': ['skillid-1']
+            'inapplicable_skill_misconception_ids': ['skillid-1']
         }
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -864,7 +864,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': ['skill_id2'],
-            'inapplicable_misconception_ids': []
+            'inapplicable_skill_misconception_ids': []
         }
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -913,7 +913,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': ['skill_id2'],
-            'inapplicable_misconception_ids': []
+            'inapplicable_skill_misconception_ids': []
         }
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -960,7 +960,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': ['skill_id2'],
-            'inapplicable_misconception_ids': []
+            'inapplicable_skill_misconception_ids': []
         }
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -1023,7 +1023,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': [self.skill_id],
-            'inapplicable_misconception_ids': ['skillid-1']
+            'inapplicable_skill_misconception_ids': ['skillid-1']
         }
 
         self.login(self.AUTHOR_EMAIL)
@@ -1369,7 +1369,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': [self.SKILL_ID],
-            'inapplicable_misconception_ids': ['skillid-1']
+            'inapplicable_skill_misconception_ids': ['skillid-1']
         }
 
         self.post_json(
@@ -1554,7 +1554,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'linked_skill_ids': [self.SKILL_ID],
-            'inapplicable_misconception_ids': ['skillid-1']
+            'inapplicable_skill_misconception_ids': ['skillid-1']
         }
 
         self.post_json(

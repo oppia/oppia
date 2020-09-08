@@ -75,7 +75,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_1'],
-            inapplicable_misconception_ids=['skill-1', 'skill-2'])
+            inapplicable_skill_misconception_ids=['skill-1', 'skill-2'])
 
         self.question_id_1 = question_services.get_new_question_id()
         self.question_1 = self.save_new_question(
@@ -497,13 +497,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(question.language_code, 'bn')
         self.assertEqual(question.version, 2)
 
-    def test_update_inapplicable_misconception_ids(self):
+    def test_update_inapplicable_skill_misconception_ids(self):
         self.assertEqual(
-            self.question.inapplicable_misconception_ids,
+            self.question.inapplicable_skill_misconception_ids,
             ['skill-1', 'skill-2'])
         change_dict = {
             'cmd': 'update_question_property',
-            'property_name': 'inapplicable_misconception_ids',
+            'property_name': 'inapplicable_skill_misconception_ids',
             'new_value': ['skill-1'],
             'old_value': []
         }
@@ -511,11 +511,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         question_services.update_question(
             self.editor_id, self.question_id, change_list,
-            'updated inapplicable_misconception_ids')
+            'updated inapplicable_skill_misconception_ids')
 
         question = question_services.get_question_by_id(self.question_id)
         self.assertEqual(
-            question.inapplicable_misconception_ids, ['skill-1'])
+            question.inapplicable_skill_misconception_ids, ['skill-1'])
         self.assertEqual(question.version, 2)
 
     def test_cannot_update_question_with_invalid_change_list(self):
@@ -749,14 +749,15 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'feedback_1': {},
             'feedback_2': {}
         })
-        inapplicable_misconception_ids = [
+        inapplicable_skill_misconception_ids = [
             'skill_with_misconceptions-3',
             'skill_with_misconceptions-4'
         ]
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
             question_state_data, ['skill_with_misconceptions'],
-            inapplicable_misconception_ids=inapplicable_misconception_ids)
+            inapplicable_skill_misconception_ids=(
+                inapplicable_skill_misconception_ids))
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_with_misconceptions', 0.5)
         answer_groups = (
@@ -771,8 +772,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'skill_with_misconceptions-2'
         ]
         self.assertEqual(
-            self.question.inapplicable_misconception_ids,
-            inapplicable_misconception_ids)
+            self.question.inapplicable_skill_misconception_ids,
+            inapplicable_skill_misconception_ids)
         self.assertEqual(actual_misconception_ids, expected_misconception_ids)
         # Try to untag deleted misconceptions when there are no deleted
         # misconceptions.
@@ -783,8 +784,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         updated_question = question_services.get_question_by_id(
             self.question_id)
         self.assertEqual(
-            updated_question.inapplicable_misconception_ids,
-            inapplicable_misconception_ids)
+            updated_question.inapplicable_skill_misconception_ids,
+            inapplicable_skill_misconception_ids)
         self.assertEqual(actual_misconception_ids, expected_misconception_ids)
 
     def test_untag_deleted_misconceptions_correctly_on_updating_skill(self):
@@ -887,14 +888,15 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'feedback_1': {},
             'feedback_2': {}
         })
-        inapplicable_misconception_ids = [
+        inapplicable_skill_misconception_ids = [
             'skill_with_misconceptions-3',
             'skill_with_misconceptions-4'
         ]
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
             question_state_data, ['skill_with_misconceptions'],
-            inapplicable_misconception_ids=inapplicable_misconception_ids)
+            inapplicable_skill_misconception_ids=(
+                inapplicable_skill_misconception_ids))
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_with_misconceptions', 0.5)
         answer_groups = (
@@ -909,8 +911,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'skill_with_misconceptions-2'
         ]
         self.assertEqual(
-            self.question.inapplicable_misconception_ids,
-            inapplicable_misconception_ids)
+            self.question.inapplicable_skill_misconception_ids,
+            inapplicable_skill_misconception_ids)
         self.assertEqual(actual_misconception_ids, expected_misconception_ids)
         # Delete few misconceptions.
         change_list = [
@@ -941,13 +943,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             for answer_group in updated_answer_groups
             if answer_group.to_dict()['tagged_skill_misconception_id']]
         expected_misconception_ids = ['skill_with_misconceptions-1']
-        actual_inapplicable_misconception_ids = (
-            updated_question.inapplicable_misconception_ids)
-        expected_inapplicable_misconception_ids = (
+        actual_inapplicable_skill_misconception_ids = (
+            updated_question.inapplicable_skill_misconception_ids)
+        expected_inapplicable_skill_misconception_ids = (
             ['skill_with_misconceptions-3'])
         self.assertEqual(
-            actual_inapplicable_misconception_ids,
-            expected_inapplicable_misconception_ids)
+            actual_inapplicable_skill_misconception_ids,
+            expected_inapplicable_skill_misconception_ids)
         self.assertEqual(actual_misconception_ids, expected_misconception_ids)
 
 

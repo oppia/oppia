@@ -52,8 +52,8 @@ def create_new_question(committer_id, question, commit_message):
         linked_skill_ids=question.linked_skill_ids,
         question_state_data_schema_version=(
             question.question_state_data_schema_version),
-        inapplicable_misconception_ids=(
-            question.inapplicable_misconception_ids)
+        inapplicable_skill_misconception_ids=(
+            question.inapplicable_skill_misconception_ids)
     )
     model.commit(
         committer_id, commit_message, [{'cmd': question_domain.CMD_CREATE_NEW}])
@@ -528,8 +528,8 @@ def apply_change_list(question_id, change_list):
         Question. The resulting question domain object.
     """
     question = get_question_by_id(question_id)
-    question_property_inapplicable_misconception_ids = (
-        question_domain.QUESTION_PROPERTY_INAPPLICABLE_MISCONCEPTION_IDS)
+    question_property_inapplicable_skill_misconception_ids = (
+        question_domain.QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS)
     try:
         for change in change_list:
             if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
@@ -545,8 +545,8 @@ def apply_change_list(question_id, change_list):
                       question_domain.QUESTION_PROPERTY_LINKED_SKILL_IDS):
                     question.update_linked_skill_ids(change.new_value)
                 elif (change.property_name ==
-                      question_property_inapplicable_misconception_ids):
-                    question.update_inapplicable_misconception_ids(
+                      question_property_inapplicable_skill_misconception_ids):
+                    question.update_inapplicable_skill_misconception_ids(
                         change.new_value)
 
         return question
@@ -587,8 +587,8 @@ def _save_question(committer_id, question, change_list, commit_message):
     question_model.question_state_data_schema_version = (
         question.question_state_data_schema_version)
     question_model.linked_skill_ids = question.linked_skill_ids
-    question_model.inapplicable_misconception_ids = (
-        question.inapplicable_misconception_ids)
+    question_model.inapplicable_skill_misconception_ids = (
+        question.inapplicable_skill_misconception_ids)
     change_dicts = [change.to_dict() for change in change_list]
     question_model.commit(committer_id, commit_message, change_dicts)
     question.version += 1
@@ -648,7 +648,7 @@ def compute_summary_of_question(question):
         answer_group.to_dict()['tagged_skill_misconception_id']
         for answer_group in answer_groups
         if answer_group.to_dict()['tagged_skill_misconception_id']]
-    misconception_ids.extend(question.inapplicable_misconception_ids)
+    misconception_ids.extend(question.inapplicable_skill_misconception_ids)
     interaction_id = question.question_state_data.interaction.id
     question_summary = question_domain.QuestionSummary(
         question.id, question_content, misconception_ids, interaction_id,
@@ -732,24 +732,26 @@ def untag_deleted_misconceptions(committer_id, skill_id, skill_description):
     skill = skill_fetchers.get_skill_by_id(skill_id)
     skill_misconception_ids = (
         [
-            '%s-%d' % (skill_id, misconception.id)
+            skill.generate_skill_misconception_id(misconception.id)
             for misconception in skill.misconceptions
         ]
     )
     for question in questions:
         change_list = []
-        inapplicable_misconception_ids = (
-            question.inapplicable_misconception_ids)
-        deleted_inapplicable_misconception_ids = utils.compute_list_difference(
-            inapplicable_misconception_ids, skill_misconception_ids)
-        for misconception_id in deleted_inapplicable_misconception_ids:
+        inapplicable_skill_misconception_ids = (
+            question.inapplicable_skill_misconception_ids)
+        deleted_inapplicable_skill_misconception_ids = (
+            utils.compute_list_difference(
+                inapplicable_skill_misconception_ids, skill_misconception_ids))
+        for misconception_id in deleted_inapplicable_skill_misconception_ids:
             old_misconception_ids = list(
-                question.inapplicable_misconception_ids)
-            question.inapplicable_misconception_ids.remove(misconception_id)
+                question.inapplicable_skill_misconception_ids)
+            question.inapplicable_skill_misconception_ids.remove(
+                misconception_id)
             change_list.append(question_domain.QuestionChange({
                 'cmd': 'update_question_property',
-                'property_name': 'inapplicable_misconception_ids',
-                'new_value': question.inapplicable_misconception_ids,
+                'property_name': 'inapplicable_skill_misconception_ids',
+                'new_value': question.inapplicable_skill_misconception_ids,
                 'old_value': old_misconception_ids
             }))
         old_question_state_data_dict = question.question_state_data.to_dict()

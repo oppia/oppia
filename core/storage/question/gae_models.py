@@ -67,7 +67,7 @@ class QuestionModel(base_models.VersionedModel):
     linked_skill_ids = ndb.StringProperty(
         indexed=True, repeated=True)
     # The optional misconception ids marked as not relevant to the question.
-    inapplicable_misconception_ids = ndb.StringProperty(
+    inapplicable_skill_misconception_ids = ndb.StringProperty(
         indexed=True, repeated=True)
 
     @staticmethod
@@ -76,9 +76,17 @@ class QuestionModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @staticmethod
-    def get_export_policy():
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'question_state_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_state_data_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'linked_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'inapplicable_skill_misconception_ids':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -148,7 +156,7 @@ class QuestionModel(base_models.VersionedModel):
     @classmethod
     def create(
             cls, question_state_data, language_code, version, linked_skill_ids,
-            inapplicable_misconception_ids):
+            inapplicable_skill_misconception_ids):
         """Creates a new QuestionModel entry.
 
         Args:
@@ -158,7 +166,7 @@ class QuestionModel(base_models.VersionedModel):
                 question is written in.
             version: str. The version of the question.
             linked_skill_ids: list(str). The skill ids linked to the question.
-            inapplicable_misconception_ids: list(str). The optional
+            inapplicable_skill_misconception_ids: list(str). The optional
                 misconception ids marked as not applicable to the question.
 
         Returns:
@@ -174,7 +182,8 @@ class QuestionModel(base_models.VersionedModel):
             language_code=language_code,
             version=version,
             linked_skill_ids=linked_skill_ids,
-            inapplicable_misconception_ids=inapplicable_misconception_ids)
+            inapplicable_skill_misconception_ids=(
+                inapplicable_skill_misconception_ids))
 
         return question_model_instance
 
