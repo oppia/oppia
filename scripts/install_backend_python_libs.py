@@ -360,7 +360,7 @@ def validate_metadata_directories():
             (following the PEP-427 and PEP-376 python guidelines).
     """
     directory_contents = _get_third_party_python_libs_directory_contents()
-    # EAch python metadata directory name contains a python library name that
+    # Each python metadata directory name contains a python library name that
     # does not have uniform case. This is because we cannot guarantee the
     # casing of the directory names generated and there are no options that we
     # can provide to `pip install` to actually guarantee that a certain casing
