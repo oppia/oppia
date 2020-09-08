@@ -234,16 +234,10 @@ def verify_user_deleted(pending_deletion_request):
     """
     user_id = pending_deletion_request.user_id
     role = pending_deletion_request.role
-    if role == feconf.ROLE_ID_LEARNER:
-        return all((
-            _verify_profile_related_models_are_deleted(user_id),
-            _verify_activity_models_deleted(user_id),
-        ))
-    else:
-        return all((
-            _verify_basic_models_deleted(user_id),
-            _verify_activity_models_deleted(user_id),
-        ))
+    return all((
+        _verify_basic_models_deleted(user_id),
+        _verify_activity_models_deleted(user_id),
+    ))
 
 
 def _hard_delete_explorations_and_collections(pending_deletion_request):
@@ -307,15 +301,9 @@ def _delete_full_user(pending_deletion_request):
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object for which to delete or pseudonymize all the models.
     """
-    user_id = pending_deletion_request.user_id
-
-    for model_class in models.Registry.get_storage_model_classes(
-            [models.NAMES.user, models.NAMES.improvements]):
-        deletion_policy = model_class.get_deletion_policy()
-        if deletion_policy == base_models.DELETION_POLICY.DELETE:
-            model_class.apply_deletion_policy(user_id)
-
+    _delete_models(pending_deletion_request.user_id, models.NAMES.user)
     _hard_delete_explorations_and_collections(pending_deletion_request)
+    _delete_models(pending_deletion_request.user_id, models.NAMES.improvements)
     _pseudonymize_feedback_models(pending_deletion_request)
     _pseudonymize_suggestion_models(pending_deletion_request)
     _pseudonymize_activity_models(
@@ -336,6 +324,19 @@ def _delete_full_user(pending_deletion_request):
         story_models.StorySnapshotMetadataModel,
         story_models.StoryCommitLogEntryModel,
         'story_id')
+
+
+def _delete_models(user_id, module_name):
+    """Delete all the models from the given module, for a given user.
+    Args:
+        user_id: str. The id of the user to be deleted.
+        module_name: models.NAMES. The name of the module containing the models
+            that are being deleted.
+    """
+    for model_class in models.Registry.get_storage_model_classes([module_name]):
+        deletion_policy = model_class.get_deletion_policy()
+        if deletion_policy == base_models.DELETION_POLICY.DELETE:
+            model_class.apply_deletion_policy(user_id)
 
 
 def _pseudonymize_activity_models(
