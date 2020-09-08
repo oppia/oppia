@@ -1,7 +1,7 @@
 <div class="oppia-translator-overview">
   <div>
     <div id="tutorialTranslationLanguage">
-      <span style="font-size: 16px;" class="protractor-test-language-selector-label">
+      <span class="protractor-test-language-selector-label oppia-language-selector-label">
         <strong>
           <span ng-if="inVoiceoverMode">Voiceovers</span>
           <span ng-if="inTranslationMode">Translations</span> for language:
@@ -90,5 +90,8 @@
   }
   .oppia-mode-change-label {
     margin: 3px 8px;
+  }
+  translator-overview .oppia-language-selector-label {
+    font-size: 16px;
   }
 </style>

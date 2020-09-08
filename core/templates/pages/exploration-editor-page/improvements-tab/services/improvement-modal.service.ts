@@ -41,7 +41,8 @@ angular.module('oppia').factory('ImprovementModalService', [
             playthrough: () => playthrough,
             playthroughIndex: () => playthroughIndex
           },
-          controller: 'ImprovementPlaythoughModalController'
+          controller: 'ImprovementPlaythoughModalController',
+          windowClass: 'oppia-improvement-playthrough-modal'
         });
       },
       openLearnerAnswerDetails: function(learnerAnswerDetails) {

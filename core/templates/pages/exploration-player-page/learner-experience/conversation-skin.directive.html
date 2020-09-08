@@ -19,16 +19,16 @@
 
     <div ng-if="!upcomingInlineInteractionHtml"
          class="conversation-skin-inline-interaction">
-      <div style="padding: 6px 12px;">
+      <div class="oppia-conversation-skin-instructions">
         <[upcomingInteractionInstructions]>
-        <i ng-if="canWindowShowTwoCards()" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
-        <i ng-if="!canWindowShowTwoCards()" class="material-icons md-18" style="position: relative;">&#xE5DB;</i>
+        <i ng-if="canWindowShowTwoCards()" class="material-icons md-18 position-relative">&#xE5C8;</i>
+        <i ng-if="!canWindowShowTwoCards()" class="material-icons md-18 position-relative">&#xE5DB;</i>
       </div>
     </div>
   </div>
 </div>
 
-<div role="main" style="margin: 0 auto; position: relative;" ng-if="hasFullyLoaded">
+<div role="main" class="oppia-conversation-skin-animate-cards-container position-relative" ng-if="hasFullyLoaded">
   <div class="conversation-skin-cards-container conversation-skin-animate-cards protractor-test-conversation-skin-cards-container"
        ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
 
@@ -62,14 +62,14 @@
         </progress-nav>
       </div>
       <div ng-if="recommendedExplorationSummaries.length > 0 && (inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
-        <div style="cursor: default">
+        <div class="oppia-conversation-skin-next-lession-text-container">
           <span class="conversation-skin-next-lesson-text">Next Lesson</span>
           <span><[recommendedExplorationSummaries[0].title]></span>
         </div>
         <div>
           <a href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
-            <md-button class="md-raised" style="background-color: #0D48A1">
-              <i class="material-icons oppia-vcenter" style="color: #fff" aria-hidden="true">&#xE5C8;</i>
+            <md-button class="md-raised oppia-button-raised">
+              <i class="material-icons oppia-vcenter oppia-button-icon" aria-hidden="true">&#xE5C8;</i>
             </md-button>
           </a>
         </div>
@@ -130,7 +130,7 @@
                                   thumbnail-bg-color="exp.thumbnailBgColor"
                                   num-views="exp.numViews"
                                   is-community-owned="exp.communityOwned"
-                                  style="margin-left: 10px;">
+                                  class="oppia-exploration-summary-tile">
         </exploration-summary-tile>
       </div>
 
@@ -391,6 +391,30 @@ otherwise they will interfere with the iframed conversation skin directive.
     position: absolute;
     right: 8px;
     top: -10px;
+  }
+
+  conversation-skin .oppia-conversation-skin-instructions {
+    padding: 6px 12px;
+  }
+
+  conversation-skin .oppia-conversation-skin-animate-cards-container {
+    margin: 0 auto;
+  }
+
+  conversation-skin .oppia-conversation-skin-next-lession-text-container {
+    cursor: default;
+  }
+
+  conversation-skin .oppia-button-raised {
+    background-color: #0D48A1
+  }
+
+  conversation-skin .oppia-button-icon {
+    color: #fff;
+  }
+
+  conversation-skin .oppia-exploration-summary-tile {
+    margin-left: 10px;
   }
 
   @media screen and (max-width: 959px) {
