@@ -100,8 +100,6 @@ _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PATHS_TO_INSERT = [
     os.getcwd(),
     os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webapp2-2.3'),
-    os.path.join(
         common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'yaml-3.10'),
     os.path.join(
         common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'jinja2-2.6'),
@@ -133,6 +131,7 @@ _PATHS_TO_INSERT = [
     os.path.join('third_party', 'soupsieve-1.9.5'),
     os.path.join('third_party', 'six-1.15.0'),
     os.path.join('third_party', 'webencodings-0.5.1'),
+    os.path.join('third_party', 'webapp2-3.0.0b1')
 ]
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)

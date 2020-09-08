@@ -134,6 +134,14 @@
         "tarRootDirPrefix": "redis-",
         "rootDirPrefix": "redis-",
         "targetDirPrefix": "redis-"
+      },
+      "webapp2": {
+        "version": "3.0.0b1",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/ff/38/8c2ba6ba7a05f1edb70c3b93074a9899c24ee894ef5d874ff054ea2bff66/webapp2-3.0.0b1.tar.gz",
+        "tarRootDirPrefix": "webapp2-",
+        "rootDirPrefix": "webapp2-",
+        "targetDirPrefix": "webapp2-"
       }
     },
     "frontend": {
