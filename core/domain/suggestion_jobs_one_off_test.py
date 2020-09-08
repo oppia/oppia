@@ -264,7 +264,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_2'],
-                    'inapplicable_misconception_ids': ['skillid-1']
+                    'inapplicable_skill_misconception_ids': ['skillid-1']
                 },
                 'skill_id': 'skill_2',
                 'skill_difficulty': 0.3,
@@ -511,7 +511,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_2'],
-                    'inapplicable_misconception_ids': ['skillid-1']
+                    'inapplicable_skill_misconception_ids': ['skillid-1']
                 },
                 'skill_id': 'skill_2',
                 'skill_difficulty': 0.3,
@@ -784,7 +784,7 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_misconception_ids': ['skillid-1']
+                'inapplicable_skill_misconception_ids': ['skillid-1']
             },
             'skill_id': 'skill_1',
             'skill_difficulty': 0.3,
@@ -1048,7 +1048,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_1'],
-                    'inapplicable_misconception_ids': ['skillid-1']
+                    'inapplicable_skill_misconception_ids': ['skillid-1']
                 },
                 'skill_id': 'skill_1',
                 'skill_difficulty': 0.3,
@@ -1419,7 +1419,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_1'],
-                    'inapplicable_misconception_ids': ['skillid-1']
+                    'inapplicable_skill_misconception_ids': ['skillid-1']
                 },
                 'skill_id': 'skill_1',
                 'skill_difficulty': 0.3,
@@ -1573,7 +1573,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_1'],
-                    'inapplicable_misconception_ids': ['skillid-1']
+                    'inapplicable_skill_misconception_ids': ['skillid-1']
                 },
                 'skill_id': 'skill_1',
                 'skill_difficulty': 0.3,
