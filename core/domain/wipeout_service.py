@@ -233,7 +233,6 @@ def verify_user_deleted(pending_deletion_request):
         bool. True if all the models were correctly deleted, False otherwise.
     """
     user_id = pending_deletion_request.user_id
-    role = pending_deletion_request.role
     return all((
         _verify_basic_models_deleted(user_id),
         _verify_activity_models_deleted(user_id),
@@ -328,6 +327,7 @@ def _delete_full_user(pending_deletion_request):
 
 def _delete_models(user_id, module_name):
     """Delete all the models from the given module, for a given user.
+
     Args:
         user_id: str. The id of the user to be deleted.
         module_name: models.NAMES. The name of the module containing the models
