@@ -83,10 +83,19 @@ class CollectionModel(base_models.VersionedModel):
         """Collection is deleted only if it is not public."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'collection_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'nodes': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -237,10 +246,21 @@ class CollectionRightsModel(base_models.VersionedModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'voice_artist_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'viewer_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            # DEPRECATED in v2.8.3.
+            'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -278,6 +298,38 @@ class CollectionRightsModel(base_models.VersionedModel):
         super(CollectionRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
 
+    @staticmethod
+    def convert_to_valid_dict(model_dict):
+        """Replace invalid fields and values in the CollectionRightsModel dict.
+
+        Some old CollectionRightsSnapshotContentModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a CollectionRightsModel from
+        them. We need to remove or replace these fields and values.
+
+        Args:
+            model_dict: dict. The content of the model. Some fields and field
+                values might no longer exist in the CollectionRightsModel
+                schema.
+
+        Returns:
+            dict. The content of the model. Only valid fields and values are
+            present.
+        """
+        # The status field could historically take the value 'publicized', this
+        # value is now equivalent to 'public'.
+        if model_dict['status'] == 'publicized':
+            model_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
+
+        # The voice_artist_ids field was previously named translator_ids. We
+        # need to move the values from translator_ids field to voice_artist_ids
+        # and delete translator_ids.
+        if 'translator_ids' in model_dict and model_dict['translator_ids']:
+            model_dict['voice_artist_ids'] = model_dict['translator_ids']
+            model_dict['translator_ids'] = []
+
+        return model_dict
+
     def _reconstitute(self, snapshot_dict):
         """Populates the model instance with the snapshot.
 
@@ -294,21 +346,8 @@ class CollectionRightsModel(base_models.VersionedModel):
             VersionedModel. The instance of the VersionedModel class populated
             with the the snapshot.
         """
-        # The status field could historically take the value 'publicized', this
-        # value is now equivalent to 'public'.
-        if snapshot_dict['status'] == 'publicized':
-            snapshot_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
-        # The voice_artist_ids field was previously named translator_ids. We
-        # need to move the values from translator_ids field to voice_artist_ids
-        # and delete translator_ids.
-        if (
-                'translator_ids' in snapshot_dict and
-                snapshot_dict['translator_ids']
-        ):
-            snapshot_dict['voice_artist_ids'] = snapshot_dict['translator_ids']
-            snapshot_dict['translator_ids'] = []
-
-        self.populate(**snapshot_dict)
+        self.populate(
+            **CollectionRightsModel.convert_to_valid_dict(snapshot_dict))
         return self
 
     def _trusted_commit(
@@ -351,6 +390,30 @@ class CollectionRightsModel(base_models.VersionedModel):
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
+
+        snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
+            self.get_snapshot_id(self.id, self.version))
+
+        snapshot_metadata_model.content_user_ids = list(sorted(
+            set(self.owner_ids) |
+            set(self.editor_ids) |
+            set(self.voice_artist_ids) |
+            set(self.viewer_ids)
+        ))
+
+        commit_cmds_user_ids = set()
+        for commit_cmd in commit_cmds:
+            user_id_attribute_names = python_utils.NEXT(
+                cmd['user_id_attribute_names']
+                for cmd in feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS
+                if cmd['name'] == commit_cmd['cmd']
+            )
+            for user_id_attribute_name in user_id_attribute_names:
+                commit_cmds_user_ids.add(commit_cmd[user_id_attribute_name])
+        snapshot_metadata_model.commit_cmds_user_ids = list(
+            sorted(commit_cmds_user_ids))
+
+        snapshot_metadata_model.put()
 
     @classmethod
     def export_data(cls, user_id):
@@ -403,12 +466,14 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """The history of commits is not relevant for the purposes of
         Takeout.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'collection_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def _get_instance_id(cls, collection_id, version):
@@ -547,13 +612,33 @@ class CollectionSummaryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model data has already been exported as a part of the
         CollectionRightsModel, and thus does not need an export_data
         function.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'ratings': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'collection_model_last_updated':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'collection_model_created_on':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'owner_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'editor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'viewer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'contributor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'contributors_summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'node_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

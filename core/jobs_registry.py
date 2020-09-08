@@ -50,6 +50,8 @@ taskqueue_services = models.Registry.import_taskqueue_services()
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.ActivityContributorsSummaryOneOffJob,
+    activity_jobs_one_off.AddContentUserIdsContentJob,
+    activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob,
     activity_jobs_one_off.AuditContributorsOneOffJob,
     activity_jobs_one_off.AuditSnapshotMetadataModelsJob,
     activity_jobs_one_off.FixCommitLastUpdatedOneOffJob,
@@ -86,6 +88,7 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.ExplorationMissingStatsAudit,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
+    stats_jobs_one_off.RegenerateMissingStateStatsOneOffJob,
     stats_jobs_one_off.RegenerateMissingV1StatsModelsOneOffJob,
     stats_jobs_one_off.RegenerateMissingV2StatsModelsOneOffJob,
     stats_jobs_one_off.StatisticsAuditV1,
@@ -234,7 +237,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.UserAuthDetailsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserBulkEmailsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserContributionRightsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UserContributionScoringModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserContributionProficiencyModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserContributionsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserEmailPreferencesModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserNormalizedNameAuditOneOffJob,

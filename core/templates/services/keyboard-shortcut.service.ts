@@ -44,11 +44,16 @@ export class KeyboardShortcutService {
 
   bindExplorationPlayerShortcuts(): void {
     Mousetrap.bind('s', function() {
-      document.getElementById('skipToMainContentId').focus();
+      var skipButton = <HTMLElement>document.querySelector(
+        '.oppia-skip-to-content');
+      if (skipButton !== null) {
+        skipButton.focus();
+      }
     });
 
     Mousetrap.bind('k', function() {
-      var previousButton = document.getElementById('backButtonId');
+      var previousButton = <HTMLElement>document.querySelector(
+        '.oppia-back-button');
       if (previousButton !== null) {
         previousButton.focus();
       }
@@ -87,7 +92,11 @@ export class KeyboardShortcutService {
     });
 
     Mousetrap.bind('s', function() {
-      document.getElementById('skipToMainContentId').focus();
+      var skipButton = <HTMLElement>document.querySelector(
+        '.oppia-skip-to-content');
+      if (skipButton !== null) {
+        skipButton.focus();
+      }
     });
 
     Mousetrap.bind('?', () => {

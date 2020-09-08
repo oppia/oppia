@@ -24,7 +24,7 @@ import ast
 from core import jobs
 from core.domain import exp_services
 from core.domain import recommendations_services
-from core.domain import rights_manager
+from core.domain import rights_domain
 from core.platform import models
 
 (exp_models, recommendations_models,) = models.Registry.import_models([
@@ -53,7 +53,7 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         # Only process the exploration if it is not private.
-        if item.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+        if item.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
             return
 
         exp_summary_id = item.id

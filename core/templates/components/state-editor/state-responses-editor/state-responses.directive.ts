@@ -109,8 +109,8 @@ angular.module('oppia').directive('stateResponses', [
         '/components/state-editor/state-responses-editor/' +
         'state-responses.directive.html'),
       controller: [
-        '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
-        'AnswerGroupObjectFactory', 'ContextService',
+        '$filter', '$scope', '$uibModal', 'AlertsService',
+        'AnswerGroupObjectFactory',
         'EditabilityService', 'ExternalSaveService', 'ResponsesService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
@@ -121,8 +121,8 @@ angular.module('oppia').directive('stateResponses', [
         'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
         function(
-            $filter, $rootScope, $scope, $uibModal, AlertsService,
-            AnswerGroupObjectFactory, ContextService,
+            $filter, $scope, $uibModal, AlertsService,
+            AnswerGroupObjectFactory,
             EditabilityService, ExternalSaveService, ResponsesService,
             StateCustomizationArgsService, StateEditorService,
             StateInteractionIdService, StateNextContentIdIndexService,
@@ -138,8 +138,6 @@ angular.module('oppia').directive('stateResponses', [
             if (StateEditorService.isInQuestionMode()) {
               return;
             }
-            var explorationId = ContextService.getExplorationId();
-            var currentStateName = $scope.stateName;
           };
 
           $scope.isInQuestionMode = function() {

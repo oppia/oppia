@@ -35,20 +35,18 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
     template: '<select></select>',
     controllerAs: '$ctrl',
     controller: [
-      '$scope', '$element', '$rootScope', '$filter',
+      '$element', '$filter', '$scope',
       'StateInteractionIdService', 'INTERACTION_SPECS',
       function(
-          $scope, $element, $rootScope, $filter,
+          $element, $filter, $scope,
           StateInteractionIdService, INTERACTION_SPECS) {
         var ctrl = this;
         ctrl.$onInit = function() {
           var choices = [];
-          var numberOfRuleTypes = 0;
 
           var ruleTypesToDescriptions = INTERACTION_SPECS[
             StateInteractionIdService.savedMemento].rule_descriptions;
           for (var ruleType in ruleTypesToDescriptions) {
-            numberOfRuleTypes++;
             choices.push({
               id: ruleType,
               text: $filter('replaceInputsWithEllipses')(

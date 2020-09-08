@@ -39,6 +39,7 @@ from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import recommendations_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_fetchers
@@ -516,7 +517,7 @@ class CollectionRightsSnapshotMetadataModelValidator(
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
-        return rights_manager.CollectionRightsChange
+        return rights_domain.CollectionRightsChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -562,7 +563,7 @@ class CollectionCommitLogEntryModelValidator(
     @classmethod
     def _get_change_domain_class(cls, item):
         if item.id.startswith('rights'):
-            return rights_manager.CollectionRightsChange
+            return rights_domain.CollectionRightsChange
         elif item.id.startswith('collection'):
             return collection_domain.CollectionChange
         else:
@@ -1496,7 +1497,7 @@ class ExplorationRightsSnapshotMetadataModelValidator(
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
-        return rights_manager.ExplorationRightsChange
+        return rights_domain.ExplorationRightsChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1542,7 +1543,7 @@ class ExplorationCommitLogEntryModelValidator(
     @classmethod
     def _get_change_domain_class(cls, item):
         if item.id.startswith('rights'):
-            return rights_manager.ExplorationRightsChange
+            return rights_domain.ExplorationRightsChange
         elif item.id.startswith('exploration'):
             return exp_domain.ExplorationChange
         else:
@@ -5028,9 +5029,9 @@ class UserSkillMasteryModelValidator(
             cls._validate_skill_mastery]
 
 
-class UserContributionScoringModelValidator(
+class UserContributionProficiencyModelValidator(
         base_model_validators.BaseUserModelValidator):
-    """Class for validating UserContributionScoringModels."""
+    """Class for validating UserContributionProficiencyModels."""
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -5048,7 +5049,7 @@ class UserContributionScoringModelValidator(
         """Validates that score is non-negative.
 
         Args:
-            item: ndb.Model. UserContributionScoringModel to validate.
+            item: ndb.Model. UserContributionProficiencyModel to validate.
         """
         if item.score < 0:
             cls._add_error(

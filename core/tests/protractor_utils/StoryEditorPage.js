@@ -52,8 +52,6 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-chapter-exploration-input'));
   var confirmChapterCreationButton = element(
     by.css('.protractor-test-confirm-chapter-creation-button'));
-  var destinationSelect = element(
-    by.css('.protractor-test-destination-select'));
   var chapterTitles = element.all(by.css('.protractor-test-chapter-title'));
   var deleteChapterButton = element(
     by.css('.protractor-test-delete-chapter-button'));

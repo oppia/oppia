@@ -71,10 +71,21 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         """ClassifierTrainingJobModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'algorithm_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'training_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_scheduled_check_time':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'data_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -226,10 +237,15 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
         """TrainingJobExplorationMappingModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'job_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):
