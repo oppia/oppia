@@ -181,7 +181,7 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class SuggestionLanguageCodeMigrationOneOffJob(
+class PopulateSuggestionLanguageCodeMigrationOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to add the language_code field
     to suggestions that do not have that field yet. The language_code field
@@ -195,8 +195,10 @@ class SuggestionLanguageCodeMigrationOneOffJob(
         return [suggestion_models.GeneralSuggestionModel]
 
     @staticmethod
+    # Do nothing if the suggestion has been marked deleted or if the suggestion
+    # already has the language code property.
     def map(item):
-        if item.deleted:
+        if item.deleted or item.language_code:
             return
 
         # Getting the suggestion from the model creates the corresponding

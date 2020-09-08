@@ -1618,7 +1618,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, [expected_output])
 
 
-class SuggestionLanguageCodeMigrationOneOffJobTests(
+class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         test_utils.GenericTestBase):
 
     target_id = 'exp1'
@@ -1695,33 +1695,37 @@ class SuggestionLanguageCodeMigrationOneOffJobTests(
             if exp.id == exp_id:
                 return exp
 
-    def run_job_and_verify_output(self, expected_output):
-        """Runs the SuggestionLanguageCodeMigrationOneOffJob and verifies that
-        the output matches the expected output.
+    def _run_job_and_verify_output(self, expected_output):
+        """Runs the PopulateSuggestionLanguageCodeMigrationOneOffJob and
+        verifies that the output matches the expected output.
 
         Args:
             expected_output: list(str). The expected output from the one off
                 job.
         """
         job_id = (
-            suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.create_new())
+            suggestion_jobs_one_off
+            .PoluateSuggestionLanguageCodeMigrationOneOffJob.create_new())
         (
-            suggestion_jobs_one_off.SuggestionLanguageCodeMigrationOneOffJob
+            suggestion_jobs_one_off
+            .PopulateSuggestionLanguageCodeMigrationOneOffJob
             .enqueue(job_id)
         )
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            suggestion_jobs_one_off.
-            SuggestionLanguageCodeMigrationOneOffJob.get_output(job_id)
+            suggestion_jobs_one_off
+            .PopulateSuggestionLanguageCodeMigrationOneOffJob
+            .get_output(job_id)
         )
 
         self.assertEqual(len(actual_output), len(expected_output))
         self.assertEqual(actual_output, expected_output)
 
     def setUp(self):
-        super(SuggestionLanguageCodeMigrationOneOffJobTests, self).setUp()
+        super(
+            PopulateSuggestionLanguageCodeMigrationOneOffJobTests,
+            self).setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         # Add valid question state data to the question dict.
