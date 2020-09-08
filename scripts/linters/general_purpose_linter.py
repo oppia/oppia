@@ -149,7 +149,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'regexp': re.compile(r'\b(ddescribe|fdescribe)\('),
         'message': 'In tests, please use \'describe\' instead of \'ddescribe\''
                    'or \'fdescribe\'',
-        'excluded_files': ('unit-test-utils.ts'),
+        'excluded_files': (),
         'excluded_dirs': ()
     },
     {
@@ -255,7 +255,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'Please do not define "any" types. You can refer '
             'https://github.com/oppia/oppia/wiki/Guide-on-defining-types '
             'if you\'re having trouble declaring types.'),
-        'excluded_files': ('core/templates/tests/unit-test-utils.ts'),
+        'excluded_files': (),
         'excluded_dirs': ()
     },
     {
