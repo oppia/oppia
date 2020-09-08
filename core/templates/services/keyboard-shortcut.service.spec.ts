@@ -18,7 +18,7 @@
 import 'mousetrap';
 
 import { ApplicationRef } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, TestBed } from '@angular/core/testing';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { KeyboardShortcutHelpModalComponent } from
   // eslint-disable-next-line max-len
@@ -50,9 +50,6 @@ describe('Keyboard Shortcuts', () => {
   let windowRef;
   let appRef: ApplicationRef;
   let keyboardShortcutService;
-  let component: KeyboardShortcutHelpModalComponent;
-  let fixture: ComponentFixture<KeyboardShortcutHelpModalComponent>;
-  let ngbActiveModal: NgbActiveModal;
   let ngbModal: NgbModal;
 
 
@@ -69,10 +66,7 @@ describe('Keyboard Shortcuts', () => {
   }));
 
   beforeEach(async() => {
-    fixture = TestBed.createComponent(KeyboardShortcutHelpModalComponent);
     ngbModal = TestBed.get(NgbModal);
-    ngbActiveModal = TestBed.get(NgbActiveModal);
-    component = fixture.componentInstance;
     windowRef = new WindowRef();
     appRef = TestBed.get(ApplicationRef);
     keyboardShortcutService = new KeyboardShortcutService(
@@ -83,8 +77,8 @@ describe('Keyboard Shortcuts', () => {
   });
 
   beforeAll(() => {
-    skipButton.setAttribute('id', 'skipToMainContentId');
-    backButton.setAttribute('id', 'backButtonId');
+    skipButton.setAttribute('class', 'oppia-skip-to-content');
+    backButton.setAttribute('class', 'oppia-back-button');
     nextButton.setAttribute('class', 'oppia-next-button');
     continueButton.setAttribute('class', 'oppia-learner-confirm-button');
     searchBar.setAttribute('class', 'oppia-search-bar-text-input');

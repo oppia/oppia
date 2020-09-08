@@ -62,11 +62,6 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             config_models.PlatformParameterModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-    def test_get_export_policy_is_not_applicable(self):
-        self.assertEqual(
-            config_models.PlatformParameterModel.get_export_policy(),
-            base_models.EXPORT_POLICY.NOT_APPLICABLE)
-
     def test_create_model(self):
         param_model = config_models.PlatformParameterModel.create(
             param_name='parameter_name',

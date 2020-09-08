@@ -89,17 +89,17 @@
     </div>
 
     <div ng-if="!isInteractionInline() && !conceptCardIsBeingShown"
-         class="conversation-skin-inline-interaction" style="opacity: 0.8;">
-      <div style="padding: 6px 12px;">
+         class="conversation-skin-inline-interaction">
+      <div class="oppia-conversation-skin-instruction-container">
         <span ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}"> <[interactionInstructions]> </span>
-        <i ng-if="canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
-        <i ng-if="!canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18" style="position: relative;">&#xE5DB;</i>
+        <i ng-if="canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5C8;</i>
+        <i ng-if="!canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5DB;</i>
       </div>
     </div>
 
     <div ng-if="!getDisplayedCard().getInteractionId() && !isOnTerminalCard() && !conceptCardIsBeingShown">
       <div class="conversation-skin-inline-interaction">
-        <span style="color: red;">
+        <span class="oppia-no-interaction-text">
           <strong>Error</strong>: No interaction specified for '<[getDisplayedCard().getStateName()]>'.
         </span>
       </div>
@@ -222,6 +222,17 @@
   .conversation-skin-inline-interaction .conversation-skin-user-avatar {
     left: -20px;
     top: 14px;
+  }
+
+  tutor-card .oppia-conversation-skin-inline-interaction {
+    opacity: 0.8;
+  }
+
+  tutor-card .oppia-conversation-skin-instruction-container {
+    padding: 6px 12px;
+  }
+  tutor-card .oppia-no-interaction-text {
+    color: #FF0000;
   }
 
   /* When the size of the browser is reduced, and the answer submitted is

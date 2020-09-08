@@ -19,21 +19,11 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TestBed } from '@angular/core/testing';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { InteractionObjectFactory } from
-  'domain/exploration/InteractionObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
 
 const constants = require('constants.ts');
 
 describe('State Object Factory', () => {
-  let sof, shof, iof, pcof, rvof, wtof;
+  let sof;
   let stateObject;
   const oldNewStateTemplate = constants.NEW_STATE_TEMPLATE;
 
@@ -42,11 +32,6 @@ describe('State Object Factory', () => {
       providers: [CamelCaseToHyphensPipe]
     });
     sof = TestBed.get(StateObjectFactory);
-    shof = TestBed.get(SubtitledHtmlObjectFactory);
-    iof = TestBed.get(InteractionObjectFactory);
-    pcof = TestBed.get(ParamChangesObjectFactory);
-    rvof = TestBed.get(RecordedVoiceoversObjectFactory);
-    wtof = TestBed.get(WrittenTranslationsObjectFactory);
 
     stateObject = {
       classifier_model_id: null,

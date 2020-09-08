@@ -19,7 +19,6 @@ require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
 
 require('pages/story-editor-page/services/story-editor-state.service.ts');
-require('pages/story-editor-page/services/story-editor-navigation.service');
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
 require('services/assets-backend-api.service.ts');
@@ -30,11 +29,9 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('storyPreviewTab', {
   template: require('./story-preview-tab.component.html'),
   controller: [
-    '$scope', 'AssetsBackendApiService', 'StoryEditorNavigationService',
-    'StoryEditorStateService', 'UrlService',
+    'AssetsBackendApiService', 'StoryEditorStateService', 'UrlService',
     function(
-        $scope, AssetsBackendApiService, StoryEditorNavigationService,
-        StoryEditorStateService, UrlService) {
+        AssetsBackendApiService, StoryEditorStateService, UrlService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.initEditor = function() {

@@ -23,13 +23,9 @@ describe('Question Suggestion Service', function() {
   let CsrfTokenService = null;
   let QuestionObjectFactory = null;
   let QuestionSuggestionService = null;
-  let QuestionUndoRedoService = null;
   let SkillObjectFactory = null;
-  let StateEditorService = null;
 
   let question = null;
-  let questionId = null;
-  let questionStateData = null;
   let skill = null;
   const skillDifficulty = 0.3;
 

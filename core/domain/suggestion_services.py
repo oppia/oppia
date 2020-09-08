@@ -336,12 +336,12 @@ def accept_suggestion(
         user_id = suggestion.author_id
         score_category = suggestion.score_category
 
-        # Get user scoring domain object.
-        user_scoring = _get_user_scoring(user_id, score_category)
+        # Get user proficiency domain object.
+        user_proficiency = _get_user_proficiency(user_id, score_category)
 
         # Increment the score of the author due to their suggestion being
         # accepted.
-        user_scoring.increment_score(
+        user_proficiency.increment_score(
             suggestion_models.INCREMENT_SCORE_OF_AUTHOR_BY
         )
 
@@ -349,16 +349,16 @@ def accept_suggestion(
         # created when the score of the user passes the minimum score required
         # to review.
         if feconf.SEND_SUGGESTION_REVIEW_RELATED_EMAILS:
-            if user_scoring.can_user_review_category() and (
-                    not user_scoring.onboarding_email_sent):
+            if user_proficiency.can_user_review_category() and (
+                    not user_proficiency.onboarding_email_sent):
                 email_manager.send_mail_to_onboard_new_reviewers(
                     user_id, score_category
                 )
-                user_scoring.mark_onboarding_email_as_sent()
+                user_proficiency.mark_onboarding_email_as_sent()
 
-        # Need to update the corresponding user scoring model after we updated
-        # the domain object.
-        _update_user_scoring(user_scoring)
+        # Need to update the corresponding user proficiency model after we
+        # updated the domain object.
+        _update_user_proficiency(user_proficiency)
 
 
 def reject_suggestion(suggestion_id, reviewer_id, review_message):
@@ -508,7 +508,7 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
         to review.
     """
     score_categories = (
-        user_models.UserContributionScoringModel
+        user_models.UserContributionProficiencyModel
         .get_all_categories_where_user_can_review(user_id))
 
     if len(score_categories) == 0:
@@ -571,51 +571,51 @@ def get_submitted_suggestions(user_id, suggestion_type):
     ])
 
 
-def get_user_scoring_from_model(user_scoring_model):
-    """Converts the given UserContributionScoringModel to a
-    UserContributionScoring domain object.
+def get_user_proficiency_from_model(user_proficiency_model):
+    """Converts the given UserContributionProficiencyModel to a
+    UserContributionProficiency domain object.
 
     Args:
-        user_scoring_model: UserContributionScoringModel.
-            UserContributionScoringModel to be
-            converted to UserContributionScoring domain object.
+        user_proficiency_model: UserContributionProficiencyModel.
+            UserContributionProficiencyModel to be converted to
+            a UserContributionProficiency domain object.
 
     Returns:
-        UserContributionScoring. The corresponding UserContributionScoring
-        domain object.
+        UserContributionProficiency. The corresponding
+        UserContributionProficiency domain object.
     """
-    return user_domain.UserContributionScoring(
-        user_scoring_model.user_id, user_scoring_model.score_category,
-        user_scoring_model.score,
-        user_scoring_model.onboarding_email_sent
+    return user_domain.UserContributionProficiency(
+        user_proficiency_model.user_id, user_proficiency_model.score_category,
+        user_proficiency_model.score,
+        user_proficiency_model.onboarding_email_sent
     )
 
 
-def _update_user_scoring(user_scoring):
-    """Updates the user_scoring.
+def _update_user_proficiency(user_proficiency):
+    """Updates the user_proficiency.
 
     Args:
-        user_scoring: UserContributionScoring. The user scoring to be
-            updated.
+        user_proficiency: UserContributionProficiency. The user proficiency to
+            be updated.
     """
-    user_scoring_model = user_models.UserContributionScoringModel.get(
-        user_scoring.user_id, user_scoring.score_category
+    user_proficiency_model = user_models.UserContributionProficiencyModel.get(
+        user_proficiency.user_id, user_proficiency.score_category
     )
 
-    if user_scoring_model is not None:
-        user_scoring_model.user_id = user_scoring.user_id
-        user_scoring_model.score_category = user_scoring.score_category
-        user_scoring_model.score = user_scoring.score
-        user_scoring_model.onboarding_email_sent = (
-            user_scoring.onboarding_email_sent
+    if user_proficiency_model is not None:
+        user_proficiency_model.user_id = user_proficiency.user_id
+        user_proficiency_model.score_category = user_proficiency.score_category
+        user_proficiency_model.score = user_proficiency.score
+        user_proficiency_model.onboarding_email_sent = (
+            user_proficiency.onboarding_email_sent
         )
 
-        user_scoring_model.put()
+        user_proficiency_model.put()
 
     else:
-        user_models.UserContributionScoringModel.create(
-            user_scoring.user_id, user_scoring.score_category,
-            user_scoring.score, user_scoring.onboarding_email_sent)
+        user_models.UserContributionProficiencyModel.create(
+            user_proficiency.user_id, user_proficiency.score_category,
+            user_proficiency.score, user_proficiency.onboarding_email_sent)
 
 
 def get_all_scores_of_user(user_id):
@@ -630,7 +630,7 @@ def get_all_scores_of_user(user_id):
     """
     scores = {}
     for model in (
-            user_models.UserContributionScoringModel.get_all_scores_of_user(
+            user_models.UserContributionProficiencyModel.get_all_scores_of_user(
                 user_id)):
         scores[model.score_category] = model.score
 
@@ -650,8 +650,8 @@ def can_user_review_category(user_id, score_category):
         bool. Whether the user can review suggestions under category
         score_category.
     """
-    user_scoring = _get_user_scoring(user_id, score_category)
-    return user_scoring.can_user_review_category()
+    user_proficiency = _get_user_proficiency(user_id, score_category)
+    return user_proficiency.can_user_review_category()
 
 
 def get_all_user_ids_who_are_allowed_to_review(score_category):
@@ -666,31 +666,32 @@ def get_all_user_ids_who_are_allowed_to_review(score_category):
         category.
     """
     return [
-        model.user_id for model in user_models.UserContributionScoringModel
+        model.user_id for model in user_models.UserContributionProficiencyModel
         .get_all_users_with_score_above_minimum_for_category(score_category)
     ]
 
 
-def _get_user_scoring(user_id, score_category):
-    """Gets the user scoring model from storage and creates the
-    corresponding user scoring domain object if the model exists. If the model
-    does not exist a user scoring domain object with the given user_id and
-    score category is created with the initial score and email values.
+def _get_user_proficiency(user_id, score_category):
+    """Gets the user proficiency model from storage and creates the
+    corresponding user proficiency domain object if the model exists. If the
+    model does not exist a user proficiency domain object with the given
+    user_id and score category is created with the initial score and email
+    values.
 
     Args:
         user_id: str. The id of the user.
         score_category: str. The category of the suggestion.
 
     Returns:
-        UserContributionScoring. The user scoring object.
+        UserContributionProficiency. The user proficiency object.
     """
-    user_scoring_model = user_models.UserContributionScoringModel.get(
+    user_proficiency_model = user_models.UserContributionProficiencyModel.get(
         user_id, score_category)
 
-    if user_scoring_model is not None:
-        return get_user_scoring_from_model(user_scoring_model)
+    if user_proficiency_model is not None:
+        return get_user_proficiency_from_model(user_proficiency_model)
 
-    return user_domain.UserContributionScoring(
+    return user_domain.UserContributionProficiency(
         user_id, score_category, 0, False)
 
 
