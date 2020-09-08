@@ -662,8 +662,8 @@
 /manifest.json @seanlip
 # TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /package.json @seanlip
-/requirements.txt @seanlip
-/requirements.in @seanlip
+/requirements.txt @vojtechjelinek
+/requirements.in @vojtechjelinek
 # TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
 /yarn.lock @seanlip
 # TODO(#10538): Revert ownership to @vojtechjelinek after 2020-09-06.
