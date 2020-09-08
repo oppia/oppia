@@ -929,8 +929,8 @@ class Skill(python_utils.OBJECT):
 
         Returns:
             str. The format is '<skill_id>-<misconception_id>', where skill_id
-                is the skill ID of the misconception and misconception_id is
-                the id of the misconception.
+            is the skill ID of the misconception and misconception_id is
+            the id of the misconception.
         """
         return '%s-%d' % (self.id, misconception_id)
 
