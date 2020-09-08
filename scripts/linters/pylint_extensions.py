@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0029.
+presubmit checks. Next message id would be C0033.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -1571,40 +1571,6 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
             self.add_message('newline-at-eof', line=file_length)
 
 
-class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
-    """Checks if only one space is used after a yield statement
-    when applicable ('yield' is acceptable).
-    """
-
-    __implements__ = interfaces.IAstroidChecker
-
-    name = 'single-space-after-yield'
-    priority = -1
-    msgs = {
-        'C0010': (
-            'Not using \'yield\' or a single space after yield statement.',
-            'single-space-after-yield',
-            'Ensure a single space is used after yield statement.',
-        ),
-    }
-
-    def visit_yield(self, node):
-        """Visit every yield statement to ensure that yield keywords are
-        followed by exactly one space, so matching 'yield *' where * is not a
-        whitespace character. Note that 'yield' is also acceptable in
-        cases where the user wants to yield nothing.
-
-        Args:
-            node: astroid.nodes.Yield. Nodes to access yield statements.
-                content.
-        """
-        line_number = node.fromlineno
-        line = linecache.getline(node.root().file, line_number).lstrip()
-        if (line.startswith(b'yield') and
-                not re.search(br'^(yield)( \S|$|\w)', line)):
-            self.add_message('single-space-after-yield', node=node)
-
-
 class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
     """Checks if there are excessive newlines between method definitions."""
 
@@ -1917,30 +1883,52 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
                         'single-line-pragma', line=line_num)
 
 
-class SingleSpaceAfterIfElifWhileChecker(checkers.BaseChecker):
+class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
     """Custom pylint checker which checks that there is a single space
-    between an `if`, `elif`, or `while` statement and a bracket `(` if
-    a bracket is used.
+    between a keyword and a bracket `(` if a bracket is used. Nodes
+    tested are `If`, `IfExp`, `While`, and `Yield`.
     """
 
     __implements__ = interfaces.IAstroidChecker
 
-    name = 'single-space-after-if-elif-while'
+    name = 'single-space-after-if'
     priority = -1
     msgs = {
-        # ERIC: Figure out how to name this message. Does 'C0029' make sense?
         'C0029': (
-            (
-                'A single space is needed between an `if`, `elif`, or `while` '
-                'and the parenthesis.'),
-            'single-space-after-if-elif-while',
-            (
-                'Add a single space between the `if`, `elif`, or `while` '
-                'and the parenthesis.')
+            'Not using a single space after `if` statement.',
+            'single-space-after-if',
+            'Add a single space after the `if` statement.',
+        ),
+    }
+    name = 'single-space-after-elif'
+    priority = -1
+    msgs = {
+        'C0030': (
+            'Not using a single space after `elif` statement.',
+            'single-space-after-elif',
+            'Add a single space after the `elif` statement.',
+        ),
+    }
+    name = 'single-space-after-while'
+    priority = -1
+    msgs = {
+        'C0031': (
+            'Not using a single space after `while` statement.',
+            'single-space-after-while',
+            'Add a single space after the `while` statement.',
+        ),
+    }
+    name = 'single-space-after-yield'
+    priority = -1
+    msgs = {
+        'C0032': (
+            'Not using \'yield\' or a single space after `yield` statement.',
+            'single-space-after-yield',
+            'Add a single space after the `yield` statement.',
         ),
     }
 
-    def visit_if_elif(self, node):
+    def visit_if(self, node):
         """Visit every `if`, and `elif` statement to make sure they are
         followed by a single space.
 
@@ -1956,8 +1944,7 @@ class SingleSpaceAfterIfElifWhileChecker(checkers.BaseChecker):
             first_space_index = line.find(' ')
             # There should be exactly one space between these indices.
             if parenthesis_index - first_space_index != 1:
-                self.add_message(
-                    'single-space-after-if-elif-while', line=line_number)
+                self.add_message('single-space-after-if', line=line_number)
 
         # Check each `elif` that has a parenthesis.
         for line_number in python_utils.RANGE(line_number, node.tolineno + 1):
@@ -1968,7 +1955,26 @@ class SingleSpaceAfterIfElifWhileChecker(checkers.BaseChecker):
                 # There should be exactly one space between these indices.
                 if parenthesis_index - first_space_index != 1:
                     self.add_message(
-                        'single-space-after-if-elif-while', line=line_number)
+                        'single-space-after-elif', line=line_number)
+
+    def visit_if_exp(self, node):
+        """Visit every `if` in a `value if condition else other` statement
+        to make sure they are followed by a single space.
+
+        Args:
+            node: astroid.nodes.IfExp. Node to access `IfExp` content.
+        """
+
+        # Check the `if` statement only if it has a parenthesis.
+        line_number = node.fromlineno
+        line = linecache.getline(node.root().file, line_number).strip()
+        idx = re.search(br'\sif\s*\(', line).start()
+        if idx:
+            parenthesis_index = line.find('(', idx + 1)
+            first_space_index = line.find(' ', idx + 1)
+            # There should be exactly one space between these indices.
+            if parenthesis_index - first_space_index != 1:
+                self.add_message('single-space-after-if', line=line_number)
 
     def visit_while(self, node):
         """Visit every `while` statement to make sure they are followed
@@ -1985,7 +1991,23 @@ class SingleSpaceAfterIfElifWhileChecker(checkers.BaseChecker):
             # There should be exactly one space between these indices.
             if parenthesis_index - first_space_index != 1:
                 self.add_message(
-                    'single-space-after-if-elif-while', node=node)
+                    'single-space-after-while', node=node)
+
+    def visit_yield(self, node):
+        """Visit every yield statement to ensure that yield keywords are
+        followed by exactly one space, so matching 'yield *' where * is not a
+        whitespace character. Note that 'yield' is also acceptable in
+        cases where the user wants to yield nothing.
+
+        Args:
+            node: astroid.nodes.Yield. Nodes to access yield statements.
+                content.
+        """
+        line_number = node.fromlineno
+        line = linecache.getline(node.root().file, line_number).lstrip()
+        if (line.startswith(b'yield') and
+                not re.search(br'^(yield)( \S|$|\w)', line)):
+            self.add_message('single-space-after-yield', node=node)
 
 
 def register(linter):
@@ -2002,10 +2024,9 @@ def register(linter):
     linter.register_checker(FunctionArgsOrderChecker(linter))
     linter.register_checker(RestrictedImportChecker(linter))
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
-    linter.register_checker(SingleSpaceAfterYieldChecker(linter))
     linter.register_checker(ExcessiveEmptyLinesChecker(linter))
     linter.register_checker(DivisionOperatorChecker(linter))
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
     linter.register_checker(SingleLinePragmaChecker(linter))
-    linter.register_checker(SingleSpaceAfterIfElifWhileChecker(linter))
+    linter.register_checker(SingleSpaceAfterKeyWordChecker(linter))

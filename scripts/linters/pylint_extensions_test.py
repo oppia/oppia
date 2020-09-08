@@ -2131,173 +2131,6 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
             temp_file.close()
 
 
-class SingleSpaceAfterYieldTests(unittest.TestCase):
-
-    def setUp(self):
-        super(SingleSpaceAfterYieldTests, self).setUp()
-        self.checker_test_object = testutils.CheckerTestCase()
-        self.checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.SingleSpaceAfterYieldChecker)
-        self.checker_test_object.setup_method()
-
-    def test_well_formed_yield_statement_on_single_line(self):
-        node_well_formed_one_line_yield_file = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def helloworld():
-                    \"\"\"Below is the yield statement.\"\"\"
-                    yield (5, 2)
-                """)
-        node_well_formed_one_line_yield_file.file = filename
-        node_well_formed_one_line_yield_file.path = filename
-        node_well_formed_one_line_yield_file.fromlineno = 3
-
-        self.checker_test_object.checker.visit_yield(
-            node_well_formed_one_line_yield_file)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_well_formed_yield_statement_on_multiple_lines(self):
-        node_well_formed_mult_lines_file = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def helloworld():
-                    yield (
-                        'This line was too long to be put on one line.')
-                """)
-        node_well_formed_mult_lines_file.file = filename
-        node_well_formed_mult_lines_file.path = filename
-        node_well_formed_mult_lines_file.fromlineno = 2
-
-        self.checker_test_object.checker.visit_yield(
-            node_well_formed_mult_lines_file)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_yield_nothing(self):
-        yield_nothing_file = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def helloworld():
-                    yield
-                """)
-        yield_nothing_file.file = filename
-        yield_nothing_file.path = filename
-        yield_nothing_file.fromlineno = 2
-
-        self.checker_test_object.checker.visit_yield(
-            yield_nothing_file)
-
-        # No errors on yield statements that do nothing.
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_yield_in_multi_line_comment(self):
-        yield_in_multiline_file = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def helloworld():
-                    \"\"\"
-                        yield(\"invalid yield format\")
-                    \"\"\"
-                    extract_node(\"\"\"
-                        yield   (invalid)
-                    \"\"\")
-                    extract_node(
-                    b\"\"\"
-                        yield(1, 2)
-                    \"\"\")
-                    extract_node(
-                    u\"\"\"
-                        yield(3, 4)
-                    \"\"\")
-                    )
-                """)
-        yield_in_multiline_file.file = filename
-        yield_in_multiline_file.path = filename
-
-        self.checker_test_object.checker.visit_yield(
-            yield_in_multiline_file)
-
-        # No errors on yield statements in multi-line comments.
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
-    def test_too_many_spaces_after_yield_statement(self):
-        node_too_many_spaces_after_yield_file = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def helloworld():
-                    yield  (5, 2)
-                """)
-        node_too_many_spaces_after_yield_file.file = filename
-        node_too_many_spaces_after_yield_file.path = filename
-        node_too_many_spaces_after_yield_file.fromlineno = 2
-
-        self.checker_test_object.checker.visit_yield(
-            node_too_many_spaces_after_yield_file)
-
-        message = testutils.Message(
-            msg_id='single-space-after-yield',
-            node=node_too_many_spaces_after_yield_file)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_no_space_after_yield_statement(self):
-        node_no_spaces_after_yield_file = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""def helloworld():
-                    yield(5, 2)
-                """)
-        node_no_spaces_after_yield_file.file = filename
-        node_no_spaces_after_yield_file.path = filename
-        node_no_spaces_after_yield_file.fromlineno = 2
-
-        self.checker_test_object.checker.visit_yield(
-            node_no_spaces_after_yield_file)
-
-        message = testutils.Message(
-            msg_id='single-space-after-yield',
-            node=node_no_spaces_after_yield_file)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-
 class ExcessiveEmptyLinesCheckerTests(unittest.TestCase):
 
     def test_checks_excessive_empty_lines(self):
@@ -2991,17 +2824,19 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
             temp_file.close()
 
 
-class SingleSpaceAfterIfElifWhileCheckerTests(unittest.TestCase):
+class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(SingleSpaceAfterIfElifWhileCheckerTests, self).setUp()
+        super(SingleSpaceAfterKeyWordCheckerTests, self).setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.SingleSpaceAfterIfElifWhileChecker)
+            pylint_extensions.SingleSpaceAfterKeyWordChecker)
         self.checker_test_object.setup_method()
 
-    def test_no_space_after_if_elif(self):
-        node_no_space_after_if_elif = astroid.nodes.If()
+    # Tests for `If` Nodes.
+
+    def test_no_space_after_if(self):
+        node_no_space_after_if = astroid.nodes.If()
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
 
@@ -3012,25 +2847,143 @@ class SingleSpaceAfterIfElifWhileCheckerTests(unittest.TestCase):
                     elif(True):
                         pass
                 """)
-        node_no_space_after_if_elif.file = filename
-        node_no_space_after_if_elif.path = filename
-        node_no_space_after_if_elif.fromlineno = 1
-        node_no_space_after_if_elif.tolineno = 4
+        node_no_space_after_if.file = filename
+        node_no_space_after_if.path = filename
+        node_no_space_after_if.fromlineno = 1
+        node_no_space_after_if.tolineno = 4
 
-        self.checker_test_object.checker.visit_if_elif(
-            node_no_space_after_if_elif)
+        self.checker_test_object.checker.visit_if(
+            node_no_space_after_if)
 
         if_message = testutils.Message(
-            msg_id='single-space-after-if-elif-while',
+            msg_id='single-space-after-if',
             line=1)
         elif_message = testutils.Message(
-            msg_id='single-space-after-if-elif-while',
+            msg_id='single-space-after-elif',
             line=3)
 
         with self.checker_test_object.assertAddsMessages(
             if_message, elif_message):
             temp_file.close()
 
+
+    def test_multiple_spaces_after_if(self):
+        test_multiple_spaces_after_if = astroid.nodes.If()
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""if  (False):
+                        pass
+                    elif  (True):
+                        pass
+                """)
+        test_multiple_spaces_after_if.file = filename
+        test_multiple_spaces_after_if.path = filename
+        test_multiple_spaces_after_if.fromlineno = 1
+        test_multiple_spaces_after_if.tolineno = 4
+
+        self.checker_test_object.checker.visit_if(
+            test_multiple_spaces_after_if)
+
+        if_message = testutils.Message(
+            msg_id='single-space-after-if',
+            line=1)
+        elif_message = testutils.Message(
+            msg_id='single-space-after-elif',
+            line=3)
+
+        with self.checker_test_object.assertAddsMessages(
+            if_message, elif_message):
+            temp_file.close()
+
+    def test_single_space_after_if(self):
+        node_single_space_after_if = astroid.nodes.If()
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""if (False):
+                        pass
+                    elif (True):
+                        pass
+                """)
+        node_single_space_after_if.file = filename
+        node_single_space_after_if.path = filename
+        node_single_space_after_if.fromlineno = 1
+        node_single_space_after_if.tolineno = 4
+
+        self.checker_test_object.checker.visit_if(
+            node_single_space_after_if)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    # Tests for `IfExp` Nodes.
+
+    def test_no_space_after_if_exp(self):
+        node_no_space_after_if_exp = astroid.nodes.IfExp()
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(u"""var = True if(False) else False""")
+        node_no_space_after_if_exp.file = filename
+        node_no_space_after_if_exp.path = filename
+        node_no_space_after_if_exp.fromlineno = 1
+
+        self.checker_test_object.checker.visit_if_exp(
+            node_no_space_after_if_exp)
+
+        if_message = testutils.Message(
+            msg_id='single-space-after-if',
+            line=1)
+
+        with self.checker_test_object.assertAddsMessages(if_message):
+            temp_file.close()
+
+
+    def test_multiple_spaces_after_if_exp(self):
+        test_multiple_spaces_after_if_exp = astroid.nodes.IfExp()
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(u"""var = True if     (False) else False""")
+        test_multiple_spaces_after_if_exp.file = filename
+        test_multiple_spaces_after_if_exp.path = filename
+        test_multiple_spaces_after_if_exp.fromlineno = 1
+
+        self.checker_test_object.checker.visit_if_exp(
+            test_multiple_spaces_after_if_exp)
+
+        if_message = testutils.Message(
+            msg_id='single-space-after-if',
+            line=1)
+
+        with self.checker_test_object.assertAddsMessages(if_message):
+            temp_file.close()
+
+    def test_single_space_after_if_exp(self):
+        node_single_space_after_if_exp = astroid.nodes.If()
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(u"""var = True if (False) else False""")
+        node_single_space_after_if_exp.file = filename
+        node_single_space_after_if_exp.path = filename
+        node_single_space_after_if_exp.fromlineno = 1
+
+        self.checker_test_object.checker.visit_if(
+            node_single_space_after_if_exp)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    # Tests for `While` Nodes.
 
     def test_no_space_after_while(self):
         node_no_space_after_while = astroid.nodes.While()
@@ -3050,43 +3003,12 @@ class SingleSpaceAfterIfElifWhileCheckerTests(unittest.TestCase):
             node_no_space_after_while)
 
         while_message = testutils.Message(
-            msg_id='single-space-after-if-elif-while',
+            msg_id='single-space-after-while',
             node=node_no_space_after_while)
 
         with self.checker_test_object.assertAddsMessages(while_message):
             temp_file.close()
 
-
-    def test_multiple_spaces_after_if_elif(self):
-        test_multiple_spaces_after_if_elif = astroid.nodes.If()
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""if  (False):
-                        pass
-                    elif  (True):
-                        pass
-                """)
-        test_multiple_spaces_after_if_elif.file = filename
-        test_multiple_spaces_after_if_elif.path = filename
-        test_multiple_spaces_after_if_elif.fromlineno = 1
-        test_multiple_spaces_after_if_elif.tolineno = 4
-
-        self.checker_test_object.checker.visit_if_elif(
-            test_multiple_spaces_after_if_elif)
-
-        if_message = testutils.Message(
-            msg_id='single-space-after-if-elif-while',
-            line=1)
-        elif_message = testutils.Message(
-            msg_id='single-space-after-if-elif-while',
-            line=3)
-
-        with self.checker_test_object.assertAddsMessages(
-            if_message, elif_message):
-            temp_file.close()
 
     def test_multiple_spaces_after_while(self):
         node_multiple_spaces_after_while = astroid.nodes.While()
@@ -3106,34 +3028,10 @@ class SingleSpaceAfterIfElifWhileCheckerTests(unittest.TestCase):
             node_multiple_spaces_after_while)
 
         while_message = testutils.Message(
-            msg_id='single-space-after-if-elif-while',
+            msg_id='single-space-after-while',
             node=node_multiple_spaces_after_while)
 
         with self.checker_test_object.assertAddsMessages(while_message):
-            temp_file.close()
-
-
-    def test_single_space_after_if_elif(self):
-        node_single_space_after_if_elif = astroid.nodes.If()
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""if (False):
-                        pass
-                    elif (True):
-                        pass
-                """)
-        node_single_space_after_if_elif.file = filename
-        node_single_space_after_if_elif.path = filename
-        node_single_space_after_if_elif.fromlineno = 1
-        node_single_space_after_if_elif.tolineno = 4
-
-        self.checker_test_object.checker.visit_if_elif(
-            node_single_space_after_if_elif)
-
-        with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
 
@@ -3155,4 +3053,163 @@ class SingleSpaceAfterIfElifWhileCheckerTests(unittest.TestCase):
             node_single_space_after_while)
 
         with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    # Tests for `Yield` Nodes.
+
+    def test_well_formed_yield_statement_on_single_line(self):
+        node_well_formed_one_line_yield_file = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def helloworld():
+                    \"\"\"Below is the yield statement.\"\"\"
+                    yield (5, 2)
+                """)
+        node_well_formed_one_line_yield_file.file = filename
+        node_well_formed_one_line_yield_file.path = filename
+        node_well_formed_one_line_yield_file.fromlineno = 3
+
+        self.checker_test_object.checker.visit_yield(
+            node_well_formed_one_line_yield_file)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_well_formed_yield_statement_on_multiple_lines(self):
+        node_well_formed_mult_lines_file = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def helloworld():
+                    yield (
+                        'This line was too long to be put on one line.')
+                """)
+        node_well_formed_mult_lines_file.file = filename
+        node_well_formed_mult_lines_file.path = filename
+        node_well_formed_mult_lines_file.fromlineno = 2
+
+        self.checker_test_object.checker.visit_yield(
+            node_well_formed_mult_lines_file)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_yield_nothing(self):
+        yield_nothing_file = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def helloworld():
+                    yield
+                """)
+        yield_nothing_file.file = filename
+        yield_nothing_file.path = filename
+        yield_nothing_file.fromlineno = 2
+
+        self.checker_test_object.checker.visit_yield(
+            yield_nothing_file)
+
+        # No errors on yield statements that do nothing.
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_yield_in_multi_line_comment(self):
+        yield_in_multiline_file = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def helloworld():
+                    \"\"\"
+                        yield(\"invalid yield format\")
+                    \"\"\"
+                    extract_node(\"\"\"
+                        yield   (invalid)
+                    \"\"\")
+                    extract_node(
+                    b\"\"\"
+                        yield(1, 2)
+                    \"\"\")
+                    extract_node(
+                    u\"\"\"
+                        yield(3, 4)
+                    \"\"\")
+                    )
+                """)
+        yield_in_multiline_file.file = filename
+        yield_in_multiline_file.path = filename
+
+        self.checker_test_object.checker.visit_yield(
+            yield_in_multiline_file)
+
+        # No errors on yield statements in multi-line comments.
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_too_many_spaces_after_yield_statement(self):
+        node_too_many_spaces_after_yield_file = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def helloworld():
+                    yield  (5, 2)
+                """)
+        node_too_many_spaces_after_yield_file.file = filename
+        node_too_many_spaces_after_yield_file.path = filename
+        node_too_many_spaces_after_yield_file.fromlineno = 2
+
+        self.checker_test_object.checker.visit_yield(
+            node_too_many_spaces_after_yield_file)
+
+        message = testutils.Message(
+            msg_id='single-space-after-yield',
+            node=node_too_many_spaces_after_yield_file)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_no_space_after_yield_statement(self):
+        node_no_spaces_after_yield_file = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""def helloworld():
+                    yield(5, 2)
+                """)
+        node_no_spaces_after_yield_file.file = filename
+        node_no_spaces_after_yield_file.path = filename
+        node_no_spaces_after_yield_file.fromlineno = 2
+
+        self.checker_test_object.checker.visit_yield(
+            node_no_spaces_after_yield_file)
+
+        message = testutils.Message(
+            msg_id='single-space-after-yield',
+            node=node_no_spaces_after_yield_file)
+
+        with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
