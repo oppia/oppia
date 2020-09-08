@@ -121,7 +121,7 @@ export class BaseUndoRedo {
     return committableChangeList;
   }
 
-  setChangesList(changeList: Change[]): void {
+  setChangeList(changeList: Change[]): void {
     this._appliedChanges = changeList;
   }
 
