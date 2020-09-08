@@ -89,8 +89,10 @@ export const bootstrap = (
     // module. In order to closer emulate what happens in real application,
     // ensure AngularJS is bootstrapped inside the Angular zone.
     ngZone.run(() => upgrade.bootstrap(
-      // This throws "Type '($provide: any) => string' is not assignable to
-      // type 'string'."
+      // This throws "Type '($provide) => string' is not assignable to
+      // type 'string'". We need to suppress this error because typescript 
+      // expects the module name to be an string but a custom module is
+      // needed here.
       // @ts-ignore
       element, [failHardModule, ng1Module.name]));
 
