@@ -4,15 +4,15 @@
 
 <div class="modal-body">
   <section class="oppia-suggestion-review-container">
-    <div class="oppia-suggestion-review-panel-container" style="float: left;">
+    <div class="oppia-suggestion-review-panel-container float-left">
       <strong>Current:</strong>
       <div class="oppia-suggestion-review-panel">
         <angular-html-bind ng-if="currentContent" html-data="currentContent">
         </angular-html-bind>
-        <div ng-if="!currentContent" style="color: red;">Oops! This state no longer exists!</div>
+        <div ng-if="!currentContent" class="oppia-state-not-exist-text">Oops! This state no longer exists!</div>
       </div>
     </div>
-    <div class="oppia-suggestion-review-panel-container" style="float: right;">
+    <div class="oppia-suggestion-review-panel-container float-right">
       <strong>Suggested:</strong>
       <div class="oppia-suggestion-review-panel">
         <angular-html-bind html-data="newContent">
@@ -20,13 +20,13 @@
       </div>
     </div>
   </section>
-  <div ng-show="canAccept" style="margin-top: 20px; margin-left: 10px;">
+  <div ng-show="canAccept" class="oppia-review-message-text">
     Review message (required if rejecting):
-    <input class="protractor-test-suggestion-review-message" type="text" ng-model="reviewMessage" style="width: 100%">
+    <input class="protractor-test-suggestion-review-message w-100" type="text" ng-model="reviewMessage">
   </div>
-  <div style="margin-top: 20px; margin-left: 10px;" ng-show="canAccept">
+  <div class="oppia-review-message-text" ng-show="canAccept">
     Brief Description of Changes (required if accepting):
-    <input class="protractor-test-suggestion-commit-message" type="text" ng-model="commitMessage" maxlength="1000" style="width: 100%">
+    <input class="protractor-test-suggestion-commit-message w-100" type="text" ng-model="commitMessage" maxlength="1000">
   </div>
 </div>
 
@@ -42,3 +42,12 @@
     <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
   </span>
 </div>
+<style>
+  .modal-body .oppia-state-not-exist-text {
+    color: #FF0000;
+  }
+  .modal-body .oppia-review-message-text {
+    margin-left: 10px;
+    margin-top: 20px;
+  }
+</style>
