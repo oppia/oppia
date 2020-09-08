@@ -38,6 +38,10 @@ export class PageTitleService {
     return this.titleService.getTitle();
   }
 
+  /**
+   * Updates the description meta tag in the current HTML page
+   * with the provided content.
+   */
   updateMetaTag(content: string): void {
     this.metaTagService.updateTag({
       name: 'description',
