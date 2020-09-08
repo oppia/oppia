@@ -29,7 +29,8 @@ TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
 PREREQUISITES = [
     ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
-    ('future', '0.17.1', os.path.join('third_party', 'future-0.17.1')),
+    ('future', '0.17.1', os.path.join(
+        'third_party', 'python_libs')),
 ]
 
 for package_name, version_number, target_path in PREREQUISITES:
