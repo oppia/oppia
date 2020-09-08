@@ -124,7 +124,6 @@ jobs:
       - persist_to_workspace:
           root: /home/circleci/
           paths:
-            - oppia/core/domain/proto/
             - oppia/node_modules/
             - oppia/third_party/
             - oppia_tools/
@@ -246,7 +245,7 @@ jobs:
       - run:
           name: Run e2e contributor dashboard test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --contributor_dashboard_enabled
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard"
 
   e2e_non_prod_new_structure_tests:
     <<: *job_defaults
