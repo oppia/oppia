@@ -2312,6 +2312,7 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
     USER_ID = 'user_id'
     USER_GAE_ID = 'gae_id'
     PROFILE_ID = 'profile_id'
+    PROFILE_2_ID = 'profile_2_id'
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -2323,6 +2324,11 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
         ).put()
         user_models.UserAuthDetailsModel(
             id=self.PROFILE_ID,
+            gae_id=None,
+            parent_user_id=self.USER_ID
+        ).put()
+        user_models.UserAuthDetailsModel(
+            id=self.PROFILE_2_ID,
             gae_id=None,
             parent_user_id=self.USER_ID
         ).put()
