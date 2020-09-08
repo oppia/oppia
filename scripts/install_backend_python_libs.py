@@ -366,7 +366,7 @@ def validate_metadata_directories():
     # can provide to `pip install` to actually guarantee that a certain casing
     # format is used to create the directory names. The only official guidelines
     # for naming directories is that it must start with the string:
-    # <library_name>-<library-version> but no casing guidelines are specified.
+    # '<library_name>-<library-version>' but no casing guidelines are specified.
     # Therefore, in order to efficiently check if a python library's metadata
     # exists in a directory, we need to normalize the directory name. Otherwise,
     # we would need to check every permutation of the casing.
