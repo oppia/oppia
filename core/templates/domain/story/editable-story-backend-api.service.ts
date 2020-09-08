@@ -21,8 +21,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+/*import { EDITABLE_STORY_DATA_URL_TEMPLATE };
+import { STORY_PUBLISH_URL_TEMPLATE };
+import { STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE };
+import { VALIDATE_EXPLORATIONS_URL_TEMPLATE };*/
 import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 import cloneDeep from 'lodash/cloneDeep';
+//import { from } from 'rxjs';
 
 
 @Injectable({
@@ -48,9 +53,14 @@ export class EditableStoryBackendApiService {
       editableStoryDataUrl, { observe: 'response'}).toPromise().then(
       (response) => {
         this.storyDataDict = cloneDeep(response.body);
+        /*var story = angular.copy(response.body.story);
+        var topicName = angular.copy(response.body.topic_name);
+        var storyIsPublished = response.body.story_is_published;
+        var skillSummaries = angular.copy(response.body.skill_summaries);
+        var topicUrlFragment = response.body.topic_url_fragment;
+        var classroomUrlFragment = response.body.classroom_url_fragment;*/
         if (successCallback) {
-          successCallback(this.storyDataDict
-            );
+          successCallback(this.storyDataDict);
         }
       }, (errorResponse) => {
         if (errorCallback) {
