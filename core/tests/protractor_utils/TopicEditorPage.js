@@ -271,7 +271,7 @@ var TopicEditorPage = function() {
 
   this.dragSkillToSubtopic = async function(skillDescription, subtopicIndex) {
     await waitFor.visibilityOf(
-      uncategorizedSkills.first(),
+      await uncategorizedSkills.first(),
       'Uncategorized skills taking too long to appear.');
     const target = subtopicColumns.get(subtopicIndex);
     var uncategorizedSkillIndex = -1;
