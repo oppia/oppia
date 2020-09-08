@@ -62,11 +62,6 @@ _PARSER.add_argument(
 
 def cleanup():
     """Deactivates webpages and deletes html lighthouse reports."""
-
-    pattern = 'CONTRIBUTOR_DASHBOARD_ENABLED = .*'
-    replace = 'CONTRIBUTOR_DASHBOARD_ENABLED = False'
-    common.inplace_replace_file(common.FECONF_PATH, pattern, replace)
-
     pattern = '"ENABLE_ACCOUNT_DELETION": .*'
     replace = '"ENABLE_ACCOUNT_DELETION": false,'
     common.inplace_replace_file(common.CONSTANTS_FILE_PATH, pattern, replace)
@@ -168,10 +163,6 @@ def run_lighthouse_checks(lighthouse_mode):
 
 def enable_webpages():
     """Enables deactivated webpages for testing."""
-    pattern = 'CONTRIBUTOR_DASHBOARD_ENABLED = .*'
-    replace = 'CONTRIBUTOR_DASHBOARD_ENABLED = True'
-    common.inplace_replace_file(common.FECONF_PATH, pattern, replace)
-
     pattern = '"ENABLE_ACCOUNT_DELETION": .*'
     replace = '"ENABLE_ACCOUNT_DELETION": true,'
     common.inplace_replace_file(common.CONSTANTS_FILE_PATH, pattern, replace)
