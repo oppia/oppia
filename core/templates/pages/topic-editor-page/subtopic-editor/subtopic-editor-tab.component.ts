@@ -292,6 +292,9 @@ angular.module('oppia').component('subtopicEditorTab', {
           TopicEditorStateService.onTopicReinitialized.subscribe(
             () => ctrl.initEditor()
           ));
+        if (TopicEditorStateService.hasLoadedTopic()) {
+          ctrl.initEditor();
+        }
       };
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();

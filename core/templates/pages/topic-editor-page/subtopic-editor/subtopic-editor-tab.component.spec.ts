@@ -90,6 +90,7 @@ describe('Subtopic editor tab', function() {
       return id === 99 ? null : subtopic;
     };
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOn(TopicEditorStateService, 'hasLoadedTopic').and.returnValue(true);
     spyOn(
       TopicEditorStateService,
       'getSubtopicPage').and.returnValue(subtopicPage);
