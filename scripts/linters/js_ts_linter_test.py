@@ -76,7 +76,7 @@ INVALID_CONSTANT_FILEPATH = os.path.join(
 INVALID_CONSTANT_AJS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_duplicate.constants.ajs.ts')
 INVALID_AS_CONST_CONSTANTS_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_as_const_constants.ts')
+    LINTER_TESTS_DIR, 'invalid_as_const.constants.ts')
 INVALID_HTTP_CLIENT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_http_client_used.ts')
 INVALID_FORMATTED_COMMENT_FILEPATH = os.path.join(
