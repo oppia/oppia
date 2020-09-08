@@ -48,8 +48,8 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
 )
 
 EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
-    'CONTAINS_USER_DATA',
-    'NOT_APPLICABLE',
+    'EXPORTED',
+    'NOT_APPLICABLE'
 )
 
 # Constant used when retrieving big number of models.
@@ -125,17 +125,14 @@ class BaseModel(ndb.Model):
             'The export_data() method is missing from the '
             'derived class. It should be implemented in the derived class.')
 
-    @staticmethod
-    def get_export_policy():
-        """This method should be implemented by subclasses.
-
-        Raises:
-            NotImplementedError. The method is not overwritten in a derived
-                class.
-        """
-        raise NotImplementedError(
-            'The get_export_policy() method is missing from the '
-            'derived class. It should be implemented in the derived class.')
+    @classmethod
+    def get_export_policy(cls):
+        """Model creation time is not relevant to user data."""
+        return {
+            'created_on': EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': EXPORT_POLICY.NOT_APPLICABLE
+        }
 
     @classmethod
     def get(cls, entity_id, strict=True):
@@ -152,7 +149,7 @@ class BaseModel(ndb.Model):
             that corresponds to the given id.
 
         Raises:
-            base_models.BaseModel.EntityNotFoundError. The value of strict is
+            BaseModel.EntityNotFoundError. The value of strict is
                 True and no undeleted entity with the given id exists in the
                 datastore.
         """
@@ -398,6 +395,23 @@ class BaseCommitLogEntryModel(BaseModel):
     post_commit_is_private = ndb.BooleanProperty(indexed=True)
     # The version number of the model after this commit.
     version = ndb.IntegerProperty()
+
+    @classmethod
+    def get_export_policy(cls):
+        """The history of commits is not relevant for the purposes of
+        Takeout.
+        """
+        return dict(BaseModel.get_export_policy(), **{
+            'user_id': EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_type': EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_message': EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_cmds': EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_status': EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_community_owned':
+                EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_is_private': EXPORT_POLICY.NOT_APPLICABLE,
+            'version': EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1062,6 +1076,15 @@ class VersionedModel(BaseModel):
             'created_on_ms': utils.get_time_in_millisecs(model.created_on),
         } for (ind, model) in enumerate(returned_models)]
 
+    @classmethod
+    def get_export_policy(cls):
+        """The history of commits is not relevant for the purposes of
+        Takeout.
+        """
+        return dict(BaseModel.get_export_policy(), **{
+            'version': EXPORT_POLICY.NOT_APPLICABLE
+        })
+
 
 class BaseSnapshotMetadataModel(BaseModel):
     """Base class for snapshot metadata classes.
@@ -1085,10 +1108,17 @@ class BaseSnapshotMetadataModel(BaseModel):
     # snapshot content model.
     content_user_ids = ndb.StringProperty(repeated=True, indexed=True)
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Snapshot Metadata is relevant to the user for Takeout."""
-        return EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(BaseModel.get_export_policy(), **{
+            'committer_id': EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_type': EXPORT_POLICY.EXPORTED,
+            'commit_message': EXPORT_POLICY.EXPORTED,
+            'commit_cmds': EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_cmds_user_ids': EXPORT_POLICY.NOT_APPLICABLE,
+            'content_user_ids': EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def exists_for_user_id(cls, user_id):
@@ -1177,12 +1207,14 @@ class BaseSnapshotContentModel(BaseModel):
     # The snapshot content, as a JSON blob.
     content = ndb.JsonProperty(indexed=False)
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """The contents of snapshots are not relevant to the user for
         Takeout.
         """
-        return EXPORT_POLICY.NOT_APPLICABLE
+        return dict(BaseModel.get_export_policy(), **{
+            'content': EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def create(cls, snapshot_id, content):

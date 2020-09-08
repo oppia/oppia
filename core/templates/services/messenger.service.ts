@@ -135,8 +135,12 @@ export class MessengerService {
     }
   };
 
-  // The argument messageData is of type Object since it can have
-  // different properties based on the messageTitle.
+  /**
+   * Sends a message to the parent iframe.
+   * @param messageTitle - The title of the message.
+   * @param messageData - The data of the message. It is of type
+   *   Object since it can have different properties based on the messageTitle.
+   */
   sendMessage(messageTitle: string, messageData: Object): void {
     // TODO(sll): For the stateTransition and explorationCompleted events,
     // we now send paramValues in the messageData. We should broadcast these
