@@ -17,6 +17,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+# This workarounds the import error 'ImportError: No module named moves'
+# when importing the 'google-cloud-ndb' library. More information can be found
+# here:
+# https://github.com/googleapis/python-ndb/issues/249#issuecomment-560957294
 import six; reload(six)
 import logging
 from constants import constants
@@ -66,6 +70,7 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 
+from google.cloud import ndb
 from mapreduce import main as mapreduce_main
 from mapreduce import parameters as mapreduce_parameters
 import redis
@@ -842,8 +847,6 @@ for subject in feconf.AVAILABLE_LANDING_PAGES:
 
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
-
-from google.cloud import ndb
 
 client = ndb.Client()
 

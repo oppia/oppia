@@ -79,7 +79,6 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
         exp_user_data_model.rated_on = datetime.datetime.utcnow()
         exp_user_data_model.put()
         return old_rating
-
     old_rating = _update_user_rating()
 
     exploration_summary = exp_fetchers.get_exploration_summary_by_id(

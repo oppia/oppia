@@ -874,6 +874,7 @@ def pop_feedback_message_references(user_id, num_references_to_pop):
         model.put()
         enqueue_feedback_message_batch_email_task(user_id)
 
+
 @ndb.transactional()
 def clear_feedback_message_references(user_id, exploration_id, thread_id):
     """Removes feedback message references associated with a feedback thread.

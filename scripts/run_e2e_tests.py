@@ -413,7 +413,7 @@ def start_google_app_engine_server(dev_mode_setting, log_level):
         log_level: str. The log level for the google app engine server.
     """
 
-    #Start the local Google Cloud Datastore emulator.
+    # Start the local Google Cloud Datastore emulator.
     if dev_mode_setting:
         SUBPROCESSES.append(subprocess.Popen(
             '%s beta emulators datastore start --host-port=localhost:8081'

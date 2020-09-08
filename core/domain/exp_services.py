@@ -780,11 +780,14 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
         exploration_ids)
 
-@taskqueue_services.context_decorator
+
+@taskqueue_services.transaction_in_ndb_context
 def delete_explorations_from_subscribed_users(exploration_ids):
     """Remove explorations from all subscribers' activity_ids.
+
     Args:
         exploration_ids: list(str). The ids of the explorations to delete.
+
     """
     if not exploration_ids:
         return
@@ -796,6 +799,7 @@ def delete_explorations_from_subscribed_users(exploration_ids):
         model.activity_ids = [
             id_ for id_ in model.activity_ids if id_ not in exploration_ids]
     user_models.UserSubscriptionsModel.put_multi(subscription_models)
+
 
 # Operations on exploration snapshots.
 def get_exploration_snapshots_metadata(exploration_id, allow_deleted=False):

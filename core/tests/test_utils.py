@@ -2339,7 +2339,6 @@ class AppEngineTestBase(TestBase):
 
     def _delete_all_models(self):
         """Deletes all models from the NDB datastore."""
-        from google.cloud import ndb
         ndb.delete_multi(ndb.Query().iter(keys_only=True))
 
     def setUp(self):
@@ -2409,8 +2408,7 @@ class AppEngineTestBase(TestBase):
             self.memory_cache_services_stub.delete_multi)
         with swap_flush_cache, swap_get_multi, swap_set_multi:
             with swap_get_memory_cache_stats, swap_delete_multi:
-                with ndb.Client().context():
-                    super(AppEngineTestBase, self).run(result=result)
+                super(AppEngineTestBase, self).run(result=result)
 
     def tearDown(self):
         self.logout()
@@ -2664,7 +2662,6 @@ class AuditJobsTestBase(GenericTestBase):
         Yields:
             None. Empty yield statement.
         """
-        from google.cloud import ndb
 
         if not isinstance(mocked_datetime, datetime.datetime):
             raise utils.ValidationError(

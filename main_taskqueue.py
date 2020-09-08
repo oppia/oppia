@@ -45,7 +45,7 @@ URLS = [
     main.get_redirect_route(
         r'%s' % feconf.TASK_URL_FEEDBACK_STATUS_EMAILS,
         tasks.FeedbackThreadStatusChangeEmailHandler),
-]=
+]
 
 app = main.ndb_wsgi_middleware(  # pylint: disable=invalid-name
     webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))

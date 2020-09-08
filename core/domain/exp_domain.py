@@ -409,7 +409,6 @@ class ExpVersionReference(python_utils.OBJECT):
                 'Expected exp_id to be a str, received %s' % self.exp_id)
 
         if not isinstance(self.version, int):
-            print(type(self.version))
             raise utils.ValidationError(
                 'Expected version to be an int, received %s' % self.version)
 

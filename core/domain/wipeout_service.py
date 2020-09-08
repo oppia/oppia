@@ -453,7 +453,6 @@ def _pseudonymize_feedback_models(pending_deletion_request):
                 0,
                 len(feedback_related_models),
                 MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-
             _pseudonymize_models(
                 feedback_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_user_id)
@@ -515,7 +514,6 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
             0,
             len(voiceover_application_models),
             MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-
         _pseudonymize_models(
             voiceover_application_models[
                 i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION])

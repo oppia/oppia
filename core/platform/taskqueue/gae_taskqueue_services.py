@@ -19,16 +19,17 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from functools import wraps
+import functools
 import json
-import redis
+
 import feconf
+from google.cloud import ndb
+import main
+import redis
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import deferred
-from google.cloud import ndb
 
-import main
 
 # NOTE: The following constants should match the queue names in queue.yaml.
 # Taskqueue for backing up state.
@@ -46,10 +47,11 @@ QUEUE_NAME_ONE_OFF_JOBS = 'one-off-jobs'
 # Taskqueue for updating stats models.
 QUEUE_NAME_STATS = 'stats'
 
+
 def defer(fn, queue_name, *args, **kwargs):
     """Adds a new task to a specified deferred queue.
     NOTE: Functions that use this function MUST be decorated with the
-    context_decorator.
+    context_decorator, @taskqueue_services.wrap_in_ndb_context().
 
     Args:
         fn: *. The task being deferred. Will be called as: fn(*args, **kwargs).
@@ -80,15 +82,34 @@ def enqueue_email_task(url, params, countdown):
         countdown=countdown, target=taskqueue.DEFAULT_APP_VERSION)
 
 
-def context_decorator(handler):
-    @wraps(handler)
+def transaction_in_ndb_context(handler):
+    """Decorator that wraps a function that will be added to the deferred
+     taskqueue in an google cloud ndb context.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that will now be in a google
+        cloud ndb context.
+    """
+    @functools.wraps(handler)
     def wrapper(*args, **kwargs):
+        """Any function that can be added to a deferred queue.
+
+        Args:
+            *args: list(*). A list of arguments.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+        """
         if not ndb.context.get_context(raise_context_error=False):
             with main.client.context(global_cache=main.global_cache):
                 return handler(*args, **kwargs)
         return handler(*args, **kwargs)
-        #return handler(*args, **kwargs)
     return wrapper
+
 
 # A special exception that ensures that the task is not tried again, if it
 # fails.

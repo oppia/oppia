@@ -155,6 +155,13 @@ indexes:
   - name: entity_id
   - name: entity_type
   - name: last_updated
+
+- kind: GeneralFeedbackThreadModel
+  properties:
+  - name: deleted
+  - name: entity_id
+  - name: entity_type
+  - name: last_updated
     direction: desc
 
 - kind: GeneralSuggestionModel

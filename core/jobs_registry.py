@@ -267,7 +267,7 @@ class ContinuousComputationEventDispatcher(python_utils.OBJECT):
     """Dispatches events to the relevant ContinuousComputation classes."""
 
     @classmethod
-    @taskqueue_services.context_decorator
+    @taskqueue_services.transaction_in_ndb_context
     def dispatch_event(cls, event_type, *args, **kwargs):
         """Dispatches an incoming event to the ContinuousComputation
         classes which listen to events of that type.

@@ -119,10 +119,12 @@ def get_exploration_stats(exp_id, exp_version):
 
     return exploration_stats
 
-@taskqueue_services.context_decorator
+
+@taskqueue_services.transaction_in_ndb_context
 def update_stats(exp_id, exp_version, aggregated_stats):
     """Updates ExplorationStatsModel according to the dict containing aggregated
     stats.
+
     Args:
         exp_id: str. ID of the exploration.
         exp_version: int. Version of the exploration.

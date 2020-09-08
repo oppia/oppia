@@ -221,18 +221,18 @@ class BaseModel(ndb.Model):
         self._update_timestamps(update_last_updated_time)
         return super(BaseModel, self).put()
 
-    # def put_async(self, update_last_updated_time=True):
-    #     """Stores the given ndb.Model instance to the datastore asynchronously.
+    def put_async(self, update_last_updated_time=True, **kwargs):
+        """Stores the given ndb.Model instance to the datastore asynchronously.
 
-    #     Args:
-    #         update_last_updated_time: bool. Whether to update the
-    #             last_updated field of the model.
+        Args:
+            update_last_updated_time: bool. Whether to update the
+                last_updated field of the model.
 
-    #     Returns:
-    #         Model. The entity that was stored.
-    #     """
-    #     self._update_timestamps(update_last_updated_time)
-    #     return super(BaseModel, self).put_async()
+        Returns:
+            Model. The entity that was stored.
+        """
+        self._update_timestamps(update_last_updated_time)
+        return super(BaseModel, self).put_async(**kwargs)
 
     @classmethod
     @ndb.transactional()
@@ -689,10 +689,7 @@ class VersionedModel(BaseModel):
             snapshot_id, committer_id, commit_type, commit_message, commit_cmds)
         snapshot_content_instance = (
             self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
-        import logging
-        # logging.info(type(snapshot_metadata_instance)) ExplorationRightsSnapshotMetadataModel
-        # logging.info(type(snapshot_content_instance)) ExplorationRightsSnapshotContentModel
-        # logging.info(type(self)) ExplorationRightsModel
+
         BaseModel.put_multi(
             [
                 snapshot_metadata_instance,

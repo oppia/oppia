@@ -606,7 +606,7 @@ class BaseDeferredJobManager(BaseJobManager):
         raise NotImplementedError
 
     @classmethod
-    @taskqueue_services.context_decorator
+    @taskqueue_services.transaction_in_ndb_context
     def _run_job(cls, job_id, additional_job_params):
         """Starts the job.
 
@@ -661,7 +661,6 @@ class BaseDeferredJobManager(BaseJobManager):
         taskqueue_services.defer(
             cls._run_job, queue_name,
             job_id, additional_job_params)
-
 
 
 class MapReduceJobPipeline(base_handler.PipelineBase):

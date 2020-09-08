@@ -55,3 +55,4 @@ else:
     os.environ['DATASTORE_EMULATOR_HOST_PATH'] = 'localhost:8081/datastore'
     os.environ['DATASTORE_HOST'] = 'http://localhost:8081'
     os.environ['DATASTORE_PROJECT_ID']= 'oppia-dev'
+    os.environ['DATASTORE_USE_PROJECT_ID_AS_APP_ID'] = True
