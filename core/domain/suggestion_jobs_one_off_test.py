@@ -1787,6 +1787,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
             score_category=self._create_score_category_for_suggestion_type(
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)).put()
         expected_output = []
+
         # Verify the language_code field is set to None by default.
         suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
             self.EXPLORATION_THREAD_ID)
@@ -1927,7 +1928,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
 
         self._run_job_and_verify_output(expected_output)
 
-    def test_migrate_edit_state_content_suggestions_that_already_set_the_field(
+    def test_migrate_edit_state_content_suggestion_when_the_field_has_been_set(
             self):
         """This test tests that the migration exits early for
         "edit state content" suggestions. The language code is already set to
