@@ -800,7 +800,7 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
             'UnauthorizedUserException: Could not deassign role.')
 
     if activity_rights.is_owner(removed_user_id):
-        old_role = rights_domain.ROLE_EDITOR
+        old_role = rights_domain.ROLE_OWNER
         activity_rights.owner_ids.remove(removed_user_id)
     elif activity_rights.is_editor(removed_user_id):
         old_role = rights_domain.ROLE_EDITOR

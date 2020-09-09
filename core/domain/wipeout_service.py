@@ -225,6 +225,18 @@ def delete_user(pending_deletion_request):
         story_models.StorySnapshotMetadataModel,
         story_models.StoryCommitLogEntryModel,
         'story_id')
+    _pseudonymize_col_or_exp_models(
+        pending_deletion_request,
+        collection_models.CollectionSnapshotMetadataModel,
+        collection_models.CollectionRightsSnapshotMetadataModel,
+        collection_models.CollectionRightsSnapshotContentModel,
+        collection_models.CollectionCommitLogEntryModel)
+    _pseudonymize_col_or_exp_models(
+        pending_deletion_request,
+        exp_models.ExplorationSnapshotMetadataModel,
+        exp_models.ExplorationRightsSnapshotMetadataModel,
+        exp_models.ExplorationRightsSnapshotContentModel,
+        exp_models.ExplorationCommitLogEntryModel)
 
 
 def verify_user_deleted(pending_deletion_request):
@@ -282,6 +294,17 @@ def _generate_activity_to_pseudonymized_ids_mapping(activity_ids):
     }
 
 
+def _save_activity_mappings(
+        pending_deletion_request, activity_category, activity_ids):
+    """"""
+    # The activity_mappings field might have only been partially generated, so
+    # we fill in the missing part for this activity category.
+    if activity_category not in pending_deletion_request.activity_mappings:
+        pending_deletion_request.activity_mappings[activity_category] = (
+            _generate_activity_to_pseudonymized_ids_mapping(activity_ids))
+        save_pending_deletion_request(pending_deletion_request)
+
+
 def _delete_models(user_id, module_name):
     """Delete all the models from the given module, for a given user.
 
@@ -297,7 +320,7 @@ def _delete_models(user_id, module_name):
 
 
 def _collect_activity_ids_from_snapshots_and_commit(
-        user_id,
+        pending_deletion_request,
         activity_category,
         snapshot_metadata_model_classes,
         commit_log_model_class,
@@ -323,6 +346,7 @@ def _collect_activity_ids_from_snapshots_and_commit(
             list(BaseCommitLogEntryModel)
         ). The activity IDs.
     """
+    user_id = pending_deletion_request.user_id
     snapshot_metadata_models = []
     for snapshot_model_class in snapshot_metadata_model_classes:
         snapshot_metadata_models.extend(
@@ -353,11 +377,11 @@ def _collect_activity_ids_from_snapshots_and_commit(
             list(snapshot_metadata_ids - commit_log_ids),
             list(commit_log_ids - snapshot_metadata_ids))
 
-    return (
-        (snapshot_metadata_ids | commit_log_ids),
-        snapshot_metadata_models,
-        commit_log_models
-    )
+    activity_ids = snapshot_metadata_ids | commit_log_ids
+    _save_activity_mappings(
+        pending_deletion_request, activity_category, activity_ids)
+
+    return (activity_ids, snapshot_metadata_models, commit_log_models)
 
 
 def _pseudonymize_activity_models(
@@ -390,13 +414,6 @@ def _pseudonymize_activity_models(
             commit_log_model_field_name
         )
     )
-
-    # The activity_mappings field might have only been partially generated, so
-    # we fill in the missing part for this activity category.
-    if activity_category not in pending_deletion_request.activity_mappings:
-        pending_deletion_request.activity_mappings[activity_category] = (
-            _generate_activity_to_pseudonymized_ids_mapping(activity_ids))
-        save_pending_deletion_request(pending_deletion_request)
 
     def _pseudonymize_models(activity_related_models, pseudonymized_id):
         """Pseudonymize user ID fields in the models.
@@ -443,8 +460,14 @@ def _pseudonymize_activity_models(
                 pseudonymized_id)
 
 
-def _pseudonymize_collection_models(pending_deletion_request):
-    """Pseudonymize the collection models for the user with user_id.
+def _pseudonymize_col_or_exp_models(
+        pending_deletion_request,
+        snapshot_metadata_model_class,
+        rights_snapshot_metadata_model_class,
+        rights_snapshot_content_model_class,
+        commit_log_model_class):
+    """Pseudonymize the collection or exploration models for the user with
+    user_id.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
@@ -457,88 +480,116 @@ def _pseudonymize_collection_models(pending_deletion_request):
             user_id,
             models.NAMES.topic,
             [
-                collection_models.CollectionSnapshotMetadataModel,
-                collection_models.CollectionRightsSnapshotMetadataModel
+                snapshot_metadata_model_class,
+                rights_snapshot_metadata_model_class
             ],
-            collection_models.CollectionCommitLogEntryModel,
-            collection_models.CollectionCommitLogEntryModel.collection_id
+            commit_log_model_class,
+            commit_log_model_class.collection_id
         )
     )
 
-    # The activity_mappings field might have only been partially generated, so
-    # we fill in the missing part for this activity category.
-    if (models.NAMES.collection not in
-            pending_deletion_request.activity_mappings):
-        pending_deletion_request.activity_mappings[models.NAMES.collection] = (
-            _generate_activity_to_pseudonymized_ids_mapping(collection_ids))
-        save_pending_deletion_request(pending_deletion_request)
-
-    def _pseudonymize_models(activity_related_models, pseudonymized_id):
+    def _pseudonymize_models(col_related_models, pseudonymized_id):
         """Pseudonymize user ID fields in the models.
 
         This function is run in a transaction, with the maximum number of
         activity_related_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
 
         Args:
-            activity_related_models: list(BaseModel). Models whose user IDs
-                should be pseudonymized.
+            col_related_models: list(BaseModel). Models whose user IDs should be
+                pseudonymized.
             pseudonymized_id: str. New pseudonymized user ID to be used for
                 the models.
         """
         snapshot_metadata_models = [
-            model for model in activity_related_models
+            model for model in col_related_models
             if isinstance(
                 model,
                 (
-                    collection_models.CollectionSnapshotMetadataModel,
-                    collection_models.CollectionRightsSnapshotMetadataModel
+                    snapshot_metadata_model_class,
+                    rights_snapshot_metadata_model_class
                 )
             )
         ]
         for snapshot_metadata_model in snapshot_metadata_models:
-            content_user_id = snapshot_metadata_model.content_user_ids
-            if user_id in content_user_id:
-                snapshot_metadata_model.content_user_ids = [
-                    pseudonymized_id if model_user_id == user_id else user_id
-                    for model_user_id in content_user_id
-                ]
-            commit_cmds_user_id = snapshot_metadata_model.commit_cmds_user_id
-            if user_id in commit_cmds_user_id:
-                snapshot_metadata_model.commit_cmds_user_id = [
-                    pseudonymized_id if model_user_id == user_id else user_id
-                    for model_user_id in commit_cmds_user_id
-                ]
+            snapshot_metadata_model.content_user_ids = [
+                pseudonymized_id if model_user_id == user_id else model_user_id
+                for model_user_id in snapshot_metadata_model.content_user_ids
+            ]
+            snapshot_metadata_model.commit_cmds_user_id = [
+                pseudonymized_id if model_user_id == user_id else model_user_id
+                for model_user_id in snapshot_metadata_model.commit_cmds_user_id
+            ]
             if user_id == snapshot_metadata_model.committer_id:
                 snapshot_metadata_model.committer_id = pseudonymized_id
 
+        rights_snapshot_content_models = [
+            model for model in col_related_models
+            if isinstance(model, rights_snapshot_content_model_class)]
+        for rights_snapshot_content_model in rights_snapshot_content_models:
+            model_dict = rights_snapshot_content_model.content
+            model_dict['owner_ids'] = [
+                pseudonymized_id if owner_id == user_id else owner_id
+                for owner_id in model_dict['owner_ids']
+            ]
+            model_dict['editor_ids'] = [
+                pseudonymized_id if editor_id == user_id else editor_id
+                for editor_id in model_dict['editor_ids']
+            ]
+            model_dict['voice_artist_ids'] = [
+                pseudonymized_id if voice_art_id == user_id else voice_art_id
+                for voice_art_id in model_dict['voice_artist_ids']
+            ]
+            model_dict['viewer_ids'] = [
+                pseudonymized_id if viewer_id == user_id else viewer_id
+                for viewer_id in model_dict['viewer_ids']
+            ]
+            rights_snapshot_content_model.content = model_dict
+
         commit_log_models = [
-            model for model in activity_related_models
-            if isinstance(
-                model, collection_models.CollectionCommitLogEntryModel)]
+            model for model in col_related_models
+            if isinstance(model, commit_log_model_class)]
         for commit_log_model in commit_log_models:
             commit_log_model.user_id = pseudonymized_id
 
-        ndb.put_multi(snapshot_metadata_models + commit_log_models)
+        ndb.put_multi(
+            snapshot_metadata_models +
+            rights_snapshot_content_models +
+            commit_log_models)
 
     collection_ids_to_pids = (
         pending_deletion_request.activity_mappings[models.NAMES.collection])
     for collection_id, pseudonymized_id in collection_ids_to_pids.items():
-        collection_related_models = [
+        col_related_snapshot_metadata_models = [
             model for model in snapshot_metadata_models
             if model.get_unversioned_instance_id() == collection_id
-        ] + [
-            model for model in commit_log_models
-            if getattr(model, commit_log_models) == collection_id
         ]
+
+        col_related_rights_snapshots_ids = [
+            model.id for model in col_related_snapshot_metadata_models
+            if isinstance(model, rights_snapshot_metadata_model_class)]
+        col_related_snapshot_content_models = (
+            rights_snapshot_content_model_class.query(
+                rights_snapshot_content_model_class.id ==
+                col_related_rights_snapshots_ids
+            ).fetch()
+        )
+
+        col_related_models = (
+            col_related_snapshot_metadata_models +
+            col_related_snapshot_content_models +
+            [
+                model for model in commit_log_models
+                if getattr(model, commit_log_models) == collection_id
+            ]
+        )
+
         for i in python_utils.RANGE(
-                0,
-                len(collection_related_models),
-                MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+                0, len(col_related_models), MAX_NUMBER_OF_OPS_IN_TRANSACTION):
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
-                collection_related_models[
-                    i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
-                pseudonymized_id)
+                col_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                pseudonymized_id
+            )
 
 
 def _pseudonymize_topic_models(pending_deletion_request):
@@ -562,13 +613,6 @@ def _pseudonymize_topic_models(pending_deletion_request):
             topic_models.TopicCommitLogEntryModel.topic_id
         )
     )
-
-    # The activity_mappings field might have only been partially generated, so
-    # we fill in the missing part for this activity category.
-    if models.NAMES.topic not in pending_deletion_request.activity_mappings:
-        pending_deletion_request.activity_mappings[models.NAMES.topic] = (
-            _generate_activity_to_pseudonymized_ids_mapping(topic_ids))
-        save_pending_deletion_request(pending_deletion_request)
 
     def _pseudonymize_models(activity_related_models, pseudonymized_id):
         """Pseudonymize user ID fields in the models.
@@ -658,13 +702,8 @@ def _pseudonymize_feedback_models(pending_deletion_request):
     )).fetch()
     feedback_ids |= set([model.id for model in general_suggestion_models])
 
-    # The activity_mappings field might have only been partially generated, so
-    # we fill in the missing part for this activity category.
-    if models.NAMES.feedback not in pending_deletion_request.activity_mappings:
-        pending_deletion_request.activity_mappings[models.NAMES.feedback] = (
-            _generate_activity_to_pseudonymized_ids_mapping(feedback_ids)
-        )
-        save_pending_deletion_request(pending_deletion_request)
+    _save_activity_mappings(
+        pending_deletion_request, models.NAMES.feedback, feedback_ids)
 
     def _pseudonymize_models(feedback_related_models, pseudonymized_id):
         """Pseudonymize user ID fields in the models.
@@ -750,18 +789,8 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
     )).fetch()
     suggestion_ids = set([model.id for model in voiceover_application_models])
 
-    # The activity_mappings field might have only been partially generated, so
-    # we fill in the missing part for this activity category.
-    if (
-            models.NAMES.suggestion not in
-            pending_deletion_request.activity_mappings):
-        pending_deletion_request.activity_mappings[models.NAMES.suggestion] = (
-            _generate_activity_to_pseudonymized_ids_mapping(suggestion_ids)
-        )
-        save_pending_deletion_request(pending_deletion_request)
-
-    suggestion_ids_to_pids = (
-        pending_deletion_request.activity_mappings[models.NAMES.suggestion])
+    _save_activity_mappings(
+        pending_deletion_request, models.NAMES.suggestion, suggestion_ids)
 
     def _pseudonymize_models(voiceover_application_models):
         """Pseudonymize user ID fields in the models.
@@ -785,6 +814,8 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
                 )
         voiceover_application_class.put_multi(voiceover_application_models)
 
+    suggestion_ids_to_pids = (
+        pending_deletion_request.activity_mappings[models.NAMES.suggestion])
     for i in python_utils.RANGE(
             0,
             len(voiceover_application_models),
