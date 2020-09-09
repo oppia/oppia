@@ -48,7 +48,6 @@ from core.domain import html_validation_service
 from core.domain import opportunity_services
 from core.domain import param_domain
 from core.domain import recommendations_services
-from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
@@ -597,8 +596,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         stats_services.create_stats_model(new_exp_stats)
 
         stats_services.update_exp_issues_for_new_exp_version(
-            exploration, exp_versions_diff=exp_versions_diff,
-            revert_to_version=None)
+            exploration, exp_versions_diff, None)
 
     transaction_services.run_in_transaction(_update_storage_models)
 
@@ -1194,9 +1192,8 @@ def revert_exploration(
         exploration_id, version=current_version)
 
     new_exp_stats = stats_services.get_stats_for_new_exp_version(
-        exploration_id, current_version + 1,
-        exploration_to_revert_to.states,
-        exp_versions_diff=None, revert_to_version=revert_to_version)
+        exploration_id, current_version + 1, exploration_to_revert_to.states,
+        None, revert_to_version)
 
     def _update_storage_models():
         """Groups all storage calls into a function call so that they can be
@@ -1217,8 +1214,7 @@ def revert_exploration(
         stats_services.create_stats_model(new_exp_stats)
 
         stats_services.update_exp_issues_for_new_exp_version(
-            exploration_at_current_version, exp_versions_diff=None,
-            revert_to_version=revert_to_version)
+            exploration_at_current_version, None, revert_to_version)
 
     transaction_services.run_in_transaction(_update_storage_models)
 
@@ -1227,9 +1223,10 @@ def revert_exploration(
     update_exploration_summary(exploration_id, None)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
-        (classifier_services
-         .create_classifier_training_job_for_reverted_exploration(
-             exploration_at_current_version, exploration_to_revert_to))
+        (
+            classifier_services
+            .create_classifier_training_job_for_reverted_exploration(
+                exploration_at_current_version, exploration_to_revert_to))
 
 
 # Creation and deletion methods.
