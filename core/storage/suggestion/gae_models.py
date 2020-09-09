@@ -153,7 +153,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # separated by a ., the first will be a value from SCORE_TYPE_CHOICES and
     # the second will be the subcategory of the suggestion.
     score_category = ndb.StringProperty(required=True, indexed=True)
-    # The ISO 639-1 code used to query suggestions by language or None if the
+    # The ISO 639-1 code used to query suggestions by language, or None if the
     # suggestion type is not queryable by language.
     language_code = ndb.StringProperty(indexed=True)
 
@@ -214,7 +214,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             thread_id: str. The ID of the feedback thread linked to the
                 suggestion.
             language_code: str|None. The ISO 639-1 code used to query
-                suggestions by language or None if the suggestion type is not
+                suggestions by language, or None if the suggestion type is not
                 queryable by language.
 
         Raises:
