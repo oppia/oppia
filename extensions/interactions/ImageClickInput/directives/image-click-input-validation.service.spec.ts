@@ -31,10 +31,9 @@ import { Outcome, OutcomeObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { AppConstants } from 'app.constants';
-import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
 describe('ImageClickInputValidationService', () => {
-  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
   let validatorService: ImageClickInputValidationService;
 
   let currentState: string;

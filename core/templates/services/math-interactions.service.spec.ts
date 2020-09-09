@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { MathInteractionsService } from 'services/math-interactions.service';
 
 describe('MathInteractionsService', () => {
-  let mathInteractionsService: MathInteractionsService = null;
+  let mathInteractionsService: MathInteractionsService;
 
   beforeEach(() => {
     mathInteractionsService = TestBed.get(MathInteractionsService);

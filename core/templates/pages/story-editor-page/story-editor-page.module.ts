@@ -40,17 +40,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-import { AppConstants } from 'app.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { ServicesConstants } from 'services/services.constants';
-import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
-import { StoryDomainConstants } from 'domain/story/story-domain.constants';
-import { StoryEditorPageConstants } from
-  'pages/story-editor-page/story-editor-page.constants';
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -64,13 +53,6 @@ import { StoryEditorPageConstants } from
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    ServicesConstants,
-    SkillDomainConstants,
-    StoryDomainConstants,
-    StoryEditorPageConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

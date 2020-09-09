@@ -16,6 +16,6 @@
  * @fileoverview Primary controller for the story editor page.
  */
 
-export class StoryEditorPageConstants {
-  public static NODE_ID_PREFIX = 'node_';
-}
+export const StoryEditorPageConstants = {
+  NODE_ID_PREFIX: 'node_'
+} as const;

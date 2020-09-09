@@ -16,8 +16,8 @@
  * @fileoverview Constants for profile page domain.
  */
 
-export class ProfilePageDomainConstants {
-  public static PROFILE_SUBSCRIBE_URL = '/subscribehandler';
-  public static PROFILE_UNSUBSCRIBE_URL = '/unsubscribehandler';
-  public static PROFILE_DATA_URL = '/profilehandler/data/<username>';
-}
+export const ProfilePageDomainConstants = {
+  PROFILE_SUBSCRIBE_URL: '/subscribehandler',
+  PROFILE_UNSUBSCRIBE_URL: '/unsubscribehandler',
+  PROFILE_DATA_URL: '/profilehandler/data/<username>'
+} as const;

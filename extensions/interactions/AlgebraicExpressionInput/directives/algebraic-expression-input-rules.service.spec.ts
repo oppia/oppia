@@ -21,7 +21,7 @@ import { AlgebraicExpressionInputRulesService } from
   'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 
 describe('Algebraic expression input rules service', () => {
-  let algebraicRulesService: AlgebraicExpressionInputRulesService = null;
+  let algebraicRulesService: AlgebraicExpressionInputRulesService;
   let inputString;
 
   beforeEach(() => {

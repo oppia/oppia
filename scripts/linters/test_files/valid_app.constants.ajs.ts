@@ -13,10 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Type definitions for the constants in the Oppia module.
+ * @fileoverview Valid syntax .ts file, used by scripts/linters/
+ * js_ts_linter_test.py.
  */
 
-export interface WARNING_TYPES_CONSTANT {
-    CRITICAL: string,
-    ERROR: string
-}
+angular.module('oppia').constant('ACTIVITY_STATUS_PRIVATE',
+  AppConstants.ACTIVITY_STATUS_PRIVATE);

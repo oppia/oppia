@@ -16,14 +16,14 @@
  * @fileoverview Constants for the question player directive.
  */
 
-export class QuestionPlayerConstants {
-  public static HASH_PARAM = 'question-player-result=';
-  public static MAX_SCORE_PER_QUESTION = 1.0;
+export const QuestionPlayerConstants = {
+  HASH_PARAM: 'question-player-result=',
+  MAX_SCORE_PER_QUESTION: 1.0,
 
-  public static MAX_MASTERY_GAIN_PER_QUESTION = 0.1;
-  public static MAX_MASTERY_LOSS_PER_QUESTION = -0.1;
+  MAX_MASTERY_GAIN_PER_QUESTION: 0.1,
+  MAX_MASTERY_LOSS_PER_QUESTION: -0.1,
 
-  public static COLORS_FOR_PASS_FAIL_MODE = {
+  COLORS_FOR_PASS_FAIL_MODE: {
     // Color orange.
     FAILED_COLOR: 'rgb(217, 92, 12)',
     // Color shallow orange.
@@ -32,17 +32,17 @@ export class QuestionPlayerConstants {
     PASSED_COLOR: 'rgb(0, 150, 136)',
     // Color shallow green.
     PASSED_COLOR_OUTER: 'rgb(143, 217, 209)'
-  };
+  },
 
-  public static QUESTION_PLAYER_MODE = {
+  QUESTION_PLAYER_MODE: {
     PASS_FAIL_MODE: 'PASS_FAIL'
-  };
+  },
 
-  public static VIEW_HINT_PENALTY = 0.1;
+  VIEW_HINT_PENALTY: 0.1,
 
-  public static VIEW_HINT_PENALTY_FOR_MASTERY = 0.02;
+  VIEW_HINT_PENALTY_FOR_MASTERY: 0.02,
 
-  public static WRONG_ANSWER_PENALTY_FOR_MASTERY = 0.05;
+  WRONG_ANSWER_PENALTY_FOR_MASTERY: 0.05,
 
-  public static WRONG_ANSWER_PENALTY = 0.1;
-}
+  WRONG_ANSWER_PENALTY: 0.1,
+} as const;

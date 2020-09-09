@@ -16,52 +16,53 @@
  * @fileoverview Constants related to improvements tasks.
  */
 
-const constants = require('constants.ts');
+import { AppConstants } from 'app.constants';
 
-export namespace ImprovementsConstants {
-  export const TASK_TYPE_HIGH_BOUNCE_RATE:
-    'high_bounce_rate' = constants.TASK_TYPE_HIGH_BOUNCE_RATE;
-  export const TASK_TYPE_NEEDS_GUIDING_RESPONSES:
-    'needs_guiding_responses' = constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES;
-  export const TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP:
-    'ineffective_feedback_loop' = constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP;
-  export const TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS:
-    'successive_incorrect_answers' = (
-      constants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS);
+export const ImprovementsConstants = {
+  TASK_TYPE_HIGH_BOUNCE_RATE: AppConstants.TASK_TYPE_HIGH_BOUNCE_RATE,
+  TASK_TYPE_NEEDS_GUIDING_RESPONSES: (
+    AppConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES),
+  TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP: (
+    AppConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP),
+  TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS: (
+    AppConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS),
 
-  export const TASK_TYPES = [
-    TASK_TYPE_HIGH_BOUNCE_RATE,
-    TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-    TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-    TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-  ] as const;
+  TASK_TYPES: [
+    AppConstants.TASK_TYPE_HIGH_BOUNCE_RATE,
+    AppConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+    AppConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+    AppConstants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS
+  ],
 
-  export const TASK_ENTITY_TYPE_EXPLORATION: string = (
-    constants.TASK_ENTITY_TYPE_EXPLORATION);
+  TASK_ENTITY_TYPE_EXPLORATION: (
+    AppConstants.TASK_ENTITY_TYPE_EXPLORATION),
 
-  export const TASK_TARGET_TYPE_STATE: string = (
-    constants.TASK_TARGET_TYPE_STATE);
+  TASK_TARGET_TYPE_STATE: (
+    AppConstants.TASK_TARGET_TYPE_STATE),
 
-  export const TASK_STATUS_OPEN: string = constants.TASK_STATUS_OPEN;
-  export const TASK_STATUS_OBSOLETE: string = constants.TASK_STATUS_OBSOLETE;
-  export const TASK_STATUS_RESOLVED: string = constants.TASK_STATUS_RESOLVED;
+  TASK_STATUS_OPEN: AppConstants.TASK_STATUS_OPEN,
+  TASK_STATUS_OBSOLETE: AppConstants.TASK_STATUS_OBSOLETE,
+  TASK_STATUS_RESOLVED: AppConstants.TASK_STATUS_RESOLVED,
 
-  export const EXPLORATION_HEALTH_TYPE_HEALTHY = 'healthy';
-  export const EXPLORATION_HEALTH_TYPE_WARNING = 'warning';
-  export const EXPLORATION_HEALTH_TYPE_CRITICAL = 'critical';
-  export const EXPLORATION_HEALTH_TYPES = [
-    EXPLORATION_HEALTH_TYPE_HEALTHY,
-    EXPLORATION_HEALTH_TYPE_WARNING,
-    EXPLORATION_HEALTH_TYPE_CRITICAL,
-  ] as const;
+  EXPLORATION_HEALTH_TYPE_HEALTHY: 'healthy',
+  EXPLORATION_HEALTH_TYPE_WARNING: 'warning',
+  EXPLORATION_HEALTH_TYPE_CRITICAL: 'critical',
+  EXPLORATION_HEALTH_TYPES: [
+    'healthy',
+    'warning',
+    'critical'
+  ],
 
-  export const COMPLETION_BAR_ARC_RADIUS = 58;
-  export const COMPLETION_BAR_ARC_LENGTH = Math.PI * COMPLETION_BAR_ARC_RADIUS;
+  COMPLETION_BAR_ARC_RADIUS: 58,
+  COMPLETION_BAR_ARC_LENGTH: Math.PI * 58,
 
-  export const EXPLORATION_IMPROVEMENTS_URL: string = (
-    `/improvements/${TASK_ENTITY_TYPE_EXPLORATION}/<exploration_id>`);
-  export const EXPLORATION_IMPROVEMENTS_HISTORY_URL: string = (
-    `/improvements/history/${TASK_ENTITY_TYPE_EXPLORATION}/<exploration_id>`);
-  export const EXPLORATION_IMPROVEMENTS_CONFIG_URL: string = (
-    `/improvements/config/${TASK_ENTITY_TYPE_EXPLORATION}/<exploration_id>`);
-}
+  EXPLORATION_IMPROVEMENTS_URL: (
+    `/improvements/${AppConstants.TASK_ENTITY_TYPE_EXPLORATION}/` +
+    '<exploration_id>'),
+  EXPLORATION_IMPROVEMENTS_HISTORY_URL: (
+    `/improvements/history/${AppConstants.TASK_ENTITY_TYPE_EXPLORATION}/` +
+    '<exploration_id>'),
+  EXPLORATION_IMPROVEMENTS_CONFIG_URL: (
+    `/improvements/config/${AppConstants.TASK_ENTITY_TYPE_EXPLORATION}/` +
+    '<exploration_id>')
+} as const;

@@ -35,10 +35,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-import { AppConstants } from 'app.constants';
-import { ClassroomDomainConstants } from
-  'domain/classroom/classroom-domain.constants';
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -52,8 +48,6 @@ import { ClassroomDomainConstants } from
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
-    ClassroomDomainConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

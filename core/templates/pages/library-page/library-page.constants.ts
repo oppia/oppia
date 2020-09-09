@@ -20,20 +20,20 @@
 // be same as the LIBRARY_PAGE_MODE constants defined in feconf.py. For example
 // LIBRARY_PAGE_MODES.GROUP should have the same value as
 // LIBRARY_PAGE_MODE_GROUP in feconf.py.
-export class LibraryPageConstants {
-  public static LIBRARY_PAGE_MODES = {
+export const LibraryPageConstants = {
+  LIBRARY_PAGE_MODES: {
     GROUP: 'group',
     INDEX: 'index',
     SEARCH: 'search'
-  };
+  },
 
-  public static LIBRARY_PATHS_TO_MODES = {
+  LIBRARY_PATHS_TO_MODES: {
     '/community-library': 'index',
     '/community-library/top-rated': 'group',
     '/community-library/recently-published': 'group',
     '/search/find': 'search'
-  };
+  },
 
-  public static SEARCH_EXPLORATION_URL_TEMPLATE =
-    '/exploration/metadata_search?q=<query>';
-}
+  SEARCH_EXPLORATION_URL_TEMPLATE:
+    '/exploration/metadata_search?q=<query>'
+} as const;

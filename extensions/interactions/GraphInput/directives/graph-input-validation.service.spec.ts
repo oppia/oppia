@@ -30,12 +30,11 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { GraphAnswer } from 'interactions/answer-defs';
 
 import { AppConstants } from 'app.constants';
-import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 import { GraphInputCustomizationArgs } from
   'interactions/customization-args-defs';
 
 describe('GraphInputValidationService', () => {
-  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
   let validatorService: GraphInputValidationService;
   let currentState: string;
   let customizationArguments: GraphInputCustomizationArgs;

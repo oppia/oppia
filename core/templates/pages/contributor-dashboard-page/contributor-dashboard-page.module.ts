@@ -40,12 +40,9 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-import { AppConstants } from 'app.constants';
 import { CkEditorCopyToolbarComponent } from
   /* eslint-disable max-len */
   'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
-import { ContributorDashboardConstants } from
-  'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
 
@@ -66,8 +63,6 @@ import { TranslationLanguageSelectorComponent } from
     TranslationLanguageSelectorComponent
   ],
   providers: [
-    AppConstants,
-    ContributorDashboardConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

@@ -30,12 +30,11 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 import { AppConstants } from 'app.constants';
-import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 import { ItemSelectionInputCustomizationArgs } from
   'interactions/customization-args-defs';
 
 describe('ItemSelectionInputValidationService', () => {
-  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
   let validatorService: ItemSelectionInputValidationService;
 
   let currentState: string = null;

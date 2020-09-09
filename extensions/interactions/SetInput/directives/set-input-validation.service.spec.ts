@@ -28,14 +28,13 @@ import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
-import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 import { AppConstants } from 'app.constants';
 import { SetInputCustomizationArgs } from
   'interactions/customization-args-defs';
 
 describe('SetInputValidationService', () => {
   let validatorService: SetInputValidationService;
-  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
 
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;

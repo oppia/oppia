@@ -34,8 +34,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-import { AppConstants } from 'app.constants';
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -49,7 +47,6 @@ import { AppConstants } from 'app.constants';
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

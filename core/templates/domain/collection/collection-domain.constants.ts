@@ -22,22 +22,19 @@
 // NOTE TO DEVELOPERS: the properties 'prerequisite_skills' and
 // 'acquired_skills' are deprecated. Do not use them.
 
-export class CollectionDomainConstants {
-  public static CMD_ADD_COLLECTION_NODE = 'add_collection_node';
-  public static CMD_SWAP_COLLECTION_NODES = 'swap_nodes';
-  public static CMD_DELETE_COLLECTION_NODE = 'delete_collection_node';
-  public static CMD_EDIT_COLLECTION_PROPERTY = 'edit_collection_property';
-  public static
-    CMD_EDIT_COLLECTION_NODE_PROPERTY = 'edit_collection_node_property';
-  public static COLLECTION_PROPERTY_TITLE = 'title';
-  public static COLLECTION_PROPERTY_CATEGORY = 'category';
-  public static COLLECTION_PROPERTY_OBJECTIVE = 'objective';
-  public static COLLECTION_PROPERTY_LANGUAGE_CODE = 'language_code';
-  public static COLLECTION_PROPERTY_TAGS = 'tags';
-  public static CMD_ADD_COLLECTION_SKILL = 'add_collection_skill';
-  public static CMD_DELETE_COLLECTION_SKILL = 'delete_collection_skill';
-  public static
-    COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS = 'prerequisite_skill_ids';
-  public static
-    COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS = 'acquired_skill_ids';
-}
+export const CollectionDomainConstants = {
+  CMD_ADD_COLLECTION_NODE: 'add_collection_node',
+  CMD_SWAP_COLLECTION_NODES: 'swap_nodes',
+  CMD_DELETE_COLLECTION_NODE: 'delete_collection_node',
+  CMD_EDIT_COLLECTION_PROPERTY: 'edit_collection_property',
+  CMD_EDIT_COLLECTION_NODE_PROPERTY: 'edit_collection_node_property',
+  COLLECTION_PROPERTY_TITLE: 'title',
+  COLLECTION_PROPERTY_CATEGORY: 'category',
+  COLLECTION_PROPERTY_OBJECTIVE: 'objective',
+  COLLECTION_PROPERTY_LANGUAGE_CODE: 'language_code',
+  COLLECTION_PROPERTY_TAGS: 'tags',
+  CMD_ADD_COLLECTION_SKILL: 'add_collection_skill',
+  CMD_DELETE_COLLECTION_SKILL: 'delete_collection_skill',
+  COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS: 'prerequisite_skill_ids',
+  COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS: 'acquired_skill_ids'
+} as const;

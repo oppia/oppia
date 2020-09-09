@@ -16,13 +16,13 @@
  * @fileoverview Constants for the Oppia about page.
  */
 
-export class AboutPageConstants {
+export const AboutPageConstants = {
   // These credits should not be changed directly. If any change is
   // made to structure/formatting, the respective constants
   // CREDITS_START_LINE, CREDITS_END_LINE and CREDITS_INDENT should be
   // updated in update_changelog_and_credits.py file. If the patterns do
   // not match, update_changelog_and_credits_test will fail.
-  public static CREDITS_CONSTANTS = [
+  CREDITS_CONSTANTS: [
     'Aadya Mishra',
     'Aaron Zuspan',
     'Aashish Gaba',
@@ -390,5 +390,5 @@ export class AboutPageConstants {
     'Zachery Vekovius',
     'Zhu Chu',
     'Zoe Madden-Wood',
-  ];
-}
+  ]
+} as const;
