@@ -17,6 +17,7 @@
 """Unit tests for core.domain.exp_services."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import division  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
@@ -25,6 +26,7 @@ import os
 import re
 import zipfile
 
+from core.domain import caching_services
 from core.domain import classifier_services
 from core.domain import draft_upgrade_services
 from core.domain import exp_domain
@@ -37,6 +39,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
+from core.domain import stats_services
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
@@ -4257,6 +4260,55 @@ title: Old Title
                     'new_value': 'new title'
                 })], feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
+    def test_update_exploration_does_nothing_if_create_stats_model_fails(self):
+        swap_create_stats_model = self.swap(
+            stats_services, 'create_stats_model',
+            lambda *_: python_utils.divide(1, 0))
+        assert_raises_regexp = (
+            self.assertRaisesRegexp(Exception, 'division or modulo by zero'))
+
+        self.save_new_valid_exploration('exp_id', 'user_id')
+        with swap_create_stats_model, assert_raises_regexp:
+            exp_services.update_exploration(
+                'user_id', 'exp_id', [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title'})],
+                'Changed language code.')
+
+        self.assertIsNone(
+            exp_fetchers.get_exploration_by_id(
+                'exp_id', strict=False, version=2))
+
+    def test_cache_does_not_persist_even_if_create_stats_model_fails(self):
+        self.save_new_valid_exploration('exp_id', 'user_id')
+
+        cached_exploration = caching_services.get_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None, ['exp_id']).get(
+                'exp_id', None)
+        actual_exploration = exp_fetchers.get_exploration_by_id('exp_id')
+        self.assertEqual(
+            cached_exploration.to_dict(), actual_exploration.to_dict())
+
+        swap_create_stats_model = self.swap(
+            stats_services, 'create_stats_model',
+            lambda *_: python_utils.divide(1, 0))
+        assert_raises_regexp = (
+            self.assertRaisesRegexp(Exception, 'division or modulo by zero'))
+
+        with swap_create_stats_model, assert_raises_regexp:
+            exp_services.update_exploration(
+                'user_id', 'exp_id', [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title'})],
+                'Changed language code.')
+
+        cached_exploration = caching_services.get_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None, ['exp_id']).get(
+                'exp_id', None)
+        self.assertIsNone(cached_exploration)
+
     def test_update_language_code(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.language_code, 'en')
@@ -4554,6 +4606,26 @@ title: Old Title
             'Unexpected error: trying to update version 0 of exploration '
             'from version 1. Please reload the page and try again.'):
             exp_services.revert_exploration('user_id', 'exp_id', 1, 0)
+
+    def test_revert_exploration_does_nothing_if_create_stats_model_fails(self):
+        swap_create_stats_model = self.swap(
+            stats_services, 'create_stats_model',
+            lambda *_: python_utils.divide(1, 0))
+        assert_raises_regexp = (
+            self.assertRaisesRegexp(Exception, 'division or modulo by zero'))
+
+        self.save_new_valid_exploration('exp_id', 'user_id')
+        exp_services.update_exploration(
+            'user_id', 'exp_id', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title'})], 'Changed interaction_solutions.')
+        with swap_create_stats_model, assert_raises_regexp:
+            exp_services.revert_exploration('user_id', 'exp_id', 2, 1)
+
+        self.assertIsNone(
+            exp_fetchers.get_exploration_by_id(
+                'exp_id', strict=False, version=3))
 
 
 class EditorAutoSavingUnitTests(test_utils.GenericTestBase):

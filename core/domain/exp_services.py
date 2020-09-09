@@ -61,6 +61,7 @@ import utils
 
 datastore_services = models.Registry.import_datastore_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
+transaction_services = models.Registry.import_transaction_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
@@ -536,11 +537,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         Exception. The versions of the given exploration and the currently
             stored exploration model do not match.
     """
-    exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    if exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
-        exploration.validate(strict=True)
-    else:
-        exploration.validate()
+    exploration_is_public = rights_manager.is_exploration_public(exploration.id)
+    exploration.validate(strict=exploration_is_public)
 
     exploration_model = exp_models.ExplorationModel.get(exploration.id)
 
@@ -555,8 +553,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             'which is too old. Please reload the page and try again.'
             % (exploration_model.version, exploration.version))
 
-    old_states = exp_fetchers.get_exploration_from_model(
-        exploration_model).states
+    old_states = (
+        exp_fetchers.get_exploration_from_model(exploration_model).states)
     exploration_model.category = exploration.category
     exploration_model.title = exploration.title
     exploration_model.objective = exploration.objective
@@ -576,31 +574,41 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.correctness_feedback_enabled = (
         exploration.correctness_feedback_enabled)
 
-    change_list_dict = [change.to_dict() for change in change_list]
-    exploration_model.commit(committer_id, commit_message, change_list_dict)
-    caching_services.delete_multi(
-        caching_services.CACHE_NAMESPACE_EXPLORATION,
-        None,
-        [exploration.id])
-
     exploration.version += 1
-
+    change_list_dict = [change.to_dict() for change in change_list]
     exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
-    # Trigger statistics model update.
     new_exp_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, exploration.version, exploration.states,
         exp_versions_diff, None)
 
-    stats_services.create_stats_model(new_exp_stats)
+    def _update_storage_models():
+        """Groups all storage calls into a function call so that they can be
+        performed as an atomic transaction.
+        """
+        exploration_model.commit(committer_id, commit_message, change_list_dict)
+        # Note: the cache will not be reinstated if the transaction fails.
+        # However, it must be deleted before creating the exploration summary
+        # because otherwise the wrong version will be used.
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+            [exploration.id])
+
+        stats_services.create_stats_model(new_exp_stats)
+
+        stats_services.update_exp_issues_for_new_exp_version(
+            exploration, exp_versions_diff=exp_versions_diff,
+            revert_to_version=None)
+
+    transaction_services.run_in_transaction(_update_storage_models)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         trainable_states_dict = exploration.get_trainable_states_dict(
             old_states, exp_versions_diff)
-        state_names_with_changed_answer_groups = trainable_states_dict[
-            'state_names_with_changed_answer_groups']
-        state_names_with_unchanged_answer_groups = trainable_states_dict[
-            'state_names_with_unchanged_answer_groups']
+        state_names_with_changed_answer_groups = (
+            trainable_states_dict['state_names_with_changed_answer_groups'])
+        state_names_with_unchanged_answer_groups = (
+            trainable_states_dict['state_names_with_unchanged_answer_groups'])
         state_names_to_train_classifier = state_names_with_changed_answer_groups
         if state_names_with_unchanged_answer_groups:
             state_names_without_classifier = (
@@ -613,13 +621,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             classifier_services.handle_trainable_states(
                 exploration, state_names_to_train_classifier)
 
-    # Trigger exploration issues model updation.
-    stats_services.update_exp_issues_for_new_exp_version(
-        exploration, exp_versions_diff, None)
 
-
-def _create_exploration(
-        committer_id, exploration, commit_message, commit_cmds):
+def _create_exploration(committer_id, exploration, commit_message, change_list):
     """Ensures that rights for a new exploration are saved first.
 
     This is because _save_exploration() depends on the rights object being
@@ -629,16 +632,13 @@ def _create_exploration(
         committer_id: str. The id of the user who made the commit.
         exploration: Exploration. The exploration domain object.
         commit_message: str. The commit description message.
-        commit_cmds: list(ExplorationChange). A list of commands, describing
+        change_list: list(ExplorationChange). A list of commands, describing
             changes made in this model, which should give sufficient information
             to reconstruct the commit.
     """
-    # This line is needed because otherwise a rights object will be created,
-    # but the creation of an exploration object will fail.
     exploration.validate()
-    rights_manager.create_new_exploration_rights(exploration.id, committer_id)
 
-    model = exp_models.ExplorationModel(
+    exploration_model = exp_models.ExplorationModel(
         id=exploration.id,
         category=exploration.category,
         title=exploration.title,
@@ -651,20 +651,37 @@ def _create_exploration(
         init_state_name=exploration.init_state_name,
         states={
             state_name: state.to_dict()
-            for (state_name, state) in exploration.states.items()},
+            for (state_name, state) in exploration.states.items()
+        },
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
-        correctness_feedback_enabled=exploration.correctness_feedback_enabled
-    )
-    commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
-    model.commit(committer_id, commit_message, commit_cmds_dict)
-    exploration.version += 1
+        correctness_feedback_enabled=exploration.correctness_feedback_enabled)
 
-    # Trigger statistics model creation.
-    exploration_stats = stats_services.get_stats_for_new_exploration(
+    exploration.version += 1
+    change_list_dict = [change.to_dict() for change in change_list]
+
+    new_exp_stats = stats_services.get_stats_for_new_exploration(
         exploration.id, exploration.version, exploration.states)
-    stats_services.create_stats_model(exploration_stats)
+
+    def _update_storage_models():
+        """Groups all storage calls into a function call so that they can be
+        performed as an atomic transaction.
+        """
+        # Rights to the exploration need to be created before the actual
+        # exploration.
+        rights_manager.create_new_exploration_rights(
+            exploration.id, committer_id)
+
+        exploration_model.commit(committer_id, commit_message, change_list_dict)
+        create_exploration_summary(exploration.id, committer_id)
+
+        stats_services.create_stats_model(new_exp_stats)
+
+        stats_services.create_exp_issues_for_new_exploration(
+            exploration.id, exploration.version)
+
+    transaction_services.run_in_transaction(_update_storage_models)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         # Find out all states that need a classifier to be trained.
@@ -677,12 +694,6 @@ def _create_exploration(
         if state_names_to_train:
             classifier_services.handle_trainable_states(
                 exploration, state_names_to_train)
-
-    # Trigger exploration issues model creation.
-    stats_services.create_exp_issues_for_new_exploration(
-        exploration.id, exploration.version)
-
-    create_exploration_summary(exploration.id, committer_id)
 
 
 def save_new_exploration(committer_id, exploration):
@@ -1158,8 +1169,8 @@ def revert_exploration(
         Exception. Version of exploration does not match the version of the
             currently-stored exploration model.
     """
-    exploration_model = exp_models.ExplorationModel.get(
-        exploration_id, strict=False)
+    exploration_model = (
+        exp_models.ExplorationModel.get(exploration_id, strict=False))
 
     if current_version > exploration_model.version:
         raise Exception(
@@ -1174,41 +1185,51 @@ def revert_exploration(
 
     # Validate the previous version of the exploration before committing the
     # change.
-    exploration = exp_fetchers.get_exploration_by_id(
+    exploration_is_public = rights_manager.is_exploration_public(exploration_id)
+    exploration_to_revert_to = exp_fetchers.get_exploration_by_id(
         exploration_id, version=revert_to_version)
-    exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    if exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
-        exploration.validate(strict=True)
-    else:
-        exploration.validate()
+    exploration_to_revert_to.validate(strict=exploration_is_public)
 
-    exp_models.ExplorationModel.revert(
-        exploration_model, committer_id,
-        'Reverted exploration to version %s' % revert_to_version,
-        revert_to_version)
-    caching_services.delete_multi(
-        caching_services.CACHE_NAMESPACE_EXPLORATION, None,
-        [exploration.id])
-
-    # Update the exploration summary, but since this is just a revert do
-    # not add the committer of the revert to the list of contributors.
-    update_exploration_summary(exploration_id, None)
-
-    exploration_stats = stats_services.get_stats_for_new_exp_version(
-        exploration.id, current_version + 1, exploration.states,
-        None, revert_to_version)
-    stats_services.create_stats_model(exploration_stats)
-
-    current_exploration = exp_fetchers.get_exploration_by_id(
+    exploration_at_current_version = exp_fetchers.get_exploration_by_id(
         exploration_id, version=current_version)
-    stats_services.update_exp_issues_for_new_exp_version(
-        current_exploration, None, revert_to_version)
+
+    new_exp_stats = stats_services.get_stats_for_new_exp_version(
+        exploration_id, current_version + 1,
+        exploration_to_revert_to.states,
+        exp_versions_diff=None, revert_to_version=revert_to_version)
+
+    def _update_storage_models():
+        """Groups all storage calls into a function call so that they can be
+        performed as an atomic transaction.
+        """
+        exp_models.ExplorationModel.revert(
+            exploration_model, committer_id,
+            'Reverted exploration to version %s' % revert_to_version,
+            revert_to_version)
+
+        # Note: the cache will not be reinstated if the transaction fails.
+        # However, it must be deleted before creating the exploration summary
+        # because otherwise the wrong version will be used.
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+            [exploration_id])
+
+        # Update the exploration summary, but since this is just a revert so
+        # not add the committer of the revert to the list of contributors.
+        update_exploration_summary(exploration_id, None)
+
+        stats_services.create_stats_model(new_exp_stats)
+
+        stats_services.update_exp_issues_for_new_exp_version(
+            exploration_at_current_version, exp_versions_diff=None,
+            revert_to_version=revert_to_version)
+
+    transaction_services.run_in_transaction(_update_storage_models)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
-        exploration_to_revert_to = exp_fetchers.get_exploration_by_id(
-            exploration_id, version=revert_to_version)
-        classifier_services.create_classifier_training_job_for_reverted_exploration( # pylint: disable=line-too-long
-            current_exploration, exploration_to_revert_to)
+        (classifier_services
+         .create_classifier_training_job_for_reverted_exploration(
+             exploration_at_current_version, exploration_to_revert_to))
 
 
 # Creation and deletion methods.
