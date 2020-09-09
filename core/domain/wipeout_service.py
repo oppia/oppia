@@ -164,6 +164,7 @@ def delete_user(pending_deletion_request):
     _hard_delete_explorations_and_collections(pending_deletion_request)
     _delete_models(pending_deletion_request.user_id, models.NAMES.improvements)
     _pseudonymize_feedback_models(pending_deletion_request)
+    _delete_models(pending_deletion_request.user_id, models.NAMES.feedback)
     _pseudonymize_suggestion_models(pending_deletion_request)
     _pseudonymize_activity_models(
         pending_deletion_request,
@@ -486,9 +487,6 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
         )
         save_pending_deletion_request(pending_deletion_request)
 
-    suggestion_ids_to_pids = (
-        pending_deletion_request.activity_mappings[models.NAMES.suggestion])
-
     def _pseudonymize_models(voiceover_application_models):
         """Pseudonymize user ID fields in the models.
 
@@ -511,6 +509,8 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
                 )
         voiceover_application_class.put_multi(voiceover_application_models)
 
+    suggestion_ids_to_pids = (
+        pending_deletion_request.activity_mappings[models.NAMES.suggestion])
     for i in python_utils.RANGE(
             0,
             len(voiceover_application_models),

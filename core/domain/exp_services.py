@@ -42,6 +42,7 @@ from core.domain import draft_upgrade_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
@@ -773,6 +774,9 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
     # necessary.
     activity_services.remove_featured_activities(
         constants.ACTIVITY_TYPE_EXPLORATION, exploration_ids)
+
+    feedback_services.delete_threads(
+        feconf.ENTITY_TYPE_EXPLORATION, exploration_ids)
 
     # Remove from subscribers.
     taskqueue_services.defer(

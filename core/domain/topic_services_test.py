@@ -21,11 +21,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.domain import exp_services
+from core.domain import question_domain
 from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -35,7 +37,11 @@ from core.tests import test_utils
 
 import feconf
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(
+    topic_models, suggestion_models
+) = models.Registry.import_models([
+    models.NAMES.topic, models.NAMES.sugestion
+])
 
 
 class TopicServicesUnitTests(test_utils.GenericTestBase):
@@ -1062,6 +1068,17 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_delete_topic(self):
         # Test whether an admin can delete a topic.
+        suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_TOPIC,
+            self.TOPIC_ID,
+            1,
+            self.user_id_admin,
+            {
+                'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            },
+            'change'
+        )
         topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID)
         self.assertIsNone(
             topic_fetchers.get_topic_by_id(self.TOPIC_ID, strict=False))
