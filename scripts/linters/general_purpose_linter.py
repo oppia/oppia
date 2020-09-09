@@ -232,7 +232,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/Polyfills.ts',
             'core/templates/filters/translate.pipe.spec.ts',
             'core/templates/components/ck-editor-helpers/' +
-            'ck-editor-copy-content-service.spec.ts'),
+            'ck-editor-copy-content-service.spec.ts',
+            'core/templates/tests/unit-test-utils.ts'),
         'excluded_dirs': ('core/tests/',)
     },
     {
