@@ -16,13 +16,13 @@
  * @fileoverview Constants for svg filename editor.
  */
 
-export class SvgFilenameEditorConstants {
+export const SvgFilenameEditorConstants = {
   // These max width and height paramameters were determined by manual
   // testing and reference from OUTPUT_IMAGE_MAX_WIDTH_PX in
   // filepath-editor file so that the created diagram fits the card
   // content.
-  public static MAX_SVG_DIAGRAM_WIDTH = 450;
-  public static MAX_SVG_DIAGRAM_HEIGHT = 450;
-  public static MIN_SVG_DIAGRAM_WIDTH = 30;
-  public static MIN_SVG_DIAGRAM_HEIGHT = 30;
-}
+  MAX_SVG_DIAGRAM_WIDTH: 450,
+  MAX_SVG_DIAGRAM_HEIGHT: 450,
+  MIN_SVG_DIAGRAM_WIDTH: 30,
+  MIN_SVG_DIAGRAM_HEIGHT: 30
+} as const;
