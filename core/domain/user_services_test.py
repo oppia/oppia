@@ -752,7 +752,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_get_auth_details_by_gae_id_non_existing_user_returns_none(self):
         non_existent_user_id = 'id_x'
         self.assertIsNone(
-            user_services.get_auth_details_by_gae_id(non_existent_user_id))
+            user_services.get_auth_details_by_user_id(non_existent_user_id))
 
     def test_create_new_profile_with_parent_user_pin_set_is_success(self):
         gae_id = 'gae_id'

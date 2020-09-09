@@ -631,26 +631,6 @@ def _verify_basic_models_deleted(user_id):
     return True
 
 
-def _verify_profile_related_models_are_deleted(user_id):
-    """Verify that all the models corresponding to the profile user with give
-    user_id were correctly deleted.
-
-    Args:
-        user_id: str. The id of the profile user to be deleted.
-
-    Returns:
-        bool. True if all the user models for given profile user_id were
-        correctly deleted, False otherwise.
-    """
-    for model_class in PROFILE_SPECIFIC_USER_MODELS:
-        if (model_class.get_deletion_policy() not in
-                [base_models.DELETION_POLICY.KEEP,
-                 base_models.DELETION_POLICY.NOT_APPLICABLE] and
-                model_class.has_reference_to_user_id(user_id)):
-            return False
-    return True
-
-
 def _verify_activity_models_deleted(user_id):
     """Verify that the activity models (question, skill, story) for the user
     with user_id are deleted.

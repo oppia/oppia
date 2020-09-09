@@ -376,8 +376,8 @@ class UserContributionRights(python_utils.OBJECT):
 
 
 class ModifiableUserData(python_utils.OBJECT):
-    """Domain object to represent change in allowed attributes for UserSettings
-    domain object.
+    """Domain object to represent the new values in a UserSettingsModel change
+    submitted by the Android client.
     """
 
     def __init__(

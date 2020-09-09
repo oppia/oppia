@@ -85,7 +85,7 @@ class UserSettings(python_utils.OBJECT):
         preferred_audio_language_code: str or None. Audio language preference.
         pin: str or None. The PIN of the user's profile for android.
         display_alias: str or None. Display name of a user who is logged
-            into the Android app. None when the request in coming from web
+            into the Android app. None when the request is coming from web
             because we don't use it there.
     """
 
@@ -140,7 +140,7 @@ class UserSettings(python_utils.OBJECT):
                 for audio translations preference.
             pin: str or None. The PIN of the user's profile for android.
             display_alias: str or None. Display name of a user who is logged
-                into the Android app. None when the request in coming from
+                into the Android app. None when the request is coming from
                 web because we don't use it there.
             deleted: bool. Whether the user has requested removal of their
                 account.
@@ -208,12 +208,6 @@ class UserSettings(python_utils.OBJECT):
                 self.gae_id
             )
 
-        if not isinstance(self.role, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected role to be a string, received %s' % self.role)
-        if self.role not in role_services.PARENT_ROLES:
-            raise utils.ValidationError('Role %s does not exist.' % self.role)
-
         if self.pin is not None:
             if not isinstance(self.pin, python_utils.BASESTRING):
                 raise utils.ValidationError(
@@ -265,13 +259,13 @@ class UserSettings(python_utils.OBJECT):
                 '%s is not a valid value for the dashboard display '
                 'preferences.' % (self.creator_dashboard_display_pref))
 
-    def populate_from_user_data(self, modifiable_user_data):
+    def populate_from_modifiable_user_data(self, modifiable_user_data):
         """Populate the UserSettings domain object using the user data in
             modifiable_user_data.
 
         Args:
             modifiable_user_data: ModifiableUserData. The modifiable user
-                data version_1 object with the data information to be updated.
+                data object with the information to be updated.
 
         Raises:
             ValidationError. None or empty value is provided for display alias
@@ -1151,7 +1145,7 @@ def create_new_profiles(gae_id, email, modifiable_user_data_list):
             preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
             pin=modifiable_user_data.pin
         )
-        user_settings.populate_from_user_data(modifiable_user_data)
+        user_settings.populate_from_modifiable_user_data(modifiable_user_data)
 
         user_auth_details = UserAuthDetails(
             user_id, None, parent_user_id)
@@ -1197,7 +1191,7 @@ def update_multiple_users_data(modifiable_user_data_list):
             raise Exception('Missing user ID.')
         if not user_settings or not user_auth_details:
             raise Exception('User not found.')
-        user_settings.populate_from_user_data(modifiable_user_data)
+        user_settings.populate_from_modifiable_user_data(modifiable_user_data)
 
     _save_existing_users_settings(user_settings_list)
     _save_existing_users_auth_details(user_auth_details_list)
@@ -1312,34 +1306,6 @@ def get_auth_details_by_user_id(user_id, strict=False):
         return _get_user_auth_details_from_model(user_auth_details_model)
     elif strict:
         logging.error('Could not find user with id %s' % user_id)
-        raise Exception('User not found.')
-    else:
-        return None
-
-
-def get_auth_details_by_gae_id(gae_id, strict=False):
-    """Return the user auth details for a single user.
-
-    Args:
-        gae_id: str. The unique GAE ID of the user.
-        strict: bool. Whether to fail noisily if no user with the given
-            id exists in the datastore. Defaults to False.
-
-    Returns:
-        UserAuthDetails or None. If a user does not exist with given gae_id and
-        strict is False, returns None. Otherwise, returns the corresponding
-        UserAuthDetails domain object.
-
-    Raises:
-        Exception. The value of strict is True and given user_id does not exist.
-    """
-    user_auth_details_model = user_models.UserAuthDetailsModel.get_by_auth_id(
-        feconf.AUTH_METHOD_GAE, gae_id)
-    if (user_auth_details_model is not None) and (
-            user_auth_details_model.deleted is False):
-        return _get_user_auth_details_from_model(user_auth_details_model)
-    elif strict:
-        logging.error('Could not find user with id %s' % gae_id)
         raise Exception('User not found.')
     else:
         return None
