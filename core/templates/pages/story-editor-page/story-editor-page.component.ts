@@ -227,7 +227,7 @@ angular.module('oppia').component('storyEditorPage', {
           StoryEditorNavigationService.navigateToStoryPreviewTab();
         }
         ctrl.directiveSubscriptions.add(
-          UndoRedoService.onUndoRedoChangeApplied().subscribe(
+          UndoRedoService.onUndoRedoChangeApplied$().subscribe(
             () => _initPage()
           )
         );

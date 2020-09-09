@@ -13,11 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for summary tile for collections.
+ * @fileoverview Valid syntax .ts file, used by scripts/linters/
+ * js_ts_linter_test.py.
  */
 
-export const CollectionSummaryTileConstants = {
-  COLLECTION_VIEWER_URL: '/collection/<collection_id>',
-  COLLECTION_EDITOR_URL:
-    '/collection_editor/create/<collection_id>',
+import commonConstants from 'assets/constants';
+
+export const AppConstants = {
+  ...commonConstants,
+  ACTIVITY_STATUS_PRIVATE: 'private'
 } as const;
