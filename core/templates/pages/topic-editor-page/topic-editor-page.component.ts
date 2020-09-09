@@ -56,17 +56,13 @@ angular.module('oppia').directive('topicEditorPage', [
         '/pages/topic-editor-page/topic-editor-page.component.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$window', 'AlertsService', 'BottomNavbarStatusService',
-        'ContextService', 'PageTitleService', 'EntityCreationService',
-        'LoaderService',
-        'BottomNavbarStatusService', 'ContextService', 'PageTitleService',
+        'BottomNavbarStatusService', 'ContextService', 'LoaderService',
+        'PageTitleService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'UndoRedoService', 'UrlService',
         function(
-            $scope, $window, AlertsService, BottomNavbarStatusService,
-            ContextService, PageTitleService, EntityCreationService,
-            LoaderService,
-            BottomNavbarStatusService, ContextService, PageTitleService,
+            BottomNavbarStatusService, ContextService, LoaderService,
+            PageTitleService,
             TopicEditorRoutingService, TopicEditorStateService,
             UndoRedoService, UrlService) {
           var ctrl = this;
