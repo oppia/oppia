@@ -674,7 +674,6 @@ def _create_exploration(committer_id, exploration, commit_message, change_list):
             exploration.id, committer_id)
 
         exploration_model.commit(committer_id, commit_message, change_list_dict)
-        create_exploration_summary(exploration.id, committer_id)
 
         stats_services.create_stats_model(new_exp_stats)
 
@@ -682,6 +681,7 @@ def _create_exploration(committer_id, exploration, commit_message, change_list):
             exploration.id, exploration.version)
 
     transaction_services.run_in_transaction(_update_storage_models)
+    create_exploration_summary(exploration.id, committer_id)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         # Find out all states that need a classifier to be trained.
@@ -1214,10 +1214,6 @@ def revert_exploration(
             caching_services.CACHE_NAMESPACE_EXPLORATION, None,
             [exploration_id])
 
-        # Update the exploration summary, but since this is just a revert so
-        # not add the committer of the revert to the list of contributors.
-        update_exploration_summary(exploration_id, None)
-
         stats_services.create_stats_model(new_exp_stats)
 
         stats_services.update_exp_issues_for_new_exp_version(
@@ -1225,6 +1221,10 @@ def revert_exploration(
             revert_to_version=revert_to_version)
 
     transaction_services.run_in_transaction(_update_storage_models)
+
+    # Update the exploration summary, but since this is just a revert so not add
+    # the committer of the revert to the list of contributors.
+    update_exploration_summary(exploration_id, None)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         (classifier_services
