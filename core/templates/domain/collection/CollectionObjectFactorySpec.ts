@@ -18,7 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { CollectionNodeObjectFactory } from
+import { CollectionNode, CollectionNodeObjectFactory } from
   'domain/collection/collection-node-object.factory';
 import { Collection, CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
@@ -55,7 +55,7 @@ describe('Collection object factory', () => {
       sampleCollectionBackendObject);
   });
 
-  var _addCollectionNode = function(explorationId) {
+  var _addCollectionNode = function(explorationId): boolean {
     var collectionNodeBackendObject = {
       exploration_id: explorationId,
       exploration_summary: {
@@ -87,7 +87,7 @@ describe('Collection object factory', () => {
       collectionNodeObjectFactory.create(collectionNodeBackendObject));
   };
 
-  var _getCollectionNode = function(explorationId) {
+  var _getCollectionNode = function(explorationId): CollectionNode {
     return _sampleCollection.getCollectionNodeByExplorationId(explorationId);
   };
 

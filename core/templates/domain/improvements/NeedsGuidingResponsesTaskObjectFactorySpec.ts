@@ -32,7 +32,8 @@ describe('Needs guiding responses task', function() {
   });
 
   beforeEach(() => {
-    this.newTop10AnswerStats = (numUnaddressedAnswers: number) => {
+    this.newTop10AnswerStats = (
+        numUnaddressedAnswers: number): AnswerStats[] => {
       const answerStats = [];
       for (let i = 0; i < 10; ++i) {
         const newAnswerStats = new AnswerStats(

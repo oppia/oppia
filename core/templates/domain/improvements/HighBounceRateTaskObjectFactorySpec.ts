@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config-object.factory';
-import { HighBounceRateTaskObjectFactory } from
+import { HighBounceRateTask, HighBounceRateTaskObjectFactory} from
   'domain/improvements/HighBounceRateTaskObjectFactory';
 import { ExplorationStatsObjectFactory, ExplorationStats } from
   'domain/statistics/ExplorationStatsObjectFactory';
@@ -39,8 +39,9 @@ describe('High bounce rate task', function() {
     this.config = (
       new ExplorationImprovementsConfig('eid', 1, true, 0.25, 0.20, 100));
     this.createFromExplorationStats = (
-        expStats: ExplorationStats, stateName: string,
-        numEqPlaythroughs: number) => {
+        expStats: ExplorationStats,
+        stateName: string,
+        numEqPlaythroughs: number): HighBounceRateTask => {
       const task = highBounceRateTaskObjectFactory.createFromBackendDict({
         entity_type: 'exploration',
         entity_id: 'eid',
@@ -58,7 +59,7 @@ describe('High bounce rate task', function() {
       return task;
     };
     this.newExplorationStatsWithBounceRate = (
-      (numExpStarts: number, bounceRate: number) => {
+      (numExpStarts: number, bounceRate: number): ExplorationStats => {
         return explorationStatsObjectFactory.createFromBackendDict({
           exp_id: 'eid',
           exp_version: 1,

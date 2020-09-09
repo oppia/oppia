@@ -51,7 +51,7 @@ describe('ParamType objects', () => {
     expect(() => {
       // Defines a "Natural Number" type but gives it a negative default value.
       new ParamType({
-        validate: function(v) {
+        validate: function(v): boolean {
           return v >= 0;
         },
         default_value: -1,

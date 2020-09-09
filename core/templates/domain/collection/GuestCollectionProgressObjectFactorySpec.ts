@@ -16,7 +16,7 @@
  * @fileoverview Tests for GuestCollectionProgressObjectFactory.
  */
 
-import { GuestCollectionProgressObjectFactory } from
+import { GuestCollectionProgress, GuestCollectionProgressObjectFactory } from
   'domain/collection/GuestCollectionProgressObjectFactory';
 
 describe('Guest collection progress object factory', () => {
@@ -37,7 +37,7 @@ describe('Guest collection progress object factory', () => {
     _expId1 = 'exploration_id1';
   });
 
-  var _createEmptyProgressObject = () => {
+  var _createEmptyProgressObject = (): GuestCollectionProgress => {
     return guestCollectionProgressObjectFactory.createFromJson(null);
   };
 

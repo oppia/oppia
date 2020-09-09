@@ -30,7 +30,7 @@ describe('Stopwatch object factory', () => {
     nowSpy = spyOn(Date, 'now');
   });
 
-  const changeCurrentTime = (desiredCurrentTime) => {
+  const changeCurrentTime = (desiredCurrentTime): void => {
     nowSpy.and.returnValue(desiredCurrentTime);
   };
 

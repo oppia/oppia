@@ -93,7 +93,7 @@ describe('App', function() {
     }));
 
     it('should handle non-Error type exceptions gracefully', function() {
-      var testException = (error, regex) => {
+      var testException = (error, regex): void => {
         $exceptionHandler(error);
         var expectedError = new Error(error);
         expect(sourceMappedStackTrace.mapStackTrace).toHaveBeenCalledWith(
