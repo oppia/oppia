@@ -305,7 +305,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_6', self.translation_language_code)
-            
+
         queries = [('language_code', self.translation_language_code)]
 
         self.assertEqual(

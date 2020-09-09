@@ -264,7 +264,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_2'],
-                    'inapplicable_misconception_ids': ['skillid-1']
+                    'inapplicable_skill_misconception_ids': ['skillid-1']
                 },
                 'skill_id': 'skill_2',
                 'skill_difficulty': 0.3,
@@ -511,7 +511,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_2'],
-                    'inapplicable_misconception_ids': ['skillid-1']
+                    'inapplicable_skill_misconception_ids': ['skillid-1']
                 },
                 'skill_id': 'skill_2',
                 'skill_difficulty': 0.3,
@@ -784,7 +784,7 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_misconception_ids': ['skillid-1']
+                'inapplicable_skill_misconception_ids': ['skillid-1']
             },
             'skill_id': 'skill_1',
             'skill_difficulty': 0.3,
@@ -1048,7 +1048,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_1'],
-                    'inapplicable_misconception_ids': ['skillid-1']
+                    'inapplicable_skill_misconception_ids': ['skillid-1']
                 },
                 'skill_id': 'skill_1',
                 'skill_difficulty': 0.3,
@@ -1419,7 +1419,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_1'],
-                    'inapplicable_misconception_ids': ['skillid-1']
+                    'inapplicable_skill_misconception_ids': ['skillid-1']
                 },
                 'skill_id': 'skill_1',
                 'skill_difficulty': 0.3,
@@ -1573,7 +1573,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_1'],
-                    'inapplicable_misconception_ids': ['skillid-1']
+                    'inapplicable_skill_misconception_ids': ['skillid-1']
                 },
                 'skill_id': 'skill_1',
                 'skill_difficulty': 0.3,
@@ -1737,11 +1737,11 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         score_type = ''
         score_subtype = ''
         if suggestion_type == (
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
             score_type = suggestion_models.SCORE_TYPE_CONTENT
             score_subtype = self.exploration_category
         elif suggestion_type == (
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             score_type = suggestion_models.SCORE_TYPE_TRANSLATION
             score_subtype = self.exploration_category
         elif suggestion_type == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
@@ -1766,8 +1766,13 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
                 'default_state').to_dict()
         self.process_and_flush_pending_tasks()
 
-    def test_migrate_edit_state_content_suggestions_does_nothing(
+    def test_migrate_language_code_for_edit_state_content_suggestions(
             self):
+        """This test checks if the one off job does nothing and exits early
+        for "edit state content" suggestions. This test also proves that ndb
+        automatically sets the language_code field to be None if it isn't
+        specified in the put call.
+        """
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
             suggestion_type=(
@@ -1882,7 +1887,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         expected_language_code = 'hi'
         self.assertEqual(suggestion.language_code, expected_language_code)
 
-    def test_no_action_is_performed_for_suggestion_that_is_marked_deleted(
+    def test_no_action_is_performed_for_suggestions_that_are_marked_deleted(
             self):
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
@@ -1922,8 +1927,12 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
 
         self._run_job_and_verify_output(expected_output)
 
-    def test_do_nothing_for_edit_state_content_suggestions_that_have_the_field(
+    def test_migrate_edit_state_content_suggestions_that_already_set_the_field(
             self):
+        """This test tests that the migration exits early for
+        "edit state content" suggestions. The language code is already set to
+        None.
+        """
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id',
@@ -1941,7 +1950,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
 
         self._run_job_and_verify_output(expected_output)
 
-    def test_do_nothing_for_translation_suggestions_that_have_a_language_code(
+    def test_migrate_translation_suggestions_that_already_have_a_language_code(
             self):
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
@@ -1963,7 +1972,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
 
         self._run_job_and_verify_output(expected_output)
 
-    def test_do_nothing_for_question_suggestions_that_have_a_language_code(
+    def test_migrate_question_suggestions_that_already_have_a_language_code(
             self):
         with self.swap(
             feedback_models.GeneralFeedbackThreadModel,
