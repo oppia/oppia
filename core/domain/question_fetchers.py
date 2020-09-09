@@ -123,7 +123,7 @@ def get_question_from_model(question_model):
         versioned_question_state['state_schema_version'],
         question_model.language_code, question_model.version,
         question_model.linked_skill_ids,
-        question_model.inapplicable_misconception_ids,
+        question_model.inapplicable_skill_misconception_ids,
         question_model.created_on, question_model.last_updated)
 
 
