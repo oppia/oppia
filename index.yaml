@@ -306,21 +306,11 @@ indexes:
   - name: commit_message
   - name: commit_type
 
-- kind: UserContributionProficiencyModel
-<<<<<<< HEAD
-  properties:
+  - kind: UserContributionProficiencyModel
+    properties:
   - name: deleted
   - name: user_id
   - name: score
-
-- kind: UserContributionScoringModel
-=======
->>>>>>> d457ca65c1e9e7d783aa5b3fedf447ee0ec01932
-  properties:
-  - name: deleted
-  - name: user_id
-  - name: score
-
 - kind: UserContributionProficiencyModel
   properties:
   - name: realtime_layer
