@@ -1,5 +1,13 @@
 name: Lighthouse CI performance tests
-on: [pull_request]
+on:
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
 
 jobs:
   lighthouse:
