@@ -17,44 +17,44 @@
  *               help tab in the navbar.
  */
 
-export class ExplorationEditorPageConstants {
-  public static EXPLORATION_TITLE_INPUT_FOCUS_LABEL =
-    'explorationTitleInputFocusLabel';
+export const ExplorationEditorPageConstants = {
+  EXPLORATION_TITLE_INPUT_FOCUS_LABEL:
+    'explorationTitleInputFocusLabel',
 
-  public static PARAM_ACTION_GET = 'get';
+  PARAM_ACTION_GET: 'get',
 
-  public static PARAM_ACTION_SET = 'set';
+  PARAM_ACTION_SET: 'set',
 
-  public static VOICEOVER_MODE = 'voiceoverMode';
+  VOICEOVER_MODE: 'voiceoverMode',
 
-  public static TRANSLATION_MODE = 'translationMode';
+  TRANSLATION_MODE: 'translationMode',
 
   // When an unresolved answer's frequency exceeds this threshold, an
   // exploration will be blocked from being published until the answer is
   // resolved.
-  public static UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD = 5;
+  UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD: 5,
 
   // Constant for audio recording time limit.
-  public static RECORDING_TIME_LIMIT = 300;
+  RECORDING_TIME_LIMIT: 300,
 
-  public static IMPROVE_TYPE_INCOMPLETE = 'incomplete';
+  IMPROVE_TYPE_INCOMPLETE: 'incomplete',
 
-  public static DEFAULT_AUDIO_LANGUAGE = 'en';
+  DEFAULT_AUDIO_LANGUAGE: 'en',
 
-  public static INFO_MESSAGE_SOLUTION_IS_VALID =
-    'The solution is now valid!';
+  INFO_MESSAGE_SOLUTION_IS_VALID:
+    'The solution is now valid!',
 
-  public static INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE =
-    'The current solution is no longer valid.';
+  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE:
+    'The current solution is no longer valid.',
 
-  public static ACTION_ACCEPT_SUGGESTION = 'accept';
-  public static ACTION_REJECT_SUGGESTION = 'reject';
+  ACTION_ACCEPT_SUGGESTION: 'accept',
+  ACTION_REJECT_SUGGESTION: 'reject',
 
-  public static COMPONENT_NAME_DEFAULT_OUTCOME = 'default_outcome';
+  COMPONENT_NAME_DEFAULT_OUTCOME: 'default_outcome',
 
-  public static STATUS_COMPLIMENT = 'compliment';
-  public static STATUS_FIXED = 'fixed';
-  public static STATUS_IGNORED = 'ignored';
-  public static STATUS_NOT_ACTIONABLE = 'not_actionable';
-  public static STATUS_OPEN = 'open';
-}
+  STATUS_COMPLIMENT: 'compliment',
+  STATUS_FIXED: 'fixed',
+  STATUS_IGNORED: 'ignored',
+  STATUS_NOT_ACTIONABLE: 'not_actionable',
+  STATUS_OPEN: 'open'
+} as const;

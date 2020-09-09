@@ -9,5 +9,8 @@
   "core/templates/Polyfills.ts": [
     "navigator.mediaDevices = {};",
     "navigator.webkitGetUserMedia || navigator.mozGetUserMedia);"
+  ],
+  "core/templates/tests/unit-test-utils.ts": [
+    "element, [failHardModule, ng1Module.name]));"
   ]
 }
