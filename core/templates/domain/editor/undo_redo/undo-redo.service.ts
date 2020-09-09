@@ -16,11 +16,11 @@
  * @fileoverview Undo Redo Service.
  */
 
-require('domain/editor/undo_redo/base-undo-redo.service.ts');
+import { BaseUndoRedo } from './base-undo-redo.service';
 
 angular.module('oppia').factory('UndoRedoService', [
-  'BaseUndoRedoService', function(BaseUndoRedoService) {
-    var child = Object.create(BaseUndoRedoService);
+  function() {
+    var child = new BaseUndoRedo();
     child.init();
     return child;
   }
