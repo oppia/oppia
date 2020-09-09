@@ -145,21 +145,25 @@ def check_updates_to_terms_of_service(
                 f.write(line)
 
 
-def verify_feconf(release_feconf_path):
+def verify_feconf(release_feconf_path, verify_mailgun_api):
     """Verifies that feconf is updated correctly to include
-    mailgun api key.
+    mailgun api key and redishost.
 
     Args:
+        verify_mailgun_api: bool. Whether to verify mailgun api key.
         release_feconf_path: str. The path to feconf file in release
             directory.
     """
     feconf_contents = python_utils.open_file(
         release_feconf_path, 'r').read()
-    if ('MAILGUN_API_KEY' not in feconf_contents or
+    if verify_mailgun_api and (
+            'MAILGUN_API_KEY' not in feconf_contents or
             'MAILGUN_API_KEY = None' in feconf_contents):
-        raise Exception(
-            'The mailgun API key must be added '
-            'before deployment.')
+        raise Exception('The mailgun API key must be added before deployment.')
+
+    if ('REDISHOST' not in feconf_contents or
+            'REDISHOST = \'localhost\'' in feconf_contents):
+        raise Exception('REDISHOST must be updated before deployment.')
 
 
 def add_mailgun_api_key(release_feconf_path):
@@ -191,8 +195,6 @@ def add_mailgun_api_key(release_feconf_path):
             if line == 'MAILGUN_API_KEY = None\n':
                 line = line.replace('None', '\'%s\'' % mailgun_api_key)
             f.write(line)
-
-    verify_feconf(release_feconf_path)
 
 
 def main(
@@ -232,11 +234,4 @@ def main(
         release_feconf_path, feconf_config_path, FECONF_REGEX)
     apply_changes_based_on_config(
         release_constants_path, constants_config_path, CONSTANTS_REGEX)
-
-    common.ask_user_to_confirm(
-        'Done! Please check %s and %s to ensure that '
-        'the changes made are correct. Specifically verify that the '
-        'MAILGUN_API_KEY and REDISHOST are updated correctly and '
-        'other config changes are corresponding to %s and %s.\n' % (
-            release_feconf_path, release_constants_path,
-            feconf_config_path, constants_config_path))
+    verify_feconf(release_feconf_path, prompt_for_mailgun_and_terms_update)

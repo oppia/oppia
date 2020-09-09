@@ -60,7 +60,7 @@
     </div>
     <div ng-if="isActive(TAB_ID_CUSTOMIZATION_ARGS)" class="translation-state-content">
       <h3>Preview - {{INTERACTION_SPECS[stateInteractionId].name}}</h3>
-      <angular-html-bind html-data="interactionPreviewHtml" style="pointer-events: none;">
+      <angular-html-bind html-data="interactionPreviewHtml" class="oppia-translation-state-content-html-data">
       </angular-html-bind>
       <h3>Content</h3>
       <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
@@ -341,5 +341,8 @@
   }
   .oppia-rte-editor-focused *:hover {
     background-color: rgba(233, 241, 242);
+  }
+  state-translation .oppia-translation-state-content-html-data {
+    pointer-events: none;
   }
 </style>
