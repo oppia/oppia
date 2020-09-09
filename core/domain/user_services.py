@@ -633,7 +633,9 @@ def get_users_settings(user_ids, strict=False):
             ))
         else:
             result.append(
-                _transform_user_settings(model) if model is not None else None)
+                _get_user_settings_from_model(model)
+                if model is not None else None
+            )
     return result
 
 
@@ -738,7 +740,7 @@ def get_user_settings_by_gae_id(gae_id, strict=False):
     user_auth_details_model = user_models.UserAuthDetailsModel.get_by_auth_id(
         feconf.AUTH_METHOD_GAE, gae_id)
     if user_auth_details_model is not None:
-        user_settings = _transform_user_settings(
+        user_settings = _get_user_settings_from_model(
             user_models.UserSettingsModel.get_by_id(user_auth_details_model.id))
         return user_settings
     elif strict:
@@ -932,7 +934,7 @@ def _save_user_settings(user_settings):
         user_models.UserSettingsModel(**user_settings_dict).put()
 
 
-def _transform_user_settings(user_settings_model):
+def _get_user_settings_from_model(user_settings_model):
     """Transform user settings storage model to domain object.
 
     Args:
