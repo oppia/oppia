@@ -47,6 +47,5 @@ URLS = [
         r'/cron/jobs/cleanup', cron.CronMapreduceCleanupHandler),
 ]
 
-
 app = main.ndb_wsgi_middleware(  # pylint: disable=invalid-name
     webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))

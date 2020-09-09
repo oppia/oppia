@@ -246,13 +246,10 @@ def main(args=None):
         # https://stackoverflow.com/q/10095037 for more details.
         sys.path.insert(1, directory)
 
-    #pkg_resources.working_set.add_entry(common.THIRD_PARTY_DIR)
-
     if 'google' in sys.modules:
         google_path = os.path.join(common.THIRD_PARTY_DIR, 'google')
         google_module = sys.modules['google']
         google_module.__path__.append(google_path)
-
 
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(
