@@ -2,27 +2,27 @@
   <div class="oppia-topic-viewer-tabs-container" headroom>
     <div class="topic-viewer-tabs-list">
       <ul class="topic-viewer-tabs">
-        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'story'}">
-          <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('story')">
-            <img alt="play story icon" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/play_icon_24px.svg')]>">
+        <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'story'}">
+          <div class="topic-viewer-tabs-text" (click)="setActiveTab('story')">
+            <img alt="play story icon" class="tab-icon" [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
             <a class="tab-title"
-               translate="I18N_TOPIC_VIEWER_LESSONS">
+               [innerHTML]="'I18N_TOPIC_VIEWER_LESSONS' | translate">
             </a>
           </div>
         </li>
-        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}">
-          <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('practice')">
-            <img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/train_icon_24px.svg')]>">
+        <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'practice'}">
+          <div class="topic-viewer-tabs-text" (click)="setActiveTab('practice')">
+            <img alt="" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
             <a class="tab-title"
-               translate="I18N_TOPIC_VIEWER_PRACTICE">
+               [innerHTML]="'I18N_TOPIC_VIEWER_PRACTICE' | translate">
             </a>
           </div>
         </li>
-        <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'subtopics'}">
-          <div class="topic-viewer-tabs-text" ng-click="$ctrl.setActiveTab('subtopics')">
-            <img alt="" class="tab-icon" ng-src="<[$ctrl.getStaticImageUrl('/icons/review_icon_24px.svg')]>">
+        <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'subtopics'}">
+          <div class="topic-viewer-tabs-text" (click)="setActiveTab('subtopics')">
+            <img alt="" class="tab-icon" [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
             <a class="tab-title"
-               translate="I18N_TOPIC_VIEWER_REVISION">
+               [innerHTML]="'I18N_TOPIC_VIEWER_REVISION' | translate">
             </a>
           </div>
         </li>
@@ -30,30 +30,30 @@
     </div>
   </div>
   <background-banner></background-banner>
-  <div class="topic-viewer-page-content" ng-if="!$ctrl.topicIsLoading">
-    <div ng-if="$ctrl.activeTab === 'story'">
-      <stories-list [topic-name]="$ctrl.topicName"
-                    [topic-description]="$ctrl.topicDescription"
-                    [canonical-story-summaries]="$ctrl.canonicalStorySummaries"
-                    [classroom-url-fragment]="$ctrl.classroomUrlFragment"
-                    [topic-url-fragment]="$ctrl.topicUrlFragment">
+  <div class="topic-viewer-page-content" *ngIf="!topicIsLoading">
+    <div *ngIf="activeTab === 'story'">
+      <stories-list [topicName]="topicName"
+                    [topicDescription]="topicDescription"
+                    [canonicalStorySummaries]="canonicalStorySummaries"
+                    [classroomUrlFragment]="classroomUrlFragment"
+                    [topicUrlFragment]="topicUrlFragment">
       </stories-list>
     </div>
-    <div ng-if="$ctrl.activeTab === 'practice'">
-      <practice-tab ng-show="$ctrl.practiceTabIsDisplayed"
-                    [subtopics-list]="$ctrl.subtopics"
-                    [topic-name]="$ctrl.topicName">
+    <div *ngIf="activeTab === 'practice'">
+      <practice-tab *ngIf="practiceTabIsDisplayed"
+                    [subtopicsList]="subtopics"
+                    [topicName]="topicName">
       </practice-tab>
-      <md-card ng-show="!$ctrl.practiceTabIsDisplayed" class="oppia-page-card practice-tab-not-available-card">
+      <mat-card *ngIf="!practiceTabIsDisplayed" class="oppia-page-card practice-tab-not-available-card">
         <h2 class="tab-title">Coming Soon!</h2>
         <div class="practice-tab-not-available-text">Come back later when practice questions are available for this topic.</div>
-      </md-card>
+      </mat-card>
     </div>
-    <div ng-if="$ctrl.activeTab === 'subtopics'">
-      <subtopics-list [classroom-url-fragment]="$ctrl.classroomUrlFragment"
-                      [subtopics-list]="$ctrl.subtopics"
-                      [topic-id]="$ctrl.topicId"
-                      [topic-url-fragment]="$ctrl.topicUrlFragment">
+    <div *ngIf="activeTab === 'subtopics'">
+      <subtopics-list [classroomUrlFragment]="classroomUrlFragment"
+                      [subtopicsList]="subtopics"
+                      [topicId]="topicId"
+                      [topicUrlFragment]="topicUrlFragment">
       </subtopics-list>
     </div>
   </div>
@@ -70,7 +70,7 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.5);
   }
 
-  .topic-viewer-tabs-list {
+ .topic-viewer-tabs-list {
     margin: 0 auto;
     width: 704px;
   }
@@ -92,7 +92,6 @@
     box-shadow: 3px 3px 6px rgba(0,0,0, 0.5);
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     margin: 0 auto;
-    position: fixed;
     width: 100%;
     z-index: 1000;
   }
@@ -171,6 +170,7 @@
   }
 
   .topic-viewer-page-content .practice-tab-not-available-card {
+    margin-top: 20vh;
     width: 40vw;
   }
 

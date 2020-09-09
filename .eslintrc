@@ -122,7 +122,8 @@
       "error",
       {
         "code": 80,
-        "ignoreUrls": true
+        "ignoreUrls": true,
+        "ignorePattern": "^import \\{"
       }
     ],
     "no-compare-neg": "off",
