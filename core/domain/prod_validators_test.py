@@ -34,7 +34,6 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import fs_services
-from core.domain import html_validation_service
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
 from core.domain import prod_validation_jobs_one_off
@@ -6043,234 +6042,6 @@ class ExplorationContextModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class ExplorationMathRichTextInfoModelValidatorTests(
-        test_utils.AuditJobsTestBase):
-
-    def setUp(self):
-        super(ExplorationMathRichTextInfoModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            '%s' % i,
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in python_utils.RANGE(3)]
-
-        for exp in explorations:
-            exp.add_states(['FirstState'])
-            exploration_state = exp.states['FirstState']
-            valid_html_content = (
-                '<oppia-noninteractive-math math_content-with-value="{&amp;'
-                'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
-                'quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
-                '-noninteractive-math>'
-            )
-            content_dict = {
-                'content_id': 'content',
-                'html': valid_html_content
-            }
-            exploration_state.update_content(
-                state_domain.SubtitledHtml.from_dict(content_dict))
-            exp_services.save_new_exploration(self.owner_id, exp)
-
-        self.model_instance_0 = (
-            exp_models.ExplorationMathRichTextInfoModel(
-                id='0',
-                latex_strings_without_svg=['+,+,+,+'],
-                math_images_generation_required=True,
-                estimated_max_size_of_images_in_bytes=7000))
-        self.model_instance_0.put()
-        self.model_instance_1 = (
-            exp_models.ExplorationMathRichTextInfoModel(
-                id='1',
-                latex_strings_without_svg=['+,+,+,+'],
-                math_images_generation_required=True,
-                estimated_max_size_of_images_in_bytes=7000))
-        self.model_instance_1.put()
-        self.model_instance_2 = (
-            exp_models.ExplorationMathRichTextInfoModel(
-                id='2',
-                latex_strings_without_svg=['+,+,+,+'],
-                math_images_generation_required=True,
-                estimated_max_size_of_images_in_bytes=7000))
-        self.model_instance_2.put()
-
-        self.job_class = (
-            prod_validation_jobs_one_off.
-            ExplorationMathRichTextInfoModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 3]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-    def test_model_with_latex_strings_not_matching_exploration(self):
-        self.model_instance_2 = (
-            exp_models.ExplorationMathRichTextInfoModel(
-                id='2',
-                latex_strings_without_svg=['+,+,+,+', 'x^2'],
-                math_images_generation_required=True,
-                estimated_max_size_of_images_in_bytes=7000))
-        self.model_instance_2.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for latex strings check of Explo'
-                'rationMathRichTextInfoModel\', '
-                '[u\'Entity id %s: latex strings in the model does not match '
-                'latex strings in the exploration model\']]') % (
-                    self.model_instance_2.id,
-                ),
-            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_estimated_svg_size_not_matching_exploration(self):
-        self.model_instance_2.estimated_max_size_of_images_in_bytes = (
-            8000)
-        self.model_instance_2.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for svg size check of '
-                'ExplorationMathRichTextInfoModel\', '
-                '[u\'Entity id %s: estimated svg size in the model does not '
-                'match estimated svg size in the exploration model\']]') % (
-                    self.model_instance_2.id,
-                ),
-            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_wrong_status_of_image_generation_requirement(self):
-        exploration = (
-            exp_domain.Exploration.create_default_exploration(
-                '3', title='title4', category='category4'))
-        exploration.add_states(['FirstState'])
-        exploration_state = exploration.states['FirstState']
-        valid_html_content = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;'
-            'quot;raw_latex&amp;quot;: &amp;quot;+,+,+,+&amp;quot;, &amp;'
-            'quot;svg_filename&amp;quot;: &amp;quot;math.svg&amp;quot;}">'
-            '</oppia-noninteractive-math>'
-        )
-        content_dict = {
-            'content_id': 'content',
-            'html': valid_html_content
-        }
-        exploration_state.update_content(
-            state_domain.SubtitledHtml.from_dict(content_dict))
-        exp_services.save_new_exploration(self.owner_id, exploration)
-        model_instance = (
-            exp_models.ExplorationMathRichTextInfoModel(
-                id='3',
-                latex_strings_without_svg=['+,+,+,+'],
-                math_images_generation_required=False,
-                estimated_max_size_of_images_in_bytes=7000))
-        model_instance.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for image generation requirement'
-                ' check of ExplorationMathRichTextInfoModel\', '
-                '[u\'Entity id %s: status of image generation does not match '
-                'the image generation requirement for the exploration'
-                ' model\']]') % (model_instance.id),
-            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 3]']
-
-        # We need to swap the return value of the method
-        # get_latex_strings_without_svg_from_html because
-        # normally this method returns LaTeX strings from math-tags without
-        # filenames.
-        with self.swap(
-            html_validation_service,
-            'get_latex_strings_without_svg_from_html',
-            lambda html: ['+,+,+,+']):
-            self.run_job_and_check_output(
-                expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for time field relation check '
-                'of ExplorationMathRichTextInfoModel\', '
-                '[u\'Entity id %s: The created_on field has a value '
-                '%s which is greater than the value '
-                '%s of last_updated field\']]') % (
-                    self.model_instance_0.id,
-                    self.model_instance_0.created_on,
-                    self.model_instance_0.last_updated
-                ),
-            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        self.model_instance_2.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'ExplorationMathRichTextInfoModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
-            hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
-            self.run_job_and_check_output(
-                expected_output, sort=True, literal_eval=False)
-
-    def test_missing_exp_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('2').delete(
-            feconf.SYSTEM_COMMITTER_ID, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for '
-                'exploration_ids field check of '
-                'ExplorationMathRichTextInfoModel\', '
-                '[u"Entity id 2: based on field '
-                'exploration_ids having value 2, expect model ExplorationModel '
-                'with id 2 but it doesn\'t exist"]]'),
-            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 2]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_standard_operation_when_latex_strings_have_unicode(self):
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id', title='title1', category='category')
-        exploration.add_states(['FirstState'])
-        exploration_state = exploration.states['FirstState']
-        valid_html_content_with_unicode = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
-            'uot;raw_latex&amp;quot;: &amp;quot;ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ&'
-            'amp;quot;, &amp;quot;svg_filename&amp;quot;: &amp;quot;&am'
-            'p;quot;}"></oppia-noninteractive-math>'
-        )
-        content_dict = {
-            'content_id': 'content',
-            'html': valid_html_content_with_unicode
-        }
-        exploration_state.update_content(
-            state_domain.SubtitledHtml.from_dict(content_dict))
-        exp_services.save_new_exploration(self.owner_id, exploration)
-
-        model_instance = (
-            exp_models.ExplorationMathRichTextInfoModel(
-                id='exp_id',
-                latex_strings_without_svg=['ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ'],
-                math_images_generation_required=True,
-                estimated_max_size_of_images_in_bytes=46000))
-        model_instance.put()
-        expected_output = [
-            u'[u\'fully-validated ExplorationMathRichTextInfoModel\', 4]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
-
 class QuestionSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
@@ -6986,8 +6757,9 @@ class ExplorationRecommendationsModelValidatorTests(
         for exp in explorations:
             exp_services.save_new_exploration(self.user_id, exp)
 
-        recommendations_services.set_recommendations('0', ['3', '4'])
-        recommendations_services.set_recommendations('1', ['5'])
+        recommendations_services.set_exploration_recommendations(
+            '0', ['3', '4'])
+        recommendations_services.set_exploration_recommendations('1', ['5'])
 
         self.model_instance_0 = (
             recommendations_models.ExplorationRecommendationsModel.get_by_id(
@@ -7345,9 +7117,9 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 'new_value': 'New description',
                 'old_value': 'description 0'
             })], 'Changes.')
-
         expected_output = [
             u'[u\'fully-validated SkillModel\', 5]']
+        self.process_and_flush_pending_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -7440,6 +7212,7 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 'new_value': 'New description',
                 'old_value': 'description 0'
             })], 'Changes.')
+        self.process_and_flush_pending_tasks()
         skill_models.SkillCommitLogEntryModel.get_by_id(
             'skill-0-1').delete()
 
@@ -7588,6 +7361,7 @@ class SkillSnapshotMetadataModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillSnapshotMetadataModel\', 4]']
+        self.process_and_flush_pending_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -7792,6 +7566,7 @@ class SkillSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillSnapshotContentModel\', 4]']
+        self.process_and_flush_pending_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -7948,6 +7723,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillCommitLogEntryModel\', 4]']
+        self.process_and_flush_pending_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -8192,6 +7968,7 @@ class SkillSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillSummaryModel\', 3]']
+        self.process_and_flush_pending_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -9442,7 +9219,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['0'],
-                'inapplicable_misconception_ids': ['skillid-0']
+                'inapplicable_skill_misconception_ids': ['skillid-0']
             },
             'skill_id': '0',
             'skill_difficulty': 0.3,
@@ -13375,8 +13152,6 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
 
 class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
 
-    USER_PIN = '123'
-
     def setUp(self):
         super(UserAuthDetailsModelValidatorTests, self).setUp()
 
@@ -14966,25 +14741,28 @@ class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
+class UserContributionProficiencyModelValidatorTests(
+        test_utils.AuditJobsTestBase):
 
     def setUp(self):
-        super(UserContributionScoringModelValidatorTests, self).setUp()
+        super(UserContributionProficiencyModelValidatorTests, self).setUp()
 
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
         score_category = 'content.Art'
-        self.model_instance = user_models.UserContributionScoringModel.create(
-            self.user_id, score_category, 10
+        self.model_instance = (
+            user_models.UserContributionProficiencyModel.create(
+                self.user_id, score_category, 10
+            )
         )
         self.job_class = (
             prod_validation_jobs_one_off
-            .UserContributionScoringModelAuditOneOffJob)
+            .UserContributionProficiencyModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
-            u'[u\'fully-validated UserContributionScoringModel\', 1]']
+            u'[u\'fully-validated UserContributionProficiencyModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -14994,7 +14772,7 @@ class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
-            'of UserContributionScoringModel\', '
+            'of UserContributionProficiencyModel\', '
             '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
@@ -15007,7 +14785,7 @@ class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
-            'UserContributionScoringModel\', '
+            'UserContributionProficiencyModel\', '
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
@@ -15023,7 +14801,7 @@ class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for user_settings_ids '
-                'field check of UserContributionScoringModel\', '
+                'field check of UserContributionProficiencyModel\', '
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
                 '%s, expect model UserSettingsModel '
@@ -15037,7 +14815,7 @@ class UserContributionScoringModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for score check of '
-            'UserContributionScoringModel\', [u\'Entity id %s: '
+            'UserContributionProficiencyModel\', [u\'Entity id %s: '
             'Expected score to be non-negative, received -1.0\']]') % (
                 self.model_instance.id)]
         self.run_job_and_check_output(

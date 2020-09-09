@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { MathInteractionsService } from 'services/math-interactions.service';
 
 describe('MathInteractionsService', () => {
-  let mathInteractionsService: MathInteractionsService = null;
+  let mathInteractionsService: MathInteractionsService;
 
   beforeEach(() => {
     mathInteractionsService = TestBed.get(MathInteractionsService);
@@ -127,6 +127,24 @@ describe('MathInteractionsService', () => {
       '(x^3.5)^/2', ['x'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer has two symbols next to each other: "^" and "/".');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'sqrt() + x', ['x'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'The sqrt function(s) cannot be empty. ' +
+      'Please enter a variable/number in it.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'sin()/x', ['x'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'The sin function(s) cannot be empty. ' +
+      'Please enter a variable/number in it.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'tan()sin()', ['x'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'The sin, tan function(s) cannot be empty. ' +
+      'Please enter a variable/number in it.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       '12+sqrt(4)', [])).toBeFalse();

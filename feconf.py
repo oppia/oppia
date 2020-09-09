@@ -166,6 +166,9 @@ ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
 
+IMAGE_CONTEXT_QUESTION_SUGGESTIONS = 'question_suggestions'
+IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS = 'exploration_suggestions'
+
 MAX_TASK_MODELS_PER_FETCH = 25
 MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
@@ -210,7 +213,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 39
+CURRENT_STATE_SCHEMA_VERSION = 38
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -465,9 +468,6 @@ AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 # determines whether the site is in maintenance mode to avoid queries to the
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
-
-# Whether contributor dashboard is ready to use for contributors.
-CONTRIBUTOR_DASHBOARD_ENABLED = False
 
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
@@ -1053,7 +1053,7 @@ AVAILABLE_LANDING_PAGES = {
 # CLASSROOM_PAGES_DATA property in config_domain.
 CLASSROOM_PAGES = ['math']
 
-# Authentication method using GAE ID (google sign in)
+# Authentication method using GAE ID (google sign in).
 AUTH_METHOD_GAE = 'gae'
 
 # TODO(#10501): Once domain objects can be imported by the storage layer, move
@@ -1210,5 +1210,10 @@ TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS = [{
     'optional_attribute_names': [],
     'user_id_attribute_names': []
 }]
+
 USER_ID_RANDOM_PART_LENGTH = 32
 USER_ID_LENGTH = 36
+
+# Length of user PIN for different roles used on Android.
+FULL_USER_PIN_LENGTH = 5
+PROFILE_USER_PIN_LENGTH = 3

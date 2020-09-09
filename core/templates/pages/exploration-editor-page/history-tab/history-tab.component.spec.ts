@@ -355,4 +355,37 @@ describe('History tab component', function() {
     ctrl.toggleHistoryOptions(5);
     expect(ctrl.highlightedIndex).toBe(5);
   });
+
+  it('should reverse the array when the date filter is applied', function() {
+    var snapshots = [{
+      commit_message: 'This is the commit message',
+      committerId: 'committer_3',
+      commit_type: '',
+      version_number: 1,
+      created_on_ms: 1416563100000,
+      commit_cmds: []
+    }, {
+      commit_message: 'This is the commit message 2',
+      committerId: 'committer_3',
+      commit_type: '',
+      version_number: 2,
+      created_on_ms: 1416563100000,
+      commit_cmds: []
+    }, {
+      commit_message: 'This is the commit message 2',
+      committerId: 'committer_1',
+      commit_type: '',
+      version_number: 3,
+      created_on_ms: 1416563100000,
+      commit_cmds: []
+    }];
+    ctrl.explorationVersionMetadata = snapshots;
+    ctrl.reverseDateOrder();
+    expect(ctrl.explorationVersionMetadata[0].version_number).toEqual(3);
+    expect(ctrl.explorationVersionMetadata[2].version_number).toEqual(1);
+
+    ctrl.reverseDateOrder();
+    expect(ctrl.explorationVersionMetadata[0].version_number).toEqual(1);
+    expect(ctrl.explorationVersionMetadata[2].version_number).toEqual(3);
+  });
 });

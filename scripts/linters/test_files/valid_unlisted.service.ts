@@ -13,10 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Type definitions for the constants in the Oppia module.
+ * @fileoverview An Injectable, that is not present in Angular Services Index
+ * js_ts_linter_test.py. This file contains an Injectable.
  */
+import { Injectable, PipeTransform } from '@angular/core';
 
-export interface WARNING_TYPES_CONSTANT {
-    CRITICAL: string,
-    ERROR: string
-}
+@Injectable({
+  providedIn: 'root'
+})
+export class UnlistedService implements PipeTransform {}

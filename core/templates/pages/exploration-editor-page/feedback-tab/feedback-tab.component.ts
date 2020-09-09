@@ -46,16 +46,16 @@ angular.module('oppia').component('feedbackTab', {
   template: require('./feedback-tab.component.html'),
   controller: [
     '$q', '$uibModal', 'AlertsService', 'ChangeListService',
-    'DateTimeFormatService', 'EditabilityService', 'LoaderService',
-    'ExplorationStatesService',
-    'SuggestionModalForExplorationEditorService', 'ThreadDataService',
-    'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
+    'DateTimeFormatService', 'EditabilityService', 'ExplorationStatesService',
+    'LoaderService', 'SuggestionModalForExplorationEditorService',
+    'ThreadDataService', 'ThreadStatusDisplayService',
+    'UrlInterpolationService', 'UserService',
     function(
         $q, $uibModal, AlertsService, ChangeListService,
-        DateTimeFormatService, EditabilityService, LoaderService,
-        ExplorationStatesService,
-        SuggestionModalForExplorationEditorService, ThreadDataService,
-        ThreadStatusDisplayService, UrlInterpolationService, UserService) {
+        DateTimeFormatService, EditabilityService, ExplorationStatesService,
+        LoaderService, SuggestionModalForExplorationEditorService,
+        ThreadDataService, ThreadStatusDisplayService,
+        UrlInterpolationService, UserService) {
       var ctrl = this;
 
       var _resetTmpMessageFields = function() {
