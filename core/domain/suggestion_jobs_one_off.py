@@ -196,11 +196,10 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
 
     @staticmethod
     def map(item):
-        # Exit early if the suggestion has been marked deleted or if the
-        # suggestion has already set the language code property or if the
-        # suggestion is of type "edit state content". The language code for
-        # "edit state content" suggestions is always set to None, which is the
-        # default value for a ndb model field that hasn't been set.
+        # Exit early if the suggestion has been marked deleted, or if the
+        # suggestion has already set the language code property, or if the
+        # suggestion type is not queryable by language, since ndb automatically
+        # sets properties that aren't intialized to None.
         if item.deleted or item.language_code or item.suggestion_type == (
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
             return

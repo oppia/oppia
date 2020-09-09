@@ -59,8 +59,8 @@ class BaseSuggestion(python_utils.OBJECT):
         last_updated: datetime.datetime. Date and time when the suggestion
             was last updated.
         language_code: str|None. The ISO 639-1 code used to query suggestions
-            by language. It is set to None for "edit state content"
-            suggestions, since they are not queryable by language.
+            by language or None if the suggestion type is not queryable by
+            language.
     """
 
     def __init__(self, status, final_reviewer_id):
@@ -354,6 +354,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         self.change = exp_domain.ExplorationChange(change)
         self.score_category = score_category
         self.last_updated = last_updated
+        # Suggestions of this type are not queryable by language code.
         self.language_code = None
         # Currently, we don't allow adding images in the edit state content
         # suggestion, so the image_context is None.
