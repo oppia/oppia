@@ -46,9 +46,6 @@ var ExplorationPlayerPage = function() {
   var waitingForResponseElem = element(by.css(
     '.protractor-test-input-response-loading-dots'));
   var ratingStars = element.all(by.css('.protractor-test-rating-star'));
-  var answerDetailsTextArea = element(
-    by.css('.protractor-test-answer-details-text-area'));
-
   var suggestionSubmitButton = element(
     by.css('.protractor-test-suggestion-submit-btn'));
   var feedbackCloseButton = element(
@@ -72,8 +69,6 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-cancel-redirection-button'));
   var returnToParentButton = element(
     by.css('.protractor-test-return-to-parent-button'));
-  var answerDetailsSubmitButton = element(
-    by.css('.protractor-test-answer-details-submit-button'));
   var correctFeedbackElement = element(
     by.css('.protractor-test-correct-feedback'));
 
@@ -134,6 +129,8 @@ var ExplorationPlayerPage = function() {
   };
 
   this.expectNextCardButtonTextToBe = async function(text) {
+    await waitFor.visibilityOf(
+      nextCardButton, 'Next Card Button not showing up.');
     var buttonText = await nextCardButton.getText();
     expect(buttonText).toMatch(text);
   };
@@ -252,14 +249,18 @@ var ExplorationPlayerPage = function() {
   };
 
   this.expectExplorationToBeOver = async function() {
+    await waitFor.visibilityOf(
+      conversationContent.last(), 'Ending message not visible');
     expect(
-      await (await conversationContent.last()).getText()
+      await (conversationContent.last()).getText()
     ).toEqual('Congratulations, you have finished!');
   };
 
   this.expectExplorationToNotBeOver = async function() {
+    await waitFor.visibilityOf(
+      conversationContent.last(), 'Ending message not visible');
     expect(
-      await (await conversationContent.last()).getText()
+      await (conversationContent.last()).getText()
     ).not.toEqual('Congratulations, you have finished!');
   };
 

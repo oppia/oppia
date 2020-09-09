@@ -34,7 +34,6 @@ require(
 
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('pages/topic-editor-page/services/entity-creation.service.ts');
 require('services/context.service.ts');
 require('services/contextual/url.service.ts');
 require('services/page-title.service.ts');
@@ -60,14 +59,16 @@ angular.module('oppia').directive('topicEditorPage', [
         '$scope', '$window', 'AlertsService', 'BottomNavbarStatusService',
         'ContextService', 'PageTitleService', 'EntityCreationService',
         'LoaderService',
+        'BottomNavbarStatusService', 'ContextService', 'PageTitleService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
-        'UndoRedoService', 'UrlService', 'TOPIC_VIEWER_URL_TEMPLATE',
+        'UndoRedoService', 'UrlService',
         function(
             $scope, $window, AlertsService, BottomNavbarStatusService,
             ContextService, PageTitleService, EntityCreationService,
             LoaderService,
+            BottomNavbarStatusService, ContextService, PageTitleService,
             TopicEditorRoutingService, TopicEditorStateService,
-            UndoRedoService, UrlService, TOPIC_VIEWER_URL_TEMPLATE) {
+            UndoRedoService, UrlService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.getActiveTabName = function() {
@@ -201,7 +202,7 @@ angular.module('oppia').directive('topicEditorPage', [
             ctrl.warningsAreShown = false;
             BottomNavbarStatusService.markBottomNavbarStatus(true);
             ctrl.directiveSubscriptions.add(
-              UndoRedoService.onUndoRedoChangeApplied().subscribe(
+              UndoRedoService.onUndoRedoChangeApplied$().subscribe(
                 () => setPageTitle()
               )
             );

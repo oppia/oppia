@@ -31,8 +31,8 @@ require(
 angular.module('oppia').component('topicPreviewTab', {
   template: require('./topic-preview-tab.component.html'),
   controllerAs: '$ctrl',
-  controller: ['$scope', 'TopicEditorStateService', 'UrlInterpolationService',
-    function($scope, TopicEditorStateService, UrlInterpolationService) {
+  controller: ['TopicEditorStateService', 'UrlInterpolationService',
+    function(TopicEditorStateService, UrlInterpolationService) {
       var ctrl = this;
       var TAB_STORY = 'story';
       var TAB_SUBTOPIC = 'subtopic';

@@ -134,9 +134,6 @@ export class StoryContents {
     var nodeIds = nodes.map((node: StoryNode) => {
       return node.getId();
     });
-    var nodeTitles = nodes.map((node: StoryNode) => {
-      return node.getTitle();
-    });
     for (var i = 0; i < nodeIds.length; i++) {
       var nodeId = nodeIds[i];
       if (nodeIds.indexOf(nodeId) < nodeIds.lastIndexOf(nodeId)) {

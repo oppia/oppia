@@ -50,12 +50,16 @@ angular.module('oppia').component('storyEditorPage', {
   controller: [
     '$scope', '$uibModal', '$window', 'BottomNavbarStatusService',
     'EditableStoryBackendApiService', 'LoaderService',
+    '$uibModal', '$window', 'BottomNavbarStatusService',
+    'EditableStoryBackendApiService',
     'PageTitleService', 'StoryEditorNavigationService',
     'StoryEditorStateService', 'UndoRedoService',
     'UrlInterpolationService', 'UrlService',
     function(
         $scope, $uibModal, $window, BottomNavbarStatusService,
         EditableStoryBackendApiService, LoaderService,
+        $uibModal, $window, BottomNavbarStatusService,
+        EditableStoryBackendApiService,
         PageTitleService, StoryEditorNavigationService,
         StoryEditorStateService, UndoRedoService,
         UrlInterpolationService, UrlService) {
@@ -216,7 +220,7 @@ angular.module('oppia').component('storyEditorPage', {
           StoryEditorNavigationService.navigateToStoryPreviewTab();
         }
         ctrl.directiveSubscriptions.add(
-          UndoRedoService.onUndoRedoChangeApplied().subscribe(
+          UndoRedoService.onUndoRedoChangeApplied$().subscribe(
             () => _initPage()
           )
         );

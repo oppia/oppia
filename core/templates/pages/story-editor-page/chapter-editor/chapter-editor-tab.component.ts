@@ -28,9 +28,9 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('chapterEditorTab', {
   template: require('./chapter-editor-tab.component.html'),
   controller: [
-    '$scope', 'StoryEditorNavigationService', 'StoryEditorStateService',
+    'StoryEditorNavigationService', 'StoryEditorStateService',
     function(
-        $scope, StoryEditorNavigationService, StoryEditorStateService) {
+        StoryEditorNavigationService, StoryEditorStateService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.initEditor = function() {
