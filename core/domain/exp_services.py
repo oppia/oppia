@@ -664,15 +664,13 @@ def _create_exploration(committer_id, exploration, commit_message, change_list):
     new_exp_stats = stats_services.get_stats_for_new_exploration(
         exploration.id, exploration.version, exploration.states)
 
+    # Rights to the exploration must exist before creating the exploration.
+    rights_manager.create_new_exploration_rights(exploration.id, committer_id)
+
     def _update_storage_models():
         """Groups all storage calls into a function call so that they can be
         performed as an atomic transaction.
         """
-        # Rights to the exploration need to be created before the actual
-        # exploration.
-        rights_manager.create_new_exploration_rights(
-            exploration.id, committer_id)
-
         exploration_model.commit(committer_id, commit_message, change_list_dict)
 
         stats_services.create_stats_model(new_exp_stats)
@@ -681,6 +679,7 @@ def _create_exploration(committer_id, exploration, commit_message, change_list):
             exploration.id, exploration.version)
 
     transaction_services.run_in_transaction(_update_storage_models)
+
     create_exploration_summary(exploration.id, committer_id)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
@@ -1222,8 +1221,8 @@ def revert_exploration(
 
     transaction_services.run_in_transaction(_update_storage_models)
 
-    # Update the exploration summary, but since this is just a revert so not add
-    # the committer of the revert to the list of contributors.
+    # Update the exploration summary, but maintain the current list of
+    # contributors to avoid losing history.
     update_exploration_summary(exploration_id, None)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
