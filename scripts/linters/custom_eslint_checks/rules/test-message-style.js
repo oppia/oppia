@@ -23,16 +23,17 @@ module.exports = {
   meta: {
     type: 'layout',
     docs: {
-      description: 'There should not be any unused directive',
+      description: 'There should not be any unused dependency',
       category: 'Stylistic Issues',
-      recommended: false
+      recommended: true
     },
     fixable: null,
     schema: [],
     messages: {
       useShould: 'Test message should start with \'should\'',
-      singleSpace: 'Do not use multiple consecutive spaces in the test message',
-      noSpaceAtEnd: 'Do not use space at the end of test message'
+      singleSpace: (
+        'Please remove multiple consecutive spaces in the test message'),
+      noSpaceAtEnd: 'Please remove space from the end of the test message'
     }
   },
 

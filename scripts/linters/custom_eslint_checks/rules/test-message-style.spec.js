@@ -37,6 +37,13 @@ ruleTester.run('test-message-style', rule, {
         expect($injector.has(constantName)).toBe(true);
         expect($injector.get(constantName)).toEqual(constants[constantName]);
     }
+    });`,
+    `it('should transform all ' + 'key value ' + 'pairs to angular constants',
+    function() {
+    for (var constantName in constants) {
+        expect($injector.has(constantName)).toBe(true);
+        expect($injector.get(constantName)).toEqual(constants[constantName]);
+    }
     });`
   ],
 
@@ -52,7 +59,8 @@ ruleTester.run('test-message-style', rule, {
         }
         });`,
       errors: [{
-        message: 'Do not use multiple consecutive spaces in the test message',
+        message: (
+          'Please remove multiple consecutive spaces in the test message'),
         type: null
       }]
     },
@@ -67,13 +75,28 @@ ruleTester.run('test-message-style', rule, {
         }
         });`,
       errors: [{
-        message: 'Do not use space at the end of test message',
+        message: 'Please remove space from the end of the test message',
         type: null
       }]
     },
     {
       code:
     `it('hould transform all key value pairs to angular constants',
+        function() {
+        for (var constantName in constants) {
+            expect($injector.has(constantName)).toBe(true);
+            expect($injector.get(constantName)).toEqual(
+                constants[constantName]);
+        }
+        });`,
+      errors: [{
+        message: 'Test message should start with \'should\'',
+        type: null
+      }]
+    },
+    {
+      code:
+    `it('hould transform all key' + ' value pairs to ' + 'angular constants',
         function() {
         for (var constantName in constants) {
             expect($injector.has(constantName)).toBe(true);
