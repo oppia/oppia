@@ -442,7 +442,6 @@
 /core/templates/App*.ts @ankita240796
 /core/templates/app.constants.ts @ankita240796
 /core/templates/app.constants.ajs.ts @ankita240796
-/core/templates/app-type.constants.ts @nishantwrp @ankita240796
 /core/templates/combined-tests.spec.ts @ankita240796
 /core/templates/pages/interaction-specs.constants.ajs.ts @jameesjohn @vojtechjelinek
 /core/templates/pages/interaction-specs.constants.ts @bansalnitish
