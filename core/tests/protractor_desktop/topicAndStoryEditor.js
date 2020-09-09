@@ -75,6 +75,7 @@ describe('Topic editor functionality', function() {
     await topicEditorPage.get(topicId);
     await topicEditorPage.expectNumberOfSubtopicsToBe(1);
     await topicEditorPage.deleteSubtopicWithIndex(0);
+    await topicEditorPage.saveTopic('Deleted subtopic.');
     await topicEditorPage.expectNumberOfSubtopicsToBe(0);
   });
 
@@ -214,6 +215,8 @@ describe('Topic editor functionality', function() {
       await topicEditorPage.dragSkillFromSubtopicToUncategorized(0, 'Skill 2');
       await topicEditorPage.expectUncategorizedSkillsToBe(
         ['Skill 2']);
+      await topicEditorPage.saveRearrangedSkills();
+      await topicEditorPage.saveTopic('Rearranged skills');
     });
 
   afterEach(async function() {
