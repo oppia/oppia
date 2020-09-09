@@ -307,7 +307,7 @@ indexes:
   - name: commit_type
 
 - kind: UserContributionProficiencyModel
-    properties:
+  properties:
   - name: deleted
   - name: user_id
   - name: score
