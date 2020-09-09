@@ -664,13 +664,14 @@ def _create_exploration(committer_id, exploration, commit_message, change_list):
     new_exp_stats = stats_services.get_stats_for_new_exploration(
         exploration.id, exploration.version, exploration.states)
 
-    # Rights to the exploration must exist before creating the exploration.
-    rights_manager.create_new_exploration_rights(exploration.id, committer_id)
-
     def _update_storage_models():
         """Groups all storage calls into a function call so that they can be
         performed as an atomic transaction.
         """
+        # Rights to the exploration must exist before creating the exploration.
+        rights_manager.create_new_exploration_rights(
+            exploration.id, committer_id)
+
         exploration_model.commit(committer_id, commit_message, change_list_dict)
 
         stats_services.create_stats_model(new_exp_stats)
