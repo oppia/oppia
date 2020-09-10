@@ -49,6 +49,7 @@ notifications:
 
 before_install:
 - pip install codecov
+- pip install wheel==0.35.0
 - export CHROME_BIN=/usr/bin/google-chrome-stable
 - export DISPLAY=:99.0
 

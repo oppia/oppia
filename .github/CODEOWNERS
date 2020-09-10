@@ -640,6 +640,8 @@
 /core/storage/ @seanlip
 /core/domain/user*.py @seanlip
 /export/ @seanlip
+/requirements.txt @vojtechjelinek
+/requirements.in @vojtechjelinek
 /manifest.json @vojtechjelinek
 /package.json @vojtechjelinek
 /yarn.lock @vojtechjelinek

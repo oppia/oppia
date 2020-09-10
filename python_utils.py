@@ -24,7 +24,8 @@ import io
 import os
 import sys
 
-_FUTURE_PATH = os.path.join(os.getcwd(), 'third_party', 'future-0.17.1')
+_FUTURE_PATH = os.path.join(
+    os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _FUTURE_PATH)
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
