@@ -775,7 +775,7 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
     activity_services.remove_featured_activities(
         constants.ACTIVITY_TYPE_EXPLORATION, exploration_ids)
 
-    feedback_services.delete_threads(
+    feedback_services.delete_threads_for_multiple_entities(
         feconf.ENTITY_TYPE_EXPLORATION, exploration_ids)
 
     # Remove from subscribers.

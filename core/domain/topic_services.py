@@ -836,7 +836,7 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
         force_deletion=force_deletion)
 
     feedback_services.delete_threads_for_multiple_entities(
-        feconf.ENTITY_TYPE_TOPIC, topic_id)
+        feconf.ENTITY_TYPE_TOPIC, [topic_id])
 
     # This must come after the topic is retrieved. Otherwise the memcache
     # key will be reinstated.

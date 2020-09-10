@@ -335,9 +335,13 @@ def _get_threads_user_info_keys(thread_ids):
     Returns:
         list(ndb.Keys). The keys of the feedback thread user model.
     """
-    return feedback_models.GeneralFeedbackThreadUserModel.query(
-        feedback_models.GeneralFeedbackThreadUserModel.thread_id.IN(thread_ids)
-    ).fetch(keys_only=True)
+    if thread_ids:
+        return feedback_models.GeneralFeedbackThreadUserModel.query(
+            feedback_models.GeneralFeedbackThreadUserModel.thread_id.IN(
+                thread_ids)
+        ).fetch(keys_only=True)
+    else:
+        return []
 
 
 def delete_threads_for_multiple_entities(entity_type, entity_ids):

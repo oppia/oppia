@@ -40,7 +40,7 @@ import feconf
 (
     topic_models, suggestion_models
 ) = models.Registry.import_models([
-    models.NAMES.topic, models.NAMES.sugestion
+    models.NAMES.topic, models.NAMES.suggestion
 ])
 
 
@@ -1067,8 +1067,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'Added story_id_4 to additional story ids')
 
     def test_delete_topic(self):
-        # Test whether an admin can delete a topic.
-        suggestion_services.create_suggestion(
+        # Add suggestion for the topic to test if it is deleted too.
+        question = self.save_new_question(
+            'question_id',
+            self.user_id_admin,
+            self._create_valid_question_data('dest'),
+            [self.skill_id_1])
+        suggestion = suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             suggestion_models.TARGET_TYPE_TOPIC,
             self.TOPIC_ID,
@@ -1076,9 +1081,16 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id_admin,
             {
                 'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+                'skill_difficulty': 0.3,
+                'skill_id': self.skill_id_1,
+                'question_dict': question.to_dict()
             },
             'change'
         )
+
+        self.assertIsNotNone(
+            suggestion_services.get_suggestion_by_id(suggestion.suggestion_id))
+
         topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID)
         self.assertIsNone(
             topic_fetchers.get_topic_by_id(self.TOPIC_ID, strict=False))
@@ -1087,6 +1099,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             subtopic_page_services.get_subtopic_page_by_id(
                 self.TOPIC_ID, 1, strict=False))
+        self.assertIsNone(
+            suggestion_services.get_suggestion_by_id(suggestion.suggestion_id))
 
     def test_delete_subtopic_with_skill_ids(self):
         changelist = [topic_domain.TopicChange({
