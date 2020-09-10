@@ -154,7 +154,7 @@ def main(args=None):
         # Give webpack few seconds to do the initial compilation.
         time.sleep(10)
 
-        common.start_redis_server()
+    common.start_redis_server()
 
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen(
