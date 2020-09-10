@@ -356,6 +356,7 @@ import { TranslationsBackendApiService } from 'services/translations-backend-api
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { ExplorationSummaryBackendApiService } from 'core/templates/domain/summary/exploration-summary-backend-api.service';
+import { ExplorationIdValidationService } from 'core/templates/domain/exploration/exploration-id-validation.service';
 
 export const angularServices: [string, unknown][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -452,6 +453,7 @@ export const angularServices: [string, unknown][] = [
     ExplorationFeaturesBackendApiService],
   ['ExplorationFeaturesService', ExplorationFeaturesService],
   ['ExplorationHtmlFormatterService', ExplorationHtmlFormatterService],
+  ['ExplorationIdValidationService', ExplorationIdValidationService]
   ['ExplorationImprovementsBackendApiService',
     ExplorationImprovementsBackendApiService],
   ['ExplorationImprovementsConfigObjectFactory',
