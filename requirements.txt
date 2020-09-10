@@ -27,6 +27,8 @@ pylatexenc==2.6           # via -r requirements.in
 pyparsing==2.4.7          # via packaging
 redis==3.5.3              # via -r requirements.in
 simplejson==3.17.0        # via -r requirements.in, googleappenginemapreduce
-six==1.15.0               # via -r requirements.in, bleach, html5lib, mock, packaging
+six==1.15.0               # via -r requirements.in, bleach, html5lib, mock, packaging, webapp2
 soupsieve==1.9.5          # via -r requirements.in, beautifulsoup4
+webapp2==3.0.0b1          # via -r requirements.in
 webencodings==0.5.1       # via -r requirements.in, bleach, html5lib
+webob==1.8.6              # via webapp2
