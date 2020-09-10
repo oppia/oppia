@@ -369,7 +369,7 @@ def install_redis_cli():
     except OSError:
         # The redis-cli is not installed, run the script to install it.
         # NOTE: We do the installation here since we need to use make.
-        python_utils.PRINT('Installing redis-cli...')
+    python_utils.PRINT('Installing redis-cli...')
 
         download_and_untar_files(
             ('https://download.redis.io/releases/redis-%s.tar.gz') %
