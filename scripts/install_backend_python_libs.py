@@ -331,8 +331,8 @@ def get_mismatches():
         # Library exists in the directory and the requirements file.
         if normalized_library_name in directory_contents:
             # Library matches but version doesn't match.
-            if (directory_contents[normalized_library_name].find(
-                    requirements_contents[normalized_library_name])):
+            if (directory_contents[normalized_library_name] !=
+                    requirements_contents[normalized_library_name]):
                 mismatches[normalized_library_name] = (
                     requirements_contents[normalized_library_name],
                     directory_contents[normalized_library_name])
