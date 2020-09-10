@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { MathInteractionsService } from 'services/math-interactions.service';
 
 describe('MathInteractionsService', () => {
-  let mathInteractionsService: MathInteractionsService = null;
+  let mathInteractionsService: MathInteractionsService;
 
   beforeEach(() => {
     mathInteractionsService = TestBed.get(MathInteractionsService);
@@ -35,7 +35,7 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
-      'sqrt(alpha)', ['alpha'])).toBeTrue();
+      'sqrt(alpha)', ['α'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
@@ -47,11 +47,11 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
-      '(alpha - beta)^pi', ['alpha', 'beta', 'pi'])).toBeTrue();
+      '(alpha - beta)^pi', ['α', 'β', 'π'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
-      '((-3.4)^(gamma/(y^2)))/2', ['y', 'gamma'])).toBeTrue();
+      '((-3.4)^(gamma/(y^2)))/2', ['y', 'γ'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
@@ -102,19 +102,49 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateAlgebraicExpression(
       'xy+c/2', ['x', 'y', 'z'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'You have entered an invalid character: c. Please use only the ' +
-      'characters x,y,z in your answer.');
+      'You have entered an invalid variable: c. Please use only the ' +
+      'variables x,y,z in your answer.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
-      'aalpha/2beta', ['alpha', 'beta', 'gamma'])).toBeFalse();
+      'ae^2 + 4b', ['a', 'b'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'You have entered an invalid character: a. Please use only the ' +
-      'characters alpha,beta,gamma in your answer.');
+      'You have entered an invalid variable: e. Please use only the ' +
+      'variables a,b in your answer.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'xyz + pi', ['x', 'y', 'z'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'You have entered an invalid variable: π. Please use only the ' +
+      'variables x,y,z in your answer.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'aalpha/2beta', ['α', 'β', 'γ'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'You have entered an invalid variable: a. Please use only the ' +
+      'variables α,β,γ in your answer.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       '(x^3.5)^/2', ['x'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer has two symbols next to each other: "^" and "/".');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'sqrt() + x', ['x'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'The sqrt function(s) cannot be empty. ' +
+      'Please enter a variable/number in it.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'sin()/x', ['x'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'The sin function(s) cannot be empty. ' +
+      'Please enter a variable/number in it.');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
+      'tan()sin()', ['x'])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'The sin, tan function(s) cannot be empty. ' +
+      'Please enter a variable/number in it.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
       '12+sqrt(4)', [])).toBeFalse();
@@ -135,7 +165,7 @@ describe('MathInteractionsService', () => {
       ' Please enter an expression instead.');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
-      '5 >= 2*alpha', ['alpha'])).toBeFalse();
+      '5 >= 2*alpha', ['α'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered an equation/inequality.' +
       ' Please enter an expression instead.');
@@ -185,7 +215,7 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateEquation(
-      'sqrt(alpha) = -1', ['alpha'])).toBeTrue();
+      'sqrt(alpha) = -1', ['α'])).toBeTrue();
     expect(mathInteractionsService.getWarningText()).toBe('');
 
     expect(mathInteractionsService.validateEquation(
@@ -261,7 +291,7 @@ describe('MathInteractionsService', () => {
       'Please enter an equation instead.');
 
     expect(mathInteractionsService.validateEquation(
-      '5 >= 2*alpha', ['alpha'])).toBeFalse();
+      '5 >= 2*alpha', ['α'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'It looks like you have entered an inequality. ' +
       'Please enter an equation instead.');
@@ -295,14 +325,14 @@ describe('MathInteractionsService', () => {
     expect(mathInteractionsService.validateEquation(
       'y=mx+b', ['x', 'y', 'm', 'c'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'You have entered an invalid character: b. Please use only the ' +
-      'characters x,y,m,c in your answer.');
+      'You have entered an invalid variable: b. Please use only the ' +
+      'variables x,y,m,c in your answer.');
 
     expect(mathInteractionsService.validateEquation(
-      'alpha(x^2)=beta/2', ['alpha', 'beta', 'gamma'])).toBeFalse();
+      'alpha(x^2)=beta/2', ['α', 'β', 'γ'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
-      'You have entered an invalid character: x. Please use only the ' +
-      'characters alpha,beta,gamma in your answer.');
+      'You have entered an invalid variable: x. Please use only the ' +
+      'variables α,β,γ in your answer.');
   });
 
   it('should insert missing multiplication signs', function() {

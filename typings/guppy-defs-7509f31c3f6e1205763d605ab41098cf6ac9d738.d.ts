@@ -48,7 +48,7 @@ interface GuppySymbols {
   add_blanks: Function;
 }
 
-class Guppy {
+declare class Guppy {
   activate: () => void;
   asciimath: () => void;
   configure: () => void;
@@ -77,14 +77,14 @@ class Guppy {
   constructor(id: string, config: GuppyConfig);
 }
 
-class GuppyOSK {
+declare class GuppyOSK {
   attach: (guppy?: Guppy) => void;
   detach: () => void;
 
   constructor(config: Object);
 }
 
-namespace Guppy {
+declare namespace Guppy {
   export function init(config: GuppyInitConfig): void;
   export let instances: Object;
   export let active_guppy: Object;

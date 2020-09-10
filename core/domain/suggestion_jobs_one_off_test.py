@@ -161,10 +161,12 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{'x': 0}]
-            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 0
+                },
+                'rule_type': 'Equals'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -261,7 +263,8 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                     'language_code': 'en',
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
-                    'linked_skill_ids': ['skill_2']
+                    'linked_skill_ids': ['skill_2'],
+                    'inapplicable_skill_misconception_ids': ['skillid-1']
                 },
                 'skill_id': 'skill_2',
                 'skill_difficulty': 0.3,
@@ -404,10 +407,12 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{'x': 0}]
-            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 0
+                },
+                'rule_type': 'Equals'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -505,7 +510,8 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                     'language_code': 'en',
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
-                    'linked_skill_ids': ['skill_2']
+                    'linked_skill_ids': ['skill_2'],
+                    'inapplicable_skill_misconception_ids': ['skillid-1']
                 },
                 'skill_id': 'skill_2',
                 'skill_difficulty': 0.3,
@@ -777,7 +783,8 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
                 'language_code': 'en',
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
-                'linked_skill_ids': ['skill_1']
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid-1']
             },
             'skill_id': 'skill_1',
             'skill_difficulty': 0.3,
@@ -943,10 +950,12 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{'x': 0}]
-            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 0
+                },
+                'rule_type': 'Equals'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1038,7 +1047,8 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                     'language_code': 'en',
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
-                    'linked_skill_ids': ['skill_1']
+                    'linked_skill_ids': ['skill_1'],
+                    'inapplicable_skill_misconception_ids': ['skillid-1']
                 },
                 'skill_id': 'skill_1',
                 'skill_difficulty': 0.3,
@@ -1312,10 +1322,12 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{'x': 0}]
-            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 0
+                },
+                'rule_type': 'Equals'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1406,7 +1418,8 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                     'language_code': 'en',
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
-                    'linked_skill_ids': ['skill_1']
+                    'linked_skill_ids': ['skill_1'],
+                    'inapplicable_skill_misconception_ids': ['skillid-1']
                 },
                 'skill_id': 'skill_1',
                 'skill_difficulty': 0.3,
@@ -1463,10 +1476,12 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None
             },
-            'rule_input_translations': {},
-            'rule_types_to_inputs': {
-                'Equals': [{'x': 0}]
-            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 0
+                },
+                'rule_type': 'Equals'
+            }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
@@ -1557,7 +1572,8 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
                     'language_code': 'en',
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
-                    'linked_skill_ids': ['skill_1']
+                    'linked_skill_ids': ['skill_1'],
+                    'inapplicable_skill_misconception_ids': ['skillid-1']
                 },
                 'skill_id': 'skill_1',
                 'skill_difficulty': 0.3,

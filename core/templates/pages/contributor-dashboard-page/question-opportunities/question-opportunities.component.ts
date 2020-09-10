@@ -57,16 +57,17 @@ require(
   'pages/contributor-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
 require('services/alerts.service.ts');
+require('services/context.service.ts');
 
 angular.module('oppia').component('questionOpportunities', {
   template: require('./question-opportunities.component.html'),
   controller: [
-    '$rootScope', '$uibModal', 'AlertsService',
+    '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionOpportunitiesService', 'QuestionObjectFactory',
     'QuestionUndoRedoService', 'UrlInterpolationService', 'UserService',
     'MAX_QUESTIONS_PER_SKILL',
     function(
-        $rootScope, $uibModal, AlertsService,
+        $rootScope, $uibModal, AlertsService, ContextService,
         ContributionOpportunitiesService, QuestionObjectFactory,
         QuestionUndoRedoService, UrlInterpolationService, UserService,
         MAX_QUESTIONS_PER_SKILL) {
@@ -137,7 +138,6 @@ angular.module('oppia').component('questionOpportunities', {
           QuestionObjectFactory.createDefaultQuestion([skillId]);
         const questionId = question.getId();
         const questionStateData = question.getStateData();
-
         QuestionUndoRedoService.clearChanges();
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -155,6 +155,7 @@ angular.module('oppia').component('questionOpportunities', {
           },
           controller: 'QuestionSuggestionEditorModalController'
         }).result.then(function() {}, function() {
+          ContextService.resetImageSaveDestination();
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.

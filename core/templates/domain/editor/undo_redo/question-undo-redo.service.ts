@@ -17,9 +17,11 @@
  * domain object.
  */
 
+import { BaseUndoRedo } from './base-undo-redo.service';
+
 angular.module('oppia').factory('QuestionUndoRedoService', [
-  'BaseUndoRedoService', function(BaseUndoRedoService) {
-    var child = Object.create(BaseUndoRedoService);
+  function() {
+    var child = new BaseUndoRedo();
     child.init();
     return child;
   }

@@ -20,13 +20,12 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ExplorationIdValidationService } from
-  'domain/exploration/exploration-id-validation.service.ts';
+  'domain/exploration/exploration-id-validation.service';
 
-describe('Exploration id validation service', function() {
+fdescribe('Exploration id validation service', function() {
   let explorationIdValidationService:
     ExplorationIdValidationService = null;
   let httpTestingController: HttpTestingController;
-  let invalidExpResults = null;
   let validExpResults = null;
 
   beforeEach(() => {
@@ -138,7 +137,7 @@ describe('Exploration id validation service', function() {
       const req = httpTestingController
         .expectOne(requestUrl);
       expect(req.request.method).toEqual('GET');
-      req.flush(validExpResults.summaries);
+      req.flush(validExpResults);
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(true);

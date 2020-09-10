@@ -45,6 +45,8 @@ import python_utils
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.ActivityContributorsSummaryOneOffJob,
+    activity_jobs_one_off.AddContentUserIdsContentJob,
+    activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob,
     activity_jobs_one_off.AuditContributorsOneOffJob,
     activity_jobs_one_off.AuditSnapshotMetadataModelsJob,
     activity_jobs_one_off.FixCommitLastUpdatedOneOffJob,
@@ -55,7 +57,6 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
     exp_jobs_one_off.ExplorationMathSvgFilenameValidationOneOffJob,
-    exp_jobs_one_off.ExplorationMathRichTextInfoModelDeletionOneOffJob,
     exp_jobs_one_off.ExplorationMigrationAuditJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationRteMathContentValidationOneOffJob,
@@ -75,11 +76,14 @@ ONE_OFF_JOB_MANAGERS = [
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
+    question_jobs_one_off.RegenerateQuestionSummaryOneOffJob,
+    recommendations_jobs_one_off.DeleteAllExplorationRecommendationsOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
     stats_jobs_one_off.ExplorationMissingStatsAudit,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
+    stats_jobs_one_off.RegenerateMissingStateStatsOneOffJob,
     stats_jobs_one_off.RegenerateMissingV1StatsModelsOneOffJob,
     stats_jobs_one_off.RegenerateMissingV2StatsModelsOneOffJob,
     stats_jobs_one_off.StatisticsAuditV1,
@@ -142,7 +146,6 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ExpUserLastPlaythroughModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationContextModelAuditOneOffJob,
-    prod_validation_jobs_one_off.ExplorationMathRichTextInfoModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
@@ -229,7 +232,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.UserAuthDetailsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserBulkEmailsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserContributionRightsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UserContributionScoringModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserContributionProficiencyModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserContributionsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserEmailPreferencesModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserNormalizedNameAuditOneOffJob,

@@ -37,12 +37,6 @@ import { OppiaAngularRootComponent } from
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 
-import { AppConstants } from 'app.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -58,9 +52,6 @@ import { ObjectsDomainConstants } from
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

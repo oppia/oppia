@@ -16,54 +16,52 @@
  * @fileoverview Constants to be used in the learner view.
  */
 
-export class ExplorationPlayerConstants {
-  public static CONTENT_FOCUS_LABEL_PREFIX = 'content-focus-label-';
+export const ExplorationPlayerConstants = {
+  CONTENT_FOCUS_LABEL_PREFIX: 'content-focus-label-',
 
-  public static TWO_CARD_THRESHOLD_PX = 960;
+  TWO_CARD_THRESHOLD_PX: 960,
 
-  public static CONTINUE_BUTTON_FOCUS_LABEL = 'continueButton';
+  CONTINUE_BUTTON_FOCUS_LABEL: 'continueButton',
 
   // The enforced waiting period before the first hint request.
-  public static WAIT_FOR_FIRST_HINT_MSEC = 60000;
+  WAIT_FOR_FIRST_HINT_MSEC: 60000,
   // The enforced waiting period before each of the subsequent hint requests.
-  public static WAIT_FOR_SUBSEQUENT_HINTS_MSEC = 30000;
+  WAIT_FOR_SUBSEQUENT_HINTS_MSEC: 30000,
 
   // The time delay between the learner clicking the hint button
   // and the appearance of the hint.
-  public static DELAY_FOR_HINT_FEEDBACK_MSEC = 100;
+  DELAY_FOR_HINT_FEEDBACK_MSEC: 100,
 
   // Array of i18n IDs for the possible hint request strings.
-  public static
-    HINT_REQUEST_STRING_I18N_IDS = [
-      'I18N_PLAYER_HINT_REQUEST_STRING_1',
-      'I18N_PLAYER_HINT_REQUEST_STRING_2',
-      'I18N_PLAYER_HINT_REQUEST_STRING_3'];
+  HINT_REQUEST_STRING_I18N_IDS: [
+    'I18N_PLAYER_HINT_REQUEST_STRING_1',
+    'I18N_PLAYER_HINT_REQUEST_STRING_2',
+    'I18N_PLAYER_HINT_REQUEST_STRING_3'],
 
   /* This should match the CSS class defined in the tutor card directive. */
-  public static AUDIO_HIGHLIGHT_CSS_CLASS = 'conversation-skin-audio-highlight';
+  AUDIO_HIGHLIGHT_CSS_CLASS: 'conversation-skin-audio-highlight',
 
-  public static
-    FLAG_EXPLORATION_URL_TEMPLATE = '/flagexplorationhandler/<exploration_id>';
+  FLAG_EXPLORATION_URL_TEMPLATE: '/flagexplorationhandler/<exploration_id>',
 
   // TODO(bhenning): Find a better place for these constants.
 
   // NOTE TO DEVELOPERS: These constants must be the same (in name and value) as
   // the corresponding classification constants defined in
   // core.domain.exp_domain.
-  public static EXPLICIT_CLASSIFICATION = 'explicit';
-  public static TRAINING_DATA_CLASSIFICATION = 'training_data_match';
-  public static STATISTICAL_CLASSIFICATION = 'statistical_classifier';
-  public static DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
+  EXPLICIT_CLASSIFICATION: 'explicit',
+  TRAINING_DATA_CLASSIFICATION: 'training_data_match',
+  STATISTICAL_CLASSIFICATION: 'statistical_classifier',
+  DEFAULT_OUTCOME_CLASSIFICATION: 'default_outcome',
 
-  public static EXPLORATION_MODE = {
+  EXPLORATION_MODE: {
     EXPLORATION: 'exploration',
     PRETEST: 'pretest',
     QUESTION_PLAYER: 'question_player',
     STORY_CHAPTER: 'story_chapter',
     OTHER: 'other'
-  };
+  },
 
-  public static STATS_EVENT_TYPES = {
+  STATS_EVENT_TYPES: {
     EVENT_TYPE_START_EXPLORATION: 'start',
     EVENT_TYPE_ACTUAL_START_EXPLORATION: 'actual_start',
     EVENT_TYPE_COMPLETE_EXPLORATION: 'complete',
@@ -72,9 +70,9 @@ export class ExplorationPlayerConstants {
     EVENT_TYPE_ANSWER_SUBMITTED: 'answer_submitted',
     EVENT_TYPE_SOLUTION_HIT: 'solution_hit',
     EVENT_TYPE_LEAVE_FOR_REFRESHER_EXP: 'leave_for_refresher_exp',
-  };
+  },
 
-  public static STATS_REPORTING_URLS = {
+  STATS_REPORTING_URLS: {
     ANSWER_SUBMITTED: '/explorehandler/answer_submitted_event/<exploration_id>',
     EXPLORATION_COMPLETED: (
       '/explorehandler/exploration_complete_event/<exploration_id>'),
@@ -90,9 +88,9 @@ export class ExplorationPlayerConstants {
     LEAVE_FOR_REFRESHER_EXP: (
       '/explorehandler/leave_for_refresher_exp_event/<exploration_id>'),
     STATS_EVENTS: '/explorehandler/stats_events/<exploration_id>'
-  };
+  },
 
-  public static FEEDBACK_POPOVER_PATH =
+  FEEDBACK_POPOVER_PATH:
     '/pages/exploration-player-page/templates/' +
-    'feedback-popup-container.template.html';
-}
+    'feedback-popup-container.template.html',
+} as const;

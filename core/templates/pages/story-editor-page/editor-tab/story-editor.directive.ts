@@ -52,22 +52,23 @@ angular.module('oppia').directive('storyEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/editor-tab/story-editor.directive.html'),
       controller: [
-        '$scope', '$rootScope', 'StoryEditorStateService', 'StoryUpdateService',
-        'UndoRedoService', 'StoryEditorNavigationService',
-        'WindowDimensionsService', 'WindowRef', '$uibModal',
-        'AlertsService', 'MAX_CHARS_IN_STORY_TITLE',
-        'MAX_CHARS_IN_CHAPTER_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        'StoryEditorNavigationService', 'StoryEditorStateService',
+        'StoryUpdateService', 'UndoRedoService', 'WindowDimensionsService',
+        'WindowRef', 'MAX_CHARS_IN_META_TAG_CONTENT',
+        'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_STORY_URL_FRAGMENT',
         function(
-            $scope, $rootScope, StoryEditorStateService, StoryUpdateService,
-            UndoRedoService, StoryEditorNavigationService,
-            WindowDimensionsService, WindowRef, $uibModal,
-            AlertsService, MAX_CHARS_IN_STORY_TITLE,
-            MAX_CHARS_IN_CHAPTER_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
+            $rootScope, $scope, $uibModal, AlertsService,
+            StoryEditorNavigationService, StoryEditorStateService,
+            StoryUpdateService, UndoRedoService, WindowDimensionsService,
+            WindowRef, MAX_CHARS_IN_META_TAG_CONTENT,
+            MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_STORY_URL_FRAGMENT) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
           $scope.MAX_CHARS_IN_STORY_URL_FRAGMENT = (
             MAX_CHARS_IN_STORY_URL_FRAGMENT);
+          $scope.MAX_CHARS_IN_META_TAG_CONTENT = MAX_CHARS_IN_META_TAG_CONTENT;
           $scope.hostname = WindowRef.nativeWindow.location.hostname;
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
           var _init = function() {
@@ -98,6 +99,7 @@ angular.module('oppia').directive('storyEditor', [
             $scope.storyTitleEditorIsShown = false;
             $scope.editableTitle = $scope.story.getTitle();
             $scope.editableUrlFragment = $scope.story.getUrlFragment();
+            $scope.editableMetaTagContent = $scope.story.getMetaTagContent();
             $scope.initialStoryUrlFragment = $scope.story.getUrlFragment();
             $scope.editableNotes = $scope.story.getNotes();
             $scope.editableDescription = $scope.story.getDescription();
@@ -195,11 +197,10 @@ angular.module('oppia').directive('storyEditor', [
           };
 
           $scope.updateNotes = function(newNotes) {
-            if (newNotes === $scope.story.getNotes()) {
-              return;
+            if (newNotes !== $scope.story.getNotes()) {
+              StoryUpdateService.setStoryNotes($scope.story, newNotes);
+              _initEditor();
             }
-            StoryUpdateService.setStoryNotes($scope.story, newNotes);
-            _initEditor();
           };
 
           $scope.navigateToChapterWithId = function(id, index) {
@@ -210,6 +211,13 @@ angular.module('oppia').directive('storyEditor', [
           $scope.updateStoryDescriptionStatus = function(description) {
             $scope.editableDescriptionIsEmpty = (description === '');
             $scope.storyDescriptionChanged = true;
+          };
+
+          $scope.updateStoryMetaTagContent = function(newMetaTagContent) {
+            if (newMetaTagContent !== $scope.story.getMetaTagContent()) {
+              StoryUpdateService.setStoryMetaTagContent(
+                $scope.story, newMetaTagContent);
+            }
           };
 
           $scope.returnToTopicEditorPage = function() {
@@ -250,10 +258,9 @@ angular.module('oppia').directive('storyEditor', [
           };
 
           $scope.updateStoryTitle = function(newTitle) {
-            if (newTitle === $scope.story.getTitle()) {
-              return;
+            if (newTitle !== $scope.story.getTitle()) {
+              StoryUpdateService.setStoryTitle($scope.story, newTitle);
             }
-            StoryUpdateService.setStoryTitle($scope.story, newTitle);
           };
 
           $scope.updateStoryUrlFragment = function(newUrlFragment) {
@@ -278,20 +285,18 @@ angular.module('oppia').directive('storyEditor', [
 
           $scope.updateStoryThumbnailFilename = function(
               newThumbnailFilename) {
-            if (newThumbnailFilename === $scope.story.getThumbnailFilename()) {
-              return;
+            if (newThumbnailFilename !== $scope.story.getThumbnailFilename()) {
+              StoryUpdateService.setThumbnailFilename(
+                $scope.story, newThumbnailFilename);
             }
-            StoryUpdateService.setThumbnailFilename(
-              $scope.story, newThumbnailFilename);
           };
 
           $scope.updateStoryThumbnailBgColor = function(
               newThumbnailBgColor) {
-            if (newThumbnailBgColor === $scope.story.getThumbnailBgColor()) {
-              return;
+            if (newThumbnailBgColor !== $scope.story.getThumbnailBgColor()) {
+              StoryUpdateService.setThumbnailBgColor(
+                $scope.story, newThumbnailBgColor);
             }
-            StoryUpdateService.setThumbnailBgColor(
-              $scope.story, newThumbnailBgColor);
           };
 
           $scope.updateStoryDescription = function(newDescription) {
@@ -311,17 +316,15 @@ angular.module('oppia').directive('storyEditor', [
           };
 
           $scope.toggleChapterLists = function() {
-            if (!WindowDimensionsService.isWindowNarrow()) {
-              return;
+            if (WindowDimensionsService.isWindowNarrow()) {
+              $scope.chaptersListIsShown = !$scope.chaptersListIsShown;
             }
-            $scope.chaptersListIsShown = !$scope.chaptersListIsShown;
           };
 
           $scope.toggleStoryEditorCard = function() {
-            if (!WindowDimensionsService.isWindowNarrow()) {
-              return;
+            if (WindowDimensionsService.isWindowNarrow()) {
+              $scope.mainStoryCardIsShown = !$scope.mainStoryCardIsShown;
             }
-            $scope.mainStoryCardIsShown = !$scope.mainStoryCardIsShown;
           };
 
           ctrl.$onInit = function() {

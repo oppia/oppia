@@ -76,10 +76,10 @@ describe('State Interaction Stats Service', () => {
       interaction: {
         answer_groups: [
           {
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Equals: [{x: 'hola!'}]
-            },
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: {x: 'hola!'}
+            }],
             outcome: {
               dest: 'Me Llamo',
               feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
@@ -92,10 +92,10 @@ describe('State Interaction Stats Service', () => {
             tagged_skill_misconception_id: null,
           },
           {
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Contains: [{x: 'hola'}]
-            },
+            rule_specs: [{
+              rule_type: 'Contains',
+              inputs: {x: 'hola'}
+            }],
             outcome: {
               dest: 'Me Llamo',
               feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
@@ -108,10 +108,10 @@ describe('State Interaction Stats Service', () => {
             tagged_skill_misconception_id: null,
           },
           {
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              FuzzyEquals: [{x: 'hola'}]
-            },
+            rule_specs: [{
+              rule_type: 'FuzzyEquals',
+              inputs: {x: 'hola'}
+            }],
             outcome: {
               dest: 'Me Llamo',
               feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},

@@ -9,7 +9,8 @@
       </div>
       <mat-card-content>
         <div *ngFor="let subtopic of availableSubtopics; let i = index">
-          <mat-checkbox color = "primary" class="practice-tab-mat-checkbox" [(ngModel)]="selectedSubtopicIndices[i]">
+          <mat-checkbox color="primary" class="practice-tab-mat-checkbox" [(ngModel)]="selectedSubtopicIndices[i]"
+                        (change)="checkIfQuestionsExist(selectedSubtopicIndices)">
             {{ subtopic.getTitle() }}
           </mat-checkbox>
         </div>
@@ -20,13 +21,20 @@
             <span class="font-heavy" [innerHTML]="'I18N_TOPIC_VIEWER_START_PRACTICE' | translate"></span>
           </button>
         </div>
+        <div class="mt-3" *ngIf="!questionsAreAvailable && isAtLeastOneSubtopicSelected()">
+          <em class="text-danger">
+            There are no questions created yet for the selected subtopic(s).
+          </em>
+        </div>
       </mat-card-actions>
     </mat-card>
   </div>
 </div>
 <style>
   .practice-tab .oppia-practice-tab-container .oppia-page-card {
-    padding: 30px 55px 30px 45px;
+    border-radius: 0.25em;
+    margin-top: 18vh;
+    padding-bottom: 7.5vh;
     width: 550px;
   }
 
@@ -48,6 +56,7 @@
 
   @media (max-width: 500px) {
     .practice-tab .oppia-practice-tab-container .oppia-page-card {
+      padding: 15px 24px 64px 24px;
       width: 90vw;
     }
   }
@@ -97,5 +106,9 @@
     font-family: "Roboto", Arial, sans-serif;
     font-size: 1.2em;
     margin-bottom: 2.5vh;
+  }
+
+  .oppia-topic-viewer-container .background-banner-position {
+    position: inherit;
   }
 </style>
