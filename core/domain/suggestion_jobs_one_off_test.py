@@ -1724,32 +1724,42 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         self.assertEqual(len(actual_output), len(expected_output))
         self.assertEqual(actual_output, expected_output)
 
-    def _create_score_category_for_suggestion_type(self, suggestion_type):
-        """Creates a valid score category based on the suggestion type.
-
-        Args:
-            suggestion_type: str. The type of suggestion for the score
-                category.
+    def _create_score_category_for_translation_suggestions(self):
+        """Creates a valid score category for translation suggestions.
 
         Returns:
             str. The score category.
         """
-        score_type = ''
-        score_subtype = ''
-        if suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
-            score_type = suggestion_models.SCORE_TYPE_CONTENT
-            score_subtype = self.exploration_category
-        elif suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
-            score_type = suggestion_models.SCORE_TYPE_TRANSLATION
-            score_subtype = self.exploration_category
-        elif suggestion_type == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
-            score_type = suggestion_models.SCORE_TYPE_QUESTION
-            score_subtype = self.target_id
         return '%s%s%s' % (
-            score_type, suggestion_models.SCORE_CATEGORY_DELIMITER,
-            score_subtype
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+            self.exploration_category
+        )
+
+    def _create_score_category_for_question_suggestions(self):
+        """Creates a valid score category for question suggestions.
+
+        Returns:
+            str. The score category.
+        """
+
+        return '%s%s%s' % (
+            suggestion_models.SCORE_TYPE_QUESTION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+            self.target_id
+        )
+
+    def _create_score_category_for_edit_state_content_suggestion(self):
+        """Creates a valid score category for "edit state content" suggestions.
+
+        Returns:
+            str. The score category.
+        """
+
+        return '%s%s%s' % (
+            suggestion_models.SCORE_TYPE_CONTENT,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+            self.exploration_category
         )
 
     def setUp(self):
@@ -1784,8 +1794,10 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
             author_id=self.author_id,
             final_reviewer_id=self.reviewer_id,
             change_cmd=self.edit_state_content_change_dict,
-            score_category=self._create_score_category_for_suggestion_type(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)).put()
+            score_category=(
+                self._create_score_category_for_edit_state_content_suggestion()
+            )
+        ).put()
         expected_output = []
 
         # Verify the language_code field is set to None by default.
@@ -1806,8 +1818,10 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
             author_id=self.author_id,
             final_reviewer_id=self.reviewer_id,
             change_cmd=self.add_translation_change_dict,
-            score_category=self._create_score_category_for_suggestion_type(
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)).put()
+            score_category=(
+                self._create_score_category_for_translation_suggestions()
+            )
+        ).put()
         expected_output = ['[u\'translate_content_suggestion_migrated\', 1]']
 
         self._run_job_and_verify_output(expected_output)
@@ -1829,8 +1843,10 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
             author_id=self.author_id,
             final_reviewer_id=self.reviewer_id,
             change_cmd=self.add_question_change_dict,
-            score_category=self._create_score_category_for_suggestion_type(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)).put()
+            score_category=(
+                self._create_score_category_for_question_suggestions()
+            )
+        ).put()
         expected_output = ['[u\'add_question_suggestion_migrated\', 1]']
 
         self._run_job_and_verify_output(expected_output)
@@ -1853,8 +1869,10 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
             author_id=self.author_id,
             final_reviewer_id=self.reviewer_id,
             change_cmd=self.add_question_change_dict,
-            score_category=self._create_score_category_for_suggestion_type(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)).put()
+            score_category=(
+                self._create_score_category_for_question_suggestions()
+            )
+        ).put()
         # Create a translate content suggestion.
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
@@ -1866,8 +1884,10 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
             author_id=self.author_id,
             final_reviewer_id=self.reviewer_id,
             change_cmd=self.add_translation_change_dict,
-            score_category=self._create_score_category_for_suggestion_type(
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)).put()
+            score_category=(
+                self._create_score_category_for_translation_suggestions()
+            )
+        ).put()
         expected_output = [
             '[u\'add_question_suggestion_migrated\', 1]',
             '[u\'translate_content_suggestion_migrated\', 1]'
