@@ -352,6 +352,8 @@ describe('Chapter editor functionality', function() {
       await storyEditorPage.createNewChapter(
         'Chapter 3', dummyExplorationIds[1], Constants.TEST_SVG_PATH);
       await storyEditorPage.expectExplorationIdAlreadyExistWarning();
+      await storyEditorPage.cancelChapterCreation();
+      await storyEditorPage.discardStoryChanges();
     }
   );
 
@@ -399,6 +401,7 @@ describe('Chapter editor functionality', function() {
       'prerequisite skill id ' +
       'list in .*');
     await storyEditorPage.expectWarningInIndicator(warningRegex);
+    await storyEditorPage.discardStoryChanges();
   });
 
   it('should delete prerequisite skill and acquired skill', async function() {
@@ -406,13 +409,14 @@ describe('Chapter editor functionality', function() {
     await storyEditorPage.deleteAcquiredSkillByIndex(0);
     await storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
     await storyEditorPage.deletePrerequisiteSkillByIndex(0);
+    await storyEditorPage.saveStory('Deleted skill');
     await storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
   });
 
   it('should delete one chapter and save', async function() {
-    await storyEditorPage.expectNumberOfChaptersToBe(2);
+    await storyEditorPage.expectNumberOfChaptersToBe(3);
     await storyEditorPage.deleteChapterWithIndex(1);
-    await storyEditorPage.expectNumberOfChaptersToBe(1);
+    await storyEditorPage.expectNumberOfChaptersToBe(2);
     await storyEditorPage.saveStory('Last');
   });
 
