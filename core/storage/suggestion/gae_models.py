@@ -175,7 +175,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             'author_id': base_models.EXPORT_POLICY.EXPORTED,
             'final_reviewer_id': base_models.EXPORT_POLICY.EXPORTED,
             'change_cmd': base_models.EXPORT_POLICY.EXPORTED,
-            'score_category': base_models.EXPORT_POLICY.EXPORTED
+            'score_category': base_models.EXPORT_POLICY.EXPORTED,
+            'language_code': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -401,6 +402,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     .target_version_at_submission),
                 'status': suggestion_model.status,
                 'change_cmd': suggestion_model.change_cmd,
+                'language_code': suggestion_model.language_code
             }
 
         return user_data
