@@ -453,7 +453,7 @@ export const angularServices: [string, unknown][] = [
     ExplorationFeaturesBackendApiService],
   ['ExplorationFeaturesService', ExplorationFeaturesService],
   ['ExplorationHtmlFormatterService', ExplorationHtmlFormatterService],
-  ['ExplorationIdValidationService', ExplorationIdValidationService]
+  ['ExplorationIdValidationService', ExplorationIdValidationService],
   ['ExplorationImprovementsBackendApiService',
     ExplorationImprovementsBackendApiService],
   ['ExplorationImprovementsConfigObjectFactory',
