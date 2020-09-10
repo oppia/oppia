@@ -48,23 +48,41 @@
 
 
 # Angular Migration team
-/core/templates/components/shared-component.module.ts @bansalnitish @srijanreddy98
-/core/templates/services/loader.service*.ts @bansalnitish @srijanreddy98
-/core/templates/components/material.module.ts @bansalnitish @srijanreddy98
-/core/templates/components/oppia-angular-root.component.ts @bansalnitish @srijanreddy98
-/core/templates/base-components/oppia-root.directive.ts @bansalnitish @srijanreddy98
-/core/templates/base-components/oppia-root.directive.html @bansalnitish @srijanreddy98
-/core/templates/filters/translate.pipe.ts @bansalnitish @srijanreddy98
-/core/templates/services/angular-services.index.ts @bansalnitish @srijanreddy98
-/core/templates/services/contextual/logger.service.ts @bansalnitish @srijanreddy98
-/core/templates/services/contextual/logger.service.spec.ts @bansalnitish @srijanreddy98
-/core/templates/services/i18n-language-code.service.ts @bansalnitish @srijanreddy98
-/core/templates/services/loader.service*.ts @bansalnitish @srijanreddy98
-/core/templates/services/question-validation.service*.ts @bansalnitish @srijanreddy98
-/core/templates/services/request-interceptor.service*.ts @bansalnitish @srijanreddy98
-/core/templates/services/translate.service.ts @bansalnitish @srijanreddy98
-/core/templates/services/translations-backend-api.service.ts @bansalnitish @srijanreddy98
-/core/templates/services/UpgradedServices.ts @bansalnitish @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/components/shared-component.module.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/services/loader.service*.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/components/material.module.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/components/oppia-angular-root.component.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/base-components/oppia-root.directive.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/base-components/oppia-root.directive.html @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/filters/translate.pipe.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/services/angular-services.index.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/services/contextual/logger.service.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/services/contextual/logger.service.spec.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/services/i18n-language-code.service.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/services/loader.service*.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/services/question-validation.service*.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/services/request-interceptor.service*.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/services/translate.service.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/services/translations-backend-api.service.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/services/UpgradedServices.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
 /tsconfig-strict.json @nishantwrp @vojtechjelinek
@@ -144,24 +162,34 @@
 
 # Dev workflow team.
 /.circleci/ @BenHenning @U8NWXD @kevintab95 @vinitamurthi
-/.eslintignore @bansalnitish @Hudda
-/.eslintrc @bansalnitish @Hudda
-/.htmllintrc @bansalnitish @Hudda
-/.coveragerc @bansalnitish @Hudda
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/.eslintignore @Hudda
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/.eslintrc @Hudda
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/.htmllintrc @Hudda
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/.coveragerc @Hudda
 /.gitattributes @DubeySandeep
 /.gitignore @DubeySandeep
-/.isort.cfg @bansalnitish @Hudda
-/.pylintrc @bansalnitish @Hudda
-/.stylelintrc @bansalnitish @Hudda
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/.isort.cfg @Hudda
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/.pylintrc @Hudda
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/.stylelintrc @Hudda
 /.travis.yml @BenHenning @vinitamurthi @U8NWXD @kevintab95
 /.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
-/core/templates/css/.stylelintrc @bansalnitish @Hudda
-/tox.ini @bansalnitish @Hudda
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/css/.stylelintrc @Hudda
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/tox.ini @Hudda
 /scripts/*.py @DubeySandeep
 /scripts/check_e2e_tests_are_captured_in_ci*.py @Showtim3 @DubeySandeep
 /scripts/check_frontend_coverage*.py @nithusha21 @DubeySandeep
-/scripts/create_topological_sort_of_all_services*.py @bansalnitish @DubeySandeep
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
 /scripts/typescript_checks*.py @ankita240796 @DubeySandeep
 /scripts/linters/ @DubeySandeep @Hudda
@@ -210,11 +238,16 @@
 
 
 # Forms pages.
-/core/templates/components/forms/ @bansalnitish
-/core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @bansalnitish
-/core/templates/components/ck-editor-helpers/customize-rte-component-modal.template.html @bansalnitish
-/core/templates/services/schema-default-value.service*.ts @bansalnitish
-/core/templates/services/schema-undefined-last-element.service*.ts @bansalnitish
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/components/forms/ @kevintab95
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/components/ck-editor-helpers/customize-rte-component-modal.template.html @DubeySandeep
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/services/schema-default-value.service*.ts @kevintab95
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/services/schema-undefined-last-element.service*.ts @kevintab95
 
 
 # Google-app-engine configurations
@@ -273,7 +306,8 @@
 
 # Global stylesheet.
 /core/templates/css/oppia.css @ankita240796
-/core/templates/css/oppia-material.css @srijanreddy98 @bansalnitish
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/css/oppia-material.css @srijanreddy98
 
 
 # Interaction project.
@@ -370,7 +404,8 @@
 
 # Readme
 /core/README.md @ankita240796
-/core/templates/css/README.md @srijanreddy98 @bansalnitish
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/css/README.md @srijanreddy98
 /extensions/README.md @ankita240796
 /scripts/README.md @ankita240796
 
@@ -445,15 +480,20 @@
 /core/templates/app-type.constants.ts @nishantwrp @ankita240796
 /core/templates/combined-tests.spec.ts @ankita240796
 /core/templates/pages/interaction-specs.constants.ajs.ts @jameesjohn @vojtechjelinek
-/core/templates/pages/interaction-specs.constants.ts @bansalnitish
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/pages/interaction-specs.constants.ts @nithusha21
 /core/templates/I18nFooter.ts @nithusha21
 /core/templates/i18n-footer.directive.html @nithusha21
 /core/templates/services/app.service*.ts @ankita240796
-/core/templates/services/contextual/document-attribute-customization.service*.ts @bansalnitish
-/core/templates/services/contextual/meta-tag-customization.service*.ts @bansalnitish
-/core/templates/services/interaction-rules-registry.service*.ts @bansalnitish
-/core/templates/services/interaction-specs.service*.ts @bansalnitish
-/core/templates/services/translation-file-hash-loader.service.ts @nithusha21
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/services/contextual/document-attribute-customization.service*.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/services/contextual/meta-tag-customization.service*.ts @srijanreddy98
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/services/interaction-rules-registry.service*.ts @DubeySandeep
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/services/interaction-specs.service*.ts @nithusha21
+/core/templates/services/translation-file-hash-loader.service.ts @DubeySandeep
 /redis.conf @seanlip
 /release_constants.py @ankita240796 @nithusha21 @DubeySandeep
 
@@ -466,7 +506,8 @@
 /core/domain/config*.py @DubeySandeep
 /core/domain/change_domain.py @ankita240796
 /core/templates/tests/ @nithusha21
-/core/templates/domain/utilities/ @bansalnitish
+# TODO(10619): Add @bansalnitish as owner after 2020-09-26
+/core/templates/domain/utilities/ @DubeySandeep
 /core/templates/Polyfills.ts @ankita240796
 /schema_utils*.py @seanlip
 /utils*.py @aks681
