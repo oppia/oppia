@@ -11,22 +11,45 @@
 backports.functools-lru-cache==1.6.1  # via -r requirements.in, soupsieve
 beautifulsoup4==4.9.1     # via -r requirements.in
 bleach==3.1.5             # via -r requirements.in
+cachetools==3.1.1         # via google-auth
 callbacks==0.3.0          # via -r requirements.in
+certifi==2020.6.20        # via requests
+chardet==3.0.4            # via requests
+enum34==1.1.10            # via grpcio
 funcsigs==1.0.2           # via mock
 future==0.17.1            # via -r requirements.in
+futures==3.3.0            # via google-api-core, grpcio
+google-api-core[grpc]==1.22.2  # via google-cloud-core, google-cloud-datastore
+google-auth==1.21.1       # via google-api-core
+google-cloud-core==1.4.1  # via google-cloud-datastore
+google-cloud-datastore==1.15.0  # via google-cloud-ndb
+google-cloud-ndb==1.5.0   # via -r requirements.in
+googleapis-common-protos==1.52.0  # via -r requirements.in, google-api-core
 googleappenginecloudstorageclient==1.9.22.1  # via -r requirements.in, googleappenginemapreduce, googleappenginepipeline
 googleappenginemapreduce==1.9.22.0  # via -r requirements.in
 googleappenginepipeline==1.9.22.1  # via -r requirements.in, googleappenginemapreduce
 graphy==1.0.0             # via -r requirements.in, googleappenginemapreduce
+grpcio==1.32.0            # via google-api-core
 html5lib==1.0.1           # via -r requirements.in
+idna==2.10                # via requests
 mock==3.0.5               # via googleappenginemapreduce
 mox==0.5.3                # via googleappenginemapreduce
 mutagen==1.43.0           # via -r requirements.in
 packaging==20.4           # via -r requirements.in, bleach
+protobuf==3.13.0          # via google-api-core, googleapis-common-protos
+pyasn1-modules==0.2.8     # via google-auth
+pyasn1==0.4.8             # via pyasn1-modules, rsa
 pylatexenc==2.6           # via -r requirements.in
 pyparsing==2.4.7          # via packaging
-redis==3.5.3              # via -r requirements.in
+pytz==2020.1              # via google-api-core
+redis==3.5.3              # via -r requirements.in, google-cloud-ndb
+requests==2.24.0          # via google-api-core
+rsa==4.5                  # via google-auth
 simplejson==3.17.0        # via -r requirements.in, googleappenginemapreduce
-six==1.15.0               # via -r requirements.in, bleach, html5lib, mock, packaging
+six==1.15.0               # via -r requirements.in, bleach, google-api-core, google-auth, grpcio, html5lib, mock, packaging, protobuf
 soupsieve==1.9.5          # via -r requirements.in, beautifulsoup4
+urllib3==1.25.10          # via requests
 webencodings==0.5.1       # via -r requirements.in, bleach, html5lib
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools
