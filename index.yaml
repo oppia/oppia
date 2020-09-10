@@ -33,17 +33,6 @@ indexes:
   - name: commit_message
   - name: commit_type
 
-- kind: DeleteExpCopiesRealtimeModel
-  properties:
-  - name: realtime_layer
-  - name: created_on
-
-- kind: ExpCopiesRealtimeModel
-  properties:
-  - name: deleted
-  - name: user_id
-  - name: score
-
 - kind: ExpCopiesRealtimeModel
   properties:
   - name: realtime_layer
@@ -102,7 +91,7 @@ indexes:
   - name: last_updated
     direction: desc
 
-- kind: ExplorationOpportunitySummaryModel
+- kind: ExplorationOpportunitySummaryModel d
   properties:
   - name: need_voice_artist_in_language_codes
   - name: created_on
@@ -173,6 +162,14 @@ indexes:
   - name: entity_id
   - name: entity_type
   - name: last_updated
+    direction: desc
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: author_id
+  - name: deleted
+  - name: suggestion_type
+  - name: created_on
     direction: desc
 
 - kind: GeneralSuggestionModel
