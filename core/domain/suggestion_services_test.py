@@ -540,7 +540,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Expected score_category to be of the form '
                                    'score_type.score_sub_type, received '
                                    'invalid_score_category'):
-            suggestion_services.update_suggestion(suggestion)
+            suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
 
     def test_accept_suggestion_no_commit_message_failure(self):
         self.mock_create_suggestion(self.target_id)

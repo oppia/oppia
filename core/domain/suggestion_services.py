@@ -215,7 +215,7 @@ def get_all_stale_suggestion_ids():
     )
 
 
-def update_suggestion(suggestion):
+def _update_suggestion(suggestion):
     """Updates the given suggestion.
 
     Args:
@@ -324,7 +324,7 @@ def accept_suggestion(
         author_name, commit_message)
     suggestion.accept(commit_message)
 
-    update_suggestion(suggestion)
+    _update_suggestion(suggestion)
 
     feedback_services.create_message(
         suggestion_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
@@ -489,7 +489,7 @@ def resubmit_rejected_suggestion(
     suggestion.pre_update_validate(change)
     suggestion.change = change
     suggestion.set_suggestion_status_to_in_review()
-    update_suggestion(suggestion)
+    _update_suggestion(suggestion)
 
     feedback_services.create_message(
         suggestion_id, author_id, feedback_models.STATUS_CHOICES_OPEN,

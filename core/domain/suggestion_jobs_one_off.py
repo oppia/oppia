@@ -223,8 +223,9 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
                 'Suggestion %s failed validation: %s' % (
                     item.id, e))
             return
-        suggestion_services.update_suggestion(suggestion)
-        yield ('%s_suggestion_migrated' % suggestion.suggestion_type, item.id)
+        item.language_code = suggestion.language_code
+        item.put()
+        yield ('%s_suggestion_migrated' % item.suggestion_type, item.id)
 
     @staticmethod
     def reduce(key, values):
