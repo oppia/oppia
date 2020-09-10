@@ -17,28 +17,18 @@
  * js_ts_linter_test.py. There are two constants in this file.
  */
 
-export class AdminPageConstants {
-  public static
-    ADMIN_ROLE_HANDLER_URL = '/adminrolehandler';
-
-  public static
-    ADMIN_ROLE_HANDLER_URL = '/adminrolehandler';
-
-  public static ADMIN_HANDLER_URL = '/adminhandler';
-  public static
-    ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL = '/admintopicscsvdownloadhandler';
-
-  public static
-    ADMIN_JOB_OUTPUT_URL_TEMPLATE = '/adminjoboutput?job_id=<jobId>';
-
-  public static ADMIN_TAB_URLS = {
+export const AdminPageConstants = {
+  ADMIN_ROLE_HANDLER_URL: '/adminrolehandler',
+  ADMIN_ROLE_HANDLER_URL: '/adminrolehandler',
+  ADMIN_HANDLER_URL: '/adminhandler',
+  ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL: '/admintopicscsvdownloadhandler',
+  ADMIN_JOB_OUTPUT_URL_TEMPLATE: '/adminjoboutput?job_id=<jobId>',
+  ADMIN_TAB_URLS: {
     ACTIVITIES: '#activities',
     JOBS: '#jobs',
     CONFIG: '#config',
     ROLES: '#roles',
     MISC: '#misc'
-  };
-
-  public static
-    PROFILE_URL_TEMPLATE = '/profile/<username>';
-}
+  },
+  PROFILE_URL_TEMPLATE: '/profile/<username>'
+} as const;

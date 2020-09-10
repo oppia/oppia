@@ -35,15 +35,17 @@ class ContributorDashboardPageTest(test_utils.GenericTestBase):
     """Test for showing contributor dashboard pages."""
 
     def test_page_with_disabled_contributor_dashboard_leads_to_404(self):
-        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', False):
-            self.get_html_response(
-                feconf.CONTRIBUTOR_DASHBOARD_URL, expected_status_int=404)
+        config_services.set_property(
+            'admin', 'contributor_dashboard_is_enabled', False)
+        self.get_html_response(
+            feconf.CONTRIBUTOR_DASHBOARD_URL, expected_status_int=404)
 
     def test_page_with_enabled_contributor_dashboard_loads_correctly(self):
-        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True):
-            response = self.get_html_response(feconf.CONTRIBUTOR_DASHBOARD_URL)
-            response.mustcontain(
-                '<contributor-dashboard-page></contributor-dashboard-page>')
+        config_services.set_property(
+            'admin', 'contributor_dashboard_is_enabled', True)
+        response = self.get_html_response(feconf.CONTRIBUTOR_DASHBOARD_URL)
+        response.mustcontain(
+            '<contributor-dashboard-page></contributor-dashboard-page>')
 
 
 class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
@@ -155,63 +157,69 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'content_count': 2,
             'translation_counts': {}
         }
+        config_services.set_property(
+            'admin', 'contributor_dashboard_is_enabled', True)
 
-    def test_handler_with_disabled_dashboard_flag(self):
-        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', False):
-            self.get_json(
-                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={}, expected_status_int=404)
+    def test_handler_with_disabled_dashboard_flag_raise_404(self):
+        config_services.set_property(
+            'admin', 'contributor_dashboard_is_enabled', True)
+
+        self.get_json(
+            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={}, expected_status_int=200)
+
+        config_services.set_property(
+            'admin', 'contributor_dashboard_is_enabled', False)
+
+        self.get_json(
+            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={}, expected_status_int=404)
 
     def test_get_skill_opportunity_data(self):
-        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True):
-            response = self.get_json(
-                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={})
+        response = self.get_json(
+            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={})
 
-            self.assertEqual(
-                response['opportunities'], [
-                    self.expected_skill_opportunity_dict_0,
-                    self.expected_skill_opportunity_dict_1])
+        self.assertEqual(
+            response['opportunities'], [
+                self.expected_skill_opportunity_dict_0,
+                self.expected_skill_opportunity_dict_1])
 
-            self.assertFalse(response['more'])
-            self.assertTrue(
-                isinstance(response['next_cursor'], python_utils.BASESTRING))
+        self.assertFalse(response['more'])
+        self.assertTrue(
+            isinstance(response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_data(self):
-        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True):
-            response = self.get_json(
-                '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'hi'})
+        response = self.get_json(
+            '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={'language_code': 'hi'})
 
-            self.assertEqual(
-                response['opportunities'], [
-                    self.expected_opportunity_dict_1,
-                    self.expected_opportunity_dict_2])
+        self.assertEqual(
+            response['opportunities'], [
+                self.expected_opportunity_dict_1,
+                self.expected_opportunity_dict_2])
 
-            self.assertFalse(response['more'])
-            self.assertTrue(
-                isinstance(response['next_cursor'], python_utils.BASESTRING))
+        self.assertFalse(response['more'])
+        self.assertTrue(
+            isinstance(response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_voiceover_opportunity_data(self):
-        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True):
-            response = self.get_json(
-                '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'en'})
+        response = self.get_json(
+            '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={'language_code': 'en'})
 
-            self.assertEqual(len(response['opportunities']), 2)
-            self.assertEqual(
-                response['opportunities'], [
-                    self.expected_opportunity_dict_1,
-                    self.expected_opportunity_dict_2])
+        self.assertEqual(len(response['opportunities']), 2)
+        self.assertEqual(
+            response['opportunities'], [
+                self.expected_opportunity_dict_1,
+                self.expected_opportunity_dict_2])
 
-            self.assertFalse(response['more'])
-            self.assertTrue(
-                isinstance(response['next_cursor'], python_utils.BASESTRING))
+        self.assertFalse(response['more'])
+        self.assertTrue(
+            isinstance(response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_skill_opportunity_data_pagination(self):
-        with self.swap(
-            feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={})
@@ -238,9 +246,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     next_response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_data_pagination(self):
-        with self.swap(
-            feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'hi'})
@@ -266,9 +272,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     next_response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_voiceover_opportunity_data_pagination(self):
-        with self.swap(
-            feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'en'})
@@ -293,43 +297,33 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 next_response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_with_invalid_language_code(self):
-        with self.swap(
-            feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'invalid_lang_code'},
                 expected_status_int=400)
 
     def test_get_translation_opportunity_without_language_code(self):
-        with self.swap(
-            feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400)
 
     def test_get_voiceover_opportunity_with_invalid_language_code(self):
-        with self.swap(
-            feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'invalid_lang_code'},
                 expected_status_int=400)
 
     def test_get_voiceover_opportunity_without_language_code(self):
-        with self.swap(
-            feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400)
 
     def test_get_opportunity_for_invalid_opportunity_type(self):
-        with self.swap(
-            feconf, 'CONTRIBUTOR_DASHBOARD_ENABLED', True), self.swap(
-                feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/invalid_opportunity_type' % (
                     feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL),

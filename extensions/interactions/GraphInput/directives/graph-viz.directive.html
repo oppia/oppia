@@ -74,7 +74,7 @@
           ng-attr-y1="<[$ctrl.graph.vertices[$ctrl.state.addEdgeVertex].y]>"
           ng-attr-x2="<[$ctrl.state.mouseX]>"
           ng-attr-y2="<[$ctrl.state.mouseY]>"
-          style="stroke: black; stroke-width: <[::EDGE_WIDTH]>;">
+          ng-style="{'stroke': 'black', 'stroke-width': $ctrl.EDGE_WIDTH}">
     </line>
     <g ng-repeat="edge in $ctrl.graph.edges">
       <line class="protractor-test-graph-edge"

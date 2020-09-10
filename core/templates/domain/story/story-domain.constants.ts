@@ -16,52 +16,47 @@
  * @fileoverview Constants for story domain.
  */
 
-export class StoryDomainConstants {
-  public static
-    EDITABLE_STORY_DATA_URL_TEMPLATE =
-    '/story_editor_handler/data/<story_id>';
+export const StoryDomainConstants = {
+  EDITABLE_STORY_DATA_URL_TEMPLATE:
+    '/story_editor_handler/data/<story_id>',
 
-  public static STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE = (
-    '/story_url_fragment_handler/<story_url_fragment>');
+  STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE: (
+    '/story_url_fragment_handler/<story_url_fragment>'),
 
-  public static STORY_PUBLISH_URL_TEMPLATE =
-    '/story_publish_handler/<story_id>';
+  STORY_PUBLISH_URL_TEMPLATE:
+    '/story_publish_handler/<story_id>',
 
-  public static VALIDATE_EXPLORATIONS_URL_TEMPLATE =
-    '/validate_story_explorations/<story_id>';
+  VALIDATE_EXPLORATIONS_URL_TEMPLATE:
+    '/validate_story_explorations/<story_id>',
 
   // These should match the constants defined in core.domain.story_domain.
-  public static CMD_ADD_STORY_NODE = 'add_story_node';
-  public static CMD_DELETE_STORY_NODE = 'delete_story_node';
-  public static
-    CMD_UPDATE_STORY_NODE_OUTLINE_STATUS = 'update_story_node_outline_status';
+  CMD_ADD_STORY_NODE: 'add_story_node',
+  CMD_DELETE_STORY_NODE: 'delete_story_node',
+  CMD_UPDATE_STORY_NODE_OUTLINE_STATUS: 'update_story_node_outline_status',
 
-  public static CMD_UPDATE_STORY_PROPERTY = 'update_story_property';
-  public static CMD_UPDATE_STORY_NODE_PROPERTY = 'update_story_node_property';
-  public static
-    CMD_UPDATE_STORY_CONTENTS_PROPERTY = 'update_story_contents_property';
+  CMD_UPDATE_STORY_PROPERTY: 'update_story_property',
+  CMD_UPDATE_STORY_NODE_PROPERTY: 'update_story_node_property',
+  CMD_UPDATE_STORY_CONTENTS_PROPERTY: 'update_story_contents_property',
 
-  public static STORY_PROPERTY_TITLE = 'title';
-  public static STORY_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename';
-  public static STORY_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color';
-  public static STORY_PROPERTY_DESCRIPTION = 'description';
-  public static STORY_PROPERTY_NOTES = 'notes';
-  public static STORY_PROPERTY_LANGUAGE_CODE = 'language_code';
-  public static STORY_PROPERTY_URL_FRAGMENT = 'url_fragment';
-  public static STORY_PROPERTY_META_TAG_CONTENT = 'meta_tag_content';
+  STORY_PROPERTY_TITLE: 'title',
+  STORY_PROPERTY_THUMBNAIL_FILENAME: 'thumbnail_filename',
+  STORY_PROPERTY_THUMBNAIL_BG_COLOR: 'thumbnail_bg_color',
+  STORY_PROPERTY_DESCRIPTION: 'description',
+  STORY_PROPERTY_NOTES: 'notes',
+  STORY_PROPERTY_LANGUAGE_CODE: 'language_code',
+  STORY_PROPERTY_URL_FRAGMENT: 'url_fragment',
+  STORY_PROPERTY_META_TAG_CONTENT: 'meta_tag_content',
 
-  public static INITIAL_NODE_ID = 'initial_node_id';
-  public static NODE = 'node';
+  INITIAL_NODE_ID: 'initial_node_id',
+  NODE: 'node',
 
-  public static STORY_NODE_PROPERTY_TITLE = 'title';
-  public static STORY_NODE_PROPERTY_DESCRIPTION = 'description';
-  public static STORY_NODE_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename';
-  public static STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color';
-  public static STORY_NODE_PROPERTY_OUTLINE = 'outline';
-  public static STORY_NODE_PROPERTY_EXPLORATION_ID = 'exploration_id';
-  public static
-    STORY_NODE_PROPERTY_DESTINATION_NODE_IDS = 'destination_node_ids';
-  public static STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS = 'acquired_skill_ids';
-  public static
-    STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS = 'prerequisite_skill_ids';
-}
+  STORY_NODE_PROPERTY_TITLE: 'title',
+  STORY_NODE_PROPERTY_DESCRIPTION: 'description',
+  STORY_NODE_PROPERTY_THUMBNAIL_FILENAME: 'thumbnail_filename',
+  STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR: 'thumbnail_bg_color',
+  STORY_NODE_PROPERTY_OUTLINE: 'outline',
+  STORY_NODE_PROPERTY_EXPLORATION_ID: 'exploration_id',
+  STORY_NODE_PROPERTY_DESTINATION_NODE_IDS: 'destination_node_ids',
+  STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS: 'acquired_skill_ids',
+  STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS: 'prerequisite_skill_ids',
+} as const;

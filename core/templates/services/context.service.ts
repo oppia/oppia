@@ -41,7 +41,7 @@ export class ContextService {
   questionId = null;
   editorContext = null;
   customEntityContext = null;
-  imageSaveDestination = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
+  imageSaveDestination: string = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
 
   init(editorName: string): void {
     this.editorContext = editorName;
@@ -275,7 +275,7 @@ export class ContextService {
 
   canAddOrEditComponents(): boolean {
     var currentPageContext = this.getPageContext();
-    var allowedPageContext = [
+    var allowedPageContext: string[] = [
       ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR,
       ServicesConstants.PAGE_CONTEXT.QUESTION_EDITOR,
       ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR,
