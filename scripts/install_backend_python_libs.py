@@ -42,6 +42,22 @@ def _normalize_python_library_name(library_name):
     Returns:
         str. A normalized library name that is all lowercase.
     """
+    # There are certain python libraries that have added support for other
+    # libraries. For example, 'google-api-core[grpc]' means that a variant of
+    # the google-api-core package is installed that supports grpc. However, the
+    # imports, the package directory, and the metadata directory names remain
+    # the same (google-api-core). Since the requirements.txt file
+    # contains the name `library[sub-library]` while pkg_resources only returns
+    # the default name `library`, this confuses this script and produces
+    # mismatches that are incorrect. To solve this problem, we remove the
+    # brackets.
+    # NOTE: This does not cause ambiguities because there is no viable scenario
+    # where both the library and a variant of the library exist in the
+    # directory. Both the default version and the variant are imported in the
+    # same way (e.g import google.api.core) and if pip allowed both versions,
+    # then there would be ambiguities in the imports. For this reason, it is
+    # safe to disambiguate the names by removing the brackets.
+    library_name = re.sub('\[[^\]]+\]', '', library_name)
     return library_name.lower()
 
 
