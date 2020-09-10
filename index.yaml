@@ -33,17 +33,6 @@ indexes:
   - name: commit_message
   - name: commit_type
 
-- kind: DeleteExpCopiesRealtimeModel
-  properties:
-  - name: realtime_layer
-  - name: created_on
-
-- kind: ExpCopiesRealtimeModel
-  properties:
-  - name: deleted
-  - name: user_id
-  - name: score
-
 - kind: ExpCopiesRealtimeModel
   properties:
   - name: realtime_layer
@@ -64,6 +53,13 @@ indexes:
   - name: deleted
   - name: status
   - name: first_published_msec
+    direction: desc
+
+- kind: ExpSummaryModel
+  properties:
+  - name: deleted
+  - name: status
+  - name: scaled_average_rating
     direction: desc
 
 - kind: ExpSummaryModel
@@ -166,6 +162,14 @@ indexes:
   - name: entity_id
   - name: entity_type
   - name: last_updated
+    direction: desc
+
+- kind: GeneralSuggestionModel
+  properties:
+  - name: author_id
+  - name: deleted
+  - name: suggestion_type
+  - name: created_on
     direction: desc
 
 - kind: GeneralSuggestionModel
