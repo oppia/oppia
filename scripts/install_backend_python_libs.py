@@ -44,13 +44,15 @@ def _normalize_python_library_name(library_name):
     """
     # There are certain python libraries that have added support for other
     # libraries. For example, 'google-api-core[grpc]' means that a variant of
-    # the google-api-core package is installed that supports grpc. However, the
-    # imports, the package directory, and the metadata directory names remain
-    # the same (google-api-core). Since the requirements.txt file
-    # contains the name `library[sub-library]` while pkg_resources only returns
-    # the default name `library`, this confuses this script and produces
-    # mismatches that are incorrect. To solve this problem, we remove the
-    # brackets.
+    # the 'google-api-core' package is installed that supports grpc. However,
+    # the import names, the package directory names, and the metadata directory
+    # names remain the same (google-api-core). These variant libraries are
+    # specified in the 'requirements.txt' file with the string,
+    # `library[sub-library]`. However, the installed version of this library
+    # is still considered by pkg_resources as having the default name `library`.
+    # This scenario causes this script to find incorrect mismatches. To solve
+    # this problem, we remove the special support package designation
+    # (e.g [grpc]) in the brackets when parsing the requirements file.
     # NOTE: This does not cause ambiguities because there is no viable scenario
     # where both the library and a variant of the library exist in the
     # directory. Both the default version and the variant are imported in the
