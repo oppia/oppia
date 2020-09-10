@@ -77,8 +77,10 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
     os.path.join(
         common.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common.PYGITHUB_VERSION),
+    os.path.join(
+        common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
     common.CURR_DIR,
-    common.THIRD_PARTY_DIR,
+    common.THIRD_PARTY_PYTHON_LIBS_DIR
 ]
 
 COVERAGE_DIR = os.path.join(
@@ -247,7 +249,7 @@ def main(args=None):
         sys.path.insert(1, directory)
 
     if 'google' in sys.modules:
-        google_path = os.path.join(common.THIRD_PARTY_DIR, 'google')
+        google_path = os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
         google_module = sys.modules['google']
         google_module.__path__.append(google_path)
 

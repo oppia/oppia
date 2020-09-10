@@ -442,7 +442,6 @@
 /core/templates/App*.ts @ankita240796
 /core/templates/app.constants.ts @ankita240796
 /core/templates/app.constants.ajs.ts @ankita240796
-/core/templates/app-type.constants.ts @nishantwrp @ankita240796
 /core/templates/combined-tests.spec.ts @ankita240796
 /core/templates/pages/interaction-specs.constants.ajs.ts @jameesjohn @vojtechjelinek
 /core/templates/pages/interaction-specs.constants.ts @bansalnitish
@@ -559,6 +558,7 @@
 /core/templates/third-party-imports/ @nishantwrp @vojtechjelinek
 /jinja_utils*.py @jameesjohn @vojtechjelinek
 /.lighthouserc.js @jimbyo @jameesjohn @vojtechjelinek
+/.lighthouserc-accessibility.js @jimbyo
 /puppeteer-login-script.js @jimbyo @vojtechjelinek
 /scripts/run_lighthouse_tests.py @jameesjohn @vojtechjelinek
 /webpack.*.ts @nishantwrp @vojtechjelinek
@@ -640,6 +640,8 @@
 /core/storage/ @seanlip
 /core/domain/user*.py @seanlip
 /export/ @seanlip
+/requirements.txt @vojtechjelinek
+/requirements.in @vojtechjelinek
 /manifest.json @vojtechjelinek
 /package.json @vojtechjelinek
 /yarn.lock @vojtechjelinek

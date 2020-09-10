@@ -46,6 +46,7 @@ PYLINT_QUOTES_VERSION = '0.1.8'
 PYGITHUB_VERSION = '1.45'
 WEBTEST_VERSION = '2.0.35'
 GRPCIO_VERSION = '1.0.0'
+PIP_TOOLS_VERSION = '5.3.1'
 
 # Node version.
 NODE_VERSION = '12.16.2'
@@ -82,6 +83,7 @@ CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
+THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-304.0.0', 'google-cloud-sdk')
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
@@ -120,6 +122,16 @@ REDIS_CONF_PATH = os.path.join('redis.conf')
 # Path for the dump file the redis server autogenerates. It contains data
 # used by the Redis server.
 REDIS_DUMP_PATH = os.path.join(CURR_DIR, 'dump.rdb')
+# The requirements.txt file is auto-generated and contains a deterministic list
+# of all libraries and versions that should exist in the
+# 'third_party/python_libs' directory.
+# NOTE: Developers should NOT modify this file.
+COMPILED_REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.txt')
+# The precompiled requirements file is the one that developers should be
+# modifying. It is the file that we use to recompile the
+# "requirements.txt" file so that all installations using "requirements.txt"
+# will be identical.
+REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.in')
 
 
 def is_windows_os():

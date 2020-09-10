@@ -26,6 +26,7 @@ from constants import constants
 
 # Root path of the app.
 ROOT_PATH = os.path.dirname(__file__)
+THIRD_PARTY_PATH = os.path.join(ROOT_PATH, 'third_party')
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 OPPIA_TOOLS_PATH = os.path.join(_PARENT_DIR, 'oppia_tools')
 
@@ -43,8 +44,9 @@ if os.path.isdir(OPPIA_TOOLS_PATH):
         raise Exception('Invalid path for oppia_tools library: %s' % PIL_PATH)
     sys.path.insert(0, PIL_PATH)
 
-vendor.add(os.path.join(ROOT_PATH, 'third_party'))
-pkg_resources.working_set.add_entry(os.path.join(ROOT_PATH, 'third_party'))
+vendor.add(os.path.join(THIRD_PARTY_PATH, 'python_libs'))
+pkg_resources.working_set.add_entry(
+    os.path.join(THIRD_PARTY_PATH, 'python_libs'))
 
 if not constants.DEV_MODE:
     pass
@@ -56,3 +58,8 @@ else:
     os.environ['DATASTORE_HOST'] = 'http://localhost:8081'
     os.environ['DATASTORE_PROJECT_ID']= 'oppia-dev'
     os.environ['DATASTORE_USE_PROJECT_ID_AS_APP_ID'] = True
+# Google App Engine (GAE) uses its own virtual environment that sets up the
+# python library system path using their third party python library, vendor. In
+# order to inform GAE of the packages that are required for Oppia, we need to
+# add it using the vendor library. More information can be found here:
+# https://cloud.google.com/appengine/docs/standard/python/tools/using-libraries-python-27

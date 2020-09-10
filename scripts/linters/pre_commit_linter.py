@@ -115,7 +115,9 @@ _PATHS_TO_INSERT = [
         _PARENT_DIR, 'oppia_tools', 'Pillow-%s' % common.PILLOW_VERSION),
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'psutil-%s' % common.PSUTIL_VERSION),
-    os.path.join(common.THIRD_PARTY_DIR)
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools', 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
+    common.THIRD_PARTY_PYTHON_LIBS_DIR
 ]
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)

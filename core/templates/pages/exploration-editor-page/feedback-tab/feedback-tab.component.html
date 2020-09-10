@@ -16,7 +16,7 @@
 
     <h2>Exploration Feedback</h2>
 
-    <div style="clear: both;"></div>
+    <div class="oppia-clear"></div>
 
     <div ng-if="$ctrl.threadData.feedbackThreads.length === 0">
       <em>No feedback has been given for this exploration yet.</em>
@@ -37,8 +37,8 @@
             <i class="material-icons oppia-vcenter" title="Return to list of feedback threads">&#xE5CB;</i>
           </button>
         </span>
-        <span style="font-size: larger" ng-show="!$ctrl.activeThread.isSuggestionThread()">Feedback Thread: <[$ctrl.activeThread.subject]></span>
-        <span style="font-size: larger" ng-show="$ctrl.activeThread.isSuggestionThread()">Suggestion Thread: <[$ctrl.activeThread.subject]></span>
+        <span class="oppia-thread-text" ng-show="!$ctrl.activeThread.isSuggestionThread()">Feedback Thread: <[$ctrl.activeThread.subject]></span>
+        <span class="oppia-thread-text" ng-show="$ctrl.activeThread.isSuggestionThread()">Suggestion Thread: <[$ctrl.activeThread.subject]></span>
       </div>
 
       <div class="col-lg-4 col-md-4 col-sm-4 float-right">
@@ -83,9 +83,9 @@
 
               <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12">
-                  <div style="white-space: pre-wrap; word-break: break-word" class="protractor-test-exploration-feedback"><[m.text]></div>
+                  <div class="oppia-view-suggestion-button-container protractor-test-exploration-feedback"><[m.text]></div>
                   <div ng-if="$ctrl.activeThread.isSuggestionThread() && $index == 0">
-                    <button class="btn btn-<[$ctrl.getSuggestionButtonType()]> protractor-test-view-suggestion-btn" style="margin-top: 6px; margin-bottom: 6px" ng-click="$ctrl.showSuggestionModal()">
+                    <button class="btn btn-<[$ctrl.getSuggestionButtonType()]> protractor-test-view-suggestion-btn oppia-view-suggestion-btn" ng-click="$ctrl.showSuggestionModal()">
                       View Suggestion
                     </button>
                   </div>
@@ -120,7 +120,7 @@
                     ng-options="choice.id as choice.text for choice in $ctrl.STATUS_CHOICES"
                     ng-disabled="$ctrl.messageSendingInProgress">
             </select>
-            <div style="color:#ff0000; margin-top: 7px;" ng-if="!$ctrl.tmpMessage.text && ($ctrl.tmpMessage.status === 'ignored' || $ctrl.tmpMessage.status === 'not_actionable')">
+            <div class="oppia-icon-container" ng-if="!$ctrl.tmpMessage.text && ($ctrl.tmpMessage.status === 'ignored' || $ctrl.tmpMessage.status === 'not_actionable')">
               <i class="material-icons">&#xE88F;</i>
               <span>Please specify a reason for setting the status to <[$ctrl.getHumanReadableStatus($ctrl.tmpMessage.status)]>.</span>
             </div>
@@ -128,7 +128,7 @@
         </div>
 
         <div>
-          <button class="btn btn-success protractor-test-oppia-feedback-response-send-btn" style="margin-top: 10px;"
+          <button class="btn btn-success protractor-test-oppia-feedback-response-send-btn oppia-feedback-response-send-btn"
                   ng-click="$ctrl.addNewMessage($ctrl.activeThread.threadId, $ctrl.tmpMessage.text, $ctrl.tmpMessage.status)"
                   ng-disabled="$ctrl.messageSendingInProgress || (!$ctrl.tmpMessage.text && $ctrl.activeThread.status === $ctrl.tmpMessage.status) || (!$ctrl.tmpMessage.text && ($ctrl.tmpMessage.status === 'ignored' || $ctrl.tmpMessage.status === 'not_actionable'))">
             <span ng-if="$ctrl.messageSendingInProgress">Sending...</span>
@@ -155,5 +155,23 @@
   .activeThreadView {
     margin-top: 10px;
     word-wrap: break-word;
+  }
+  feedback-tab .oppia-thread-text {
+    font-size: larger;
+  }
+  feedback-tab .oppia-view-suggestion-button-container {
+    white-space: pre-wrap;
+    word-break: break-word
+  }
+  feedback-tab .oppia-view-suggestion-btn {
+    margin-bottom: 6px;
+    margin-top: 6px;
+  }
+  feedback-tab .oppia-icon-container {
+    color: #ff0000;
+    margin-top: 7px;
+  }
+  feedback-tab .oppia-feedback-response-send-btn {
+    margin-top: 10px;
   }
 </style>
