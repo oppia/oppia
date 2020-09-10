@@ -355,6 +355,7 @@ import { TranslateService } from 'services/translate.service';
 import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
+import { ExplorationSummaryBackendApiService } from 'core/templates/domain/summary/exploration-summary-backend-api.service';
 
 export const angularServices: [string, unknown][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -444,6 +445,7 @@ export const angularServices: [string, unknown][] = [
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
   ['EntityContextObjectFactory', EntityContextObjectFactory],
+  ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],
   ['ExplorationDiffService', ExplorationDiffService],
   ['ExplorationDraftObjectFactory', ExplorationDraftObjectFactory],
   ['ExplorationFeaturesBackendApiService',
