@@ -22,7 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ExplorationIdValidationService } from
   'domain/exploration/exploration-id-validation.service';
 
-fdescribe('Exploration id validation service', function() {
+describe('Exploration id validation service', function() {
   let explorationIdValidationService:
     ExplorationIdValidationService = null;
   let httpTestingController: HttpTestingController;
