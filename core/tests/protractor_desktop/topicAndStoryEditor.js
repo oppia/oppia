@@ -371,9 +371,9 @@ describe('Chapter editor functionality', function() {
 
       await storyEditorPage.dragChapterToAnotherChapter(
         'Chapter 2', 'Chapter 1');
+      await storyEditorPage.saveStory('Saving chapters');
       await storyEditorPage.expectChaptersListToBe(
         ['Chapter 3', 'Chapter 2', 'Chapter 1']);
-      await storyEditorPage.saveStory('Saving chapters');
     }
   );
 
