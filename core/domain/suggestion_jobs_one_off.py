@@ -190,6 +190,8 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
     them, if needed, and immediately store them back into the data store.
     """
 
+    _VALIDATION_ERROR_KEY = 'validation_error'
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [suggestion_models.GeneralSuggestionModel]
@@ -209,6 +211,18 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
         # domain classes, the language code field is retrieved and set
         # automatically.
         suggestion = suggestion_services.get_suggestion_from_model(item)
+        try:
+            suggestion.validate()
+        except Exception as e:
+            logging.error(
+                'Suggestion %s failed validation: %s' % (
+                    item.id, e))
+            yield (
+                PopulateSuggestionLanguageCodeMigrationOneOffJob
+                ._VALIDATION_ERROR_KEY,
+                'Suggestion %s failed validation: %s' % (
+                    item.id, e))
+            return
         suggestion_services.update_suggestion(suggestion)
         yield ('%s_suggestion_migrated' % suggestion.suggestion_type, item.id)
 

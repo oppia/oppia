@@ -2007,3 +2007,23 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         expected_output = []
 
         self._run_job_and_verify_output(expected_output)
+
+    def test_migration_skips_suggestions_failing_validation(self):
+        # Create an add question suggestion with an invalid score category.
+        suggestion_models.GeneralSuggestionModel(
+            id=self.SKILL_THREAD_ID,
+            suggestion_type=suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=suggestion_models.TARGET_TYPE_SKILL,
+            target_id='skill_1',
+            target_version_at_submission=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id=self.author_id,
+            final_reviewer_id=self.reviewer_id,
+            change_cmd=self.add_question_change_dict,
+            score_category='invalid_score_category'
+        ).put()
+        expected_output = [
+            u'[u\'validation_error\', 1]'
+        ]
+
+        self._run_job_and_verify_output(expected_output)
