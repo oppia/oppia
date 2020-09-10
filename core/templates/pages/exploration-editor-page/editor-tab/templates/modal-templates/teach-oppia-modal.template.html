@@ -39,6 +39,9 @@
     background: white;
     border-color: green;
   }
+  .teach-oppia-modal .oppia-unresolved-answers-container {
+    padding-top: 10px;
+  }
 </style>
 
 <div class="modal-header">
@@ -49,7 +52,7 @@
 <div class="modal-body teach-oppia-modal">
   <div class="unresolved-answers-list oppia-rule-details-header">
     <p class="unresolved-answers-loading-text" ng-show="loadingDotsAreShown">Loading <loading-dots></loading-dots></p>
-    <div ng-show="unresolvedAnswers.length > 0" style="padding-top: 10px;">
+    <div ng-show="unresolvedAnswers.length > 0" class="oppia-unresolved-answers-container">
       <div class="unresolved-answer" ng-repeat="answer in unresolvedAnswers track by $index">
         <p class="answer-header-label"><strong>Answer</strong></p>
         <div>

@@ -15,7 +15,7 @@
           </i>
         </div>
       </div>
-      <input class="form-control protractor-test-new-chapter-title-field" style="font-size: 12px;"
+      <input class="form-control protractor-test-new-chapter-title-field oppia-new-chapter-title-field"
              placeholder="Enter the title for this chapter to be displayed to learners in the story viewer page (can be edited later)"
              ng-model="title" ng-change="resetErrorMsg()" maxlength="<[MAX_CHARS_IN_CHAPTER_TITLE]>" autofocus>
       <span class="oppia-input-box-subtitle">
@@ -79,6 +79,9 @@
   }
   .create-new-chapter .modal-close-button {
     display: none;
+  }
+  .create-new-chapter .oppia-new-chapter-title-field {
+    font-size: 12px;
   }
   @media screen and (max-width: 768px) {
     .create-new-chapter .modal-dialog {

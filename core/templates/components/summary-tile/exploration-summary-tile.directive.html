@@ -8,10 +8,10 @@
 </learner-dashboard-icons>
 
 <md-card ng-class="[isCollectionPreviewTile ? 'oppia-activity-summary-tile-mobile' : 'oppia-activity-summary-tile', {'small-width': !isWindowLarge}, {'oppia-activity-playlist-tile': isPlaylistTile()}]"
-         style="position: relative; z-index: 5;" ng-if="!isRefresherExploration"
-         class="protractor-test-exploration-dashboard-card">
+         ng-if="!isRefresherExploration"
+         class="oppia-exploration-dashboard-card protractor-test-exploration-dashboard-card">
   <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
-    <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
+    <div class="title-section" ng-style="{'background-color': getThumbnailBgColor()}">
       <img class="thumbnail-image" ng-src="<[getCompleteThumbnailIconUrl()]>" alt="<[getCategory()]>" ng-style="isPlaylistTile() && {'top': '4px', 'width': '50px'}">
       <h3 class="activity-title protractor-test-exp-summary-tile-title" ng-style="isPlaylistTile() && {'width': '93%'}">
         <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
@@ -73,19 +73,37 @@
           </span>
         </li>
       </ul>
-      <button ng-if="isCollectionPreviewTile" class="oppia-learner-confirm-button md-button md-default-theme protractor-test-play-exploration-button"
-              style="display: block; margin: auto; touch-action: pan-y; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+      <button ng-if="isCollectionPreviewTile" class="oppia-learner-confirm-button oppia-play-exploration-button md-button md-default-theme protractor-test-play-exploration-button">
         <span translate="I18N_PLAYER_PLAY_EXPLORATION"></span>
       </button>
     </div>
   </a>
 </md-card>
-<md-button class="oppia-learner-confirm-button protractor-test-return-to-parent-button"
-           style="margin-top: 12px;"
+<md-button class="oppia-learner-confirm-button oppia-return-to-parent-button protractor-test-return-to-parent-button"
            ng-if="isRefresherExploration"
            ng-click="loadParentExploration()">
   <span translate="I18N_PLAYER_RETURN_TO_PARENT"></span>
-  <i class="fas fa-arrow-right"
-     style="font-size: 19px; padding-top: 1.5px;">
+  <i class="fas fa-arrow-right oppia-arrow-icon">
   </i>
 </md-button>
+<style>
+  exploration-summary-tile .oppia-exploration-dashboard-card {
+    position: relative;
+    z-index: 5;
+  }
+  exploration-summary-tile .oppia-play-exploration-button {
+    display: block;
+    margin: auto;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    touch-action: pan-y;
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+  exploration-summary-tile .oppia-return-to-parent-button {
+    margin-top: 12px;
+  }
+  exploration-summary-tile .oppia-arrow-icon {
+    font-size: 19px;
+    padding-top: 1.5px;
+  }
+</style>

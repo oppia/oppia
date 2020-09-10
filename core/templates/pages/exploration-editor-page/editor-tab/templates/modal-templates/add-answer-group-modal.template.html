@@ -15,16 +15,15 @@
     <br>
 
     <div ng-if="!feedbackEditorIsOpen && !isLinearWithNoFeedback(tmpOutcome)"
-         title="Edit feedback"
-         style="height: 100%; width: 100%; margin-right: 22px;">
+         title="Edit feedback" class="oppia-edit-feedback">
       <div class="oppia-rule-details-header oppia-editable-section">
         <div class="oppia-rule-preview oppia-transition-200">
           <div class="oppia-click-to-start-editing protractor-test-open-feedback-editor" ng-click="openFeedbackEditor()">
             <i class="material-icons oppia-editor-edit-icon" title="Edit Feedback">&#xE254;</i>
           </div>
           <strong>Oppia tells the learner...</strong>
-          <div style="position: relative;">
-            <span style="color: #888">
+          <div class="position-relative">
+            <span class="oppia-nothing-text">
               <em>Nothing</em>
             </span>
           </div>
@@ -73,6 +72,14 @@
   }
   .add-answer-group-modal .modal-header i {
     display: none;
+  }
+  .add-answer-group-modal .oppia-edit-feedback {
+    height: 100%;
+    margin-right: 22px;
+    width: 100%;
+  }
+  .add-answer-group-modal .oppia-nothing-text {
+    color: #888;
   }
   @media screen and (max-width: 768px) {
     .add-answer-group-modal .modal-dialog ,

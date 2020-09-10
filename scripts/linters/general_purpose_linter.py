@@ -24,7 +24,6 @@ import re
 
 import python_utils
 
-from . import ignored_style_tag_files
 from . import js_ts_linter
 from . import warranted_angular_security_bypasses
 from .. import common
@@ -333,7 +332,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
         'regexp': re.compile(r'\s+style\s*=\s*'),
         'message': 'Please do not use inline styling.',
-        'excluded_files': ignored_style_tag_files.EXCLUDED_FILES,
+        'excluded_files': (),
         'excluded_dirs': ()
     }
 ]

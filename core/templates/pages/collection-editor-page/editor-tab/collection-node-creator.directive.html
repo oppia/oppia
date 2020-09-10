@@ -7,7 +7,7 @@ or
 <form class="form-inline oppia-add-existing-exploration-form" ng-class="{'has-error': $ctrl.searchQueryHasError}" ng-submit="$ctrl.addExploration()">
   <input class="form-control protractor-test-add-exploration-input" ng-model="$ctrl.newExplorationId" type="text" placeholder="Enter exploration id to be added, or search explorations by name" uib-typeahead="exploration for exploration in $ctrl.fetchTypeaheadResults($viewValue)" ng-model-options="{ debounce: 300 }">
   <button class="btn btn-success protractor-test-add-exploration-button" type="submit" ng-disabled="!$ctrl.newExplorationId">Add Existing Exploration</button>
-  <span class="form-text" style="font-size: smaller" ng-if="$ctrl.isMalformedId($ctrl.newExplorationId)">
+  <span class="form-text oppia-form-text" ng-if="$ctrl.isMalformedId($ctrl.newExplorationId)">
     <em>The trailing '#' is not part of the ID.</em>
   </span>
 </form>
@@ -20,5 +20,9 @@ or
   .oppia-new-exploration-form > input {
     margin-right: 10px;
     min-width: 160px;
+  }
+
+  collection-node-creator .oppia-form-text {
+    font-size: smaller;
   }
 </style>

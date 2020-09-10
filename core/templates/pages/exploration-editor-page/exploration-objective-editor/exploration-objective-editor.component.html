@@ -6,7 +6,7 @@
            ng-model="explorationObjectiveService.displayed"
            ng-blur="$ctrl.onInputFieldBlur()" placeholder="Learn how to..." ng-trim="false"
            width="100%">
-    <span class="form-text protractor-test-exploration-objective-warning" style="font-size: smaller">
+    <span class="form-text protractor-test-exploration-objective-warning">
       <em>In a complete sentence, tell people what they'll learn from this exploration.</em>
       <span ng-if="explorationObjectiveService.displayed.length > 0">
         <em>Characters used: <[explorationObjectiveService.displayed.length]>/100</em>
@@ -22,7 +22,8 @@
       width: 100%;
     }
   }
-  .modal-body exploration-objective-editor .form-text {
+  exploration-objective-editor .form-text {
+    font-size: smaller;
     margin-bottom: -8px;
   }
 </style>

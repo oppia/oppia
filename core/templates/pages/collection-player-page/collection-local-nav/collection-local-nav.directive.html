@@ -1,4 +1,4 @@
-<ul class="nav navbar-nav oppia-navbar-nav float-right" style="margin-right: 0;">
+<ul class="nav navbar-nav oppia-navbar-nav float-right oppia-navbar-pencil-icon">
   <li ng-if="$ctrl.canEdit" class="nav-item">
     <a ng-href="/collection_editor/create/<[$ctrl.collectionId]>" uib-tooltip="Edit" tooltip-placement="bottom" target="_blank" rel="noopener" class="nav-link">
       <i class="material-icons">&#xE254;</i>
@@ -6,3 +6,8 @@
     </a>
   </li>
 </ul>
+<style>
+  collection-local-nav .oppia-navbar-pencil-icon {
+    margin-right: 0;
+  }
+</style>

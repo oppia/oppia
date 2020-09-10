@@ -28,7 +28,7 @@
     <strong class="title-text">
       <a ng-href="<[$ctrl.getStoryLink()]>" ng-class="{'disabled-link': !$ctrl.classroomUrlFragment}"><[$ctrl.storySummary.getTitle()]> </a>
     </strong>
-    <span style="padding-left: 10px; font-size: 0.75em; color: #404040;">
+    <span class="oppia-chapters-count">
        <[$ctrl.nodeCount]> <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span><[($ctrl.nodeCount > 1) ? 's' : '']>
     </span>
   </div>
@@ -190,6 +190,12 @@
 
   story-summary-tile a:hover {
     text-decoration: none;
+  }
+
+  story-summary-tile .oppia-chapters-count {
+    color: #404040;
+    font-size: 0.75em;
+    padding-left: 10px;
   }
 
   @media (max-width: 800px) {
