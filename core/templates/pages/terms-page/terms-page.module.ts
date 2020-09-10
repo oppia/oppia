@@ -37,12 +37,6 @@ import { OppiaAngularRootComponent } from
 import { TermsPageComponent } from
   'pages/terms-page/terms-page.component';
 
-import { AppConstants } from 'app.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -58,9 +52,6 @@ import { ObjectsDomainConstants } from
     TermsPageComponent
   ],
   providers: [
-    AppConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

@@ -16,7 +16,7 @@
  * @fileoverview Constants for topics and skills dashboard domain.
  */
 
-export class TopicsAndSkillsDashboardDomainConstants {
-  public static MERGE_SKILLS_URL = '/merge_skills_handler';
-  public static SKILL_DASHBOARD_DATA_URL = '/skills_dashboard/data';
-}
+export const TopicsAndSkillsDashboardDomainConstants = {
+  MERGE_SKILLS_URL: '/merge_skills_handler',
+  SKILL_DASHBOARD_DATA_URL: '/skills_dashboard/data'
+} as const;
