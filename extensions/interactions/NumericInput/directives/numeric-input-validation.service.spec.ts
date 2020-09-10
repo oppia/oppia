@@ -29,11 +29,10 @@ import { Outcome, OutcomeObjectFactory } from
 import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { AppConstants } from 'app.constants';
-import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
 describe('NumericInputValidationService', () => {
   let validatorService: NumericInputValidationService;
-  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
 
   let currentState: string;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
