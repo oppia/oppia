@@ -42,6 +42,7 @@ def _normalize_python_library_name(library_name):
     Returns:
         str. A normalized library name that is all lowercase.
     """
+    library_name = re.sub('\[[^\]]+\]', '', library_name)
     return library_name.lower()
 
 
