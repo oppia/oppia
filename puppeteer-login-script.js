@@ -38,6 +38,8 @@ module.exports = async(browser, context) => {
   // Sign into Oppia.
   if (context.url.includes('admin')) {
     await login(context, page);
+  } else if (context.url.includes('emaildashboard')) {
+    await setRole(page, 'string:ADMIN');
   } else if (context.url.includes('collection/0')) {
     await createCollections(context, page);
   } else if (context.url.includes('explore/0')) {
@@ -68,8 +70,6 @@ const login = async function(context, page) {
     }
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log('Login Failed');
-    // eslint-disable-next-line no-console
     console.log(e);
   }
 };
@@ -94,8 +94,6 @@ const setRole = async function(page, role) {
     await page.goto(CREATOR_DASHBOARD_URL, { waitUntil: networkIdle});
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log('Changing role to admin failed');
-    // eslint-disable-next-line no-console
     console.log(e);
   }
 };
@@ -116,8 +114,6 @@ const createCollections = async function(context, page) {
     console.log('Collections Created');
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log('Creating Collections Failed');
-    // eslint-disable-next-line no-console
     console.log(e);
   }
 };
@@ -136,8 +132,6 @@ const createExplorations = async function(context, page) {
     // eslint-disable-next-line no-console
     console.log('Exploration Created');
   } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('Creating Exploration Failed');
     // eslint-disable-next-line no-console
     console.log(e);
   }

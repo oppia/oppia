@@ -57,7 +57,6 @@ module.exports = {
         {
           'matchingUrlPattern': '.*',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 1}],
             'first-contentful-paint': [ 'warn', {'maxNumericValue': 1230000}],
             'first-meaningful-paint': ['warn', {'maxNumericValue': 1280000}],
             'first-cpu-idle': ['warn', {'maxNumericValue': 1460000}],
