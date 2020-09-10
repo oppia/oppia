@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import os
+import re
 import shutil
 import subprocess
 
