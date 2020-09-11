@@ -78,6 +78,7 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_TRANSLATION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+        # The language code of the translation.
         language_code = change['language_code']
         content_html = exploration.get_content_html(
             change['state_name'], change['content_id'])
@@ -89,6 +90,7 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
+        # The language code of the question.
         language_code = change['question_dict']['language_code']
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)

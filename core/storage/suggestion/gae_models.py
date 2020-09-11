@@ -401,8 +401,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     suggestion_model
                     .target_version_at_submission),
                 'status': suggestion_model.status,
-                'change_cmd': suggestion_model.change_cmd,
-                'language_code': suggestion_model.language_code
+                'change_cmd': suggestion_model.change_cmd
             }
 
         return user_data

@@ -1742,7 +1742,6 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         Returns:
             str. The score category.
         """
-
         return '%s%s%s' % (
             suggestion_models.SCORE_TYPE_QUESTION,
             suggestion_models.SCORE_CATEGORY_DELIMITER,
@@ -1755,7 +1754,6 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         Returns:
             str. The score category.
         """
-
         return '%s%s%s' % (
             suggestion_models.SCORE_TYPE_CONTENT,
             suggestion_models.SCORE_CATEGORY_DELIMITER,
