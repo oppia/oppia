@@ -936,32 +936,40 @@ def update_collection(
             committer_id, utils.get_current_time_in_millisecs())
 
 
-def create_collection_summary(collection_id, contributor_id_to_add):
+def create_collection_summary(
+        collection_id, contributor_id_to_add, contributor_id_to_remove=None):
     """Creates and stores a summary of the given collection.
 
     Args:
         collection_id: str. ID of the collection.
-        contributor_id_to_add: str. ID of the contributor to be added to the
-            collection summary.
+        contributor_id_to_add: str|None. ID of the contributor to be added to
+            the collection summary.
+        contributor_id_to_remove: str|None. ID of the contributor to remove from
+            the collection summary.
     """
     collection = get_collection_by_id(collection_id)
     collection_summary = compute_summary_of_collection(
-        collection, contributor_id_to_add)
+        collection, contributor_id_to_add, contributor_id_to_remove)
     save_collection_summary(collection_summary)
 
 
-def update_collection_summary(collection_id, contributor_id_to_add):
+def update_collection_summary(
+        collection_id, contributor_id_to_add, contributor_id_to_remove=None):
     """Update the summary of an collection.
 
     Args:
         collection_id: str. ID of the collection.
-        contributor_id_to_add: str. ID of the contributor to be added to the
-            collection summary.
+        contributor_id_to_add: str|None. ID of the contributor to be added to
+            the collection summary.
+        contributor_id_to_remove: str|None. ID of the contributor to remove from
+            the collection summary.
     """
-    create_collection_summary(collection_id, contributor_id_to_add)
+    create_collection_summary(
+        collection_id, contributor_id_to_add, contributor_id_to_remove)
 
 
-def compute_summary_of_collection(collection, contributor_id_to_add):
+def compute_summary_of_collection(
+        collection, contributor_id_to_add, contributor_id_to_remove):
     """Create a CollectionSummary domain object for a given Collection domain
     object and return it.
 
@@ -969,6 +977,8 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
         collection: Collection. The domain object.
         contributor_id_to_add: str. ID of the contributor to be added to the
             collection summary.
+        contributor_id_to_remove: str|None. ID of the contributor to remove from
+            the collection summary.
 
     Returns:
         CollectionSummary. The computed summary for the given collection.
@@ -992,6 +1002,10 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
     elif contributor_id_to_add not in constants.SYSTEM_USER_IDS:
         contributors_summary[contributor_id_to_add] = (
             contributors_summary.get(contributor_id_to_add, 0) + 1)
+
+    if contributor_id_to_remove in contributors_summary:
+        del contributors_summary[contributor_id_to_remove]
+
     contributor_ids = list(contributors_summary.keys())
 
     collection_model_last_updated = collection.last_updated
@@ -1029,7 +1043,10 @@ def compute_collection_contributors_summary(collection_id):
     while True:
         snapshot_metadata = snapshots_metadata[current_version - 1]
         committer_id = snapshot_metadata['committer_id']
-        if committer_id not in constants.SYSTEM_USER_IDS:
+        if (
+                committer_id not in constants.SYSTEM_USER_IDS and
+                user_services.is_user_id_correct(committer_id)
+        ):
             contributors_summary[committer_id] += 1
 
         if current_version == 1:

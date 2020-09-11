@@ -28,6 +28,7 @@ from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_domain
 from core.domain import wipeout_service
@@ -42,12 +43,12 @@ from google.appengine.ext import ndb
     base_models, collection_models, exp_models,
     feedback_models, improvements_models, question_models,
     skill_models, story_models, suggestion_models,
-    user_models
+    topic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.collection, models.NAMES.exploration,
     models.NAMES.feedback, models.NAMES.improvements, models.NAMES.question,
     models.NAMES.skill, models.NAMES.story, models.NAMES.suggestion,
-    models.NAMES.user
+    models.NAMES.topic, models.NAMES.user
 ])
 
 
@@ -165,10 +166,13 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
     def setUp(self):
         super(WipeoutServicePreDeleteTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+        self.set_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
         self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
+        self.user_1_actions = user_services.UserActionsInfo(self.user_1_id)
+
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
 
     def test_pre_delete_user_email_subscriptions(self):
         email_preferences = user_services.get_email_preferences(self.user_1_id)
@@ -230,14 +234,13 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
     def test_pre_delete_user_with_activities_multiple_owners(self):
         user_services.update_user_role(
             self.user_1_id, feconf.ROLE_ID_COLLECTION_EDITOR)
-        user_1_actions = user_services.UserActionsInfo(self.user_1_id)
         self.save_new_valid_exploration('exp_id', self.user_1_id)
         rights_manager.assign_role_for_exploration(
-            user_1_actions, 'exp_id', self.user_2_id, rights_domain.ROLE_OWNER)
+            self.user_1_actions, 'exp_id', self.user_2_id, rights_domain.ROLE_OWNER)
         self.save_new_valid_collection(
             'col_id', self.user_1_id, exploration_id='exp_id')
         rights_manager.assign_role_for_collection(
-            user_1_actions, 'col_id', self.user_2_id, rights_domain.ROLE_OWNER)
+            self.user_1_actions, 'col_id', self.user_2_id, rights_domain.ROLE_OWNER)
 
         wipeout_service.pre_delete_user(self.user_1_id)
 
@@ -248,8 +251,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.assertEqual(pending_deletion_model.collection_ids, [])
 
     def test_pre_delete_user_collection_is_marked_deleted(self):
-        self.save_new_valid_collection(
-            'col_id', self.user_1_id)
+        self.save_new_valid_collection('col_id', self.user_1_id)
 
         collection_model = collection_models.CollectionModel.get_by_id('col_id')
         self.assertFalse(collection_model.deleted)
@@ -269,6 +271,89 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
 
         exp_model = exp_models.ExplorationModel.get_by_id('exp_id')
         self.assertTrue(exp_model.deleted)
+
+    def test_pre_delete_user_collection_ownership_is_released(self):
+        self.save_new_valid_collection('col_id', self.user_1_id)
+        self.publish_collection(self.user_1_id, 'col_id')
+        rights_manager.assign_role_for_collection(
+            user_services.get_system_user(), 'col_id', self.user_2_id, feconf.ROLE_EDITOR)
+
+        collection_summary_model = (
+            collection_models.CollectionSummaryModel.get_by_id('col_id'))
+        self.assertFalse(collection_summary_model.community_owned)
+
+        wipeout_service.pre_delete_user(self.user_1_id)
+
+        collection_summary_model = (
+            collection_models.CollectionSummaryModel.get_by_id('col_id'))
+        self.assertTrue(collection_summary_model.community_owned)
+
+    def test_pre_delete_user_exploration_ownership_is_released(self):
+        self.save_new_valid_exploration('exp_id', self.user_1_id)
+        self.publish_exploration(self.user_1_id, 'exp_id')
+        rights_manager.assign_role_for_exploration(
+            user_services.get_system_user(),
+            'exp_id',
+            self.user_2_id,
+            feconf.ROLE_EDITOR)
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertFalse(exp_summary_model.community_owned)
+
+        wipeout_service.pre_delete_user(self.user_1_id)
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertTrue(exp_summary_model.community_owned)
+
+    def test_pre_delete_user_collection_user_is_deassigned(self):
+        self.save_new_valid_collection('col_id', self.user_1_id)
+        rights_manager.assign_role_for_collection(
+            user_services.get_system_user(),
+            'col_id',
+            self.user_2_id,
+            feconf.ROLE_EDITOR)
+
+        collection_summary_model = (
+            collection_models.CollectionSummaryModel.get_by_id('col_id'))
+        self.assertEqual(collection_summary_model.editor_ids, [self.user_2_id])
+
+        wipeout_service.pre_delete_user(self.user_2_id)
+
+        collection_summary_model = (
+            collection_models.CollectionSummaryModel.get_by_id('col_id'))
+        self.assertEqual(collection_summary_model.editor_ids, [])
+
+    def test_pre_delete_user_exploration_user_is_deassigned(self):
+        self.save_new_valid_exploration('exp_id', self.user_1_id)
+        rights_manager.assign_role_for_exploration(
+            user_services.get_system_user(),
+            'exp_id',
+            self.user_2_id,
+            feconf.ROLE_EDITOR)
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertEqual(exp_summary_model.editor_ids, [self.user_2_id])
+
+        wipeout_service.pre_delete_user(self.user_2_id)
+
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id('exp_id')
+        self.assertEqual(exp_summary_model.editor_ids, [])
+
+    def test_pre_delete_user_user_is_deassigned_from_topics(self):
+        self.save_new_topic('top_id', self.user_1_id)
+        topic_services.assign_role(
+            user_services.get_system_user(),
+            self.user_1_actions,
+            feconf.ROLE_MANAGER,
+            'top_id')
+
+        top_rights_model = topic_models.TopicRightsModel.get_by_id('top_id')
+        self.assertEqual(top_rights_model.manager_ids, [self.user_1_id])
+
+        wipeout_service.pre_delete_user(self.user_1_id)
+
+        top_rights_model = topic_models.TopicRightsModel.get_by_id('top_id')
+        self.assertEqual(top_rights_model.manager_ids, [])
 
 
 class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):

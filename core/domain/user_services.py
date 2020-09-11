@@ -421,7 +421,7 @@ def is_pseudonymous_id(user_id):
     return all((
         user_id.islower(),
         user_id.startswith('pid_'),
-        len(user_id) == user_models.USER_ID_LENGTH))
+        len(user_id) == feconf.USER_ID_LENGTH))
 
 
 def is_username_taken(username):
@@ -1342,8 +1342,6 @@ def get_human_readable_user_ids(user_ids):
             logging.error('User id %s not known in list of user_ids %s' % (
                 user_ids[ind], user_ids))
             raise Exception('User not found.')
-        elif user_settings.user_id == feconf.SYSTEM_COMMITTER_ID:
-            usernames.append('admin')
         elif user_settings.username:
             usernames.append(user_settings.username)
         else:

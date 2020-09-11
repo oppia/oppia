@@ -227,16 +227,20 @@ def delete_user(pending_deletion_request):
         'story_id')
     _pseudonymize_col_or_exp_models(
         pending_deletion_request,
+        models.NAMES.collection,
         collection_models.CollectionSnapshotMetadataModel,
         collection_models.CollectionRightsSnapshotMetadataModel,
         collection_models.CollectionRightsSnapshotContentModel,
-        collection_models.CollectionCommitLogEntryModel)
+        collection_models.CollectionCommitLogEntryModel,
+        'collection_id')
     _pseudonymize_col_or_exp_models(
         pending_deletion_request,
+        models.NAMES.exploration,
         exp_models.ExplorationSnapshotMetadataModel,
         exp_models.ExplorationRightsSnapshotMetadataModel,
         exp_models.ExplorationRightsSnapshotContentModel,
-        exp_models.ExplorationCommitLogEntryModel)
+        exp_models.ExplorationCommitLogEntryModel,
+        'exploration_id')
 
 
 def verify_user_deleted(pending_deletion_request):
@@ -269,11 +273,14 @@ def _hard_delete_explorations_and_collections(pending_deletion_request):
         pending_deletion_request.user_id,
         pending_deletion_request.exploration_ids,
         force_deletion=True)
+    pending_deletion_request.exploration_ids = []
+    save_pending_deletion_request(pending_deletion_request)
     collection_services.delete_collections(
         pending_deletion_request.user_id,
         pending_deletion_request.collection_ids,
         force_deletion=True)
-
+    pending_deletion_request.collection_ids = []
+    save_pending_deletion_request(pending_deletion_request)
 
 def _generate_activity_to_pseudonymized_ids_mapping(activity_ids):
     """Generate mapping from activity IDs to pseudonymous user IDs.
@@ -412,10 +419,9 @@ def _pseudonymize_activity_models(
         commit_log_model_field_name: str. The name of the field holding the
             activity id in the corresponding commit log model.
     """
-    user_id = pending_deletion_request.user_id
     snapshot_metadata_models, commit_log_models = (
         _collect_activity_ids_from_snapshots_and_commit(
-            user_id,
+            pending_deletion_request,
             activity_category,
             [snapshot_model_class],
             commit_log_model_class,
@@ -470,16 +476,20 @@ def _pseudonymize_activity_models(
 
 def _pseudonymize_col_or_exp_models(
         pending_deletion_request,
+        activity_category,
         snapshot_metadata_model_class,
         rights_snapshot_metadata_model_class,
         rights_snapshot_content_model_class,
-        commit_log_model_class):
+        commit_log_model_class,
+        commit_log_model_field_name):
     """Pseudonymize the collection or exploration models for the user with
     user_id.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object to be saved in the datastore.
+        activity_category: models.NAMES. The category of the models that are
+            being pseudonymized.
         snapshot_metadata_model_class:
             CollectionSnapshotMetadataModel|ExplorationSnapshotMetadataModel.
             The snapshot metadata model class.
@@ -490,19 +500,21 @@ def _pseudonymize_col_or_exp_models(
         commit_log_model_class:
             CollectionCommitLogEntryModel|ExplorationCommitLogEntryModel.
             The commit log model class.
+        commit_log_model_field_name: str. The name of the field holding the
+            activity id in the corresponding commit log model.
     """
     user_id = pending_deletion_request.user_id
 
     snapshot_metadata_models, commit_log_models = (
         _collect_activity_ids_from_snapshots_and_commit(
-            user_id,
-            models.NAMES.topic,
+            pending_deletion_request,
+            activity_category,
             [
                 snapshot_metadata_model_class,
                 rights_snapshot_metadata_model_class
             ],
             commit_log_model_class,
-            commit_log_model_class.collection_id
+            commit_log_model_field_name
         )
     )
 
@@ -533,9 +545,10 @@ def _pseudonymize_col_or_exp_models(
                 pseudonymized_id if model_user_id == user_id else model_user_id
                 for model_user_id in snapshot_metadata_model.content_user_ids
             ]
-            snapshot_metadata_model.commit_cmds_user_id = [
+            snapshot_metadata_model.commit_cmds_user_ids = [
                 pseudonymized_id if model_user_id == user_id else model_user_id
-                for model_user_id in snapshot_metadata_model.commit_cmds_user_id
+                for model_user_id in
+                snapshot_metadata_model.commit_cmds_user_ids
             ]
             if user_id == snapshot_metadata_model.committer_id:
                 snapshot_metadata_model.committer_id = pseudonymized_id
@@ -574,38 +587,39 @@ def _pseudonymize_col_or_exp_models(
             rights_snapshot_content_models +
             commit_log_models)
 
-    collection_ids_to_pids = (
-        pending_deletion_request.activity_mappings[models.NAMES.collection])
-    for collection_id, pseudonymized_id in collection_ids_to_pids.items():
-        col_related_snapshot_metadata_models = [
+    col_or_exp_ids_to_pids = (
+        pending_deletion_request.activity_mappings[activity_category])
+    for col_or_exp_id, pseudonymized_id in col_or_exp_ids_to_pids.items():
+        col_or_exp_related_snapshot_metadata_models = [
             model for model in snapshot_metadata_models
-            if model.get_unversioned_instance_id() == collection_id
+            if model.get_unversioned_instance_id() == col_or_exp_id
         ]
 
-        col_related_rights_snapshots_ids = [
-            model.id for model in col_related_snapshot_metadata_models
+        col_or_exp_related_rights_snapshots_ids = [
+            model.id for model in col_or_exp_related_snapshot_metadata_models
             if isinstance(model, rights_snapshot_metadata_model_class)]
-        col_related_snapshot_content_models = (
-            rights_snapshot_content_model_class.query(
-                rights_snapshot_content_model_class.id ==
-                col_related_rights_snapshots_ids
-            ).fetch()
+        col_or_exp_related_snapshot_content_models = (
+            rights_snapshot_content_model_class.get_multi(
+                col_or_exp_related_rights_snapshots_ids, include_deleted=True
+            )
         )
 
-        col_related_models = (
-            col_related_snapshot_metadata_models +
-            col_related_snapshot_content_models +
+        col_or_exp_related_models = (
+            col_or_exp_related_snapshot_metadata_models +
+            col_or_exp_related_snapshot_content_models +
             [
                 model for model in commit_log_models
-                if getattr(model, commit_log_models) == collection_id
+                if getattr(model, commit_log_model_field_name) == col_or_exp_id
             ]
         )
 
         for i in python_utils.RANGE(
-                0, len(col_related_models), MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+                0,
+                len(col_or_exp_related_models),
+                MAX_NUMBER_OF_OPS_IN_TRANSACTION):
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
-                col_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                col_or_exp_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id
             )
 
@@ -617,11 +631,10 @@ def _pseudonymize_topic_models(pending_deletion_request):
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object to be saved in the datastore.
     """
-    user_id = pending_deletion_request.user_id
 
     snapshot_metadata_models, commit_log_models = (
         _collect_activity_ids_from_snapshots_and_commit(
-            user_id,
+            pending_deletion_request,
             models.NAMES.topic,
             [
                 topic_models.TopicSnapshotMetadataModel,
