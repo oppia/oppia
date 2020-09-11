@@ -41,6 +41,7 @@ require('domain/story/editable-story-backend-api.service.ts');
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 require('services/bottom-navbar-status.service.ts');
 require('services/page-title.service.ts');
+require('services/loader.service.ts');
 require('services/contextual/window-ref.service');
 
 import { Subscription } from 'rxjs';
@@ -49,13 +50,13 @@ angular.module('oppia').component('storyEditorPage', {
   template: require('./story-editor-page.component.html'),
   controller: [
     '$uibModal', '$window', 'BottomNavbarStatusService',
-    'EditableStoryBackendApiService',
+    'EditableStoryBackendApiService', 'LoaderService',
     'PageTitleService', 'StoryEditorNavigationService',
     'StoryEditorStateService', 'UndoRedoService',
     'UrlInterpolationService', 'UrlService', 'WindowRef',
     function(
         $uibModal, $window, BottomNavbarStatusService,
-        EditableStoryBackendApiService,
+        EditableStoryBackendApiService, LoaderService,
         PageTitleService, StoryEditorNavigationService,
         StoryEditorStateService, UndoRedoService,
         UrlInterpolationService, UrlService, WindowRef) {
@@ -200,9 +201,13 @@ angular.module('oppia').component('storyEditorPage', {
       };
 
       ctrl.$onInit = function() {
+        LoaderService.showLoadingScreen('Loading Story');
         ctrl.directiveSubscriptions.add(
           StoryEditorStateService.onStoryInitialized.subscribe(
-            () => _initPage()
+            () => {
+              _initPage();
+              LoaderService.hideLoadingScreen();
+            }
           ));
         ctrl.directiveSubscriptions.add(
           StoryEditorStateService.onStoryReinitialized.subscribe(
