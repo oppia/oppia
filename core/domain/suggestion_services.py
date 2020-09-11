@@ -71,10 +71,14 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_CONTENT +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+        # Suggestions of this type do not have an associated language code,
+        # since they are not queryable by language.
+        language_code = None
     elif suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
         score_category = (
             suggestion_models.SCORE_TYPE_TRANSLATION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+        language_code = change['language_code']
         content_html = exploration.get_content_html(
             change['state_name'], change['content_id'])
         if content_html != change['content_html']:
@@ -85,6 +89,7 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
+        language_code = change['question_dict']['language_code']
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
 
@@ -93,7 +98,7 @@ def create_suggestion(
             suggestion_type])
     suggestion = suggestion_domain_class(
         thread_id, target_id, target_version_at_submission, status, author_id,
-        None, change, score_category)
+        None, change, score_category, language_code)
     suggestion.validate()
 
     suggestion_models.GeneralSuggestionModel.create(
@@ -121,7 +126,8 @@ def get_suggestion_from_model(suggestion_model):
         suggestion_model.target_version_at_submission,
         suggestion_model.status, suggestion_model.author_id,
         suggestion_model.final_reviewer_id, suggestion_model.change_cmd,
-        suggestion_model.score_category, suggestion_model.last_updated)
+        suggestion_model.score_category, suggestion_model.language_code,
+        suggestion_model.last_updated)
 
 
 def get_suggestion_by_id(suggestion_id):

@@ -188,7 +188,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 },
                 'old_value': None
             },
-            'score_category': self.score_category
+            'score_category': self.score_category,
+            'language_code': None
         }
         self.mock_create_suggestion(self.target_id)
 

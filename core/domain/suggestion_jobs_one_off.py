@@ -206,11 +206,17 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
             return
 
-        # Getting the suggestion from the model creates the corresponding
-        # suggestion domain object. In the init functions for the suggestion
-        # domain classes, the language code field is retrieved and set
-        # automatically.
         suggestion = suggestion_services.get_suggestion_from_model(item)
+        if suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+            # Set the language code to be the language of the question.
+            suggestion.language_code = suggestion.change.question_dict[
+                'language_code']
+        elif suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            # Set the language code to be the language of the translation.
+            suggestion.language_code = suggestion.change.language_code
+        # Validate the suggestion before updating the storage model.          
         try:
             suggestion.validate()
         except Exception as e:

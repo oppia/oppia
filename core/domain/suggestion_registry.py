@@ -85,8 +85,8 @@ class BaseSuggestion(python_utils.OBJECT):
             'final_reviewer_id': self.final_reviewer_id,
             'change': self.change.to_dict(),
             'score_category': self.score_category,
-            'last_updated': utils.get_time_in_millisecs(self.last_updated),
-            'language_code': self.language_code
+            'language_code': self.language_code,
+            'last_updated': utils.get_time_in_millisecs(self.last_updated)
         }
 
     def get_score_type(self):
@@ -338,7 +338,7 @@ class SuggestionEditStateContent(BaseSuggestion):
     def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, last_updated=None):
+            change, score_category, language_code, last_updated=None):
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
         """
@@ -353,9 +353,8 @@ class SuggestionEditStateContent(BaseSuggestion):
         self.author_id = author_id
         self.change = exp_domain.ExplorationChange(change)
         self.score_category = score_category
+        self.language_code = language_code
         self.last_updated = last_updated
-        # Suggestions of this type are not queryable by language code.
-        self.language_code = None
         # Currently, we don't allow adding images in the "edit state content"
         # suggestion, so the image_context is None.
         self.image_context = None
@@ -525,7 +524,7 @@ class SuggestionTranslateContent(BaseSuggestion):
     def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, last_updated=None):
+            change, score_category, language_code, last_updated=None):
         """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
         """
@@ -540,8 +539,8 @@ class SuggestionTranslateContent(BaseSuggestion):
         self.author_id = author_id
         self.change = exp_domain.ExplorationChange(change)
         self.score_category = score_category
+        self.language_code = language_code
         self.last_updated = last_updated
-        self.language_code = self.change.language_code
         self.image_context = feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
 
     def validate(self):
@@ -664,12 +663,14 @@ class SuggestionAddQuestion(BaseSuggestion):
         score_category: str. The scoring category for the suggestion.
         last_updated: datetime.datetime. Date and time when the suggestion
             was last updated.
+        language_code: str. The ISO 639-1 code used to query suggestions
+            by language. In this case it is the language code of the question.
     """
 
     def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, last_updated=None):
+            change, score_category, language_code, last_updated=None):
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
         """
@@ -686,8 +687,8 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.change.question_dict['question_state_data_schema_version'] = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.score_category = score_category
+        self.language_code = language_code
         self.last_updated = last_updated
-        self.language_code = self.change.question_dict['language_code']
         self.image_context = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
 
     def validate(self):
