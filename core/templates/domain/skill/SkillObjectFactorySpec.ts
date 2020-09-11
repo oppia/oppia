@@ -150,7 +150,7 @@ describe('Skill object factory', () => {
     expect(skill.getPrerequisiteSkillIds()).toEqual(['skill_1']);
   });
 
-  it('Should find misconception by id', () => {
+  it('should find misconception by id', () => {
     let skill = skillObjectFactory.createFromBackendDict(skillDict);
     expect(skill.findMisconceptionById('4')).toEqual(
       misconceptionObjectFactory.createFromBackendDict(misconceptionDict2));
