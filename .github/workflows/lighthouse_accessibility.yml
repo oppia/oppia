@@ -1,5 +1,13 @@
-name: Lighthouse CI tests
-on: [pull_request]
+name: Lighthouse CI accessibility tests
+on:
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
 
 jobs:
   lighthouse:
@@ -13,7 +21,10 @@ jobs:
         with:
           python-version: '2.x'
           architecture: 'x64'
+      - name: Setup python by installing wheel
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: pip install wheel==0.35.0
       - name: Install Third Party Dependencies
         run: python -m scripts.install_third_party_libs
       - name: Run lighthouse checks
-        run: python -m scripts.run_lighthouse_tests
+        run: python -m scripts.run_lighthouse_tests --mode accessibility

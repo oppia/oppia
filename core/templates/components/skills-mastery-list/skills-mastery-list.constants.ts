@@ -16,18 +16,18 @@
  * @fileoverview Constants for the skills mastery list.
  */
 
-export class SkillMasteryListConstants {
-  public static MASTERY_CUTOFF = {
+export const SkillMasteryListConstants = {
+  MASTERY_CUTOFF: {
     GOOD_CUTOFF: 0.7,
     MEDIUM_CUTOFF: 0.4
-  };
+  },
 
-  public static MASTERY_COLORS = {
+  MASTERY_COLORS: {
     // Color green.
     GOOD_MASTERY_COLOR: 'rgb(0, 150, 136)',
     // Color orange.
     MEDIUM_MASTERY_COLOR: 'rgb(217, 92, 12)',
     // Color red.
     BAD_MASTERY_COLOR: 'rgb(201, 80, 66)'
-  };
-}
+  },
+} as const;
