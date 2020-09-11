@@ -73,7 +73,7 @@ describe('Notifications Dashboard Page', function() {
     expect(windowRefMock.nativeWindow.location.href).toBe('/profile/user1');
   });
 
-  it('shoud get locale date time string', function() {
+  it('should get locale date time string', function() {
     // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
     var NOW_MILLIS = 1416563100000;
     expect(ctrl.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(

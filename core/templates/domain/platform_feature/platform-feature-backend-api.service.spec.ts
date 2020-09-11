@@ -85,7 +85,7 @@ describe('PlatformFeatureBackendApiService', () => {
       })
     );
 
-    it('shoud reject if the request fails', fakeAsync(() => {
+    it('should reject if the request fails', fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 

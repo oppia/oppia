@@ -182,7 +182,7 @@ describe('Translation opportunities component', function() {
     expect($uibModal.open).toHaveBeenCalled();
   });
 
-  it('shoud close translation modal when clicking save', function() {
+  it('should close translation modal when clicking save', function() {
     spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
       isLoggedIn: () => true
     }));

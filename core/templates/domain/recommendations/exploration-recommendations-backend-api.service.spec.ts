@@ -44,7 +44,7 @@ describe('Exploration recommendations backend api service', () => {
     httpTestingController.verify();
   });
 
-  it('correctly fetches recommended explorations', fakeAsync(() => {
+  it('should correctly fetch recommended explorations', fakeAsync(() => {
     let backendResponse = {
       summaries: [{
         last_updated_msec: 1591296737470.528,

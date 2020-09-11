@@ -1334,7 +1334,7 @@ describe('Compare versions service', function() {
       }]);
     });
 
-    it('shouldn\'t compare versions if v1 > v2.', function() {
+    it('should not compare versions if v1 > v2.', function() {
       expect(function() {
         cvs.getDiffGraphData(8, 5);
       }).toThrowError('Tried to compare v1 > v2.');

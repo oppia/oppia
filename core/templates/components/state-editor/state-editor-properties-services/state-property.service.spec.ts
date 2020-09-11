@@ -260,7 +260,7 @@ describe('Exploration title service', function() {
       $httpBackend = $injector.get('$httpBackend');
     }));
 
-    it('correctly initializes the service', function() {
+    it('should correctly initialize the service', function() {
       expect(ets.displayed).toBeUndefined();
       expect(ets.savedMemento).toBeUndefined();
       ets.init('A title');
@@ -268,7 +268,7 @@ describe('Exploration title service', function() {
       expect(ets.savedMemento).toEqual('A title');
     });
 
-    it('updates only the title and not the memento', function() {
+    it('should update only the title and not the memento', function() {
       ets.init('A title');
       ets.displayed = 'New title';
       expect(ets.displayed).toEqual('New title');
@@ -276,7 +276,7 @@ describe('Exploration title service', function() {
       expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
     });
 
-    it('restores correctly from the memento', function() {
+    it('should restore correctly from the memento', function() {
       ets.init('A title');
       ets.displayed = 'New title';
       ets.restoreFromMemento();
@@ -284,7 +284,7 @@ describe('Exploration title service', function() {
       expect(ets.savedMemento).toEqual('A title');
     });
 
-    it('updates the memento with the displayed title', function() {
+    it('should update the memento with the displayed title', function() {
       ets.init('A title');
       ets.displayed = 'New title';
       expect(ets.savedMemento).toEqual('A title');
@@ -294,19 +294,20 @@ describe('Exploration title service', function() {
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     });
 
-    it('reports whether the title has changed since it was saved', function() {
-      ets.init('A title');
-      expect(ets.hasChanged()).toBe(false);
-      ets.displayed = 'A title';
-      expect(ets.hasChanged()).toBe(false);
-      ets.displayed = 'New title';
-      expect(ets.hasChanged()).toBe(true);
-      ets.displayed = 'A title';
-      expect(ets.hasChanged()).toBe(false);
+    it('should report whether the title has changed since it was saved',
+      function() {
+        ets.init('A title');
+        expect(ets.hasChanged()).toBe(false);
+        ets.displayed = 'A title';
+        expect(ets.hasChanged()).toBe(false);
+        ets.displayed = 'New title';
+        expect(ets.hasChanged()).toBe(true);
+        ets.displayed = 'A title';
+        expect(ets.hasChanged()).toBe(false);
 
-      ets.saveDisplayedValue();
-      expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
-      expect(ets.hasChanged()).toBe(false);
-    });
+        ets.saveDisplayedValue();
+        expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
+        expect(ets.hasChanged()).toBe(false);
+      });
   });
 });

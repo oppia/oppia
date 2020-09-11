@@ -112,7 +112,7 @@ describe('Translator Overview component', function() {
     });
 
   it('should show tab mode switcher when language code is different' +
-    ' from exploration\'s language code ', function() {
+    ' from exploration\'s language code', function() {
     expect($scope.canShowTabModeSwitcher()).toBe(true);
   });
 

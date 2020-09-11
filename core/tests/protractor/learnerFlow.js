@@ -109,7 +109,7 @@ describe('Learner dashboard functionality', function() {
     }
   });
 
-  it('visits the exploration player and plays the correct exploration',
+  it('should visit the exploration player and plays the correct exploration',
     async function() {
       await users.createUser(
         'expCreator@learnerDashboard.com', 'expCreator');
@@ -134,7 +134,7 @@ describe('Learner dashboard functionality', function() {
       await libraryPage.playExploration('Exploration Player Test');
     });
 
-  it('visits the collection player and plays the correct collection',
+  it('should visit the collection player and plays the correct collection',
     async function() {
       await users.createUser(
         'expOfCollectionCreator@learnerDashboard.com',
@@ -177,7 +177,7 @@ describe('Learner dashboard functionality', function() {
       await libraryPage.playCollection('Introduction to Collections in Oppia');
     });
 
-  it('displays incomplete and completed explorations', async function() {
+  it('should display incomplete and completed explorations', async function() {
     await users.createUser(
       'originalCreator@learnerDashboard.com', 'originalCreator');
     await users.login('originalCreator@learnerDashboard.com', true);
@@ -288,7 +288,7 @@ describe('Learner dashboard functionality', function() {
     }
   });
 
-  it('displays incomplete and completed collections', async function() {
+  it('should display incomplete and completed collections', async function() {
     await users.createUser(
       'explorationCreator@learnerDashboard.com', 'explorationCreator');
     await users.login('explorationCreator@learnerDashboard.com', true);

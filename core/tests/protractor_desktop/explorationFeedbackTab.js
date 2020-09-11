@@ -263,7 +263,7 @@ describe('Suggestions on Explorations', function() {
       'configExplorationSuggestions');
   });
 
-  it('accepts & rejects a suggestion on a published exploration',
+  it('should accepts & rejects a suggestion on a published exploration',
     async function() {
       await users.login('user1@ExplorationSuggestions.com');
       await workflow.createAndPublishExploration(

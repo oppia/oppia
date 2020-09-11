@@ -287,7 +287,7 @@ describe('Question opportunities component', function() {
     });
 
   it('should not create a question when dismissing select skill and skill' +
-    ' difficulty modal ', function() {
+    ' difficulty modal', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });

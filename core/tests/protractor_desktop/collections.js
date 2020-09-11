@@ -123,7 +123,7 @@ describe('Collections', function() {
     await users.logout();
   });
 
-  it('visits the collection editor', async function() {
+  it('should visit the collection editor', async function() {
     await users.login('alice@collections.com');
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
@@ -152,7 +152,7 @@ describe('Collections', function() {
     await users.logout();
   });
 
-  it('visits the collection player', async function() {
+  it('should visit the collection player', async function() {
     await users.login('alice@collections.com');
     await libraryPage.get();
     await libraryPage.findCollection('Test Collection');
@@ -160,7 +160,7 @@ describe('Collections', function() {
     await users.logout();
   });
 
-  it('checks for errors in a collection with varying node count',
+  it('should check for errors in a collection with varying node count',
     async function() {
     // Checking in a collection with one node.
       await users.login('player@collections.com');

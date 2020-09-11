@@ -20,7 +20,7 @@ var waitFor = require('../protractor_utils/waitFor.js');
 var GetStartedPage = require('../protractor_utils/GetStartedPage.js');
 
 describe('Oppia landing pages tour', function() {
-  it('visits the Fractions landing page', async function() {
+  it('should visit the Fractions landing page', async function() {
     await browser.get('/fractions');
     await waitFor.pageToFullyLoad();
 
@@ -31,27 +31,27 @@ describe('Oppia landing pages tour', function() {
     await waitFor.pageToFullyLoad();
   });
 
-  it('visits the Partners landing page', async function() {
+  it('should visit the Partners landing page', async function() {
     await browser.get('/partners');
     await waitFor.pageToFullyLoad();
   });
 
-  it('visits the Nonprofits landing page', async function() {
+  it('should visit the Nonprofits landing page', async function() {
     await browser.get('/nonprofits');
     await waitFor.pageToFullyLoad();
   });
 
-  it('visits the Parents landing page', async function() {
+  it('should visit the Parents landing page', async function() {
     await browser.get('/parents');
     await waitFor.pageToFullyLoad();
   });
 
-  it('visits the Teachers landing page', async function() {
+  it('should visit the Teachers landing page', async function() {
     await browser.get('/teachers');
     await waitFor.pageToFullyLoad();
   });
 
-  it('visits the Volunteers landing page', async function() {
+  it('should visit the Volunteers landing page', async function() {
     await browser.get('/volunteers');
     await waitFor.pageToFullyLoad();
   });
@@ -105,73 +105,74 @@ describe('DEV MODE Test', function() {
 
 describe('Static Pages Tour', function() {
   var getStartedPage = new GetStartedPage.GetStartedPage();
-  it('visits the Get started page', async function() {
+  it('should visit the Get started page', async function() {
     await getStartedPage.get();
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-get-started-page')).isPresent()).toBe(true);
   });
 
-  it('visits the Teach page', async function() {
+  it('should visit the Teach page', async function() {
     await browser.get('/teach');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-teach-page')).isPresent()).toBe(true);
   });
 
-  it('visits the Home page', async function() {
+  it('should visit the Home page', async function() {
     await browser.get('/');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-splash-page')).isPresent()).toBe(true);
   });
 
-  it('visits the About page', async function() {
+  it('should visit the About page', async function() {
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-about-page')).isPresent()).toBe(true);
   });
 
-  it('visits the Contact page', async function() {
+  it('should visit the Contact page', async function() {
     await browser.get('/contact');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-contact-page')).isPresent()).toBe(true);
   });
 
-  it('visits the Donate page', async function() {
+  it('should visit the Donate page', async function() {
     await browser.get('/donate');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-donate-page')).isPresent()).toBe(true);
   });
 
-  it('visits the Privacy page', async function() {
+  it('should visit the Privacy page', async function() {
     await browser.get('/privacy-policy');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-privacy-page')).isPresent()).toBe(true);
   });
 
-  it('visits the Terms page', async function() {
+  it('should visit the Terms page', async function() {
     await browser.get('/terms');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-terms-page')).isPresent()).toBe(true);
   });
 
-  it('visits the Thanks page', async function() {
+  it('should visit the Thanks page', async function() {
     await browser.get('/thanks');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-thanks-page')).isPresent()).toBe(true);
   });
 
-  it('shows the error page when an incorrect url is given', async function() {
-    await browser.get('/splashes');
-    await waitFor.pageToFullyLoad();
-    expect(await element(
-      by.css('.protractor-test-error-page')).isPresent()).toBe(true);
-  });
+  it('should show the error page when an incorrect url is given',
+    async function() {
+      await browser.get('/splashes');
+      await waitFor.pageToFullyLoad();
+      expect(await element(
+        by.css('.protractor-test-error-page')).isPresent()).toBe(true);
+    });
 });

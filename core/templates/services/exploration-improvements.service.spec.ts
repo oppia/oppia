@@ -312,8 +312,8 @@ describe('ExplorationImprovementsService', function() {
         newExpImprovementsConfig(true)));
     });
 
-    it('does nothing when flush is attempted while the improvements tab is ' +
-      'disabled', fakeAsync(() => {
+    it('should do nothing when flush is attempted while the improvements ' +
+      'tab is disabled', fakeAsync(() => {
       this.eibasGetConfigAsyncSpy.and.returnValue(Promise.resolve(
         newExpImprovementsConfig(false)));
 
@@ -326,7 +326,7 @@ describe('ExplorationImprovementsService', function() {
       flushMicrotasks();
     }));
 
-    it('posts new high bounce rate tasks', fakeAsync(async() => {
+    it('should post new high bounce rate tasks', fakeAsync(async() => {
       // Set-up the conditions to generate an HBR task:
       // -   A state demonstrating a high bounce-rate (determined by config).
       const numStarts = 100;
@@ -374,7 +374,7 @@ describe('ExplorationImprovementsService', function() {
       expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
     }));
 
-    it('posts obsolete high bounce rate tasks', fakeAsync(async() => {
+    it('should post obsolete high bounce rate tasks', fakeAsync(async() => {
       // Set-up the conditions to obsolete an HBR task:
       // -   A state demonstrating a low bounce-rate.
       const numStarts = 100;
@@ -439,69 +439,73 @@ describe('ExplorationImprovementsService', function() {
       expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
     }));
 
-    it('posts new NGR tasks after they are resolved', fakeAsync(async() => {
+    it('should post new NGR tasks after they are resolved', fakeAsync(
+      async() => {
       // Set-up the conditions to generate an NGR task:
       // -   A high-frequency unaddressed answer.
-      const answerStats = new AnswerStats('foo', 'foo', 100, false);
-      this.stassGetTopAnswersByStateNameAsyncSpy.and.returnValue(
-        Promise.resolve(new Map([[stateName, [answerStats]]])));
-      const expStats = new ExplorationStats(
-        expId, expVersion, 0, 0, 0,
-        new Map([[stateName, new StateStats(0, 0, 0, 0, 0, 0)]]));
-      this.essGetExplorationStatsSpy.and.returnValue(Promise.resolve(expStats));
+        const answerStats = new AnswerStats('foo', 'foo', 100, false);
+        this.stassGetTopAnswersByStateNameAsyncSpy.and.returnValue(
+          Promise.resolve(new Map([[stateName, [answerStats]]])));
+        const expStats = new ExplorationStats(
+          expId, expVersion, 0, 0, 0,
+          new Map([[stateName, new StateStats(0, 0, 0, 0, 0, 0)]]));
+        this.essGetExplorationStatsSpy.and.returnValue(
+          Promise.resolve(expStats));
 
-      // Initialize the service, this should generate a new NGR task.
-      let p = explorationImprovementsService.initAsync();
-      flushMicrotasks();
-      await p;
+        // Initialize the service, this should generate a new NGR task.
+        let p = explorationImprovementsService.initAsync();
+        flushMicrotasks();
+        await p;
 
-      const [ngrTask] = (
+        const [ngrTask] = (
+          explorationImprovementsTaskRegistryService
+            .getOpenNeedsGuidingResponsesTasks());
+        expect(ngrTask).toBeDefined();
+        expect(ngrTask.targetId).toEqual(stateName);
+
+        // There should be no tasks to flush, because the NGR task is still
+        // open.
+        this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+          expect(tasks).toEqual([]);
+        });
+
+        p = explorationImprovementsService.flushUpdatedTasksToBackend();
+        flushMicrotasks();
+        await p;
+        expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
+
+        // Once the NGR task is resolved, however, it should get flushed.
+        answerStats.isAddressed = true;
         explorationImprovementsTaskRegistryService
-          .getOpenNeedsGuidingResponsesTasks());
-      expect(ngrTask).toBeDefined();
-      expect(ngrTask.targetId).toEqual(stateName);
+          .onStateInteractionSaved(
+            explorationStatesService.getState(stateName));
+        expect(ngrTask.isResolved()).toBeTrue();
 
-      // There should be no tasks to flush, because the NGR task is still open.
-      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
-        expect(tasks).toEqual([]);
-      });
+        this.eibasPostTasksAsyncSpy.calls.reset();
+        this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+          expect(tasks).toEqual([ngrTask]);
+        });
 
-      p = explorationImprovementsService.flushUpdatedTasksToBackend();
-      flushMicrotasks();
-      await p;
-      expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
+        p = explorationImprovementsService.flushUpdatedTasksToBackend();
+        flushMicrotasks();
+        await p;
 
-      // Once the NGR task is resolved, however, it should get flushed.
-      answerStats.isAddressed = true;
-      explorationImprovementsTaskRegistryService
-        .onStateInteractionSaved(explorationStatesService.getState(stateName));
-      expect(ngrTask.isResolved()).toBeTrue();
+        expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
 
-      this.eibasPostTasksAsyncSpy.calls.reset();
-      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
-        expect(tasks).toEqual([ngrTask]);
-      });
+        // The NGR task should be flushed once and only once.
+        this.eibasPostTasksAsyncSpy.calls.reset();
+        this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+          expect(tasks).toEqual([]);
+        });
 
-      p = explorationImprovementsService.flushUpdatedTasksToBackend();
-      flushMicrotasks();
-      await p;
+        p = explorationImprovementsService.flushUpdatedTasksToBackend();
+        flushMicrotasks();
+        await p;
 
-      expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
+        expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
+      }));
 
-      // The NGR task should be flushed once and only once.
-      this.eibasPostTasksAsyncSpy.calls.reset();
-      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
-        expect(tasks).toEqual([]);
-      });
-
-      p = explorationImprovementsService.flushUpdatedTasksToBackend();
-      flushMicrotasks();
-      await p;
-
-      expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
-    }));
-
-    it('does not store post-init NGR tasks', fakeAsync(async() => {
+    it('should not store post-init NGR tasks', fakeAsync(async() => {
       // An NGR task will not be generated because all answers are addressed.
       const answerStats = new AnswerStats('foo', 'foo', 100, true);
       this.stassGetTopAnswersByStateNameAsyncSpy.and.returnValue(

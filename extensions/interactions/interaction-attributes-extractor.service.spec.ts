@@ -37,18 +37,19 @@ describe('Interaction attributes extractor service', () => {
     hes = TestBed.get(HtmlEscaperService);
   });
 
-  it('properly extract customization arguments values from attributes', () => {
-    const placeholderWithValue = hes.objToEscapedJson({
-      content_id: 'ca_placeholder_0',
-      unicode_str: 'Enter here.'
-    });
-    const rowsWithValue = hes.objToEscapedJson(2);
-    const attributes = { placeholderWithValue, rowsWithValue };
+  it('should properly extract customization arguments values from attributes',
+    () => {
+      const placeholderWithValue = hes.objToEscapedJson({
+        content_id: 'ca_placeholder_0',
+        unicode_str: 'Enter here.'
+      });
+      const rowsWithValue = hes.objToEscapedJson(2);
+      const attributes = { placeholderWithValue, rowsWithValue };
 
-    const caValues = iaes.getValuesFromAttributes('TextInput', attributes);
-    expect(caValues).toEqual({
-      placeholder: new SubtitledUnicode('Enter here.', 'ca_placeholder_0'),
-      rows: 2
+      const caValues = iaes.getValuesFromAttributes('TextInput', attributes);
+      expect(caValues).toEqual({
+        placeholder: new SubtitledUnicode('Enter here.', 'ca_placeholder_0'),
+        rows: 2
+      });
     });
-  });
 });

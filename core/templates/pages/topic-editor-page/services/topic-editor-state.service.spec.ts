@@ -556,7 +556,7 @@ describe('Topic editor state service', function() {
     }
   );
 
-  it('it should report that a topic has loaded through loadTopic()',
+  it('should report that a topic has loaded through loadTopic()',
     function() {
       expect(TopicEditorStateService.hasLoadedTopic()).toBe(false);
 
@@ -568,7 +568,7 @@ describe('Topic editor state service', function() {
     }
   );
 
-  it('it should report that a topic has loaded through setTopic()',
+  it('should report that a topic has loaded through setTopic()',
     function() {
       expect(TopicEditorStateService.hasLoadedTopic()).toBe(false);
 

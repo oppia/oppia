@@ -286,7 +286,7 @@ describe('Collection editor state service', function() {
     }
   );
 
-  it('it should report that a collection has loaded through loadCollection()',
+  it('should report that a collection has loaded through loadCollection()',
     function() {
       expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
 
@@ -298,7 +298,7 @@ describe('Collection editor state service', function() {
     }
   );
 
-  it('it should report that a collection has loaded through setCollection()',
+  it('should report that a collection has loaded through setCollection()',
     function() {
       expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
 

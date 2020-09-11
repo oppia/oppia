@@ -299,7 +299,7 @@ describe('Learner dashboard page', function() {
       expect(ctrl.noActivity).toBe(false);
     });
 
-    it('should set ui height when sorting collection playlist ', function() {
+    it('should set ui height when sorting collection playlist', function() {
       var mockedUi = {
         placeholder: {
           height: (setHeight) => {

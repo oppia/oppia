@@ -110,7 +110,7 @@ describe('Voiceover opportunities component', function() {
     ctrl.$onDestroy();
   });
 
-  it('sshould initialize controller properties after its initialization',
+  it('should initialize controller properties after its initialization',
     function() {
       expect(ctrl.opportunities.length).toBe(2);
       expect(ctrl.opportunitiesAreLoading).toBe(false);

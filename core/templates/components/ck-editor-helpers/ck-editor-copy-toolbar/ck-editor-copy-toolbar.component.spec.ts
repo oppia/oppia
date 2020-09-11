@@ -55,7 +55,7 @@ describe('CkEditor copy toolbar', () => {
     document.body.append(dummyRichTextEditor);
   });
 
-  it('toggle copy mode correctly', () => {
+  it('should toggle copy mode correctly', () => {
     const toggleCopyModeSpy = spyOn(ckCopyService, 'toggleCopyMode')
       .and.callThrough();
 
@@ -69,7 +69,7 @@ describe('CkEditor copy toolbar', () => {
     expect(document.body.style.cursor).toBe('copy');
   });
 
-  it('set focus and unfocus the rich text editor', () => {
+  it('should set focus and unfocus the rich text editor', () => {
     const focusSpy = spyOn(dummyRichTextEditor, 'focus');
     component.toggleToolActive();
     fixture.detectChanges();

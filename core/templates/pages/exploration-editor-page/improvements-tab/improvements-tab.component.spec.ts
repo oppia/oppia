@@ -258,7 +258,7 @@ describe('Improvements tab', function() {
       expect($ctrl.getNumCardLevelTasksForState('End')).toEqual(2);
     }));
 
-    it('can toggle the visibility of state tasks', fakeAsync(() => {
+    it('should toggle the visibility of state tasks', fakeAsync(() => {
       this.expStatsSpy.and.returnValue(
         new ExplorationStats('id', 1, 0, 0, 0, new Map([
           ['Introduction', emptyStateStats],

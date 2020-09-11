@@ -66,7 +66,7 @@ describe('Prediction Algorithm Registry Service', () => {
     ).toBeNull();
   });
 
-  it('shoud return null for NullClassifier which does not exist.', () => {
+  it('should return null for NullClassifier which does not exist.', () => {
     expect(
       predictionAlgorithmRegistryService
         .getPredictionService('NullClassifier', 1)
