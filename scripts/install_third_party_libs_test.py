@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import subprocess
-import sys
 import tempfile
 
 from core.tests import test_utils
@@ -29,6 +28,7 @@ from core.tests import test_utils
 import python_utils
 
 from . import common
+from . import install_backend_python_libs
 from . import install_third_party
 from . import install_third_party_libs
 from . import pre_commit_hook
@@ -113,76 +113,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             command = install_third_party_libs.get_yarn_command()
             self.assertEqual(command, 'yarn')
 
-    def test_pip_install_without_import_error(self):
-        with self.Popen_swap:
-            install_third_party_libs.pip_install('package', 'version', 'path')
-        self.assertTrue(self.check_function_calls['check_call_is_called'])
-
-    def test_pip_install_with_user_prefix_error(self):
-        with self.Popen_error_swap:
-            with self.check_call_swap:
-                install_third_party_libs.pip_install('pkg', 'ver', 'path')
-        self.assertTrue(self.check_function_calls['check_call_is_called'])
-
-    def test_pip_install_exception_handling(self):
-        with self.assertRaisesRegexp(
-            Exception, 'Error installing package') as context:
-            install_third_party_libs.pip_install('package', 'version', 'path')
-        self.assertTrue('Error installing package' in context.exception)
-
-    def test_pip_install_with_import_error_and_darwin_os(self):
-        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
-
-        import pip
-        try:
-            sys.modules['pip'] = None
-            with os_name_swap, self.print_swap, self.check_call_swap:
-                with self.assertRaisesRegexp(
-                    ImportError, 'Error importing pip: No module named pip'):
-                    install_third_party_libs.pip_install(
-                        'package', 'version', 'path')
-        finally:
-            sys.modules['pip'] = pip
-        self.assertTrue(
-            'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
-            'OS%29' in self.print_arr)
-        self.assertFalse(self.check_function_calls['check_call_is_called'])
-
-    def test_pip_install_with_import_error_and_linux_os(self):
-        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
-
-        import pip
-        try:
-            sys.modules['pip'] = None
-            with os_name_swap, self.print_swap, self.check_call_swap:
-                with self.assertRaisesRegexp(
-                    Exception, 'Error importing pip: No module named pip'):
-                    install_third_party_libs.pip_install(
-                        'package', 'version', 'path')
-        finally:
-            sys.modules['pip'] = pip
-        self.assertTrue(
-            'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
-            '%29' in self.print_arr)
-        self.assertFalse(self.check_function_calls['check_call_is_called'])
-
-    def test_pip_install_with_import_error_and_windows_os(self):
-        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
-        import pip
-        try:
-            sys.modules['pip'] = None
-            with os_name_swap, self.print_swap, self.check_call_swap:
-                with self.assertRaisesRegexp(
-                    Exception, 'Error importing pip: No module named pip'):
-                    install_third_party_libs.pip_install(
-                        'package', 'version', 'path')
-        finally:
-            sys.modules['pip'] = pip
-        self.assertTrue(
-            'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
-            'Windows%29' in self.print_arr)
-        self.assertFalse(self.check_function_calls['check_call_is_called'])
-
     def test_ensure_pip_library_is_installed(self):
         check_function_calls = {
             'pip_install_is_called': False
@@ -194,7 +124,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         pip_install_swap = self.swap(
-            install_third_party_libs, 'pip_install', mock_pip_install)
+            install_backend_python_libs, 'pip_install', mock_pip_install)
 
         with exists_swap, pip_install_swap:
             install_third_party_libs.ensure_pip_library_is_installed(
