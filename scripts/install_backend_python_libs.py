@@ -30,19 +30,19 @@ import pkg_resources
 
 
 def _normalize_python_library_name(library_name):
-    """Returns a normalized (lowercase) version of the python library name.
+    """Returns a normalized version of the python library name.
 
-    Normalization means converting the library name to lowercase, and removing
-    any "[...]" suffixes that occur. The reason we do this is because of
-    2 potential confusions when comparing library names that will cause this
-    script to find incorrect mismatches.
+    Normalization of a library name means converting the library name to
+    lowercase, and removing any "[...]" suffixes that occur. The reason we do
+    this is because of 2 potential confusions when comparing library names that
+    will cause this script to find incorrect mismatches.
 
     1. Python library name strings are case insensitive which means that
        libraries are equivalent even if the casing of the library names are
        different.
     2. There are certain python libraries with a default version and multiple
        variants. These variants have names like `library[sub-library]` and
-       signify that it is a version of the 'library' with special support for
+       signify that it is a version of the library with special support for
        the sub-library.
 
     Here are some examples of ambiguities that this function resolves:
@@ -64,7 +64,7 @@ def _normalize_python_library_name(library_name):
         library_name: str. The library name to be normalized.
 
     Returns:
-        str. A normalized library name that is all lowercase.
+        str. A normalized library name.
     """
     # Remove the special support package designation (e.g [grpc]) in the
     # brackets when parsing the requirements file to resolve confusion 2 in the
@@ -72,9 +72,10 @@ def _normalize_python_library_name(library_name):
     # NOTE: This does not cause ambiguities because there is no viable scenario
     # where both the library and a variant of the library exist in the
     # directory. Both the default version and the variant are imported in the
-    # same way (e.g import google.api.core) and if pip allowed both versions,
-    # then there would be ambiguities in the imports. For this reason, it is
-    # safe to disambiguate the names by removing the brackets.
+    # same way (e.g import google.api.core) and if pip allowed a scenario where
+    # both versions were installed, then there would be ambiguities in the
+    # imports. For this reason, it is safe to disambiguate the names by removing
+    # the suffix.
     library_name = re.sub(r'\[[^\[^\]]+\]', '', library_name)
     return library_name.lower()
 
