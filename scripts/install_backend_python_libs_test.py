@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import os
 import shutil
 import subprocess
+import re
 
 from core.tests import test_utils
 import python_utils
@@ -524,3 +525,21 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         with swap_find_distributions, swap_list_dir, metadata_exception:
             with swap_is_dir:
                 install_backend_python_libs.validate_metadata_directories()
+
+    def test_that_libraries_in_requirements_are_correctly_named(self):
+        # Matches strings starting with a normal library name that contains
+        # regular letters, digits, periods, underscores, or hyphens and ending
+        # with an optional suffix of the pattern [str] with no brackets inside
+        # the outside brackets.
+        library_name_pattern = re.compile(r'^[a-zA-Z0-9_.-]+(\[[^\[^\]]+\])*$')
+        with python_utils.open_file(
+            common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
+            lines = f.readlines()
+            for l in lines:
+                l = l.strip()
+                if l.startswith('#') or len(l) == 0:
+                    continue
+                library_name_and_version_string = l.split(' ')[0].split('==')
+                library_name = library_name_and_version_string[0]
+                self.assertIsNotNone(
+                    re.match(library_name_pattern, library_name))
