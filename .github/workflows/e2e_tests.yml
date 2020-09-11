@@ -1,4 +1,4 @@
-name: End-to-End Tests
+name: End-to-End tests
 on:
   push:
     branches:

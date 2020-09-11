@@ -1,4 +1,4 @@
-name: CI Frontend
+name: Frontend Karma tests
 on:
   push:
     branches:
