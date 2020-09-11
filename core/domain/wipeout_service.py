@@ -296,7 +296,16 @@ def _generate_activity_to_pseudonymized_ids_mapping(activity_ids):
 
 def _save_activity_mappings(
         pending_deletion_request, activity_category, activity_ids):
-    """"""
+    """Save the activity mappings for some activity category into the pending
+    deletion request.
+
+    Args:
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object to which to save the activity mappings.
+        activity_category: models.NAMES. The category of the models that
+            contain the activity IDs.
+        activity_ids: list(str). The IDs for which to genetrate the mappings.
+    """
     # The activity_mappings field might have only been partially generated, so
     # we fill in the missing part for this activity category.
     if activity_category not in pending_deletion_request.activity_mappings:
@@ -329,22 +338,20 @@ def _collect_activity_ids_from_snapshots_and_commit(
     snapshot has corresponding commit log.
 
     Args:
-        user_id: str. The id of the user for which to collect the activity IDs.
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object for which to collect the activity IDs.
         activity_category: models.NAMES. The category of the models that are
             that contain the activity IDs.
-        snapshot_model_classes: list(class). The snapshot metadata model classes
-            that contain the activity IDs.
+        snapshot_metadata_model_classes: list(class). The snapshot metadata
+            model classes that contain the activity IDs.
         commit_log_model_class: class. The metadata model classes that
             contains the activity IDs.
         commit_log_model_field_name: str. The name of the field holding the
             activity ID in the corresponding commit log model.
 
     Returns:
-        (
-            set(str),
-            list(BaseSnapshotMetadataModel),
-            list(BaseCommitLogEntryModel)
-        ). The activity IDs.
+        (list(BaseSnapshotMetadataModel), list(BaseCommitLogEntryModel)).
+        The tuple of snapshot metadata and commit log models.
     """
     user_id = pending_deletion_request.user_id
     snapshot_metadata_models = []
@@ -377,11 +384,12 @@ def _collect_activity_ids_from_snapshots_and_commit(
             list(snapshot_metadata_ids - commit_log_ids),
             list(commit_log_ids - snapshot_metadata_ids))
 
-    activity_ids = snapshot_metadata_ids | commit_log_ids
     _save_activity_mappings(
-        pending_deletion_request, activity_category, activity_ids)
+        pending_deletion_request,
+        activity_category,
+        snapshot_metadata_ids | commit_log_ids)
 
-    return (activity_ids, snapshot_metadata_models, commit_log_models)
+    return (snapshot_metadata_models, commit_log_models)
 
 
 def _pseudonymize_activity_models(
@@ -394,7 +402,7 @@ def _pseudonymize_activity_models(
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
-            request object to be saved in the datastore.
+            request object for which to pseudonymize the models.
         activity_category: models.NAMES. The category of the models that are
             being pseudonymized.
         snapshot_model_class: class. The metadata model class that is being
@@ -405,7 +413,7 @@ def _pseudonymize_activity_models(
             activity id in the corresponding commit log model.
     """
     user_id = pending_deletion_request.user_id
-    activity_ids, snapshot_metadata_models, commit_log_models = (
+    snapshot_metadata_models, commit_log_models = (
         _collect_activity_ids_from_snapshots_and_commit(
             user_id,
             activity_category,
@@ -472,10 +480,20 @@ def _pseudonymize_col_or_exp_models(
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object to be saved in the datastore.
+        snapshot_metadata_model_class:
+            CollectionSnapshotMetadataModel|ExplorationSnapshotMetadataModel.
+            The snapshot metadata model class.
+        rights_snapshot_metadata_model_class:
+            BaseSnapshotMetadataModel. The rights snapshot metadata model class.
+        rights_snapshot_content_model_class:
+            BaseSnapshotContentModel. The rights snapshot content model class.
+        commit_log_model_class:
+            CollectionCommitLogEntryModel|ExplorationCommitLogEntryModel.
+            The commit log model class.
     """
     user_id = pending_deletion_request.user_id
 
-    collection_ids, snapshot_metadata_models, commit_log_models = (
+    snapshot_metadata_models, commit_log_models = (
         _collect_activity_ids_from_snapshots_and_commit(
             user_id,
             models.NAMES.topic,
@@ -601,7 +619,7 @@ def _pseudonymize_topic_models(pending_deletion_request):
     """
     user_id = pending_deletion_request.user_id
 
-    topic_ids, snapshot_metadata_models, commit_log_models = (
+    snapshot_metadata_models, commit_log_models = (
         _collect_activity_ids_from_snapshots_and_commit(
             user_id,
             models.NAMES.topic,

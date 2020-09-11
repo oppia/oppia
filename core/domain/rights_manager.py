@@ -783,10 +783,16 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
     Args:
         committer: UserActionsInfo. UserActionsInfo object for the user
             who is performing the action.
-        user_id: str. The ID of the user.
+        removed_user_id: str. ID of the user whom is being deassigned from
+            the activity.
+        activity_id: str. ID of the activity.
+        activity_type: str. The type of activity. Possible values:
+            constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.ACTIVITY_TYPE_COLLECTION.
 
     Raises:
-        Exception. The committer does not have rights to modify a role.
+        Exception. UnauthorizedUserException: Could not deassign role.
+        Exception. This user does not have any role.
     """
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)

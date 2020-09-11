@@ -351,27 +351,6 @@ def _run_pip_command(cmd_parts):
             'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
         raise Exception('Error installing package')
 
-def pip_install(
-        package, version, install_path, upgrade=False, no_dependencies=False):
-    """Installs third party libraries with pip.
-
-    Args:
-        package: str. The package name.
-        version: str. The package version.
-        install_path: str. The installation path for the package.
-        upgrade: bool. Whether call the pip with --upgrade flag.
-        no_dependencies: bool. Whether call the pip with --no-dependencies flag.
-    """
-    additional_pip_args = []
-    if upgrade:
-        additional_pip_args.append('--upgrade')
-    if no_dependencies:
-        additional_pip_args.append('--no-dependencies')
-
-    _run_pip_command([
-        'install', '%s==%s' % (package, version), '--target', install_path
-    ] + additional_pip_args)
-
 
 def pip_install(
         package, version, install_path, upgrade=False, no_dependencies=False):

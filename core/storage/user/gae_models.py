@@ -31,8 +31,6 @@ import utils
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
-from feconf import USER_ID_RANDOM_PART_LENGTH
-
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 transaction_services = models.Registry.import_transaction_services()
 
@@ -269,7 +267,7 @@ class UserSettingsModel(base_models.BaseModel):
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = 'uid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
-                for _ in python_utils.RANGE(USER_ID_RANDOM_PART_LENGTH))
+                for _ in python_utils.RANGE(feconf.USER_ID_RANDOM_PART_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
 
@@ -2371,7 +2369,7 @@ class PseudonymizedUserModel(base_models.BaseModel):
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = 'pid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
-                for _ in python_utils.RANGE(USER_ID_RANDOM_PART_LENGTH))
+                for _ in python_utils.RANGE(feconf.USER_ID_RANDOM_PART_LENGTH))
 
             if not cls.get_by_id(new_id):
                 return new_id
