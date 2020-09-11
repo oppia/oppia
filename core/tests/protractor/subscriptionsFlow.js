@@ -38,7 +38,7 @@ describe('Subscriptions functionality', function() {
       new SubscriptionDashboardPage.SubscriptionDashboardPage());
   });
 
-  it('handle subscriptions to creators correctly', async function() {
+  it('should handle subscriptions to creators correctly', async function() {
     // Create two creators.
     await users.createUser(
       'creator1Id@subscriptions.com', 'creator1Idsubscriptions');

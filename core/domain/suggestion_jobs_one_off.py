@@ -216,7 +216,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             # Set the language code to be the language of the translation.
             suggestion.language_code = suggestion.change.language_code
-        # Validate the suggestion before updating the storage model.          
+        # Validate the suggestion before updating the storage model.
         try:
             suggestion.validate()
         except Exception as e:
