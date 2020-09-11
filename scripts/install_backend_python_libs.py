@@ -322,6 +322,36 @@ def _verify_pip_is_installed():
         raise ImportError('Error importing pip: %s' % e)
 
 
+def _run_pip_command(cmd_parts):
+    """Run pip command with some flags and configs. If it fails try to rerun it
+    with additional flags and else raise an exception.
+
+    Args:
+        cmd_parts: list(str). List of cmd parts to be run with pip.
+
+    Raises:
+        Exception. Error installing package.
+    """
+    _verify_pip_is_installed()
+    # The call to python -m is used to ensure that Python and Pip versions are
+    # compatible.
+    command = [sys.executable, '-m', 'pip'] + cmd_parts
+    process = subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode == 0:
+        python_utils.PRINT(stdout)
+    elif 'can\'t combine user with prefix' in stderr:
+        python_utils.PRINT('Trying by setting --user and --prefix flags.')
+        subprocess.check_call(
+            command + ['--user', '--prefix=', '--system'])
+    else:
+        python_utils.PRINT(stderr)
+        python_utils.PRINT(
+            'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
+        raise Exception('Error installing package')
+
+
 def pip_install(
         package, version, install_path, upgrade=False, no_dependencies=False):
     """Installs third party libraries with pip.
@@ -333,34 +363,15 @@ def pip_install(
         upgrade: bool. Whether call the pip with --upgrade flag.
         no_dependencies: bool. Whether call the pip with --no-dependencies flag.
     """
-    _verify_pip_is_installed()
-
     additional_pip_args = []
     if upgrade:
         additional_pip_args.append('--upgrade')
     if no_dependencies:
         additional_pip_args.append('--no-dependencies')
 
-    # The call to python -m is used to ensure that Python and Pip versions are
-    # compatible.
-    command = [
-        sys.executable, '-m', 'pip', 'install', '%s==%s'
-        % (package, version), '--target', install_path] + additional_pip_args
-    process = subprocess.Popen(
-
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
-        python_utils.PRINT(stdout)
-    elif 'can\'t combine user with prefix' in stderr:
-        python_utils.PRINT('Trying by setting --user and --prefix flags.')
-        subprocess.check_call(
-            command + additional_pip_args + ['--user', '--prefix=', '--system'])
-    else:
-        python_utils.PRINT(stderr)
-        python_utils.PRINT(
-            'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
-        raise Exception('Error installing package')
+    _run_pip_command([
+        'install', '%s==%s' % (package, version), '--target', install_path
+    ] + additional_pip_args)
 
 
 def _pip_install_requirements(install_path, requirements_path):
@@ -370,26 +381,10 @@ def _pip_install_requirements(install_path, requirements_path):
         install_path: str. The installation path for the packages.
         requirements_path: str. The path to the requirements file.
     """
-    _verify_pip_is_installed()
-
-    # The call to python -m is used to ensure that Python and Pip versions are
-    # compatible.
-    command = [
-        sys.executable, '-m', 'pip', 'install', '--target', install_path,
-        '--no-dependencies', '-r', requirements_path, '--upgrade']
-    process = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
-        python_utils.PRINT(stdout)
-    elif 'can\'t combine user with prefix' in stderr:
-        python_utils.PRINT('Trying by setting --user and --prefix flags.')
-        subprocess.check_call(command + ['--user', '--prefix=', '--system'])
-    else:
-        python_utils.PRINT(stderr)
-        python_utils.PRINT(
-            'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
-        raise Exception('Error installing package')
+    _run_pip_command([
+        'install', '--target', install_path, '--no-dependencies',
+        '-r', requirements_path, '--upgrade'
+    ])
 
 
 def get_mismatches():
