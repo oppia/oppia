@@ -19,18 +19,21 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 
+from core import jobs_registry
 from core.controllers import base
 from core.domain import email_manager
 from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import suggestion_services
+from core.domain import stats_services
+from core.domain import taskqueue_services
 from core.platform import models
 
 (job_models, email_models) = models.Registry.import_models(
     [models.NAMES.job, models.NAMES.email])
 transaction_services = models.Registry.import_transaction_services()
-
 
 class UnsentFeedbackEmailHandler(base.BaseHandler):
     """Handler task of sending emails of feedback messages."""
@@ -154,3 +157,26 @@ class FlagExplorationEmailHandler(base.BaseHandler):
 
         email_manager.send_flag_exploration_email(
             exploration.title, exploration_id, reporter_id, report_text)
+
+
+class DeferredTasksHandler(base.BaseHandler):
+    """Handles special singular function tasks."""
+
+    def post(self):
+        payload = json.loads(self.request.body)
+        if 'queue_name' not in payload: #TODO: add header id
+            raise Exception('This request cannot defer.')
+        if (payload['queue_name'] ==
+            taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS):
+            jobs_registry.ContinuousComputationEventDispatcher.dispatch_event(
+                *payload['args'], **payload['kwargs'])
+        elif (payload['queue_name'] ==
+              taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS):
+            exp_services.delete_explorations_from_subscribed_users(
+                *payload['args'], **payload['kwargs'])
+        elif (payload['queue_name'] ==
+              taskqueue_services.QUEUE_NAME_STATS): #TODO: figure out whether we can pass arguments in this way
+            stats_services.update_stats(
+                *payload['args'], **payload['kwargs'])
+
+

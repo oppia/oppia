@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -25,18 +25,9 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import deferred
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
+from core.platform.taskqueue import cloud_tasks_services
 import datetime
 import json
-
-# Create a client.
-client = tasks_v2.CloudTasksClient()
-
-# TODO(developer): Uncomment these lines and replace with your values.
-# project = 'my-project-id'
-# queue = 'my-queue'
-# location = 'us-central1'
-# url = 'https://example.com/task_handler'
-# payload = 'hello' or {'param': 'value'} for application/json
 
 # Construct the fully qualified queue name.
 
@@ -56,20 +47,30 @@ QUEUE_NAME_ONE_OFF_JOBS = 'one-off-jobs'
 # Taskqueue for updating stats models.
 QUEUE_NAME_STATS = 'stats'
 
+DEFERRED_TASKS_HANDLER_URL = '/deferred_tasks_handler'
 
-def defer(fn, queue_name, *args, **kwargs):
+def defer(queue_name, *args, **kwargs):
     '''Adds a new task to a specified deferred queue.
 
     Args:
         fn: *. The task being deferred. Will be called as: fn(*args, **kwargs).
         queue_name: str. The name of the queue to place the task into. Should be
             one of the QUEUE_NAME_* constants listed above.
-        *args: list(*). Positional arguments for fn.
+        *args: list(*). Positional arguments for fn. Positional arguments should
+        be json serializable.
         **kwargs: dict(str : *). Keyword arguments for fn.
     '''
     # See https://developers.google.com/appengine/articles/deferred for details
     # on the _queue kwarg.
-    deferred.defer(fn, *args, _queue=queue_name, **kwargs)
+    payload = {
+        'queue_name': queue_name
+        'args': args if args else []
+        'kwargs': kwargs if kwargs else {}
+    }
+    cloud_tasks_services.create_http_task(
+        queue_name=queue_name, url=DEFERRED_TASKS_HANDLER_URL,
+        payload=json.dumps(payload))
+    #deferred.defer(fn, *args, _queue=queue_name, **kwargs)
 
 
 def enqueue_email_task(url, params, countdown):
@@ -82,13 +83,13 @@ def enqueue_email_task(url, params, countdown):
         countdown: int. Amount of time, in seconds, to wait before executing
             task.
     '''
-    # See https://cloud.google.com/appengine/docs/python/taskqueue for
+    # See https://googleapis.dev/python/cloudtasks/latest/gapic/v2/api.html for
     # details of various parameters set when adding a new task.
-    taskqueue.add(
-        queue_name=QUEUE_NAME_EMAILS, url=url, payload=json.dumps(params),
-        countdown=countdown, target=taskqueue.DEFAULT_APP_VERSION)
+    cloud_tasks_services.create_http_task(
+        queue_name=QUEUE_NAME_EMAILS, url=url, payload=json.dump(params),
+        scheduled_for=countdown)
 
 
 # A special exception that ensures that the task is not tried again, if it
 # fails.
-PermanentTaskFailure = deferred.PermanentTaskFailure
+#PermanentTaskFailure = deferred.PermanentTaskFailure

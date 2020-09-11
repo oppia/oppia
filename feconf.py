@@ -414,6 +414,12 @@ MAILGUN_DOMAIN_NAME = None
 REDISHOST = 'localhost'
 REDISPORT = 6379
 
+# Replace project id with the correct project id when switching to the prod
+# server.
+OPPIA_PROJECT_ID = 'my-project-id'
+GOOGLE_APP_ENGINE_REGION = 'us-central1'
+# url = 'https://example.com/task_handler'
+
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
 SYSTEM_COMMITTER_ID = 'admin'

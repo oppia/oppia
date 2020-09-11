@@ -50,6 +50,7 @@ from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
+from core.platform.taskqueue import cloud_tasks_emulator
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 import feconf
@@ -2368,6 +2369,8 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_search_stub()
 
         # The root path tells the testbed where to find the queue.yaml file.
+        self.taskqueue_stub = cloud_tasks_emulator.Emulator(
+            task_handler=post_json, hibernation=False)
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
         self.taskqueue_stub = self.testbed.get_stub(
             testbed.TASKQUEUE_SERVICE_NAME)
@@ -2470,11 +2473,7 @@ class AppEngineTestBase(TestBase):
         """Returns the jobs in the given queue. If queue_name is None, defaults
         to returning the jobs in all available queues.
         """
-        if queue_name is not None:
-            return self.taskqueue_stub.get_filtered_tasks(
-                queue_names=[queue_name])
-        else:
-            return self.taskqueue_stub.get_filtered_tasks()
+        return self.taskqueue_stub.get_filtered_tasks(queue_name=queue_name)
 
     def _execute_tasks(self, tasks):
         """Execute queued tasks.
