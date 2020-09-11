@@ -420,7 +420,6 @@ var TopicEditorPage = function() {
 
     await action.click(
       'Confirm create story button', confirmStoryCreationButton);
-    await confirmStoryCreationButton.click();
     await waitFor.pageToFullyLoad();
   };
 
