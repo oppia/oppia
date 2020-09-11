@@ -418,9 +418,8 @@ var TopicEditorPage = function() {
     await workflow.submitImage(
       storyThumbnailButton, thumbnailContainer, imgPath, false);
 
-    await waitFor.elementToBeClickable(
-      confirmStoryCreationButton,
-      'Confirm Create Story button takes too long to be clickable');
+    await action.click(
+      'Confirm create story button', confirmStoryCreationButton);
     await confirmStoryCreationButton.click();
     await waitFor.pageToFullyLoad();
   };
