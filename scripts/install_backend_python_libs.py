@@ -75,7 +75,7 @@ def _normalize_python_library_name(library_name):
     # same way (e.g import google.api.core) and if pip allowed both versions,
     # then there would be ambiguities in the imports. For this reason, it is
     # safe to disambiguate the names by removing the brackets.
-    library_name = re.sub('\[[^\[^\]]+\]', '', library_name)
+    library_name = re.sub(r'\[[^\[^\]]+\]', '', library_name)
     return library_name.lower()
 
 
