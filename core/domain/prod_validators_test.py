@@ -9186,7 +9186,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, '0',
             1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
-            self.admin_id, change, score_category, thread_id, None)
+            self.admin_id, change, score_category, thread_id, 'hi')
         model_instance = (
             suggestion_models.GeneralSuggestionModel.get_by_id(thread_id))
         expected_output = [((
@@ -9237,7 +9237,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             suggestion_models.TARGET_TYPE_SKILL, '0',
             1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
-            self.admin_id, change, score_category, thread_id, None)
+            self.admin_id, change, score_category, thread_id, 'en')
         model_instance = (
             suggestion_models.GeneralSuggestionModel.get_by_id(thread_id))
         expected_output = [(

@@ -39,6 +39,9 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     change_cmd = {}
     # Language code that would normally be derived from the change_cmd.
     translation_language_code = 'en'
+    # Language code that would normally be derived from the question_dict in
+    # the change_cmd.
+    question_language_code = 'en'
 
     def setUp(self):
         super(SuggestionModelUnitTests, self).setUp()
@@ -492,6 +495,31 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertIn(self.score_category, score_categories)
         self.assertIn('category1', score_categories)
         self.assertIn('category2', score_categories)
+
+    def test_get_question_suggestions_waiting_longest_for_review(self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            'skill_1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, 'category1',
+            'skill1.thread1', self.question_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            'skill_2', self.target_version_at_submission,
+            suggestion_models.STATUS_REJECTED, 'author_3',
+            'reviewer_2', self.change_cmd, 'category2',
+            'skill1.thread1', self.question_language_code)
+
+        suggestion_models = (
+            suggestion_models.GeneralSuggestionModel
+            .get_question_suggestions_waiting_longest_for_review()
+        )
+
+        self.assertEqual(len(suggestion_models), 2)
+        self.assertEqual(suggestion_models[0].id, 'skill_1')
+        self.assertEqual(suggestion_models[1].id, 'skill_2')
 
     def test_export_data_trivial(self):
         user_data = (
