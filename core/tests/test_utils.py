@@ -1289,8 +1289,8 @@ tags: []
             self, exploration_id, owner_id, title='A title',
             category='A category', objective='An objective',
             language_code=constants.DEFAULT_LANGUAGE_CODE,
-            end_state_name=None,
-            interaction_id='TextInput'):
+            end_state_name=None, interaction_id='TextInput',
+            correctness_feedback_enabled=False):
         """Saves a new strictly-validated exploration.
 
         Args:
@@ -1302,6 +1302,8 @@ tags: []
             language_code: str. The language_code of this exploration.
             end_state_name: str. The name of the end state for the exploration.
             interaction_id: str. The id of the interaction.
+            correctness_feedback_enabled: bool. Whether correctness feedback is
+                enabled for the exploration.
 
         Returns:
             Exploration. The exploration domain object.
@@ -1313,6 +1315,7 @@ tags: []
             exploration.states[exploration.init_state_name], interaction_id)
 
         exploration.objective = objective
+        exploration.correctness_feedback_enabled = correctness_feedback_enabled
 
         # If an end state name is provided, add terminal node with that name.
         if end_state_name is not None:
@@ -1325,6 +1328,8 @@ tags: []
             init_state = exploration.states[exploration.init_state_name]
             init_interaction = init_state.interaction
             init_interaction.default_outcome.dest = end_state_name
+            if correctness_feedback_enabled:
+                init_interaction.default_outcome.labelled_as_correct = True
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
