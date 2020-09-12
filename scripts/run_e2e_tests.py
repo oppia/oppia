@@ -526,7 +526,10 @@ def get_flaky_tests_data_from_sheets(sheet):
     """Gets all flaky tests from the google sheet.
 
     Args:
-        sheet: object. The spreedsheet object.
+        sheet: googleapiclient.discovery.Resource. The spreedsheet object.
+    
+    Returns: list(tuple). A list of rows from the sheet. The tuple has 4
+        entries. (suite_name, test_name, test_error_log, flake_count).
     """
     sheet_id = os.getenv('FLAKY_E2E_TEST_SHEET_ID')
     flaky_tests_list = []
@@ -548,6 +551,13 @@ def get_flaky_tests_data_from_sheets(sheet):
 
 
 def update_flaky_tests_count(sheet, row_index, current_count):
+    """Updates the flaky tests count in the google sheet.
+
+    Args:
+        sheet: googleapiclient.discovery.Resource. The spreedsheet object.
+        row_index: int. The index of the row to update in the sheet.
+        current_count: int. The current count of this flake in the sheet.
+    """
     sheet_id = os.getenv('FLAKY_E2E_TEST_SHEET_ID')
     if sheet_id is not None:
         values = [
@@ -623,7 +633,8 @@ def main(args=None):
     flaky_tests_list = []
     google_auth_decode_password = os.getenv('GOOGLE_AUTH_DECODE_PASSWORD')
     if google_auth_decode_password is not None:
-        with python_utils.open_file('auth.json.enc', 'rb') as enc_file:
+        with python_utils.open_file(
+            'auth.json.enc', 'rb', encoding=None) as enc_file:
             with python_utils.open_file('auth.json', 'w') as dec_file:
                 ciphertext = enc_file.read()
                 plaintext = decrypt(
