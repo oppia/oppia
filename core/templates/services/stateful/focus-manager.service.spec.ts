@@ -25,7 +25,7 @@ import { FocusManagerService } from './focus-manager.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { IdGenerationService } from 'services/id-generation.service';
 
-fdescribe('Focus Manager Service', () => {
+describe('Focus Manager Service', () => {
   let focusManagerService: FocusManagerService;
   let deviceInfoService: DeviceInfoService;
   let idGenerationService: IdGenerationService;
