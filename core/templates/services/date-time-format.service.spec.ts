@@ -19,19 +19,6 @@
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import moment from 'moment';
 
-// Needed because MockDateContructor should be of same type as
-// DateConstructor to be used in callFake.
-interface MockDateContructorType {
-  parse: (s: string) => number;
-  UTC: (
-    year: number, month: number, date?: number, hours?: number,
-    minutes?: number, seconds?: number, ms?: number) => number;
-  now: () => number;
-
-  (millisSinceEpoch?: number): string;
-  new(): Date;
-}
-
 describe('datetimeformatter', () => {
   // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
   let NOW_MILLIS = 1416563100000;
