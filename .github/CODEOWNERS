@@ -477,6 +477,7 @@
 
 
 # Miscellaneous.
+/auth.json.enc @nithusha21
 /__init__.py @nithusha21
 /core/__init__.py @nithusha21
 /core/controllers/__init__.py @nithusha21
@@ -670,4 +671,3 @@
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796
 /.github/workflows/ @BenHenning @vinitamurthi
-/auth.json.enc @nithusha21

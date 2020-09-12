@@ -529,7 +529,8 @@ def get_flaky_tests_data_from_sheets(sheet):
     Args:
         sheet: googleapiclient.discovery.Resource. The spreedsheet object.
 
-    Returns: list(tuple(str, str, str, int)). A list of rows from the sheet.
+    Returns: 
+        list(tuple(str, str, str, int)). A list of rows from the sheet.
         The tuple has 4 entries. The entries represent 
         (suite_name, test_name, test_error_log, flake_count).
     """
@@ -657,7 +658,7 @@ def run_tests(args=None):
                 # Remove coloring characters.
                 ansi_escape = re.compile(
                     r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-                failure_log = ansi_escape.sub('', output_lines[i+4])
+                failure_log = ansi_escape.sub('', output_lines[i + 4])
                 failure_log = failure_log[2:].strip().lower()
                 for index, row in enumerate(flaky_tests_list):
                     flaky_suite_name = row[0].strip().lower()
@@ -678,12 +679,14 @@ def run_tests(args=None):
                                     return 'flake'
     sys.exit(p.returncode)
 
+
 def main():
     """Run tests, rerunning at most MAXIMUM_RUNS times if they flake."""
-    for _ in range(MAXIMUM_RUNS):
+    for _ in python_utils.RANGE(MAXIMUM_RUNS):
         flake_state = run_tests()
         if flake_state != 'flake':
             break
+
 
 if __name__ == '__main__':  # pragma: no cover
     main()
