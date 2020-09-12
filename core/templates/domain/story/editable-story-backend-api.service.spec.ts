@@ -25,11 +25,11 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from
   '@angular/core/testing';
 export {};
-class MockEditableStory extends EditableStoryBackendApiService {
+/*class MockEditableStory extends EditableStoryBackendApiService {
   isAuthenticated() {
     return 'Mocked';
   }
-}
+}*/
 describe('Editable story backend API service', () => {
   let editableStoryBackendApiService: EditableStoryBackendApiService = null;
   let sampleDataResults = null;
