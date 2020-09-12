@@ -1,5 +1,5 @@
 {
-  "core/templates/expressions/expression-evaluator.service.ts": [
+  "core/templates/expressions/expression-evaluator.service.spec.ts": [
     "expression,"
   ],
   "core/templates/mathjaxConfig.ts": [
