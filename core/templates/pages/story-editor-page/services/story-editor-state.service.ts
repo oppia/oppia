@@ -29,10 +29,10 @@ import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('StoryEditorStateService', [
   'AlertsService', 'EditableStoryBackendApiService',
-  'StoryObjectFactory', 'UndoRedoService',
+  'StoryObjectFactory', 'UndoRedoService','$rootScope',
   function(
       AlertsService, EditableStoryBackendApiService,
-      StoryObjectFactory, UndoRedoService) {
+      StoryObjectFactory, UndoRedoService,$rootScope) {
     var _story = StoryObjectFactory.createInterstitialStory();
     var _storyIsInitialized = false;
     var _storyIsLoading = false;
@@ -108,6 +108,9 @@ angular.module('oppia').factory('StoryEditorStateService', [
             _setClassroomUrlFragment(
               newBackendStoryObject.classroomUrlFragment);
             _setTopicUrlFragment(newBackendStoryObject.topicUrlFragment);
+             // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular
+                $rootScope.$apply();
           },
           function(error) {
             AlertsService.addWarning(
@@ -209,6 +212,9 @@ angular.module('oppia').factory('StoryEditorStateService', [
             if (successCallback) {
               successCallback();
             }
+             // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular
+                $rootScope.$apply();
           }, function(error) {
             AlertsService.addWarning(
               error || 'There was an error when saving the story.');
@@ -239,6 +245,9 @@ angular.module('oppia').factory('StoryEditorStateService', [
             if (successCallback) {
               successCallback();
             }
+             // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular
+                $rootScope.$apply();
           }, function(error) {
             AlertsService.addWarning(
               error ||
@@ -294,6 +303,9 @@ angular.module('oppia').factory('StoryEditorStateService', [
             if (successCallback) {
               successCallback();
             }
+             // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular
+                $rootScope.$apply();
           }, function(error) {
             AlertsService.addWarning(
               error ||
