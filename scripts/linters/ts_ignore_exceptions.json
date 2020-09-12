@@ -1,4 +1,7 @@
 {
+  "core/templates/expressions/expression-evaluator.service.ts": [
+    "expression"
+  ],
   "core/templates/mathjaxConfig.ts": [
     "skipStartupTypeset: true,"
   ],
