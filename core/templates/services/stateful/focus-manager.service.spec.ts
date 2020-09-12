@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,89 +16,69 @@
  * @fileoverview Unit tests for the FocusManagerService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-
-require('App.ts');
-require('services/id-generation.service.ts');
-require('services/contextual/device-info.service.ts');
-require('services/stateful/focus-manager.service.ts');
+import { fakeAsync, flush, TestBed } from '@angular/core/testing';
 
 import { Subscription } from 'rxjs';
 
-describe('Focus Manager Service', function() {
-  var FocusManagerService;
-  var DeviceInfoService;
-  var IdGenerationService;
-  var $timeout;
-  var clearLabel;
-  var focusLabel = 'FocusLabel';
-  var focusLabelTwo = 'FocusLabelTwo';
+import { AppConstants } from 'app.constants';
+import { FocusManagerService } from './focus-manager.service';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { IdGenerationService } from 'services/id-generation.service';
 
-  var focusOnSpy = null;
-  var testSubscriptions = null;
+fdescribe('Focus Manager Service', () => {
+  let focusManagerService: FocusManagerService;
+  let deviceInfoService: DeviceInfoService;
+  let idGenerationService: IdGenerationService;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(function($injector) {
-    clearLabel = $injector.get('LABEL_FOR_CLEARING_FOCUS');
-    FocusManagerService = $injector.get('FocusManagerService');
-    DeviceInfoService = $injector.get('DeviceInfoService');
-    IdGenerationService = $injector.get('IdGenerationService');
-    $timeout = $injector.get('$timeout');
-  }));
+  const clearLabel = AppConstants.LABEL_FOR_CLEARING_FOCUS;
+  let focusLabel = 'FocusLabel';
+  let focusLabelTwo = 'FocusLabelTwo';
+
+  let focusOnSpy = null;
+  let testSubscriptions = null;
+
+  beforeEach(() => {
+    focusManagerService = TestBed.get(FocusManagerService);
+    deviceInfoService = TestBed.get(DeviceInfoService);
+    idGenerationService = TestBed.get(IdGenerationService);
+  });
 
   beforeEach(() => {
     focusOnSpy = jasmine.createSpy('focusOn');
     testSubscriptions = new Subscription();
-    testSubscriptions.add(
-      FocusManagerService.onFocus.subscribe(focusOnSpy));
+    testSubscriptions.add(focusManagerService.onFocus.subscribe(focusOnSpy));
   });
 
-  it('should generate a random string for focus label', function() {
-    spyOn(IdGenerationService, 'generateNewId');
-    FocusManagerService.generateFocusLabel();
-    expect(IdGenerationService.generateNewId).toHaveBeenCalled();
+  it('should generate a random string for focus label', () => {
+    spyOn(idGenerationService, 'generateNewId');
+    focusManagerService.generateFocusLabel();
+    expect(idGenerationService.generateNewId).toHaveBeenCalled();
   });
 
-  it('should set focus label and broadcast it', function() {
-    FocusManagerService.setFocus(focusLabel);
-    $timeout(function() {
-      expect(focusOnSpy).toHaveBeenCalledWith(focusLabel);
-    });
-    $timeout.flush();
-  });
-
-  it('should not set focus label if _nextLabelToFocusOn is set', function() {
-    FocusManagerService.setFocus(focusLabel);
-    expect(FocusManagerService.setFocus(focusLabelTwo)).toEqual(undefined);
-    $timeout.flush();
-    $timeout.verifyNoPendingTasks();
+  it('should set focus label and broadcast it', fakeAsync(() => {
+    focusManagerService.setFocus(focusLabel);
+    flush();
     expect(focusOnSpy).toHaveBeenCalledWith(focusLabel);
-  });
+  }));
 
-  it('should set label to clear focus and broadcast it', function() {
-    FocusManagerService.clearFocus();
-    $timeout(function() {
-      expect(focusOnSpy).toHaveBeenCalledWith(clearLabel);
-    });
-    $timeout.flush();
-  });
+  it('should not set focus label if _nextLabelToFocusOn is set', fakeAsync(() => {
+    focusManagerService.setFocus(focusLabel);
+    expect(focusManagerService.setFocus(focusLabelTwo)).toEqual(undefined);
+    flush();
+    expect(focusOnSpy).toHaveBeenCalledWith(focusLabel);
+  }));
 
-  it('should set focus label if on desktop and broadcast it', function() {
-    FocusManagerService.setFocusIfOnDesktop(focusLabel);
-    if (!DeviceInfoService.isMobileDevice()) {
-      $timeout(function() {
-        expect(focusOnSpy).toHaveBeenCalledWith(focusLabel);
-      });
-      $timeout.flush();
+  it('should set label to clear focus and broadcast it', fakeAsync(() => {
+    focusManagerService.clearFocus();
+    flush();
+    expect(focusOnSpy).toHaveBeenCalledWith(clearLabel);
+  }));
+
+  it('should set focus label if on desktop and broadcast it', fakeAsync(() => {
+    focusManagerService.setFocusIfOnDesktop(focusLabel);
+    if (!deviceInfoService.isMobileDevice()) {
+      flush();
+      expect(focusOnSpy).toHaveBeenCalledWith(focusLabel);
     }
-  });
+  }));
 });
