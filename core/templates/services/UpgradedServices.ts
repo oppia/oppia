@@ -55,6 +55,8 @@ import { AnswerGroupObjectFactory } from
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { AppService } from 'services/app.service';
+import { AssetsBackendApiService } from
+  'services/assets-backend-api.service';
 import { AssignedSkillObjectFactory } from
   'domain/skill/assigned-skill-object.factory';
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
@@ -697,7 +699,6 @@ export class UpgradedServices {
       new AnswerGroupsCacheService();
     upgradedServices['AnswerStatsObjectFactory'] =
       new AnswerStatsObjectFactory();
-    upgradedServices['AudioFileObjectFactory'] = new AudioFileObjectFactory();
     upgradedServices['AppService'] = new AppService();
     upgradedServices['AssignedSkillObjectFactory'] =
       new AssignedSkillObjectFactory();
@@ -1284,6 +1285,14 @@ export class UpgradedServices {
       upgradedServices['TopicSummaryObjectFactory']);
     upgradedServices['AdminDataService'] = new AdminDataService(
       upgradedServices['HttpClient']);
+    upgradedServices['AssetsBackendApiService'] =
+      new AssetsBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['AudioFileObjectFactory'],
+        upgradedServices['CsrfTokenService'],
+        upgradedServices['FileDownloadRequestObjectFactory'],
+        upgradedServices['ImageFileObjectFactory'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['EmailDashboardBackendApiService'] =
       new EmailDashboardBackendApiService(
         upgradedServices['HttpClient'],

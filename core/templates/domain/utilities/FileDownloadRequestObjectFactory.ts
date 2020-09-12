@@ -18,14 +18,15 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Subscription } from 'rxjs';
 
 export class FileDownloadRequest {
   filename: string;
-  canceler: Q.Deferred<Object>;
+  subscription: Subscription;
 
-  constructor(filename: string, canceler: Q.Deferred<Object>) {
+  constructor(filename: string, subscription: Subscription) {
     this.filename = filename;
-    this.canceler = canceler;
+    this.subscription = subscription;
   }
 }
 
@@ -33,9 +34,8 @@ export class FileDownloadRequest {
   providedIn: 'root'
 })
 export class FileDownloadRequestObjectFactory {
-  createNew(
-      filename: string, canceler: Q.Deferred<Object>): FileDownloadRequest {
-    return new FileDownloadRequest(filename, canceler);
+  createNew(filename: string, subscription: Subscription): FileDownloadRequest {
+    return new FileDownloadRequest(filename, subscription);
   }
 }
 

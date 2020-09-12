@@ -92,6 +92,8 @@ import { AnswerGroupObjectFactory } from
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { AppService } from 'services/app.service';
+import { AssetsBackendApiService } from
+  'services/assets-backend-api.service';
 import { AssignedSkillObjectFactory } from
   'domain/skill/assigned-skill-object.factory';
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
@@ -733,6 +735,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static answerGroupObjectFactory: AnswerGroupObjectFactory;
   static answerStatsObjectFactory: AnswerStatsObjectFactory;
   static appService: AppService;
+  static assetsBackendApiService: AssetsBackendApiService;
   static assignedSkillObjectFactory: AssignedSkillObjectFactory;
   static audioBarStatusService: AudioBarStatusService;
   static audioFileObjectFactory: AudioFileObjectFactory;
@@ -1068,6 +1071,7 @@ private answerGroupsCacheService: AnswerGroupsCacheService,
 private answerGroupObjectFactory: AnswerGroupObjectFactory,
 private answerStatsObjectFactory: AnswerStatsObjectFactory,
 private appService: AppService,
+private assetsBackendApiService: AssetsBackendApiService,
 private assignedSkillObjectFactory: AssignedSkillObjectFactory,
 private audioBarStatusService: AudioBarStatusService,
 private audioFileObjectFactory: AudioFileObjectFactory,
@@ -1404,6 +1408,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.answerGroupObjectFactory = this.answerGroupObjectFactory;
     OppiaAngularRootComponent.answerStatsObjectFactory = this.answerStatsObjectFactory;
     OppiaAngularRootComponent.appService = this.appService;
+    OppiaAngularRootComponent.assetsBackendApiService = this.assetsBackendApiService;
     OppiaAngularRootComponent.assignedSkillObjectFactory = this.assignedSkillObjectFactory;
     OppiaAngularRootComponent.audioBarStatusService = this.audioBarStatusService;
     OppiaAngularRootComponent.audioFileObjectFactory = this.audioFileObjectFactory;
