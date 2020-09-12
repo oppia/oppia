@@ -436,6 +436,7 @@ import { ProfilePageBackendApiService } from
   'pages/profile-page/profile-page-backend-api.service';
 import { ProfileSummaryObjectFactory } from
   'domain/user/profile-summary-object.factory';
+import { PromoBarService } from 'services/promo-bar.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
@@ -941,6 +942,7 @@ export class UpgradedServices {
       new baseInteractionValidationService();
     upgradedServices['ɵangular_packages_common_http_http_d'] =
       new ɵangular_packages_common_http_http_d();
+    upgradedServices['']
 
     // Topological level: 1.
     upgradedServices['AlgebraicExpressionInputValidationService'] =
@@ -1084,6 +1086,7 @@ export class UpgradedServices {
       upgradedServices['LoggerService']);
     upgradedServices['PlaythroughObjectFactory'] = new PlaythroughObjectFactory(
       upgradedServices['LearnerActionObjectFactory']);
+    upgradedServices['PromoBarSesrvice'] = new PromoBarService(HttpClient);
     upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
       upgradedServices['LoggerService']);
     upgradedServices['QuestionSummaryForOneSkillObjectFactory'] =
