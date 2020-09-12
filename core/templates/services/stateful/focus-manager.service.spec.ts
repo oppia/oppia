@@ -21,7 +21,7 @@ import { fakeAsync, flush, TestBed } from '@angular/core/testing';
 import { Subscription } from 'rxjs';
 
 import { AppConstants } from 'app.constants';
-import { FocusManagerService } from './focus-manager.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { IdGenerationService } from 'services/id-generation.service';
 
