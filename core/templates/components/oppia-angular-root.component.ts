@@ -228,6 +228,8 @@ import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
 import { ExplorationOpportunitySummaryObjectFactory } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+import { ExpressionEvaluatorService } from
+  'expressions/expression-evaluator.service';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExplorationImprovementsBackendApiService } from
   'services/exploration-improvements-backend-api.service';
@@ -808,6 +810,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static explorationMetadataObjectFactory: ExplorationMetadataObjectFactory;
   static explorationObjectFactory: ExplorationObjectFactory;
   static explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory;
+  static expressionEvaluatorService: ExpressionEvaluatorService;
   static expressionParserService: ExpressionParserService;
   static explorationPermissionsBackendApiService: ExplorationPermissionsBackendApiService;
   static explorationPermissionsObjectFactory: ExplorationPermissionsObjectFactory;
@@ -1143,6 +1146,7 @@ private explorationImprovementsTaskRegistryService: ExplorationImprovementsTaskR
 private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
 private explorationObjectFactory: ExplorationObjectFactory,
 private explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory,
+private expressionEvaluatorService: ExpressionEvaluatorService,
 private expressionParserService: ExpressionParserService,
 private explorationPermissionsBackendApiService: ExplorationPermissionsBackendApiService,
 private explorationPermissionsObjectFactory: ExplorationPermissionsObjectFactory,
@@ -1479,6 +1483,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.explorationMetadataObjectFactory = this.explorationMetadataObjectFactory;
     OppiaAngularRootComponent.explorationObjectFactory = this.explorationObjectFactory;
     OppiaAngularRootComponent.explorationOpportunitySummaryObjectFactory = this.explorationOpportunitySummaryObjectFactory;
+    OppiaAngularRootComponent.expressionEvaluatorService = this.expressionEvaluatorService;
     OppiaAngularRootComponent.expressionParserService = this.expressionParserService;
     OppiaAngularRootComponent.explorationPermissionsBackendApiService = this.explorationPermissionsBackendApiService;
     OppiaAngularRootComponent.explorationPermissionsObjectFactory = this.explorationPermissionsObjectFactory;
