@@ -116,10 +116,16 @@ class StateCounterModel(base_models.BaseModel):
             counter = cls(id=instance_id)
         return counter
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'first_entry_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subsequent_entries_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'resolved_answer_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'active_answer_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
@@ -177,10 +183,19 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
         answer_submitted_event_entity.put()
         return entity_id
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_spent_in_state_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'is_feedback_useful': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
@@ -233,10 +248,16 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
         actual_start_event_entity.put()
         return entity_id
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class SolutionHitEventLogEntryModel(base_models.BaseModel):
@@ -291,10 +312,18 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
         solution_hit_event_entity.put()
         return entity_id
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_spent_in_state_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class StartExplorationEventLogEntryModel(base_models.BaseModel):
@@ -402,10 +431,21 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         start_event_entity.put()
         return entity_id
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'client_time_spent_in_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
@@ -526,10 +566,21 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         leave_event_entity.put()
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'client_time_spent_in_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
@@ -644,10 +695,21 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
         complete_event_entity.put()
         return entity_id
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'client_time_spent_in_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class RateExplorationEventLogEntryModel(base_models.BaseModel):
@@ -721,10 +783,16 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
         ).put()
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'rating': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'old_rating': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class StateHitEventLogEntryModel(base_models.BaseModel):
@@ -828,10 +896,19 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         state_event_entity.put()
         return entity_id
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class StateCompleteEventLogEntryModel(base_models.BaseModel):
@@ -886,10 +963,18 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
         state_finish_event_entity.put()
         return entity_id
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_spent_in_state_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
@@ -947,10 +1032,19 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
         leave_for_refresher_exp_entity.put()
         return entity_id
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'refresher_exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_spent_in_state_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        })
 
 
 class ExplorationStatsModel(base_models.BaseModel):
@@ -1136,10 +1230,20 @@ class ExplorationStatsModel(base_models.BaseModel):
             exploration_stats_models.append(stats_instance)
         cls.put_multi(exploration_stats_models)
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_starts_v1': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_starts_v2': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_actual_starts_v1': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_actual_starts_v2': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_completions_v1': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_completions_v2': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_stats_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class ExplorationIssuesModel(base_models.BaseModel):
@@ -1215,10 +1319,14 @@ class ExplorationIssuesModel(base_models.BaseModel):
         exp_issues_instance.put()
         return instance_id
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'unresolved_issues': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        })
 
 
 class PlaythroughModel(base_models.BaseModel):
@@ -1319,10 +1427,17 @@ class PlaythroughModel(base_models.BaseModel):
         instances = cls.get_multi(playthrough_ids)
         cls.delete_multi(instances)
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'issue_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'issue_customization_args':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'actions': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class LearnerAnswerDetailsModel(base_models.BaseModel):
@@ -1475,10 +1590,20 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             return model_instance
         return None
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'state_reference': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'learner_answer_info_list':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'learner_answer_info_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'accumulated_answer_info_json_size_bytes':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
@@ -1565,10 +1690,16 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
                 cls.exploration_id == exploration_id
             ).fetch(feconf.DEFAULT_QUERY_LIMIT)]
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_starts': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'num_completions': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_hit_counts': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class StateAnswersModel(base_models.BaseModel):
@@ -1917,10 +2048,21 @@ class StateAnswersModel(base_models.BaseModel):
         """
         return sys.getsizeof(json.dumps(answer_dict))
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'shard_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'shard_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'accumulated_answer_json_size_bytes':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'submitted_answer_list': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
@@ -2037,7 +2179,15 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             exploration_id, python_utils.UNICODE(exploration_version),
             state_name, calculation_id])
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'calculation_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'calculation_output_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'calculation_output': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })

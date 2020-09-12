@@ -144,6 +144,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
 
         temp_feconf_path = tempfile.NamedTemporaryFile().name
         feconf_text = (
+            'REDISHOST = \'192.13.2.1\'\n'
             '# When the site terms were last updated, in UTC.\n'
             'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
             'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
@@ -180,6 +181,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
 
         temp_feconf_path = tempfile.NamedTemporaryFile().name
         feconf_text = (
+            'REDISHOST = \'192.13.2.1\'\n'
             'MAILGUN_API_KEY = None\n'
             '# When the site terms were last updated, in UTC.\n'
             'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
@@ -190,6 +192,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
         expected_feconf_text = (
+            'REDISHOST = \'192.13.2.1\'\n'
             'MAILGUN_API_KEY = \'%s\'\n'
             '# When the site terms were last updated, in UTC.\n'
             'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
@@ -217,6 +220,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
 
         temp_feconf_path = tempfile.NamedTemporaryFile().name
         feconf_text = (
+            'REDISHOST = \'192.13.2.1\'\n'
             'MAILGUN_API_KEY = None\n'
             '# When the site terms were last updated, in UTC.\n'
             'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
@@ -227,6 +231,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
         expected_feconf_text = (
+            'REDISHOST = \'192.13.2.1\'\n'
             'MAILGUN_API_KEY = \'%s\'\n'
             '# When the site terms were last updated, in UTC.\n'
             'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
@@ -245,7 +250,61 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with python_utils.open_file(temp_feconf_path, 'r') as f:
             self.assertEqual(f.read(), expected_feconf_text)
 
-    def test_feconf_verification_with_key_present(self):
+    def test_feconf_verification_with_correct_config(self):
+        mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
+        temp_feconf_path = tempfile.NamedTemporaryFile().name
+        feconf_text = (
+            'MAILGUN_API_KEY = \'%s\'\n'
+            'REDISHOST = \'192.13.2.1\'\n'
+            '# When the site terms were last updated, in UTC.\n'
+            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+            '# Format of string for dashboard statistics logs.\n'
+            '# NOTE TO DEVELOPERS: This format should not be changed, '
+            'since it is used in\n'
+            '# the existing storage models for UserStatsModel.\n'
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
+                mailgun_api_key))
+        with python_utils.open_file(temp_feconf_path, 'w') as f:
+            f.write(feconf_text)
+        update_configs.verify_feconf(temp_feconf_path, True)
+
+    def test_feconf_verification_with_key_absent(self):
+        temp_feconf_path = tempfile.NamedTemporaryFile().name
+        feconf_text = (
+            'REDISHOST = \'192.13.2.1\'\n'
+            '# When the site terms were last updated, in UTC.\n'
+            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+            '# Format of string for dashboard statistics logs.\n'
+            '# NOTE TO DEVELOPERS: This format should not be changed, '
+            'since it is used in\n'
+            '# the existing storage models for UserStatsModel.\n'
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
+        with python_utils.open_file(temp_feconf_path, 'w') as f:
+            f.write(feconf_text)
+        with self.assertRaisesRegexp(
+            Exception, 'The mailgun API key must be added before deployment.'):
+            update_configs.verify_feconf(temp_feconf_path, True)
+
+    def test_feconf_verification_with_key_absent_and_verification_disabled(
+            self):
+        temp_feconf_path = tempfile.NamedTemporaryFile().name
+        feconf_text = (
+            'REDISHOST = \'192.13.2.1\'\n'
+            '# When the site terms were last updated, in UTC.\n'
+            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+            '# Format of string for dashboard statistics logs.\n'
+            '# NOTE TO DEVELOPERS: This format should not be changed, '
+            'since it is used in\n'
+            '# the existing storage models for UserStatsModel.\n'
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
+        with python_utils.open_file(temp_feconf_path, 'w') as f:
+            f.write(feconf_text)
+        update_configs.verify_feconf(temp_feconf_path, False)
+
+    def test_feconf_verification_with_redishost_absent(self):
         mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
         temp_feconf_path = tempfile.NamedTemporaryFile().name
         feconf_text = (
@@ -261,24 +320,9 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 mailgun_api_key))
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
-        update_configs.verify_feconf(temp_feconf_path)
-
-    def test_feconf_verification_with_key_absent(self):
-        temp_feconf_path = tempfile.NamedTemporaryFile().name
-        feconf_text = (
-            '# When the site terms were last updated, in UTC.\n'
-            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
-            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
-            '# Format of string for dashboard statistics logs.\n'
-            '# NOTE TO DEVELOPERS: This format should not be changed, '
-            'since it is used in\n'
-            '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
-        with python_utils.open_file(temp_feconf_path, 'w') as f:
-            f.write(feconf_text)
         with self.assertRaisesRegexp(
-            Exception, 'The mailgun API key must be added before deployment.'):
-            update_configs.verify_feconf(temp_feconf_path)
+            Exception, 'REDISHOST must be updated before deployment.'):
+            update_configs.verify_feconf(temp_feconf_path, True)
 
     def test_invalid_config(self):
         with self.assertRaisesRegexp(
@@ -320,13 +364,15 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'check_updates_to_terms_of_service_gets_called': False,
             'add_mailgun_api_key_gets_called': False,
             'apply_changes_based_on_config_gets_called': False,
-            'ask_user_to_confirm_gets_called': False
+            'verify_feconf_gets_called': False,
+            'mailgun_api_key_is_to_be_verified': False
         }
         expected_check_function_calls = {
             'check_updates_to_terms_of_service_gets_called': True,
             'add_mailgun_api_key_gets_called': True,
             'apply_changes_based_on_config_gets_called': True,
-            'ask_user_to_confirm_gets_called': True
+            'verify_feconf_gets_called': True,
+            'mailgun_api_key_is_to_be_verified': True
         }
         def mock_check_updates(
                 unused_release_feconf_path, unused_personal_access_token):
@@ -339,8 +385,10 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 unused_expected_config_line_regex):
             check_function_calls[
                 'apply_changes_based_on_config_gets_called'] = True
-        def mock_ask_user_to_confirm(unused_msg):
-            check_function_calls['ask_user_to_confirm_gets_called'] = True
+        def mock_verify_feconf(unused_release_feconf_path, verify_mailgun_api):
+            check_function_calls['verify_feconf_gets_called'] = True
+            check_function_calls['mailgun_api_key_is_to_be_verified'] = (
+                verify_mailgun_api)
 
         check_updates_swap = self.swap(
             update_configs, 'check_updates_to_terms_of_service',
@@ -349,11 +397,11 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             update_configs, 'add_mailgun_api_key', mock_add_mailgun_api_key)
         apply_changes_swap = self.swap(
             update_configs, 'apply_changes_based_on_config', mock_apply_changes)
-        ask_user_swap = self.swap(
-            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+        verify_feconf_swap = self.swap(
+            update_configs, 'verify_feconf', mock_verify_feconf)
 
         with self.url_open_swap, check_updates_swap, add_mailgun_api_key_swap:
-            with apply_changes_swap, ask_user_swap:
+            with apply_changes_swap, verify_feconf_swap:
                 update_configs.main(
                     'test-release-dir', 'test-deploy-dir', 'test-token', True)
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -361,25 +409,29 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
     def test_function_calls_without_prompt_for_feconf_and_terms_update(self):
         check_function_calls = {
             'apply_changes_based_on_config_gets_called': False,
-            'ask_user_to_confirm_gets_called': False
+            'verify_feconf_gets_called': False,
+            'mailgun_api_key_is_to_be_verified': False
         }
         expected_check_function_calls = {
             'apply_changes_based_on_config_gets_called': True,
-            'ask_user_to_confirm_gets_called': True
+            'verify_feconf_gets_called': True,
+            'mailgun_api_key_is_to_be_verified': False
         }
         def mock_apply_changes(
                 unused_local_filepath, unused_config_filepath,
                 unused_expected_config_line_regex):
             check_function_calls[
                 'apply_changes_based_on_config_gets_called'] = True
-        def mock_ask_user_to_confirm(unused_msg):
-            check_function_calls['ask_user_to_confirm_gets_called'] = True
+        def mock_verify_feconf(unused_release_feconf_path, verify_mailgun_api):
+            check_function_calls['verify_feconf_gets_called'] = True
+            check_function_calls['mailgun_api_key_is_to_be_verified'] = (
+                verify_mailgun_api)
 
         apply_changes_swap = self.swap(
             update_configs, 'apply_changes_based_on_config', mock_apply_changes)
-        ask_user_swap = self.swap(
-            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
-        with ask_user_swap, apply_changes_swap:
+        verify_feconf_swap = self.swap(
+            update_configs, 'verify_feconf', mock_verify_feconf)
+        with apply_changes_swap, verify_feconf_swap:
             update_configs.main(
                 'test-release-dir', 'test-deploy-dir', 'test-token', False)
         self.assertEqual(check_function_calls, expected_check_function_calls)
