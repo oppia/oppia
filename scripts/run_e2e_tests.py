@@ -27,13 +27,14 @@ import subprocess
 import sys
 import time
 
-from googleapiclient.discovery import build as gacbuild
-from google.oauth2 import service_account
 import python_utils
 from scripts import build
 from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
+
+from google.oauth2 import service_account
+from googleapiclient.discovery import build as gacbuild
 from simplecrypt import decrypt
 
 WEB_DRIVER_PORT = 4444
@@ -522,11 +523,17 @@ def cleanup_portserver(portserver_process):
 
 
 def get_flaky_tests_data_from_sheets(sheet):
+    """Gets all flaky tests from the google sheet.
+
+    Args:
+        sheet: object. The spreedsheet object.
+    """
     sheet_id = os.getenv('FLAKY_E2E_TEST_SHEET_ID')
     flaky_tests_list = []
     if sheet_id is not None:
-        result = sheet.values().get(spreadsheetId=sheet_id,
-                                    range='Log!A5:T1000').execute()
+        result = sheet.values().get(
+            spreadsheetId=sheet_id,
+            range='Log!A5:T1000').execute()
         values = result.get('values', [])
 
         for row in values:
@@ -550,7 +557,7 @@ def update_flaky_tests_count(sheet, row_index, current_count):
         ]
 
         body = {
-            'values' : values
+            'values': values
         }
 
         sheet.values().update(
@@ -558,7 +565,8 @@ def update_flaky_tests_count(sheet, row_index, current_count):
             range='Log!F' + python_utils.convert_to_bytes(row_index + 5),
             valueInputOption='USER_ENTERED',
             body=body).execute()
-        python_utils.print_function('** NOTE: Updated sheet for first failing test **')
+        python_utils.print_function(
+            '** NOTE: Updated sheet for first failing test **')
 
 
 def main(args=None):
@@ -615,8 +623,8 @@ def main(args=None):
     flaky_tests_list = []
     google_auth_decode_password = os.getenv('GOOGLE_AUTH_DECODE_PASSWORD')
     if google_auth_decode_password is not None:
-        with open('auth.json.enc', 'rb') as enc_file:
-            with open('auth.json', 'w') as dec_file:
+        with python_utils.open_file('auth.json.enc', 'rb') as enc_file:
+            with python_utils.open_file('auth.json', 'w') as dec_file:
                 ciphertext = enc_file.read()
                 plaintext = decrypt(
                     google_auth_decode_password, ciphertext).decode('utf-8')
@@ -626,28 +634,30 @@ def main(args=None):
         creds = service_account.Credentials.from_service_account_file(
             'auth.json', scopes=sheets_scopes)
         sheet = gacbuild('sheets', 'v4', credentials=creds).spreadsheets()
-
+        print(type(sheet))
         flaky_tests_list = get_flaky_tests_data_from_sheets(sheet)
 
     suite_name = parsed_args.suite.lower()
     if len(flaky_tests_list) > 0 and p.returncode != 0:
         for i, line in enumerate(output_lines):
             if line == '*                    Failures                    *':
-                test_name = output_lines[i + 3][3 :].strip().lower()
+                test_name = output_lines[i + 3][3: ].strip().lower()
 
                 # Remove coloring characters.
                 ansi_escape = re.compile(
                     r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
                 failure_log = ansi_escape.sub('', output_lines[i+4])
-                failure_log = failure_log[2 :].strip().lower()
+                failure_log = failure_log[2: ].strip().lower()
                 for index, row in enumerate(flaky_tests_list):
                     flaky_suite_name = row[0].strip().lower()
                     flaky_test_message = row[1].strip().lower()
                     flaky_error_message = row[2].strip().lower()
                     if (
-                        suite_name == flaky_suite_name or
-                        suite_name == '[general]'):
-                        if test_name == flaky_suite_name or test_name == 'many':
+                            suite_name == flaky_suite_name or
+                            suite_name == '[general]'):
+                        if (
+                                test_name == flaky_test_message or
+                                test_name == 'many'):
                             if flaky_error_message in failure_log:
                                 update_flaky_tests_count(sheet, index, row[3])
                                 try:

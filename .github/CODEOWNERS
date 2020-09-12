@@ -670,3 +670,4 @@
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @ankita240796
 /.github/workflows/ @BenHenning @vinitamurthi
+/auth.json.enc @nithusha21
