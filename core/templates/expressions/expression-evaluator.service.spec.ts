@@ -84,10 +84,7 @@ describe('Expression evaluator service', () => {
       ['log(9, 3)', []],
       ['numZero + numOne', ['numOne', 'numZero']]
     ]).forEach(([expression, expectedParams]) => {
-      const description = (
-        'should find that ' + JSON.stringify(expression) +
-        ' contains params: ' + JSON.stringify(expectedParams));
-      it(description, () => {
+      it('should find the params in ' + JSON.stringify(expression), () => {
         expect(
           expressionSyntaxTreeService.getParamsUsedInExpression(expression)
         ).toEqual(expectedParams);
