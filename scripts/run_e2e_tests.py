@@ -28,14 +28,13 @@ import sys
 import time
 
 from google.oauth2 import service_account
-from googleapiclient.discovery import build as gacbuild
+import googleapiclient.discovery
 import python_utils
 from scripts import build
 from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
-from simplecrypt import decrypt
-
+import simplecrypt
 
 MAXIMUM_RUNS = 3
 WEB_DRIVER_PORT = 4444
@@ -529,9 +528,9 @@ def get_flaky_tests_data_from_sheets(sheet):
     Args:
         sheet: googleapiclient.discovery.Resource. The spreedsheet object.
 
-    Returns: 
+    Returns:
         list(tuple(str, str, str, int)). A list of rows from the sheet.
-        The tuple has 4 entries. The entries represent 
+        The tuple has 4 entries. The entries represent
         (suite_name, test_name, test_error_log, flake_count).
     """
     sheet_id = os.getenv('FLAKY_E2E_TEST_SHEET_ID')
@@ -639,14 +638,15 @@ def run_tests(args=None):
             'auth.json.enc', 'rb', encoding=None) as enc_file:
             with python_utils.open_file('auth.json', 'w') as dec_file:
                 ciphertext = enc_file.read()
-                plaintext = decrypt(
+                plaintext = simplecrypt.decrypt(
                     google_auth_decode_password, ciphertext).decode('utf-8')
                 dec_file.write(plaintext)
 
         sheets_scopes = ['https://www.googleapis.com/auth/spreadsheets']
         creds = service_account.Credentials.from_service_account_file(
             'auth.json', scopes=sheets_scopes)
-        sheet = gacbuild('sheets', 'v4', credentials=creds).spreadsheets()
+        sheet = googleapiclient.discovery.build(
+            'sheets', 'v4', credentials=creds).spreadsheets()
         flaky_tests_list = get_flaky_tests_data_from_sheets(sheet)
 
     suite_name = parsed_args.suite.lower()

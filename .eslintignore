@@ -10,3 +10,4 @@ assets/scripts/*
 third_party/*
 build/*
 *.min.js
+auth.json.enc

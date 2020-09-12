@@ -23,4 +23,5 @@ webencodings==0.5.1
 redis==3.5.3
 google-api-python-client==1.11.0
 google-auth-oauthlib==0.4.1
+google-auth-httplib2==0.0.4
 simple-crypt==4.1.7
