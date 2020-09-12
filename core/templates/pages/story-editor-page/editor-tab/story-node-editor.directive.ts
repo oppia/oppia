@@ -63,13 +63,13 @@ angular.module('oppia').directive('storyNodeEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/editor-tab/story-node-editor.directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', 'AlertsService',
+        '$scope', '$uibModal', 'AlertsService',
         'ExplorationIdValidationService', 'PageTitleService',
         'StoryEditorStateService', 'StoryUpdateService',
         'TopicsAndSkillsDashboardBackendApiService',
         'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
         'MAX_CHARS_IN_CHAPTER_TITLE', function(
-            $scope, $rootScope, $uibModal, AlertsService,
+            $scope, $uibModal, AlertsService,
             ExplorationIdValidationService, PageTitleService,
             StoryEditorStateService, StoryUpdateService,
             TopicsAndSkillsDashboardBackendApiService,

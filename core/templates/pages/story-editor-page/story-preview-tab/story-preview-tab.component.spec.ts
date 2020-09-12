@@ -41,7 +41,8 @@ describe('Story Preview tab', function() {
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('EditableStoryBackendApiService',
+    $provide.value(
+      'EditableStoryBackendApiService',
       TestBed.get(EditableStoryBackendApiService));
     $provide.value('StoryObjectFactory', TestBed.get(StoryObjectFactory));
     $provide.value(

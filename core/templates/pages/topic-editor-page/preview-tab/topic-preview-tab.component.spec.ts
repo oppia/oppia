@@ -38,7 +38,8 @@ describe('Topic preview tab', function() {
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('EditableStoryBackendApiService',
+    $provide.value(
+      'EditableStoryBackendApiService',
       TestBed.get(EditableStoryBackendApiService));
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {

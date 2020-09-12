@@ -39,11 +39,11 @@ angular.module('oppia').directive('storyEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/navbar/story-editor-navbar.directive.html'),
       controller: [
-        '$scope','$rootScope', '$uibModal', 'EditableStoryBackendApiService',
+        '$rootScope', '$scope', '$uibModal', 'EditableStoryBackendApiService',
         'StoryEditorNavigationService', 'StoryEditorStateService',
         'UndoRedoService',
         function(
-            $scope, $rootScope,$uibModal, EditableStoryBackendApiService,
+            $rootScope, $scope, $uibModal, EditableStoryBackendApiService,
             StoryEditorNavigationService, StoryEditorStateService,
             UndoRedoService) {
           var ctrl = this;
@@ -127,9 +127,9 @@ angular.module('oppia').directive('storyEditorNavbar', [
                 ).then(function(validationIssues) {
                   $scope.explorationValidationIssues =
                     $scope.explorationValidationIssues.concat(validationIssues);
-                   // TODO(#8521): Remove the use of $rootScope.$apply()
-                // once the directive is migrated to angular
-                $rootScope.$apply();
+                  // TODO(#8521): Remove the use of $rootScope.$apply()
+                  // once the directive is migrated to angular.
+                  $rootScope.$apply();
                 });
               }
             }

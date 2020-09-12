@@ -50,9 +50,12 @@ describe('Create New Chapter Modal Controller', function() {
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('EditableStoryBackendApiService',
-      TestBed.get(EditableStoryBackendApiService));
-    $provide.value('StoryObjectFactory',
+    $provide.value(
+      'EditableStoryBackendApiService',
+      TestBed.get(
+        EditableStoryBackendApiService));
+    $provide.value(
+      'StoryObjectFactory',
       new StoryObjectFactory(new StoryContentsObjectFactory(
         new StoryNodeObjectFactory())));
     $provide.value('AlertsService', new AlertsService(new LoggerService()));

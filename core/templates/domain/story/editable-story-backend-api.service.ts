@@ -35,7 +35,6 @@ export class EditableStoryBackendApiService {
     private http: HttpClient,
     private urlInterpolation: UrlInterpolationService) {}
   private storyDataDict = null;
-    
   private _fetchStory(
       storyId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
@@ -53,7 +52,8 @@ export class EditableStoryBackendApiService {
         }
       }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse.error
+          errorCallback(
+            errorResponse.error
           );
         }
       });
@@ -150,7 +150,8 @@ export class EditableStoryBackendApiService {
           story_id: storyId
         });
 
-      this.http.request('delete',
+      this.http.request(
+        'delete',
         storyDataUrl).toPromise().then(
         (response) => {
           if (successCallback) {
@@ -200,7 +201,8 @@ export class EditableStoryBackendApiService {
        * the success callback, if one is provided to the returned promise
        * object. Errors are passed to the error callback, if one is provided.
        */
-    updateStory(storyId: string, storyVersion: string,
+    updateStory(
+        storyId: string, storyVersion: string,
         commitMessage: string,
         changeList: string[]):
       Promise<object> {
@@ -210,7 +212,8 @@ export class EditableStoryBackendApiService {
           resolve, reject);
       });
     }
-    changeStoryPublicationStatus(storyId: string,
+    changeStoryPublicationStatus(
+        storyId: string,
         newStoryStatusIsPublic: boolean):
     Promise<object> {
       return new Promise((resolve, reject) => {
