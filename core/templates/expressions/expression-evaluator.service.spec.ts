@@ -138,7 +138,9 @@ describe('Expression evaluator service', () => {
       it('should report an error when ' + errorReason, () => {
         expect(
           () => expressionSyntaxTreeService.applyFunctionToParseTree(
-            // @ts-ignore We are purposely testing invalid types.
+            // This throws "type error". This needs to be suppressed because we
+            // are explicitly testing invalid types.
+            // @ts-ignore
             expression,
             ENVS,
             (parsed, envs) => expressionEvaluatorService.evaluate(parsed, envs))
