@@ -783,6 +783,15 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     AUTHOR_EMAIL_2 = 'author2@example.com'
     REVIEWER_EMAIL_2 = 'reviewer2@example.com'
 
+    add_translation_change_dict = {
+        'cmd': exp_domain.CMD_ADD_TRANSLATION,
+        'state_name': 'state_1',
+        'content_id': 'content',
+        'language_code': 'hi',
+        'content_html': '<p>State name: state_1, Content id: content</p>',
+        'translation_html': '<p>This is translated html.</p>'
+    }
+
     class MockExploration(python_utils.OBJECT):
         """Mocks an exploration. To be used only for testing."""
 
@@ -913,14 +922,6 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.query_suggestions(queries)
 
     def test_get_translation_suggestion_ids_with_exp_ids_with_one_exp(self):
-        add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
-            'state_name': 'state_1',
-            'content_id': 'content',
-            'language_code': 'hi',
-            'content_html': '<p>State name: state_1, Content id: content</p>',
-            'translation_html': '<p>This is translated html.</p>'
-        }
         # Create the translation suggestion associated with exploration id
         # target_id_1.
         with self.swap(
@@ -933,7 +934,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id_1, 1, self.author_id_1,
-                    add_translation_change_dict, 'test description')
+                    self.add_translation_change_dict, 'test description')
 
         # Assert that there is one translation suggestion with the given
         # exploration id found.
@@ -945,14 +946,6 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_translation_suggestion_ids_with_exp_ids_with_multiple_exps(
             self):
-        add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
-            'state_name': 'state_1',
-            'content_id': 'content',
-            'language_code': 'hi',
-            'content_html': '<p>State name: state_1, Content id: content</p>',
-            'translation_html': '<p>This is translated html.</p>'
-        }
         # Create the translation suggestion associated with exploration id
         # target_id_2.
         with self.swap(
@@ -965,7 +958,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id_2, 1, self.author_id_1,
-                    add_translation_change_dict, 'test description')
+                    self.add_translation_change_dict, 'test description')
         # Create the translation suggestion associated with exploration id
         # target_id_3.
         with self.swap(
@@ -978,7 +971,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id_3, 1, self.author_id_1,
-                    add_translation_change_dict, 'test description')
+                    self.add_translation_change_dict, 'test description')
 
         # Assert that there are two translation suggestions with the given
         # exploration ids found.
@@ -1006,6 +999,172 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             len(
                 suggestion_services
                 .get_translation_suggestion_ids_with_exp_ids([])), 0)
+
+    def test_get_translation_suggestions_waiting_longest_for_review_per_lang(
+            self):
+        # Create the translation suggestion associated with exploration id
+        # target_id_1.
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            with self.swap(
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_1, 1, self.author_id_1,
+                    self.add_translation_change_dict, 'test description')
+        # Create the translation suggestion associated with exploration id
+        # target_id_2.
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            with self.swap(
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_2, 1, self.author_id_1,
+                    self.add_translation_change_dict, 'test description')
+        # Create the translation suggestion associated with exploration id
+        # target_id_3.
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            with self.swap(
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_3, 1, self.author_id_1,
+                    self.add_translation_change_dict, 'test description')
+
+        suggestions = (
+            suggestion_services
+            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+                'hi'))
+
+        self.assertEqual(len(suggestions), 3)
+        self.assertLessEqual(suggestions[0].target_id, self.target_id_1)
+        self.assertLessEqual(suggestions[1].target_id, self.target_id_2)
+        self.assertLessEqual(suggestions[2].target_id, self.target_id_3)
+
+    def test_get_translation_suggestions_waiting_longest_for_review_order(
+            self):
+        # Create the translation suggestion associated with exploration id
+        # target_id_1.
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            with self.swap(
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_1, 1, self.author_id_1,
+                    self.add_translation_change_dict, 'test description')
+        # Create the translation suggestion associated with exploration id
+        # target_id_2.
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            with self.swap(
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_2, 1, self.author_id_1,
+                    self.add_translation_change_dict, 'test description')
+        # Verify that both suggestions are returned and in the right order.
+        suggestions = (
+            suggestion_services
+            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+                'hi'))
+        self.assertEqual(len(suggestions), 2)
+        self.assertLessEqual(suggestions[0].target_id, self.target_id_1)
+        self.assertLessEqual(suggestions[1].target_id, self.target_id_2)
+
+        # Reject the suggestion that was created first since it is the one that
+        # has been waiting the longest for review.
+        suggestion_services.reject_suggestion(
+            'exploration.exp1.thread_1', self.reviewer_id_1, 'Reject message')
+
+        # Verify that only the suggestion that was created second is returned.
+        suggestions = (
+            suggestion_services
+            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+                'hi'))
+        self.assertEqual(len(suggestions), 1)
+        self.assertLessEqual(suggestions[0].target_id, self.target_id_1)
+
+        # Resubmit rejected suggestion.
+        suggestion_services.resubmit_rejected_suggestion(
+            'exploration.exp1.thread_1', 'resubmit summary message',
+            self.author_id_1, self.add_translation_change_dict)
+
+        # Verify that both suggestions are returned again and the suggestion
+        # that was created second is now the first element, since it has been
+        # waiting longer for review.
+        suggestions = (
+            suggestion_services
+            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+                'hi'))
+        self.assertEqual(len(suggestions), 2)
+        self.assertLessEqual(suggestions[0].target_id, self.target_id_2)
+        self.assertLessEqual(suggestions[1].target_id, self.target_id_1)
+
+
+    def test_get_question_suggestions_waiting_longest_for_review(self):
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid-1']
+            },
+            'skill_id': 'skill1',
+            'skill_difficulty': 0.3
+        }
+        suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL, 'skill1', 1,
+            self.author_id_1, suggestion_change, 'test description')
+        # Change the skill_id of the suggestion change so that we can reuse the
+        # suggestion change to make a new question suggestion with a different
+        # skill_id.
+        suggestion_change['skill_id'] = 'skill2'
+        suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL, 'skill2', 1,
+            self.author_id_1, suggestion_change, 'test description')
+        # Change the skill_id one more time to make a third suggestion with a
+        # unique skill_id.
+        suggestion_change['skill_id'] = 'skill3'
+        suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL, 'skill3', 1,
+            self.author_id_1, suggestion_change, 'test description')
+
+        suggestions = (
+            suggestion_services
+            .get_question_suggestions_waiting_longest_for_review()
+        )
+
+        self.assertEqual(len(suggestions), 3)
+        self.assertLessEqual(suggestions[0].target_id, 'skill1')
+        self.assertLessEqual(suggestions[1].target_id, 'skill2')
+        self.assertLessEqual(suggestions[2].target_id, 'skill3')
 
     def test_query_suggestions_that_can_be_reviewed_by_user(self):
         # User proficiency models for user1.

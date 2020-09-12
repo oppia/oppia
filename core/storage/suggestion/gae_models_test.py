@@ -508,18 +508,92 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             suggestion_models.TARGET_TYPE_SKILL,
             'skill_2', self.target_version_at_submission,
-            suggestion_models.STATUS_REJECTED, 'author_3',
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change_cmd, 'category2',
-            'skill1.thread1', self.question_language_code)
+            'skill2.thread1', self.question_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            'skill_3', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, 'category2',
+            'skill3.thread1', self.question_language_code)
 
-        suggestion_models = (
+        question_suggestion_models = (
             suggestion_models.GeneralSuggestionModel
             .get_question_suggestions_waiting_longest_for_review()
         )
 
-        self.assertEqual(len(suggestion_models), 2)
-        self.assertEqual(suggestion_models[0].id, 'skill_1')
-        self.assertEqual(suggestion_models[1].id, 'skill_2')
+        self.assertEqual(len(question_suggestion_models), 3)
+        # Assert that the order of the returned suggestion models represents
+        # the suggestions sorted in descending order, based on how long each
+        # suggestion has been waiting for review.
+        self.assertEqual(question_suggestion_models[0].id, 'skill1.thread1')
+        self.assertEqual(question_suggestion_models[1].id, 'skill2.thread1')
+        self.assertEqual(question_suggestion_models[2].id, 'skill3.thread1')
+
+    def test_get_translation_suggestions_waiting_longest_for_review_per_lang(
+            self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread1', self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp2', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp2.thread1', self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp3', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp3.thread1', self.translation_language_code)
+        # Create a translation suggestion that has a different language code.
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp4', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp4.thread1', 'different_language_code')
+
+        translation_suggestion_models = (
+            suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+                self.translation_language_code
+            )
+        )
+
+        self.assertEqual(len(translation_suggestion_models), 3)
+        # Assert that the order of the returned suggestion models represents
+        # the suggestions sorted in descending order, based on how long each
+        # suggestion has been waiting for review.
+        self.assertEqual(translation_suggestion_models[0].id,
+            'exploration.exp1.thread1')
+        self.assertEqual(translation_suggestion_models[1].id,
+            'exploration.exp2.thread1')
+        self.assertEqual(translation_suggestion_models[2].id,
+            'exploration.exp3.thread1')
+
+        translation_suggestion_models_with_different_lang_code = (
+            suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+                'different_language_code'
+            )
+        )
+
+        self.assertEqual(len(
+            translation_suggestion_models_with_different_lang_code), 1)
+        self.assertEqual(
+            translation_suggestion_models_with_different_lang_code[0].id,
+            'exploration.exp4.thread1')
 
     def test_export_data_trivial(self):
         user_data = (

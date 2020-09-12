@@ -361,27 +361,28 @@ class GeneralSuggestionModel(base_models.BaseModel):
         time.
 
         Returns:
-            list(GeneralSuggestionModel). A list of question suggestions in
-            descending order based on how long the suggestions have been
-            waiting for review.
+            list(GeneralSuggestionModel). A list of question suggestions,
+            sorted in descending order based on how long the suggestions have
+            been waiting for review.
         """
         return (
             cls.get_all()
             .filter(cls.status == STATUS_IN_REVIEW)
             .filter(cls.suggestion_type == SUGGESTION_TYPE_ADD_QUESTION)
-            .order(-cls.last_updated)
+            .order(cls.last_updated)
             .fetch(MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
         )
     
     @classmethod
     def get_translation_suggestions_waiting_longest_for_review_per_lang(
-            cls, lang_code):
+            cls, language_code):
         """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
         number of translation suggestions in the specified language code,
         sorted in descending order by review wait time.
 
         Args:
-            lang_code: str. The language of the translation suggestions.
+            language_code: str. The ISO 639-1 language code of the translation
+                suggestions.
 
         Returns:
             list(GeneralSuggestionModel). A list of translation suggestions,
@@ -392,7 +393,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.get_all()
             .filter(cls.status == STATUS_IN_REVIEW)
             .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
-            .order(-cls.last_updated)
+            .filter(cls.language_code == language_code)
+            .order(cls.last_updated)
             .fetch(MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
         )
 
