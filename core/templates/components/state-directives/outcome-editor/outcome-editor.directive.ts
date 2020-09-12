@@ -57,11 +57,11 @@ angular.module('oppia').directive('outcomeEditor', [
         'outcome-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'ExternalSaveService', 'StateEditorService',
+        'ExternalSaveService', 'StateEditorService',
         'StateInteractionIdService', 'ENABLE_PREREQUISITE_SKILLS',
         'INTERACTION_SPECS',
         function(
-            $scope, ExternalSaveService, StateEditorService,
+            ExternalSaveService, StateEditorService,
             StateInteractionIdService, ENABLE_PREREQUISITE_SKILLS,
             INTERACTION_SPECS) {
           var ctrl = this;
@@ -170,7 +170,6 @@ angular.module('oppia').directive('outcomeEditor', [
               // the active state name.
               ctrl.savedOutcome.dest = StateEditorService.getActiveStateName();
             }
-            var feedbackContentId = ctrl.savedOutcome.feedback.getContentId();
             if (fromClickSaveFeedbackButton && contentHasChanged) {
               var contentId = ctrl.savedOutcome.feedback.getContentId();
               ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired([contentId]);

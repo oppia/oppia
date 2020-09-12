@@ -95,11 +95,11 @@ angular.module('oppia').directive('explorationSummaryTile', [
         );
       },
       controller: [
-        '$scope', '$http', '$window', 'DateTimeFormatService',
+        '$scope', '$window', 'DateTimeFormatService',
         'RatingComputationService', 'UrlService', 'UserService',
         'WindowDimensionsService', 'ACTIVITY_TYPE_EXPLORATION',
         function(
-            $scope, $http, $window, DateTimeFormatService,
+            $scope, $window, DateTimeFormatService,
             RatingComputationService, UrlService, UserService,
             WindowDimensionsService, ACTIVITY_TYPE_EXPLORATION) {
           var ctrl = this;

@@ -38,17 +38,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-import { AppConstants } from 'app.constants';
-import { CollectionDomainConstants } from
-  'domain/collection/collection-domain.constants';
-import { CollectionEditorPageConstants } from
-  'pages/collection-editor-page/collection-editor-page.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { ServicesConstants } from 'services/services.constants';
-
 import { CollectionHistoryTabComponent } from
   'pages/collection-editor-page/history-tab/collection-history-tab.component';
 import { CollectionDetailsEditor } from
@@ -84,12 +73,6 @@ import { CollectionStatisticsTabComponent } from
     CollectionStatisticsTabComponent,
   ],
   providers: [
-    AppConstants,
-    CollectionDomainConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    ServicesConstants,
-    CollectionEditorPageConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

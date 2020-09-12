@@ -31,7 +31,6 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('pages/topic-editor-page/services/entity-creation.service.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts');
 
 import { Subscription } from 'rxjs';
@@ -39,16 +38,16 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('subtopicEditorTab', {
   template: require('./subtopic-editor-tab.component.html'),
   controller: [
-    '$scope', 'EntityCreationService', 'QuestionBackendApiService',
-    'SubtopicValidationService', 'TopicEditorStateService',
-    'TopicEditorRoutingService', 'TopicUpdateService',
+    '$scope', 'QuestionBackendApiService',
+    'SubtopicValidationService', 'TopicEditorRoutingService',
+    'TopicEditorStateService', 'TopicUpdateService',
     'UrlInterpolationService', 'WindowDimensionsService', 'WindowRef',
     'MAX_CHARS_IN_SUBTOPIC_TITLE',
     'MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT',
     function(
-        $scope, EntityCreationService, QuestionBackendApiService,
-        SubtopicValidationService, TopicEditorStateService,
-        TopicEditorRoutingService, TopicUpdateService,
+        $scope, QuestionBackendApiService,
+        SubtopicValidationService, TopicEditorRoutingService,
+        TopicEditorStateService, TopicUpdateService,
         UrlInterpolationService, WindowDimensionsService, WindowRef,
         MAX_CHARS_IN_SUBTOPIC_TITLE,
         MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT) {
@@ -65,6 +64,9 @@ angular.module('oppia').component('subtopicEditorTab', {
           TopicEditorStateService.getClassroomUrlFragment());
         ctrl.subtopicId = TopicEditorRoutingService.getSubtopicIdFromUrl();
         ctrl.subtopic = ctrl.topic.getSubtopicById(ctrl.subtopicId);
+        if (!ctrl.subtopic) {
+          TopicEditorRoutingService.navigateToMainTab();
+        }
         ctrl.errorMsg = null;
         ctrl.subtopicUrlFragmentExists = false;
         ctrl.subtopicUrlFragmentIsValid = false;
@@ -290,8 +292,9 @@ angular.module('oppia').component('subtopicEditorTab', {
           TopicEditorStateService.onTopicReinitialized.subscribe(
             () => ctrl.initEditor()
           ));
-
-        ctrl.initEditor();
+        if (TopicEditorStateService.hasLoadedTopic()) {
+          ctrl.initEditor();
+        }
       };
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();

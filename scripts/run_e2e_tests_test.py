@@ -1379,27 +1379,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                                         '--chrome_driver_version',
                                         CHROME_DRIVER_VERSION])
 
-    def test_update_contributor_dashboard_status_with_dashboard_enabled(self):
-        swap_inplace_replace = self.inplace_replace_swap(expected_args=[(
-            run_e2e_tests.FECONF_FILE_PATH,
-            'CONTRIBUTOR_DASHBOARD_ENABLED = .*',
-            'CONTRIBUTOR_DASHBOARD_ENABLED = True'
-        )])
-
-        with swap_inplace_replace:
-            run_e2e_tests.update_contributor_dashboard_status_in_feconf_file(
-                run_e2e_tests.FECONF_FILE_PATH, True)
-
-    def test_update_contributor_dashboard_status_with_dashboard_disabled(self):
-        swap_inplace_replace = self.inplace_replace_swap(expected_args=[(
-            run_e2e_tests.FECONF_FILE_PATH,
-            'CONTRIBUTOR_DASHBOARD_ENABLED = .*',
-            'CONTRIBUTOR_DASHBOARD_ENABLED = False'
-        )])
-        with swap_inplace_replace:
-            run_e2e_tests.update_contributor_dashboard_status_in_feconf_file(
-                run_e2e_tests.FECONF_FILE_PATH, False)
-
     def test_cleanup_portserver_when_server_shuts_down_cleanly(self):
         process = MockProcessClass(clean_shutdown=True)
         run_e2e_tests.cleanup_portserver(process)

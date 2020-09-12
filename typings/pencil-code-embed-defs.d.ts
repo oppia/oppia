@@ -7,7 +7,7 @@ interface SetupCode {
   type: string
 }
 
-class PencilCodeEmbed {
+declare class PencilCodeEmbed {
   div: Object;
   updatedCode: string;
   callbacks: Object;

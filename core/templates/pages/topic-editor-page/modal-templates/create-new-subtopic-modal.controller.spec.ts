@@ -34,7 +34,6 @@ describe('Create new subtopic modal', function() {
   var $scope = null;
   var ctrl = null;
   var $uibModalInstance = null;
-  var NewlyCreatedTopicObjectFactory = null;
   var TopicObjectFactory = null;
   var SubtopicValidationService = null;
   var topic = null;
@@ -43,8 +42,6 @@ describe('Create new subtopic modal', function() {
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
-    NewlyCreatedTopicObjectFactory =
-            $injector.get('NewlyCreatedTopicObjectFactory');
     TopicObjectFactory =
             $injector.get('TopicObjectFactory');
     SubtopicValidationService = $injector.get('SubtopicValidationService');
@@ -96,7 +93,7 @@ describe('Create new subtopic modal', function() {
     expect(ctrl.errorMsg).toEqual(errorMessage);
   });
 
-  it('should show reset the error message ', function() {
+  it('should show reset the error message', function() {
     expect(ctrl.errorMsg).toEqual(null);
     spyOn(
       SubtopicValidationService,
