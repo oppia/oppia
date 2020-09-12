@@ -31,17 +31,20 @@ require('services/alerts.service.ts');
 require('services/page-title.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/i18n-language-code.service.ts');
 require('pages/library-page/search-bar/search-bar.component.ts');
 
 angular.module('oppia').component('classroomPage', {
   template: require('./classroom-page.component.html'),
   controller: [
-    '$filter', 'AlertsService', 'ClassroomBackendApiService', 'LoaderService',
-    'PageTitleService', 'UrlInterpolationService', 'UrlService',
+    '$filter', '$http', 'AlertsService', 'ClassroomBackendApiService',
+    'I18nLanguageCodeService', 'LoaderService', 'PageTitleService',
+    'UrlInterpolationService', 'UrlService',
     'FATAL_ERROR_CODES',
     function(
-        $filter, AlertsService, ClassroomBackendApiService, LoaderService,
-        PageTitleService, UrlInterpolationService, UrlService,
+        $filter, $http, AlertsService, ClassroomBackendApiService,
+        I18nLanguageCodeService, LoaderService, PageTitleService,
+        UrlInterpolationService, UrlService,
         FATAL_ERROR_CODES) {
       var ctrl = this;
 
@@ -60,6 +63,11 @@ angular.module('oppia').component('classroomPage', {
           '/splash/books.svg');
 
         LoaderService.showLoadingScreen('Loading');
+        $http.get('/libraryindexhandler').then(function(response) {
+          I18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
+            response.data.preferred_language_codes);
+        });
+
         ctrl.classroomBackendApiService.fetchClassroomDataAsync(
           ctrl.classroomUrlFragment).then(function(classroomData) {
           ctrl.classroomData = classroomData;
