@@ -77,7 +77,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection-node-creator.directive.ts',
     'collection-node-editor.directive.ts',
     'collection-node-object.factory.ts',
-    'collection-permissions-card.directive.ts',
     'collection-player-page.directive.ts',
     'collection-summary-tile.directive.ts',
     'collection-update.service.ts',
@@ -373,6 +372,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'truncate.pipe.ts',
     'tutor-card.directive.ts',
     'unicode-string-editor.directive.ts',
+    'unit-test-utils.ts', # Please don't try to cover this file.
     'url-interpolation.service.ts',
     'utils.service.ts',
     'version-diff-visualization.directive.ts',

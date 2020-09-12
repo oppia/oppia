@@ -36,7 +36,7 @@ describe('Device Info Service', () => {
     wrs = TestBed.get(WindowRef);
   });
 
-  it('should evaluate when a device is a mobile device ', () => {
+  it('should evaluate when a device is a mobile device', () => {
     spyOnProperty(wrs.nativeWindow, 'navigator').and.callFake(() => ({
       userAgent: mobileUserAgent
     }));
