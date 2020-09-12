@@ -24,10 +24,10 @@ require(
   'ratio-expression-input-validation.service.ts');
 require(
   'interactions/RatioExpressionInput/directives/' +
-  'oppia-interactive-ratio-expression-input.directive.ts');
+  'oppia-interactive-ratio-expression-input.component.ts');
 require(
   'interactions/RatioExpressionInput/directives/' +
-  'oppia-response-ratio-expression-input.directive.ts');
+  'oppia-response-ratio-expression-input.component.ts');
 require(
   'interactions/RatioExpressionInput/directives/' +
-  'oppia-short-response-ratio-expression-input.directive.ts');
+  'oppia-short-response-ratio-expression-input.component.ts');

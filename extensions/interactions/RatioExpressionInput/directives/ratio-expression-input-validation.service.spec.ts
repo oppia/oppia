@@ -160,9 +160,21 @@ describe('RatioExpressionInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because' +
-      ' it is preceded by a \'HasNumberOfTermsEqualTo\' rule with a matching' +
-      ' input.'
+      message: 'Rule 2 from answer group 1 will never be matched because ' +
+      'the \'HasNumberOfTermsEqualTo\' rule is preceded by a rule with a ' +
+      'matching input.'
+    }]);
+
+    // The second rule will never get matched.
+    answerGroups[0].rules = [hasNumberOfTermsEqualTo, hasNumberOfTermsEqualTo];
+
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched because ' +
+      'it is preceded by a \'HasNumberOfTermsEqualTo\' rule with a ' +
+      'matching input.'
     }]);
 
     let equalsTwoTerms = rof.createFromBackendDict({
@@ -201,7 +213,8 @@ describe('RatioExpressionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: ('The number of terms should be a positive integer.')
+      message: (
+        'The number of terms should be a non negative integer other than 1.')
     }]);
   });
 
@@ -212,7 +225,8 @@ describe('RatioExpressionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: ('The number of terms should be a positive integer.')
+      message: (
+        'The number of terms should be a non negative integer other than 1.')
     }]);
   });
 
@@ -223,7 +237,8 @@ describe('RatioExpressionInputValidationService', () => {
       goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: ('The number of terms should be a positive integer.')
+      message: (
+        'The number of terms should be a non negative integer other than 1.')
     }]);
   });
 

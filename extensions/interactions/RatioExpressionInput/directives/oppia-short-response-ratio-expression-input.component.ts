@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the RatioExpressionInput response.
+ * @fileoverview Component for the RatioExpressionInput short response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
@@ -23,22 +23,15 @@
 require('domain/objects/RatioObjectFactory.ts');
 require('services/html-escaper.service.ts');
 
-angular.module('oppia').directive('oppiaResponseRatioExpressionInput', [
-  'HtmlEscaperService', 'RatioObjectFactory',
-  function(HtmlEscaperService, RatioObjectFactory) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./ratio-expression-input-response.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$attrs', function($attrs) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-          ctrl.answer = RatioObjectFactory.fromList(answer).toAnswerString();
-        };
-      }]
+angular.module('oppia').component('oppiaShortResponseRatioExpressionInput', {
+  template: require('./ratio-expression-input-short-response.component.html'),
+  controller: [
+    '$attrs', 'HtmlEscaperService', 'RatioObjectFactory',
+    function($attrs, HtmlEscaperService, RatioObjectFactory) {
+    var ctrl = this;
+    ctrl.$onInit = function() {
+      var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+      ctrl.answer = RatioObjectFactory.fromList(answer).toAnswerString();
     };
-  }
-]);
+  }]
+});

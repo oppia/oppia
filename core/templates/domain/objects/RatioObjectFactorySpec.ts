@@ -60,8 +60,8 @@ describe('Ratio Object Factory', () => {
 
   describe('.getComponents()', () => {
     it('should return the correct components list', () => {
-      expect(new Ratio([1, 2, 3]).getComponents()).toBe([1, 2, 3]);
-      expect(new Ratio([1, 2]).getComponents()).toBe([1, 2]);
+      expect(new Ratio([1, 2, 3]).getComponents()).toEqual([1, 2, 3]);
+      expect(new Ratio([1, 2]).getComponents()).toEqual([1, 2]);
     });
   });
 

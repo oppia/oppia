@@ -46,6 +46,9 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
 
           var ruleTypesToDescriptions = INTERACTION_SPECS[
             StateInteractionIdService.savedMemento].rule_descriptions;
+          // TODO(bhenning): The order of choices should be meaningful. E.g.,
+          // having "is equal to" for most interactions first makes sense. They
+          // should ideally be ordered based on likelihood of being used.
           for (var ruleType in ruleTypesToDescriptions) {
             choices.push({
               id: ruleType,
@@ -53,18 +56,6 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
                 ruleTypesToDescriptions[ruleType])
             });
           }
-          // TODO(bhenning): The order of choices should be meaningful. E.g.,
-          // having "is equal to" for most interactions first makes sense. They
-          // should ideally be ordered based on likelihood of being used.
-          choices.sort(function(a, b) {
-            if (a.text < b.text) {
-              return -1;
-            } else if (a.text > b.text) {
-              return 1;
-            } else {
-              return 0;
-            }
-          });
 
           var select2Node = $element[0].firstChild;
           $(select2Node).select2({

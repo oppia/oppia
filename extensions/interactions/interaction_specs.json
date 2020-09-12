@@ -78,8 +78,8 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "MatchesExactlyWith": "matches exactly with {{x|NumericExpression}}",
       "IsEquivalentTo": "is equivalent to {{x|NumericExpression}}",
+      "MatchesExactlyWith": "matches exactly with {{x|NumericExpression}}",
       "ContainsSomeOf": "contains at least one of the terms present in {{x|NumericExpression}}",
       "OmitsSomeOf": "omits at least one of the terms present in {{x|NumericExpression}}"
     }
@@ -241,10 +241,10 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
+      "Equals": "is equal to {{x|SetOfHtmlString}}",
       "DoesNotContainAtLeastOneOf": "omits at least one of {{x|SetOfHtmlString}}",
       "IsProperSubsetOf": "is a proper subset of {{x|SetOfHtmlString}}",
-      "ContainsAtLeastOneOf": "contains at least one of {{x|SetOfHtmlString}}",
-      "Equals": "is equal to {{x|SetOfHtmlString}}"
+      "ContainsAtLeastOneOf": "contains at least one of {{x|SetOfHtmlString}}"
     }
   },
   "Continue": {
@@ -460,8 +460,8 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "HasElementsNotIn": "has elements not in {{x|SetOfUnicodeString}}",
       "Equals": "is equal to {{x|SetOfUnicodeString}}",
+      "HasElementsNotIn": "has elements not in {{x|SetOfUnicodeString}}",
       "IsSupersetOf": "is a proper superset of {{x|SetOfUnicodeString}}",
       "OmitsElementsIn": "omits some elements of {{x|SetOfUnicodeString}}",
       "HasElementsIn": "has elements in common with {{x|SetOfUnicodeString}}",
@@ -617,8 +617,8 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "MatchesExactlyWith": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}",
       "IsEquivalentTo": "is equivalent to {{x|MathEquation}}",
+      "MatchesExactlyWith": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}",
       "ContainsSomeOf": "contains at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
       "OmitsSomeOf": "omits at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}",
       "MatchesWithGeneralForm": "matches the form of {{x|MathEquation}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
@@ -768,9 +768,9 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "StartsWith": "starts with {{x|NormalizedString}}",
       "Contains": "contains {{x|NormalizedString}}",
       "Equals": "is equal to {{x|NormalizedString}}, without taking case into account",
+      "StartsWith": "starts with {{x|NormalizedString}}",
       "FuzzyEquals": "is equal to {{x|NormalizedString}}, misspelled by at most one character"
     }
   },
@@ -972,15 +972,15 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
+      "IsExactlyEqualTo": "exactly matches {{f|Fraction}}",
+      "IsEquivalentTo": "is equivalent to {{f|Fraction}}",
+      "IsEquivalentToAndInSimplestForm": "is equivalent to {{f|Fraction}} and in simplest form",
       "HasNoFractionalPart": "has no fractional part",
       "HasFractionalPartExactlyEqualTo": "has fractional part exactly equal to {{f|Fraction}}",
-      "IsEquivalentToAndInSimplestForm": "is equivalent to {{f|Fraction}} and in simplest form",
-      "IsExactlyEqualTo": "exactly matches {{f|Fraction}}",
       "HasNumeratorEqualTo": "has numerator equal to {{x|Int}}",
       "IsLessThan": "is less than {{f|Fraction}}",
       "IsGreaterThan": "is greater than {{f|Fraction}}",
       "HasIntegerPartEqualTo": "has integer part equal to {{x|Int}}",
-      "IsEquivalentTo": "is equivalent to {{f|Fraction}}",
       "HasDenominatorEqualTo": "has denominator equal to {{x|NonnegativeInt}}"
     }
   },
