@@ -49,13 +49,13 @@ require('services/suggestion-modal.service.ts');
 angular.module('oppia').component('contributionsAndReview', {
   template: require('./contributions-and-review.component.html'),
   controller: [
-    '$filter', '$uibModal', 'AlertsService', 'ContextService',
-    'ContributionAndReviewService', 'MisconceptionObjectFactory',
+    '$filter', '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
+    'ContributionAndReviewService',
     'QuestionObjectFactory', 'SkillBackendApiService',
     'UrlInterpolationService', 'UserService', 'IMAGE_CONTEXT',
     function(
-        $filter, $uibModal, AlertsService, ContextService,
-        ContributionAndReviewService, MisconceptionObjectFactory,
+        $filter, $rootScope, $uibModal, AlertsService, ContextService,
+        ContributionAndReviewService,
         QuestionObjectFactory, SkillBackendApiService,
         UrlInterpolationService, UserService, IMAGE_CONTEXT) {
       var ctrl = this;
@@ -237,16 +237,11 @@ angular.module('oppia').component('contributionsAndReview', {
           SkillBackendApiService.fetchSkill(skillId).then((skillDict) => {
             var misconceptionsBySkill = {};
             var skill = skillDict.skill;
-            misconceptionsBySkill[skill.id] = (
-              skill.misconceptions.map((misconceptionDict) => {
-                return (
-                  MisconceptionObjectFactory.createFromBackendDict(
-                    misconceptionDict));
-              })
-            );
+            misconceptionsBySkill[skill.getId()] = skill.misconceptions;
             _showQuestionSuggestionModal(
               suggestion, contributionDetails, reviewable,
               misconceptionsBySkill);
+            $rootScope.$apply();
           });
         }
         if (suggestion.suggestion_type === ctrl.SUGGESTION_TYPE_TRANSLATE) {

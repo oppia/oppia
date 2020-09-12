@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for QuestionCreationService.
  */
 
-
+import { TestBed } from '@angular/core/testing';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -61,7 +61,7 @@ describe('Question Creation Service', function() {
       $q = $injector.get('$q');
       SkillDifficultyObjectFactory = $injector.get(
         'SkillDifficultyObjectFactory');
-      SkillBackendApiService = $injector.get('SkillBackendApiService');
+      SkillBackendApiService = TestBed.get(SkillBackendApiService);
       EditableQuestionBackendApiService = $injector.get(
         'EditableQuestionBackendApiService');
       $uibModal = $injector.get('$uibModal');

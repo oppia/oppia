@@ -16,10 +16,13 @@
  * @fileoverview Unit tests for contributionsAndReview.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { ContextService } from 'services/context.service';
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
+import { SkillBackendApiService } from
+  'domain/skill/skill-backend-api.service';
 
 describe('Contributions and review component', function() {
   var ctrl = null;
@@ -36,7 +39,12 @@ describe('Contributions and review component', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+
     contextService = TestBed.get(ContextService);
+    skillBackendApiService = TestBed.get(SkillBackendApiService);
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
   });
@@ -248,7 +256,6 @@ describe('Contributions and review component', function() {
       contributionAndReviewService = $injector.get(
         'ContributionAndReviewService');
       csrfTokenService = $injector.get('CsrfTokenService');
-      skillBackendApiService = $injector.get('SkillBackendApiService');
       userService = $injector.get('UserService');
 
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
