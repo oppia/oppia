@@ -99,7 +99,7 @@ export class ExpressionEvaluatorService {
    * @param envs Represents a nested name space environment to look up the name
    *     in. The first element is looked up first (i.e. has higher precedence).
    */
-  evaluate(parsed: string | string[], envs: EnvDict[]): Expr {
+  evaluate(parsed: Expr | Expr[], envs: EnvDict[]): Expr {
     // The intermediate nodes of the parse tree are arrays. The terminal
     // nodes are JavaScript primitives (as described in the "Parser output"
     // section of parser.pegjs).

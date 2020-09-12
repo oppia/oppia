@@ -92,8 +92,8 @@ export class ExpressionSyntaxTreeService {
   }
 
   public applyFunctionToParseTree(
-      parsed: string | string[], envs: EnvDict[],
-      func: (parsed: string | string[], envs: EnvDict[]) => Expr): Expr {
+      parsed: Expr | Expr[], envs: EnvDict[],
+      func: (parsed: Expr | Expr[], envs: EnvDict[]) => Expr): Expr {
     return func(parsed, envs.concat(this.system));
   }
 

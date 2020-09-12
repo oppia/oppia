@@ -138,11 +138,7 @@ describe('Expression evaluator service', () => {
       it('should report an error when ' + errorReason, () => {
         expect(
           () => expressionSyntaxTreeService.applyFunctionToParseTree(
-            // This throws "TS2345". This needs to be suppressed because we are
-            // explicitly testing invalid types.
-            // @ts-expect-error
-            expression,
-            ENVS,
+            expression, ENVS,
             (parsed, envs) => expressionEvaluatorService.evaluate(parsed, envs))
         ).toThrowError(errorKind);
       });
