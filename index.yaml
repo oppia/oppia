@@ -312,16 +312,16 @@ indexes:
   - name: user_id
   - name: score
 
+- kind: UserContributionProficiencyModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
 - kind: UserContributionScoringModel
   properties:
   - name: deleted
   - name: user_id
   - name: score
-
-- kind: UserContributionProficiencyModel
-  properties:
-  - name: realtime_layer
-  - name: created_on
 
 - kind: UserStatsRealtimeModel
   properties:
