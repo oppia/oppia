@@ -61,7 +61,7 @@ fdescribe('Focus Manager Service', () => {
     expect(focusOnSpy).toHaveBeenCalledWith(focusLabel);
   }));
 
-  it('should not set focus label if _nextLabelToFocusOn is set', fakeAsync(() => {
+  it('should not be able to reset focus label', fakeAsync(() => {
     focusManagerService.setFocus(focusLabel);
     expect(focusManagerService.setFocus(focusLabelTwo)).toEqual(undefined);
     flush();
