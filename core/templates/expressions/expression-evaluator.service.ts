@@ -87,11 +87,11 @@ export class ExpressionEvaluatorService {
       private expressionParserService: ExpressionParserService,
       private expressionSyntaxTreeService: ExpressionSyntaxTreeService) {}
 
-  evaluateExpression(expression: string, envs: EnvDict[]) {
+  evaluateExpression(expression: string, envs: EnvDict[]): Expr {
     return this.expressionSyntaxTreeService.applyFunctionToParseTree(
       this.expressionParserService.parse(expression), envs,
       (parsed, envs) => this.evaluate(parsed, envs));
-  };
+  }
 
   /**
    * @param parsed Parse output from the parser. See parser.pegjs for the data

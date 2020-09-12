@@ -1,4 +1,3 @@
-import {Type} from "@angular/core";
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +12,8 @@ import {Type} from "@angular/core";
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { TestBed } from "@angular/core/testing";
+import { Type } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 
 import { ExpressionEvaluatorService } from
   'expressions/expression-evaluator.service';
