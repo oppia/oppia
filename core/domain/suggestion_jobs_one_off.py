@@ -179,3 +179,60 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 no_of_suggestions_migrated)])
         else:
             yield (key, values)
+
+
+class PopulateSuggestionLanguageCodeMigrationOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """A reusable one-time job that may be used to add the language_code field
+    to suggestions that do not have that field yet. The language_code field
+    allows question and translation suggestions to be queried by language.
+    This job will load all existing suggestions from the data store, update
+    them, if needed, and immediately store them back into the data store.
+    """
+
+    _VALIDATION_ERROR_KEY = 'validation_error'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        # Exit early if the suggestion has been marked deleted, or if the
+        # suggestion has already set the language code property, or if the
+        # suggestion type is not queryable by language, since ndb automatically
+        # sets properties that aren't intialized to None.
+        if item.deleted or item.language_code or item.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
+            return
+
+        suggestion = suggestion_services.get_suggestion_from_model(item)
+        if suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+            # Set the language code to be the language of the question.
+            suggestion.language_code = suggestion.change.question_dict[
+                'language_code']
+        elif suggestion.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            # Set the language code to be the language of the translation.
+            suggestion.language_code = suggestion.change.language_code
+        # Validate the suggestion before updating the storage model.
+        try:
+            suggestion.validate()
+        except Exception as e:
+            logging.error(
+                'Suggestion %s failed validation: %s' % (
+                    item.id, e))
+            yield (
+                PopulateSuggestionLanguageCodeMigrationOneOffJob
+                ._VALIDATION_ERROR_KEY,
+                'Suggestion %s failed validation: %s' % (
+                    item.id, e))
+            return
+        item.language_code = suggestion.language_code
+        item.put()
+        yield ('%s_suggestion_migrated' % item.suggestion_type, item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

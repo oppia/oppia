@@ -433,7 +433,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID_1, 1,
             suggestion_models.STATUS_IN_REVIEW, self.editor_id, None,
-            change_cmd, 'score category', thread_id)
+            change_cmd, 'score category', thread_id, None)
 
         suggestion_thread = feedback_services.get_thread(thread_id)
         suggestion = suggestion_services.get_suggestion_by_id(thread_id)
