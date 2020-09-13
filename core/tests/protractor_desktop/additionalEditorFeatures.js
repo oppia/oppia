@@ -60,7 +60,7 @@ fdescribe('Full exploration editor', function() {
     }
   );
 
-  it('should generate warning message if card height limit is exceeded ',
+  it('should generate warning message if card height limit is exceeded',
     async function() {
       await users.createUser('user@heightWarning.com', 'userHeightWarning');
       await users.login('user@heightWarning.com');

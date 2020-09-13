@@ -40,7 +40,7 @@ describe('Learner dashboard activity ids object factory', () => {
   });
 
   it('should check if activity id is present among learner dashboard ' +
-     ' activity ids', () => {
+     'activity ids', () => {
     var learnerDashboardActivityIds = (
       learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
         learnerDashboardActivityIdsDict));
