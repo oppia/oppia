@@ -682,7 +682,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             export_policy = model.get_export_policy()
             if 'export_method' in export_policy:
                 per_field_policy = export_policy['per_field_policy']
-                if export_policy['export_method'] == base_models.EXPORT_METHOD.DIRECT_EXPORT:
+                if (
+                    export_policy['export_method'] ==
+                    base_models.EXPORT_METHOD.DIRECT_EXPORT):
                     exported_props = [
                         prop for prop in model._properties
                         if (per_field_policy[prop] ==
