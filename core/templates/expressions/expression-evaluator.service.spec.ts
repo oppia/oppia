@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for Expression Evaluator Service.
+ */
+
 import { Type } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
@@ -29,14 +33,16 @@ import {
   ExpressionSyntaxTreeService,
 } from 'expressions/expression-syntax-tree.service';
 
-/**
- * @fileoverview Unit tests for Expression Evaluator Service.
- */
-
 describe('Expression evaluator service', () => {
   let expressionEvaluatorService: ExpressionEvaluatorService;
   let expressionParserService: ExpressionParserService;
   let expressionSyntaxTreeService: ExpressionSyntaxTreeService;
+
+  beforeEach(() => {
+    expressionEvaluatorService = TestBed.get(ExpressionEvaluatorService);
+    expressionParserService = TestBed.get(ExpressionParserService);
+    expressionSyntaxTreeService = TestBed.get(ExpressionSyntaxTreeService);
+  });
 
   const ENVS: EnvDict[] = [
     {
@@ -48,12 +54,6 @@ describe('Expression evaluator service', () => {
       strNull: ''
     }
   ];
-
-  beforeEach(() => {
-    expressionEvaluatorService = TestBed.get(ExpressionEvaluatorService);
-    expressionParserService = TestBed.get(ExpressionParserService);
-    expressionSyntaxTreeService = TestBed.get(ExpressionSyntaxTreeService);
-  });
 
   describe('Getting params from expressions', () => {
     type TestParam = [string, string[]];
@@ -85,7 +85,7 @@ describe('Expression evaluator service', () => {
       ['log(9, 3)', []],
       ['numZero + numOne', ['numOne', 'numZero']]
     ]).forEach(([expression, expectedParams]) => {
-      it('should get the references from the expression ' +
+      it('should get references from the expression ' +
         JSON.stringify(expression), () => {
         expect(
           expressionSyntaxTreeService.getParamsUsedInExpression(expression)
@@ -122,8 +122,8 @@ describe('Expression evaluator service', () => {
         expect(
           expressionSyntaxTreeService.applyFunctionToParseTree(
             expressionParserService.parse(expression), ENVS,
-            (parsed, envs) => expressionEvaluatorService.evaluate(parsed, envs)
-          )).toEqual(expected);
+            (parsed, envs) => expressionEvaluatorService.evaluate(parsed, envs))
+        ).toEqual(expected);
         expect(expressionEvaluatorService.evaluateExpression(expression, ENVS))
           .toEqual(expected);
       });
@@ -136,26 +136,26 @@ describe('Expression evaluator service', () => {
       ['there are too many args', ['+', 10, 20, 30], ExprWrongNumArgsError],
       ['there are too few args', ['==', true], ExprWrongNumArgsError],
       ['an arg has the wrong type', ['+', 'abc', 1], ExprWrongArgTypeError],
-    ]).forEach(([errorReason, expression, errorKind]) => {
-      it('should report an error when ' + errorReason, () => {
+    ]).forEach(([problemDescription, expression, errorType]) => {
+      it('should report an error when ' + problemDescription, () => {
         expect(
           () => expressionSyntaxTreeService.applyFunctionToParseTree(
             expression, ENVS,
             (parsed, envs) => expressionEvaluatorService.evaluate(parsed, envs))
-        ).toThrowError(errorKind);
+        ).toThrowError(errorType);
       });
     });
 
     it('should report an error when using an undefined variable', () => {
-      const expression = 'numZero + numOne';
+      const expression = 'numZero + numOne'; // numOne is undefined.
       expect(
         () => expressionSyntaxTreeService.applyFunctionToParseTree(
           expressionParserService.parse(expression), ENVS,
           (parsed, envs) => expressionEvaluatorService.evaluate(parsed, envs)))
         .toThrowError(ExprUndefinedVarError);
       expect(
-        () => expressionEvaluatorService.evaluateExpression(expression, ENVS))
-        .toThrowError(ExprUndefinedVarError);
+        () => expressionEvaluatorService.evaluateExpression(expression, ENVS)
+      ).toThrowError(ExprUndefinedVarError);
     });
   });
 });

@@ -89,8 +89,7 @@ export class ExpressionEvaluatorService {
 
   evaluateExpression(expression: string, envs: EnvDict[]): Expr {
     return this.expressionSyntaxTreeService.applyFunctionToParseTree(
-      this.expressionParserService.parse(expression), envs,
-      (parsed, envs) => this.evaluate(parsed, envs));
+      this.expressionParserService.parse(expression), envs, this.evaluate);
   }
 
   /**
@@ -100,9 +99,9 @@ export class ExpressionEvaluatorService {
    *     in. The first element is looked up first (i.e. has higher precedence).
    */
   evaluate(parsed: Expr | Expr[], envs: EnvDict[]): Expr {
-    // The intermediate nodes of the parse tree are arrays. The terminal
-    // nodes are JavaScript primitives (as described in the "Parser output"
-    // section of parser.pegjs).
+    // The intermediate nodes of the parse tree are arrays. The terminal nodes
+    // are JavaScript primitives (as described in the "Parser output" section of
+    // parser.pegjs).
     if (parsed instanceof Array) {
       if (parsed.length === 0) {
         throw new Error(
@@ -111,12 +110,11 @@ export class ExpressionEvaluatorService {
 
       if (parsed[0] === '#') {
         const varName = <string> parsed[1];
-        const varValue = <Expr> this.expressionSyntaxTreeService.lookupEnvs(
-          varName, envs);
-        return varValue;
+        return (
+          <Expr> this.expressionSyntaxTreeService.lookupEnvs(varName, envs));
       }
 
-      // Otherwise, this must be a function or operator expression.
+      // Otherwise, this must be a function/operator expression.
       const funcName = <string> parsed[0];
       const funcArgs = parsed.slice(1).map(item => this.evaluate(item, envs));
       const funcEnvs = <SystemEnv> this.expressionSyntaxTreeService.lookupEnvs(
