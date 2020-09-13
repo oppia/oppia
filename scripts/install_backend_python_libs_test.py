@@ -623,9 +623,27 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
             'Windows%29' in self.print_arr)
 
-    def test_that_normalized_library_requirements_are_unique(self):
+    def test_that_normalized_library_requirements_in_are_unique(self):
         normalized_library_names = set()
         with python_utils.open_file(common.REQUIREMENTS_FILE_PATH, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                trimmed_line = line.strip()
+                if trimmed_line.startswith('#') or len(trimmed_line) == 0:
+                    continue
+                library_name_and_version_string = trimmed_line.split(
+                    ' ')[0].split('==')
+                normalized_library_name = (
+                    install_backend_python_libs.normalize_python_library_name(
+                        library_name_and_version_string[0]))
+                self.assertNotIn(
+                    normalized_library_name, normalized_library_names)
+                normalized_library_names.add(normalized_library_name)
+
+    def test_that_normalized_library_requirements_txt_are_unique(self):
+        normalized_library_names = set()
+        with python_utils.open_file(
+            common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
