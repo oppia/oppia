@@ -691,7 +691,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                         base_models.EXPORT_POLICY.EXPORTED)
                     ]
                     exported_data = model.export_data(self.USER_ID_1)
-                    self.assertEquals(
+                    self.assertEqual(
                         sorted([python_utils.UNICODE(key) for key in exported_data.keys()]),
                         sorted(exported_props)
                     )
