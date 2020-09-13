@@ -71,7 +71,7 @@
         <div ng-click="$ctrl.editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
           <div class="question-data">
             <angular-html-bind class="question-text" html-data="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()"></angular-html-bind>
-            <span ng-click="$ctrl.deleteQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription())"
+            <span ng-click="$ctrl.deleteQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription());$event.stopPropagation();"
                   class="link-off-icon">
               <i class="material-icons">link_off</i>
             </span>

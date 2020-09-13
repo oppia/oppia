@@ -523,8 +523,9 @@ angular.module('oppia').directive('questionsList', [
                 });
           };
           ctrl.isQuestionValid = function() {
-            return QuestionValidationService.isQuestionValid(
-              ctrl.question, ctrl.misconceptionsBySkill);
+            return Boolean(QuestionValidationService.isQuestionValid(
+              ctrl.question, ctrl.misconceptionsBySkill) &&
+                ctrl.newQuestionSkillDifficulties.length);
           };
           ctrl.addSkill = function() {
             var skillsInSameTopicCount =

@@ -47,7 +47,11 @@ angular.module('oppia').factory('QuestionsListService', [
       _questionSummartiesInitializedEventEmitter.emit();
     };
 
-    var _setQuestionSummariesForOneSkill = function(newQuestionSummaries) {
+    var _setQuestionSummariesForOneSkill = function(
+        newQuestionSummaries, resetHistory) {
+      if (resetHistory) {
+        _questionSummariesForOneSkill = [];
+      }
       _questionSummariesForOneSkill = _questionSummariesForOneSkill.concat(
         angular.copy(newQuestionSummaries));
       _questionSummartiesInitializedEventEmitter.emit();
@@ -101,7 +105,8 @@ angular.module('oppia').factory('QuestionsListService', [
                       QuestionSummaryForOneSkillObjectFactory.
                         createFromBackendDict(summary));
                   });
-                _setQuestionSummariesForOneSkill(questionSummaries);
+                _setQuestionSummariesForOneSkill(
+                  questionSummaries, resetHistory);
               } else {
                 _setQuestionSummaries(returnObject.questionSummaries);
               }
