@@ -157,6 +157,14 @@ export const AppConstants = {
     QUESTION: 'question',
   },
 
+  ASSET_TYPE_AUDIO: 'audio',
+  ASSET_TYPE_IMAGE: 'image',
+  ASSET_TYPE_THUMBNAIL: 'thumbnail',
+  AUDIO_UPLOAD_URL_TEMPLATE: '/createhandler/audioupload/<exploration_id>',
+
+  MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY: 3,
+  MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY: 3,
+
   IMAGE_CONTEXT: {
     EXPLORATION_SUGGESTIONS: 'exploration_suggestions',
     QUESTION_SUGGESTIONS: 'question_suggestions'

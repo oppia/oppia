@@ -310,6 +310,8 @@ import { ImageClickInputValidationService } from
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
+import { ImagePreloaderService } from
+  'pages/exploration-player-page/services/image-preloader.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -851,6 +853,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static imageClickInputRulesService: ImageClickInputRulesService;
   static imageClickInputValidationService: ImageClickInputValidationService;
   static imageFileObjectFactory: ImageFileObjectFactory;
+  static imagePreloaderService: ImagePreloaderService;
   static improvementsService: ImprovementsService;
   static ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory;
   static interactionAttributesExtractorService: InteractionAttributesExtractorService;
@@ -1187,6 +1190,7 @@ private idGenerationService: IdGenerationService,
 private imageClickInputRulesService: ImageClickInputRulesService,
 private imageClickInputValidationService: ImageClickInputValidationService,
 private imageFileObjectFactory: ImageFileObjectFactory,
+private imagePreloaderService: ImagePreloaderService,
 private improvementsService: ImprovementsService,
 private ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory,
 private interactionAttributesExtractorService: InteractionAttributesExtractorService,
@@ -1524,6 +1528,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.imageClickInputRulesService = this.imageClickInputRulesService;
     OppiaAngularRootComponent.imageClickInputValidationService = this.imageClickInputValidationService;
     OppiaAngularRootComponent.imageFileObjectFactory = this.imageFileObjectFactory;
+    OppiaAngularRootComponent.imagePreloaderService = this.imagePreloaderService;
     OppiaAngularRootComponent.improvementsService = this.improvementsService;
     OppiaAngularRootComponent.ineffectiveFeedbackLoopTaskObjectFactory = this.ineffectiveFeedbackLoopTaskObjectFactory;
     OppiaAngularRootComponent.interactionAttributesExtractorService = this.interactionAttributesExtractorService;

@@ -64,6 +64,8 @@ import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory';
 import { AudioLanguageObjectFactory } from
   'domain/utilities/AudioLanguageObjectFactory';
+import { AudioPreloaderService } from
+  'pages/exploration-player-page/services/audio-preloader.service';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { AudioTranslationManagerService } from
@@ -269,6 +271,8 @@ import { ImageClickInputValidationService } from
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
+import { ImagePreloaderService } from
+  'pages/exploration-player-page/services/image-preloader.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -1551,7 +1555,6 @@ export class UpgradedServices {
         upgradedServices['HttpClient']);
 
     // Topological level: 4.
-
     upgradedServices['CollectionCreationService'] =
       new CollectionCreationService(
         upgradedServices['CollectionCreationBackendService'],
@@ -1626,11 +1629,21 @@ export class UpgradedServices {
         upgradedServices['InteractionSpecsService'],
         upgradedServices['PredictionAlgorithmRegistryService'],
         upgradedServices['StateClassifierMappingService']);
+    upgradedServices['AudioPreloaderService'] = new AudioPreloaderService(
+      upgradedServices['AssetsBackendApiService'],
+      upgradedServices['AudioTranslationLanguageService'],
+      upgradedServices['ComputeGraphService'],
+      upgradedServices['ContextService']);
     upgradedServices['ExplorationHtmlFormatterService'] =
       new ExplorationHtmlFormatterService(
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
+    upgradedServices['ImagePreloaderService'] = new ImagePreloaderService(
+      upgradedServices['AssetsBackendApiService'],
+      upgradedServices['ComputeGraphService'],
+      upgradedServices['ContextService'],
+      upgradedServices['ExtractImageFilenamesFromStateService']);
     upgradedServices['SubtopicViewerBackendApiService'] =
       new SubtopicViewerBackendApiService(
         upgradedServices['HttpClient'],
