@@ -92,8 +92,6 @@ import { AnswerGroupObjectFactory } from
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { AppService } from 'services/app.service';
-import { AssetsBackendApiService } from
-  'services/assets-backend-api.service';
 import { AssignedSkillObjectFactory } from
   'domain/skill/assigned-skill-object.factory';
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
@@ -310,8 +308,6 @@ import { ImageClickInputValidationService } from
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
-import { ImagePreloaderService } from
-  'pages/exploration-player-page/services/image-preloader.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -737,7 +733,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static answerGroupObjectFactory: AnswerGroupObjectFactory;
   static answerStatsObjectFactory: AnswerStatsObjectFactory;
   static appService: AppService;
-  static assetsBackendApiService: AssetsBackendApiService;
   static assignedSkillObjectFactory: AssignedSkillObjectFactory;
   static audioBarStatusService: AudioBarStatusService;
   static audioFileObjectFactory: AudioFileObjectFactory;
@@ -853,7 +848,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static imageClickInputRulesService: ImageClickInputRulesService;
   static imageClickInputValidationService: ImageClickInputValidationService;
   static imageFileObjectFactory: ImageFileObjectFactory;
-  static imagePreloaderService: ImagePreloaderService;
   static improvementsService: ImprovementsService;
   static ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory;
   static interactionAttributesExtractorService: InteractionAttributesExtractorService;
@@ -1074,7 +1068,6 @@ private answerGroupsCacheService: AnswerGroupsCacheService,
 private answerGroupObjectFactory: AnswerGroupObjectFactory,
 private answerStatsObjectFactory: AnswerStatsObjectFactory,
 private appService: AppService,
-private assetsBackendApiService: AssetsBackendApiService,
 private assignedSkillObjectFactory: AssignedSkillObjectFactory,
 private audioBarStatusService: AudioBarStatusService,
 private audioFileObjectFactory: AudioFileObjectFactory,
@@ -1190,7 +1183,6 @@ private idGenerationService: IdGenerationService,
 private imageClickInputRulesService: ImageClickInputRulesService,
 private imageClickInputValidationService: ImageClickInputValidationService,
 private imageFileObjectFactory: ImageFileObjectFactory,
-private imagePreloaderService: ImagePreloaderService,
 private improvementsService: ImprovementsService,
 private ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory,
 private interactionAttributesExtractorService: InteractionAttributesExtractorService,
@@ -1412,7 +1404,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.answerGroupObjectFactory = this.answerGroupObjectFactory;
     OppiaAngularRootComponent.answerStatsObjectFactory = this.answerStatsObjectFactory;
     OppiaAngularRootComponent.appService = this.appService;
-    OppiaAngularRootComponent.assetsBackendApiService = this.assetsBackendApiService;
     OppiaAngularRootComponent.assignedSkillObjectFactory = this.assignedSkillObjectFactory;
     OppiaAngularRootComponent.audioBarStatusService = this.audioBarStatusService;
     OppiaAngularRootComponent.audioFileObjectFactory = this.audioFileObjectFactory;
@@ -1528,7 +1519,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.imageClickInputRulesService = this.imageClickInputRulesService;
     OppiaAngularRootComponent.imageClickInputValidationService = this.imageClickInputValidationService;
     OppiaAngularRootComponent.imageFileObjectFactory = this.imageFileObjectFactory;
-    OppiaAngularRootComponent.imagePreloaderService = this.imagePreloaderService;
     OppiaAngularRootComponent.improvementsService = this.improvementsService;
     OppiaAngularRootComponent.ineffectiveFeedbackLoopTaskObjectFactory = this.ineffectiveFeedbackLoopTaskObjectFactory;
     OppiaAngularRootComponent.interactionAttributesExtractorService = this.interactionAttributesExtractorService;
