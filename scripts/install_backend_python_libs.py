@@ -30,7 +30,7 @@ from scripts import common
 import pkg_resources
 
 
-def _normalize_python_library_name(library_name):
+def normalize_python_library_name(library_name):
     """Returns a normalized version of the python library name.
 
     Normalization of a library name means converting the library name to
@@ -38,28 +38,30 @@ def _normalize_python_library_name(library_name):
     this is because of 2 potential confusions when comparing library names that
     will cause this script to find incorrect mismatches.
 
-    1. Python library name strings are case insensitive which means that
-       libraries are equivalent even if the casing of the library names are
-       different.
+    1. Python library name strings are case-insensitive, which means that
+       libraries are considered equivalent even if the casing of the library
+       names is different.
     2. There are certain python libraries with a default version and multiple
        variants. These variants have names like `library[sub-library]` and
        signify that it is a version of the library with special support for
-       the sub-library.
+       the sub-library. These variants can be considered equivalent to an
+       individual developer and project because at any point in time, only one
+       of these variants is allowed to be installed/used in a project.
 
     Here are some examples of ambiguities that this function resolves:
     - 'googleappenginemapreduce' is listed in the 'requirements.txt' file as
-      all lowercase. However, the installed directories has names starting with
+      all lowercase. However, the installed directories have names starting with
       the string 'GoogleAppEngineMapReduce'. This causes confusion when
       searching for mismatches because python treats the two library names as
       different even though they are equivalent.
-    - The name 'google-api-core[grpc]', listed in a 'requirements.txt' file
-      means that a variant of the 'google-api-core' package that supports grpc
-      is required. However, the import names, the package directory names, and
-      the metadata directory names of the installed package do not actually
-      contain the sub-directory identifier. This causes incorrect mismatches to
-      be found because the script treats the installed package's library name,
-      'library', differently from the 'requirements.txt' listed library name,
-      'library[sub-library]'
+    - If the name 'google-api-core[grpc]' is listed in the 'requirements.txt'
+      file, this means that a variant of the 'google-api-core' package that
+      supports grpc is required. However, the import names, the package
+      directory names, and the metadata directory names of the installed package
+      do not actually contain the sub-library identifier. This causes
+      incorrect mismatches to be found because the script treats the installed
+      package's library name, 'library', differently from the 'requirements.txt'
+      listed library name, 'library[sub-library]'
 
     Args:
         library_name: str. The library name to be normalized.
@@ -81,7 +83,7 @@ def _normalize_python_library_name(library_name):
     return library_name.lower()
 
 
-def _normalize_directory_name(directory_name):
+def normalize_directory_name(directory_name):
     """Returns a normalized (lowercase) version of the directory name.
 
     Python library name strings are case insensitive which means that
@@ -118,17 +120,18 @@ def _get_requirements_file_contents():
     with python_utils.open_file(
         common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
         lines = f.readlines()
-        for l in lines:
-            l = l.strip()
-            if l.startswith('#') or len(l) == 0:
+        for line in lines:
+            trimmed_line = line.strip()
+            if trimmed_line.startswith('#') or len(trimmed_line) == 0:
                 continue
-            library_name_and_version_string = l.split(' ')[0].split('==')
+            library_name_and_version_string = trimmed_line.split(
+                ' ')[0].split('==')
             # Libraries with different case are considered equivalent libraries:
             # e.g 'Flask' is the same library as 'flask'. Therefore, we
             # normalize all library names in order to compare libraries without
             # ambiguities.
             normalized_library_name = (
-                _normalize_python_library_name(
+                normalize_python_library_name(
                     library_name_and_version_string[0]))
             version_string = library_name_and_version_string[1]
             requirements_contents[normalized_library_name] = version_string
@@ -154,7 +157,7 @@ def _get_third_party_python_libs_directory_contents():
     # normalize all library names in order to compare libraries without
     # ambiguities.
     directory_contents = {
-        _normalize_python_library_name(library_name): version_string
+        normalize_python_library_name(library_name): version_string
         for library_name, version_string in installed_packages
     }
 
@@ -179,7 +182,7 @@ def _remove_metadata(library_name, version_string):
         _get_possible_normalized_metadata_directory_names(
             library_name, version_string))
     normalized_directory_names = [
-        _normalize_directory_name(name)
+        normalize_directory_name(name)
         for name in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR)
         if os.path.isdir(
             os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, name))
@@ -312,14 +315,14 @@ def _get_possible_normalized_metadata_directory_names(
     # Some metadata folders replace the hyphens in the library name with
     # underscores.
     return {
-        _normalize_directory_name(
+        normalize_directory_name(
             '%s-%s.dist-info' % (library_name, version_string)),
-        _normalize_directory_name(
+        normalize_directory_name(
             '%s-%s.dist-info' % (
                 library_name.replace('-', '_'), version_string)),
-        _normalize_directory_name(
+        normalize_directory_name(
             '%s-%s.egg-info' % (library_name, version_string)),
-        _normalize_directory_name(
+        normalize_directory_name(
             '%s-%s.egg-info' % (
                 library_name.replace('-', '_'), version_string)),
     }
@@ -500,7 +503,7 @@ def validate_metadata_directories():
     # we would need to check every permutation of the casing.
     normalized_directory_names = set(
         [
-            _normalize_directory_name(name)
+            normalize_directory_name(name)
             for name in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR)
             if os.path.isdir(
                 os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, name))
