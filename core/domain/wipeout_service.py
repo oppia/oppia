@@ -27,6 +27,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_domain
 from core.platform import models
+import feconf
 import python_utils
 
 from google.appengine.ext import ndb
@@ -281,6 +282,7 @@ def _hard_delete_explorations_and_collections(pending_deletion_request):
         force_deletion=True)
     pending_deletion_request.collection_ids = []
     save_pending_deletion_request(pending_deletion_request)
+
 
 def _generate_activity_to_pseudonymized_ids_mapping(activity_ids):
     """Generate mapping from activity IDs to pseudonymous user IDs.
@@ -540,7 +542,21 @@ def _pseudonymize_col_or_exp_models(
                 )
             )
         ]
+        allowed_commands = (
+            feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS
+            if activity_category == models.NAMES.collection else
+            feconf.EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS
+        )
         for snapshot_metadata_model in snapshot_metadata_models:
+            for commit_cmd in snapshot_metadata_model.commit_cmds:
+                user_id_attribute_names = python_utils.NEXT(
+                    cmd['user_id_attribute_names']
+                    for cmd in allowed_commands
+                    if cmd['name'] == commit_cmd['cmd']
+                )
+                for user_id_attribute_name in user_id_attribute_names:
+                    if commit_cmd[user_id_attribute_name] == user_id:
+                        commit_cmd[user_id_attribute_name] = pseudonymized_id
             snapshot_metadata_model.content_user_ids = [
                 pseudonymized_id if model_user_id == user_id else model_user_id
                 for model_user_id in snapshot_metadata_model.content_user_ids

@@ -155,7 +155,7 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
         # does not create a summary object, which is needed for the
         # job to update the index after updating the collection.
         collection_summary = collection_services.compute_summary_of_collection(
-            model, self.albert_id)
+            model, self.albert_id, None)
         collection_services.save_collection_summary(collection_summary)
 
         # Start migration job on sample collection.
@@ -258,7 +258,7 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
         # does not create a summary object, which is needed for the
         # job to update the index after updating the collection.
         collection_summary = collection_services.compute_summary_of_collection(
-            model, self.albert_id)
+            model, self.albert_id, None)
         collection_services.save_collection_summary(collection_summary)
 
         # Check that collection_contents is empty.
