@@ -30,6 +30,7 @@ from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -43,7 +44,6 @@ import python_utils
         models.NAMES.skill, models.NAMES.user, models.NAMES.question,
         models.NAMES.topic]))
 datastore_services = models.Registry.import_datastore_services()
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 # Repository GET methods.
@@ -755,9 +755,10 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
     ])
     if misconception_is_deleted:
         taskqueue_services.defer(
-            question_services.untag_deleted_misconceptions,
+            taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS,
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
-            committer_id, skill_id, skill.description)
+            committer_id, skill_id, skill.description
+        )
 
 
 def delete_skill(committer_id, skill_id, force_deletion=False):

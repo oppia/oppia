@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import functools
 import json
 
 from core import jobs_registry
@@ -25,6 +26,7 @@ from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import suggestion_services
 from core.domain import stats_services
@@ -161,22 +163,33 @@ class FlagExplorationEmailHandler(base.BaseHandler):
 
 class DeferredTasksHandler(base.BaseHandler):
     """Handles special singular function tasks."""
-
+    def get(self):
+        import logging
+        logging.info("Received get request")
     def post(self):
+        import logging
+        logging.info("++++++++++++++++++++++++++++++++++++++++")
+        logging.info("Received post request with payload")
         payload = json.loads(self.request.body)
-        if 'queue_name' not in payload: #TODO: add header id
+        logging.info(payload)
+        if 'fn_identifier' not in payload: #TODO: add header id
             raise Exception('This request cannot defer.')
-        if (payload['queue_name'] ==
-            taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS):
+        if (payload['fn_identifier'] ==
+            taskqueue_services.FUNCTION_ID_DISPATCH_EVENT):
             jobs_registry.ContinuousComputationEventDispatcher.dispatch_event(
                 *payload['args'], **payload['kwargs'])
-        elif (payload['queue_name'] ==
-              taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS):
+        elif (payload['fn_identifier'] ==
+              taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS):
             exp_services.delete_explorations_from_subscribed_users(
                 *payload['args'], **payload['kwargs'])
-        elif (payload['queue_name'] ==
-              taskqueue_services.QUEUE_NAME_STATS): #TODO: figure out whether we can pass arguments in this way
+        elif (payload['fn_identifier'] ==
+              taskqueue_services.FUNCTION_ID_UPDATE_STATS): #TODO: figure out whether we can pass arguments in this way
             stats_services.update_stats(
                 *payload['args'], **payload['kwargs'])
+        elif (payload['fn_identifier'] ==
+              taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS):
+              question_services.untag_deleted_misconceptions(
+                  *payload['args'], **payload['kwargs'])
+
 
 

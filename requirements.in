@@ -21,4 +21,5 @@ six==1.15.0
 soupsieve==1.9.5
 webencodings==0.5.1
 redis==3.5.3
+requests==2.24.0
 google-cloud-tasks==1.5.0

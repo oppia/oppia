@@ -23,11 +23,12 @@ import json
 
 from google.appengine.api import taskqueue
 from google.appengine.ext import deferred
-from google.cloud import tasks_v2
-from google.protobuf import timestamp_pb2
-from core.platform.taskqueue import cloud_tasks_services
+import feconf
 import datetime
 import json
+from core.platform import models
+
+platform_taskqueue_services = models.Registry.import_taskqueue_services()
 
 # Construct the fully qualified queue name.
 
@@ -47,13 +48,19 @@ QUEUE_NAME_ONE_OFF_JOBS = 'one-off-jobs'
 # Taskqueue for updating stats models.
 QUEUE_NAME_STATS = 'stats'
 
-DEFERRED_TASKS_HANDLER_URL = '/deferred_tasks_handler'
+# Function identifiers that informs the deferred task handler what task is being
+# run.
+FUNCTION_ID_DISPATCH_EVENT = 'dispatch_event'
+FUNCTION_ID_UPDATE_STATS = 'update_stats'
+FUNCTION_ID_DELETE_EXPLORATIONS = 'delete_explorations'
+FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS = 'untag_deleted_misconceptions'
 
-def defer(queue_name, *args, **kwargs):
+
+def defer(fn_identifier, queue_name, *args, **kwargs):
     '''Adds a new task to a specified deferred queue.
 
     Args:
-        fn: *. The task being deferred. Will be called as: fn(*args, **kwargs).
+        fn_identifier: str. The string identifier of the function being deferred.
         queue_name: str. The name of the queue to place the task into. Should be
             one of the QUEUE_NAME_* constants listed above.
         *args: list(*). Positional arguments for fn. Positional arguments should
@@ -63,17 +70,17 @@ def defer(queue_name, *args, **kwargs):
     # See https://developers.google.com/appengine/articles/deferred for details
     # on the _queue kwarg.
     payload = {
-        'queue_name': queue_name
-        'args': args if args else []
-        'kwargs': kwargs if kwargs else {}
+        'fn_identifier': fn_identifier,
+        'args': (args if args else []),
+        'kwargs': (kwargs if kwargs else {})
     }
-    cloud_tasks_services.create_http_task(
-        queue_name=queue_name, url=DEFERRED_TASKS_HANDLER_URL,
+    platform_taskqueue_services.create_http_task(
+        queue_name=queue_name, url=feconf.TASK_URL_DEFERRED,
         payload=json.dumps(payload))
     #deferred.defer(fn, *args, _queue=queue_name, **kwargs)
 
 
-def enqueue_email_task(url, params, countdown):
+def enqueue_task(url, params, countdown):
     '''Adds a new task for sending email.
 
     Args:
@@ -85,7 +92,7 @@ def enqueue_email_task(url, params, countdown):
     '''
     # See https://googleapis.dev/python/cloudtasks/latest/gapic/v2/api.html for
     # details of various parameters set when adding a new task.
-    cloud_tasks_services.create_http_task(
+    platform_taskqueue_services.create_http_task(
         queue_name=QUEUE_NAME_EMAILS, url=url, payload=json.dump(params),
         scheduled_for=countdown)
 

@@ -258,8 +258,12 @@ class _Gae(Platform):
         Returns:
             module. The gae_taskqueue_services module.
         """
-        from core.platform.taskqueue import gae_taskqueue_services
-        return gae_taskqueue_services
+        if constants.DEV_MODE:
+            from core.platform.taskqueue import dev_mode_tasks_services
+            return dev_mode_tasks_services
+        else:
+            from core.platform.taskqueue import cloud_tasks_services
+            return cloud_tasks_services
 
     @classmethod
     def import_search_services(cls):

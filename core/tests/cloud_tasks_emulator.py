@@ -26,7 +26,9 @@ import logging
 import os
 import threading
 import time
+from typing import Callable, List, Optional, Dict
 
+import jsonpickle
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -57,6 +59,9 @@ class Emulator:
         self.__lock = threading.Lock()
         self.__task_handler = task_handler
         self.__queues = {}
+        if hibernation:
+            atexit.register(self._hibernate)
+            self.__queues = self.__load_from_hibernation()
 
         tot = self.total_enqueued_tasks()
         if tot:  # Walrus in Python 3.8!
@@ -64,8 +69,31 @@ class Emulator:
 
         self.__queue_threads = {}
 
+        # Remove hibernation file whether we just loaded or are skipping hubernation.
+        self.__remove_hibernation_file()
         for queue_name in self.__queues:  # Launch threads for loaded queues, if any.
             self.__launch_queue_thread(queue_name)
+
+    def __load_from_hibernation(self):
+        try:
+            with open(self.__hibernation_file, 'r') as f:
+                json_s = f.read()
+                return jsonpickle.decode(json_s)
+        except FileNotFoundError:
+            return {}
+
+    def __remove_hibernation_file(self):
+        try:
+            os.remove(self.__hibernation_file)
+        except FileNotFoundError:
+            pass
+
+    def _hibernate(self):
+        if self.total_enqueued_tasks():
+            with open(self.__hibernation_file, 'w') as f:
+                json_s = jsonpickle.encode(self.__queues, indent=2)
+                f.write(json_s)
+                log.info('Persisted queue state to %s', self.__hibernation_file)
 
     def __process_queue(self, queue_path):
         while True:
@@ -92,13 +120,13 @@ class Emulator:
         :param project: Not used in emulator, but used in the real implementation (See tasks_access.py.)
         :param location: Not used in emulator, but used in the real implementation (See tasks_access.py.)
         """
-        scheduled_for = scheduled_for or time.time()
+        scheduled_for = scheduled_for or datetime.datetime.now()
         with self.__lock:
             if queue_name not in self.__queues:
                 self.__queues[queue_name] = []
                 self.__launch_queue_thread(queue_name)
             queue = self.__queues[queue_name]
-            task = Task(queue_name, url, payload, scheduled_for=scheduled_for)
+            task = Task(queue_name, url, payload, scheduled_for.timestamp())
             queue.append(task)
             queue.sort(key=lambda t: t.scheduled_for)
 
@@ -106,7 +134,7 @@ class Emulator:
         new_thread = threading.Thread(
             target=self.__process_queue,
             name=('Thread-%s' % queue_name), args=[queue_name])
-        new_thread.daemon = True
+        newThread.daemon = True
         self.__queue_threads[queue_name] = new_thread
         new_thread.start()
 

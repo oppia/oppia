@@ -21,6 +21,7 @@ from core.domain import exp_domain
 from core.domain import feedback_services
 from core.domain import rights_domain
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -31,7 +32,6 @@ import python_utils
     [models.NAMES.job, models.NAMES.email])
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.suggestion])
-taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -180,7 +180,7 @@ class TasksTests(test_utils.EmailTestBase):
                     'thread_id': thread_id}
                 messages = self._get_all_sent_email_messages()
                 self.assertEqual(len(messages), 0)
-                taskqueue_services.enqueue_email_task(
+                taskqueue_services.enqueue_task(
                     feconf.TASK_URL_SUGGESTION_EMAILS, payload, 0)
                 self.process_and_flush_pending_tasks()
 
@@ -305,7 +305,7 @@ class TasksTests(test_utils.EmailTestBase):
                     'exploration_id': self.exploration.id,
                     'report_text': 'He said a bad word :-( ',
                     'reporter_id': self.user_id_b}
-                taskqueue_services.enqueue_email_task(
+                taskqueue_services.enqueue_task(
                     feconf.TASK_URL_FLAG_EXPLORATION_EMAILS,
                     payload, 0)
                 # Ensure moderator has no messages sent to him yet.
