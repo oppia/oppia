@@ -595,7 +595,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         with self.assertRaisesRegexp(
-                Exception, 'Could not deassign role'):
+            Exception, 'Could not deassign role'):
             rights_manager.deassign_role_for_exploration(
                 self.user_b, self.EXP_ID, self.user_id_a)
 
@@ -631,7 +631,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
         self.assertFalse(exp_rights.is_voice_artist(self.user_id_b))
 
-    def test_deassign_voice_artist_is_successful(self):
+    def test_deassign_editor_is_successful(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
@@ -664,7 +664,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         with self.assertRaisesRegexp(
-                Exception, 'This user does not have any role in'):
+            Exception, 'This user does not have any role in'):
             rights_manager.deassign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b)
 
@@ -986,7 +986,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
 
         with self.assertRaisesRegexp(
-                Exception, 'Could not deassign role'):
+            Exception, 'Could not deassign role'):
             rights_manager.deassign_role_for_collection(
                 self.user_b, self.COLLECTION_ID, self.user_id_a)
 
@@ -1025,7 +1025,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         col_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
         self.assertFalse(col_rights.is_voice_artist(self.user_id_b))
 
-    def test_deassign_voice_artist_is_successful(self):
+    def test_deassign_editor_is_successful(self):
         self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
 
         rights_manager.assign_role_for_collection(
@@ -1063,9 +1063,10 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
 
         with self.assertRaisesRegexp(
-                Exception, 'This user does not have any role in'):
+            Exception, 'This user does not have any role in'):
             rights_manager.deassign_role_for_collection(
                 self.user_a, self.COLLECTION_ID, self.user_id_b)
+
 
 class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
     """Tests for check_can_release_ownership function."""

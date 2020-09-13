@@ -985,7 +985,9 @@ def update_exploration_summary(
             the collection summary.
     """
     create_exploration_summary(
-        exploration_id, contributor_id_to_add, contributor_id_to_remove)
+        exploration_id,
+        contributor_id_to_add,
+        contributor_id_to_remove=contributor_id_to_remove)
 
 
 def compute_summary_of_exploration(

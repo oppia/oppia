@@ -635,7 +635,8 @@ def _pseudonymize_col_or_exp_models(
                 MAX_NUMBER_OF_OPS_IN_TRANSACTION):
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
-                col_or_exp_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                col_or_exp_related_models[
+                    i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id
             )
 

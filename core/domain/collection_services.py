@@ -965,7 +965,9 @@ def update_collection_summary(
             the collection summary.
     """
     create_collection_summary(
-        collection_id, contributor_id_to_add, contributor_id_to_remove)
+        collection_id,
+        contributor_id_to_add,
+        contributor_id_to_remove=contributor_id_to_remove)
 
 
 def compute_summary_of_collection(

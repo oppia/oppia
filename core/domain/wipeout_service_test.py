@@ -236,11 +236,17 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             self.user_1_id, feconf.ROLE_ID_COLLECTION_EDITOR)
         self.save_new_valid_exploration('exp_id', self.user_1_id)
         rights_manager.assign_role_for_exploration(
-            self.user_1_actions, 'exp_id', self.user_2_id, rights_domain.ROLE_OWNER)
+            self.user_1_actions,
+            'exp_id',
+            self.user_2_id,
+            rights_domain.ROLE_OWNER)
         self.save_new_valid_collection(
             'col_id', self.user_1_id, exploration_id='exp_id')
         rights_manager.assign_role_for_collection(
-            self.user_1_actions, 'col_id', self.user_2_id, rights_domain.ROLE_OWNER)
+            self.user_1_actions,
+            'col_id',
+            self.user_2_id,
+            rights_domain.ROLE_OWNER)
 
         wipeout_service.pre_delete_user(self.user_1_id)
 
@@ -276,7 +282,10 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.save_new_valid_collection('col_id', self.user_1_id)
         self.publish_collection(self.user_1_id, 'col_id')
         rights_manager.assign_role_for_collection(
-            user_services.get_system_user(), 'col_id', self.user_2_id, feconf.ROLE_EDITOR)
+            user_services.get_system_user(),
+            'col_id',
+            self.user_2_id,
+            feconf.ROLE_EDITOR)
 
         collection_summary_model = (
             collection_models.CollectionSummaryModel.get_by_id('col_id'))
@@ -504,11 +513,11 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
             observed_log_messages,
             [
                 'The commit log and snapshot collection IDs differ. '
-                 'Snapshots without commit logs: [], '
-                 'Commit logs without snapshots: [u\'%s\'].' % self.COL_2_ID,
-                 'The commit log and snapshot exploration IDs differ. '
-                 'Snapshots without commit logs: [], '
-                 'Commit logs without snapshots: [u\'an_exploration_id\'].'
+                'Snapshots without commit logs: [], '
+                'Commit logs without snapshots: [u\'%s\'].' % self.COL_2_ID,
+                'The commit log and snapshot exploration IDs differ. '
+                'Snapshots without commit logs: [], '
+                'Commit logs without snapshots: [u\'an_exploration_id\'].'
             ]
         )
 
@@ -820,8 +829,8 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
             observed_log_messages,
             [
                 'The commit log and snapshot exploration IDs differ. '
-                 'Snapshots without commit logs: [], '
-                 'Commit logs without snapshots: [u\'%s\'].' % self.EXP_2_ID
+                'Snapshots without commit logs: [], '
+                'Commit logs without snapshots: [u\'%s\'].' % self.EXP_2_ID
             ]
         )
 
