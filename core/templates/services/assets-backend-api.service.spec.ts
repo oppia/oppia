@@ -368,7 +368,8 @@ describe('Assets Backend API Service', () => {
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-      expect(successHandler.calls.first().args[0].data.type).toEqual('audiotype');
+      expect(successHandler.calls.first().args[0].data.type)
+        .toEqual('audiotype');
     }));
   });
 
