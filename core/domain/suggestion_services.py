@@ -47,7 +47,6 @@ def create_suggestion(
             be one of the constants defined in storage/suggestion/gae_models.py.
         target_type: str. The target entity being edited. This parameter should
             be one of the constants defined in storage/suggestion/gae_models.py.
-
         target_id: str. The ID of the target entity being suggested to.
         target_version_at_submission: int. The version number of the target
             entity at the time of creation of the suggestion.
@@ -72,10 +71,15 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_CONTENT +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+        # Suggestions of this type do not have an associated language code,
+        # since they are not queryable by language.
+        language_code = None
     elif suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
         score_category = (
             suggestion_models.SCORE_TYPE_TRANSLATION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+        # The language code of the translation, used for querying purposes.
+        language_code = change['language_code']
         content_html = exploration.get_content_html(
             change['state_name'], change['content_id'])
         if content_html != change['content_html']:
@@ -86,6 +90,8 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
+        # The language code of the question, used for querying purposes.
+        language_code = change['question_dict']['language_code']
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
 
@@ -94,13 +100,13 @@ def create_suggestion(
             suggestion_type])
     suggestion = suggestion_domain_class(
         thread_id, target_id, target_version_at_submission, status, author_id,
-        None, change, score_category)
+        None, change, score_category, language_code)
     suggestion.validate()
 
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,
-        None, change, score_category, thread_id)
+        None, change, score_category, thread_id, suggestion.language_code)
     return get_suggestion_by_id(thread_id)
 
 
@@ -122,7 +128,8 @@ def get_suggestion_from_model(suggestion_model):
         suggestion_model.target_version_at_submission,
         suggestion_model.status, suggestion_model.author_id,
         suggestion_model.final_reviewer_id, suggestion_model.change_cmd,
-        suggestion_model.score_category, suggestion_model.last_updated)
+        suggestion_model.score_category, suggestion_model.language_code,
+        suggestion_model.last_updated)
 
 
 def get_suggestion_by_id(suggestion_id):
@@ -250,6 +257,7 @@ def _update_suggestions(suggestions, update_last_updated_time=True):
         suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
         suggestion_model.change_cmd = suggestion.change.to_dict()
         suggestion_model.score_category = suggestion.score_category
+        suggestion_model.language_code = suggestion.language_code
 
     suggestion_models.GeneralSuggestionModel.put_multi(
         suggestion_models_to_update,
