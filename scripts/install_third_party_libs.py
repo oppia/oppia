@@ -67,10 +67,19 @@ PQ_CONFIGPARSER_FILEPATH = os.path.join(
     common.OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % common.PYLINT_QUOTES_VERSION,
     'configparser.py')
 
+# Download locations for prototool binary.
+PROTOTOOL_LINUX_BIN_URL = (
+    'https://github.com/uber/prototool/releases/download/v1.10.0/'
+    'prototool-Linux-x86_64')
+
+PROTOTOOL_DARWIN_BIN_URL = (
+    'https://github.com/uber/prototool/releases/download/v1.10.0/'
+    'prototool-Darwin-x86_64')
+
 # Path of the prototool executable.
-PROTOTOOL_PATH = os.path.join(
-    common.THIRD_PARTY_DIR, 'prototool-%s' % common.PROTOTOOL_VERSION,
-    'bin', 'prototool')
+PROTOTOOL_DIR = os.path.join(
+    common.OPPIA_TOOLS_DIR, 'prototool-%s' % common.PROTOTOOL_VERSION)
+PROTOTOOL_PATH = os.path.join(PROTOTOOL_DIR, 'prototool')
 # Path of files which needs to be compiled by protobuf.
 PROTO_FILES_PATHS = [
     os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0'),
@@ -95,6 +104,20 @@ def get_yarn_command():
     if common.is_windows_os():
         return 'yarn.cmd'
     return 'yarn'
+
+
+def install_prototool():
+    """Installs prototool for Linux or Darwin, depending upon the platform."""
+    if os.path.exists(PROTOTOOL_PATH):
+        return
+
+    prototool_url = PROTOTOOL_LINUX_BIN_URL
+    if common.is_mac_os():
+        prototool_url = PROTOTOOL_DARWIN_BIN_URL
+
+    common.ensure_directory_exists(PROTOTOOL_DIR)
+    python_utils.url_retrieve(prototool_url, filename=PROTOTOOL_PATH)
+    common.recursive_chmod(PROTOTOOL_PATH, 0o744)
 
 
 def compile_protobuf_files(proto_files_paths):
@@ -190,6 +213,8 @@ def main():
     install_third_party.main(args=[])
 
     # Compile protobuf files.
+    python_utils.PRINT('Installing Prototool.')
+    install_prototool()
     python_utils.PRINT('Compiling protobuf files.')
     compile_protobuf_files(PROTO_FILES_PATHS)
 
