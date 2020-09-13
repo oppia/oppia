@@ -42,7 +42,7 @@ export class FocusManagerService {
   }
 
   setFocus(name: string): void {
-    if (this.nextLabelToFocusOn !== null) {
+    if (this.nextLabelToFocusOn === null) {
       this.nextLabelToFocusOn = name;
       setTimeout(() => {
         this.focusEventEmitter.emit(this.nextLabelToFocusOn);
