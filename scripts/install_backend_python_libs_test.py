@@ -31,7 +31,6 @@ from scripts import common
 from scripts import install_backend_python_libs
 
 
-
 class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     """Tests for installing backend python libraries."""
 

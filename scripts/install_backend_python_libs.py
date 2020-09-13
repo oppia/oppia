@@ -28,7 +28,6 @@ import python_utils
 from scripts import common
 
 
-
 def _normalize_python_library_name(library_name):
     """Returns a normalized (lowercase) version of the python library name.
 
