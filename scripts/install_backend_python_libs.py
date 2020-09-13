@@ -78,8 +78,11 @@ def normalize_python_library_name(library_name):
     # same way (e.g import google.api.core) and if pip allowed a scenario where
     # both versions were installed, then there would be ambiguities in the
     # imports. For this reason, it is safe to disambiguate the names by removing
-    # the suffix. We have also implemented a backend test to ensure that all
-    # libraries in the requirements files are distinct when normalized.
+    # the suffix. We have also implemented the backend tests,
+    # test_uniqueness_of_lib_names_in_requirements_file and
+    # test_uniqueness_of_lib_names_in_compiled_requirements_file, in
+    # scripts/install_backend_python_libs_test.py to ensure that all
+    # library names in the requirements files are distinct when normalized.
     library_name = re.sub(r'\[[^\[^\]]+\]', '', library_name)
     return library_name.lower()
 
