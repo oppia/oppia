@@ -79,7 +79,7 @@ PROTOTOOL_DARWIN_BIN_URL = (
 # Path of the prototool executable.
 PROTOTOOL_DIR = os.path.join(
     common.OPPIA_TOOLS_DIR, 'prototool-%s' % common.PROTOTOOL_VERSION)
-PROTOTOOL_PATH = os.path.join(PROTOTOOL_DIR, 'prototool')
+PROTOTOOL_BIN_PATH = os.path.join(PROTOTOOL_DIR, 'prototool')
 # Path of files which needs to be compiled by protobuf.
 PROTO_FILES_PATHS = [
     os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0'),
@@ -108,7 +108,7 @@ def get_yarn_command():
 
 def install_prototool():
     """Installs prototool for Linux or Darwin, depending upon the platform."""
-    if os.path.exists(PROTOTOOL_PATH):
+    if os.path.exists(PROTOTOOL_BIN_PATH):
         return
 
     prototool_url = PROTOTOOL_LINUX_BIN_URL
@@ -116,8 +116,8 @@ def install_prototool():
         prototool_url = PROTOTOOL_DARWIN_BIN_URL
 
     common.ensure_directory_exists(PROTOTOOL_DIR)
-    python_utils.url_retrieve(prototool_url, filename=PROTOTOOL_PATH)
-    common.recursive_chmod(PROTOTOOL_PATH, 0o744)
+    python_utils.url_retrieve(prototool_url, filename=PROTOTOOL_BIN_PATH)
+    common.recursive_chmod(PROTOTOOL_BIN_PATH, 0o744)
 
 
 def compile_protobuf_files(proto_files_paths):
@@ -128,7 +128,7 @@ def compile_protobuf_files(proto_files_paths):
     """
     for path in proto_files_paths:
         command = [
-            PROTOTOOL_PATH, 'generate', path]
+            PROTOTOOL_BIN_PATH, 'generate', path]
         process = subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()

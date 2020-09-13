@@ -81,7 +81,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             'training_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'next_scheduled_check_time':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'data_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'algorithm_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -245,7 +245,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'job_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'algorithm_ids_to_job_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
