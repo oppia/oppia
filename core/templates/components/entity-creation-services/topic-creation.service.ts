@@ -59,7 +59,7 @@ angular.module('oppia').factory('TopicCreationService', [
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topics-and-skills-dashboard-page/templates/' +
             'create-new-topic-modal.template.html'),
-          backdrop: true,
+          backdrop: 'static',
           windowClass: 'create-new-topic',
           controller: 'CreateNewTopicModalController'
         }).result.then(function(newlyCreatedTopic) {
