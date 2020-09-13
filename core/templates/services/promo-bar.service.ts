@@ -15,35 +15,6 @@
 /**
  * @fileoverview Service Promo bar.
  */
-
-// require('services/services.constants.ajs.ts');
-
-// angular.module('oppia').factory('PromoBarService', [
-//   '$http', '$q', 'ENABLE_PROMO_BAR',
-//   function($http, $q, ENABLE_PROMO_BAR) {
-//     return {
-//       getPromoBarData: function() {
-//         var promoBarData = {
-//           promoBarEnabled: false,
-//           promoBarMessage: ''
-//         };
-
-//         if (ENABLE_PROMO_BAR) {
-//           return $http.get('/promo_bar_handler', {}).then(
-//             function(response) {
-//               promoBarData.promoBarEnabled = response.data.promo_bar_enabled;
-//               promoBarData.promoBarMessage = response.data.promo_bar_message;
-//               return promoBarData;
-//             }
-//           );
-//         } else {
-//           return $q.resolve(promoBarData);
-//         }
-//       }
-//     };
-//   }
-// ]);
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { downgradeInjectable } from '@angular/upgrade/static';
