@@ -21,9 +21,9 @@ import { fakeAsync, flush, TestBed } from '@angular/core/testing';
 import { Subscription } from 'rxjs';
 
 import { AppConstants } from 'app.constants';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { IdGenerationService } from 'services/id-generation.service';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 describe('Focus Manager Service', () => {
   let focusManagerService: FocusManagerService;
@@ -31,19 +31,17 @@ describe('Focus Manager Service', () => {
   let idGenerationService: IdGenerationService;
 
   const clearLabel = AppConstants.LABEL_FOR_CLEARING_FOCUS;
-  let focusLabel = 'FocusLabel';
-  let focusLabelTwo = 'FocusLabelTwo';
+  const focusLabel = 'FocusLabel';
+  const focusLabelTwo = 'FocusLabelTwo';
 
-  let focusOnSpy = null;
-  let testSubscriptions = null;
+  let focusOnSpy: jasmine.Spy;
+  let testSubscriptions: Subscription;
 
   beforeEach(() => {
     focusManagerService = TestBed.get(FocusManagerService);
     deviceInfoService = TestBed.get(DeviceInfoService);
     idGenerationService = TestBed.get(IdGenerationService);
-  });
 
-  beforeEach(() => {
     focusOnSpy = jasmine.createSpy('focusOn');
     testSubscriptions = new Subscription();
     testSubscriptions.add(focusManagerService.onFocus.subscribe(focusOnSpy));

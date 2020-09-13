@@ -15,10 +15,8 @@
 /**
  * @fileoverview Service for setting focus. This broadcasts a 'focusOn' event
  *     which sets focus to the element in the page with the corresponding
- *     focusOn attribute.
- *
- * NOTE: This requires LABEL_FOR_CLEARING_FOCUS to exist somewhere in the HTML
- * page.
+ *     focusOn attribute. This requires LABEL_FOR_CLEARING_FOCUS to exist
+ *     somewhere in the HTML page.
  */
 
 import { EventEmitter, Injectable } from '@angular/core';
@@ -44,15 +42,13 @@ export class FocusManagerService {
   }
 
   setFocus(name: string): void {
-    if (this.nextLabelToFocusOn) {
-      return;
+    if (this.nextLabelToFocusOn !== null) {
+      this.nextLabelToFocusOn = name;
+      setTimeout(() => {
+        this.focusEventEmitter.emit(this.nextLabelToFocusOn);
+        this.nextLabelToFocusOn = null;
+      });
     }
-
-    this.nextLabelToFocusOn = name;
-    setTimeout(() => {
-      this.focusEventEmitter.emit(this.nextLabelToFocusOn);
-      this.nextLabelToFocusOn = null;
-    });
   }
 
   setFocusIfOnDesktop(newFocusLabel: string): void {
