@@ -120,8 +120,8 @@
           <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().interaction.hints.length}">5</div>
           <div class="checklist-item-text">Hints</div>
         </div>
-        <div class="checklist-item-separator"></div>
-        <div class="checklist-item">
+        <div class="checklist-item-separator" ng-if="$ctrl.showSolutionCheckpoint()"></div>
+        <div class="checklist-item" ng-if="$ctrl.showSolutionCheckpoint()">
           <div class="checklist-item-number" ng-class="{'checklist-item-number-active': $ctrl.question.getStateData().interaction.solution}">6</div>
           <div class="checklist-item-text">Solution</div>
         </div>
@@ -217,6 +217,9 @@
     color: #FFFFFF;
     font-weight: bold;
     text-align: center;
+  }
+  questions-list .add-question-btn .btn.disabled, .btn:disabled {
+    cursor: not-allowed;
   }
   questions-list .question-editor-parent {
     width: 60%;
