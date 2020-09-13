@@ -248,16 +248,15 @@ var TopicsAndSkillsDashboardPage = function() {
       }
     }
     await browser.switchTo().window(newHandle);
+    await waitFor.visibilityOf(
+      element(by.css('.protractor-test-topic-name-field')),
+      'Topic Editor is taking too long to appear.');
     if (shouldCloseTopicEditor) {
       await browser.driver.close();
       await browser.switchTo().window(parentHandle);
       await waitFor.invisibilityOf(
         confirmTopicCreationButton,
         'Create Topic modal takes too long to disappear.');
-    } else {
-      await waitFor.visibilityOf(
-        element(by.css('.protractor-test-topic-name-field')),
-        'Topic Editor is taking too long to appear.');
     }
     return await waitFor.pageToFullyLoad();
   };

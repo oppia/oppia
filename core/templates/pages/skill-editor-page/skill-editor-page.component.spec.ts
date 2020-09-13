@@ -17,8 +17,8 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// App.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+// Skill editor page is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('pages/skill-editor-page/skill-editor-page.component.ts');
@@ -32,12 +32,7 @@ describe('Skill editor page', function() {
   var $uibModal = null;
   var UrlService = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
