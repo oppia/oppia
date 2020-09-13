@@ -89,7 +89,8 @@ export class ExpressionEvaluatorService {
 
   evaluateExpression(expression: string, envs: EnvDict[]): Expr {
     return this.expressionSyntaxTreeService.applyFunctionToParseTree(
-      this.expressionParserService.parse(expression), envs, this.evaluate);
+      this.expressionParserService.parse(expression), envs,
+      (parsed, envs) => this.evaluate(parsed, envs));
   }
 
   /**
