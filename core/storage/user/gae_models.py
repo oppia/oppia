@@ -136,41 +136,46 @@ class UserSettingsModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'email': base_models.EXPORT_POLICY.EXPORTED,
-            'role': base_models.EXPORT_POLICY.EXPORTED,
-            'last_agreed_to_terms': base_models.EXPORT_POLICY.EXPORTED,
-            'last_logged_in': base_models.EXPORT_POLICY.EXPORTED,
-            'display_alias': base_models.EXPORT_POLICY.EXPORTED,
-            'user_bio': base_models.EXPORT_POLICY.EXPORTED,
-            'profile_picture_data_url':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'subject_interests': base_models.EXPORT_POLICY.EXPORTED,
-            'preferred_language_codes':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'preferred_site_language_code':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'preferred_audio_language_code':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'username': base_models.EXPORT_POLICY.EXPORTED,
-            'normalized_username': base_models.EXPORT_POLICY.EXPORTED,
-            'last_started_state_editor_tutorial':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'last_started_state_translation_tutorial':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'last_edited_an_exploration':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'last_created_an_exploration':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'default_dashboard': base_models.EXPORT_POLICY.EXPORTED,
-            'creator_dashboard_display_pref':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'first_contribution_msec':
-                base_models.EXPORT_POLICY.EXPORTED,
-            'gae_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return {
+            'export_method': base_models.EXPORT_METHOD.DIRECT_EXPORT,
+            'per_field_policy': 
+                dict(super(cls, cls).get_export_policy()['per_field_policy'],
+                **{
+                    'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                    'email': base_models.EXPORT_POLICY.EXPORTED,
+                    'role': base_models.EXPORT_POLICY.EXPORTED,
+                    'last_agreed_to_terms': base_models.EXPORT_POLICY.EXPORTED,
+                    'last_logged_in': base_models.EXPORT_POLICY.EXPORTED,
+                    'display_alias': base_models.EXPORT_POLICY.EXPORTED,
+                    'user_bio': base_models.EXPORT_POLICY.EXPORTED,
+                    'profile_picture_data_url':
+                        base_models.EXPORT_POLICY.EXPORTED,
+                    'subject_interests': base_models.EXPORT_POLICY.EXPORTED,
+                    'preferred_language_codes':
+                        base_models.EXPORT_POLICY.EXPORTED,
+                    'preferred_site_language_code':
+                        base_models.EXPORT_POLICY.EXPORTED,
+                    'preferred_audio_language_code':
+                        base_models.EXPORT_POLICY.EXPORTED,
+                    'username': base_models.EXPORT_POLICY.EXPORTED,
+                    'normalized_username': base_models.EXPORT_POLICY.EXPORTED,
+                    'last_started_state_editor_tutorial':
+                        base_models.EXPORT_POLICY.EXPORTED,
+                    'last_started_state_translation_tutorial':
+                        base_models.EXPORT_POLICY.EXPORTED,
+                    'last_edited_an_exploration':
+                        base_models.EXPORT_POLICY.EXPORTED,
+                    'last_created_an_exploration':
+                        base_models.EXPORT_POLICY.EXPORTED,
+                    'default_dashboard': base_models.EXPORT_POLICY.EXPORTED,
+                    'creator_dashboard_display_pref':
+                        base_models.EXPORT_POLICY.EXPORTED,
+                    'first_contribution_msec':
+                        base_models.EXPORT_POLICY.EXPORTED,
+                    'gae_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                    'pin': base_models.EXPORT_POLICY.EXPORTED
+                })
+        }
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -234,6 +239,11 @@ class UserSettingsModel(base_models.BaseModel):
             'last_edited_an_exploration': (
                 utils.get_time_in_millisecs(user.last_edited_an_exploration)
                 if user.last_edited_an_exploration
+                else None
+            ),
+            'last_created_an_exploration': (
+                utils.get_time_in_millisecs(user.last_created_an_exploration)
+                if user.last_created_an_exploration
                 else None
             ),
             'profile_picture_data_url': user.profile_picture_data_url,

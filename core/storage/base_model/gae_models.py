@@ -52,6 +52,13 @@ EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'NOT_APPLICABLE'
 )
 
+EXPORT_METHOD = utils.create_enum(  # pylint: disable=invalid-name
+    'DIRECT_EXPORT',
+    'LIST_OF_IDS',
+    'EXPORT_BY_MODEL_ID',
+    'NOT_EXPORTED'
+)
+
 # Constant used when retrieving big number of models.
 FETCH_BATCH_SIZE = 1000
 
@@ -129,9 +136,12 @@ class BaseModel(ndb.Model):
     def get_export_policy(cls):
         """Model creation time is not relevant to user data."""
         return {
-            'created_on': EXPORT_POLICY.NOT_APPLICABLE,
-            'last_updated': EXPORT_POLICY.NOT_APPLICABLE,
-            'deleted': EXPORT_POLICY.NOT_APPLICABLE
+            'export_method': EXPORT_METHOD.NOT_EXPORTED,
+            'per_field_policy': {
+                'created_on': EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': EXPORT_POLICY.NOT_APPLICABLE
+            }
         }
 
     @classmethod
