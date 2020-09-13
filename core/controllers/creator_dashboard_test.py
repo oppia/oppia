@@ -878,7 +878,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             suggestion_models.TARGET_TYPE_EXPLORATION,
             'exp1', 1, suggestion_models.STATUS_IN_REVIEW, self.owner_id_1,
             self.owner_id_2, change_dict, 'category1',
-            'exploration.exp1.thread_1')
+            'exploration.exp1.thread_1', None)
 
         change_dict['old_value'] = {
             'content_id': 'content',

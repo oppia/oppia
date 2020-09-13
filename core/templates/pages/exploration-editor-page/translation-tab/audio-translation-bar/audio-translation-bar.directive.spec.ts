@@ -635,7 +635,7 @@ describe('Audio translation bar directive', function() {
       expect($scope.audioTimerIsShown).toBe(false);
     });
 
-  it('should delete audio when closing delete audio translation modal ',
+  it('should delete audio when closing delete audio translation modal',
     function() {
       spyOn(stateRecordedVoiceoversService.displayed, 'deleteVoiceover');
       spyOn($uibModal, 'open').and.returnValue({
@@ -652,7 +652,7 @@ describe('Audio translation bar directive', function() {
     });
 
   it('should not delete audio when dismissing delete audio translation' +
-    ' modal ', function() {
+    ' modal', function() {
     spyOn(stateRecordedVoiceoversService.displayed, 'deleteVoiceover');
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()

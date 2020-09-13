@@ -157,7 +157,7 @@ import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-
 import { SkillSummaryObjectFactory } from 'domain/skill/skill-summary-object.factory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
-import { ExplorationStatsObjectFactory, ExplorationStats } from 'domain/statistics/ExplorationStatsObjectFactory';
+import { ExplorationStatsObjectFactory } from 'domain/statistics/ExplorationStatsObjectFactory';
 import { LearnerActionObjectFactory } from 'domain/statistics/LearnerActionObjectFactory';
 import { LearnerAnswerDetailsObjectFactory } from 'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerAnswerInfoObjectFactory } from 'domain/statistics/LearnerAnswerInfoObjectFactory';
@@ -467,7 +467,6 @@ export const angularServices: [string, unknown][] = [
   ['ExplorationRecommendationsBackendApiService',
     ExplorationRecommendationsBackendApiService],
   ['ExplorationRecommendationsService', ExplorationRecommendationsService],
-  ['ExplorationStats', ExplorationStats],
   ['ExplorationStatsBackendApiService', ExplorationStatsBackendApiService],
   ['ExplorationStatsObjectFactory', ExplorationStatsObjectFactory],
   ['ExplorationStatsService', ExplorationStatsService],
