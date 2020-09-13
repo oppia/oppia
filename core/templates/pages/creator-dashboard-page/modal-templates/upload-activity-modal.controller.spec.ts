@@ -47,7 +47,7 @@ describe('Upload Activity Modal Controller', function() {
     });
   }));
 
-  it('should close modal when saving activity ', function() {
+  it('should close modal when saving activity', function() {
     var documentCopy = angular.copy(document);
     var file = {
       size: 100,
