@@ -67,6 +67,15 @@ PQ_CONFIGPARSER_FILEPATH = os.path.join(
     common.OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % common.PYLINT_QUOTES_VERSION,
     'configparser.py')
 
+# Path of the prototool executable.
+PROTOTOOL_PATH = os.path.join(
+    common.THIRD_PARTY_DIR, 'prototool-%s' % common.PROTOTOOL_VERSION,
+    'bin', 'prototool')
+# Path of files which needs to be compiled by protobuf.
+PROTO_FILES_PATHS = [
+    os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0'),
+    os.path.join('core', 'domain', 'proto')]
+
 
 def tweak_yarn_executable():
     """When yarn is run on Windows, the file yarn will be executed by default.
@@ -86,6 +95,25 @@ def get_yarn_command():
     if common.is_windows_os():
         return 'yarn.cmd'
     return 'yarn'
+
+
+def compile_protobuf_files(proto_files_paths):
+    """Compiles protobuf files using prototool.
+
+    Raises:
+        Exception. If there is any error in compiling the proto files.
+    """
+    for path in proto_files_paths:
+        command = [
+            PROTOTOOL_PATH, 'generate', path]
+        process = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        if process.returncode == 0:
+            python_utils.PRINT(stdout)
+        else:
+            python_utils.PRINT(stderr)
+            raise Exception('Error compiling proto files at %s' % path)
 
 
 def ensure_pip_library_is_installed(package, version, path):
@@ -120,6 +148,7 @@ def main():
         ('pycodestyle', common.PYCODESTYLE_VERSION, common.OPPIA_TOOLS_DIR),
         ('esprima', common.ESPRIMA_VERSION, common.OPPIA_TOOLS_DIR),
         ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
+        ('protobuf', common.PROTOBUF_VERSION, common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
         ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR)
     ]
@@ -159,6 +188,10 @@ def main():
     # Download and install required JS and zip files.
     python_utils.PRINT('Installing third-party JS libraries and zip files.')
     install_third_party.main(args=[])
+
+    # Compile protobuf files.
+    python_utils.PRINT('Compiling protobuf files.')
+    compile_protobuf_files(PROTO_FILES_PATHS)
 
     if common.is_windows_os():
         tweak_yarn_executable()
