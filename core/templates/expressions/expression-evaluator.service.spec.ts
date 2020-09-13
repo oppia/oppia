@@ -56,7 +56,8 @@ describe('Expression evaluator service', () => {
   });
 
   describe('Getting params from expressions', () => {
-    (<[string, string[]][]> [
+    type TestParam = [string, string[]];
+    (<TestParam[]> [
       ['numZero', ['numZero']],
       ['b + a', ['a', 'b']],
       ['a + b + a', ['a', 'b']],
@@ -84,7 +85,8 @@ describe('Expression evaluator service', () => {
       ['log(9, 3)', []],
       ['numZero + numOne', ['numOne', 'numZero']]
     ]).forEach(([expression, expectedParams]) => {
-      it('should find the params in ' + JSON.stringify(expression), () => {
+      it('should get the references from the expression ' +
+        JSON.stringify(expression), () => {
         expect(
           expressionSyntaxTreeService.getParamsUsedInExpression(expression)
         ).toEqual(expectedParams);
