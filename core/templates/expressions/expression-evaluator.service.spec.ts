@@ -147,7 +147,7 @@ describe('Expression evaluator service', () => {
     });
 
     it('should report an error when using an undefined variable', () => {
-      const expression = 'numZero + numOne'; // numOne is undefined.
+      const expression = 'numZero + numOne'; // The param `numOne` is undefined.
       expect(
         () => expressionSyntaxTreeService.applyFunctionToParseTree(
           expressionParserService.parse(expression), ENVS,
