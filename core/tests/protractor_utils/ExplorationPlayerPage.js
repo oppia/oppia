@@ -20,6 +20,7 @@
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
+var action = require('./action.js');
 
 var ExplorationPlayerPage = function() {
   var conversationInput = element(
@@ -117,9 +118,7 @@ var ExplorationPlayerPage = function() {
   };
 
   this.clickThroughToNextCard = async function() {
-    await waitFor.elementToBeClickable(
-      nextCardButton, '"Next Card" button takes too long to be clickable');
-    await nextCardButton.click();
+    await action.click('Next Card button', nextCardButton);
   };
 
   this.clickSuggestChangesButton = async function() {

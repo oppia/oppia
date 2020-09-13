@@ -117,8 +117,10 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setObjective = async function(objective) {
-    await explorationObjectiveInput.clear();
-    await explorationObjectiveInput.sendKeys(objective);
+    // await explorationObjectiveInput.clear();
+    // await explorationObjectiveInput.sendKeys(objective);
+    await action.sendKeys(
+      'Exploration Objective Input', explorationObjectiveInput, objective);
   };
 
   this.setTitle = async function(title) {

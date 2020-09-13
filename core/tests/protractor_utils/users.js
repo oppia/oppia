@@ -20,7 +20,8 @@
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
+var action = require('./action.js');
+var AdminPage = require('./AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
 
 var login = async function(email, isSuperAdmin = false) {
@@ -40,6 +41,8 @@ var login = async function(email, isSuperAdmin = false) {
 var logout = async function() {
   var driver = browser.driver;
   await driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
+  //var submitLogoutButton = await driver.findElement(protractor.By.id('submit-logout'));
+  //await action.click('Submit Logout button', submitLogoutButton);
   await (await driver.findElement(protractor.By.id('submit-logout'))).click();
 };
 
