@@ -64,7 +64,7 @@ export class ImagePreloaderService {
   init(exploration: Exploration): void {
     this.exploration = exploration;
     this.imagePreloaderServiceHasStarted = true;
-  };
+  }
 
   /**
    * Checks if the given filename is in this.filenamesOfImageFailedToDownload or
@@ -75,7 +75,7 @@ export class ImagePreloaderService {
    */
   isInFailedDownload(filename: string): boolean {
     return this.filenamesOfImageFailedToDownload.includes(filename);
-  };
+  }
 
   /**
    * Initiates the image preloader beginning from the sourceStateName.
@@ -98,7 +98,7 @@ export class ImagePreloaderService {
       this.filenamesOfImageCurrentlyDownloading.push(imageFilename);
       this.loadImage(imageFilename);
     }
-  };
+  }
 
   /**
    * Cancels the preloading of the images that are being downloaded.
@@ -106,7 +106,7 @@ export class ImagePreloaderService {
   cancelPreloading(): void {
     this.assetsBackendApiService.abortAllCurrentImageDownloads();
     this.filenamesOfImageCurrentlyDownloading.length = 0;
-  };
+  }
 
   /**
    * When the state changes, it decides whether to restart the preloader
@@ -142,7 +142,7 @@ export class ImagePreloaderService {
         this.kickOffImagePreloader(stateName);
       }
     }
-  };
+  }
 
   /**
   * Gets the dimensions of the images from the filename provided.
@@ -163,7 +163,7 @@ export class ImagePreloaderService {
       throw new Error(
         `Input path ${filename} is invalid, it does not contain dimensions.`);
     }
-  };
+  }
 
   /**
   * Gets the dimensions of the math SVGs from the SVG filename provided.
@@ -185,7 +185,7 @@ export class ImagePreloaderService {
       throw new Error(
         `Input path ${filename} is invalid, it does not contain dimensions.`);
     }
-  };
+  }
 
   isLoadingImageFile(filename: string): boolean {
     return this.filenamesOfImageCurrentlyDownloading.includes(filename);
@@ -213,14 +213,15 @@ export class ImagePreloaderService {
           this.isInFailedDownload(filename)) {
         this.assetsBackendApiService.loadImage(
           this.contextService.getEntityType(),
-          this.contextService.getEntityId(), filename).then(
-            loadedImageFile => {
-              if (this.isInFailedDownload(loadedImageFile.filename)) {
-                this.removeFromFailedDownload(loadedImageFile.filename);
-              }
-              resolve(URL.createObjectURL(loadedImageFile.data));
-            },
-            reject)
+          this.contextService.getEntityId(), filename
+        ).then(
+          loadedImageFile => {
+            if (this.isInFailedDownload(loadedImageFile.filename)) {
+              this.removeFromFailedDownload(loadedImageFile.filename);
+            }
+            resolve(URL.createObjectURL(loadedImageFile.data));
+          },
+          reject);
       } else {
         this.imageLoadedCallback[filename] = {
           resolveMethod: resolve,
@@ -243,7 +244,7 @@ export class ImagePreloaderService {
   private removeFromFailedDownload(filename: string): void {
     var index = this.filenamesOfImageFailedToDownload.indexOf(filename);
     this.filenamesOfImageFailedToDownload.splice(index, 1);
-  };
+  }
 
   /**
    * Gets image files names in Bfs order from the state.
@@ -264,7 +265,7 @@ export class ImagePreloaderService {
         .forEach(filename => imageFilenames.push(filename));
     });
     return imageFilenames;
-  };
+  }
 
   /**
    * Removes the filename from the filenamesOfImageCurrentlyDownloading and
@@ -282,7 +283,7 @@ export class ImagePreloaderService {
       this.filenamesOfImageCurrentlyDownloading.push(nextImageFilename);
       this.loadImage(nextImageFilename);
     }
-  };
+  }
 
   /**
    * Handles the loading of the image file.
@@ -291,25 +292,26 @@ export class ImagePreloaderService {
   private loadImage(imageFilename: string): void {
     this.assetsBackendApiService.loadImage(
       AppConstants.ENTITY_TYPE.EXPLORATION,
-      this.contextService.getExplorationId(), imageFilename).then(
-        loadedImage => {
-          this.removeCurrentAndLoadNextImage(loadedImage.filename);
-          if (this.imageLoadedCallback[loadedImage.filename]) {
-            var onLoadImageResolve = (
-              this.imageLoadedCallback[loadedImage.filename].resolveMethod);
-            onLoadImageResolve(URL.createObjectURL(loadedImage.data));
-            this.imageLoadedCallback[loadedImage.filename] = null;
-          }
-        },
-        filename => {
-          if (this.imageLoadedCallback[filename]) {
-            this.imageLoadedCallback[filename].rejectMethod();
-            this.imageLoadedCallback[filename] = null;
-          }
-          this.filenamesOfImageFailedToDownload.push(filename);
-          this.removeCurrentAndLoadNextImage(filename);
-        });
-  };
+      this.contextService.getExplorationId(), imageFilename
+    ).then(
+      loadedImage => {
+        this.removeCurrentAndLoadNextImage(loadedImage.filename);
+        if (this.imageLoadedCallback[loadedImage.filename]) {
+          var onLoadImageResolve = (
+            this.imageLoadedCallback[loadedImage.filename].resolveMethod);
+          onLoadImageResolve(URL.createObjectURL(loadedImage.data));
+          this.imageLoadedCallback[loadedImage.filename] = null;
+        }
+      },
+      filename => {
+        if (this.imageLoadedCallback[filename]) {
+          this.imageLoadedCallback[filename].rejectMethod();
+          this.imageLoadedCallback[filename] = null;
+        }
+        this.filenamesOfImageFailedToDownload.push(filename);
+        this.removeCurrentAndLoadNextImage(filename);
+      });
+  }
 }
 
 angular.module('oppia').factory(

@@ -29,7 +29,7 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 
 const Constants = require('constants.ts');
 
-fdescribe('Assets Backend API Service', () => {
+describe('Assets Backend API Service', () => {
   describe('on dev mode', () => {
     let assetsBackendApiService: AssetsBackendApiService;
     let audioFileObjectFactory: AudioFileObjectFactory;
@@ -97,11 +97,13 @@ fdescribe('Assets Backend API Service', () => {
         successHandler, failHandler);
       const req = httpTestingController.expectOne(audioRequestUrl);
       expect(req.request.method).toEqual('GET');
-      expect((assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+      expect(
+        assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
         .audio.length).toBe(1);
       req.flush(audioBlob);
       flushMicrotasks();
-      expect((assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+      expect(
+        assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
         .audio.length).toBe(0);
       expect(assetsBackendApiService.isCached('myfile.mp3')).toBe(true);
       expect(successHandler).toHaveBeenCalled();
@@ -230,12 +232,14 @@ fdescribe('Assets Backend API Service', () => {
         successHandler, failHandler);
       const req = httpTestingController.expectOne(imageRequestUrl);
       expect(req.request.method).toEqual('GET');
-      expect((assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+      expect(
+        assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
         .image.length).toBe(1);
 
       req.flush(imageBlob);
       flushMicrotasks();
-      expect((assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+      expect(
+        assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
         .image.length).toBe(0);
       expect(assetsBackendApiService.isCached('myfile.png')).toBe(true);
       expect(successHandler).toHaveBeenCalled();
@@ -312,11 +316,13 @@ fdescribe('Assets Backend API Service', () => {
           successHandler, failHandler);
         let req = httpTestingController.expectOne(audioRequestUrl);
         expect(req.request.method).toEqual('GET');
-        expect(assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
+        expect(
+          assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
           .audio.length).toBe(1);
 
         assetsBackendApiService.abortAllCurrentAudioDownloads();
-        expect(assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
+        expect(
+          assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
           .audio.length).toBe(0);
         expect(assetsBackendApiService.isCached('myfile.mp3')).toBe(false);
       }));
@@ -331,11 +337,13 @@ fdescribe('Assets Backend API Service', () => {
           successHandler, failHandler);
         let req = httpTestingController.expectOne(imageRequestUrl);
         expect(req.request.method).toEqual('GET');
-        expect(assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
+        expect(
+          assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
           .image.length).toBe(1);
 
         assetsBackendApiService.abortAllCurrentImageDownloads();
-        expect(assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
+        expect(
+          assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
           .image.length).toBe(0);
         expect(assetsBackendApiService.isCached('myfile.png')).toBe(false);
       }));

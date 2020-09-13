@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Injectable } from "@angular/core";
-import { downgradeInjectable } from "@angular/upgrade/static";
-
-import { AssetsBackendApiService } from "services/assets-backend-api.service";
-import { ComputeGraphService } from "services/compute-graph.service";
-import { ContextService } from "services/context.service";
-import { AudioTranslationLanguageService } from "pages/exploration-player-page/services/audio-translation-language.service";
-
-import { AppConstants } from 'app.constants';
-import { Exploration } from "domain/exploration/ExplorationObjectFactory";
-
 /**
  * @fileoverview Service to preload audio into AssetsBackendApiService's cache.
  */
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { AppConstants } from 'app.constants';
+import { Exploration } from 'domain/exploration/ExplorationObjectFactory';
+import { AudioTranslationLanguageService } from
+  'pages/exploration-player-page/services/audio-translation-language.service';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { ComputeGraphService } from 'services/compute-graph.service';
+import { ContextService } from 'services/context.service';
 
 @Injectable({
   providedIn: 'root'
@@ -46,7 +46,7 @@ export class AudioPreloaderService {
 
   init(exploration: Exploration): void {
     this.exploration = exploration;
-  };
+  }
 
   private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
     const languageCode = (
@@ -56,7 +56,8 @@ export class AudioPreloaderService {
         this.exploration.getInitialState().name, this.exploration.getStates(),
         sourceStateName);
     const audioFilenames = [];
-    const allAudioTranslations = this.exploration.getAllVoiceovers(languageCode);
+    const allAudioTranslations = (
+      this.exploration.getAllVoiceovers(languageCode));
 
     stateNamesInBfsOrder.forEach(stateName => {
       const allAudioTranslationsForState = allAudioTranslations[stateName];
@@ -65,7 +66,7 @@ export class AudioPreloaderService {
       });
     });
     return audioFilenames;
-  };
+  }
 
   private loadAudio(audioFilename: string): void {
     this.assetsBackendApiService.loadAudio(
@@ -74,7 +75,7 @@ export class AudioPreloaderService {
       const index = this.filenamesOfAudioCurrentlyDownloading.findIndex(
         filename => filename === loadedAudio.filename);
       if (index !== -1) {
-          this.filenamesOfAudioCurrentlyDownloading.splice(index, 1);
+        this.filenamesOfAudioCurrentlyDownloading.splice(index, 1);
       }
 
       if (this.filenamesOfAudioToBeDownloaded.length > 0) {
@@ -86,7 +87,7 @@ export class AudioPreloaderService {
         this.audioLoadedCallback(loadedAudio.filename);
       }
     });
-  };
+  }
 
   kickOffAudioPreloader(sourceStateName: string): void {
     this.filenamesOfAudioToBeDownloaded =
@@ -98,12 +99,12 @@ export class AudioPreloaderService {
       this.filenamesOfAudioCurrentlyDownloading.push(audioFilename);
       this.loadAudio(audioFilename);
     }
-  };
+  }
 
   private cancelPreloading(): void {
     this.assetsBackendApiService.abortAllCurrentAudioDownloads();
     this.filenamesOfAudioCurrentlyDownloading = [];
-  };
+  }
 
   isLoadingAudioFile(filename: string): boolean {
     return this.filenamesOfAudioCurrentlyDownloading.indexOf(filename) !== -1;

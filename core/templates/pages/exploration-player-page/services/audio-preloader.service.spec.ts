@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { TestBed, fakeAsync, flush, flushMicrotasks } from
+import { TestBed, fakeAsync, flushMicrotasks } from
   '@angular/core/testing';
 
 import { ExplorationBackendDict, ExplorationObjectFactory } from

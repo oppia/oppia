@@ -449,54 +449,54 @@ describe('Image preloader service', () => {
 
   it('should start preloader when state changes and there is at least' +
     ' one file downloading', fakeAsync(() => {
-      imagePreloaderService.init(exploration);
-      imagePreloaderService.kickOffImagePreloader(initStateName);
+    imagePreloaderService.init(exploration);
+    imagePreloaderService.kickOffImagePreloader(initStateName);
 
-      httpTestingController.expectOne(requestUrl1);
-      httpTestingController.expectOne(requestUrl2);
-      httpTestingController.expectOne(requestUrl3);
-      expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-        .toEqual([filename1, filename2, filename3]);
-      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
+    httpTestingController.expectOne(requestUrl1);
+    httpTestingController.expectOne(requestUrl2);
+    httpTestingController.expectOne(requestUrl3);
+    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
+      .toEqual([filename1, filename2, filename3]);
+    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
 
-      imagePreloaderService.onStateChange('State 6');
+    imagePreloaderService.onStateChange('State 6');
 
-      httpTestingController.expectOne(requestUrl4).flush(imageBlob);
-      expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-        .toEqual([filename4]);
-      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTrue();
+    httpTestingController.expectOne(requestUrl4).flush(imageBlob);
+    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
+      .toEqual([filename4]);
+    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTrue();
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
-    }));
+    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
+  }));
 
   it('should not start preloader when state changes and there is no' +
     ' file downloading', fakeAsync(() => {
-      imagePreloaderService.init(exploration);
-      imagePreloaderService.kickOffImagePreloader(initStateName);
+    imagePreloaderService.init(exploration);
+    imagePreloaderService.kickOffImagePreloader(initStateName);
 
-      httpTestingController.expectOne(requestUrl1).flush(imageBlob);
-      httpTestingController.expectOne(requestUrl2).flush(imageBlob);
-      httpTestingController.expectOne(requestUrl3).flush(imageBlob);
-      expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-        .toEqual([filename1, filename2, filename3]);
+    httpTestingController.expectOne(requestUrl1).flush(imageBlob);
+    httpTestingController.expectOne(requestUrl2).flush(imageBlob);
+    httpTestingController.expectOne(requestUrl3).flush(imageBlob);
+    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
+      .toEqual([filename1, filename2, filename3]);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      httpTestingController.expectOne(requestUrl4).flush(imageBlob);
-      expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-        .toEqual([filename4]);
+    httpTestingController.expectOne(requestUrl4).flush(imageBlob);
+    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
+      .toEqual([filename4]);
 
-      imagePreloaderService.onStateChange('State 6');
-      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTrue();
+    imagePreloaderService.onStateChange('State 6');
+    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTrue();
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-        .toEqual([]);
-      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
-    }));
+    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
+      .toEqual([]);
+    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
+  }));
 
   it('should check that there is sync between AssetsBackendApi Service and' +
     'ImagePreloader Service', fakeAsync(() => {
