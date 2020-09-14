@@ -775,12 +775,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.question.inapplicable_skill_misconception_ids,
             inapplicable_skill_misconception_ids)
         self.assertEqual(actual_misconception_ids, expected_misconception_ids)
-        # Try to untag deleted misconceptions when there are no deleted
+        # Try to untag deleted skill misconceptions when there are no deleted
         # misconceptions.
         question_services.untag_deleted_misconceptions(
             self.editor_id, 'skill_with_misconceptions',
-            'Skill with misconceptions')
-        # No change when misconception ids exist.
+            'Skill with misconceptions', [])
+        # No change when skill misconception ids exist.
         updated_question = question_services.get_question_by_id(
             self.question_id)
         self.assertEqual(

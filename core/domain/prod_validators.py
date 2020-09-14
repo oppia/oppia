@@ -2158,6 +2158,39 @@ class QuestionModelValidator(base_model_validators.BaseModelValidator):
                 'linked_skill_ids',
                 skill_models.SkillModel, item.linked_skill_ids)]
 
+    @classmethod
+    def _validate_inapplicable_skill_misconception_ids(cls, item):
+        """Validate that inapplicable skill misconception ids are valid.
+
+        Args:
+            item: ndb.Model. QuestionModel to validate.
+        """
+        inapplicable_skill_misconception_ids = (
+            item.inapplicable_skill_misconception_ids)
+        for skill_misconception_id in inapplicable_skill_misconception_ids:
+            skill_id, misconception_id = skill_misconception_id.split('-')
+            skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
+            if skill:
+                misconception_ids = [
+                    misconception.id
+                    for misconception in skill.misconceptions
+                ]
+                if int(misconception_id) not in misconception_ids:
+                    cls._add_error(
+                        'misconception id',
+                        'Entity id %s: misconception with the id %s does '
+                        'not exist in the skill with id %s' % (
+                        item.id, misconception_id, skill_id))
+            else:
+                cls._add_error(
+                'skill id',
+                'Entity id %s: skill with the following id does not exist: %s'
+                % (item.id, skill_id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_inapplicable_skill_misconception_ids]
+
 
 class ExplorationContextModelValidator(
         base_model_validators.BaseModelValidator):

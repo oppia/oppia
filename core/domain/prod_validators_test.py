@@ -5624,12 +5624,22 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+        misconceptions = [
+            skill_domain.Misconception(
+                0, 'name', '<p>notes</p>',
+                '<p>default_feedback</p>', True),
+            skill_domain.Misconception(
+                1, 'name', '<p>notes</p>',
+                '<p>default_feedback</p>', False)
+        ]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
             'description %d' % i,
             rubrics
         ) for i in python_utils.RANGE(6)]
         for skill in skills:
+            skill.misconceptions = misconceptions
+            skill.next_misconception_id = 2
             skill_services.save_new_skill(self.owner_id, skill)
 
         language_codes = ['ar', 'en', 'en']
@@ -5796,6 +5806,54 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'fully-validated QuestionModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
+
+    def test_inapplicable_skill_misconception_ids_invalid_skill_failure(self):
+        question_services.update_question(
+            self.owner_id, '0', [question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'inapplicable_skill_misconception_ids',
+                'new_value': ['invalidskill-0'],
+                'old_value': []
+            })], 'Add invalid skill misconception id.')
+
+        expected_output = [
+            u'[u\'failed validation check for skill id of QuestionModel\','
+            u' [u\'Entity id 0: skill with the following id does not exist: '
+            u'invalidskill\']]',
+            u'[u\'fully-validated QuestionModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_inapplicable_skill_misconception_ids_invalid_id_failure(self):
+        question_services.update_question(
+            self.owner_id, '0', [question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'inapplicable_skill_misconception_ids',
+                'new_value': ['0-99'],
+                'old_value': []
+            })], 'Add invalid skill misconception id.')
+
+        expected_output = [
+            u'[u\'failed validation check for misconception id of '
+            u'QuestionModel\', [u\'Entity id 0: misconception with '
+            u'the id 99 does not exist in the skill with id 0\']]',
+            u'[u\'fully-validated QuestionModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_inapplicable_skill_misconception_ids_validation_success(self):
+        question_services.update_question(
+            self.owner_id, '0', [question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'inapplicable_skill_misconception_ids',
+                'new_value': ['0-0', '0-1'],
+                'old_value': []
+            })], 'Add invalid skill misconception id.')
+
+        expected_output = [
+            u'[u\'fully-validated QuestionModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
 
 class QuestionSkillLinkModelValidatorTests(test_utils.AuditJobsTestBase):

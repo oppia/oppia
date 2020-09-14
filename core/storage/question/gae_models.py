@@ -167,7 +167,8 @@ class QuestionModel(base_models.VersionedModel):
             version: str. The version of the question.
             linked_skill_ids: list(str). The skill ids linked to the question.
             inapplicable_skill_misconception_ids: list(str). The optional
-                misconception ids marked as not applicable to the question.
+                skill misconception ids marked as not applicable to the
+                question.
 
         Returns:
             QuestionModel. Instance of the new QuestionModel entry.

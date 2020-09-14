@@ -794,6 +794,13 @@ class Question(python_utils.OBJECT):
                 'of strings, received %s'
                 % self.inapplicable_skill_misconception_ids)
 
+        if not (all(elem.count('-') == 1 for elem in (
+                    self.inapplicable_skill_misconception_ids))):
+            raise utils.ValidationError(
+                'Expected inapplicable_skill_misconception_ids to be a list '
+                'of strings of the format <skill_id>-<misconception_id>, '
+                'received %s' % self.inapplicable_skill_misconception_ids)
+
         if len(set(self.inapplicable_skill_misconception_ids)) != len(
                 self.inapplicable_skill_misconception_ids):
             raise utils.ValidationError(
@@ -925,7 +932,8 @@ class Question(python_utils.OBJECT):
 
         Args:
             inapplicable_skill_misconception_ids: list(str). The optional
-                misconception ids marked as not applicable to the question.
+                skill misconception ids marked as not applicable to the
+                question.
         """
         self.inapplicable_skill_misconception_ids = list(
             set(inapplicable_skill_misconception_ids))

@@ -390,6 +390,18 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'Expected inapplicable_skill_misconception_ids to be a list of '
             'strings, received 123')
 
+    def test_validate_invalid_format_of_inapplicable_skill_misconception_ids(
+            self):
+        """Test to verify that the validation fails when
+        inapplicable_skill_misconception_ids value is an invalid format i.e.
+        it is not of the form <skill-id>-<misconception-id>.
+        """
+        self.question.inapplicable_skill_misconception_ids = ['abc', 'def']
+        self._assert_validation_error(
+            r'Expected inapplicable_skill_misconception_ids to be a list '
+            r'of strings of the format <skill_id>-<misconception_id>, '
+            r'received \[u\'abc\', u\'def\'\]')
+
     def test_validate_duplicate_inapplicable_skill_misconception_ids_list(
             self):
         """Test to verify that the validation fails when

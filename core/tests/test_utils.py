@@ -1908,7 +1908,8 @@ tags: []
             linked_skill_ids: list(str). List of skill IDs linked to the
                 question.
             inapplicable_skill_misconception_ids: list(str). List of
-                misconceptions ids that are not applicable to the question.
+                skill misconceptions ids that are not applicable to the
+                question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 
@@ -1948,7 +1949,8 @@ tags: []
             owner_id: str. The id of the user creating the question.
             linked_skill_ids: list(str). The skill IDs linked to the question.
             inapplicable_skill_misconception_ids: list(str). List of
-                misconceptions ids that are not applicable to the question.
+                skill misconceptions ids that are not applicable to the
+                question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
