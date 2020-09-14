@@ -2180,12 +2180,12 @@ class QuestionModelValidator(base_model_validators.BaseModelValidator):
                         'misconception id',
                         'Entity id %s: misconception with the id %s does '
                         'not exist in the skill with id %s' % (
-                        item.id, misconception_id, skill_id))
+                            item.id, misconception_id, skill_id))
             else:
                 cls._add_error(
-                'skill id',
-                'Entity id %s: skill with the following id does not exist: %s'
-                % (item.id, skill_id))
+                    'skill id',
+                    'Entity id %s: skill with the following id does not exist:'
+                    ' %s' % (item.id, skill_id))
 
     @classmethod
     def _get_custom_validation_functions(cls):

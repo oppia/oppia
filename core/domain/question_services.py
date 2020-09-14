@@ -739,7 +739,8 @@ def untag_deleted_misconceptions(
         inapplicable_skill_misconception_ids = (
             question.inapplicable_skill_misconception_ids)
         deleted_inapplicable_skill_misconception_ids = (
-            list(set(deleted_skill_misconception_ids) &
+            list(
+                set(deleted_skill_misconception_ids) &
                 set(inapplicable_skill_misconception_ids)))
         if deleted_inapplicable_skill_misconception_ids:
             new_inapplicable_skill_misconception_ids = (
@@ -759,7 +760,7 @@ def untag_deleted_misconceptions(
             tagged_skill_misconception_id = (
                 answer_groups[i].to_dict()['tagged_skill_misconception_id'])
             if (tagged_skill_misconception_id
-                in deleted_skill_misconception_ids):
+                    in deleted_skill_misconception_ids):
                 answer_groups[i].tagged_skill_misconception_id = None
         question.question_state_data.interaction.answer_groups = answer_groups
         change_list.append(question_domain.QuestionChange({

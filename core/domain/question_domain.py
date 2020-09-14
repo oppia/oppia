@@ -795,7 +795,7 @@ class Question(python_utils.OBJECT):
                 % self.inapplicable_skill_misconception_ids)
 
         if not (all(elem.count('-') == 1 for elem in (
-                    self.inapplicable_skill_misconception_ids))):
+                self.inapplicable_skill_misconception_ids))):
             raise utils.ValidationError(
                 'Expected inapplicable_skill_misconception_ids to be a list '
                 'of strings of the format <skill_id>-<misconception_id>, '
