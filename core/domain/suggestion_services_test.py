@@ -821,6 +821,9 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             if exp.id == exp_id:
                 return exp
 
+    def mock_pre_update_validate_does_nothing(self, unused_change_list):
+        pass
+
     def setUp(self):
         super(SuggestionGetServicesUnitTests, self).setUp()
 
@@ -1052,8 +1055,22 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertLessEqual(suggestions[1].target_id, self.target_id_2)
         self.assertLessEqual(suggestions[2].target_id, self.target_id_3)
 
+    def test_get_translation_suggestions_waiting_longest_for_review_wrong_lang(
+            self):
+        suggestions = (
+            suggestion_services
+            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+                'wrong_language_code'))
+
+        self.assertEqual(len(suggestions), 0)
+
     def test_get_translation_suggestions_waiting_longest_for_review_order(
             self):
+        """This test makes sure that if a suggestion is rejected and is then
+        resubmitted, we count the time that the suggestion has been waiting for
+        review as the time from when it was resubmitted, not from when it was
+        first submitted.
+        """
         # Create the translation suggestion associated with exploration id
         # target_id_1.
         with self.swap(
@@ -1062,7 +1079,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             with self.swap(
                 exp_domain.Exploration, 'get_content_html',
                 self.MockExploration.get_content_html):
-                suggestion_services.create_suggestion(
+                suggestion_1 = suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id_1, 1, self.author_id_1,
@@ -1075,7 +1092,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             with self.swap(
                 exp_domain.Exploration, 'get_content_html',
                 self.MockExploration.get_content_html):
-                suggestion_services.create_suggestion(
+                suggestion_2 = suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id_2, 1, self.author_id_1,
@@ -1086,13 +1103,15 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             .get_translation_suggestions_waiting_longest_for_review_per_lang(
                 'hi'))
         self.assertEqual(len(suggestions), 2)
-        self.assertLessEqual(suggestions[0].target_id, self.target_id_1)
-        self.assertLessEqual(suggestions[1].target_id, self.target_id_2)
+        self.assertLessEqual(
+            suggestions[0].suggestion_id, suggestion_1.suggestion_id)
+        self.assertLessEqual(
+            suggestions[1].suggestion_id, suggestion_2.suggestion_id)
 
         # Reject the suggestion that was created first since it is the one that
         # has been waiting the longest for review.
         suggestion_services.reject_suggestion(
-            'exploration.exp1.thread_1', self.reviewer_id_1, 'Reject message')
+            suggestion_1.suggestion_id, self.reviewer_id_1, 'Reject message')
 
         # Verify that only the suggestion that was created second is returned.
         suggestions = (
@@ -1100,24 +1119,31 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             .get_translation_suggestions_waiting_longest_for_review_per_lang(
                 'hi'))
         self.assertEqual(len(suggestions), 1)
-        self.assertLessEqual(suggestions[0].target_id, self.target_id_1)
+        self.assertLessEqual(
+            suggestions[0].suggestion_id, suggestion_2.suggestion_id)
 
         # Resubmit rejected suggestion.
-        suggestion_services.resubmit_rejected_suggestion(
-            'exploration.exp1.thread_1', 'resubmit summary message',
-            self.author_id_1, self.add_translation_change_dict)
+        with self.swap(
+            suggestion_registry.SuggestionTranslateContent,
+            'pre_update_validate',
+            self.mock_pre_update_validate_does_nothing):
+            suggestion_services.resubmit_rejected_suggestion(
+                suggestion_1.suggestion_id, 'resubmit summary message',
+                self.author_id_1, exp_domain.ExplorationChange(
+                    self.add_translation_change_dict))
 
         # Verify that both suggestions are returned again and the suggestion
         # that was created second is now the first element, since it has been
-        # waiting longer for review.
+        # waiting longer because it has not been updated.
         suggestions = (
             suggestion_services
             .get_translation_suggestions_waiting_longest_for_review_per_lang(
                 'hi'))
         self.assertEqual(len(suggestions), 2)
-        self.assertLessEqual(suggestions[0].target_id, self.target_id_2)
-        self.assertLessEqual(suggestions[1].target_id, self.target_id_1)
-
+        self.assertLessEqual(
+            suggestions[0].suggestion_id, suggestion_2.suggestion_id)
+        self.assertLessEqual(
+            suggestions[1].suggestion_id, suggestion_1.suggestion_id)
 
     def test_get_question_suggestions_waiting_longest_for_review(self):
         suggestion_change = {
