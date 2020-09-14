@@ -1115,6 +1115,13 @@ class BaseSnapshotMetadataModel(BaseModel):
     # snapshot content model.
     content_user_ids = ndb.StringProperty(repeated=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Collection rights are deleted only if the corresponding collection
+        is not public.
+        """
+        return DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
     @classmethod
     def get_export_policy(cls):
         """Snapshot Metadata is relevant to the user for Takeout."""
@@ -1128,7 +1135,7 @@ class BaseSnapshotMetadataModel(BaseModel):
         })
 
     @classmethod
-    def exists_for_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, user_id):
         """Check whether BaseSnapshotMetadataModel references the given user.
 
         Args:
@@ -1213,6 +1220,13 @@ class BaseSnapshotContentModel(BaseModel):
 
     # The snapshot content, as a JSON blob.
     content = ndb.JsonProperty(indexed=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Collection rights are deleted only if the corresponding collection
+        is not public.
+        """
+        return DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_export_policy(cls):

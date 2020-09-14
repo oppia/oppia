@@ -104,7 +104,7 @@ def _save_activity_rights(
     model.commit(committer_id, commit_message, commit_cmds)
 
 
-def _update_exploration_summary(activity_rights):
+def _update_exploration_summary(activity_rights, contributor_id_to_remove):
     """Updates the exploration summary for the activity associated with the
     given rights object.
 
@@ -113,14 +113,18 @@ def _update_exploration_summary(activity_rights):
     Args:
         activity_rights: ActivityRights. The rights object for the given
             activity.
+        contributor_id_to_remove: str. User ID to remove from contributors.
+            Default is None.
     """
     # TODO(msl): Get rid of inline imports by refactoring code.
     from core.domain import exp_services
     exp_services.update_exploration_summary(
-        activity_rights.id, None)
+        activity_rights.id,
+        None,
+        contributor_id_to_remove=contributor_id_to_remove)
 
 
-def _update_collection_summary(activity_rights):
+def _update_collection_summary(activity_rights, contributor_id_to_remove):
     """Updates the collection summary for the given activity associated with
     the given rights object.
 
@@ -129,14 +133,18 @@ def _update_collection_summary(activity_rights):
     Args:
         activity_rights: ActivityRights. The rights object for the given
             activity.
+        contributor_id_to_remove: str. User ID to remove from contributors.
     """
 
     from core.domain import collection_services
     collection_services.update_collection_summary(
-        activity_rights.id, None)
+        activity_rights.id,
+        None,
+        contributor_id_to_remove=contributor_id_to_remove)
 
 
-def _update_activity_summary(activity_type, activity_rights):
+def _update_activity_summary(
+        activity_type, activity_rights, contributor_id_to_remove=None):
     """Updates the activity summary for the given activity associated with
     the given rights object.
 
@@ -148,11 +156,13 @@ def _update_activity_summary(activity_type, activity_rights):
             constants.ACTIVITY_TYPE_COLLECTION.
         activity_rights: ActivityRights. The rights object for the given
             activity.
+        contributor_id_to_remove: str. User ID to remove from contributors.
+            Default is None.
     """
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-        _update_exploration_summary(activity_rights)
+        _update_exploration_summary(activity_rights, contributor_id_to_remove)
     elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
-        _update_collection_summary(activity_rights)
+        _update_collection_summary(activity_rights, contributor_id_to_remove)
 
 
 def update_activity_first_published_msec(
@@ -838,7 +848,10 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
         commit_message,
         commit_cmds
     )
-    _update_activity_summary(activity_type, activity_rights)
+    _update_activity_summary(
+        activity_type,
+        activity_rights,
+        contributor_id_to_remove=removed_user_id)
 
 
 def _release_ownership_of_activity(committer, activity_id, activity_type):
@@ -1108,7 +1121,7 @@ def set_private_viewability_of_exploration(
     _save_activity_rights(
         committer_id, exploration_rights, constants.ACTIVITY_TYPE_EXPLORATION,
         commit_message, commit_cmds)
-    _update_exploration_summary(exploration_rights)
+    _update_exploration_summary(exploration_rights, None)
 
 
 def publish_exploration(committer, exploration_id):

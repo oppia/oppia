@@ -158,7 +158,8 @@ def pre_delete_user(user_id):
                 []
             )
         )
-
+    explorations_to_be_deleted_ids = []
+    collections_to_be_deleted_ids = []
     if user_settings.role != feconf.ROLE_ID_LEARNER:
         subscribed_exploration_summaries = (
             exp_fetchers.get_exploration_summaries_subscribed_to(user_id))
@@ -166,14 +167,15 @@ def pre_delete_user(user_id):
         explorations_to_be_deleted_ids = [
             exp_summary.id for exp_summary in subscribed_exploration_summaries
             if exp_summary.is_private() and
-               exp_summary.is_solely_owned_by_user(user_id)]
-        exp_services.delete_explorations(user_id,
-                                         explorations_to_be_deleted_ids)
+            exp_summary.is_solely_owned_by_user(user_id)
+        ]
+        exp_services.delete_explorations(
+            user_id, explorations_to_be_deleted_ids)
 
         explorations_to_release_ownership_ids = [
             exp_summary.id for exp_summary in subscribed_exploration_summaries
             if not exp_summary.is_private() and
-               exp_summary.is_solely_owned_by_user(user_id)
+            exp_summary.is_solely_owned_by_user(user_id)
         ]
         for exp_id in explorations_to_release_ownership_ids:
             rights_manager.release_ownership_of_exploration(
@@ -192,7 +194,7 @@ def pre_delete_user(user_id):
         collections_to_be_deleted_ids = [
             col_summary.id for col_summary in subscribed_collection_summaries
             if col_summary.is_private() and
-               col_summary.is_solely_owned_by_user(user_id)
+            col_summary.is_solely_owned_by_user(user_id)
         ]
         collection_services.delete_collections(
             user_id, collections_to_be_deleted_ids)
@@ -200,7 +202,7 @@ def pre_delete_user(user_id):
         collections_to_release_ownership_ids = [
             col_summary.id for col_summary in subscribed_collection_summaries
             if not col_summary.is_private() and
-               col_summary.is_solely_owned_by_user(user_id)
+            col_summary.is_solely_owned_by_user(user_id)
         ]
         for col_id in collections_to_release_ownership_ids:
             rights_manager.release_ownership_of_collection(
@@ -217,9 +219,10 @@ def pre_delete_user(user_id):
         topic_services.deassign_user_from_all_topics(
             user_services.get_system_user(), user_id)
 
-    # Set all the user's email preferences to False in order to disable all
-    # ordinary emails that could be sent to the users.
-    user_services.update_email_preferences(user_id, False, False, False, False)
+        # Set all the user's email preferences to False in order to disable all
+        # ordinary emails that could be sent to the users.
+        user_services.update_email_preferences(
+            user_id, False, False, False, False)
 
     user_services.mark_user_for_deletion(user_id)
     pending_deletion_requests.append(
@@ -232,7 +235,7 @@ def pre_delete_user(user_id):
         )
     )
 
-    save_pending_deletion_requests([pending_deletion_requests])
+    save_pending_deletion_requests(pending_deletion_requests)
 
 
 def delete_user(pending_deletion_request):
@@ -271,20 +274,20 @@ def delete_user(pending_deletion_request):
             'story_id')
         _pseudonymize_col_or_exp_models(
             pending_deletion_request,
-            models.NAMES.collection,
-            collection_models.CollectionSnapshotMetadataModel,
-            collection_models.CollectionRightsSnapshotMetadataModel,
-            collection_models.CollectionRightsSnapshotContentModel,
-            collection_models.CollectionCommitLogEntryModel,
-            'collection_id')
-        _pseudonymize_col_or_exp_models(
-            pending_deletion_request,
             models.NAMES.exploration,
             exp_models.ExplorationSnapshotMetadataModel,
             exp_models.ExplorationRightsSnapshotMetadataModel,
             exp_models.ExplorationRightsSnapshotContentModel,
             exp_models.ExplorationCommitLogEntryModel,
             'exploration_id')
+        _pseudonymize_col_or_exp_models(
+            pending_deletion_request,
+            models.NAMES.collection,
+            collection_models.CollectionSnapshotMetadataModel,
+            collection_models.CollectionRightsSnapshotMetadataModel,
+            collection_models.CollectionRightsSnapshotContentModel,
+            collection_models.CollectionCommitLogEntryModel,
+            'collection_id')
 
 
 def verify_user_deleted(pending_deletion_request):
@@ -298,11 +301,24 @@ def verify_user_deleted(pending_deletion_request):
     Returns:
         bool. True if all the models were correctly deleted, False otherwise.
     """
-    user_id = pending_deletion_request.user_id
-    return all((
-        _verify_basic_models_deleted(user_id),
-        _verify_activity_models_deleted(user_id),
-    ))
+    for model_class in models.Registry.get_storage_model_classes([
+            models.NAMES.collection,
+            models.NAMES.exploration,
+            models.NAMES.feedback,
+            models.NAMES.improvements,
+            models.NAMES.question,
+            models.NAMES.skill,
+            models.NAMES.story,
+            models.NAMES.suggestion,
+            models.NAMES.user
+    ]):
+        if (model_class.get_deletion_policy() not in
+                [base_models.DELETION_POLICY.KEEP,
+                 base_models.DELETION_POLICY.NOT_APPLICABLE] and
+                model_class.has_reference_to_user_id(
+                    pending_deletion_request.user_id)):
+            return False
+    return True
 
 
 def _hard_delete_explorations_and_collections(pending_deletion_request):
@@ -318,13 +334,13 @@ def _hard_delete_explorations_and_collections(pending_deletion_request):
         pending_deletion_request.exploration_ids,
         force_deletion=True)
     pending_deletion_request.exploration_ids = []
-    save_pending_deletion_request(pending_deletion_request)
+    save_pending_deletion_requests([pending_deletion_request])
     collection_services.delete_collections(
         pending_deletion_request.user_id,
         pending_deletion_request.collection_ids,
         force_deletion=True)
     pending_deletion_request.collection_ids = []
-    save_pending_deletion_request(pending_deletion_request)
+    save_pending_deletion_requests([pending_deletion_request])
 
 
 def _generate_activity_to_pseudonymized_ids_mapping(activity_ids):
@@ -363,7 +379,7 @@ def _save_activity_mappings(
     if activity_category not in pending_deletion_request.activity_mappings:
         pending_deletion_request.activity_mappings[activity_category] = (
             _generate_activity_to_pseudonymized_ids_mapping(activity_ids))
-        save_pending_deletion_request(pending_deletion_request)
+        save_pending_deletion_requests([pending_deletion_request])
 
 
 def _delete_models(user_id, user_role, module_name):
@@ -849,53 +865,3 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
             _pseudonymize_models,
             voiceover_application_models[
                 i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION])
-
-
-def _verify_basic_models_deleted(user_id):
-    """Verify that the models that do not represent any activity for the user
-    with user_id are deleted.
-
-    Args:
-        user_id: str. The id of the user to be deleted.
-
-    Returns:
-        bool. True if all the improvements and user models were correctly
-        deleted, False otherwise.
-    """
-    for model_class in models.Registry.get_storage_model_classes([
-            models.NAMES.feedback,
-            models.NAMES.improvements,
-            models.NAMES.suggestion,
-            models.NAMES.user
-    ]):
-        if (model_class.get_deletion_policy() not in
-                [base_models.DELETION_POLICY.KEEP,
-                 base_models.DELETION_POLICY.NOT_APPLICABLE] and
-                model_class.has_reference_to_user_id(user_id)):
-            return False
-    return True
-
-
-def _verify_activity_models_deleted(user_id):
-    """Verify that the activity models (question, skill, story) for the user
-    with user_id are deleted.
-
-    Args:
-        user_id: str. The id of the user to be deleted.
-
-    Returns:
-        bool. True if all the question models were correctly pseudonymized,
-        False otherwise.
-    """
-    return not any((
-        question_models.QuestionModel.has_reference_to_user_id(user_id),
-        question_models.QuestionCommitLogEntryModel
-        .has_reference_to_user_id(user_id),
-        question_models.QuestionSummaryModel.has_reference_to_user_id(user_id),
-        skill_models.SkillModel.has_reference_to_user_id(user_id),
-        skill_models.SkillCommitLogEntryModel.has_reference_to_user_id(user_id),
-        skill_models.SkillSummaryModel.has_reference_to_user_id(user_id),
-        story_models.StoryModel.has_reference_to_user_id(user_id),
-        story_models.StoryCommitLogEntryModel.has_reference_to_user_id(user_id),
-        story_models.StorySummaryModel.has_reference_to_user_id(user_id),
-    ))

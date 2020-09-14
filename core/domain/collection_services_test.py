@@ -1950,7 +1950,9 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         collection_summary_model.put()
 
         collection_services.update_collection_summary(
-            self.COLLECTION_ID_1, feconf.SYSTEM_COMMITTER_ID, 'id_to_remove')
+            self.COLLECTION_ID_1,
+            feconf.SYSTEM_COMMITTER_ID,
+            contributor_id_to_remove='id_to_remove')
         updated_collection_summary_model = (
             collection_models.CollectionSummaryModel.get_by_id(
                 self.COLLECTION_ID_1))

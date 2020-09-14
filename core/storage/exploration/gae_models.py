@@ -143,7 +143,7 @@ class ExplorationModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+        return False
 
     @classmethod
     def get_exploration_count(cls):
@@ -349,14 +349,12 @@ class ExplorationRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return (
-            cls.query(ndb.OR(
-                cls.owner_ids == user_id,
-                cls.editor_ids == user_id,
-                cls.voice_artist_ids == user_id,
-                cls.viewer_ids == user_id
-            )).get(keys_only=True) is not None
-            or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+        return cls.query(ndb.OR(
+            cls.owner_ids == user_id,
+            cls.editor_ids == user_id,
+            cls.voice_artist_ids == user_id,
+            cls.viewer_ids == user_id
+        )).get(keys_only=True) is not None
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Saves a new version of the exploration, updating the Exploration

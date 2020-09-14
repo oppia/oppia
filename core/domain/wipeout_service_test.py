@@ -749,7 +749,12 @@ class WipeoutServiceVerifyDeleteCollectionModelsTests(
         self.assertTrue(wipeout_service.verify_user_deleted(
             wipeout_service.get_pending_deletion_request(self.user_1_id)))
 
-        self.save_new_valid_collection(self.COL_1_ID, self.user_1_id)
+        collection_models.CollectionSnapshotMetadataModel(
+            id='%s-1' % self.COL_1_ID,
+            committer_id=self.user_1_id,
+            commit_type='create',
+            commit_cmds={}
+        ).put()
 
         self.assertFalse(wipeout_service.verify_user_deleted(
             wipeout_service.get_pending_deletion_request(self.user_1_id)))
@@ -1039,8 +1044,8 @@ class WipeoutServiceVerifyDeleteExplorationModelsTests(
 
     USER_1_EMAIL = 'some@email.com'
     USER_1_USERNAME = 'username1'
-    EXP_1_ID = 'col_1_id'
-    EXP_2_ID = 'col_2_id'
+    EXP_1_ID = 'exp_1_id'
+    EXP_2_ID = 'exp_2_id'
 
     def setUp(self):
         super(WipeoutServiceVerifyDeleteExplorationModelsTests, self).setUp()
@@ -1062,7 +1067,12 @@ class WipeoutServiceVerifyDeleteExplorationModelsTests(
         self.assertTrue(wipeout_service.verify_user_deleted(
             wipeout_service.get_pending_deletion_request(self.user_1_id)))
 
-        self.save_new_valid_exploration(self.EXP_1_ID, self.user_1_id)
+        exp_models.ExplorationSnapshotMetadataModel(
+            id='%s-1' % self.EXP_1_ID,
+            committer_id=self.user_1_id,
+            commit_type='create',
+            commit_cmds={}
+        ).put()
 
         self.assertFalse(wipeout_service.verify_user_deleted(
             wipeout_service.get_pending_deletion_request(self.user_1_id)))

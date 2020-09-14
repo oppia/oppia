@@ -3918,7 +3918,9 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         exp_summary_model.put()
 
         exp_services.update_exploration_summary(
-            self.EXP_ID_1, feconf.SYSTEM_COMMITTER_ID, 'id_to_remove')
+            self.EXP_ID_1,
+            feconf.SYSTEM_COMMITTER_ID,
+            contributor_id_to_remove='id_to_remove')
         updated_exp_summary_model = (
             exp_models.ExpSummaryModel.get_by_id(self.EXP_ID_1))
         self.assertEqual(
