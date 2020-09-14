@@ -66,7 +66,14 @@ class QuestionModel(base_models.VersionedModel):
     # The skill ids linked to this question.
     linked_skill_ids = ndb.StringProperty(
         indexed=True, repeated=True)
-    # The optional misconception ids marked as not relevant to the question.
+    # The optional skill misconception ids marked as not relevant to the
+    # question.
+    # Note: Misconception ids are represented in two ways. In the Misconception
+    # domain object the id is a number. But in the context of a question
+    # (used here), the skill id needs to be included along with the
+    # misconception id, this is because questions can have multiple skills
+    # attached to it. Hence, the format for this field will be
+    # <skill-id>-<misconceptionid>.
     inapplicable_skill_misconception_ids = ndb.StringProperty(
         indexed=True, repeated=True)
 
