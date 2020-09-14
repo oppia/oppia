@@ -57,7 +57,7 @@ else:
     os.environ['DATASTORE_EMULATOR_HOST_PATH'] = 'localhost:8081/datastore'
     os.environ['DATASTORE_HOST'] = 'http://localhost:8081'
     os.environ['DATASTORE_PROJECT_ID']= 'oppia-dev'
-    os.environ['DATASTORE_USE_PROJECT_ID_AS_APP_ID'] = True
+    os.environ['DATASTORE_USE_PROJECT_ID_AS_APP_ID'] = 'True'
 # Google App Engine (GAE) uses its own virtual environment that sets up the
 # python library system path using their third party python library, vendor. In
 # order to inform GAE of the packages that are required for Oppia, we need to

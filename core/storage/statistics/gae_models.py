@@ -1962,8 +1962,8 @@ class StateAnswersModel(base_models.BaseModel):
             new_submitted_answer_dict_list: list(dict). List of new submitted
                 answers each of which is stored as a JSON blob.
         """
-        cls._insert_submitted_answers_unsafe(exploration_id,
-            exploration_version, state_name, interaction_id,
+        cls._insert_submitted_answers_unsafe(
+            exploration_id, exploration_version, state_name, interaction_id,
             new_submitted_answer_dict_list)
 
     @classmethod

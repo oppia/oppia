@@ -105,13 +105,12 @@ _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
 _PATHS_TO_INSERT = [
     os.getcwd(),
-    os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webapp2-2.3'),
-    os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'yaml-3.10'),
-    os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'jinja2-2.6'),
-    common.GOOGLE_APP_ENGINE_SDK_HOME,
+    # os.path.join(
+    #     common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webapp2-2.3'),
+    # os.path.join(
+    #     common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'yaml-3.10'),
+    # os.path.join(
+    #     common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'jinja2-2.6'),
     os.path.join(common.OPPIA_TOOLS_DIR, 'grpcio-%s' % common.GRPCIO_VERSION),
     os.path.join(common.OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
     os.path.join(
@@ -127,19 +126,35 @@ _PATHS_TO_INSERT = [
     common.THIRD_PARTY_PYTHON_LIBS_DIR
 ]
 
+sys.path.insert(1, common.GOOGLE_APP_ENGINE_SDK_HOME)
+
+import dev_appserver
+dev_appserver.fix_sys_path()
+google_module = sys.modules['google']
+print(google_module.__path__)
 for path in _PATHS_TO_INSERT:
     sys.path.insert(1, path)
 
 
-pkg_resources.working_set.add_entry(common.THIRD_PARTY_PYTHON_LIBS_DIR)
+#pkg_resources.working_set.add_entry(common.THIRD_PARTY_PYTHON_LIBS_DIR)
 
 if 'google' in sys.modules:
-    print("Fixing google path")
     google_path = os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
-    google_module = sys.modules['google']
-    google_module.__path__.append(google_path)
+    sys.modules['google2'] = sys.modules['google']
+    google_module = sys.modules['google2']
     if not hasattr(google_module, '__file__') or not google_module.__file__:
         google_module.__file__ = os.path.join(google_path, '__init__.py')
+    # google_module.__path__.append(google_path)
+    # if not hasattr(google_module, '__file__') or not google_module.__file__:
+    #     google_module.__file__ = os.path.join(google_path, '__init__.py')
+google_module = sys.modules['google']
+print(google_module.__path__)
+# if 'google' in sys.modules:
+#     google_path = os.path.join(common.GOOGLE_APP_ENGINE_SDK_HOME, 'google')
+#     google_module = sys.modules['google']
+#     google_module.__path__.append(google_path)
+#     if not hasattr(google_module, '__file__') or not google_module.__file__:
+#         google_module.__file__ = os.path.join(google_path, '__init__.py')
 
 _TARGET_STDOUT = python_utils.string_io()
 _STDOUT_LIST = multiprocessing.Manager().list()

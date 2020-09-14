@@ -20,7 +20,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from constants import constants
-from core.platform import models
 import feconf
 import python_utils
 import utils
@@ -227,6 +226,7 @@ class BaseModel(ndb.Model):
         Args:
             update_last_updated_time: bool. Whether to update the
                 last_updated field of the model.
+            kwargs: *. Keyword arguments for put_async.
 
         Returns:
             Model. The entity that was stored.

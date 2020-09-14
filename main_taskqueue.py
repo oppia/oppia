@@ -22,7 +22,6 @@ from core.platform import models
 import feconf
 import main
 
-import redis
 import webapp2
 
 
