@@ -640,6 +640,9 @@ import { TopicsAndSkillsDashboardFilterObjectFactory } from
 import { TopicsAndSkillsDashboardPageService } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
+import { TranslationLanguageService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
 import { TranslationsBackendApiService } from
@@ -1540,6 +1543,10 @@ export class UpgradedServices {
     upgradedServices['TranslationsBackendApiService'] =
       new TranslationsBackendApiService(
         upgradedServices['HttpClient']);
+    upgradedServices['TranslationLanguageService'] =
+      new TranslationLanguageService(
+        upgradedServices['LanguageUtilService'],
+        upgradedServices['LoggerService']);
 
     // Topological level: 4.
 

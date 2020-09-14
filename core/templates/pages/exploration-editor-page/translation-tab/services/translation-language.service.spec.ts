@@ -16,65 +16,59 @@
  * @fileoverview Unit test for the Translation language service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+// eslint-disable-next-line max-len
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { LanguageUtilService } from 'domain/utilities/language-util.service';
+import { TestBed } from '@angular/core/testing';
 
-require(
-  'pages/exploration-editor-page/translation-tab/services/' +
-  'translation-language.service.ts');
+describe('Translation language service', () => {
+  let translationLanguageService: TranslationLanguageService;
+  let languageUtilService: LanguageUtilService;
 
-describe('Translation language service', function() {
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('LanguageUtilService', {
-      getAllVoiceoverLanguageCodes: function() {
-        return ['en', 'hi'];
-      },
-      getAudioLanguageDescription: function(activeLanguageCode) {
+  beforeEach(() => {
+    translationLanguageService = TestBed.get(TranslationLanguageService);
+    languageUtilService = TestBed.get(LanguageUtilService);
+    spyOn(languageUtilService, 'getAllVoiceoverLanguageCodes').and.returnValue(
+      ['en', 'hi']);
+    spyOn(languageUtilService, 'getAudioLanguageDescription').and.callFake(
+      (activeLanguageCode: string) => {
         var descriptions = {
           en: 'English'
         };
         return descriptions[activeLanguageCode];
-      }
-    });
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+      });
+  });
 
-  describe('Translation language service', function() {
-    var tls = null;
-
-    beforeEach(angular.mock.inject(function($injector) {
-      tls = $injector.get('TranslationLanguageService');
-    }));
-
-    it('should correctly set and get state names', function() {
-      tls.setActiveLanguageCode('en');
-      expect(tls.getActiveLanguageCode()).toBe('en');
+  describe('Translation language service', () => {
+    it('should correctly set and get state names', () => {
+      translationLanguageService.setActiveLanguageCode('en');
+      expect(translationLanguageService.getActiveLanguageCode()).toBe(
+        'en');
     });
 
-    it('should not allow invalid state names to be set', function() {
-      tls.setActiveLanguageCode('eng');
-      expect(tls.getActiveLanguageCode()).toBeNull();
+    it('should not allow invalid state names to be set', () => {
+      translationLanguageService.setActiveLanguageCode('eng');
+      expect(
+        translationLanguageService.getActiveLanguageCode()).toBeNull();
 
-      tls.setActiveLanguageCode(null);
-      expect(tls.getActiveLanguageCode()).toBeNull();
+      translationLanguageService.setActiveLanguageCode(null);
+      expect(
+        translationLanguageService.getActiveLanguageCode()).toBeNull();
     });
 
-    it('should show the language description', function() {
-      tls.setActiveLanguageCode('en');
-      expect(tls.getActiveLanguageDescription()).toBe('English');
+    it('should show the language description', () => {
+      translationLanguageService.setActiveLanguageCode('en');
+      expect(
+        translationLanguageService.getActiveLanguageDescription()).toBe(
+        'English');
     });
 
     it('should not show the language description of invalid state name',
-      function() {
-        tls.setActiveLanguageCode('eng');
-        expect(tls.getActiveLanguageDescription()).toBeNull();
+      () => {
+        translationLanguageService.setActiveLanguageCode('eng');
+        expect(
+          translationLanguageService.getActiveLanguageDescription())
+          .toBeNull();
       });
   });
 });
