@@ -372,7 +372,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             .order(cls.last_updated)
             .fetch(MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
         )
-    
+
     @classmethod
     def get_translation_suggestions_waiting_longest_for_review_per_lang(
             cls, language_code):

@@ -33,9 +33,6 @@ export interface ExplorationStatsBackendDict {
   };
 }
 
-@Injectable({
-  providedIn: 'root'
-})
 export class ExplorationStats {
   constructor(
       public readonly expId: string,

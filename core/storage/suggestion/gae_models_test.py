@@ -575,12 +575,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         # Assert that the order of the returned suggestion models represents
         # the suggestions sorted in descending order, based on how long each
         # suggestion has been waiting for review.
-        self.assertEqual(translation_suggestion_models[0].id,
-            'exploration.exp1.thread1')
-        self.assertEqual(translation_suggestion_models[1].id,
-            'exploration.exp2.thread1')
-        self.assertEqual(translation_suggestion_models[2].id,
-            'exploration.exp3.thread1')
+        self.assertEqual(
+            translation_suggestion_models[0].id, 'exploration.exp1.thread1')
+        self.assertEqual(
+            translation_suggestion_models[1].id, 'exploration.exp2.thread1')
+        self.assertEqual(
+            translation_suggestion_models[2].id, 'exploration.exp3.thread1')
 
         translation_suggestion_models_with_different_lang_code = (
             suggestion_models.GeneralSuggestionModel
@@ -596,7 +596,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'exploration.exp4.thread1')
 
     def test_get_translation_suggestions_waiting_longest_for_review_wrong_lang(
-        self):
+            self):
         translation_suggestion_models = (
             suggestion_models.GeneralSuggestionModel
             .get_translation_suggestions_waiting_longest_for_review_per_lang(
