@@ -7177,7 +7177,6 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillModel\', 5]']
-        self.process_and_flush_pending_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 

@@ -2720,6 +2720,7 @@ class AuditJobsTestBase(GenericTestBase):
             literal_eval: bool. Whether to use ast.literal_eval before
                 comparison.
         """
+        self.process_and_flush_pending_tasks()
         job_id = self.job_class.create_new()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
