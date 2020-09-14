@@ -22,29 +22,29 @@ import { ServicesConstants } from 'services/services.constants';
 @Injectable({
   providedIn: 'root'
 })
-export class PromoBarService{
-    constructor(
+export class PromoBarService {
+  constructor(
       private http: HttpClient
-    ) {}
-    getPromoBarData() {
-      var promoBarData = {
-        promoBarEnabled: false,
-        promoBarMessage: ''
-      };
-
-      if (ServicesConstants.ENABLE_PROMO_BAR) {
-        return this.http.get('/promo_bar_handler', { observe: 'response' })
-        .toPromise()
-        .then(
-          (response) => {
-            promoBarData.promoBarEnabled = response.data.promo_bar_enabled;
-            promoBarData.promoBarMessage = response.data.promo_bar_message;
-            return promoBarData;
-          }
-        );
-      } else {
-        return Promise.resolve(promoBarData);
-      }
+  ) {}
+  getPromoBarData(): Promise<{}> {
+    var promoBarData = {
+      promoBarEnabled: false,
+      promoBarMessage: ''
+    };
+    if (ServicesConstants.ENABLE_PROMO_BAR) {
+      return this.http.get('/promo_bar_handler', { observe: 'response' })
+      .toPromise()
+      .then(
+        (response) => {
+          promoBarData.promoBarEnabled = response.data.promo_bar_enabled;
+          promoBarData.promoBarMessage = response.data.promo_bar_message;
+          return promoBarData;
+        }
+      );
+    } else {
+      return Promise.resolve(promoBarData);
     }
+  }
 }
-angular.module('oppia').factory('PromoBarService', downgradeInjectable(PromoBarService));
+angular.module('oppia').factory('PromoBarService',
+  downgradeInjectable(PromoBarService));

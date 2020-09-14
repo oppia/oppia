@@ -942,8 +942,6 @@ export class UpgradedServices {
       new baseInteractionValidationService();
     upgradedServices['ɵangular_packages_common_http_http_d'] =
       new ɵangular_packages_common_http_http_d();
-    upgradedServices['']
-
     // Topological level: 1.
     upgradedServices['AlgebraicExpressionInputValidationService'] =
       new AlgebraicExpressionInputValidationService(
