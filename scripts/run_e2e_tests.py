@@ -680,10 +680,10 @@ def run_tests(args=None):
     sys.exit(p.returncode)
 
 
-def main():
+def main(args=[]):
     """Run tests, rerunning at most MAXIMUM_RUNS times if they flake."""
     for _ in python_utils.RANGE(MAXIMUM_RUNS):
-        flake_state = run_tests()
+        flake_state = run_tests(args)
         if flake_state != 'flake':
             break
 

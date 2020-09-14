@@ -26,6 +26,7 @@ import signal
 import subprocess
 import sys
 import time
+import StringIO
 
 from core.tests import test_utils
 import feconf
@@ -43,7 +44,7 @@ CHROME_DRIVER_VERSION = '77.0.3865.40'
 
 class MockProcessClass(python_utils.OBJECT):
 
-    def __init__(self, clean_shutdown=True):
+    def __init__(self, clean_shutdown=True, stdout=''):
         """Create a mock process object.
 
         Attributes:
@@ -54,6 +55,8 @@ class MockProcessClass(python_utils.OBJECT):
             poll_return: bool. The return value for poll().
             clean_shutdown: bool. Whether to shut down when signal.SIGINT
                 signal is received.
+            stdout: str. The text written to standard output by the
+                process.
 
         Args:
             clean_shutdown: bool. Whether to shut down when SIGINT received.
@@ -63,6 +66,8 @@ class MockProcessClass(python_utils.OBJECT):
         self.kill_count = 0
         self.poll_return = True
         self.clean_shutdown = clean_shutdown
+
+        self.stdout = StringIO.StringIO(stdout)
 
     def kill(self):
         """Increment kill_count.
@@ -873,7 +878,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 unused_sharding_instances, unused_suite, unused_dev_mode):
             return ['commands']
 
-        def mock_popen(unused_commands):
+        def mock_popen(unused_commands, stdout=None):
             def mock_communicate():
                 return
             result = mock_process
@@ -949,6 +954,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     'commands',
                 ],),
             ],
+            expected_kwargs=[
+                {},
+                {},
+                {'stdout': subprocess.PIPE},
+            ],
         )
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(0,)])
@@ -995,7 +1005,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 unused_sharding_instances, unused_suite, unused_dev_mode):
             return ['commands']
 
-        def mock_popen(unused_commands):
+        def mock_popen(unused_commands, stdout=None):
             def mock_communicate():
                 return
             result = mock_process
@@ -1067,6 +1077,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     run_e2e_tests.PROTRACTOR_BIN_PATH,
                     'commands'
                 ],),
+            ],
+            expected_kwargs=[
+                {},
+                {},
+                {'stdout': subprocess.PIPE},
             ],
         )
         exit_swap = self.swap_with_checks(
@@ -1165,7 +1180,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 unused_sharding_instances, unused_suite, unused_dev_mode):
             return ['commands']
 
-        def mock_popen(unused_commands):
+        def mock_popen(unused_commands, stdout=None):
             def mock_communicate():
                 return
             result = mock_process
@@ -1242,6 +1257,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     'commands',
                 ],),
             ],
+            expected_kwargs=[
+                {},
+                {},
+                {'stdout': subprocess.PIPE},
+            ],
         )
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(0,)])
@@ -1289,7 +1309,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 unused_sharding_instances, unused_suite, unused_dev_mode):
             return ['commands']
 
-        def mock_popen(unused_commands):
+        def mock_popen(unused_commands, stdout=None):
             def mock_communicate():
                 return
             result = mock_process
@@ -1364,6 +1384,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     run_e2e_tests.PROTRACTOR_BIN_PATH,
                     'commands',
                 ],),
+            ],
+            expected_kwargs=[
+                {},
+                {},
+                {'stdout': subprocess.PIPE},
             ],
         )
         exit_swap = self.swap_with_checks(
