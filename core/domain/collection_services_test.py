@@ -1935,6 +1935,32 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         # self._check_contributors_summary(self.COLLECTION_ID,
         #                                 {albert_id: 1, bob_id: 2})
 
+    def test_create_collection_summary_with_contributor_to_remove(self):
+        self.save_new_valid_collection(
+            self.COLLECTION_ID_1, feconf.SYSTEM_COMMITTER_ID)
+        collection_summary_model = (
+            collection_models.CollectionSummaryModel.get_by_id(
+                self.COLLECTION_ID_1))
+        collection_summary_model.contributor_ids = [
+            'id_to_remove', 'id_not_to_remove']
+        collection_summary_model.contributors_summary = {
+            'id_to_remove': 1,
+            'id_not_to_remove': 1
+        }
+        collection_summary_model.put()
+
+        collection_services.update_collection_summary(
+            self.COLLECTION_ID_1, feconf.SYSTEM_COMMITTER_ID, 'id_to_remove')
+        updated_collection_summary_model = (
+            collection_models.CollectionSummaryModel.get_by_id(
+                self.COLLECTION_ID_1))
+        self.assertEqual(
+            updated_collection_summary_model.contributor_ids,
+            ['id_not_to_remove'])
+        self.assertEqual(
+            updated_collection_summary_model.contributors_summary,
+            {'id_not_to_remove': 1})
+
 
 class GetCollectionAndCollectionRightsTests(CollectionServicesUnitTests):
 

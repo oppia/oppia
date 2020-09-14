@@ -3906,6 +3906,27 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
         self.assertIsNone(exploration_summary)
 
+    def test_create_exploration_summary_with_contributor_to_remove(self):
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, feconf.SYSTEM_COMMITTER_ID)
+        exp_summary_model = exp_models.ExpSummaryModel.get_by_id(self.EXP_ID_1)
+        exp_summary_model.contributor_ids = ['id_to_remove', 'id_not_to_remove']
+        exp_summary_model.contributors_summary = {
+            'id_to_remove': 1,
+            'id_not_to_remove': 1
+        }
+        exp_summary_model.put()
+
+        exp_services.update_exploration_summary(
+            self.EXP_ID_1, feconf.SYSTEM_COMMITTER_ID, 'id_to_remove')
+        updated_exp_summary_model = (
+            exp_models.ExpSummaryModel.get_by_id(self.EXP_ID_1))
+        self.assertEqual(
+            updated_exp_summary_model.contributor_ids, ['id_not_to_remove'])
+        self.assertEqual(
+            updated_exp_summary_model.contributors_summary,
+            {'id_not_to_remove': 1})
+
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""
