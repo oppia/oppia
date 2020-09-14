@@ -33,10 +33,10 @@ angular.module('oppia').directive('topicSummaryTile', [
         '/components/summary-tile/topic-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$window', 'AssetsBackendApiService', 'ENTITY_TYPE',
+        'AssetsBackendApiService', 'ENTITY_TYPE',
         'TOPIC_VIEWER_URL_TEMPLATE',
         function(
-            $window, AssetsBackendApiService, ENTITY_TYPE,
+            AssetsBackendApiService, ENTITY_TYPE,
             TOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.getTopicPageUrl = function() {
