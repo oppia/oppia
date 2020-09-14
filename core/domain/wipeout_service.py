@@ -22,9 +22,11 @@ import logging
 from core.domain import collection_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import role_services
 from core.domain import user_services
 from core.domain import wipeout_domain
 from core.platform import models
+import feconf
 import python_utils
 
 from google.appengine.ext import ndb
@@ -59,6 +61,7 @@ def get_pending_deletion_request(user_id):
     return wipeout_domain.PendingDeletionRequest(
         pending_deletion_request_model.id,
         pending_deletion_request_model.email,
+        pending_deletion_request_model.role,
         pending_deletion_request_model.deletion_complete,
         pending_deletion_request_model.exploration_ids,
         pending_deletion_request_model.collection_ids,
@@ -66,34 +69,42 @@ def get_pending_deletion_request(user_id):
     )
 
 
-def save_pending_deletion_request(pending_deletion_request):
-    """Save a pending deletion request domain object as
-    a PendingDeletionRequestModel entity in the datastore.
+def save_pending_deletion_requests(pending_deletion_requests):
+    """Save a list of pending deletion request domain objects as
+    PendingDeletionRequestModel entities in the datastore.
 
     Args:
-        pending_deletion_request: PendingDeletionRequest. The pending deletion
-            request object to be saved in the datastore.
+        pending_deletion_requests: list(PendingDeletionRequest). List of pending
+            deletion request objects to be saved in the datastore.
     """
-    pending_deletion_request.validate()
-    pending_deletion_request_dict = {
-        'email': pending_deletion_request.email,
-        'deletion_complete': pending_deletion_request.deletion_complete,
-        'exploration_ids': pending_deletion_request.exploration_ids,
-        'collection_ids': pending_deletion_request.collection_ids,
-        'activity_mappings': pending_deletion_request.activity_mappings
-    }
+    user_ids = [request.user_id for request in pending_deletion_requests]
+    pending_deletion_request_models = (
+        user_models.PendingDeletionRequestModel.get_multi(
+            user_ids, include_deleted=True)
+    )
+    final_pending_deletion_request_models = []
+    for deletion_request_model, deletion_request in python_utils.ZIP(
+            pending_deletion_request_models, pending_deletion_requests):
+        deletion_request.validate()
+        deletion_request_dict = {
+            'email': deletion_request.email,
+            'role': deletion_request.role,
+            'deletion_complete': deletion_request.deletion_complete,
+            'exploration_ids': deletion_request.exploration_ids,
+            'collection_ids': deletion_request.collection_ids,
+            'activity_mappings': deletion_request.activity_mappings
+        }
+        if deletion_request_model is not None:
+            deletion_request_model.populate(**deletion_request_dict)
+        else:
+            deletion_request_dict['id'] = deletion_request.user_id
+            deletion_request_model = user_models.PendingDeletionRequestModel(
+                **deletion_request_dict
+            )
+        final_pending_deletion_request_models.append(deletion_request_model)
 
-    pending_deletion_request_model = (
-        user_models.PendingDeletionRequestModel.get_by_id(
-            pending_deletion_request.user_id))
-    if pending_deletion_request_model is not None:
-        pending_deletion_request_model.populate(**pending_deletion_request_dict)
-        pending_deletion_request_model.put()
-    else:
-        pending_deletion_request_dict['id'] = pending_deletion_request.user_id
-        user_models.PendingDeletionRequestModel(
-            **pending_deletion_request_dict
-        ).put()
+    user_models.PendingDeletionRequestModel.put_multi(
+        final_pending_deletion_request_models)
 
 
 def delete_pending_deletion_request(user_id):
@@ -117,73 +128,112 @@ def pre_delete_user(user_id):
         4. Create PendingDeletionRequestModel for the user.
 
     Args:
-        user_id: str. The id of the user to be deleted.
+        user_id: str. The id of the user to be deleted. If the user_id
+            corresponds to a profile user then only that profile is deleted.
+            For a full user, all of its associated profile users are deleted
+            too.
     """
-    subscribed_exploration_summaries = (
-        exp_fetchers.get_exploration_summaries_subscribed_to(user_id))
-    explorations_to_be_deleted_ids = [
-        exp_summary.id for exp_summary in subscribed_exploration_summaries
-        if exp_summary.is_private() and
-        exp_summary.is_solely_owned_by_user(user_id)]
-    exp_services.delete_explorations(user_id, explorations_to_be_deleted_ids)
+    pending_deletion_requests = []
+    user_settings = user_services.get_user_settings(
+        user_id, strict=True)
 
-    subscribed_collection_summaries = (
-        collection_services.get_collection_summaries_subscribed_to(user_id))
-    collections_to_be_deleted_ids = [
-        col_summary.id for col_summary in subscribed_collection_summaries
-        if col_summary.is_private() and
-        col_summary.is_solely_owned_by_user(user_id)]
-    collection_services.delete_collections(
-        user_id, collections_to_be_deleted_ids)
+    linked_profile_user_ids = [
+        user.user_id for user in
+        user_services.get_all_profiles_auth_details_by_parent_user_id(user_id)
+    ]
+    profile_users_settings_list = user_services.get_users_settings(
+        linked_profile_user_ids)
+    for profile_user_settings in profile_users_settings_list:
+        profile_id = profile_user_settings.user_id
+        user_services.mark_user_for_deletion(profile_id)
+        pending_deletion_requests.append(
+            wipeout_domain.PendingDeletionRequest.create_default(
+                profile_id,
+                profile_user_settings.email,
+                profile_user_settings.role,
+                [],
+                []
+            )
+        )
 
-    # Set all the user's email preferences to False in order to disable all
-    # ordinary emails that could be sent to the users.
-    user_services.update_email_preferences(user_id, False, False, False, False)
+    explorations_to_be_deleted_ids = []
+    collections_to_be_deleted_ids = []
+    if user_settings.role != feconf.ROLE_ID_LEARNER:
+        subscribed_exploration_summaries = (
+            exp_fetchers.get_exploration_summaries_subscribed_to(
+                user_id)
+        )
+        explorations_to_be_deleted_ids = [
+            exp_summary.id for exp_summary in subscribed_exploration_summaries
+            if exp_summary.is_private() and
+            exp_summary.is_solely_owned_by_user(user_id)]
+        exp_services.delete_explorations(
+            user_id, explorations_to_be_deleted_ids)
 
-    email = user_services.get_user_settings(user_id, strict=True).email
+        subscribed_collection_summaries = (
+            collection_services.get_collection_summaries_subscribed_to(
+                user_id)
+        )
+        collections_to_be_deleted_ids = [
+            col_summary.id for col_summary in subscribed_collection_summaries
+            if col_summary.is_private() and
+            col_summary.is_solely_owned_by_user(user_id)]
+        collection_services.delete_collections(
+            user_id, collections_to_be_deleted_ids)
+
+        # Set all the user's email preferences to False in order to disable all
+        # ordinary emails that could be sent to the users.
+        user_services.update_email_preferences(
+            user_id, False, False, False, False)
+
     user_services.mark_user_for_deletion(user_id)
-
-    save_pending_deletion_request(
+    pending_deletion_requests.append(
         wipeout_domain.PendingDeletionRequest.create_default(
             user_id,
-            email,
+            user_settings.email,
+            user_settings.role,
             explorations_to_be_deleted_ids,
             collections_to_be_deleted_ids
         )
     )
 
+    save_pending_deletion_requests(pending_deletion_requests)
+
 
 def delete_user(pending_deletion_request):
-    """Delete all the models for user specified in pending_deletion_request.
+    """Delete all the models for user specified in pending_deletion_request
+    on the basis of the user role specified in the request.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object for which to delete or pseudonymize all the models.
     """
-    _delete_models(pending_deletion_request.user_id, models.NAMES.user)
-    _hard_delete_explorations_and_collections(pending_deletion_request)
-    _delete_models(pending_deletion_request.user_id, models.NAMES.improvements)
-    _pseudonymize_feedback_models(pending_deletion_request)
-    _delete_models(pending_deletion_request.user_id, models.NAMES.feedback)
-    _pseudonymize_suggestion_models(pending_deletion_request)
-    _pseudonymize_activity_models(
-        pending_deletion_request,
-        models.NAMES.question,
-        question_models.QuestionSnapshotMetadataModel,
-        question_models.QuestionCommitLogEntryModel,
-        'question_id')
-    _pseudonymize_activity_models(
-        pending_deletion_request,
-        models.NAMES.skill,
-        skill_models.SkillSnapshotMetadataModel,
-        skill_models.SkillCommitLogEntryModel,
-        'skill_id')
-    _pseudonymize_activity_models(
-        pending_deletion_request,
-        models.NAMES.story,
-        story_models.StorySnapshotMetadataModel,
-        story_models.StoryCommitLogEntryModel,
-        'story_id')
+    user_id = pending_deletion_request.user_id
+    user_role = pending_deletion_request.role
+    _delete_models(user_id, user_role, models.NAMES.user)
+    _delete_models(user_id, user_role, models.NAMES.improvements)
+    if user_role != feconf.ROLE_ID_LEARNER:
+        _hard_delete_explorations_and_collections(pending_deletion_request)
+        _pseudonymize_feedback_models(pending_deletion_request)
+        _pseudonymize_suggestion_models(pending_deletion_request)
+        _pseudonymize_activity_models(
+            pending_deletion_request,
+            models.NAMES.question,
+            question_models.QuestionSnapshotMetadataModel,
+            question_models.QuestionCommitLogEntryModel,
+            'question_id')
+        _pseudonymize_activity_models(
+            pending_deletion_request,
+            models.NAMES.skill,
+            skill_models.SkillSnapshotMetadataModel,
+            skill_models.SkillCommitLogEntryModel,
+            'skill_id')
+        _pseudonymize_activity_models(
+            pending_deletion_request,
+            models.NAMES.story,
+            story_models.StorySnapshotMetadataModel,
+            story_models.StoryCommitLogEntryModel,
+            'story_id')
 
 
 def verify_user_deleted(pending_deletion_request):
@@ -241,16 +291,24 @@ def _generate_activity_to_pseudonymized_ids_mapping(activity_ids):
     }
 
 
-def _delete_models(user_id, module_name):
+def _delete_models(user_id, user_role, module_name):
     """Delete all the models from the given module, for a given user.
 
     Args:
         user_id: str. The id of the user to be deleted.
+        user_role: str. The role of the user to be deleted.
         module_name: models.NAMES. The name of the module containing the models
             that are being deleted.
     """
     for model_class in models.Registry.get_storage_model_classes([module_name]):
         deletion_policy = model_class.get_deletion_policy()
+        lowest_role_for_class = model_class.get_lowest_supported_role()
+        if (user_role != lowest_role_for_class) and (
+                role_services.check_if_path_exists_in_roles_graph(
+                    lowest_role_for_class, user_role) is False
+            ):
+            continue
+
         if deletion_policy == base_models.DELETION_POLICY.DELETE:
             model_class.apply_deletion_policy(user_id)
 
@@ -303,7 +361,7 @@ def _pseudonymize_activity_models(
     if activity_category not in pending_deletion_request.activity_mappings:
         pending_deletion_request.activity_mappings[activity_category] = (
             _generate_activity_to_pseudonymized_ids_mapping(activity_ids))
-        save_pending_deletion_request(pending_deletion_request)
+        save_pending_deletion_requests([pending_deletion_request])
 
     def _pseudonymize_models(activity_related_models, pseudonymized_user_id):
         """Pseudonymize user ID fields in the models.
@@ -391,7 +449,7 @@ def _pseudonymize_feedback_models(pending_deletion_request):
         pending_deletion_request.activity_mappings[models.NAMES.feedback] = (
             _generate_activity_to_pseudonymized_ids_mapping(feedback_ids)
         )
-        save_pending_deletion_request(pending_deletion_request)
+        save_pending_deletion_requests([pending_deletion_request])
 
     def _pseudonymize_models(feedback_related_models, pseudonymized_user_id):
         """Pseudonymize user ID fields in the models.
@@ -485,7 +543,7 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
         pending_deletion_request.activity_mappings[models.NAMES.suggestion] = (
             _generate_activity_to_pseudonymized_ids_mapping(suggestion_ids)
         )
-        save_pending_deletion_request(pending_deletion_request)
+        save_pending_deletion_requests([pending_deletion_request])
 
     def _pseudonymize_models(voiceover_application_models):
         """Pseudonymize user ID fields in the models.

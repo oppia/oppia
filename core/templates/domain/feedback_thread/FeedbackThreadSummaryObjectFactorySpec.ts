@@ -28,7 +28,7 @@ describe('Feedback thread object factory', () => {
   });
 
   it('should update the summary of the thread on addition of a ' +
-     ' message', () => {
+     'message', () => {
     var feedbackThreadSummary = feedbackThreadSummaryObjectFactory.create(
       'open', 'Test user 1', new Date().getTime(), 'last message', 2, false,
       false, 'Test user 2', 'Test user 2', 'Test exploration name', '0',

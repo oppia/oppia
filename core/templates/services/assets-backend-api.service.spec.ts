@@ -261,7 +261,7 @@ describe('Assets Backend API Service', function() {
       $rootScope.$apply();
     });
 
-    it('should handle rejection when saving a math SVG fails ', function(done) {
+    it('should handle rejection when saving a math SVG fails', function(done) {
       var errorMessage = 'Math SVG was not successfully saved.';
       // This throws "Argument of type '() => Promise<any, any, any>' is not
       // assignable to parameter of type '{ (url: string, ...):
