@@ -1065,7 +1065,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(suggestions), 0)
 
-    def test_get_translation_suggestions_waiting_longest_for_review_order(
+    def test_get_translation_suggestions_waiting_longest_for_review_in_order(
             self):
         """This test makes sure that if a suggestion is rejected and is then
         resubmitted, we count the time that the suggestion has been waiting for
@@ -1098,6 +1098,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id_2, 1, self.author_id_1,
                     self.add_translation_change_dict, 'test description')
+
         # Verify that both suggestions are returned and in the right order.
         suggestions = (
             suggestion_services
