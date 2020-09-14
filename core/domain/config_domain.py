@@ -158,7 +158,8 @@ class ConfigPropertyChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = [{
         'name': CMD_CHANGE_PROPERTY_VALUE,
         'required_attribute_names': ['new_value'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
 
@@ -405,9 +406,13 @@ ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
     'Always ask learners for answer details. For testing -- do not use',
     False)
 
-CLASSROOM_PAGE_IS_SHOWN = ConfigProperty(
-    'classroom_page_is_shown', BOOL_SCHEMA,
-    'Show classroom components.', False)
+CLASSROOM_PAGE_IS_ACCESSIBLE = ConfigProperty(
+    'classroom_page_is_accessible', BOOL_SCHEMA,
+    'Make classroom page accessible.', False)
+
+CLASSROOM_PROMOS_ARE_ENABLED = ConfigProperty(
+    'classroom_promos_are_enabled', BOOL_SCHEMA,
+    'Show classroom promos.', False)
 
 FEATURED_TRANSLATION_LANGUAGES = ConfigProperty(
     'featured_translation_languages',
@@ -447,3 +452,7 @@ MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
     'The maximum number of explorations that can be send in a batch of math '
     'rich text svgs.',
     2)
+
+CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
+    'contributor_dashboard_is_enabled', BOOL_SCHEMA,
+    'Enable contributor dashboard page. The default value is true.', True)

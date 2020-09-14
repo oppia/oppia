@@ -63,11 +63,13 @@ describe('Translator Overview component', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('LanguageUtilService', languageUtilService);
-    $provide.value('StateRecordedVoiceoversService',
+    $provide.value(
+      'StateRecordedVoiceoversService',
       TestBed.get(StateRecordedVoiceoversService));
-    $provide.value('StateEditorRefreshService',
-      TestBed.get(StateEditorRefreshService));
-    $provide.value('StateWrittenTranslationsService',
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
     mockWindow = new MockWindow();
     $provide.value('$window', mockWindow);
@@ -110,7 +112,7 @@ describe('Translator Overview component', function() {
     });
 
   it('should show tab mode switcher when language code is different' +
-    ' from exploration\'s language code ', function() {
+    ' from exploration\'s language code', function() {
     expect($scope.canShowTabModeSwitcher()).toBe(true);
   });
 

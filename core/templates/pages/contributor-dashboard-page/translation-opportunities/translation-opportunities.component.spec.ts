@@ -49,7 +49,8 @@ describe('Translation opportunities component', function() {
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ContributionOpportunitiesBackendApiService',
+    $provide.value(
+      'ContributionOpportunitiesBackendApiService',
       TestBed.get(ContributionOpportunitiesBackendApiService));
     $provide.value('LanguageUtilService', TestBed.get(LanguageUtilService));
   }));
@@ -181,7 +182,7 @@ describe('Translation opportunities component', function() {
     expect($uibModal.open).toHaveBeenCalled();
   });
 
-  it('shoud close translation modal when clicking save', function() {
+  it('should close translation modal when clicking save', function() {
     spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
       isLoggedIn: () => true
     }));

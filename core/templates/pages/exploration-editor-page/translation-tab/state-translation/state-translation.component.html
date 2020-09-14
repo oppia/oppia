@@ -60,14 +60,13 @@
     </div>
     <div ng-if="isActive(TAB_ID_CUSTOMIZATION_ARGS)" class="translation-state-content">
       <h3>Preview - {{INTERACTION_SPECS[stateInteractionId].name}}</h3>
-      <angular-html-bind html-data="interactionPreviewHtml" style="pointer-events: none;">
+      <angular-html-bind html-data="interactionPreviewHtml" class="oppia-translation-state-content-html-data">
       </angular-html-bind>
       <h3>Content</h3>
       <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
-        <li class="oppia-rule-block oppia-prevent-selection"
+        <li class="oppia-rule-block oppia-prevent-selection mt-0"
             ng-repeat="caContent in interactionCustomizationArgTranslatableContent track by $index"
-            ng-class="{'active': activeCustomizationArgContentIndex === $index}"
-            style="margin-top: 0;">
+            ng-class="{'active': activeCustomizationArgContentIndex === $index}">
           <a ng-click="changeActiveCustomizationArgContentIndex($index)"
              class="oppia-rule-tab"
              ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}"
@@ -107,10 +106,9 @@
     <div ng-if="isActive(TAB_ID_FEEDBACK)" class="translation-state-content">
       <div>
         <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
-          <li class="oppia-rule-block oppia-prevent-selection protractor-test-translation-feedback"
+          <li class="oppia-rule-block oppia-prevent-selection protractor-test-translation-feedback mt-0"
               ng-repeat="answerGroup in stateAnswerGroups track by $index"
-              ng-class="{'active': activeAnswerGroupIndex === $index}"
-              style="margin-top: 0;">
+              ng-class="{'active': activeAnswerGroupIndex === $index}">
             <a class="oppia-rule-tab protractor-test-feedback-<[$index]>"
                ng-click="changeActiveAnswerGroupIndex($index)"
                ng-class="{'oppia-rule-tab-active': activeAnswerGroupIndex === $index}"
@@ -184,11 +182,9 @@
     </div>
     <div ng-if="isActive(TAB_ID_HINTS)" class="translation-state-content">
       <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
-        <li class="oppia-rule-block oppia-prevent-selection protractor-test-translation-hint"
+        <li class="oppia-rule-block oppia-prevent-selection protractor-test-translation-hint mt-0"
             ng-repeat="hint in stateHints track by $index"
-            ng-class="{'active': activeHintIndex === $index}"
-
-            style="margin-top: 0;">
+            ng-class="{'active': activeHintIndex === $index}">
           <a ng-click="changeActiveHintIndex($index)"
              class="oppia-rule-tab protractor-test-hint-<[$index]>"
              ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}"
@@ -345,5 +341,8 @@
   }
   .oppia-rte-editor-focused *:hover {
     background-color: rgba(233, 241, 242);
+  }
+  state-translation .oppia-translation-state-content-html-data {
+    pointer-events: none;
   }
 </style>

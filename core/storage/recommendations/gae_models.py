@@ -37,7 +37,7 @@ class ExplorationRecommendationsModel(
 
     # Ids of recommended explorations.
     recommended_exploration_ids = ndb.StringProperty(
-        repeated=True, indexed=False)
+        repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -46,10 +46,13 @@ class ExplorationRecommendationsModel(
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'recommended_exploration_ids':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
@@ -88,7 +91,9 @@ class TopicSimilaritiesModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'content': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })

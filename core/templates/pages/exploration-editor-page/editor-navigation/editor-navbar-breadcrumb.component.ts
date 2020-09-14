@@ -18,8 +18,8 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('pages/exploration-editor-page/services/' +
-  'exploration-property.service.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-property.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 require('services/stateful/focus-manager.service.ts');
@@ -30,11 +30,11 @@ angular.module('oppia').component('editorNavbarBreadcrumb', {
   template: require('./editor-navbar-breadcrumb.component.html'),
   controller: [
     '$scope', 'ExplorationPropertyService', 'ExplorationTitleService',
-    'RouterService', 'FocusManagerService',
+    'FocusManagerService', 'RouterService',
     'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
     function(
         $scope, ExplorationPropertyService, ExplorationTitleService,
-        RouterService, FocusManagerService,
+        FocusManagerService, RouterService,
         EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();

@@ -31,11 +31,9 @@ import { Outcome, OutcomeObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { AppConstants } from 'app.constants';
-import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
-import { ImageClickRuleInputs } from 'interactions/rule-input-defs';
 
 describe('ImageClickInputValidationService', () => {
-  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
   let validatorService: ImageClickInputValidationService;
 
   let currentState: string;
@@ -103,19 +101,21 @@ describe('ImageClickInputValidationService', () => {
       }
     };
 
-    const goodAnswerGroup = agof.createNew(goodDefaultOutcome, null, null);
-    goodAnswerGroup.updateRuleTypesToInputs([rof.createFromBackendDict({
-      rule_type: 'IsInRegion',
-      inputs: {
-        x: 'SecondLabel'
-      }
-    })]);
-    goodAnswerGroups = [goodAnswerGroup];
+    goodAnswerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'IsInRegion',
+        inputs: {
+          x: 'SecondLabel'
+        }
+      })],
+      goodDefaultOutcome,
+      null,
+      null)];
   });
 
   it('should expect a customization argument for image and regions',
     () => {
-      goodAnswerGroups[0].updateRuleTypesToInputs([]);
+      goodAnswerGroups[0].rules = [];
       expect(() => {
         validatorService.getAllWarnings(
           // This throws "Argument of type '{}' is not assignable to
@@ -176,7 +176,7 @@ describe('ImageClickInputValidationService', () => {
     }]);
 
     customizationArguments.imageAndRegions.value.labeledRegions = [];
-    goodAnswerGroups[0].updateRuleTypesToInputs([]);
+    goodAnswerGroups[0].rules = [];
     warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
@@ -187,8 +187,7 @@ describe('ImageClickInputValidationService', () => {
   });
 
   it('should expect rule types to reference valid region labels', () => {
-    (<ImageClickRuleInputs>
-      goodAnswerGroups[0].ruleTypesToInputs.IsInRegion[0]).x = 'FakeLabel';
+    goodAnswerGroups[0].rules[0].inputs.x = 'FakeLabel';
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);

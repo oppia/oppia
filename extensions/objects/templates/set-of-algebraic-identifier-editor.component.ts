@@ -27,8 +27,8 @@ angular.module('oppia').component('setOfAlgebraicIdentifierEditor', {
     value: '='
   },
   template: require('./set-of-algebraic-identifier-editor.component.html'),
-  controller: ['VALID_ALGEBRAIC_IDENTIFIERS', 'GuppyInitializationService',
-    function(VALID_ALGEBRAIC_IDENTIFIERS, GuppyInitializationService) {
+  controller: ['GuppyInitializationService', 'VALID_ALGEBRAIC_IDENTIFIERS',
+    function(GuppyInitializationService, VALID_ALGEBRAIC_IDENTIFIERS) {
       const ctrl = this;
 
       ctrl.$onInit = function() {
@@ -37,9 +37,10 @@ angular.module('oppia').component('setOfAlgebraicIdentifierEditor', {
           'independently and won\'t allow reordering of terms ' +
           'around the = sign.');
 
+        let customOskLetters = GuppyInitializationService.getCustomOskLetters();
+
         let choices = (
-          GuppyInitializationService.customOskLetters ?
-          GuppyInitializationService.customOskLetters :
+          customOskLetters ? customOskLetters :
           VALID_ALGEBRAIC_IDENTIFIERS);
 
         ctrl.SCHEMA = {

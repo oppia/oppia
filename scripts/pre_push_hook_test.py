@@ -30,6 +30,7 @@ from core.tests import test_utils
 import python_utils
 
 from . import common
+from . import install_backend_python_libs
 from . import pre_push_hook
 
 
@@ -74,6 +75,13 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 unused_diff_files):
             return self.does_diff_include_travis_yml_or_js_files
 
+        def mock_check_backend_python_library_for_inconsistencies():
+            return
+
+        self.swap_check_backend_python_libs = self.swap(
+            pre_push_hook,
+            'check_for_backend_python_library_inconsistencies',
+            mock_check_backend_python_library_for_inconsistencies)
         self.popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         self.get_remote_name_swap = self.swap(
             pre_push_hook, 'get_remote_name', mock_get_remote_name)
@@ -551,7 +559,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, uncommitted_files_swap:
                 with self.assertRaisesRegexp(SystemExit, '1'):
-                    pre_push_hook.main(args=[])
+                    with self.swap_check_backend_python_libs:
+                        pre_push_hook.main(args=[])
         self.assertTrue(
             'Your repo is in a dirty state which prevents the linting from'
             ' working.\nStash your changes or commit them.\n' in self.print_arr)
@@ -568,7 +577,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with check_output_swap, self.assertRaisesRegexp(
                     SystemExit, '1'):
-                    pre_push_hook.main(args=[])
+                    with self.swap_check_backend_python_libs:
+                        pre_push_hook.main(args=[])
         self.assertTrue(
             '\nCould not change branch to branch2. This is most probably '
             'because you are in a dirty state. Change manually to the branch '
@@ -580,7 +590,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.assertRaisesRegexp(SystemExit, '1'):
-                        pre_push_hook.main(args=[])
+                        with self.swap_check_backend_python_libs:
+                            pre_push_hook.main(args=[])
         self.assertTrue(
             'Push failed, please correct the linting issues above.'
             in self.print_arr)
@@ -597,9 +608,31 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 with self.check_output_swap, self.start_linter_swap:
                     with self.ts_swap, run_script_and_get_returncode_swap:
                         with self.assertRaisesRegexp(SystemExit, '1'):
-                            pre_push_hook.main(args=[])
+                            with self.swap_check_backend_python_libs:
+                                pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing typescript checks.' in self.print_arr)
+
+    def test_strict_typescript_check_failiure(self):
+        self.does_diff_include_ts_files = True
+        def mock_run_script_and_get_returncode(script):
+            if script == pre_push_hook.STRICT_TYPESCRIPT_CHECKS_CMDS:
+                return 1
+            return 0
+
+        run_script_and_get_returncode_swap = self.swap(
+            pre_push_hook, 'run_script_and_get_returncode',
+            mock_run_script_and_get_returncode)
+        with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
+            with self.collect_files_swap, self.uncommitted_files_swap:
+                with self.check_output_swap, self.start_linter_swap:
+                    with self.ts_swap, run_script_and_get_returncode_swap:
+                        with self.assertRaisesRegexp(SystemExit, '1'):
+                            with self.swap_check_backend_python_libs:
+                                pre_push_hook.main(args=[])
+        self.assertTrue(
+            'Push aborted due to failing typescript checks in '
+            'strict mode.' in self.print_arr)
 
     def test_frontend_test_failure(self):
         self.does_diff_include_js_or_ts_files = True
@@ -613,7 +646,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 with self.check_output_swap, self.start_linter_swap:
                     with self.js_or_ts_swap, run_script_and_get_returncode_swap:
                         with self.assertRaisesRegexp(SystemExit, '1'):
-                            pre_push_hook.main(args=[])
+                            with self.swap_check_backend_python_libs:
+                                pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing frontend tests.' in self.print_arr)
 
@@ -631,7 +665,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
                     with run_script_and_get_returncode_swap:
                         with self.travis_yml_or_js_files_swap:
                             with self.assertRaisesRegexp(SystemExit, '1'):
-                                pre_push_hook.main(args=[])
+                                with self.swap_check_backend_python_libs:
+                                    pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing e2e test configuration check.'
             in self.print_arr)
@@ -643,7 +678,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_install_hook():
             check_function_calls['install_hook_is_called'] = True
         with self.swap(
-            pre_push_hook, 'install_hook', mock_install_hook):
+            pre_push_hook, 'install_hook', mock_install_hook), (
+                self.swap_check_backend_python_libs):
             pre_push_hook.main(args=['--install'])
 
     def test_main_without_install_arg_and_errors(self):
@@ -651,4 +687,57 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.js_or_ts_swap:
-                        pre_push_hook.main(args=[])
+                        with self.swap_check_backend_python_libs:
+                            pre_push_hook.main(args=[])
+
+    def test_main_exits_when_mismatches_exist_in_backend_python_libs(self):
+        """Test that main exits with correct error message when mismatches are
+        found between the installed python libraries in
+        `third_party/python_libs` and the compiled 'requirements.txt' file.
+        """
+        def mock_get_mismatches():
+            return {
+                'library': ('version', 'version')
+            }
+
+        def mock_exit_error(error_code):
+            self.assertEqual(error_code, 1)
+
+        swap_get_mismatches = self.swap(
+            install_backend_python_libs, 'get_mismatches',
+            mock_get_mismatches)
+        swap_sys_exit = self.swap(sys, 'exit', mock_exit_error)
+        with self.print_swap, swap_sys_exit, swap_get_mismatches:
+            pre_push_hook.check_for_backend_python_library_inconsistencies()
+
+        self.assertEqual(
+            self.print_arr,
+            [
+                'Your currently installed python libraries do not match the\n'
+                'libraries listed in your "requirements.txt" file. Here is a\n'
+                'full list of library/version discrepancies:\n',
+                'Library                             |Requirements Version     '
+                '|Currently Installed Version',
+                'library                             |version                  '
+                '|version                  ',
+                '\n',
+                'Please fix these discrepancies by editing the '
+                '`requirements.in`\nfile or running '
+                '`scripts.install_third_party` to regenerate\nthe '
+                '`third_party/python_libs` directory.\n\n'
+            ])
+
+    def test_main_with_no_inconsistencies_in_backend_python_libs(self):
+        def mock_get_mismatches():
+            return {}
+        swap_get_mismatches = self.swap(
+            install_backend_python_libs,
+            'get_mismatches',
+            mock_get_mismatches)
+
+        with swap_get_mismatches, self.print_swap:
+            pre_push_hook.check_for_backend_python_library_inconsistencies()
+
+        self.assertEqual(
+            self.print_arr,
+            ['Python dependencies consistency check succeeded.'])

@@ -66,10 +66,6 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
     var currentIndex = null;
     var nextIndex = null;
 
-    var randomFromArray = function(arr) {
-      return arr[Math.floor(Math.random() * arr.length)];
-    };
-
     // Evaluate feedback.
     var makeFeedback = function(feedbackHtml, envs) {
       return ExpressionInterpolationService.processHtml(feedbackHtml, envs);
@@ -97,9 +93,9 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
     };
 
     // This should only be called when 'exploration' is non-null.
-    var _loadInitialQuestion = function(successCallback) {
+    var _loadInitialQuestion = function(successCallback, errorCallback) {
       if (!questions || questions.length === 0) {
-        AlertsService.addWarning('No questions available.');
+        errorCallback();
         return;
       }
       ContextService.setCustomEntityContext(
@@ -164,14 +160,14 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
        *   - initHtml {string}, an HTML string representing the content of the
        *       first state.
        */
-      init: function(questionDicts, successCallback) {
+      init: function(questionDicts, successCallback, errorCallback) {
         answerIsBeingProcessed = false;
         for (var i = 0; i < questionDicts.length; i++) {
           questions.push(
             QuestionObjectFactory.createFromBackendDict(questionDicts[i])
           );
         }
-        _loadInitialQuestion(successCallback);
+        _loadInitialQuestion(successCallback, errorCallback);
       },
       recordNewCardAdded: function() {
         currentIndex = nextIndex;
@@ -206,7 +202,6 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
         }
 
         answerIsBeingProcessed = true;
-        var oldIndex = currentIndex;
         var oldState = _getCurrentStateData();
         var recordedVoiceovers = oldState.recordedVoiceovers;
         var classificationResult = (

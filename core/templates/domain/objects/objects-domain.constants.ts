@@ -16,8 +16,8 @@
  * @fileoverview Constants for objects domain.
  */
 
-export class ObjectsDomainConstants {
-  public static FRACTION_PARSING_ERRORS = {
+export const ObjectsDomainConstants = {
+  FRACTION_PARSING_ERRORS: {
     INVALID_CHARS_LENGTH:
       'None of the numbers in the fraction should have more than 7 digits',
     INVALID_CHARS:
@@ -25,9 +25,9 @@ export class ObjectsDomainConstants {
     INVALID_FORMAT:
       'Please enter a valid fraction (e.g., 5/3 or 1 2/3)',
     DIVISION_BY_ZERO: 'Please do not put 0 in the denominator'
-  };
+  },
 
-  public static NUMBER_WITH_UNITS_PARSING_ERRORS = {
+  NUMBER_WITH_UNITS_PARSING_ERRORS: {
     INVALID_VALUE:
       'Please ensure that value is either a fraction or a number',
     INVALID_CURRENCY:
@@ -36,9 +36,9 @@ export class ObjectsDomainConstants {
     INVALID_UNIT_CHARS:
       'Please ensure that unit only contains numbers, alphabets, (, ), *, ^, ' +
       '/, -'
-  };
+  },
 
-  public static CURRENCY_UNITS = {
+  CURRENCY_UNITS: {
     dollar: {
       name: 'dollar',
       aliases: ['$', 'dollars', 'Dollars', 'Dollar', 'USD'],
@@ -63,5 +63,22 @@ export class ObjectsDomainConstants {
       front_units: [],
       base_unit: '0.01 rupee'
     }
-  };
-}
+  },
+
+  RATIO_PARSING_ERRORS: {
+    INVALID_COLONS:
+      'Your answer has two colons (:) next to each other.',
+    INVALID_CHARS:
+      'Please write a ratio that consists of digits separated by colons' +
+      '(e.g. 1:2 or 1:2:3).',
+    INVALID_FORMAT:
+      'Please enter a valid ratio (e.g. 1:2 or 1:2:3).',
+    NON_INTEGER_ELEMENTS:
+      'For this question, each element in your ratio should be a whole ' +
+      'number (not a fraction or a decimal).',
+    INCLUDES_ZERO:
+      'Ratios cannot have 0 as a element.',
+    EMPTY_STRING:
+      'Please enter a valid ratio (e.g. 1:2 or 1:2:3).',
+  }
+} as const;

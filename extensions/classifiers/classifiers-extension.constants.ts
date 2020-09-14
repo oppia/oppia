@@ -16,8 +16,8 @@
  * @fileoverview Constants for classfiers extensions.
  */
 
-export class ClassifiersExtensionConstants {
-  public static PythonProgramTokenType = {
+export const ClassifiersExtensionConstants = {
+  PythonProgramTokenType: {
     COMMENT: 'COMMENT',
     NL: 'NL',
     STRING: 'STRING',
@@ -28,5 +28,5 @@ export class ClassifiersExtensionConstants {
     NAME: 'NAME',
     OP: 'OP',
     ERRORTOKEN: 'ERRORTOKEN'
-  };
-}
+  }
+} as const;

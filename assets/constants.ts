@@ -5144,7 +5144,8 @@ export = {
       "NumericExpressionInput",
       "AlgebraicExpressionInput",
       "MathEquationInput",
-      "NumberWithUnits"
+      "NumberWithUnits",
+      "RatioExpressionInput"
     ]
   }, {
     "name": "Programming",
@@ -5221,13 +5222,6 @@ export = {
 
   "ENABLE_PREREQUISITE_SKILLS": false,
 
-  // For the full new structures viewer features, both
-  // ENABLE_NEW_STRUCTURE_PLAYERS and ENABLE_NEW_STRUCTURE_VIEWER_UPDATES has
-  // to be true. Only ENABLE_NEW_STRUCTURE_PLAYERS can be true if just the
-  // players need to be accessed, but without story progress updation.
-  // This is split up so as to access the viewers in production without
-  // exposing the POST and PUT endpoints just yet.
-  "ENABLE_NEW_STRUCTURE_PLAYERS": true,
   "ENABLE_NEW_STRUCTURE_VIEWER_UPDATES": true,
 
   "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": true,
@@ -5270,6 +5264,9 @@ export = {
   // in /learn/math/fractions/revision/place-values, 'place-values' is the
   // 'subtopic URL fragment'.
   "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
+  // The recommended length for meta tag contents. Search engines will truncate
+  // results greater than this limit.
+  "MAX_CHARS_IN_META_TAG_CONTENT": 160,
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
@@ -5446,4 +5443,4 @@ export = {
   "MAX_USERNAME_LENGTH": 30,
 
   "DEV_MODE": true
-};
+} as const;

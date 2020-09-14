@@ -6,7 +6,6 @@
     "noImplicitUseStrict": true,
     "outDir": "local_compiled_js_for_test",
     "rootDir": ".",
-    "skipLibCheck": true,
     "target": "es5",
     "sourceMap": true,
     "typeRoots": ["./node_modules/@types"],
@@ -14,6 +13,7 @@
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
       "app.constants": ["core/templates/app.constants"],

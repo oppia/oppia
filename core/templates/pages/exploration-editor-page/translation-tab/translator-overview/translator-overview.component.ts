@@ -17,7 +17,8 @@
  * translation language.
  */
 
-require('components/state-editor/state-editor-properties-services/' +
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -37,17 +38,15 @@ angular.module('oppia').component('translatorOverview', {
   },
   template: require('./translator-overview.component.html'),
   controller: [
-    '$rootScope', '$scope', '$window',
-    'ExplorationLanguageCodeService', 'LanguageUtilService',
-    'StateEditorService', 'TranslationLanguageService',
+    '$scope', '$window', 'ExplorationLanguageCodeService',
+    'LanguageUtilService', 'StateEditorService', 'TranslationLanguageService',
     'TranslationStatusService', 'TranslationTabActiveModeService',
-    'DEFAULT_AUDIO_LANGUAGE', 'SUPPORTED_AUDIO_LANGUAGES',
+    'DEFAULT_AUDIO_LANGUAGE',
     function(
-        $rootScope, $scope, $window,
-        ExplorationLanguageCodeService, LanguageUtilService,
-        StateEditorService, TranslationLanguageService,
+        $scope, $window, ExplorationLanguageCodeService,
+        LanguageUtilService, StateEditorService, TranslationLanguageService,
         TranslationStatusService, TranslationTabActiveModeService,
-        DEFAULT_AUDIO_LANGUAGE, SUPPORTED_AUDIO_LANGUAGES) {
+        DEFAULT_AUDIO_LANGUAGE) {
       var ctrl = this;
       var LAST_SELECTED_TRANSLATION_LANGUAGE = (
         'last_selected_translation_lang');
@@ -102,7 +101,8 @@ angular.module('oppia').component('translatorOverview', {
         $scope.numberOfAudioNotAvailable = TranslationStatusService
           .getExplorationContentNotAvailableCount();
         var progressPercent = (
-          100 - ($scope.numberOfAudioNotAvailable /
+          100 - (
+            $scope.numberOfAudioNotAvailable /
             $scope.numberOfRequiredAudio) * 100);
         return {width: progressPercent + '%', height: '100%'};
       };

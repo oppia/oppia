@@ -52,10 +52,12 @@ describe('Question opportunities component', function() {
       SkillOpportunityObjectFactory);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ContributionOpportunitiesBackendApiService',
-      TestBed.get(ContributionOpportunitiesBackendApiService));
-  }));
+  beforeEach(angular.mock.module(
+    'oppia', function($provide) {
+      $provide.value(
+        'ContributionOpportunitiesBackendApiService',
+        TestBed.get(ContributionOpportunitiesBackendApiService));
+    }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
@@ -285,7 +287,7 @@ describe('Question opportunities component', function() {
     });
 
   it('should not create a question when dismissing select skill and skill' +
-    ' difficulty modal ', function() {
+    ' difficulty modal', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });

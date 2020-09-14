@@ -71,6 +71,8 @@ import { ContinueRulesService } from
   'interactions/Continue/directives/continue-rules.service';
 import { EventEmitter } from '@angular/core';
 import { ExternalSaveService } from 'services/external-save.service';
+import { RatioObjectFactory } from
+  'domain/objects/RatioObjectFactory';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
@@ -114,8 +116,7 @@ describe('State translation component', function() {
           }
         },
         answer_groups: [{
-          rule_types_to_inputs: {},
-          rule_input_translations: {},
+          rule_specs: [],
           outcome: {
             dest: 'unused',
             feedback: {
@@ -124,8 +125,7 @@ describe('State translation component', function() {
             },
           }
         }, {
-          rule_types_to_inputs: {},
-          rule_input_translations: {},
+          rule_specs: [],
           outcome: {
             dest: 'unused',
             feedback: {
@@ -372,17 +372,19 @@ describe('State translation component', function() {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
       'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
-    $provide.value('ContinueValidationService',
-      TestBed.get(ContinueValidationService));
-    $provide.value('ContinueRulesService',
-      TestBed.get(ContinueRulesService));
-    $provide.value('ExplorationImprovementsTaskRegistryService',
+    $provide.value(
+      'ContinueValidationService', TestBed.get(ContinueValidationService));
+    $provide.value(
+      'ContinueRulesService', TestBed.get(ContinueRulesService));
+    $provide.value(
+      'ExplorationImprovementsTaskRegistryService',
       TestBed.get(ExplorationImprovementsTaskRegistryService));
-    $provide.value('ExplorationStatsService',
-      TestBed.get(ExplorationStatsService));
+    $provide.value(
+      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
     $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
     $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));
-    $provide.value('NumberWithUnitsObjectFactory',
+    $provide.value(
+      'NumberWithUnitsObjectFactory',
       TestBed.get(NumberWithUnitsObjectFactory));
     $provide.value(
       'TextInputRulesService',
@@ -392,15 +394,17 @@ describe('State translation component', function() {
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
-    $provide.value('StateInteractionIdService',
-      TestBed.get(StateInteractionIdService));
-    $provide.value('StateEditorRefreshService',
-      TestBed.get(StateEditorRefreshService));
-    $provide.value('StateRecordedVoiceoversService',
-      stateRecordedVoiceoversService);
+    $provide.value(
+      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+    $provide.value(
+      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'StateRecordedVoiceoversService', stateRecordedVoiceoversService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
-    $provide.value('StateWrittenTranslationsService',
+    $provide.value(
+      'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
+    $provide.value('RatioObjectFactory', TestBed.get(RatioObjectFactory));
   }));
 
   beforeEach(function() {
@@ -449,8 +453,8 @@ describe('State translation component', function() {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
       explorationStatesService.init(explorationState1);
-      stateRecordedVoiceoversService.init('Introduction',
-        recordedVoiceoversObjectFactory.createFromBackendDict(
+      stateRecordedVoiceoversService.init(
+        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
@@ -609,7 +613,7 @@ describe('State translation component', function() {
       });
     });
 
-    it('should change active hint index ', function() {
+    it('should change active hint index', function() {
       $scope.onTabClick('hint');
 
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
@@ -630,7 +634,7 @@ describe('State translation component', function() {
           .toHaveBeenCalled();
       });
 
-    it('should change active answer group index ', function() {
+    it('should change active answer group index', function() {
       $scope.onTabClick('feedback');
 
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
@@ -724,6 +728,7 @@ describe('State translation component', function() {
     it('should get summary answer group', function() {
       expect($scope.summarizeAnswerGroup(
         answerGroupObjectFactory.createNew(
+          [],
           outcomeObjectFactory.createNew('unused', '1', 'Feedback text', []),
           'Training data text', '0'), '1', {}, true))
         .toBe('[Answer] Feedback text');
@@ -750,8 +755,8 @@ describe('State translation component', function() {
       spyOnProperty(stateEditorService, 'onShowTranslationTabBusyModal').and
         .returnValue(showTranslationTabBusyModalEmitter);
       explorationStatesService.init(explorationState1);
-      stateRecordedVoiceoversService.init('Introduction',
-        recordedVoiceoversObjectFactory.createFromBackendDict(
+      stateRecordedVoiceoversService.init(
+        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
@@ -822,7 +827,7 @@ describe('State translation component', function() {
     });
 
     it('should open translation tab busy modal when trying to change' +
-      ' active hint index ', function() {
+      ' active hint index', function() {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveHintIndex(1);
@@ -833,7 +838,7 @@ describe('State translation component', function() {
     });
 
     it('should open translation tab busy modal when trying to change' +
-      ' active answer group index ', function() {
+      ' active answer group index', function() {
       spyOn(showTranslationTabBusyModalEmitter, 'emit');
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
       $scope.changeActiveAnswerGroupIndex(1);
@@ -894,8 +899,8 @@ describe('State translation component', function() {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
       explorationStatesService.init(explorationState2);
-      stateRecordedVoiceoversService.init('Introduction',
-        recordedVoiceoversObjectFactory.createFromBackendDict(
+      stateRecordedVoiceoversService.init(
+        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
@@ -937,8 +942,8 @@ describe('State translation component', function() {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction');
       explorationStatesService.init(explorationState3);
-      stateRecordedVoiceoversService.init('Introduction',
-        recordedVoiceoversObjectFactory.createFromBackendDict(
+      stateRecordedVoiceoversService.init(
+        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
@@ -1008,8 +1013,8 @@ describe('State translation component', function() {
         }
       });
       explorationStatesService.init(explorationState4);
-      stateRecordedVoiceoversService.init('Introduction',
-        recordedVoiceoversObjectFactory.createFromBackendDict(
+      stateRecordedVoiceoversService.init(
+        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
           {
             voiceovers_mapping: {
               content: {},
@@ -1048,7 +1053,7 @@ describe('State translation component', function() {
       expect($scope.isDisabled('solution')).toBe(true);
     });
 
-    it('should change active customization argument index ', function() {
+    it('should change active customization argument index', function() {
       $scope.onTabClick('ca');
       spyOn(translationTabActiveContentIdService, 'setActiveContent');
 

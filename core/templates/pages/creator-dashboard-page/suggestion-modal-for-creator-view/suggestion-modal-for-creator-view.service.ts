@@ -20,14 +20,14 @@ require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/suggestion-modal.service.ts');
-require('pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
+require(
+  'pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
   'suggestion-modal-for-creator-view.controller');
 
 angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
-  '$http', '$log',
-  '$uibModal', 'UrlInterpolationService',
-  function($http, $log,
-      $uibModal, UrlInterpolationService) {
+  '$http', '$log', '$uibModal', 'UrlInterpolationService',
+  function(
+      $http, $log, $uibModal, UrlInterpolationService) {
     var _showEditStateContentSuggestionModal = function(
         activeThread, suggestionsToReviewList, clearActiveThread,
         canReviewActiveThread) {

@@ -28,6 +28,7 @@ from core.domain import exp_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rating_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import suggestion_services
@@ -433,7 +434,7 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.owner_1, self.EXP_ID_1, self.owner_id_2,
-            rights_manager.ROLE_OWNER)
+            rights_domain.ROLE_OWNER)
 
         self.login(self.OWNER_EMAIL_1)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
@@ -482,10 +483,10 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.owner_1, self.EXP_ID_1, self.owner_id_2,
-            rights_manager.ROLE_OWNER)
+            rights_domain.ROLE_OWNER)
         rights_manager.assign_role_for_exploration(
             self.owner_1, self.EXP_ID_2, self.owner_id_2,
-            rights_manager.ROLE_OWNER)
+            rights_domain.ROLE_OWNER)
 
         self.login(self.OWNER_EMAIL_2)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
@@ -647,14 +648,14 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.ACTIVITY_STATUS_PRIVATE)
+            rights_domain.ACTIVITY_STATUS_PRIVATE)
 
         rights_manager.publish_exploration(self.owner, self.EXP_ID)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.ACTIVITY_STATUS_PUBLIC)
+            rights_domain.ACTIVITY_STATUS_PUBLIC)
 
         self.logout()
 
@@ -663,7 +664,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         rights_manager.assign_role_for_exploration(
             self.owner, self.EXP_ID, self.collaborator_id,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
         self.set_admins([self.OWNER_USERNAME])
 
         self.login(self.COLLABORATOR_EMAIL)
@@ -671,14 +672,14 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.ACTIVITY_STATUS_PRIVATE)
+            rights_domain.ACTIVITY_STATUS_PRIVATE)
 
         rights_manager.publish_exploration(self.owner, self.EXP_ID)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
         self.assertEqual(
             response['explorations_list'][0]['status'],
-            rights_manager.ACTIVITY_STATUS_PUBLIC)
+            rights_domain.ACTIVITY_STATUS_PUBLIC)
 
         self.logout()
 
@@ -687,7 +688,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         rights_manager.assign_role_for_exploration(
             self.owner, self.EXP_ID, self.viewer_id,
-            rights_manager.ROLE_VIEWER)
+            rights_domain.ROLE_VIEWER)
         self.set_admins([self.OWNER_USERNAME])
 
         self.login(self.VIEWER_EMAIL)
@@ -753,30 +754,21 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
     def test_get_topic_summary_dicts_with_new_structure_players_enabled(self):
         self.login(self.OWNER_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-            self.assertEqual(len(response['topic_summary_dicts']), 0)
-            self.save_new_topic(
-                'topic_id', self.owner_id, name='Name',
-                description='Description',
-                canonical_story_ids=['story_id_1', 'story_id_2'],
-                additional_story_ids=['story_id_3'],
-                uncategorized_skill_ids=['skill_id_1', 'skill_id_2'],
-                subtopics=[], next_subtopic_id=1)
-            response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-            self.assertEqual(len(response['topic_summary_dicts']), 1)
-            self.assertTrue(isinstance(response['topic_summary_dicts'], list))
-            self.assertEqual(response['topic_summary_dicts'][0]['name'], 'Name')
-            self.assertEqual(
-                response['topic_summary_dicts'][0]['id'], 'topic_id')
-        self.logout()
-
-    def test_get_no_topic_summary_dicts_with_new_structure_players_disabled(
-            self):
-        self.login(self.OWNER_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-            self.assertEqual(response.get('topic_summary_dicts'), [])
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['topic_summary_dicts']), 0)
+        self.save_new_topic(
+            'topic_id', self.owner_id, name='Name',
+            description='Description',
+            canonical_story_ids=['story_id_1', 'story_id_2'],
+            additional_story_ids=['story_id_3'],
+            uncategorized_skill_ids=['skill_id_1', 'skill_id_2'],
+            subtopics=[], next_subtopic_id=1)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['topic_summary_dicts']), 1)
+        self.assertTrue(isinstance(response['topic_summary_dicts'], list))
+        self.assertEqual(response['topic_summary_dicts'][0]['name'], 'Name')
+        self.assertEqual(
+            response['topic_summary_dicts'][0]['id'], 'topic_id')
         self.logout()
 
     def test_can_update_display_preference(self):
@@ -872,7 +864,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         }
         self.save_new_default_exploration('exp1', self.owner_id)
 
-        suggestion_services.create_new_user_contribution_scoring_model(
+        user_models.UserContributionProficiencyModel.create(
             self.owner_id, 'category1', 15)
         model1 = feedback_models.GeneralFeedbackThreadModel.create(
             'exploration.exp1.thread_1')
@@ -886,7 +878,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             suggestion_models.TARGET_TYPE_EXPLORATION,
             'exp1', 1, suggestion_models.STATUS_IN_REVIEW, self.owner_id_1,
             self.owner_id_2, change_dict, 'category1',
-            'exploration.exp1.thread_1')
+            'exploration.exp1.thread_1', None)
 
         change_dict['old_value'] = {
             'content_id': 'content',

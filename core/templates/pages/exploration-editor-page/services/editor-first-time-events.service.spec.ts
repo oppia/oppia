@@ -29,7 +29,7 @@ describe('Editor First Time Events Service', () => {
     sas = TestBed.get(SiteAnalyticsService);
   });
 
-  it('should', () => {
+  it('should intialize register events', () => {
     eftes.initRegisterEvents('0');
   });
 

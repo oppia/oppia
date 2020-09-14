@@ -37,7 +37,8 @@ describe('Voiceover opportunities component', function() {
   var activeLanguageChangedEmitter = new EventEmitter();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ContributionOpportunitiesBackendApiService',
+    $provide.value(
+      'ContributionOpportunitiesBackendApiService',
       TestBed.get(ContributionOpportunitiesBackendApiService));
     $provide.value('LanguageUtilService', TestBed.get(LanguageUtilService));
   }));
@@ -109,7 +110,7 @@ describe('Voiceover opportunities component', function() {
     ctrl.$onDestroy();
   });
 
-  it('sshould initialize controller properties after its initialization',
+  it('should initialize controller properties after its initialization',
     function() {
       expect(ctrl.opportunities.length).toBe(2);
       expect(ctrl.opportunitiesAreLoading).toBe(false);

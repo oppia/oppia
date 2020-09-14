@@ -35,9 +35,10 @@ require('pages/profile-page/profile-page-backend-api.service');
 angular.module('oppia').component('profilePage', {
   template: require('./profile-page.component.html'),
   controller: [
-    '$scope', '$log', '$rootScope', 'DateTimeFormatService', 'LoaderService',
+    '$log', '$rootScope', '$scope', 'DateTimeFormatService', 'LoaderService',
     'UrlInterpolationService', 'UserService', 'WindowRef',
-    function($scope, $log, $rootScope, DateTimeFormatService, LoaderService,
+    function(
+        $log, $rootScope, $scope, DateTimeFormatService, LoaderService,
         UrlInterpolationService, UserService, WindowRef) {
       var ctrl = this;
       const ProfilePageBackendApiService = (
@@ -189,7 +190,8 @@ angular.module('oppia').component('profilePage', {
                 ctrl.currentPageNumber * ctrl.PAGE_SIZE + 1
               );
               ctrl.endingExplorationNumber = (
-                Math.min(ctrl.numUserPortfolioExplorations,
+                Math.min(
+                  ctrl.numUserPortfolioExplorations,
                   (ctrl.currentPageNumber + 1) * ctrl.PAGE_SIZE)
               );
             }

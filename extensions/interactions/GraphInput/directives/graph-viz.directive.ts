@@ -49,13 +49,13 @@ angular.module('oppia').directive('graphViz', [
       template: require('./graph-viz.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$element', '$attrs', '$document',
-        'FocusManagerService', 'GraphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
-        'PlayerPositionService', 'DeviceInfoService',
+        '$document', '$element', 'DeviceInfoService', 'FocusManagerService',
+        'GraphDetailService', 'PlayerPositionService',
+        'GRAPH_INPUT_LEFT_MARGIN',
         function(
-            $scope, $element, $attrs, $document,
-            FocusManagerService, GraphDetailService, GRAPH_INPUT_LEFT_MARGIN,
-            PlayerPositionService, DeviceInfoService) {
+            $document, $element, DeviceInfoService, FocusManagerService,
+            GraphDetailService, PlayerPositionService,
+            GRAPH_INPUT_LEFT_MARGIN) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _MODES = {

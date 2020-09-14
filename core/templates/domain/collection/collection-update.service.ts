@@ -30,7 +30,6 @@ angular.module('oppia').factory('CollectionUpdateService', [
   'CollectionNodeObjectFactory', 'UndoRedoService',
   'CMD_ADD_COLLECTION_NODE',
   'CMD_DELETE_COLLECTION_NODE',
-  'CMD_EDIT_COLLECTION_NODE_PROPERTY',
   'CMD_EDIT_COLLECTION_PROPERTY', 'CMD_SWAP_COLLECTION_NODES',
   'COLLECTION_PROPERTY_CATEGORY', 'COLLECTION_PROPERTY_LANGUAGE_CODE',
   'COLLECTION_PROPERTY_OBJECTIVE',
@@ -39,7 +38,6 @@ angular.module('oppia').factory('CollectionUpdateService', [
       CollectionNodeObjectFactory, UndoRedoService,
       CMD_ADD_COLLECTION_NODE,
       CMD_DELETE_COLLECTION_NODE,
-      CMD_EDIT_COLLECTION_NODE_PROPERTY,
       CMD_EDIT_COLLECTION_PROPERTY, CMD_SWAP_COLLECTION_NODES,
       COLLECTION_PROPERTY_CATEGORY, COLLECTION_PROPERTY_LANGUAGE_CODE,
       COLLECTION_PROPERTY_OBJECTIVE,
@@ -73,19 +71,6 @@ angular.module('oppia').factory('CollectionUpdateService', [
       return _getParameterFromChangeDict(changeDict, 'new_value');
     };
 
-    // Applies a property change to a collection node. See _applyChanges() for
-    // details on the other behavior of this function.
-    var _applyNodePropertyChange = function(
-        collection, propertyName, explorationId, newValue, oldValue, apply,
-        reverse) {
-      _applyChange(collection, CMD_EDIT_COLLECTION_NODE_PROPERTY, {
-        property_name: propertyName,
-        exploration_id: explorationId,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue)
-      }, apply, reverse);
-    };
-
     var _getExplorationIdFromChangeDict = function(changeDict) {
       return _getParameterFromChangeDict(changeDict, 'exploration_id');
     };
@@ -105,8 +90,8 @@ angular.module('oppia').factory('CollectionUpdateService', [
        * Adds a new exploration to a collection and records the change in the
        * undo/redo service.
        */
-      addCollectionNode: function(collection, explorationId,
-          explorationSummaryBackendObject) {
+      addCollectionNode: function(
+          collection, explorationId, explorationSummaryBackendObject) {
         var oldSummaryBackendObject = angular.copy(
           explorationSummaryBackendObject);
         _applyChange(collection, CMD_ADD_COLLECTION_NODE, {

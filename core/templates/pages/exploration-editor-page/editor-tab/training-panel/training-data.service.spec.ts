@@ -68,7 +68,6 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import { TranslatorProviderForTests } from 'tests/test.extras';
 
 require('App.ts');
-require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
@@ -83,8 +82,7 @@ require(
   'state-interaction-id.service.ts');
 
 describe('TrainingDataService', function() {
-  var $httpBackend;
-  var scope, siis, ecs, cls, rs, tds, ess, IS, oof;
+  var siis, ecs, rs, tds, ess, oof;
   var mockExplorationData;
 
   beforeEach(
@@ -101,12 +99,6 @@ describe('TrainingDataService', function() {
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
     angular.mock.module(function($provide) {
-      $provide.constant('INTERACTION_SPECS', {
-        TextInput: {
-          display_mode: 'inline',
-          is_terminal: false
-        }
-      });
       $provide.value('AngularNameService', new AngularNameService());
       $provide.value(
         'AnswerClassificationResultObjectFactory',
@@ -166,15 +158,11 @@ describe('TrainingDataService', function() {
   });
 
   beforeEach(angular.mock.inject(function($injector, $rootScope) {
-    scope = $rootScope.$new();
-    $httpBackend = $injector.get('$httpBackend');
     siis = $injector.get('StateInteractionIdService');
     ecs = $injector.get('StateEditorService');
-    cls = $injector.get('ChangeListService');
     ess = $injector.get('ExplorationStatesService');
     rs = $injector.get('ResponsesService');
     tds = $injector.get('TrainingDataService');
-    IS = $injector.get('INTERACTION_SPECS');
     oof = $injector.get('OutcomeObjectFactory');
 
     // Set the currently loaded interaction ID.
@@ -196,14 +184,10 @@ describe('TrainingDataService', function() {
         interaction: {
           id: 'TextInput',
           answer_groups: [{
-            rule_input_translations: {},
-            rule_types_to_inputs: {
-              Contains: [
-                {
-                  x: 'Test'
-                }
-              ]
-            },
+            rule_specs: [{
+              rule_type: 'Contains',
+              inputs: {x: 'Test'}
+            }],
             outcome: {
               dest: 'State',
               feedback: {
