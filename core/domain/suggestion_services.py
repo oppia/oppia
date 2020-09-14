@@ -586,9 +586,9 @@ def get_translation_suggestions_waiting_longest_for_review_per_lang(
             suggestions.
 
     Returns:
-        list(GeneralSuggestionModel). A list of translation suggestions,
-        sorted in descending order based on how long the suggestions have
-        been waiting for review.
+        list(Suggestion). A list of translation suggestions, sorted in
+        descending order based on how long the suggestions have been waiting
+        for review.
     """
     return [
         get_suggestion_from_model(suggestion_model) for suggestion_model in (

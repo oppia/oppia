@@ -69,7 +69,6 @@ SUGGESTION_TYPE_CHOICES = [
 MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS = 30
 MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS = 30
 
-
 # Defines what is the minimum role required to review suggestions
 # of a particular type.
 SUGGESTION_MINIMUM_ROLE_FOR_REVIEW = {
@@ -395,7 +394,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
             .filter(cls.language_code == language_code)
             .order(cls.last_updated)
-            .fetch(MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
+            .fetch(MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
         )
 
     @classmethod
