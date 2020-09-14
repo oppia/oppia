@@ -206,6 +206,8 @@ import { StopwatchObjectFactory } from 'domain/utilities/StopwatchObjectFactory'
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
+import { ExplorationIdValidationService } from 'domain/exploration/exploration-id-validation.service';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExpressionSyntaxTreeService } from 'expressions/expression-syntax-tree.service';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
@@ -355,8 +357,6 @@ import { TranslateService } from 'services/translate.service';
 import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
-import { ExplorationSummaryBackendApiService } from 'core/templates/domain/summary/exploration-summary-backend-api.service';
-import { ExplorationIdValidationService } from 'core/templates/domain/exploration/exploration-id-validation.service';
 
 export const angularServices: [string, unknown][] = [
   ['AdminBackendApiService', AdminBackendApiService],

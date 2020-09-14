@@ -12,21 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 /**
  * @fileoverview Unit tests for the story node editor directive.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
-
 describe('Story node editor directive', function() {
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
+
   var $uibModal = null;
   var $scope = null;
   var ctrl = null;
