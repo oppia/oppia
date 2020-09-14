@@ -606,7 +606,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(translation_suggestion_models), 0)
 
-    def test_get_translation_suggestions_waiting_longest_for_review_big_fetch(
+    def test_get_translation_suggestions_waiting_longest_for_review_max_fetch(
             self):
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -638,7 +638,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             translation_suggestion_models[0].id, 'exploration.exp1.thread1')
 
-    def test_get_question_suggestions_waiting_longest_for_review_larger_fetch(
+    def test_get_question_suggestions_waiting_longest_for_review_max_fetch(
             self):
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
