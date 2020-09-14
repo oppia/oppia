@@ -39,14 +39,12 @@ angular.module('oppia').directive('topicSummaryTile', [
             $window, AssetsBackendApiService, ENTITY_TYPE,
             TOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
-          ctrl.openTopicPage = function() {
-            $window.open(
-              UrlInterpolationService.interpolateUrl(
-                TOPIC_VIEWER_URL_TEMPLATE, {
-                  topic_url_fragment: ctrl.getTopicSummary().getUrlFragment(),
-                  classroom_url_fragment: ctrl.getClassroomUrlFragment()
-                }), '_self'
-            );
+          ctrl.getTopicPageUrl = function() {
+            return UrlInterpolationService.interpolateUrl(
+              TOPIC_VIEWER_URL_TEMPLATE, {
+                topic_url_fragment: ctrl.getTopicSummary().getUrlFragment(),
+                classroom_url_fragment: ctrl.getClassroomUrlFragment()
+              });
           };
 
           var getColorValueInHexForm = function(colorValue) {

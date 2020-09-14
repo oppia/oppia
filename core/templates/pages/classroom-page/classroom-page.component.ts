@@ -68,7 +68,7 @@ angular.module('oppia').component('classroomPage', {
           PageTitleService.setPageTitle(
             ctrl.classroomDisplayName + ' Classroom | Oppia');
           LoaderService.hideLoadingScreen();
-          ClassroomBackendApiService.onInitializeTranslation.emit();
+          ctrl.classroomBackendApiService.onInitializeTranslation.emit();
         }, function(errorResponse) {
           if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
             AlertsService.addWarning('Failed to get dashboard data');
