@@ -19,10 +19,10 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { AlertsService } from 'services/alerts.service';
-import { CsrfTokenService } from 'services/csrf-token.service.ts';
 import { ExplorationSummaryBackendApiService } from
   'domain/summary/exploration-summary-backend-api.service.ts';
+import { AlertsService } from 'services/alerts.service';
+import { CsrfTokenService } from 'services/csrf-token.service.ts';
 
 
 describe('Exploration Summary Backend Api Service', () => {

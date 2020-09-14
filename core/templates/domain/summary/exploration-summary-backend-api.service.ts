@@ -17,13 +17,13 @@
  * from the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
 import { ValidatorsService } from 'services/validators.service';
-import { AppConstants } from 'app.constants';
 
 @Injectable({
   providedIn: 'root'

@@ -16,8 +16,8 @@
  * @fileoverview Service to validate exploration id
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ExplorationSummaryBackendApiService } from
   'domain/summary/exploration-summary-backend-api.service';
@@ -25,7 +25,6 @@ import { ExplorationSummaryBackendApiService } from
 @Injectable({
   providedIn: 'root'
 })
-
 export class ExplorationIdValidationService {
   constructor(
     private explorationSummartBackendApiService:
