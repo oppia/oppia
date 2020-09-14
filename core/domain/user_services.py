@@ -775,16 +775,69 @@ def get_user_contribution_rights(user_id):
         UserContributionRights. The UserContributionRights domain object for the
         corresponding user.
     """
-    user_model = (
-        user_models.UserContributionRightsModel.get_by_id(user_id))
-    if user_model is not None:
-        return user_domain.UserContributionRights(
-            user_id,
-            user_model.can_review_translation_for_language_codes,
-            user_model.can_review_voiceover_for_language_codes,
-            user_model.can_review_questions)
-    else:
-        return user_domain.UserContributionRights(user_id, [], [], False)
+    return get_users_contribution_rights([user_id])[0]
+
+
+def get_users_contribution_rights(user_ids):
+    """Returns the UserContributionRights domain object for each user_id in
+    user_ids.
+
+    Args:
+        user_ids: list(str). A list of user ids.
+
+    Returns:
+        list(UserContributionRights). A list containing the
+        UserContributionRights domain object for each user.
+    """
+    user_contribution_rights_models = (
+        user_models.UserContributionRightsModel.get_multi(user_ids)
+    )
+
+    users_contribution_rights = []
+    for index, user_contribution_rights_model in enumerate(
+            user_contribution_rights_models):
+        if user_contribution_rights_model is not None:
+            users_contribution_rights.append(user_domain.UserContributionRights(
+                user_ids[index],
+                (
+                    user_contribution_rights_model
+                    .can_review_translation_for_language_codes
+                ),
+                (
+                    user_contribution_rights_model
+                    .can_review_voiceover_for_language_codes
+                ),
+                user_contribution_rights_model.can_review_questions))
+        else:
+            users_contribution_rights.append(
+                user_domain.UserContributionRights(
+                    user_ids[index], [], [], False))
+
+    return users_contribution_rights
+
+
+def get_reviewer_user_ids_to_notify():
+    """Gets a list of the reviewer user_ids who want to be notified of
+    Contributor Dashboard reviewer updates.
+
+    Returns:
+        list(str). A list of reviewer user_ids who want to be notified of
+        Contributor Dashboard reviewer updates.
+    """
+    # Get the user ids of the Contributor Dashboard reviewers.
+    users_contribution_rights = get_all_contribution_reviewers()
+    reviewer_ids = [
+        user_contribution_rights.id for user_contribution_rights in
+        users_contribution_rights
+    ]
+
+    users_global_prefs = get_users_email_preferences(reviewer_ids)
+    reviewer_ids_to_notify = []
+    for index, user_global_pref in enumerate(users_global_prefs):
+        if user_global_pref.can_receive_email_updates:
+            reviewer_ids_to_notify.append(reviewer_ids[index])
+
+    return reviewer_ids_to_notify
 
 
 def get_all_contribution_reviewers():

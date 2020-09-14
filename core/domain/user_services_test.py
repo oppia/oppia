@@ -2219,7 +2219,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.signup(
             self.QUESTION_REVIEWER_EMAIL, self.QUESTION_REVIEWER_USERNAME)
         self.question_reviewer_id = (
-            self.get_user_id_from_email(self.TRANSLATOR_EMAIL))
+            self.get_user_id_from_email(self.QUESTION_REVIEWER_EMAIL))
 
     def test_assign_user_review_translation_suggestion_in_language(self):
         self.assertFalse(
@@ -2301,6 +2301,68 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             [reviewer.id for reviewer in all_reviewers],
             [self.voice_artist_id, self.translator_id])
+
+    def test_get_reviewer_user_ids_to_notify_when_reviewers_want_notifications(
+            self):
+        # Assert that there are no reviewers at the start.
+        self.assertEqual(user_services.get_all_contribution_reviewers(), [])
+        # Add a question reviewer and a translation reviewer.
+        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'hi')
+        # Ensure that these reviewers want email updates.
+        user_services.update_email_preferences(
+            self.question_reviewer_id, True,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+        user_services.update_email_preferences(
+            self.translator_id, True,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+
+        reviewer_ids_to_notify = user_services.get_reviewer_user_ids_to_notify(
+        )
+
+        self.assertEqual(len(reviewer_ids_to_notify), 2)
+        self.assertIn(self.question_reviewer_id, reviewer_ids_to_notify)
+        self.assertIn(self.translator_id, reviewer_ids_to_notify)
+
+    def test_get_reviewer_user_ids_to_notify_when_reviewers_do_not_want_emails(
+            self):
+        # Assert that there are no reviewers at the start.
+        self.assertEqual(user_services.get_all_contribution_reviewers(), [])
+        # Add a question reviewer and a translation reviewer.
+        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'hi')
+        # Ensure that these reviewers do not want email updates.
+        user_services.update_email_preferences(
+            self.question_reviewer_id, False,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+        user_services.update_email_preferences(
+            self.translator_id, False,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+
+        reviewer_ids_to_notify = user_services.get_reviewer_user_ids_to_notify(
+        )
+
+        self.assertEqual(len(reviewer_ids_to_notify), 0)
+
+    def test_get_reviewer_user_ids_to_notify_when_there_are_no_reviewers(
+            self):
+        # Assert that there are no reviewers.
+        self.assertEqual(user_services.get_all_contribution_reviewers(), [])
+
+        reviewer_ids_to_notify = user_services.get_reviewer_user_ids_to_notify(
+        )
+
+        self.assertEqual(len(reviewer_ids_to_notify), 0)
 
     def test_remove_translation_review_rights_in_language(self):
         user_services.allow_user_to_review_translation_in_language(
