@@ -633,7 +633,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             )
 
         # There should only be one translation suggestion returned since we
-        # changed the maximum questions to fetch to 1.
+        # changed the maximum translations to fetch to 1.
         self.assertEqual(len(translation_suggestion_models), 1)
         self.assertEqual(
             translation_suggestion_models[0].id, 'exploration.exp1.thread1')

@@ -1134,8 +1134,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                     self.add_translation_change_dict))
 
         # Verify that both suggestions are returned again and the suggestion
-        # that was created second is now the first element, since it has been
-        # waiting longer because it has not been updated.
+        # that was created second is now the first suggestion in the returned
+        # list, since it has been waiting longer (due to it not being updated).
         suggestions = (
             suggestion_services
             .get_translation_suggestions_waiting_longest_for_review_per_lang(
