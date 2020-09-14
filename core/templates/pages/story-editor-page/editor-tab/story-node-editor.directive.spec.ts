@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 /**
  * @fileoverview Unit tests for the story node editor directive.
  */
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Story node editor directive', function() {
   beforeEach(angular.mock.module('oppia'));

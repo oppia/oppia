@@ -31,6 +31,8 @@ describe('Exploration Summary Backend Api Service', () => {
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService = null;
   let alertsService: AlertsService = null;
+  let successHandler = null;
+  let failHandler = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -49,16 +51,19 @@ describe('Exploration Summary Backend Api Service', () => {
     });
   });
 
+  beforeEach(() => {
+    successHandler = jasmine.createSpy('success');
+    failHandler = jasmine.createSpy('fail');
+  });
+
   afterEach(() => {
     httpTestingController.verify();
   });
 
   it('should not load public exploration summaries from backend when' +
     ' exploration id is not valid', fakeAsync(()=> {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-    let explorationIds = ['#', null, '1'];
-    let alertSpy = spyOn(alertsService, 'addWarning').and.callThrough();
+    const explorationIds = ['#', null, '1'];
+    const alertSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
     explorationSummaryBackendApiService.loadPublicExplorationSummaries(
       explorationIds).then(successHandler, failHandler);
@@ -72,10 +77,8 @@ describe('Exploration Summary Backend Api Service', () => {
   }));
 
   it('should use reject handler when server throws an error', fakeAsync(()=> {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-    let explorationIds = ['12'];
-    let requestUrl = '/explorationsummarieshandler/data?' +
+    const explorationIds = ['12'];
+    const requestUrl = '/explorationsummarieshandler/data?' +
     'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
     '&' + 'include_private_explorations=false';
 
@@ -92,42 +95,37 @@ describe('Exploration Summary Backend Api Service', () => {
     expect(failHandler).toHaveBeenCalledWith('Error Communicating with Server');
   }));
 
-  it('should load public exploration summaries from backend',
-    fakeAsync(()=> {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let explorationIds = ['0', '1', '2'];
-      let sampleResults = [{
-        title: 'Title 1',
-        category: 'Category 1',
-        status: 'public',
-        language_code: 'en'
-      }];
+  it('should load public exploration summaries from backend', fakeAsync(()=> {
+    const explorationIds = ['0', '1', '2'];
+    const sampleResults = [{
+      title: 'Title 1',
+      category: 'Category 1',
+      status: 'public',
+      language_code: 'en'
+    }];
 
-      let requestUrl = '/explorationsummarieshandler/data?' +
-        'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
-        '&' + 'include_private_explorations=false';
+    const requestUrl = '/explorationsummarieshandler/data?' +
+      'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
+      '&' + 'include_private_explorations=false';
 
-      explorationSummaryBackendApiService
-        .loadPublicExplorationSummaries(explorationIds)
-        .then(successHandler, failHandler);
+    explorationSummaryBackendApiService
+      .loadPublicExplorationSummaries(explorationIds)
+      .then(successHandler, failHandler);
 
-      const req = httpTestingController.expectOne(requestUrl);
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleResults);
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleResults);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleResults);
-      expect(failHandler).not.toHaveBeenCalled();
-    }));
+    expect(successHandler).toHaveBeenCalledWith(sampleResults);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
   it('should load public and private exploration summaries from backend',
     fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let explorationIds = ['0', '1', '2'];
-      let sampleResults = [{
+      const explorationIds = ['0', '1', '2'];
+      const sampleResults = [{
         title: 'Title 1',
         category: 'Category 1',
         status: 'public',
@@ -139,7 +137,7 @@ describe('Exploration Summary Backend Api Service', () => {
         language_code: 'en'
       }];
 
-      let requestUrl = '/explorationsummarieshandler/data?' +
+      const requestUrl = '/explorationsummarieshandler/data?' +
         'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
         '&' + 'include_private_explorations=true';
 
@@ -160,11 +158,9 @@ describe('Exploration Summary Backend Api Service', () => {
 
   it('should use reject handler when loading public exploration summaries' +
     ' from backend returns null', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-    let explorationIds = ['0', '1', '2'];
+    const explorationIds = ['0', '1', '2'];
 
-    let requestUrl = '/explorationsummarieshandler/data?' +
+    const requestUrl = '/explorationsummarieshandler/data?' +
       'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
       '&' + 'include_private_explorations=false';
 
@@ -186,12 +182,10 @@ describe('Exploration Summary Backend Api Service', () => {
 
   it('should use reject handler when loading public exploration summaries' +
     ' from backend fails', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-    let explorationIds = ['0', '1', '2'];
-    let errorMessage = 'Error on loading public exploration summaries.';
+    const explorationIds = ['0', '1', '2'];
+    const errorMessage = 'Error on loading public exploration summaries.';
 
-    let requestUrl = '/explorationsummarieshandler/data?' +
+    const requestUrl = '/explorationsummarieshandler/data?' +
       'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
       '&' + 'include_private_explorations=false';
 

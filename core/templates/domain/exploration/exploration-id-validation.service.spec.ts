@@ -19,6 +19,7 @@
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
 import { ExplorationIdValidationService } from
   'domain/exploration/exploration-id-validation.service';
 
@@ -27,6 +28,8 @@ describe('Exploration id validation service', function() {
     ExplorationIdValidationService = null;
   let httpTestingController: HttpTestingController;
   let validExpResults = null;
+  let successHandler = null;
+  let failHandler = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -37,7 +40,12 @@ describe('Exploration id validation service', function() {
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
-  beforeEach(()=> {
+  beforeEach(() => {
+    successHandler = jasmine.createSpy('success');
+    failHandler = jasmine.createSpy('fail');
+  });
+
+  beforeEach(() => {
     validExpResults = {
       summaries: [{
         id: '0',
@@ -70,78 +78,71 @@ describe('Exploration id validation service', function() {
     httpTestingController.verify();
   });
 
-  it('should correctly validate the invalid exploration ids',
-    fakeAsync(()=> {
-      // The service should respond false when the summaries array
-      // is empty.
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let explorationIds = ['0'];
-      let requestUrl = '/explorationsummarieshandler/data?' +
-        'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
-        '&' + 'include_private_explorations=false';
+  it('should correctly validate the invalid exploration ids', fakeAsync(()=> {
+    // The service should respond false when the summaries array
+    // is empty.
+    const explorationIds = ['0'];
+    const requestUrl = '/explorationsummarieshandler/data?' +
+      'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
+      '&' + 'include_private_explorations=false';
 
-      explorationIdValidationService.isExpPublished('0')
-        .then(successHandler, failHandler);
-      let req = httpTestingController
-        .expectOne(requestUrl);
-      expect(req.request.method).toEqual('GET');
-      req.flush({summaries: []});
-      flushMicrotasks();
+    explorationIdValidationService.isExpPublished('0')
+      .then(successHandler, failHandler);
+    let req = httpTestingController
+      .expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush({summaries: []});
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(false);
-      expect(failHandler).not.toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(false);
+    expect(failHandler).not.toHaveBeenCalled();
 
-      // The service should respond false when the summaries array
-      // contains null.
-      explorationIdValidationService.isExpPublished('0')
-        .then(successHandler, failHandler);
-      req = httpTestingController
-        .expectOne(requestUrl);
-      expect(req.request.method).toEqual('GET');
-      req.flush({summaries: [null]});
-      flushMicrotasks();
+    // The service should respond false when the summaries array
+    // contains null.
+    explorationIdValidationService.isExpPublished('0')
+      .then(successHandler, failHandler);
+    req = httpTestingController
+      .expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush({summaries: [null]});
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(false);
-      expect(failHandler).not.toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(false);
+    expect(failHandler).not.toHaveBeenCalled();
 
-      // The service should respond false when the summaries array
-      // contains more than one element.
-      explorationIdValidationService.isExpPublished('0')
-        .then(successHandler, failHandler);
-      req = httpTestingController
-        .expectOne(requestUrl);
-      expect(req.request.method).toEqual('GET');
-      req.flush({summaries: [
-        'exp1',
-        'exp2'
-      ]});
-      flushMicrotasks();
+    // The service should respond false when the summaries array
+    // contains more than one element.
+    explorationIdValidationService.isExpPublished('0')
+      .then(successHandler, failHandler);
+    req = httpTestingController
+      .expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush({summaries: [
+      'exp1',
+      'exp2'
+    ]});
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(false);
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).toHaveBeenCalledWith(false);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
 
-  it('should correctly validate the valid exploration id',
-    fakeAsync(()=> {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let explorationIds = ['0'];
-      let requestUrl = '/explorationsummarieshandler/data?' +
-        'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
-        '&' + 'include_private_explorations=false';
+  it('should correctly validate the valid exploration id', fakeAsync(()=> {
+    const explorationIds = ['0'];
+    const requestUrl = '/explorationsummarieshandler/data?' +
+      'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
+      '&' + 'include_private_explorations=false';
 
-      explorationIdValidationService.isExpPublished('0')
-        .then(successHandler, failHandler);
-      const req = httpTestingController
-        .expectOne(requestUrl);
-      expect(req.request.method).toEqual('GET');
-      req.flush(validExpResults);
-      flushMicrotasks();
+    explorationIdValidationService.isExpPublished('0')
+      .then(successHandler, failHandler);
+    const req = httpTestingController
+      .expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(validExpResults);
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(true);
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).toHaveBeenCalledWith(true);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

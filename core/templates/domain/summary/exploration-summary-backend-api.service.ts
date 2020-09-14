@@ -34,7 +34,7 @@ export class ExplorationSummaryBackendApiService {
     private alertsService: AlertsService,
     private validatorsService: ValidatorsService) {}
 
-  _fetchExpSummaries(
+  private _fetchExpSummaries(
       explorationIds: string[],
       includePrivateExplorations: boolean,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
@@ -42,8 +42,8 @@ export class ExplorationSummaryBackendApiService {
     if (!explorationIds.every(expId =>
       this.validatorsService.isValidExplorationId(expId, true))) {
       this.alertsService.addWarning('Please enter a valid exploration ID.');
-      var returnValue = [];
-      for (var i = 0; i < explorationIds.length; i++) {
+      let returnValue = [];
+      for (let i = 0; i < explorationIds.length; i++) {
         returnValue.push(null);
       }
       if (errorCallback) {
@@ -51,7 +51,7 @@ export class ExplorationSummaryBackendApiService {
       }
       return;
     }
-    var explorationSummaryDataUrl =
+    const explorationSummaryDataUrl =
     AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE;
     this.httpClient.get(explorationSummaryDataUrl, {
       params: {
@@ -59,17 +59,16 @@ export class ExplorationSummaryBackendApiService {
         include_private_explorations: JSON.stringify(
           includePrivateExplorations)
       }
-    }).toPromise().then((response: Object[]) => {
-      var summaries = angular.copy(response);
+    }).toPromise().then((summaries: Object[]) => {
       try {
         if (successCallback) {
           if (summaries === null) {
-            var summariesError = (
+            const summariesError = (
               'Summaries fetched are null for explorationIds: ' + explorationIds
             );
             throw new Error(summariesError);
           } else if (typeof (summaries) === 'string') {
-            var fetchingError =
+            const fetchingError =
             'Error on loading public exploration summaries.';
             throw new Error(fetchingError);
           }
