@@ -36,7 +36,6 @@ angular.module('oppia').directive('i18nFooter', [
             UserService, SUPPORTED_SITE_LANGUAGES) {
           var ctrl = this;
           // Changes the language of the translations.
-          var preferencesDataUrl = '/preferenceshandler/data';
           var siteLanguageUrl = '/save_site_language';
           ctrl.changeLanguage = function() {
             $translate.use(ctrl.currentLanguageCode);

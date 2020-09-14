@@ -188,7 +188,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 },
                 'old_value': None
             },
-            'score_category': self.score_category
+            'score_category': self.score_category,
+            'language_code': None
         }
         self.mock_create_suggestion(self.target_id)
 
@@ -1026,29 +1027,34 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             'exp1', 1, suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change, 'category1', 'exploration.exp1.thread_1')
+            'reviewer_2', self.change, 'category1',
+            'exploration.exp1.thread_1', None)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change, 'category2', 'exploration.exp1.thread_2')
+            'reviewer_2', self.change, 'category2',
+            'exploration.exp1.thread_2', None)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change, 'category3', 'exploration.exp1.thread_3')
+            'reviewer_2', self.change, 'category3',
+            'exploration.exp1.thread_3', None)
         # This suggestion does not count as a suggestion that can be reviewed
         # by a user because it has already been rejected.
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_REJECTED, 'author_3',
-            'reviewer_2', self.change, 'category1', 'exploration.exp1.thread_4')
+            'reviewer_2', self.change, 'category1',
+            'exploration.exp1.thread_4', None)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_2', self.change, 'category2', 'exploration.exp1.thread_5')
+            'reviewer_2', self.change, 'category2',
+            'exploration.exp1.thread_5', None)
 
         self.assertEqual(len(
             suggestion_services
@@ -1301,7 +1307,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_misconception_ids': ['skillid-1']
+                'inapplicable_skill_misconception_ids': ['skillid-1']
             },
             'skill_id': skill_id,
             'skill_difficulty': 0.3

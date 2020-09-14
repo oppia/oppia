@@ -108,10 +108,29 @@ class ExplorationModel(base_models.VersionedModel):
         """Exploration is deleted only if it is not public."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'blurb': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'author_notes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'states_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'init_state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'states': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'param_specs': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'param_changes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'auto_tts_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'correctness_feedback_enabled':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'default_skin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skin_customizations': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -220,10 +239,12 @@ class ExplorationContextModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
@@ -302,10 +323,21 @@ class ExplorationRightsModel(base_models.VersionedModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'voice_artist_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'viewer_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'cloned_from': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -523,12 +555,14 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def get_multi(cls, exp_id, exp_versions):
@@ -805,10 +839,33 @@ class ExpSummaryModel(base_models.BaseModel):
             -ExpSummaryModel.first_published_msec
         ).fetch(limit)
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model data has already been exported as a part of the
         ExplorationModel and thus does not need a separate export_data
         function.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'objective': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'ratings': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'scaled_average_rating': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_model_last_updated':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_model_created_on':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'owner_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'editor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'voice_artist_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'viewer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'contributor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'contributors_summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })

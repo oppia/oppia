@@ -209,8 +209,6 @@ angular.module('oppia').directive('adminMiscTab', [
         ctrl.submitQuery = function() {
           var STATUS_PENDING = (
             'Data extraction query has been submitted. Please wait.');
-          var STATUS_FINISHED = 'Loading the extracted data ...';
-          var STATUS_FAILED = 'Error, ';
 
           setDataExtractionQueryStatusMessage(STATUS_PENDING);
 

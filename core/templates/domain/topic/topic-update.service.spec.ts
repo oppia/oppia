@@ -51,7 +51,6 @@ describe('Topic update service', function() {
   var recordedVoiceoversObjectFactory = null;
   var TopicUpdateService = null;
   var TopicObjectFactory = null;
-  var subtopicObjectFactory = null;
   var skillSummaryObjectFactory = null;
   var subtitledHtmlObjectFactory = null;
   var subtopicPageObjectFactory = null;
@@ -164,7 +163,6 @@ describe('Topic update service', function() {
     TopicUpdateService = $injector.get('TopicUpdateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     subtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
-    subtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     subtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
     skillSummaryObjectFactory = $injector.get('ShortSkillSummaryObjectFactory');
@@ -507,7 +505,7 @@ describe('Topic update service', function() {
   }
   );
 
-  it('should not create a backend change dict for changing subtopic  ' +
+  it('should not create a backend change dict for changing subtopic ' +
     'thumbnail filename when the subtopic does not exist', function() {
     expect(function() {
       TopicUpdateService

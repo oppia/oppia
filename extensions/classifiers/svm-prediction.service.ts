@@ -46,7 +46,6 @@ export class SVMPredictionService {
 
     if (kernel === 'rbf') {
       var gamma = kernelParams.gamma;
-      var vectorLength = input.length;
       for (var i = 0; i < supportVectors.length; i++) {
         var sum = 0;
         for (var j = 0; j < input.length; j++) {
@@ -55,7 +54,6 @@ export class SVMPredictionService {
         kvalues.push(Math.exp(-gamma * sum));
       }
     } else if (kernel === 'linear') {
-      var vectorLength = input.length;
       for (var i = 0; i < supportVectors.length; i++) {
         var sum = 0;
         for (var j = 0; j < input.length; j++) {

@@ -50,7 +50,6 @@ describe('Collection editor state service', function() {
   var secondBackendCollectionObject = null;
   var unpublishablePublicCollectionRightsObject = null;
   var $rootScope = null;
-  var $scope = null;
   var $q = null;
   var testSubscriptions: Subscription;
 
@@ -154,7 +153,6 @@ describe('Collection editor state service', function() {
     CollectionUpdateService = $injector.get('CollectionUpdateService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
 
     fakeEditableCollectionBackendApiService.newBackendCollectionObject = {
       id: '0',
@@ -288,7 +286,7 @@ describe('Collection editor state service', function() {
     }
   );
 
-  it('it should report that a collection has loaded through loadCollection()',
+  it('should report that a collection has loaded through loadCollection()',
     function() {
       expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
 
@@ -300,7 +298,7 @@ describe('Collection editor state service', function() {
     }
   );
 
-  it('it should report that a collection has loaded through setCollection()',
+  it('should report that a collection has loaded through setCollection()',
     function() {
       expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
 

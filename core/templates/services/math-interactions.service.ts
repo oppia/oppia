@@ -81,11 +81,22 @@ export class MathInteractionsService {
         'Your answer has two symbols next to each other: "' + symbol1 +
         '" and "' + symbol2 + '".');
     }
+    if (
+      errorMessage === 'Cannot read property \'parent\' of undefined.') {
+      let emptyFunctionNames = [];
+      for (let functionName of this.mathFunctionNames) {
+        if (expressionString.includes(functionName + '()')) {
+          emptyFunctionNames.push(functionName);
+        }
+      }
+      errorMessage = (
+        'The ' + emptyFunctionNames.join(', ') +
+        ' function(s) cannot be empty. Please enter a variable/number in it.');
+    }
     return errorMessage;
   }
 
-  _validateExpression(
-      expressionString: string, validVariablesList: string[]): boolean {
+  _validateExpression(expressionString: string): boolean {
     expressionString = expressionString.replace(/\s/g, '');
     if (expressionString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
@@ -119,7 +130,7 @@ export class MathInteractionsService {
 
   validateAlgebraicExpression(
       expressionString: string, validVariablesList: string[]): boolean {
-    if (!this._validateExpression(expressionString, validVariablesList)) {
+    if (!this._validateExpression(expressionString)) {
       return false;
     }
 
@@ -132,12 +143,13 @@ export class MathInteractionsService {
     if (expressionString.match(/(^|[^a-zA-Z])pi($|[^a-zA-Z])/g)) {
       variablesList.push('pi');
     }
+    const greekNameToSymbolMap: { [greekName: string]: string } = (
+      AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+
     // Replacing greek names with symbols.
     for (let i = 0; i < variablesList.length; i++) {
       if (variablesList[i].length > 1) {
-        // eslint-disable-next-line dot-notation
-        variablesList[i] = AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS'][
-          variablesList[i]];
+        variablesList[i] = greekNameToSymbolMap[variablesList[i]];
       }
     }
     if (variablesList.length === 0) {
@@ -160,7 +172,7 @@ export class MathInteractionsService {
   }
 
   validateNumericExpression(expressionString: string): boolean {
-    if (!this._validateExpression(expressionString, [])) {
+    if (!this._validateExpression(expressionString)) {
       return false;
     }
     for (let functionName of this.mathFunctionNames) {
@@ -253,8 +265,8 @@ export class MathInteractionsService {
     // ['alpha', 'beta'] and not ['alpha', 'b', 'eta'].
     greekLettersAndSymbols.sort((a, b) => b[0].length - a[0].length);
 
-    let greekLetterToSymbol = {};
-    let greekSymbolToLetter = {};
+    let greekLetterToSymbol: { [letter: string]: string } = {};
+    let greekSymbolToLetter: { [symbol: string]: string } = {};
     for (let letterAndSymbol of greekLettersAndSymbols) {
       greekLetterToSymbol[letterAndSymbol[0]] = letterAndSymbol[1];
       greekSymbolToLetter[letterAndSymbol[1]] = letterAndSymbol[0];
