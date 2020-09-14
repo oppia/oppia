@@ -634,7 +634,7 @@ class DeployTests(test_utils.GenericTestBase):
         }
         expected_check_function_calls = {
             'update_indexes_gets_called': True,
-            'check_all_indexes_are_serving_gets_called': 2,
+            'check_all_indexes_are_serving_gets_called': 3,
             'sleep_gets_called': 2
         }
         def mock_update_indexes(unused_index_yaml_path, unused_app_name):
@@ -643,7 +643,7 @@ class DeployTests(test_utils.GenericTestBase):
             check_function_calls[
                 'check_all_indexes_are_serving_gets_called'] += 1
             if check_function_calls[
-                'check_all_indexes_are_serving_gets_called'] == 2:
+                    'check_all_indexes_are_serving_gets_called'] == 3:
                 return True
             return False
         def mock_sleep(unused_time):
@@ -653,12 +653,39 @@ class DeployTests(test_utils.GenericTestBase):
             gcloud_adapter, 'update_indexes', mock_update_indexes)
         check_indexes_swap = self.swap(
             gcloud_adapter, 'check_all_indexes_are_serving', mock_check_indexes)
+        sleep_swap = self.swap(time, 'sleep', mock_sleep)
         with self.open_tab_swap, update_indexes_swap, check_indexes_swap:
-            with self.assertRaisesRegexp(
-                Exception,
-                'Please wait for all indexes to serve, then run this '
-                'script again to complete the deployment. For details, '
-                'visit the indexes page. Exiting.'):
+            with sleep_swap:
+                deploy.update_and_check_indexes('oppiaserver')
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_indexes_serving(self):
+        check_function_calls = {
+            'update_indexes_gets_called': False,
+            'check_all_indexes_are_serving_gets_called': 0,
+            'sleep_gets_called': 0
+        }
+        expected_check_function_calls = {
+            'update_indexes_gets_called': True,
+            'check_all_indexes_are_serving_gets_called': 1,
+            'sleep_gets_called': 1
+        }
+        def mock_update_indexes(unused_index_yaml_path, unused_app_name):
+            check_function_calls['update_indexes_gets_called'] = True
+        def mock_check_indexes(unused_app_name):
+            check_function_calls[
+                'check_all_indexes_are_serving_gets_called'] += 1
+            return True
+        def mock_sleep(unused_time):
+            check_function_calls['sleep_gets_called'] += 1
+
+        update_indexes_swap = self.swap(
+            gcloud_adapter, 'update_indexes', mock_update_indexes)
+        check_indexes_swap = self.swap(
+            gcloud_adapter, 'check_all_indexes_are_serving', mock_check_indexes)
+        sleep_swap = self.swap(time, 'sleep', mock_sleep)
+        with self.open_tab_swap, update_indexes_swap, check_indexes_swap:
+            with sleep_swap:
                 deploy.update_and_check_indexes('oppiaserver')
         self.assertEqual(check_function_calls, expected_check_function_calls)
 

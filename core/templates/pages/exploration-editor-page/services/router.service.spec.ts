@@ -337,7 +337,7 @@ describe('Router Service', () => {
     $rootScope.$apply();
   });
 
-  it('should navigate to stats tab ', () => {
+  it('should navigate to stats tab', () => {
     RouterService.navigateToStatsTab();
     $rootScope.$apply();
 
@@ -349,7 +349,7 @@ describe('Router Service', () => {
     $rootScope.$apply();
   });
 
-  it('should navigate to improvements tab ', fakeAsync(() => {
+  it('should navigate to improvements tab', fakeAsync(() => {
     spyOn(ExplorationImprovementsService, 'isImprovementsTabEnabledAsync')
       .and.returnValue(Promise.resolve(true));
 
@@ -463,7 +463,7 @@ describe('Router Service', () => {
       expect(RouterService.getActiveTabName()).toEqual('stats');
     }));
 
-  it('should navigate to settings tab ', () => {
+  it('should navigate to settings tab', () => {
     RouterService.navigateToSettingsTab();
     $rootScope.$apply();
 
@@ -475,7 +475,7 @@ describe('Router Service', () => {
     $rootScope.$apply();
   });
 
-  it('should navigate to history tab ', () => {
+  it('should navigate to history tab', () => {
     RouterService.navigateToHistoryTab();
     $rootScope.$apply();
 
@@ -487,7 +487,7 @@ describe('Router Service', () => {
     $rootScope.$apply();
   });
 
-  it('should navigate to feedback tab ', () => {
+  it('should navigate to feedback tab', () => {
     RouterService.navigateToFeedbackTab();
     $rootScope.$apply();
 
