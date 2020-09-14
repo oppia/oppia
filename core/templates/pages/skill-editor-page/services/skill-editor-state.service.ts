@@ -111,7 +111,6 @@ angular.module('oppia').factory('SkillEditorStateService', [
             assignedSkillTopicData = (
               newBackendSkillObject.assignedSkillTopicData);
             _updateSkill(newBackendSkillObject.skill);
-            // TODO: Fix this.
             _updateGroupedSkillSummaries(
               newBackendSkillObject.groupedSkillSummaries);
             QuestionsListService.getQuestionSummariesAsync(
