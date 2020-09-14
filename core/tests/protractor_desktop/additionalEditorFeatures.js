@@ -32,7 +32,7 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-fdescribe('Full exploration editor', function() {
+describe('Full exploration editor', function() {
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
@@ -68,15 +68,10 @@ fdescribe('Full exploration editor', function() {
       await workflow.createExploration();
 
       var postTutorialPopover = element(by.css('.popover-content'));
-      // var stateEditContent = element(by.css('.protractor-test-edit-content'));
       var stateEditButton = element(
         by.css('.protractor-test-edit-content-pencil-button'));
       await waitFor.invisibilityOf(
         postTutorialPopover, 'Post-tutorial popover does not disappear.');
-      /*await waitFor.elementToBeClickable(
-        stateEditContent,
-        'stateEditContent taking too long to appear to set content');
-      await stateEditContent.click();*/
       await action.click('State Edit Button', stateEditButton);
       var stateEditorTag = element(by.tagName('state-content-editor'));
       var stateContentEditor = stateEditorTag.element(
@@ -246,7 +241,8 @@ fdescribe('Full exploration editor', function() {
     await users.logout();
   });
 
-  fit('should handle multiple rules in an answer group and also disallow ' +
+  it(
+    'should handle multiple rules in an answer group and also disallow ' +
       'editing of a read-only exploration', async function() {
     await users.createUser('user6@editorAndPlayer.com', 'user6EditorAndPlayer');
     await users.createUser('user7@editorAndPlayer.com', 'user7EditorAndPlayer');
@@ -361,7 +357,7 @@ fdescribe('Full exploration editor', function() {
     await users.logout();
   });
 
-  fit('should delete interactions cleanly', async function() {
+  it('should delete interactions cleanly', async function() {
     await users.createUser('user8@editorAndPlayer.com', 'user8EditorAndPlayer');
     await users.login('user8@editorAndPlayer.com');
     await workflow.createExploration();

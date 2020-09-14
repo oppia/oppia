@@ -166,7 +166,6 @@ var ExplorationEditorMainTab = function() {
     // Otherwise, if the editor tutorial shows up, exit it.
     var buttons = element.all(by.css('.skipBtn'));
     if (await buttons.count() === 1) {
-      // await (await buttons.get(0)).click();
       await action.click('Skip button', await buttons.get(0));
     } else if (await buttons.count() !== 0) {
       throw new Error(
@@ -183,7 +182,6 @@ var ExplorationEditorMainTab = function() {
     if (await finishTutorialButtons.count() === 1) {
       await action.click(
         'Finish Tutorial Stage button', finishTutorialButtons.get(0));
-      // await finishTutorialButtons.get(0).click();
     } else {
       throw new Error('There is more than 1 Finish button!');
     }
@@ -212,7 +210,6 @@ var ExplorationEditorMainTab = function() {
       if (await nextTutorialStageButtons.count() === 1) {
         await action.click(
           'Next Tutorial Stage button', nextTutorialStageButtons.get(0));
-        // await nextTutorialStageButtons.get(0).click();
         await waitFor.invisibilityOf(
           tutorialTabHeadingElement,
           'Tutorial stage takes too long to disappear');
@@ -225,7 +222,8 @@ var ExplorationEditorMainTab = function() {
   this.startTutorial = async function() {
     await waitFor.visibilityOf(
       editorWelcomeModal, 'Editor Welcome modal takes too long to appear');
-    var startTutorialButton = element(by.css('.protractor-test-start-tutorial'));
+    var startTutorialButton = element(
+      by.css('.protractor-test-start-tutorial'));
     await action.click('Start Tutorial button', startTutorialButton);
     await waitFor.visibilityOf(
       element(by.css('.ng-joyride-title')),
@@ -470,13 +468,7 @@ var ExplorationEditorMainTab = function() {
       targetOption = destName;
     }
 
-    var outcomeDestOption = await editOutcomeDestDropdownOptions(targetOption)
-    /*await waitFor.visibilityOf(
-      await editOutcomeDestDropdownOptions(targetOption),
-      'editOutcomeDestDropdownOptions taking too long to appear');
-    expect(await editOutcomeDestDropdownOptions(targetOption).isDisplayed())
-      .toBe(true);
-    await editOutcomeDestDropdownOptions(targetOption).click();*/
+    var outcomeDestOption = await editOutcomeDestDropdownOptions(targetOption);
     await action.click('Outcome Destination Option', outcomeDestOption);
 
     if (createNewDest) {
