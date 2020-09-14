@@ -22,6 +22,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 
 import python_utils
 from scripts import common
@@ -238,28 +239,23 @@ def _install_library(library_name, version_string):
         library_name: str. Name of the library to install.
         version_string: str. Stringified version of the library to install.
     """
-    subprocess.check_call([
-        'pip', 'install', '--target',
+    pip_install(
+        library_name,
+        version_string,
         common.THIRD_PARTY_PYTHON_LIBS_DIR,
-        '--no-dependencies',
-        '%s==%s' % (
-            library_name,
-            version_string),
-        '--upgrade'
-    ])
+        upgrade=True,
+        no_dependencies=True
+    )
 
 
 def _reinstall_all_dependencies():
     """Reinstalls all of the libraries detailed in the compiled
     'requirements.txt' file to the 'third_party/python_libs' folder.
     """
-    subprocess.check_call([
-        'pip', 'install', '--target',
+    _pip_install_requirements(
         common.THIRD_PARTY_PYTHON_LIBS_DIR,
-        '--no-dependencies', '-r',
-        common.COMPILED_REQUIREMENTS_FILE_PATH,
-        '--upgrade'
-    ])
+        common.COMPILED_REQUIREMENTS_FILE_PATH
+    )
 
 
 def _get_possible_normalized_metadata_directory_names(
@@ -294,6 +290,103 @@ def _get_possible_normalized_metadata_directory_names(
             '%s-%s.egg-info' % (
                 library_name.replace('-', '_'), version_string)),
     }
+
+
+def _verify_pip_is_installed():
+    """Verify that pip is installed.
+
+    Raises:
+        ImportError. Error importing pip.
+    """
+    try:
+        python_utils.PRINT('Checking if pip is installed on the local machine')
+        # Importing pip just to check if its installed.
+        import pip  #pylint: disable=unused-variable
+    except ImportError as e:
+        common.print_each_string_after_two_new_lines([
+            'Pip is required to install Oppia dependencies, but pip wasn\'t '
+            'found on your local machine.',
+            'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
+            'page:'])
+
+        if common.is_mac_os():
+            python_utils.PRINT(
+                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
+                'OS%29')
+        elif common.is_linux_os():
+            python_utils.PRINT(
+                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
+                '%29')
+        else:
+            python_utils.PRINT(
+                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
+                'Windows%29')
+        raise ImportError('Error importing pip: %s' % e)
+
+
+def _run_pip_command(cmd_parts):
+    """Run pip command with some flags and configs. If it fails try to rerun it
+    with additional flags and else raise an exception.
+
+    Args:
+        cmd_parts: list(str). List of cmd parts to be run with pip.
+
+    Raises:
+        Exception. Error installing package.
+    """
+    _verify_pip_is_installed()
+    # The call to python -m is used to ensure that Python and Pip versions are
+    # compatible.
+    command = [sys.executable, '-m', 'pip'] + cmd_parts
+    process = subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode == 0:
+        python_utils.PRINT(stdout)
+    elif 'can\'t combine user with prefix' in stderr:
+        python_utils.PRINT('Trying by setting --user and --prefix flags.')
+        subprocess.check_call(
+            command + ['--user', '--prefix=', '--system'])
+    else:
+        python_utils.PRINT(stderr)
+        python_utils.PRINT(
+            'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
+        raise Exception('Error installing package')
+
+
+def pip_install(
+        package, version, install_path, upgrade=False, no_dependencies=False):
+    """Installs third party libraries with pip.
+
+    Args:
+        package: str. The package name.
+        version: str. The package version.
+        install_path: str. The installation path for the package.
+        upgrade: bool. Whether call the pip with --upgrade flag.
+        no_dependencies: bool. Whether call the pip with --no-dependencies flag.
+    """
+    additional_pip_args = []
+    if upgrade:
+        additional_pip_args.append('--upgrade')
+    if no_dependencies:
+        additional_pip_args.append('--no-dependencies')
+
+    _run_pip_command([
+        'install', '%s==%s' % (package, version), '--target', install_path
+    ] + additional_pip_args)
+
+
+def _pip_install_requirements(install_path, requirements_path):
+    """Installs third party libraries from requirements files with pip.
+
+    Args:
+        install_path: str. The installation path for the packages.
+        requirements_path: str. The path to the requirements file.
+    """
+    _run_pip_command([
+        'install', '--target', install_path, '--no-dependencies',
+        '-r', requirements_path, '--upgrade'
+    ])
 
 
 def get_mismatches():
