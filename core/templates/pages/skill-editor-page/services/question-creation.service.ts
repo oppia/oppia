@@ -93,7 +93,7 @@ angular.module('oppia').factory('QuestionCreationService', [
         function(skills) {
           skills.forEach(function(skill) {
             misconceptionsBySkill[skill.getId()] =
-              skill.misconceptions;
+              skill.getMisconceptions();
           });
           $rootScope.$apply();
         }, function(error) {

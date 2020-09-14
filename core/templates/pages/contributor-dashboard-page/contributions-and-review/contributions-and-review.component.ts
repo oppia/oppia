@@ -237,7 +237,7 @@ angular.module('oppia').component('contributionsAndReview', {
           SkillBackendApiService.fetchSkill(skillId).then((skillDict) => {
             var misconceptionsBySkill = {};
             var skill = skillDict.skill;
-            misconceptionsBySkill[skill.getId()] = skill.misconceptions;
+            misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
             _showQuestionSuggestionModal(
               suggestion, contributionDetails, reviewable,
               misconceptionsBySkill);

@@ -19,28 +19,27 @@
 
 import { EventEmitter } from '@angular/core';
 
-import { UpgradedServices } from 'services/UpgradedServices';
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
 
 import { Subscription } from 'rxjs';
 
 describe('Skills List Directive', function() {
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
+
   var $uibModal = null;
   var $scope = null;
   var ctrl = null;
   var $q = null;
-  var $httpBackend = null;
   var $rootScope = null;
   var directive = null;
   var $timeout = null;
   var EditableTopicBackendApiService = null;
+  var SkillBackendApiService = null;
 
   var mockTasdReinitializedEventEmitter;
   var tasdReinitializedSpy = null;
@@ -62,16 +61,17 @@ describe('Skills List Directive', function() {
     $uibModal = $injector.get('$uibModal');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    $httpBackend = $injector.get('$httpBackend');
     $timeout = $injector.get('$timeout');
     $q = $injector.get('$q');
 
     EditableTopicBackendApiService =
         $injector.get('EditableTopicBackendApiService');
+    SkillBackendApiService = $injector.get('SkillBackendApiService');
     directive = $injector.get('skillsListDirective')[0];
 
     ctrl = $injector.instantiate(directive.controller, {
       $scope: $scope,
+      SkillBackendApiService: SkillBackendApiService,
       TopicsAndSkillsDashboardBackendApiService:
       MockTopicsAndSkillsDashboardBackendApiService,
       $uibModal
@@ -140,12 +140,12 @@ describe('Skills List Directive', function() {
         result: $q.resolve()
       });
 
+      spyOn(SkillBackendApiService, 'deleteSkill').and.returnValue(
+        $q.resolve());
+
       var skillId = 'CdjnJUE332dd';
-      var url = '/skill_editor_handler/data/' + skillId;
-      $httpBackend.expectDELETE(url).respond(200);
       ctrl.deleteSkill(skillId);
 
-      $httpBackend.flush();
       $timeout.flush();
       expect(tasdReinitializedSpy).toHaveBeenCalled();
     });

@@ -318,7 +318,7 @@ angular.module('oppia').directive('questionsList', [
               function(skills) {
                 skills.forEach(function(skill) {
                   ctrl.misconceptionsBySkill[skill.getId()] =
-                    skill.misconceptions;
+                    skill.getMisconceptions();
                 });
                 $rootScope.$apply();
               }, function(error) {
