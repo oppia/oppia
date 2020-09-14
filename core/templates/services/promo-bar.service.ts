@@ -33,14 +33,14 @@ export class PromoBarService {
     };
     if (ServicesConstants.ENABLE_PROMO_BAR) {
       return this.http.get('/promo_bar_handler', { observe: 'response' })
-      .toPromise()
-      .then(
-        (response) => {
-          promoBarData.promoBarEnabled = response.data.promo_bar_enabled;
-          promoBarData.promoBarMessage = response.data.promo_bar_message;
-          return promoBarData;
-        }
-      );
+        .toPromise()
+        .then(
+          (response) => {
+            promoBarData.promoBarEnabled = response.data.promo_bar_enabled;
+            promoBarData.promoBarMessage = response.data.promo_bar_message;
+            return promoBarData;
+          }
+        );
     } else {
       return Promise.resolve(promoBarData);
     }
