@@ -51,10 +51,8 @@ export class ValidatorsService {
     }
 
     for (
-      /* eslint-disable dot-notation */
-      var i = 0; i < AppConstants['INVALID_NAME_CHARS'].length; i++) {
-      if (input.indexOf(AppConstants['INVALID_NAME_CHARS'][i]) !== -1) {
-      /* eslint-enable dot-notation */
+      var i = 0; i < AppConstants.INVALID_NAME_CHARS.length; i++) {
+      if (input.indexOf(AppConstants.INVALID_NAME_CHARS[i]) !== -1) {
         if (showWarnings) {
           this.alerts.addWarning(
             'Invalid input. Please use a non-empty description ' +
