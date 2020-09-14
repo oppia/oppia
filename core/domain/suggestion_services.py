@@ -594,8 +594,7 @@ def get_translation_suggestions_waiting_longest_for_review_per_lang(
         get_suggestion_from_model(suggestion_model) for suggestion_model in (
             suggestion_models.GeneralSuggestionModel
             .get_translation_suggestions_waiting_longest_for_review_per_lang(
-                language_code
-            )
+                language_code)
         )
     ]
 

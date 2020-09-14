@@ -606,6 +606,38 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(translation_suggestion_models), 0)
 
+    def test_get_translation_suggestions_waiting_longest_for_review_big_fetch(
+            self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread1', self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp2', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp2.thread1', self.translation_language_code)
+
+        with self.swap(
+            suggestion_models,
+            'MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS', 1):
+            translation_suggestion_models = (
+                suggestion_models.GeneralSuggestionModel.
+                get_translation_suggestions_waiting_longest_for_review_per_lang(
+                    self.translation_language_code)
+            )
+
+        # There should only be one translation suggestion returned since we
+        # changed the maximum questions to fetch to 1.
+        self.assertEqual(len(translation_suggestion_models), 1)
+        self.assertEqual(
+            translation_suggestion_models[0].id, 'exploration.exp1.thread1')
+
     def test_get_question_suggestions_waiting_longest_for_review_larger_fetch(
             self):
         suggestion_models.GeneralSuggestionModel.create(

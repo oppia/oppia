@@ -1005,7 +1005,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_translation_suggestions_waiting_longest_for_review_per_lang(
             self):
-        # Create the translation suggestion associated with exploration id
+        # Create a Hindi translation suggestion associated with exploration id
         # target_id_1.
         with self.swap(
             exp_fetchers, 'get_exploration_by_id',
@@ -1018,7 +1018,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id_1, 1, self.author_id_1,
                     self.add_translation_change_dict, 'test description')
-        # Create the translation suggestion associated with exploration id
+        # Create a Hindi translation suggestion associated with exploration id
         # target_id_2.
         with self.swap(
             exp_fetchers, 'get_exploration_by_id',
@@ -1031,7 +1031,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id_2, 1, self.author_id_1,
                     self.add_translation_change_dict, 'test description')
-        # Create the translation suggestion associated with exploration id
+        # Create a Hindi translation suggestion associated with exploration id
         # target_id_3.
         with self.swap(
             exp_fetchers, 'get_exploration_by_id',
@@ -1050,6 +1050,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             .get_translation_suggestions_waiting_longest_for_review_per_lang(
                 'hi'))
 
+        # Assert that the suggestions are in the order that they were created.
         self.assertEqual(len(suggestions), 3)
         self.assertLessEqual(suggestions[0].target_id, self.target_id_1)
         self.assertLessEqual(suggestions[1].target_id, self.target_id_2)
@@ -1068,10 +1069,10 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self):
         """This test makes sure that if a suggestion is rejected and is then
         resubmitted, we count the time that the suggestion has been waiting for
-        review as the time from when it was resubmitted, not from when it was
-        first submitted.
+        review from when it was resubmitted, not from when it was first
+        submitted.
         """
-        # Create the translation suggestion associated with exploration id
+        # Create a Hindi translation suggestion associated with exploration id
         # target_id_1.
         with self.swap(
             exp_fetchers, 'get_exploration_by_id',
@@ -1084,7 +1085,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id_1, 1, self.author_id_1,
                     self.add_translation_change_dict, 'test description')
-        # Create the translation suggestion associated with exploration id
+        # Create a Hindi translation suggestion associated with exploration id
         # target_id_2.
         with self.swap(
             exp_fetchers, 'get_exploration_by_id',
@@ -1187,6 +1188,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             .get_question_suggestions_waiting_longest_for_review()
         )
 
+        # Assert that the suggestions are in the order that they were created.
         self.assertEqual(len(suggestions), 3)
         self.assertLessEqual(suggestions[0].target_id, 'skill1')
         self.assertLessEqual(suggestions[1].target_id, 'skill2')
