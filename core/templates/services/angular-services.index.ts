@@ -352,6 +352,9 @@ import { BackgroundMaskService } from 'services/stateful/background-mask.service
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionsService } from 'services/suggestions.service';
 import { TranslateService } from 'services/translate.service';
+import { TranslationLanguageService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
@@ -718,6 +721,7 @@ export const angularServices: [string, unknown][] = [
     TopicsAndSkillsDashboardFilterObjectFactory],
   ['TopicsAndSkillsDashboardPageService', TopicsAndSkillsDashboardPageService],
   ['TranslateService', TranslateService],
+  ['TranslationLanguageService', TranslationLanguageService],
   ['TranslationsBackendApiService', TranslationsBackendApiService],
   ['UnitsObjectFactory', UnitsObjectFactory],
   ['UrlInterpolationService', UrlInterpolationService],

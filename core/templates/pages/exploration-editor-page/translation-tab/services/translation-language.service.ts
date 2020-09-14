@@ -63,6 +63,6 @@ export class TranslationLanguageService {
   }
 }
 
-angular.module('oppia').factory(
+angular.module('oppia').service(
   'TranslationLanguageService',
   downgradeInjectable(TranslationLanguageService));
