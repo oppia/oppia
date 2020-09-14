@@ -244,118 +244,118 @@ describe('Full exploration editor', function() {
   it(
     'should handle multiple rules in an answer group and also disallow ' +
       'editing of a read-only exploration', async function() {
-    await users.createUser('user6@editorAndPlayer.com', 'user6EditorAndPlayer');
-    await users.createUser('user7@editorAndPlayer.com', 'user7EditorAndPlayer');
-    await users.login('user6@editorAndPlayer.com');
-    await workflow.createExploration();
+      await users.createUser('user6@editorAndPlayer.com', 'user6EditorAndPlayer');
+      await users.createUser('user7@editorAndPlayer.com', 'user7EditorAndPlayer');
+      await users.login('user6@editorAndPlayer.com');
+      await workflow.createExploration();
 
-    // Create an exploration with multiple groups.
-    await explorationEditorMainTab.setStateName('first card');
-    await explorationEditorMainTab.setContent(await forms.toRichText(
-      'How are you feeling?'));
-    await explorationEditorMainTab.setInteraction('TextInput');
-    await explorationEditorMainTab.addResponse(
-      'TextInput', await forms.toRichText('You must be happy!'),
-      null, false, 'Equals', 'happy');
-    await explorationEditorMainTab.addResponse(
-      'TextInput', await forms.toRichText('No being sad!'),
-      null, false, 'Contains', 'sad');
-    var responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
-    await responseEditor.setFeedback(await forms.toRichText(
-      'Okay, now this is just becoming annoying.'));
-    await responseEditor.setDestination('final card', true, null);
+      // Create an exploration with multiple groups.
+      await explorationEditorMainTab.setStateName('first card');
+      await explorationEditorMainTab.setContent(await forms.toRichText(
+        'How are you feeling?'));
+      await explorationEditorMainTab.setInteraction('TextInput');
+      await explorationEditorMainTab.addResponse(
+        'TextInput', await forms.toRichText('You must be happy!'),
+        null, false, 'Equals', 'happy');
+      await explorationEditorMainTab.addResponse(
+        'TextInput', await forms.toRichText('No being sad!'),
+        null, false, 'Contains', 'sad');
+      var responseEditor = await explorationEditorMainTab.getResponseEditor(
+        'default');
+      await responseEditor.setFeedback(await forms.toRichText(
+        'Okay, now this is just becoming annoying.'));
+      await responseEditor.setDestination('final card', true, null);
 
-    // Now, add multiple rules to a single answer group.
-    responseEditor = await explorationEditorMainTab.getResponseEditor(0);
-    await responseEditor.addRule('TextInput', 'Contains', 'meh');
-    await responseEditor.addRule('TextInput', 'Contains', 'okay');
+      // Now, add multiple rules to a single answer group.
+      responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+      await responseEditor.addRule('TextInput', 'Contains', 'meh');
+      await responseEditor.addRule('TextInput', 'Contains', 'okay');
 
-    // Ensure that the only rule for this group cannot be deleted.
-    await (
-      await explorationEditorMainTab.getResponseEditor(1)
-    ).expectCannotDeleteRule(0);
+      // Ensure that the only rule for this group cannot be deleted.
+      await (
+        await explorationEditorMainTab.getResponseEditor(1)
+      ).expectCannotDeleteRule(0);
 
-    // Setup a terminating state.
-    await explorationEditorMainTab.moveToState('final card');
-    await explorationEditorMainTab.setInteraction('EndExploration');
+      // Setup a terminating state.
+      await explorationEditorMainTab.moveToState('final card');
+      await explorationEditorMainTab.setInteraction('EndExploration');
 
-    // Save.
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle('Testing multiple rules');
-    await explorationEditorSettingsTab.setCategory('Algebra');
-    await explorationEditorSettingsTab.setObjective('To assess happiness.');
-    await explorationEditorSettingsTab.openAndClosePreviewSummaryTile();
-    await explorationEditorPage.saveChanges();
-    await workflow.publishExploration();
+      // Save.
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.setTitle('Testing multiple rules');
+      await explorationEditorSettingsTab.setCategory('Algebra');
+      await explorationEditorSettingsTab.setObjective('To assess happiness.');
+      await explorationEditorSettingsTab.openAndClosePreviewSummaryTile();
+      await explorationEditorPage.saveChanges();
+      await workflow.publishExploration();
 
-    // Login as another user and verify that the exploration editor does not
-    // allow the second user to modify the exploration.
-    await users.logout();
-    await users.login('user7@editorAndPlayer.com');
-    // 2nd user finds an exploration, plays it and then try to access
-    // its editor via /create/explorationId.
-    await libraryPage.get();
-    await libraryPage.findExploration('Testing multiple rules');
-    await libraryPage.playExploration('Testing multiple rules');
-    var explorationId = await general.getExplorationIdFromPlayer();
-    await browser.get(
-      general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId);
-    await explorationEditorMainTab.exitTutorial();
+      // Login as another user and verify that the exploration editor does not
+      // allow the second user to modify the exploration.
+      await users.logout();
+      await users.login('user7@editorAndPlayer.com');
+      // 2nd user finds an exploration, plays it and then try to access
+      // its editor via /create/explorationId.
+      await libraryPage.get();
+      await libraryPage.findExploration('Testing multiple rules');
+      await libraryPage.playExploration('Testing multiple rules');
+      var explorationId = await general.getExplorationIdFromPlayer();
+      await browser.get(
+        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId);
+      await explorationEditorMainTab.exitTutorial();
 
-    // Verify nothing can change with this user.
-    await explorationEditorMainTab.expectInteractionToMatch('TextInput');
-    await explorationEditorMainTab.expectCannotDeleteInteraction();
-    await explorationEditorMainTab.expectCannotAddResponse();
-    await explorationEditorPage.expectCannotSaveChanges();
+      // Verify nothing can change with this user.
+      await explorationEditorMainTab.expectInteractionToMatch('TextInput');
+      await explorationEditorMainTab.expectCannotDeleteInteraction();
+      await explorationEditorMainTab.expectCannotAddResponse();
+      await explorationEditorPage.expectCannotSaveChanges();
 
-    // Check answer group 1.
-    responseEditor = await explorationEditorMainTab.getResponseEditor(0);
-    await responseEditor.expectCannotSetFeedback();
-    await responseEditor.expectCannotSetDestination();
-    await responseEditor.expectCannotDeleteResponse();
-    await responseEditor.expectCannotAddRule();
-    await responseEditor.expectCannotDeleteRule(0);
-    await responseEditor.expectCannotDeleteRule(1);
+      // Check answer group 1.
+      responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+      await responseEditor.expectCannotSetFeedback();
+      await responseEditor.expectCannotSetDestination();
+      await responseEditor.expectCannotDeleteResponse();
+      await responseEditor.expectCannotAddRule();
+      await responseEditor.expectCannotDeleteRule(0);
+      await responseEditor.expectCannotDeleteRule(1);
 
-    // Check answer group 2.
-    responseEditor = await explorationEditorMainTab.getResponseEditor(1);
-    await responseEditor.expectCannotSetFeedback();
-    await responseEditor.expectCannotSetDestination();
-    await responseEditor.expectCannotDeleteResponse();
-    await responseEditor.expectCannotAddRule();
-    await responseEditor.expectCannotDeleteRule(0);
+      // Check answer group 2.
+      responseEditor = await explorationEditorMainTab.getResponseEditor(1);
+      await responseEditor.expectCannotSetFeedback();
+      await responseEditor.expectCannotSetDestination();
+      await responseEditor.expectCannotDeleteResponse();
+      await responseEditor.expectCannotAddRule();
+      await responseEditor.expectCannotDeleteRule(0);
 
-    // Check default outcome.
-    responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
-    await responseEditor.expectCannotSetFeedback();
-    await responseEditor.expectCannotSetDestination();
+      // Check default outcome.
+      responseEditor = await explorationEditorMainTab.getResponseEditor(
+        'default');
+      await responseEditor.expectCannotSetFeedback();
+      await responseEditor.expectCannotSetDestination();
 
-    // Check editor preview tab to verify multiple rules are working.
-    await general.moveToPlayer();
-    await explorationPlayerPage.expectContentToMatch(
-      await forms.toRichText('How are you feeling?'));
-    await explorationPlayerPage.expectInteractionToMatch('TextInput');
+      // Check editor preview tab to verify multiple rules are working.
+      await general.moveToPlayer();
+      await explorationPlayerPage.expectContentToMatch(
+        await forms.toRichText('How are you feeling?'));
+      await explorationPlayerPage.expectInteractionToMatch('TextInput');
 
-    await explorationPlayerPage.submitAnswer(
-      'TextInput', 'Fine...I\'m doing okay');
-    await explorationPlayerPage.expectLatestFeedbackToMatch(
-      await forms.toRichText('You must be happy!'));
+      await explorationPlayerPage.submitAnswer(
+        'TextInput', 'Fine...I\'m doing okay');
+      await explorationPlayerPage.expectLatestFeedbackToMatch(
+        await forms.toRichText('You must be happy!'));
 
-    await explorationPlayerPage.submitAnswer('TextInput', 'meh, I\'m so-so');
-    await explorationPlayerPage.expectLatestFeedbackToMatch(
-      await forms.toRichText('You must be happy!'));
+      await explorationPlayerPage.submitAnswer('TextInput', 'meh, I\'m so-so');
+      await explorationPlayerPage.expectLatestFeedbackToMatch(
+        await forms.toRichText('You must be happy!'));
 
-    // Finish the exploration.
-    await explorationPlayerPage.submitAnswer('TextInput', 'Whatever...');
+      // Finish the exploration.
+      await explorationPlayerPage.submitAnswer('TextInput', 'Whatever...');
 
-    await explorationPlayerPage.expectLatestFeedbackToMatch(
-      await forms.toRichText('Okay, now this is just becoming annoying.'));
-    await explorationPlayerPage.clickThroughToNextCard();
-    await explorationPlayerPage.expectExplorationToBeOver();
-    await users.logout();
-  });
+      await explorationPlayerPage.expectLatestFeedbackToMatch(
+        await forms.toRichText('Okay, now this is just becoming annoying.'));
+      await explorationPlayerPage.clickThroughToNextCard();
+      await explorationPlayerPage.expectExplorationToBeOver();
+      await users.logout();
+    });
 
   it('should delete interactions cleanly', async function() {
     await users.createUser('user8@editorAndPlayer.com', 'user8EditorAndPlayer');
