@@ -18,13 +18,13 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroupObjectFactory } from
+import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from
+import { Rule, RuleObjectFactory } from
   'domain/exploration/RuleObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
@@ -32,12 +32,14 @@ import { TextInputValidationService } from
   'interactions/TextInput/directives/text-input-validation.service';
 
 describe('TextInputValidationService', () => {
-  var validatorService, WARNING_TYPES;
-  var INTERACTION_SPECS, customizationArgSpecs, rowsSpecs, minRows, maxRows;
+  let validatorService, WARNING_TYPES;
+  let INTERACTION_SPECS, customizationArgSpecs, rowsSpecs, minRows, maxRows;
 
-  var currentState, customizationArguments;
-  var goodAnswerGroups, goodDefaultOutcome;
-  var oof, agof, rof;
+  let currentState, customizationArguments;
+  let goodAnswerGroups, goodDefaultOutcome;
+  let oof, agof, rof;
+
+  let createAnswerGroupByRules: (rules: Rule[]) => AnswerGroup;
 
   beforeEach(() => {
     validatorService = TestBed.get(TextInputValidationService);
@@ -74,10 +76,16 @@ describe('TextInputValidationService', () => {
     };
 
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    createAnswerGroupByRules = (rules) => agof.createNew(
+      rules,
+      goodDefaultOutcome,
+      null,
+      null
+    );
   });
 
   it('should be able to perform basic validation', () => {
-    var warnings = validatorService.getAllWarnings(
+    let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
@@ -85,7 +93,7 @@ describe('TextInputValidationService', () => {
 
   it('should catch non-string value for placeholder', () => {
     customizationArguments.placeholder.value = 1;
-    var warnings = validatorService.getAllWarnings(
+    let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -97,7 +105,7 @@ describe('TextInputValidationService', () => {
   it('should catch non-string value for placeholder', () => {
     customizationArguments.placeholder.value = (
       new SubtitledUnicode(undefined, undefined));
-    var warnings = validatorService.getAllWarnings(
+    let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -108,7 +116,7 @@ describe('TextInputValidationService', () => {
 
   it('should catch non-integer value for # rows', () => {
     customizationArguments.rows.value = 1.5;
-    var warnings = validatorService.getAllWarnings(
+    let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -119,7 +127,7 @@ describe('TextInputValidationService', () => {
 
   it('should catch an out of range value for # rows', () => {
     customizationArguments.rows.value = -1;
-    var warnings = validatorService.getAllWarnings(
+    let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -131,22 +139,21 @@ describe('TextInputValidationService', () => {
   });
 
   it('should catch redundancy of contains rules with matching inputs', () => {
-    var answerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
-    answerGroups[0].updateRuleTypesToInputs(
+    let answerGroups = [createAnswerGroupByRules(
       [rof.createFromBackendDict({
         rule_type: 'Contains',
         inputs: {
           x: 'xyz'
         }
-      }),
-      rof.createFromBackendDict({
+      }), rof.createFromBackendDict({
         rule_type: 'Contains',
         inputs: {
           x: 'xyza'
         }
-      })]);
+      })]
+    )];
 
-    var warnings = validatorService.getAllWarnings(
+    let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -155,7 +162,7 @@ describe('TextInputValidationService', () => {
       ' is preceded by a \'Contains\' rule with a matching input.'
     }]);
 
-    answerGroups[0].updateRuleTypesToInputs(
+    answerGroups = [createAnswerGroupByRules(
       [rof.createFromBackendDict({
         rule_type: 'Contains',
         inputs: {
@@ -167,9 +174,10 @@ describe('TextInputValidationService', () => {
         inputs: {
           x: 'abc'
         }
-      })]);
+      })]
+    )];
 
-    var warnings = validatorService.getAllWarnings(
+    warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -178,7 +186,7 @@ describe('TextInputValidationService', () => {
       ' is preceded by a \'Contains\' rule with a matching input.'
     }]);
 
-    answerGroups[0].updateRuleTypesToInputs(
+    answerGroups = [createAnswerGroupByRules(
       [rof.createFromBackendDict({
         rule_type: 'Contains',
         inputs: {
@@ -190,9 +198,10 @@ describe('TextInputValidationService', () => {
         inputs: {
           x: 'xyz'
         }
-      })]);
+      })]
+    )];
 
-    var warnings = validatorService.getAllWarnings(
+    warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -203,8 +212,7 @@ describe('TextInputValidationService', () => {
   });
 
   it('should catch redundancy of startsWith rules with matching inputs', () => {
-    var answerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
-    answerGroups[0].updateRuleTypesToInputs(
+    let answerGroups = [createAnswerGroupByRules(
       [rof.createFromBackendDict({
         rule_type: 'StartsWith',
         inputs: {
@@ -216,9 +224,10 @@ describe('TextInputValidationService', () => {
         inputs: {
           x: 'xyza'
         }
-      })]);
+      })]
+    )];
 
-    var warnings = validatorService.getAllWarnings(
+    let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -227,7 +236,7 @@ describe('TextInputValidationService', () => {
       ' is preceded by a \'StartsWith\' rule with a matching prefix.'
     }]);
 
-    answerGroups[0].updateRuleTypesToInputs(
+    answerGroups = [createAnswerGroupByRules(
       [rof.createFromBackendDict({
         rule_type: 'StartsWith',
         inputs: {
@@ -239,9 +248,10 @@ describe('TextInputValidationService', () => {
         inputs: {
           x: 'abc'
         }
-      })]);
+      })]
+    )];
 
-    var warnings = validatorService.getAllWarnings(
+    warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -250,7 +260,7 @@ describe('TextInputValidationService', () => {
       ' is preceded by a \'StartsWith\' rule with a matching prefix.'
     }]);
 
-    answerGroups[0].updateRuleTypesToInputs(
+    answerGroups = [createAnswerGroupByRules(
       [rof.createFromBackendDict({
         rule_type: 'Contains',
         inputs: {
@@ -262,9 +272,10 @@ describe('TextInputValidationService', () => {
         inputs: {
           x: 'xyzy'
         }
-      })]);
+      })]
+    )];
 
-    var warnings = validatorService.getAllWarnings(
+    warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -275,10 +286,7 @@ describe('TextInputValidationService', () => {
   });
 
   it('should catch redundancy of equals rules with matching inputs', () => {
-    var answerGroups = [
-      agof.createNew(goodDefaultOutcome, null, null),
-      agof.createNew(goodDefaultOutcome, null, null)];
-    answerGroups[0].updateRuleTypesToInputs(
+    let answerGroups = [createAnswerGroupByRules(
       [rof.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
@@ -290,9 +298,10 @@ describe('TextInputValidationService', () => {
         inputs: {
           x: 'xyz'
         }
-      })]);
+      })]
+    )];
 
-    var warnings = validatorService.getAllWarnings(
+    let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -301,22 +310,23 @@ describe('TextInputValidationService', () => {
       ' is preceded by a \'Equals\' rule with a matching input.'
     }]);
 
-    answerGroups[0].updateRuleTypesToInputs(
+    answerGroups = [createAnswerGroupByRules(
       [rof.createFromBackendDict({
         rule_type: 'FuzzyEquals',
         inputs: {
           x: 'xyz'
         }
-      })]);
-    answerGroups[1].updateRuleTypesToInputs(
+      })]),
+    createAnswerGroupByRules(
       [rof.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
           x: 'xya'
         }
-      })]);
+      })]
+    )];
 
-    var warnings = validatorService.getAllWarnings(
+    warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -327,8 +337,7 @@ describe('TextInputValidationService', () => {
   });
 
   it('should catch redundancy of fuzzyEquals rules with matching input', () => {
-    var answerGroups = [agof.createNew(goodDefaultOutcome, null, null)];
-    answerGroups[0].updateRuleTypesToInputs(
+    let answerGroups = [createAnswerGroupByRules(
       [rof.createFromBackendDict({
         rule_type: 'FuzzyEquals',
         inputs: {
@@ -340,9 +349,10 @@ describe('TextInputValidationService', () => {
         inputs: {
           x: 'xyz'
         }
-      })]);
+      })]
+    )];
 
-    var warnings = validatorService.getAllWarnings(
+    let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
@@ -351,7 +361,7 @@ describe('TextInputValidationService', () => {
       ' is preceded by a \'FuzzyEquals\' rule with a matching input.'
     }]);
 
-    answerGroups[0].updateRuleTypesToInputs(
+    answerGroups = [createAnswerGroupByRules(
       [rof.createFromBackendDict({
         rule_type: 'FuzzyEquals',
         inputs: {
@@ -363,9 +373,10 @@ describe('TextInputValidationService', () => {
         inputs: {
           x: 'xya'
         }
-      })]);
+      })]
+    )];
 
-    var warnings = validatorService.getAllWarnings(
+    warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, answerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([{
