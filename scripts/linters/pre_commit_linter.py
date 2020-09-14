@@ -53,10 +53,17 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import fnmatch
 import multiprocessing
+import pkg_resources
 import os
 import subprocess
 import sys
 import threading
+
+
+from .. import install_third_party_libs
+# This installs third party libraries before importing other files or importing
+# libraries that use the builtins python module (e.g. build, python_utils).
+install_third_party_libs.main()
 
 import python_utils
 
@@ -70,7 +77,6 @@ from . import other_files_linter
 from . import python_linter
 from .. import common
 from .. import concurrent_task_utils
-from .. import install_third_party_libs
 
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
@@ -105,8 +111,9 @@ _PATHS_TO_INSERT = [
         common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'yaml-3.10'),
     os.path.join(
         common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'jinja2-2.6'),
-    os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME),
+    common.GOOGLE_APP_ENGINE_SDK_HOME,
+    os.path.join(common.OPPIA_TOOLS_DIR, 'grpcio-%s' % common.GRPCIO_VERSION),
+    os.path.join(common.OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'webtest-%s' % common.WEBTEST_VERSION),
     os.path.join(
@@ -119,8 +126,20 @@ _PATHS_TO_INSERT = [
         _PARENT_DIR, 'oppia_tools', 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
     common.THIRD_PARTY_PYTHON_LIBS_DIR
 ]
+
 for path in _PATHS_TO_INSERT:
-    sys.path.insert(0, path)
+    sys.path.insert(1, path)
+
+
+pkg_resources.working_set.add_entry(common.THIRD_PARTY_PYTHON_LIBS_DIR)
+
+if 'google' in sys.modules:
+    print("Fixing google path")
+    google_path = os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+    google_module = sys.modules['google']
+    google_module.__path__.append(google_path)
+    if not hasattr(google_module, '__file__') or not google_module.__file__:
+        google_module.__file__ = os.path.join(google_path, '__init__.py')
 
 _TARGET_STDOUT = python_utils.string_io()
 _STDOUT_LIST = multiprocessing.Manager().list()
@@ -466,7 +485,6 @@ def main(args=None):
     verbose_mode_enabled = bool(parsed_args.verbose)
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
 
-    install_third_party_libs.main()
 
     python_utils.PRINT('Starting Linter....')
 

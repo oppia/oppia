@@ -61,7 +61,6 @@ from . import install_third_party_libs
 # libraries that use the builtins python module (e.g. build, python_utils).
 install_third_party_libs.main()
 
-import pkg_resources
 import python_utils
 
 from . import common

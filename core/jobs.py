@@ -1524,7 +1524,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             cc_model.last_started_msec = utils.get_current_time_in_millisecs()
             cc_model.put()
 
-        _start_computation_transactional
+        _start_computation_transactional()
 
         cls._clear_inactive_realtime_layer(datetime.datetime.utcnow())
 
