@@ -47,6 +47,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 
 import python_utils
 import release_constants
@@ -220,12 +221,16 @@ def update_and_check_indexes(app_name):
         'https://console.cloud.google.com/datastore/indexes'
         '?project=%s') % app_name
     gcloud_adapter.update_indexes(INDEX_YAML_PATH, app_name)
-    if not gcloud_adapter.check_all_indexes_are_serving(app_name):
-        common.open_new_tab_in_browser_if_possible(indexes_page_url)
-        raise Exception(
-            'Please wait for all indexes to serve, then run this '
-            'script again to complete the deployment. For details, '
-            'visit the indexes page. Exiting.')
+
+    # Sleep for a minute before checking that all indexes are serving.
+    time.sleep(60)
+    if gcloud_adapter.check_all_indexes_are_serving(app_name):
+        return
+
+    common.open_new_tab_in_browser_if_possible(indexes_page_url)
+    python_utils.PRINT('Waiting for all indexes to serve...')
+    while not gcloud_adapter.check_all_indexes_are_serving(app_name):
+        time.sleep(30)
 
 
 def build_scripts(maintenance_mode):

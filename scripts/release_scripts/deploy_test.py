@@ -24,6 +24,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 
 from core.tests import test_utils
 import python_utils
@@ -628,18 +629,25 @@ class DeployTests(test_utils.GenericTestBase):
     def test_indexes_not_serving(self):
         check_function_calls = {
             'update_indexes_gets_called': False,
-            'check_all_indexes_are_serving_gets_called': False
+            'check_all_indexes_are_serving_gets_called': 0,
+            'sleep_gets_called': 0
         }
         expected_check_function_calls = {
             'update_indexes_gets_called': True,
-            'check_all_indexes_are_serving_gets_called': True
+            'check_all_indexes_are_serving_gets_called': 2,
+            'sleep_gets_called': 2
         }
         def mock_update_indexes(unused_index_yaml_path, unused_app_name):
             check_function_calls['update_indexes_gets_called'] = True
         def mock_check_indexes(unused_app_name):
             check_function_calls[
-                'check_all_indexes_are_serving_gets_called'] = True
+                'check_all_indexes_are_serving_gets_called'] += 1
+            if check_function_calls[
+                'check_all_indexes_are_serving_gets_called'] == 2:
+                return True
             return False
+        def mock_sleep(unused_time):
+            check_function_calls['sleep_gets_called'] += 1
 
         update_indexes_swap = self.swap(
             gcloud_adapter, 'update_indexes', mock_update_indexes)
