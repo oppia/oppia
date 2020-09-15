@@ -208,6 +208,7 @@ import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { ExplorationIdValidationService } from 'domain/exploration/exploration-id-validation.service';
+import { ExpressionEvaluatorService } from 'expressions/expression-evaluator.service';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExpressionSyntaxTreeService } from 'expressions/expression-syntax-tree.service';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
@@ -351,6 +352,7 @@ import { StateInteractionStatsService } from 'services/state-interaction-stats.s
 import { StateTopAnswersStatsBackendApiService } from 'services/state-top-answers-stats-backend-api.service';
 import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionsService } from 'services/suggestions.service';
 import { TranslateService } from 'services/translate.service';
@@ -474,6 +476,7 @@ export const angularServices: [string, unknown][] = [
   ['ExplorationStatsObjectFactory', ExplorationStatsObjectFactory],
   ['ExplorationStatsService', ExplorationStatsService],
   ['ExplorationTaskObjectFactory', ExplorationTaskObjectFactory],
+  ['ExpressionEvaluatorService', ExpressionEvaluatorService],
   ['ExpressionParserService', ExpressionParserService],
   ['ExpressionSyntaxTreeService', ExpressionSyntaxTreeService],
   ['ExtensionTagAssemblerService', ExtensionTagAssemblerService],
@@ -488,6 +491,7 @@ export const angularServices: [string, unknown][] = [
   ['FeedbackThreadObjectFactory', FeedbackThreadObjectFactory],
   ['FeedbackThreadSummaryObjectFactory', FeedbackThreadSummaryObjectFactory],
   ['FileDownloadRequestObjectFactory', FileDownloadRequestObjectFactory],
+  ['FocusManagerService', FocusManagerService],
   ['FormatTimePipe', FormatTimePipe],
   ['FractionInputRulesService', FractionInputRulesService],
   ['FractionInputValidationService', FractionInputValidationService],
