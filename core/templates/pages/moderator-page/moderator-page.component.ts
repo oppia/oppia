@@ -28,15 +28,18 @@ angular.module('oppia').component('moderatorPage', {
   template: require('./moderator-page.component.html'),
   controller: [
     '$http', 'AlertsService', 'DateTimeFormatService', 'LoaderService',
-    'ThreadMessageObjectFactory',
+    'ThreadMessageObjectFactory', 'ENTITY_TYPE',
     function(
         $http, AlertsService, DateTimeFormatService, LoaderService,
-        ThreadMessageObjectFactory) {
+        ThreadMessageObjectFactory, ENTITY_TYPE) {
       var ctrl = this;
       ctrl.getDatetimeAsString = function(millisSinceEpoch) {
         return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
           millisSinceEpoch);
       };
+
+      ctrl.isMessageFromExploration = (
+        (message) => message.entityType === ENTITY_TYPE.EXPLORATION);
 
       ctrl.getExplorationCreateUrl = function(explorationId) {
         return '/create/' + explorationId;
@@ -44,7 +47,7 @@ angular.module('oppia').component('moderatorPage', {
 
       ctrl.getActivityCreateUrl = function(reference) {
         var path = (
-          reference.type === 'exploration' ?
+          reference.type === ENTITY_TYPE.EXPLORATION ?
           '/create' :
           '/create_collection');
         return path + '/' + reference.id;
@@ -87,7 +90,7 @@ angular.module('oppia').component('moderatorPage', {
               name: 'type',
               schema: {
                 type: 'unicode',
-                choices: ['exploration', 'collection']
+                choices: [ENTITY_TYPE.EXPLORATION, ENTITY_TYPE.COLLECTION]
               }
             }, {
               name: 'id',
