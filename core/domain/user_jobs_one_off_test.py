@@ -1570,3 +1570,43 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
             'removed explorations 0, 1, 2\', 1]' %
             self.user_id]
         self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+
+class FixUserSettingCreatedOnOneOffJobTests(test_utils.GenericTestBase):
+
+    EXP_ID = 'exp_id_1'
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    def setUp(self):
+        super(FixUserSettingCreatedOnOneOffJobTests, self).setUp()
+
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.albert_id, end_state_name='End')
+
+        exp_services.update_exploration(
+            self.albert_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+            })], 'Test edit')
+
+    def test_user_gets_processed(self):
+        """Tests that the user gets processed."""
+
+        # Start migration job on user created above.
+        job_id = (
+            user_jobs_one_off.FixUserSettingCreatedOnOneOffJob.create_new())
+        user_jobs_one_off.FixUserSettingCreatedOnOneOffJob.enqueue(job_id)
+
+        self.process_and_flush_pending_tasks()
+
+        output = user_jobs_one_off.FixUserSettingCreatedOnOneOffJob.get_output(
+            job_id)
+        # 1 superadmin user is created by default.
+        expected = [[u'user_processed',
+                     [u'Successfully processed 2 users.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])

@@ -439,3 +439,43 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
     @staticmethod
     def reduce(key, values):
         yield (key, len(values))
+
+
+class FixUserSettingCreatedOnOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One off job that updates the created_on field by finding the minimum
+     date-time among other fields.
+    """
+
+    _USER_PROCESSED = 'user_processed'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(model_instance):
+        if not model_instance.deleted:
+            user_dates = [
+                model_instance.last_agreed_to_terms,
+                model_instance.last_started_state_editor_tutorial,
+                model_instance.last_started_state_translation_tutorial,
+                model_instance.last_logged_in,
+                model_instance.last_edited_an_exploration,
+                model_instance.last_created_an_exploration]
+
+            # Removing None values from the user_dates list.
+            filtered_user_dates_list = list(filter(None, user_dates))
+            min_date = min(filtered_user_dates_list)
+            if min_date is not None:
+                model_instance.created_on = min_date
+                model_instance.put()
+                yield FixUserSettingCreatedOnOneOffJob._USER_PROCESSED, 1
+
+    @staticmethod
+    def reduce(key, values):
+        if key == FixUserSettingCreatedOnOneOffJob._USER_PROCESSED:
+            yield (key, ['Successfully processed %d users.' % (
+                sum(ast.literal_eval(v) for v in values))])

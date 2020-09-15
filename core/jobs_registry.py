@@ -102,6 +102,7 @@ ONE_OFF_JOB_MANAGERS = [
     topic_jobs_one_off.TopicMigrationOneOffJob,
     user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
+    user_jobs_one_off.FixUserSettingCreatedOnOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
     user_jobs_one_off.PopulateUserAuthDetailsModelOneOffJob,
     user_jobs_one_off.UserContributionsOneOffJob,
