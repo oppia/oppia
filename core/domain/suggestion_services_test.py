@@ -839,6 +839,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             'skill_id': skill_id,
             'skill_difficulty': 0.3
         }
+
         return suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             suggestion_models.TARGET_TYPE_SKILL, skill_id, 1,
@@ -1128,8 +1129,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestions[0].suggestion_id, suggestion_2.suggestion_id)
 
-        # Change the question_dict of question suggestion that got rejected so
-        # we can resubmit it for review.
+        # Change the question_dict of the question suggestion that got rejected
+        # so we can resubmit the suggestion for review.
         resubmit_question_change = suggestion_1.change
         resubmit_question_change.question_dict['linked_skill_ids'] = ['skill1']
 
