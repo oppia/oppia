@@ -1125,11 +1125,11 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             .get_question_suggestions_waiting_longest_for_review()
         )
         self.assertEqual(len(suggestions), 1)
-        self.assertLessEqual(
+        self.assertEqual(
             suggestions[0].suggestion_id, suggestion_2.suggestion_id)
 
-        # Change the question_dict of question suggestion 1 so that we can
-        # resubmit it for review.
+        # Change the question_dict of question suggestion that got rejected so
+        # we can resubmit it for review.
         resubmit_question_change = suggestion_1.change
         resubmit_question_change.question_dict['linked_skill_ids'] = ['skill1']
 
