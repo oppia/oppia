@@ -23,6 +23,7 @@ import collections
 import copy
 import datetime
 import itertools
+import logging
 
 from core.domain import exp_fetchers
 from core.domain import interaction_registry
@@ -128,35 +129,26 @@ def update_stats(exp_id, exp_version, aggregated_stats):
         aggregated_stats: dict. Dict representing an ExplorationStatsModel
             instance with stats aggregated in the frontend.
     """
-    exploration_stats = get_exploration_stats_by_id(
-        exp_id, exp_version)
+    exp_stats = get_exploration_stats_by_id(exp_id, exp_version)
+    if exp_stats is None:
+        raise Exception(
+            'ExplorationStatsModel id="%s.%s" does not exist' % (
+                exp_id, exp_version))
 
-    exploration_stats.num_starts_v2 += aggregated_stats['num_starts']
-    exploration_stats.num_completions_v2 += aggregated_stats['num_completions']
-    exploration_stats.num_actual_starts_v2 += aggregated_stats[
-        'num_actual_starts']
+    exp_stats.num_starts_v2 += aggregated_stats['num_starts']
+    exp_stats.num_completions_v2 += aggregated_stats['num_completions']
+    exp_stats.num_actual_starts_v2 += aggregated_stats['num_actual_starts']
 
-    for state_name in aggregated_stats['state_stats_mapping']:
-        exploration_stats.state_stats_mapping[
-            state_name].total_answers_count_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['total_answers_count']
-        exploration_stats.state_stats_mapping[
-            state_name].useful_feedback_count_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['useful_feedback_count']
-        exploration_stats.state_stats_mapping[
-            state_name].total_hit_count_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['total_hit_count']
-        exploration_stats.state_stats_mapping[
-            state_name].first_hit_count_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['first_hit_count']
-        exploration_stats.state_stats_mapping[
-            state_name].num_times_solution_viewed_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['num_times_solution_viewed']
-        exploration_stats.state_stats_mapping[
-            state_name].num_completions_v2 += aggregated_stats[
-                'state_stats_mapping'][state_name]['num_completions']
+    for state_name, stats in aggregated_stats['state_stats_mapping'].items():
+        if state_name not in exp_stats.state_stats_mapping:
+            raise Exception(
+                'ExplorationStatsModel id="%s.%s": state_stats_mapping[%r] '
+                'does not exist' % (exp_id, exp_version, state_name))
+        current_stats = exp_stats.state_stats_mapping[state_name]
+        current_stats.aggregate_from(
+            stats_domain.StateStats.from_frontend_dict(stats))
 
-    save_stats_model_transactional(exploration_stats)
+    save_stats_model_transactional(exp_stats)
 
 
 def get_stats_for_new_exploration(exp_id, exp_version, state_names):

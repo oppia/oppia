@@ -263,6 +263,56 @@ class StateStatsTests(test_utils.GenericTestBase):
             state_stats.num_completions_v2,
             expected_state_stats.num_completions_v2)
 
+    def test_repr(self):
+        state_stats = stats_domain.StateStats(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+        self.assertEqual(
+            repr(state_stats),
+            'StateStats('
+            'total_answers_count_v1=1, total_answers_count_v2=2, '
+            'useful_feedback_count_v1=3, useful_feedback_count_v2=4, '
+            'total_hit_count_v1=5, total_hit_count_v2=6, '
+            'first_hit_count_v1=7, first_hit_count_v2=8, '
+            'num_times_solution_viewed_v2=9, '
+            'num_completions_v1=10, num_completions_v2=11)')
+
+    def test_str(self):
+        state_stats = stats_domain.StateStats(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+        self.assertEqual(
+            str(state_stats),
+            'StateStats('
+            'total_answers_count=3, '
+            'useful_feedback_count=7, '
+            'total_hit_count=11, '
+            'first_hit_count=15, '
+            'num_times_solution_viewed=9, '
+            'num_completions=21)')
+
+    def test_from_frontend_dict(self):
+        actual_state_stats = stats_domain.StateStats.from_frontend_dict({
+            'total_answers_count': 10,
+            'useful_feedback_count': 4,
+            'total_hit_count': 18,
+            'first_hit_count': 7,
+            'num_times_solution_viewed': 2,
+            'num_completions': 2
+        })
+
+        # Should interpret each version-less key as a v2 value.
+        expected_state_stats = stats_domain.StateStats(
+            total_answers_count_v1=0,
+            total_answers_count_v2=10,
+            useful_feedback_count_v1=0,
+            useful_feedback_count_v2=4,
+            total_hit_count_v1=0,
+            total_hit_count_v2=18,
+            first_hit_count_v1=0,
+            first_hit_count_v2=7,
+            num_times_solution_viewed_v2=2,
+            num_completions_v1=0,
+            num_completions_v2=2)
+
+        self.assertEqual(actual_state_stats, expected_state_stats)
+
     def test_create_default(self):
         state_stats = stats_domain.StateStats.create_default()
         self.assertEqual(state_stats.total_answers_count_v1, 0)

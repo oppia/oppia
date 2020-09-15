@@ -392,6 +392,48 @@ class StateStats(python_utils.OBJECT):
         }
         return state_stats_dict
 
+    def __repr__(self):
+        """Returns a detailed representation of self.
+
+        Uses self.to_dict to print out the v1 and v2 stats as distinct and
+        separate values.
+
+        Returns:
+            str. A string representation of self.
+        """
+        props = [
+            'total_answers_count_v1', 'total_answers_count_v2',
+            'useful_feedback_count_v1', 'useful_feedback_count_v2',
+            'total_hit_count_v1', 'total_hit_count_v2',
+            'first_hit_count_v1', 'first_hit_count_v2',
+            'num_times_solution_viewed_v2',
+            'num_completions_v1', 'num_completions_v2',
+        ]
+        return '%s(%s)' % (
+            self.__class__.__name__,
+            ', '.join('%s=%r' % (prop, getattr(self, prop)) for prop in props))
+
+    def __str__(self):
+        """Returns a simplified representation of self.
+
+        Uses self.to_frontend_dict to print out the v1 and v2 stats as combined
+        values.
+
+        Returns:
+            str. A string representation of self.
+        """
+        props = [
+            'total_answers_count',
+            'useful_feedback_count',
+            'total_hit_count',
+            'first_hit_count',
+            'num_times_solution_viewed',
+            'num_completions',
+        ]
+        return '%s(%s)' % (
+            self.__class__.__name__,
+            ', '.join('%s=%r' % (prop, getattr(self, prop)) for prop in props))
+
     def __eq__(self, other):
         """Implements == comparison between two StateStats instances, returning
         whether they both hold the same values.
@@ -448,8 +490,25 @@ class StateStats(python_utils.OBJECT):
             state_stats_dict['first_hit_count_v2'],
             state_stats_dict['num_times_solution_viewed_v2'],
             state_stats_dict['num_completions_v1'],
-            state_stats_dict['num_completions_v2']
-        )
+            state_stats_dict['num_completions_v2'])
+
+    @classmethod
+    def from_frontend_dict(cls, frontend_state_stats_dict):
+        return cls(
+            total_answers_count_v1=0,
+            total_answers_count_v2=(
+                frontend_state_stats_dict['total_answers_count']),
+            useful_feedback_count_v1=0,
+            useful_feedback_count_v2=(
+                frontend_state_stats_dict['useful_feedback_count']),
+            total_hit_count_v1=0,
+            total_hit_count_v2=frontend_state_stats_dict['total_hit_count'],
+            first_hit_count_v1=0,
+            first_hit_count_v2=frontend_state_stats_dict['first_hit_count'],
+            num_times_solution_viewed_v2=(
+                frontend_state_stats_dict['num_times_solution_viewed']),
+            num_completions_v1=0,
+            num_completions_v2=frontend_state_stats_dict['num_completions'])
 
     def validate(self):
         """Validates the StateStats domain object."""
