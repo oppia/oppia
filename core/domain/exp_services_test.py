@@ -30,6 +30,7 @@ from core.domain import draft_upgrade_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import param_domain
 from core.domain import rating_services
@@ -46,10 +47,10 @@ import python_utils
 import utils
 
 (
-    exp_models, opportunity_models,
+    feedback_models, exp_models, opportunity_models,
     recommendations_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.opportunity,
+    models.NAMES.feedback, models.NAMES.exploration, models.NAMES.opportunity,
     models.NAMES.recommendations, models.NAMES.user
 ])
 search_services = models.Registry.import_search_services()
@@ -821,6 +822,31 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertIsNone(
             opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
                 self.EXP_1_ID))
+
+    def test_feedbacks_belonging_to_exploration_are_deleted(self):
+        """Tests that feedbacks belonging to exploration are deleted."""
+        self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
+        thread_1_id = feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.EXP_0_ID,
+            self.owner_id,
+            'subject',
+            'text'
+        )
+        thread_2_id = feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.EXP_0_ID,
+            self.owner_id,
+            'subject 2',
+            'text 2'
+        )
+
+        exp_services.delete_explorations(self.owner_id, [self.EXP_0_ID])
+
+        self.assertIsNone(feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            thread_1_id))
+        self.assertIsNone(feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            thread_2_id))
 
     def test_exploration_is_removed_from_index_when_deleted(self):
         """Tests that exploration is removed from the search index when
