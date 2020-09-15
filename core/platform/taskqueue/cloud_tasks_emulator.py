@@ -34,11 +34,14 @@ log.addHandler(logging.StreamHandler())
 
 
 class Task:
-    def __init__(self, queue_name, url, payload=None, scheduled_for=None):
+    def __init__(
+        self, queue_name, url, payload=None, scheduled_for=None,
+        task_name=None):
         self.payload = payload
         self.url = url
         self.scheduled_for = scheduled_for or time.time()
         self.queue_name = queue_name
+        self.task_name = task_name
 
 
 class Emulator:
@@ -47,7 +50,7 @@ class Emulator:
     """
     __hibernation_file = os.path.abspath('hibernate-emulator-task-queue.json')
 
-    def __init__(self, task_handler, hibernation=True):
+    def __init__(self, task_handler):
         """
         :param task_handler: A callback function: It will receive the tasks
         :param hibernation: If True, queue state will be persisted at shutdown and reloaded at startup.
@@ -78,7 +81,10 @@ class Emulator:
                     if peek.scheduled_for <= now:
                         task = queue.pop(0)  # Pop from the beginning; push to the end
             if task:
-                self.__task_handler(url=task.url, payload=task.payload)
+                self.__task_handler(
+                    url=task.url, payload=task.payload,
+                    queue_name=task.queue_name,
+                    task_name=task.task_name)
 
             time.sleep(0.01)
 
@@ -98,7 +104,9 @@ class Emulator:
                 self.__queues[queue_name] = []
                 self.__launch_queue_thread(queue_name)
             queue = self.__queues[queue_name]
-            task = Task(queue_name, url, payload, scheduled_for=scheduled_for)
+            task = Task(
+                queue_name, url, payload, scheduled_for=scheduled_for,
+                task_name=task_name)
             queue.append(task)
             queue.sort(key=lambda t: t.scheduled_for)
 

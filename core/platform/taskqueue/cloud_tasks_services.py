@@ -27,6 +27,7 @@ from google.protobuf import timestamp_pb2
 import feconf
 
 client = tasks_v2.CloudTasksClient()
+
 def create_http_task(
     queue_name, url, payload=None, scheduled_for=None, task_name=None
 ):

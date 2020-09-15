@@ -52,7 +52,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform.taskqueue import cloud_tasks_emulator
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 import feconf
 import main
 import main_mail
@@ -74,6 +73,7 @@ import webtest
 current_user_services = models.Registry.import_current_user_services()
 email_services = models.Registry.import_email_services()
 memory_cache_services = models.Registry.import_cache_services()
+platform_taskqueue_services = models.Registry.import_taskqueue_services()
 
 # Prefix to append to all lines printed by tests to the console.
 # We are using the b' prefix as all the stdouts are in bytes.
@@ -169,6 +169,30 @@ def check_image_png_or_webp(image_string):
             image_string.startswith('data:image/webp')):
         return True
     return False
+
+
+class TaskqueueServicesStub(python_utils.OBJECT):
+    """The stub class that mocks the API functionality offered by the platform
+    layer, namely the platform.taskqueue taskqueue services API.
+    """
+    client = cloud_tasks_emulator.Emulator(task_handler=self._task_handler)
+    def __init__(self, test_base):
+        self.test_base = test_base
+
+    def _task_handler(self, url, payload, queue_name, task_name=None):
+        headers = {}
+        headers['X-Appengine-QueueName'] = queue_name
+        headers['X-Appengine-TaskName'] = task_name
+        headers['X-Appengine-TaskRetryCount'] = '0'
+        headers['X-Appengine-TaskExecutionCount'] = '0'
+        headers['X-Appengine-TaskETA'] = '0'
+        headers['X-AppEngine-Fake-Is-Admin'] = '1'
+        self.test_base.post_task(url=url, payload=payload, headers=headers)
+
+    def create_http_task(
+            queue_name, url, payload=None, scheduled_for=None, task_name=None):
+        client.create_task(queue_name, url, payload, scheduled_for, task_name)
+
 
 
 class MemoryCacheServicesStub(python_utils.OBJECT):
@@ -1040,6 +1064,17 @@ tags: []
 
         return self._send_post_request(
             app, incoming_email_url, data,
+            expect_errors, headers=headers,
+            expected_status_int=expected_status_int)
+
+    def post_task(self, url, payload, headers, expected_status_int=200):
+        """Put an object to the server by JSON with the specific headers
+        specified; return the received object."""
+        data = {'payload': json.dumps(payload)}
+        app = webtest.TestApp(main_taskqueue.app)
+
+        json_response = self._send_post_request(
+            app, url, data,
             expect_errors, headers=headers,
             expected_status_int=expected_status_int)
 

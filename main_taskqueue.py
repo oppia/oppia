@@ -45,7 +45,7 @@ URLS = [
         r'%s' % feconf.TASK_URL_FEEDBACK_STATUS_EMAILS,
         tasks.FeedbackThreadStatusChangeEmailHandler),
     main.get_redirect_route(
-        r'/task/deferredtaskshandler',
+        r'%s' % feconf.TASK_URL_DEFERRED,
         tasks.DeferredTasksHandler),
 ]
 

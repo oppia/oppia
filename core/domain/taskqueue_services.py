@@ -73,10 +73,10 @@ def defer(fn_identifier, queue_name, *args, **kwargs):
         'fn_identifier': fn_identifier,
         'args': (args if args else []),
         'kwargs': (kwargs if kwargs else {})
-    }
+}
     platform_taskqueue_services.create_http_task(
         queue_name=queue_name, url=feconf.TASK_URL_DEFERRED,
-        payload=json.dumps(payload))
+        payload=payload)
     #deferred.defer(fn, *args, _queue=queue_name, **kwargs)
 
 
@@ -93,7 +93,7 @@ def enqueue_task(url, params, countdown):
     # See https://googleapis.dev/python/cloudtasks/latest/gapic/v2/api.html for
     # details of various parameters set when adding a new task.
     platform_taskqueue_services.create_http_task(
-        queue_name=QUEUE_NAME_EMAILS, url=url, payload=json.dump(params),
+        queue_name=QUEUE_NAME_EMAILS, url=url, payload=params,
         scheduled_for=countdown)
 
 

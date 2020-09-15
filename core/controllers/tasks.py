@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
 import json
+from core.controllers import acl_decorators
 
 from core import jobs_registry
 from core.controllers import base
@@ -166,12 +167,9 @@ class DeferredTasksHandler(base.BaseHandler):
     def get(self):
         import logging
         logging.info("Received get request")
+
     def post(self):
-        import logging
-        logging.info("++++++++++++++++++++++++++++++++++++++++")
-        logging.info("Received post request with payload")
-        payload = json.loads(self.request.body)
-        logging.info(payload)
+        payload = json.loads(self.request.body.decode())
         if 'fn_identifier' not in payload: #TODO: add header id
             raise Exception('This request cannot defer.')
         if (payload['fn_identifier'] ==

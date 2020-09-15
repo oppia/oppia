@@ -55,20 +55,25 @@ import threading
 import time
 import unittest
 
+
+from . import install_third_party_libs
+# This installs third party libraries before importing other files or importing
+# libraries that use the builtins python module (e.g. build, python_utils).
+install_third_party_libs.main()
+
 import python_utils
 
 from . import common
 from . import concurrent_task_utils
-from . import install_third_party_libs
 
 DIRS_TO_ADD_TO_SYS_PATH = [
-    os.path.join(common.OPPIA_TOOLS_DIR, 'pylint-1.9.4'),
-    common.GOOGLE_APP_ENGINE_SDK_HOME,
+    os.path.join(common.OPPIA_TOOLS_DIR, 'pylint-%s' % common.PYLINT_VERSION),
+
     os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-%s' % common.WEBTEST_VERSION),
-    os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webob_0_9'),
     os.path.join(common.OPPIA_TOOLS_DIR, 'Pillow-%s' % common.PILLOW_VERSION),
     os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-%s' % common.PSUTIL_VERSION),
+    os.path.join(common.OPPIA_TOOLS_DIR, 'grpcio-%s' % common.GRPCIO_VERSION),
+    os.path.join(common.OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
     os.path.join(
         common.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common.PYGITHUB_VERSION),
     os.path.join(
@@ -227,10 +232,11 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
 def main(args=None):
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
-
-    # Make sure that third-party libraries are up-to-date before running tests,
-    # otherwise import errors may result.
-    install_third_party_libs.main()
+    sys.path.insert(1, os.path.join(
+        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webob_0_9'))
+    sys.path.insert(1, common.GOOGLE_APP_ENGINE_SDK_HOME)
+    import dev_appserver
+    dev_appserver.fix_sys_path()
 
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
@@ -241,8 +247,10 @@ def main(args=None):
         # https://stackoverflow.com/q/10095037 for more details.
         sys.path.insert(1, directory)
 
-    import dev_appserver
-    dev_appserver.fix_sys_path()
+    if 'google' in sys.modules:
+        google_path = os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+        google_module = sys.modules['google']
+        google_module.__path__.append(google_path)
 
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(
