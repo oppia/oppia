@@ -31,6 +31,7 @@ from core.domain import stats_domain
 from core.platform import models
 import feconf
 import utils
+import python_utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 transaction_services = models.Registry.import_transaction_services()
@@ -143,8 +144,7 @@ def update_stats(exp_id, exp_version, aggregated_stats):
             raise Exception(
                 'ExplorationStatsModel id="%s.%s": state_stats_mapping[%r] '
                 'does not exist' % (exp_id, exp_version, state_name))
-        current_stats = exp_stats.state_stats_mapping[state_name]
-        current_stats.aggregate_from(
+        exp_stats.state_stats_mapping[state_name].aggregate_from(
             stats_domain.StateStats.from_frontend_dict(stats))
 
     save_stats_model_transactional(exp_stats)
