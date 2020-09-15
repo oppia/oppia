@@ -189,7 +189,7 @@ angular.module('oppia').component('historyTab', {
               laterComparedVersion) {
             laterIndex = i;
           }
-          if (earlierIndex && laterIndex) {
+          if (earlierIndex !== null && laterIndex !== null) {
             break;
           }
         }

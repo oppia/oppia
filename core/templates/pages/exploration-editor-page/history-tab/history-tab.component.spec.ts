@@ -238,11 +238,11 @@ describe('History tab component', function() {
     expect(ctrl.diffData).toEqual({});
 
     expect(ctrl.earlierVersionHeader).toBe(
-      'Revision #2 by committer_3 (11/21/2014):' +
-        ' This is the commit message 2');
-    expect(ctrl.laterVersionHeader).toBe(
       'Revision #1 by committer_3 (11/21/2014):' +
         ' This is the commit message');
+    expect(ctrl.laterVersionHeader).toBe(
+      'Revision #2 by committer_3 (11/21/2014):' +
+        ' This is the commit message 2');
   });
 
   it('should open a new tab for download exploration with version', function() {
