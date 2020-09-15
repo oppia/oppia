@@ -192,7 +192,7 @@ class UserSettings(python_utils.OBJECT):
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
-        if not is_user_id_correct(self.user_id):
+        if not is_user_id_valid(self.user_id):
             raise utils.ValidationError('The user ID is in a wrong format.')
 
         if not isinstance(self.role, python_utils.BASESTRING):
@@ -453,7 +453,7 @@ class UserAuthDetails(python_utils.OBJECT):
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
-        if not is_user_id_correct(self.user_id):
+        if not is_user_id_valid(self.user_id):
             raise utils.ValidationError('The user ID is in a wrong format.')
 
         if (self.gae_id is not None and
@@ -464,7 +464,7 @@ class UserAuthDetails(python_utils.OBJECT):
             )
 
         if (self.parent_user_id is not None and
-                not is_user_id_correct(self.parent_user_id)):
+                not is_user_id_valid(self.parent_user_id)):
             raise utils.ValidationError(
                 'The parent user ID is in a wrong format.')
 
@@ -479,7 +479,7 @@ class UserAuthDetails(python_utils.OBJECT):
                 'for a user.')
 
 
-def is_user_id_correct(user_id):
+def is_user_id_valid(user_id):
     """Verify that the user ID is in a correct format or that it belongs to
     a system user.
 
