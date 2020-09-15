@@ -119,6 +119,9 @@ INCREMENT_SCORE_OF_AUTHOR_BY = 1
 ACTION_TYPE_ACCEPT = 'accept'
 ACTION_TYPE_REJECT = 'reject'
 
+# The unique ID for the ReviewerAndSuggestionCountsModel.
+REVIEWER_AND_SUGGESTION_COUNTS_ID = 'reviewer_and_suggestion_counts'
+
 
 class GeneralSuggestionModel(base_models.BaseModel):
     """Model to store suggestions made by Oppia users.
@@ -559,3 +562,61 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
                 'rejection_message': voiceover_model.rejection_message
             }
         return user_data
+
+
+class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
+    """Records the total number of reviewers for each suggestion type and the
+    total number of suggestions in review for each suggestion type. There is
+    only ever one instance of this model with ID
+    REVIEWER_AND_SUGGESTION_COUNTS_ID.
+   
+    Fields: 
+        translation_reviewer_counts_per_language: dict. A dictionary where the 
+            keys are the languages that translation suggestions are offered in
+            and the values are the number of reviewers who have permission to
+            review translation suggestions for each language.
+        translation_suggestion_counts_per_language: dict. A dictionary where
+            the keys are the languages that translation suggestions are offered
+            in and the values are the number of translation suggestions that
+            are currently in review for each language.
+        question_reviewer_count: int. The number of reviewers who have
+            permission to review question suggestions.
+        question_suggestion_count: int. The number of question suggestions that
+            are currently in review.    
+    """
+
+    # A dictionary that contains the total number of translation reviewers for
+    # each language.
+    reviewer_counts_per_language = ndb.JsonProperty(
+        required=True, indexed=True)
+    # A dictionary that contains the total total number of translation
+    # suggestions in review per language.
+    translation_suggestion_counts_per_language = ndb.JsonProperty(
+        required=True, indexed=True)
+    # The total number of question reviewers.
+    question_reviewer_count = ndb.IntegerProperty(
+        required=True, indexed=True)
+    # The total number of question suggestions currently in review.
+    question_suggestion_count = ndb.IntegerProperty(
+        required=True, indexed=True)
+
+    def get_deletion_policy():
+        """NOT_APPLICABLE - this model does not directly contain user
+        information because the data is aggregated.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    def get_export_policy():
+        """NOT_APPLICABLE - this model does not directly contain user
+        information because the data is aggregated.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'reviewer_counts_per_language':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'translation_suggestion_counts_per_language':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_reviewer_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_suggestion_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })

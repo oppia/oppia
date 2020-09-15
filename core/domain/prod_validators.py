@@ -3103,6 +3103,45 @@ class GeneralVoiceoverApplicationModelValidator(
         return field_name_to_external_model_references
 
 
+class ReviewerAndSuggestionCountsModelValidator(
+        base_model_validators.BaseModelValidator):
+    """Class for validating ReviewerAndSuggestionCountsModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        # Valid id: reviewer_and_suggestion_counts.
+        return '^%s$' % suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_ID
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return []
+
+    @classmethod
+    def _validate_reviewer_and_suggestion_counts(cls, item):
+        """Validate the ReviewerAndSuggestionCountsModel by ensuring that all
+        of the counts stored are nonnegative.
+
+        Args:
+            item: ndb.Model. ReviewerAndSuggestionCountsModel to validate.
+        """
+        reviewer_and_suggestion_counts = (
+            suggestion_services
+            .create_reviewer_and_suggestion_counts_from_model(item)
+        )
+
+        try:
+            reviewer_and_suggestion_counts.validate()
+        except Exception as e:
+            cls._add_error(
+                'reviewer and suggestion counts check',
+                'Entity id %s: ReviewerAndSuggestionCounts validation fails '
+                'with error: %s' % (item.id, e))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._reviewer_and_suggestion_counts]
+
+
 class TopicModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating TopicModel."""
 
