@@ -138,9 +138,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             }
         }
 
-        with self.assertRaisesRegexp(
-                Exception, 'id="exp_id0.1" does not exist'):
-            stats_services.update_stats('exp_id0', 1, aggregated_stats)
+        with self.assertRaisesRegexp(Exception, 'id="nullid.1" does not exist'):
+            stats_services.update_stats('nullid', 1, aggregated_stats)
 
     def test_update_stats_throws_if_model_is_missing_state_stats(self):
         """Test the update_stats method."""
@@ -175,10 +174,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             }
         }
 
-        with self.assertRaisesRegexp(
-                Exception,
-                re.escape(
-                    'state_stats_mapping[u\'Away from Home\'] does not exist')):
+        exception_re = re.escape(
+            'state_stats_mapping[u\'Away from Home\'] does not exist')
+        with self.assertRaisesRegexp(Exception, exception_re):
             stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
     def test_calls_to_stats_methods(self):

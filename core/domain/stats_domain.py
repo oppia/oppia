@@ -393,10 +393,8 @@ class StateStats(python_utils.OBJECT):
         return state_stats_dict
 
     def __repr__(self):
-        """Returns a detailed representation of self.
-
-        Uses self.to_dict to print out the v1 and v2 stats as distinct and
-        separate values.
+        """Returns a detailed representation of self, distinguishing v1 values
+        from v2 values.
 
         Returns:
             str. A string representation of self.
@@ -414,10 +412,7 @@ class StateStats(python_utils.OBJECT):
             ', '.join('%s=%r' % (prop, getattr(self, prop)) for prop in props))
 
     def __str__(self):
-        """Returns a simplified representation of self.
-
-        Uses self.to_frontend_dict to print out the v1 and v2 stats as combined
-        values.
+        """Returns a simple representation of self, combining v1 and v2 values.
 
         Returns:
             str. A string representation of self.
@@ -494,6 +489,7 @@ class StateStats(python_utils.OBJECT):
 
     @classmethod
     def from_frontend_dict(cls, frontend_state_stats_dict):
+        """Constructs a StateStats domain object from a frontend dict."""
         return cls(
             total_answers_count_v1=0,
             total_answers_count_v2=(

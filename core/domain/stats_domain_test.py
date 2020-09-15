@@ -266,7 +266,7 @@ class StateStatsTests(test_utils.GenericTestBase):
     def test_repr(self):
         state_stats = stats_domain.StateStats(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
         self.assertEqual(
-            repr(state_stats),
+            '%r' % (state_stats,),
             'StateStats('
             'total_answers_count_v1=1, total_answers_count_v2=2, '
             'useful_feedback_count_v1=3, useful_feedback_count_v2=4, '
@@ -278,7 +278,7 @@ class StateStatsTests(test_utils.GenericTestBase):
     def test_str(self):
         state_stats = stats_domain.StateStats(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
         self.assertEqual(
-            str(state_stats),
+            '%s' % (state_stats,),
             'StateStats('
             'total_answers_count=3, '
             'useful_feedback_count=7, '
