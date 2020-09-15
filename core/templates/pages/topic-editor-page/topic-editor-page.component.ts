@@ -41,6 +41,7 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 require('pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts');
+require('services/loader.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -55,11 +56,13 @@ angular.module('oppia').directive('topicEditorPage', [
         '/pages/topic-editor-page/topic-editor-page.component.html'),
       controllerAs: '$ctrl',
       controller: [
-        'BottomNavbarStatusService', 'ContextService', 'PageTitleService',
+        'BottomNavbarStatusService', 'ContextService', 'LoaderService',
+        'PageTitleService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'UndoRedoService', 'UrlService',
         function(
-            BottomNavbarStatusService, ContextService, PageTitleService,
+            BottomNavbarStatusService, ContextService, LoaderService,
+            PageTitleService,
             TopicEditorRoutingService, TopicEditorStateService,
             UndoRedoService, UrlService) {
           var ctrl = this;
@@ -176,9 +179,13 @@ angular.module('oppia').directive('topicEditorPage', [
 
 
           ctrl.$onInit = function() {
+            LoaderService.showLoadingScreen('Loading Topic');
             ctrl.directiveSubscriptions.add(
               TopicEditorStateService.onTopicInitialized.subscribe(
-                () => setPageTitle()
+                () => {
+                  LoaderService.hideLoadingScreen();
+                  setPageTitle();
+                }
               ));
             ctrl.directiveSubscriptions.add(
               TopicEditorStateService.onTopicReinitialized.subscribe(
@@ -191,7 +198,7 @@ angular.module('oppia').directive('topicEditorPage', [
             ctrl.warningsAreShown = false;
             BottomNavbarStatusService.markBottomNavbarStatus(true);
             ctrl.directiveSubscriptions.add(
-              UndoRedoService.onUndoRedoChangeApplied().subscribe(
+              UndoRedoService.onUndoRedoChangeApplied$().subscribe(
                 () => setPageTitle()
               )
             );

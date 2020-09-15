@@ -4759,7 +4759,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, '0',
             1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
-            self.admin_id, change, score_category, self.thread_id)
+            self.admin_id, change, score_category, self.thread_id, None)
 
         self.model_instance = (
             feedback_models.GeneralFeedbackThreadModel.get_by_id(
@@ -7117,9 +7117,9 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 'new_value': 'New description',
                 'old_value': 'description 0'
             })], 'Changes.')
-
         expected_output = [
             u'[u\'fully-validated SkillModel\', 5]']
+        self.process_and_flush_pending_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -7212,6 +7212,7 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 'new_value': 'New description',
                 'old_value': 'description 0'
             })], 'Changes.')
+        self.process_and_flush_pending_tasks()
         skill_models.SkillCommitLogEntryModel.get_by_id(
             'skill-0-1').delete()
 
@@ -7360,6 +7361,7 @@ class SkillSnapshotMetadataModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillSnapshotMetadataModel\', 4]']
+        self.process_and_flush_pending_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -7564,6 +7566,7 @@ class SkillSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillSnapshotContentModel\', 4]']
+        self.process_and_flush_pending_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -7720,6 +7723,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillCommitLogEntryModel\', 4]']
+        self.process_and_flush_pending_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -7964,6 +7968,7 @@ class SkillSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SkillSummaryModel\', 3]']
+        self.process_and_flush_pending_tasks()
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -8989,7 +8994,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, '0',
             1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
-            self.admin_id, change, score_category, self.thread_id)
+            self.admin_id, change, score_category, self.thread_id, None)
         self.model_instance = (
             suggestion_models.GeneralSuggestionModel.get_by_id(self.thread_id))
 
@@ -9181,7 +9186,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, '0',
             1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
-            self.admin_id, change, score_category, thread_id)
+            self.admin_id, change, score_category, thread_id, 'hi')
         model_instance = (
             suggestion_models.GeneralSuggestionModel.get_by_id(thread_id))
         expected_output = [((
@@ -9214,7 +9219,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['0'],
-                'inapplicable_misconception_ids': ['skillid-0']
+                'inapplicable_skill_misconception_ids': ['skillid-0']
             },
             'skill_id': '0',
             'skill_difficulty': 0.3,
@@ -9232,7 +9237,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             suggestion_models.TARGET_TYPE_SKILL, '0',
             1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
-            self.admin_id, change, score_category, thread_id)
+            self.admin_id, change, score_category, thread_id, 'en')
         model_instance = (
             suggestion_models.GeneralSuggestionModel.get_by_id(thread_id))
         expected_output = [(

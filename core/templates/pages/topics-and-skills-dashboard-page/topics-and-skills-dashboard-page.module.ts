@@ -36,22 +36,7 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-import { AppConstants } from 'app.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-import { ServicesConstants } from 'services/services.constants';
-import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
-import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
-import { TopicsAndSkillsDashboardDomainConstants } from
-  // eslint-disable-next-line max-len
-  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
-import { TopicsAndSkillsDashboardPageConstants } from
-  // eslint-disable-next-line max-len
-  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
-/* eslint-enable max-len */
 
 @NgModule({
   imports: [
@@ -66,14 +51,6 @@ import { TopicsAndSkillsDashboardPageConstants } from
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    ServicesConstants,
-    SkillDomainConstants,
-    TopicDomainConstants,
-    TopicsAndSkillsDashboardDomainConstants,
-    TopicsAndSkillsDashboardPageConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

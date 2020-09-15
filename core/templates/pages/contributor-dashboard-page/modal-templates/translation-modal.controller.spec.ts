@@ -21,6 +21,7 @@ describe('Translation Modal Controller', function() {
   let $q = null;
   let $scope = null;
   let $uibModalInstance = null;
+  let CkEditorCopyContentService = null;
   let CsrfTokenService = null;
   let TranslateTextService = null;
   let TranslationLanguageService = null;
@@ -40,6 +41,7 @@ describe('Translation Modal Controller', function() {
     CsrfTokenService = $injector.get('CsrfTokenService');
     TranslateTextService = $injector.get('TranslateTextService');
     TranslationLanguageService = $injector.get('TranslationLanguageService');
+    CkEditorCopyContentService = $injector.get('CkEditorCopyContentService');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
@@ -51,6 +53,9 @@ describe('Translation Modal Controller', function() {
       .returnValue('English');
     spyOn(TranslationLanguageService, 'getActiveLanguageCode').and
       .returnValue('en');
+
+    spyOn(CkEditorCopyContentService, 'copyModeActive').and.returnValue(true);
+
     getTextToTranslateSpy = spyOn(TranslateTextService, 'getTextToTranslate');
     getTextToTranslateSpy.and.returnValue({
       text: 'Texto a traducir',
@@ -120,6 +125,22 @@ describe('Translation Modal Controller', function() {
     });
     expect($scope.uploadingTranslation).toBe(false);
   });
+
+  it('should broadcast copy to ck editor when clicking on content',
+    function() {
+      spyOn(CkEditorCopyContentService, 'broadcastCopy').and
+        .callFake(() => {});
+
+      var mockEvent = {
+        stopPropagation: jasmine.createSpy('stopPropagation', () => {}),
+        target: {}
+      };
+      $scope.onContentClick(mockEvent);
+
+      expect(mockEvent.stopPropagation).toHaveBeenCalled();
+      expect(CkEditorCopyContentService.broadcastCopy).toHaveBeenCalledWith(
+        mockEvent.target);
+    });
 
   it('should close modal when there is not more text to be translated',
     function() {

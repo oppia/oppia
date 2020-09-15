@@ -5444,4 +5444,4 @@ export = {
   "MAX_USERNAME_LENGTH": 30,
 
   "DEV_MODE": true
-};
+} as const;

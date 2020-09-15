@@ -24,6 +24,7 @@
   "rules": {
     "oppia/break-after-parens": "error",
     "oppia/no-multiline-disable": "error",
+    "oppia/test-message-style": "error",
     "oppia/no-unused-dependency": "error",
     "angular/di": [
       "error",
@@ -122,7 +123,8 @@
       "error",
       {
         "code": 80,
-        "ignoreUrls": true
+        "ignoreUrls": true,
+        "ignorePattern": "^import \\{"
       }
     ],
     "no-compare-neg": "off",

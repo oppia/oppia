@@ -25,22 +25,29 @@ import { ValidatorsService } from 'services/validators.service';
 describe('Validators service', () => {
   let vs: ValidatorsService = null;
   const INVALID_NAME_CHARS_COPY = (
-    /* eslint-disable-next-line dot-notation */
-    Array.from(AppConstants['INVALID_NAME_CHARS']));
+    Array.from(AppConstants.INVALID_NAME_CHARS));
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [AlertsService, NormalizeWhitespacePipe]
     });
     vs = TestBed.get(ValidatorsService);
-    /* eslint-disable-next-line dot-notation */
-    AppConstants['INVALID_NAME_CHARS'] = '#xyz';
+    // This throws "Cannot assign to 'INVALID_NAME_CHARS' because it
+    // is a read-only property.". We need to suppress this error because
+    // we need to change the value of 'INVALID_NAME_CHARS' for testing
+    // purposes.
+    // @ts-expect-error
+    AppConstants.INVALID_NAME_CHARS = ['#', 'x', 'y', 'z'];
   });
 
 
   afterAll(() => {
-    /* eslint-disable-next-line dot-notation */
-    AppConstants['INVALID_NAME_CHARS'] = INVALID_NAME_CHARS_COPY;
+    // This throws "Cannot assign to 'INVALID_NAME_CHARS' because it
+    // is a read-only property.". We need to suppress this error because
+    // we need to change the value of 'INVALID_NAME_CHARS' for testing
+    // purposes.
+    // @ts-expect-error
+    AppConstants.INVALID_NAME_CHARS = INVALID_NAME_CHARS_COPY;
   });
 
   it('should correctly validate entity names', () => {
