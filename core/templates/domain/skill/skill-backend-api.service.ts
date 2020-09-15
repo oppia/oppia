@@ -79,7 +79,7 @@ export class SkillBackendApiService {
             skill: this.skillObjectFactory.createFromBackendDict(
               response.skill),
             assignedSkillTopicData: response.assigned_skill_topic_data_dict,
-            // TODO: Refactor this property to return SkillSummary domain
+            // TODO(nishantwrp): Refactor this property to return SkillSummary domain
             // objects instead of backend dicts.
             groupedSkillSummaries: response.grouped_skill_summaries
           });
