@@ -1104,14 +1104,14 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
     """Domain object for the ReviewerAndSuggestionCountsModel.
 
     Attributes:
-        translation_reviewer_counts_per_language: dict. A dictionary where the 
-            keys are the languages that translation suggestions are offered in
-            and the values are the number of reviewers who have permission to
+        translation_reviewer_counts_per_lang: dict. A dictionary where the keys
+            are the languages that translation suggestions are offered in and
+            the values are the number of reviewers who have permission to
             review translation suggestions for each language.
-        translation_suggestion_counts_per_language: dict. A dictionary where
-            the keys are the languages that translation suggestions are offered
-            in and the values are the number of translation suggestions that
-            are currently in review for each language.
+        translation_suggestion_counts_per_lang: dict. A dictionary where the
+            keys are the languages that translation suggestions are offered in
+            and the values are the number of translation suggestions that are
+            currently in review for each language.
         question_reviewer_count: int. The number of reviewers who have
             permission to review question suggestions.
         question_suggestion_count: int. The number of question suggestions that
@@ -1119,13 +1119,14 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
     """
 
     def __init__(
-            self, translation_reviewer_counts_per_language,
-            translation_suggestion_counts_per_language,
+            self, translation_reviewer_counts_per_lang,
+            translation_suggestion_counts_per_lang,
             question_reviewer_count, question_suggestion_count):
-        self.translation_reviewer_counts_per_language = (
-            translation_reviewer_counts_per_language)
-        self.translation_suggestion_counts_per_language = (
-            translation_suggestion_counts_per_language
+        self.translation_reviewer_counts_per_lang = (
+            translation_reviewer_counts_per_lang
+        )
+        self.translation_suggestion_counts_per_lang = (
+            translation_suggestion_counts_per_lang
         )
         self.question_reviewer_count = question_reviewer_count
         self.question_suggestion_count = question_suggestion_count
@@ -1134,11 +1135,11 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
         """Validates the ReviewerAndSuggestionCounts object.
 
         Raises:
-            ValidationError. One or more attributes of the ReviewerAndSuggestionCounts
-                object is invalid.
+            ValidationError. One or more attributes of the
+                ReviewerAndSuggestionCounts object is invalid.
         """
         for language_code, reviewer_count in (
-                self.translation_reviewer_counts_per_language):
+                self.translation_reviewer_counts_per_lang):
             if reviewer_count < 0:
                 raise utils.ValidationError(
                     'Invalid translation reviewer count: %s, the translation '
@@ -1146,7 +1147,7 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
                 )
 
         for language_code, suggestion_count in (
-                self.translation_suggestion_counts_per_language):
+                self.translation_suggestion_counts_per_lang):
             if suggestion_count < 0:
                 raise utils.ValidationError(
                     'Invalid translation suggestion count: %s, the translation'
@@ -1175,29 +1176,29 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
     
         Returns:
             Bool. Whether or not more reviewers are needed to review
-        translation suggestions in the given language.
+            translation suggestions in the given language.
        """
-        if language_code in self.translation_reviewer_counts_per_language):
-            if language_code in self.translation_suggestion_counts_per_language:
-                number_of_reviewers = (
-                    self.translation_reviewer_counts_per_language[language_code]
-                )
-                number_of_suggestions = (
-                    self.translation_suggestion_counts_per_language[
-                        language_code]
-                )
-                if number_of_reviewers == 0:
-                    return True
-                else:
-                    return python_utils.divide(
-                        number_of_suggestions, number_of_reviewers) > (
-                            MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER)
+        if language_code in self.translation_reviewer_counts_per_lang and (
+                language_code in self.translation_suggestion_counts_per_lang):
+            number_of_reviewers = (
+                self.translation_reviewer_counts_per_lang[language_code]
+            )
+            number_of_suggestions = (
+                self.translation_suggestion_counts_per_lang[
+                    language_code]
+            )
+            if number_of_reviewers == 0:
+                return True
             else:
-                # There are no translation suggestions in this language
-                # currently in review, but there are reviewers. Therefore,
-                # there is not a shortage of reviewers.
-                return False
-        elif language_code in self.translation_suggestion_counts_per_language:
+                return python_utils.divide(
+                    number_of_suggestions, number_of_reviewers) > (
+                        MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER)
+        elif language_code in self.translation_reviewer_counts_per_lang:
+            # There are no translation suggestions in this language
+            # currently in review, but there are reviewers. Therefore,
+            # there is not a shortage of reviewers.
+            return False
+        elif language_code in self.translation_suggestion_counts_per_lang:
             # There are no reviewers but there are translation suggestions that
             # need review. Therefore, there is a shortage of reviewers.
             return True
@@ -1206,12 +1207,16 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
             return False
 
 
-    def calculate_the_ratio_of_question_suggestions_to_reviewers(self):
-        """Divides the number of question suggestions currently in review
-        by the number of reviewers who have permissions to review question
+    def are_reviewers_needed_for_question_suggestions(self):
+        """Returns whether or not more reviewers are needed to review question
         suggestions.
-    
+
         Returns:
-            Float. The result of dividing the number of question suggestions
-            by the number of question reviewers.
-        """
+            Bool. Whether or not more reviewers are needed to review
+            question suggestions.
+       """
+        if self.question_reviewer_count == 0:
+            return True
+        else:
+            return python_utils.divide(
+                self.question_suggestion_count, self.question_reviewer_count)

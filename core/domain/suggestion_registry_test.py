@@ -2382,3 +2382,49 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.assertEqual(self.voiceover_application.status, 'rejected')
         self.assertEqual(
             self.voiceover_application.rejection_message, 'rejection message')
+
+
+class ReviewerAndSuggestionCountsUnitTests(test_utils.GenericTestBase):
+    """Tests for the ReviewerAndSuggestionCounts class."""
+
+    translation_reviewer_counts_per_lang = {
+        'hi': 0,
+        'en': 1
+    }
+    translation_suggestion_counts_per_lang = {
+        'fr': 6,
+        'en': 5 
+    }
+    question_reviewer_count = 1
+    question_suggestion_count = 4
+
+    def setUp(self):
+        super(ReviewerAndSuggestionCountsUnitTests, self).setUp()
+
+    def test_create_reviewer_and_suggestion_counts(self):
+        reviewer_and_suggestion_counts = (
+            suggestion_registry.ReviewerAndSuggestionCounts(
+                self.translation_reviewer_counts_per_lang,
+                self.translation_suggestion_counts_per_lang,
+                self.question_reviewer_count,
+                self.question_suggestion_count
+            )
+        )
+
+        self.assertEqual(
+            reviewer_and_suggestion_counts.translation_reviewer_counts_per_lang,
+            self.translation_reviewer_counts_per_lang)
+        self.assertEqual(
+            reviewer_and_suggestion_counts.translation_suggestion_counts_per_lang,
+            self.translation_suggestion_counts_per_lang
+        )
+        self.assertEqual(
+            reviewer_and_suggestion_counts.question_reviewer_count,
+            self.question_reviewer_count
+        )
+        self.assertEqual(
+            reviewer_and_suggestion_counts.question_suggestion_count,
+            self.question_suggestion_count
+        )
+
+        

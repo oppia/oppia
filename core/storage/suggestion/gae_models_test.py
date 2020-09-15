@@ -748,3 +748,16 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralVoiceoverApplicationModel
             .export_data('author_1'))
         self.assertEqual(expected_data, user_data)
+
+
+class ReviewerAndSuggestionCountsModelUnitTests(test_utils.GenericTestBase):
+    """Tests the ReviewerAndSuggestionCountsModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            (
+                suggestion_models.ReviewerAndSuggestionCountsModel
+                .get_deletion_policy()
+            ),
+            base_models.DELETION_POLICY.NOT_APPLICABLE
+        )
