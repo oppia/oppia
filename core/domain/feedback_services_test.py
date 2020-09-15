@@ -21,18 +21,23 @@ import json
 
 from core.domain import email_services
 from core.domain import event_services
+from core.domain import exp_domain
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
 from core.domain import subscription_services
+from core.domain import suggestion_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
 
-(feedback_models, email_models) = models.Registry.import_models([
-    models.NAMES.feedback, models.NAMES.email])
+(
+    feedback_models, email_models, suggestion_models
+) = models.Registry.import_models([
+    models.NAMES.feedback, models.NAMES.email, models.NAMES.suggestion
+])
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
@@ -41,6 +46,7 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
 
     USER_EMAIL = 'user@example.com'
     USER_USERNAME = 'user'
+    EXP_1_ID = 'exp_1_id'
 
     def setUp(self):
         super(FeedbackServicesUnitTests, self).setUp()
@@ -112,6 +118,36 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
             feedback_services.create_messages(
                 repeated_thread_ids, self.user_id, None, None, 'Hello')
 
+    def test_delete_threads_for_multiple_entities(self):
+        self.save_new_default_exploration(self.EXP_1_ID, self.EXP_1_ID)
+        suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.EXP_1_ID,
+            1,
+            self.user_id,
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state',
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'new_value': 'new content'
+            },
+            'some text')
+        thread_id = feedback_services.get_threads(
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_1_ID
+        )[0].id
+        feedback_services.create_message(
+            thread_id, self.user_id, None, None, 'some text')
+        feedback_models.FeedbackAnalyticsModel(id=self.EXP_1_ID).put()
+
+        feedback_services.delete_threads_for_multiple_entities(
+            feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID])
+
+        self.assertIsNone(
+            feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
+        self.assertIsNone(
+            feedback_models.FeedbackAnalyticsModel.get_by_id(self.EXP_1_ID))
+
     def test_status_of_newly_created_thread_is_open(self):
         exp_id = '0'
         feedback_services.create_thread(
@@ -125,6 +161,105 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
         thread_id = 'exploration.exp1.1234'
         self.assertEqual(
             feedback_services.get_exp_id_from_thread_id(thread_id), 'exp1')
+
+
+class FeedbackDeletionUnitTests(test_utils.GenericTestBase):
+    """Test functions in feedback_services."""
+
+    USER_EMAIL = 'user@example.com'
+    USER_USERNAME = 'user'
+    EXP_1_ID = 'exp_1_id'
+    EXP_2_ID = 'exp_2_id'
+
+    def setUp(self):
+        super(FeedbackDeletionUnitTests, self).setUp()
+        self.signup(self.USER_EMAIL, self.USER_USERNAME)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+
+        self.save_new_default_exploration(self.EXP_1_ID, self.user_id)
+        suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.EXP_1_ID,
+            1,
+            self.user_id,
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state',
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'new_value': 'new content'
+            },
+            'some text')
+        self.thread_1_id = feedback_services.get_threads(
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_1_ID
+        )[0].id
+        feedback_services.create_message(
+            self.thread_1_id, self.user_id, None, None, 'some text')
+
+        self.save_new_default_exploration(self.EXP_2_ID, self.user_id)
+        self.thread_2_id = feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.EXP_2_ID,
+            self.user_id,
+            'subject',
+            'text'
+        )
+
+        feedback_models.FeedbackAnalyticsModel(id=self.EXP_1_ID).put()
+
+    def test_delete_feedback_threads_deletes_thread(self):
+        self.assertIsNotNone(
+            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                self.thread_1_id))
+        feedback_services.delete_threads_for_multiple_entities(
+            feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID])
+        self.assertIsNone(
+            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                self.thread_1_id))
+
+    def test_delete_feedback_threads_deletes_suggestion(self):
+        self.assertIsNotNone(
+            suggestion_models.GeneralSuggestionModel.get_by_id(self.thread_1_id)
+        )
+        feedback_services.delete_threads_for_multiple_entities(
+            feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID])
+        self.assertIsNone(
+            suggestion_models.GeneralSuggestionModel.get_by_id(self.thread_1_id)
+        )
+
+    def test_delete_feedback_threads_deletes_message(self):
+        self.assertIsNotNone(
+            feedback_models.GeneralFeedbackMessageModel.get_by_id(
+                '%s.%s' % (self.thread_1_id, 0)))
+        feedback_services.delete_threads_for_multiple_entities(
+            feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID])
+        self.assertIsNone(
+            feedback_models.GeneralFeedbackMessageModel.get_by_id(
+                '%s.%s' % (self.thread_1_id, 0)))
+
+    def test_delete_feedback_threads_deletes_feedback_analytics(self):
+        self.assertIsNotNone(
+            feedback_models.FeedbackAnalyticsModel.get_by_id(self.EXP_1_ID))
+        feedback_services.delete_threads_for_multiple_entities(
+            feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID])
+        self.assertIsNone(
+            feedback_models.FeedbackAnalyticsModel.get_by_id(self.EXP_1_ID))
+
+    def test_delete_feedback_threads_deletes_multiple_feedbacks(self):
+        self.assertIsNotNone(
+            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                self.thread_1_id))
+        self.assertIsNotNone(
+            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                self.thread_2_id))
+        feedback_services.delete_threads_for_multiple_entities(
+            feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID, self.EXP_2_ID])
+        self.assertIsNone(
+            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                self.thread_1_id))
+        self.assertIsNone(
+            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                self.thread_2_id))
 
 
 class MockFeedbackAnalyticsAggregator(

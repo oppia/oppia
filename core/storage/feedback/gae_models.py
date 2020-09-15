@@ -547,6 +547,16 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         })
 
     @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instance of GeneralFeedbackThreadUserModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        ndb.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+
+    @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether GeneralFeedbackThreadUserModel exists for user.
 
