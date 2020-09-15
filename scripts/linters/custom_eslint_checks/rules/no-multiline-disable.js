@@ -21,15 +21,15 @@
 
 module.exports = {
   meta: {
-    type: 'suggestion',
+    type: 'problem',
     docs: {
       description: (
         'Lint check to ensure that there are no multiline eslint disable ' +
         'statements'),
-      category: 'Stylistic Issues',
+      category: 'Possible Errors',
       recommended: true
     },
-    fixable: 'code',
+    fixable: null,
     schema: [],
     messages: {
       noMultilineDisable: 'Do not use disable statement for multilines'

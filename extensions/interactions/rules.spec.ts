@@ -66,7 +66,6 @@ import { UtilsService } from 'services/utils.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 import { ImageClickAnswer } from './answer-defs';
 import { ImageClickRuleInputs } from './rule-input-defs';
-/* eslint-enable max-len */
 // ^^^ This block is to be removed.
 
 describe('Rule spec services', function() {
