@@ -2288,8 +2288,9 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.assertTrue(
             user_services.can_review_question_suggestions(self.voice_artist_id))
 
-    def test_get_all_contribution_reviewers(self):
-        self.assertEqual(user_services.get_all_contribution_reviewers(), [])
+    def test_get_all_reviewers_contribution_rights(self):
+        self.assertEqual(
+            user_services.get_all_reviewers_contribution_rights(), [])
 
         user_services.allow_user_to_review_voiceover_in_language(
             self.voice_artist_id, 'hi')
@@ -2297,7 +2298,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.translator_id, 'hi')
 
-        all_reviewers = user_services.get_all_contribution_reviewers()
+        all_reviewers = user_services.get_all_reviewers_contribution_rights()
         self.assertItemsEqual(
             [reviewer.id for reviewer in all_reviewers],
             [self.voice_artist_id, self.translator_id])
@@ -2305,7 +2306,8 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
     def test_get_reviewer_user_ids_to_notify_when_reviewers_want_notifications(
             self):
         # Assert that there are no reviewers at the start.
-        self.assertEqual(user_services.get_all_contribution_reviewers(), [])
+        self.assertEqual(
+            user_services.get_all_reviewers_contribution_rights(), [])
         # Add a question reviewer and a translation reviewer.
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         user_services.allow_user_to_review_translation_in_language(
@@ -2332,7 +2334,8 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
     def test_get_reviewer_user_ids_to_notify_when_reviewers_do_not_want_emails(
             self):
         # Assert that there are no reviewers at the start.
-        self.assertEqual(user_services.get_all_contribution_reviewers(), [])
+        self.assertEqual(
+            user_services.get_all_reviewers_contribution_rights(), [])
         # Add a question reviewer and a translation reviewer.
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         user_services.allow_user_to_review_translation_in_language(
@@ -2357,7 +2360,8 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
     def test_get_reviewer_user_ids_to_notify_when_there_are_no_reviewers(
             self):
         # Assert that there are no reviewers.
-        self.assertEqual(user_services.get_all_contribution_reviewers(), [])
+        self.assertEqual(
+            user_services.get_all_reviewers_contribution_rights(), [])
 
         reviewer_ids_to_notify = user_services.get_reviewer_user_ids_to_notify(
         )

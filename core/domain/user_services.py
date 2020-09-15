@@ -825,7 +825,7 @@ def get_reviewer_user_ids_to_notify():
         Contributor Dashboard reviewer updates.
     """
     # Get the user ids of the Contributor Dashboard reviewers.
-    users_contribution_rights = get_all_contribution_reviewers()
+    users_contribution_rights = get_all_reviewers_contribution_rights()
     reviewer_ids = [
         user_contribution_rights.id for user_contribution_rights in
         users_contribution_rights
@@ -840,7 +840,7 @@ def get_reviewer_user_ids_to_notify():
     return reviewer_ids_to_notify
 
 
-def get_all_contribution_reviewers():
+def get_all_reviewers_contribution_rights():
     """Returns a list of UserContributionRights objects corresponding to each
     UserContributionRightsModel.
 
