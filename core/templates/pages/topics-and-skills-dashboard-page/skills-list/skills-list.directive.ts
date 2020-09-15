@@ -102,10 +102,10 @@ angular.module('oppia').directive('skillsList', [
               },
               windowClass: 'delete-skill-modal',
               controller: 'DeleteSkillModalController'
-            }).result.then(function() {
+            }).result.then(() => {
               SkillBackendApiService.deleteSkill(skillId).then(
-                function() {
-                  $timeout(function() {
+                () => {
+                  setTimeout(() => {
                     TopicsAndSkillsDashboardBackendApiService.
                       onTopicsAndSkillsDashboardReinitialized.emit();
                     var successToast = 'The skill has been deleted.';
