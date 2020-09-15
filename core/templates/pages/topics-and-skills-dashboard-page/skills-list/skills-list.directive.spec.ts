@@ -18,6 +18,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { fakeAsync, tick } from '@angular/core/testing';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -135,7 +136,7 @@ describe('Skills List Directive', function() {
   });
 
   it('should reinitialize the page after successfully deleting the skill',
-    function() {
+    fakeAsync(() => {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
       });
@@ -147,8 +148,9 @@ describe('Skills List Directive', function() {
       ctrl.deleteSkill(skillId);
 
       $timeout.flush();
+      tick(100);
       expect(tasdReinitializedSpy).toHaveBeenCalled();
-    });
+    }));
 
   it('should select and show edit options for a skill', function() {
     const skillId1 = 'uXcdsad3f42';
