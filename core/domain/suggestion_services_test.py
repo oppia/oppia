@@ -821,8 +821,29 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             if exp.id == exp_id:
                 return exp
 
-    def mock_pre_update_validate_does_nothing(self, unused_change_list):
-        pass
+    def _create_question_suggestion_with_skill_id(self, skill_id):
+        """Creates a question suggestion with the given skill_id."""
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid-1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        return suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL, skill_id, 1,
+            self.author_id_1, suggestion_change, 'test description'
+        )
 
     def setUp(self):
         super(SuggestionGetServicesUnitTests, self).setUp()
@@ -1013,73 +1034,6 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             with self.swap(
                 exp_domain.Exploration, 'get_content_html',
                 self.MockExploration.get_content_html):
-                suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id_1, 1, self.author_id_1,
-                    self.add_translation_change_dict, 'test description')
-        # Create a Hindi translation suggestion associated with exploration id
-        # target_id_2.
-        with self.swap(
-            exp_fetchers, 'get_exploration_by_id',
-            self.mock_get_exploration_by_id):
-            with self.swap(
-                exp_domain.Exploration, 'get_content_html',
-                self.MockExploration.get_content_html):
-                suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id_2, 1, self.author_id_1,
-                    self.add_translation_change_dict, 'test description')
-        # Create a Hindi translation suggestion associated with exploration id
-        # target_id_3.
-        with self.swap(
-            exp_fetchers, 'get_exploration_by_id',
-            self.mock_get_exploration_by_id):
-            with self.swap(
-                exp_domain.Exploration, 'get_content_html',
-                self.MockExploration.get_content_html):
-                suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
-                    self.target_id_3, 1, self.author_id_1,
-                    self.add_translation_change_dict, 'test description')
-
-        suggestions = (
-            suggestion_services
-            .get_translation_suggestions_waiting_longest_for_review_per_lang(
-                'hi'))
-
-        # Assert that the suggestions are in the order that they were created.
-        self.assertEqual(len(suggestions), 3)
-        self.assertLessEqual(suggestions[0].target_id, self.target_id_1)
-        self.assertLessEqual(suggestions[1].target_id, self.target_id_2)
-        self.assertLessEqual(suggestions[2].target_id, self.target_id_3)
-
-    def test_get_translation_suggestions_waiting_longest_for_review_wrong_lang(
-            self):
-        suggestions = (
-            suggestion_services
-            .get_translation_suggestions_waiting_longest_for_review_per_lang(
-                'wrong_language_code'))
-
-        self.assertEqual(len(suggestions), 0)
-
-    def test_get_translation_suggestions_waiting_longest_for_review_in_order(
-            self):
-        """This test makes sure that if a suggestion is rejected and is then
-        resubmitted, we count the time that the suggestion has been waiting for
-        review from when it was resubmitted, not from when it was first
-        submitted.
-        """
-        # Create a Hindi translation suggestion associated with exploration id
-        # target_id_1.
-        with self.swap(
-            exp_fetchers, 'get_exploration_by_id',
-            self.mock_get_exploration_by_id):
-            with self.swap(
-                exp_domain.Exploration, 'get_content_html',
-                self.MockExploration.get_content_html):
                 suggestion_1 = suggestion_services.create_suggestion(
                     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                     suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -1098,17 +1052,67 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                     suggestion_models.TARGET_TYPE_EXPLORATION,
                     self.target_id_2, 1, self.author_id_1,
                     self.add_translation_change_dict, 'test description')
+        # Create a Hindi translation suggestion associated with exploration id
+        # target_id_3.
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            with self.swap(
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                suggestion_3 = suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id_3, 1, self.author_id_1,
+                    self.add_translation_change_dict, 'test description')
 
-        # Verify that both suggestions are returned and in the right order.
         suggestions = (
             suggestion_services
             .get_translation_suggestions_waiting_longest_for_review_per_lang(
                 'hi'))
-        self.assertEqual(len(suggestions), 2)
-        self.assertLessEqual(
+
+        # Assert that the suggestions are in the order that they were created.
+        self.assertEqual(len(suggestions), 3)
+        self.assertEqual(
             suggestions[0].suggestion_id, suggestion_1.suggestion_id)
-        self.assertLessEqual(
+        self.assertEqual(
             suggestions[1].suggestion_id, suggestion_2.suggestion_id)
+        self.assertEqual(
+            suggestions[2].suggestion_id, suggestion_3.suggestion_id)
+        for i in python_utils.RANGE(len(suggestions) - 1):
+            self.assertLess(
+                suggestions[i].last_updated, suggestions[i + 1].last_updated)
+
+    def test_get_translation_suggestions_waiting_longest_for_review_wrong_lang(
+            self):
+        suggestions = (
+            suggestion_services
+            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+                'wrong_language_code'))
+
+        self.assertEqual(len(suggestions), 0)
+
+    def test_get_question_suggestions_waiting_longest_for_review_keeps_order(
+            self):
+        """This test makes sure that if a suggestion is rejected and is then
+        resubmitted, we count the time that the suggestion has been waiting for
+        review from when it was resubmitted, not from when it was first
+        submitted.
+        """
+        suggestion_1 = self._create_question_suggestion_with_skill_id('skill1')
+        suggestion_2 = self._create_question_suggestion_with_skill_id('skill2')
+        # Verify that both suggestions are returned and in the right order.
+        suggestions = (
+            suggestion_services
+            .get_question_suggestions_waiting_longest_for_review()
+        )
+        self.assertEqual(len(suggestions), 2)
+        self.assertEqual(
+            suggestions[0].suggestion_id, suggestion_1.suggestion_id)
+        self.assertEqual(
+            suggestions[1].suggestion_id, suggestion_2.suggestion_id)
+        self.assertLess(
+            suggestions[0].last_updated, suggestions[1].last_updated)
 
         # Reject the suggestion that was created first since it is the one that
         # has been waiting the longest for review.
@@ -1118,71 +1122,42 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         # Verify that only the suggestion that was created second is returned.
         suggestions = (
             suggestion_services
-            .get_translation_suggestions_waiting_longest_for_review_per_lang(
-                'hi'))
+            .get_question_suggestions_waiting_longest_for_review()
+        )
         self.assertEqual(len(suggestions), 1)
         self.assertLessEqual(
             suggestions[0].suggestion_id, suggestion_2.suggestion_id)
 
-        # Resubmit rejected suggestion.
-        with self.swap(
-            suggestion_registry.SuggestionTranslateContent,
-            'pre_update_validate',
-            self.mock_pre_update_validate_does_nothing):
-            suggestion_services.resubmit_rejected_suggestion(
-                suggestion_1.suggestion_id, 'resubmit summary message',
-                self.author_id_1, exp_domain.ExplorationChange(
-                    self.add_translation_change_dict))
+        # Change the question_dict of question suggestion 1 so that we can
+        # resubmit it for review.
+        resubmit_question_change = suggestion_1.change
+        resubmit_question_change.question_dict['linked_skill_ids'] = ['skill1']
+
+        # Resubmit the rejected question suggestion.
+        suggestion_services.resubmit_rejected_suggestion(
+            suggestion_1.suggestion_id, 'resubmit summary message',
+            self.author_id_1, resubmit_question_change
+        )
 
         # Verify that both suggestions are returned again and the suggestion
         # that was created second is now the first suggestion in the returned
         # list, since it has been waiting longer (due to it not being updated).
         suggestions = (
             suggestion_services
-            .get_translation_suggestions_waiting_longest_for_review_per_lang(
-                'hi'))
+            .get_question_suggestions_waiting_longest_for_review()
+        )
         self.assertEqual(len(suggestions), 2)
-        self.assertLessEqual(
+        self.assertEqual(
             suggestions[0].suggestion_id, suggestion_2.suggestion_id)
-        self.assertLessEqual(
+        self.assertEqual(
             suggestions[1].suggestion_id, suggestion_1.suggestion_id)
+        self.assertLess(
+            suggestions[0].last_updated, suggestions[1].last_updated)
 
     def test_get_question_suggestions_waiting_longest_for_review(self):
-        suggestion_change = {
-            'cmd': (
-                question_domain
-                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-            'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION),
-                'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid-1']
-            },
-            'skill_id': 'skill1',
-            'skill_difficulty': 0.3
-        }
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL, 'skill1', 1,
-            self.author_id_1, suggestion_change, 'test description')
-        # Change the skill_id of the suggestion change so that we can reuse the
-        # suggestion change to make a new question suggestion with a different
-        # skill_id.
-        suggestion_change['skill_id'] = 'skill2'
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL, 'skill2', 1,
-            self.author_id_1, suggestion_change, 'test description')
-        # Change the skill_id one more time to make a third suggestion with a
-        # unique skill_id.
-        suggestion_change['skill_id'] = 'skill3'
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL, 'skill3', 1,
-            self.author_id_1, suggestion_change, 'test description')
+        suggestion_1 = self._create_question_suggestion_with_skill_id('skill1')
+        suggestion_2 = self._create_question_suggestion_with_skill_id('skill2')
+        suggestion_3 = self._create_question_suggestion_with_skill_id('skill3')
 
         suggestions = (
             suggestion_services
@@ -1191,9 +1166,15 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         # Assert that the suggestions are in the order that they were created.
         self.assertEqual(len(suggestions), 3)
-        self.assertLessEqual(suggestions[0].target_id, 'skill1')
-        self.assertLessEqual(suggestions[1].target_id, 'skill2')
-        self.assertLessEqual(suggestions[2].target_id, 'skill3')
+        self.assertEqual(
+            suggestions[0].suggestion_id, suggestion_1.suggestion_id)
+        self.assertEqual(
+            suggestions[1].suggestion_id, suggestion_2.suggestion_id)
+        self.assertEqual(
+            suggestions[2].suggestion_id, suggestion_3.suggestion_id)
+        for i in python_utils.RANGE(len(suggestions) - 1):
+            self.assertLess(
+                suggestions[i].last_updated, suggestions[i + 1].last_updated)
 
     def test_query_suggestions_that_can_be_reviewed_by_user(self):
         # User proficiency models for user1.

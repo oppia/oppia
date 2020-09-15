@@ -2324,8 +2324,8 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
-        reviewer_ids_to_notify = user_services.get_reviewer_user_ids_to_notify(
-        )
+        reviewer_ids_to_notify = (
+            user_services.get_reviewer_user_ids_to_notify())
 
         self.assertEqual(len(reviewer_ids_to_notify), 2)
         self.assertIn(self.question_reviewer_id, reviewer_ids_to_notify)
@@ -2352,19 +2352,19 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
-        reviewer_ids_to_notify = user_services.get_reviewer_user_ids_to_notify(
-        )
+        reviewer_ids_to_notify = (
+            user_services.get_reviewer_user_ids_to_notify())
 
         self.assertEqual(len(reviewer_ids_to_notify), 0)
 
-    def test_get_reviewer_user_ids_to_notify_when_there_are_no_reviewers(
+    def test_get_reviewer_user_ids_to_notify_returns_empty_for_no_reviewers(
             self):
         # Assert that there are no reviewers.
         self.assertEqual(
             user_services.get_all_reviewers_contribution_rights(), [])
 
-        reviewer_ids_to_notify = user_services.get_reviewer_user_ids_to_notify(
-        )
+        reviewer_ids_to_notify = (
+            user_services.get_reviewer_user_ids_to_notify())
 
         self.assertEqual(len(reviewer_ids_to_notify), 0)
 

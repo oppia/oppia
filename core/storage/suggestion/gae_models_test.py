@@ -562,7 +562,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'exp4', self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change_cmd, self.score_category,
-            'exploration.exp4.thread1', 'different_language_code')
+            'exploration.exp4.thread1', 'fr')
 
         translation_suggestion_models = (
             suggestion_models.GeneralSuggestionModel
@@ -585,7 +585,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         translation_suggestion_models_with_different_lang_code = (
             suggestion_models.GeneralSuggestionModel
             .get_translation_suggestions_waiting_longest_for_review_per_lang(
-                'different_language_code'
+                'fr'
             )
         )
 
