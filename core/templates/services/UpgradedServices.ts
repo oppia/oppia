@@ -214,6 +214,8 @@ import { ExplorationStatsObjectFactory } from
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ExplorationTaskObjectFactory } from
   'domain/improvements/ExplorationTaskObjectFactory';
+import { ExpressionEvaluatorService } from
+  'expressions/expression-evaluator.service';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExplorationRecommendationsService } from
   // eslint-disable-next-line max-len
@@ -238,6 +240,7 @@ import { FeedbackThreadSummaryObjectFactory } from
   'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { FractionInputValidationService } from
@@ -1200,6 +1203,10 @@ export class UpgradedServices {
     upgradedServices['ExplorationImprovementsTaskRegistryService'] =
       new ExplorationImprovementsTaskRegistryService(
         upgradedServices['ExplorationTaskObjectFactory']);
+    upgradedServices['ExpressionEvaluatorService'] =
+      new ExpressionEvaluatorService(
+        upgradedServices['ExpressionParserService'],
+        upgradedServices['ExpressionSyntaxTreeService']);
     upgradedServices['ExtensionTagAssemblerService'] =
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
@@ -1207,6 +1214,9 @@ export class UpgradedServices {
     upgradedServices['ExtractImageFilenamesFromStateService'] =
       new ExtractImageFilenamesFromStateService(
         upgradedServices['HtmlEscaperService']);
+    upgradedServices['FocusManagerService'] = new FocusManagerService(
+      upgradedServices['DeviceInfoService'],
+      upgradedServices['IdGenerationService']);
     upgradedServices['HttpClient'] = new HttpClient(
       upgradedServices['HttpXhrBackend']);
     upgradedServices['LanguageUtilService'] = new LanguageUtilService(
