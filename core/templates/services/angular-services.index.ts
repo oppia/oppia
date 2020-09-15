@@ -206,6 +206,7 @@ import { StopwatchObjectFactory } from 'domain/utilities/StopwatchObjectFactory'
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ExpressionEvaluatorService } from 'expressions/expression-evaluator.service';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExpressionSyntaxTreeService } from 'expressions/expression-syntax-tree.service';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
@@ -470,6 +471,7 @@ export const angularServices: [string, unknown][] = [
   ['ExplorationStatsObjectFactory', ExplorationStatsObjectFactory],
   ['ExplorationStatsService', ExplorationStatsService],
   ['ExplorationTaskObjectFactory', ExplorationTaskObjectFactory],
+  ['ExpressionEvaluatorService', ExpressionEvaluatorService],
   ['ExpressionParserService', ExpressionParserService],
   ['ExpressionSyntaxTreeService', ExpressionSyntaxTreeService],
   ['ExtensionTagAssemblerService', ExtensionTagAssemblerService],

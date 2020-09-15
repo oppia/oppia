@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,105 +12,122 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// This file defines the evaluation engine as well as the system operators.
-// The evaluator takes the output of the parser (i.e. parse tree) as defined in
-// parser.pegjs and produces a javaScript primitive value when the evaluation is
-// performed correctly.
-// Two cases that can throw an exception (i.e. an Error object):
-// - Variable look-up ('#' operator) failure. (ExprUndefinedVarError)
-// - Wrong number of arguments in the node for the given operator.
-//   (ExprWrongNumArgsError)
-// Both errors are children of ExpressionError, so caller can use
-// ExpressionError to catch only these expected error cases.
-//
-// An expression is evaluated in a context consisting of predefined system
-// variables, system operators, and system functions. In the input language,
-// operators are predefined set of characters in infix, postfix, or ternary
-// format (there is currently no postfix operators) while functions have the
-// form of function calls (e.g. "abs(10)"). In the parse tree, there is no
-// difference between operators and functions. User defined parameters may
-// override the meaning of system variables and functions (but not operators).
-// Users also can define parameters with new names. Referencing a variable which
-// is not defined as a system variable, system function, or user parameter will
-// result in ExprUndefinedVarError to be thrown.
-//
-// All system variables, system operators, and system functions are defined
-// as 'system' variable in this file.
-//
-// TODO(kashida): Split the following section into two:
-//     - A general overview of operators (including some concrete examples)
-//     - A numbered sequence of steps which a new contributor should follow in
-//         order to define a new operator.
-// Defining new operators and functions:
-// Operators and functions are given an array of arguments which are already all
-// evaluated. E.g. for an expression "1 + 2 * 3", the "+" plus operator receives
-// values 1 and 6 (i.e. "2 * 3" already evaluated).
-// The operators and functions should verify that the argument array
-// has the required number of arguments. Operators and functions can coerse the
-// input arguments to the desired typed values, or throw an exception if wrong
-// type of argument is given.
-// type of inputs. This does not prevent operators to eror on wrong parameter
-// values (e.g. getting negative number for an index).
-// When successful, operators and functions may return any valid JavaScript
-// values. In general, an operator always returns the same type of value, but
-// there are exceptions (e.g. "+" operator may return a number or a string
-// depending on the types of the input arguments).
-// Constraints on the input arguments (number, types, and any other
-// constraints) as well as the output value and type should be documented.
-
 /**
  * @fileoverview Service for expression evaluation.
+ *
+ * This file defines the evaluation engine as well as the system operators. The
+ * evaluator takes the output of the parser (a parse tree) as defined in
+ * parser.pegjs and produces a JavaScript primitive value if successful.
+ *
+ * There are 2 scenarios where an exception is thrown:
+ * -   ExprUndefinedVarError: Variable look-up ('#' operator) failed.
+ * -   ExprWrongNumArgsError: Wrong number of arguments provided to an operator.
+ *
+ * Both errors are children of ExpressionError, so callers can catch
+ * ExpressionError to identify issues in the evaluator.
+ *
+ * An expression is evaluated in a context. The context consists of predefined
+ * system variables, system operators, and system functions.
+ *
+ * Operators are a predefined set of characters using infix, prefix, or ternary
+ * format for its values. There are currently no postfix operators.
+ *
+ * Functions are written like they would in JavaScript (e.g. "abs(10)"). The
+ * parse tree treat operators and functions equivalently.
+ *
+ * User-defined parameters may override the meaning of system variables and
+ * functions, but not operators.
+ *
+ * Users also can define parameters with new names. Trying to reference a
+ * variable which has not been defined as a system variable, system function, or
+ * user parameter will throw an ExprUndefinedVarError.
+ *
+ * All system variables, system operators, and system functions are defined in
+ * the 'system' variable in this service.
+ *
+ * TODO(kashida): Split the following section into two:
+ * 1.  A general overview of operators (including some concrete examples)
+ * 2.  A numbered sequence of steps which a new contributor should follow in
+ *     order to define a new operator.
+ *
+ * Defining new operators and functions:
+ *     Operators and functions are given an array of arguments which are already
+ *     all evaluated. For example, in the expression "1 + 2 * 3" the "+" plus
+ *     operator receives values 1 and 6 (because "2 * 3" has already been
+ *     evaluated).
+ *
+ *     The operators and functions should verify that the argument array has the
+ *     required number of arguments. Operators and functions can coerce the
+ *     input arguments to the desired typed values, or throw an exception if
+ *     wrong type of argument is given. This does not prevent operators to error
+ *     on wrong parameter values (e.g. getting negative number for an index).
+ *
+ *     When successful, operators and functions may return any valid JavaScript
+ *     values. In general, an operator always returns the same type of value,
+ *     but there are exceptions (e.g. "+" operator may return a number or a
+ *     string depending on the types of the input arguments).
+ *
+ *     Constraints on the input arguments (number, types, and any other
+ *     constraints) as well as the output value and type should be documented.
  */
 
-require('expressions/expression-parser.service.ts');
-require('expressions/expression-syntax-tree.service.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-// Service for expression evaluation.
-angular.module('oppia').factory('ExpressionEvaluatorService', [
-  'ExpressionParserService', 'ExpressionSyntaxTreeService',
-  function(ExpressionParserService, ExpressionSyntaxTreeService) {
-    var evaluateExpression = function(expression, envs) {
-      return ExpressionSyntaxTreeService.applyFunctionToParseTree(
-        ExpressionParserService.parse(expression), envs, evaluate);
-    };
+import { ExpressionParserService } from
+  'expressions/expression-parser.service';
+import { EnvDict, Expr, ExpressionSyntaxTreeService, SystemEnv } from
+  'expressions/expression-syntax-tree.service';
 
-    /**
-     * @param {*} parsed Parse output from the parser. See parser.pegjs for
-     *     the data structure.
-     * @param {!Array.<!Object>} envs Represents a nested name space
-     *     environment to look up the name in. The first element is looked up
-     *     first (i.e. has higher precedence).
-     */
-    var evaluate = function(parsed, envs) {
-      // The intermediate nodes of the parse tree are arrays. The terminal
-      // nodes are JavaScript primitives (as described in the "Parser output"
-      // section of parser.pegjs).
-      if (parsed instanceof Array) {
-        if (parsed.length === 0) {
-          throw new Error(
-            'Parser generated an intermediate node with zero children');
-        }
+@Injectable({
+  providedIn: 'root'
+})
+export class ExpressionEvaluatorService {
+  constructor(
+      private expressionParserService: ExpressionParserService,
+      private expressionSyntaxTreeService: ExpressionSyntaxTreeService) {}
 
-        if (parsed[0] === '#') {
-          return ExpressionSyntaxTreeService.lookupEnvs(parsed[1], envs);
-        }
+  evaluateExpression(expression: string, envs: EnvDict[]): Expr {
+    return this.expressionSyntaxTreeService.applyFunctionToParseTree(
+      this.expressionParserService.parse(expression), envs,
+      (parsed, envs) => this.evaluate(parsed, envs));
+  }
 
-        // Evaluate rest of the elements, i.e. the arguments.
-        var args = parsed.slice(1).map(function(item) {
-          return evaluate(item, envs);
-        });
-        // The first element should be a function name.
-        return ExpressionSyntaxTreeService.lookupEnvs(
-          parsed[0], envs).eval(args);
+  /**
+   * @param parsed Parse output from the parser. See parser.pegjs for the data
+   *     structure.
+   * @param envs Represents a nested name space environment to look up the name
+   *     in. The first element is looked up first (i.e. has higher precedence).
+   */
+  evaluate(parsed: Expr | Expr[], envs: EnvDict[]): Expr {
+    // The intermediate nodes of the parse tree are arrays. The terminal nodes
+    // are JavaScript primitives (as described in the "Parser output" section of
+    // parser.pegjs).
+    if (parsed instanceof Array) {
+      if (parsed.length === 0) {
+        throw new Error(
+          'Parser generated an intermediate node with zero children');
       }
 
-      // This should be a terminal node with the actual value.
-      return parsed;
-    };
+      if (parsed[0] === '#') {
+        const varName = <string> parsed[1];
+        return (
+          <Expr> this.expressionSyntaxTreeService.lookupEnvs(varName, envs));
+      }
 
-    return {
-      evaluate: evaluate,
-      evaluateExpression: evaluateExpression,
-    };
+      // Otherwise, this must be a function/operator expression.
+      const funcName = <string> parsed[0];
+      const funcArgs = parsed.slice(1).map(item => this.evaluate(item, envs));
+      const funcEnvs = <SystemEnv> this.expressionSyntaxTreeService.lookupEnvs(
+        funcName, envs);
+      return funcEnvs.eval(funcArgs);
+    }
+
+    // This should be a terminal node with an actual value.
+    return parsed;
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'ExpressionEvaluatorService',
+  downgradeInjectable(ExpressionEvaluatorService));
