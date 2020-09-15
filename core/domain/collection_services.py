@@ -936,42 +936,33 @@ def update_collection(
             committer_id, utils.get_current_time_in_millisecs())
 
 
-def create_collection_summary(
-        collection_id, contributor_id_to_add, contributor_id_to_remove=None):
+def create_collection_summary(collection_id, contributor_id_to_add):
     """Creates and stores a summary of the given collection.
 
     Args:
         collection_id: str. ID of the collection.
         contributor_id_to_add: str|None. ID of the contributor to be added to
             the collection summary.
-        contributor_id_to_remove: str|None. ID of the contributor to remove from
-            the collection summary.
     """
     collection = get_collection_by_id(collection_id)
     collection_summary = compute_summary_of_collection(
-        collection, contributor_id_to_add, contributor_id_to_remove)
+        collection, contributor_id_to_add)
     save_collection_summary(collection_summary)
 
 
 def update_collection_summary(
-        collection_id, contributor_id_to_add, contributor_id_to_remove=None):
+        collection_id, contributor_id_to_add):
     """Update the summary of an collection.
 
     Args:
         collection_id: str. ID of the collection.
         contributor_id_to_add: str|None. ID of the contributor to be added to
             the collection summary.
-        contributor_id_to_remove: str|None. ID of the contributor to remove from
-            the collection summary.
     """
-    create_collection_summary(
-        collection_id,
-        contributor_id_to_add,
-        contributor_id_to_remove=contributor_id_to_remove)
+    create_collection_summary(collection_id, contributor_id_to_add)
 
 
-def compute_summary_of_collection(
-        collection, contributor_id_to_add, contributor_id_to_remove):
+def compute_summary_of_collection(collection, contributor_id_to_add):
     """Create a CollectionSummary domain object for a given Collection domain
     object and return it.
 
@@ -979,8 +970,6 @@ def compute_summary_of_collection(
         collection: Collection. The domain object.
         contributor_id_to_add: str. ID of the contributor to be added to the
             collection summary.
-        contributor_id_to_remove: str|None. ID of the contributor to remove from
-            the collection summary.
 
     Returns:
         CollectionSummary. The computed summary for the given collection.
@@ -1004,9 +993,6 @@ def compute_summary_of_collection(
     elif contributor_id_to_add not in constants.SYSTEM_USER_IDS:
         contributors_summary[contributor_id_to_add] = (
             contributors_summary.get(contributor_id_to_add, 0) + 1)
-
-    if contributor_id_to_remove in contributors_summary:
-        del contributors_summary[contributor_id_to_remove]
 
     contributor_ids = list(contributors_summary.keys())
 
@@ -1045,16 +1031,22 @@ def compute_collection_contributors_summary(collection_id):
     while True:
         snapshot_metadata = snapshots_metadata[current_version - 1]
         committer_id = snapshot_metadata['committer_id']
-        if (
-                committer_id not in constants.SYSTEM_USER_IDS and
-                user_services.is_user_id_correct(committer_id)
-        ):
+        if committer_id not in constants.SYSTEM_USER_IDS:
             contributors_summary[committer_id] += 1
 
         if current_version == 1:
             break
 
         current_version -= 1
+
+    # Remove IDs that are deleted or do not exists.
+    users_settings = user_services.get_users_settings(
+        contributors_summary.keys())
+    for key, user_settings in python_utils.ZIP(
+            contributors_summary.keys(), users_settings):
+        if user_settings is None:
+            del contributors_summary[key]
+
     return contributors_summary
 
 

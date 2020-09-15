@@ -949,8 +949,7 @@ def update_exploration(
             exploration_id)
 
 
-def create_exploration_summary(
-        exploration_id, contributor_id_to_add, contributor_id_to_remove=None):
+def create_exploration_summary(exploration_id, contributor_id_to_add):
     """Create the summary model for an exploration, and store it in the
     datastore.
 
@@ -965,12 +964,11 @@ def create_exploration_summary(
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     exp_summary = compute_summary_of_exploration(
-        exploration, contributor_id_to_add, contributor_id_to_remove)
+        exploration, contributor_id_to_add)
     save_exploration_summary(exp_summary)
 
 
-def update_exploration_summary(
-        exploration_id, contributor_id_to_add, contributor_id_to_remove=None):
+def update_exploration_summary(exploration_id, contributor_id_to_add):
     """Update the summary of an exploration.
 
     Args:
@@ -981,17 +979,11 @@ def update_exploration_summary(
             update to the exploration's content) will be added to the list of
             contributors for the exploration if the argument is not None and it
             is not a system id.
-        contributor_id_to_remove: str|None. ID of the contributor to remove from
-            the collection summary.
     """
-    create_exploration_summary(
-        exploration_id,
-        contributor_id_to_add,
-        contributor_id_to_remove=contributor_id_to_remove)
+    create_exploration_summary(exploration_id, contributor_id_to_add)
 
 
-def compute_summary_of_exploration(
-        exploration, contributor_id_to_add, contributor_id_to_remove):
+def compute_summary_of_exploration(exploration, contributor_id_to_add):
     """Create an ExplorationSummary domain object for a given Exploration
     domain object and return it. contributor_id_to_add will be added to
     the list of contributors for the exploration if the argument is not
@@ -1005,8 +997,6 @@ def compute_summary_of_exploration(
             change to the exploration's content) will be added to the list of
             contributors for the exploration if the argument is not None and it
             is not a system id.
-        contributor_id_to_remove: str|None. ID of the contributor to remove from
-            the collection summary.
 
     Returns:
         ExplorationSummary. The resulting exploration summary domain object.
@@ -1035,9 +1025,6 @@ def compute_summary_of_exploration(
     elif contributor_id_to_add not in constants.SYSTEM_USER_IDS:
         contributors_summary[contributor_id_to_add] = (
             contributors_summary.get(contributor_id_to_add, 0) + 1)
-
-    if contributor_id_to_remove in contributors_summary:
-        del contributors_summary[contributor_id_to_remove]
 
     contributor_ids = list(contributors_summary.keys())
 
@@ -1080,11 +1067,7 @@ def compute_exploration_contributors_summary(exploration_id):
         snapshot_metadata = snapshots_metadata[current_version - 1]
         committer_id = snapshot_metadata['committer_id']
         is_revert = (snapshot_metadata['commit_type'] == 'revert')
-        if (
-                not is_revert and
-                committer_id not in constants.SYSTEM_USER_IDS and
-                user_services.is_user_id_correct(committer_id)
-        ):
+        if not is_revert and committer_id not in constants.SYSTEM_USER_IDS:
             contributors_summary[committer_id] += 1
         if current_version == 1:
             break
@@ -1094,6 +1077,15 @@ def compute_exploration_contributors_summary(exploration_id):
                 'version_number']
         else:
             current_version -= 1
+
+    # Remove IDs that are deleted or do not exists.
+    users_settings = user_services.get_users_settings(
+        contributors_summary.keys())
+    for key, user_settings in python_utils.ZIP(
+            contributors_summary.keys(), users_settings):
+        if user_settings is None:
+            del contributors_summary[key]
+
     return contributors_summary
 
 
