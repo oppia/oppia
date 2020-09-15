@@ -121,6 +121,15 @@ describe('Topic editor page', function() {
     expect(ctrl.getNavbarText()).toBe('Question Editor');
   });
 
+  it('should call confirm before leaving', function() {
+    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
+    spyOn(window, 'addEventListener');
+    ctrl.setUpBeforeUnload();
+    ctrl.confirmBeforeLeaving({returnValue: ''});
+    expect(window.addEventListener).toHaveBeenCalledWith(
+      'beforeunload', ctrl.confirmBeforeLeaving);
+  });
+
   it('should return the change count', function() {
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
     expect(ctrl.getChangeListLength()).toBe(10);

@@ -37,17 +37,18 @@ require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 require('services/bottom-navbar-status.service.ts');
 require('services/page-title.service.ts');
+require('services/contextual/window-ref.service');
 
 angular.module('oppia').component('skillEditorPage', {
   template: require('./skill-editor-page.component.html'),
   controller: [
     '$uibModal', 'BottomNavbarStatusService',
     'SkillEditorRoutingService', 'SkillEditorStateService',
-    'UndoRedoService', 'UrlInterpolationService', 'UrlService',
+    'UndoRedoService', 'UrlInterpolationService', 'UrlService', 'WindowRef',
     function(
         $uibModal, BottomNavbarStatusService,
         SkillEditorRoutingService, SkillEditorStateService,
-        UndoRedoService, UrlInterpolationService, UrlService) {
+        UndoRedoService, UrlInterpolationService, UrlService, WindowRef) {
       var ctrl = this;
       ctrl.getActiveTabName = function() {
         return SkillEditorRoutingService.getActiveTabName();
@@ -83,8 +84,24 @@ angular.module('oppia').component('skillEditorPage', {
       ctrl.getWarningsCount = function() {
         return ctrl.skill.getValidationIssues().length;
       };
+
+      ctrl.setUpBeforeUnload = function() {
+        WindowRef.nativeWindow.addEventListener(
+          'beforeunload', ctrl.confirmBeforeLeaving);
+      };
+
+      ctrl.confirmBeforeLeaving = function(e) {
+        if (UndoRedoService.getChangeCount()) {
+          // This message is irrelevant, but is needed to trigger the
+          // confirmation before leaving.
+          e.returnValue = 'Sure?';
+          return false;
+        }
+      };
+
       ctrl.$onInit = function() {
         BottomNavbarStatusService.markBottomNavbarStatus(true);
+        ctrl.setUpBeforeUnload();
         SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
         ctrl.skill = SkillEditorStateService.getSkill();
       };

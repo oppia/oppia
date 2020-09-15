@@ -45,7 +45,9 @@ angular.module('oppia').directive('skillRubricsEditor', [
               $scope.skill, difficulty, explanations);
           };
           $scope.toggleRubricsList = function() {
-            $scope.rubricsListIsShown = !$scope.rubricsListIsShown;
+            if (WindowDimensionsService.isWindowNarrow()) {
+              $scope.rubricsListIsShown = !$scope.rubricsListIsShown;
+            }
           };
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
