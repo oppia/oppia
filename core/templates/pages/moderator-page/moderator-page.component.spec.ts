@@ -93,7 +93,7 @@ describe('Moderator Page', function() {
     expect(ctrl.getDatetimeAsString(NOW_MILLIS)).toEqual('11/21/14');
   });
 
-  it('should return correct bool for isEntityExploration', function() {
+  it('should return correct bool for isMessageFromExploration', function() {
     expect(
       ctrl.isMessageFromExploration({entityType: 'exploration'})
     ).toBeTrue();
