@@ -350,6 +350,7 @@ import { StateInteractionStatsService } from 'services/state-interaction-stats.s
 import { StateTopAnswersStatsBackendApiService } from 'services/state-top-answers-stats-backend-api.service';
 import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionsService } from 'services/suggestions.service';
 import { TranslateService } from 'services/translate.service';
@@ -486,6 +487,7 @@ export const angularServices: [string, unknown][] = [
   ['FeedbackThreadObjectFactory', FeedbackThreadObjectFactory],
   ['FeedbackThreadSummaryObjectFactory', FeedbackThreadSummaryObjectFactory],
   ['FileDownloadRequestObjectFactory', FileDownloadRequestObjectFactory],
+  ['FocusManagerService', FocusManagerService],
   ['FormatTimePipe', FormatTimePipe],
   ['FractionInputRulesService', FractionInputRulesService],
   ['FractionInputValidationService', FractionInputValidationService],
