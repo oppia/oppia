@@ -11,6 +11,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS-IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
@@ -155,7 +156,7 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
         # does not create a summary object, which is needed for the
         # job to update the index after updating the collection.
         collection_summary = collection_services.compute_summary_of_collection(
-            model, self.albert_id, None)
+            model, self.albert_id)
         collection_services.save_collection_summary(collection_summary)
 
         # Start migration job on sample collection.
@@ -258,7 +259,7 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
         # does not create a summary object, which is needed for the
         # job to update the index after updating the collection.
         collection_summary = collection_services.compute_summary_of_collection(
-            model, self.albert_id, None)
+            model, self.albert_id)
         collection_services.save_collection_summary(collection_summary)
 
         # Check that collection_contents is empty.

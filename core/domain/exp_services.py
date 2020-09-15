@@ -963,8 +963,6 @@ def create_exploration_summary(exploration_id, contributor_id_to_add):
             created the exploration will be added to the list of contributours
             for the exploration if the argument is not None and it is not a
             system id.
-        contributor_id_to_remove: str|None. ID of the contributor to remove from
-            the collection summary.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     exp_summary = compute_summary_of_exploration(
@@ -1084,9 +1082,9 @@ def compute_exploration_contributors_summary(exploration_id):
 
     # Remove IDs that are deleted or do not exists.
     users_settings = user_services.get_users_settings(
-        contributors_summary.keys())
+        list(contributors_summary))
     for key, user_settings in python_utils.ZIP(
-            contributors_summary.keys(), users_settings):
+            list(contributors_summary), users_settings):
         if user_settings is None:
             del contributors_summary[key]
 

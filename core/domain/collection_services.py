@@ -1041,9 +1041,9 @@ def compute_collection_contributors_summary(collection_id):
 
     # Remove IDs that are deleted or do not exists.
     users_settings = user_services.get_users_settings(
-        contributors_summary.keys())
+        list(contributors_summary))
     for key, user_settings in python_utils.ZIP(
-            contributors_summary.keys(), users_settings):
+            list(contributors_summary), users_settings):
         if user_settings is None:
             del contributors_summary[key]
 

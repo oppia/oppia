@@ -113,8 +113,6 @@ def _update_exploration_summary(activity_rights):
     Args:
         activity_rights: ActivityRights. The rights object for the given
             activity.
-        contributor_id_to_remove: str. User ID to remove from contributors.
-            Default is None.
     """
     # TODO(msl): Get rid of inline imports by refactoring code.
     from core.domain import exp_services
@@ -130,7 +128,6 @@ def _update_collection_summary(activity_rights):
     Args:
         activity_rights: ActivityRights. The rights object for the given
             activity.
-        contributor_id_to_remove: str. User ID to remove from contributors.
     """
 
     from core.domain import collection_services
@@ -1109,7 +1106,7 @@ def set_private_viewability_of_exploration(
     _save_activity_rights(
         committer_id, exploration_rights, constants.ACTIVITY_TYPE_EXPLORATION,
         commit_message, commit_cmds)
-    _update_exploration_summary(exploration_rights, None)
+    _update_exploration_summary(exploration_rights)
 
 
 def publish_exploration(committer, exploration_id):
