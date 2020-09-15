@@ -212,6 +212,8 @@ import { ExplorationStatsObjectFactory } from
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ExplorationTaskObjectFactory } from
   'domain/improvements/ExplorationTaskObjectFactory';
+import { ExpressionEvaluatorService } from
+  'expressions/expression-evaluator.service';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExplorationRecommendationsService } from
   // eslint-disable-next-line max-len
@@ -1192,6 +1194,10 @@ export class UpgradedServices {
     upgradedServices['ExplorationImprovementsTaskRegistryService'] =
       new ExplorationImprovementsTaskRegistryService(
         upgradedServices['ExplorationTaskObjectFactory']);
+    upgradedServices['ExpressionEvaluatorService'] =
+      new ExpressionEvaluatorService(
+        upgradedServices['ExpressionParserService'],
+        upgradedServices['ExpressionSyntaxTreeService']);
     upgradedServices['ExtensionTagAssemblerService'] =
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
