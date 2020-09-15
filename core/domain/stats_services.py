@@ -31,7 +31,6 @@ from core.domain import stats_domain
 from core.platform import models
 import feconf
 import utils
-import python_utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 transaction_services = models.Registry.import_transaction_services()

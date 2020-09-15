@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import operator
 import os
-import re
 
 from core import jobs_registry
 from core.domain import event_services
