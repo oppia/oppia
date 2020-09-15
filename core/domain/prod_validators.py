@@ -2170,7 +2170,7 @@ class QuestionModelValidator(base_model_validators.BaseModelValidator):
         for skill_misconception_id in inapplicable_skill_misconception_ids:
             skill_id, misconception_id = skill_misconception_id.split('-')
             skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
-            if skill:
+            if skill is not None:
                 misconception_ids = [
                     misconception.id
                     for misconception in skill.misconceptions
