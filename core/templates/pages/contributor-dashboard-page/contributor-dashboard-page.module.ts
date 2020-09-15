@@ -41,7 +41,7 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
 import { CkEditorCopyToolbarComponent } from
-  /* eslint-disable max-len */
+  /* eslint-disable-next-line max-len */
   'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
