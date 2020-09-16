@@ -151,8 +151,6 @@ import { CollectionRightsObjectFactory } from
   'domain/collection/CollectionRightsObjectFactory';
 import { CollectionValidationService } from
   'domain/collection/collection-validation.service';
-import { ComputationDataObjectFactory } from
-  'domain/admin/computation-data-object.factory';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
@@ -754,7 +752,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static collectionRightsBackendApiService: CollectionRightsBackendApiService;
   static collectionRightsObjectFactory: CollectionRightsObjectFactory;
   static collectionValidationService: CollectionValidationService;
-  static computationDataObjectFactory: ComputationDataObjectFactory;
   static computeGraphService: ComputeGraphService;
   static conceptCardObjectFactory: ConceptCardObjectFactory;
   static contextService: ContextService;
@@ -1084,7 +1081,6 @@ private collectionPlaythroughObjectFactory: CollectionPlaythroughObjectFactory,
 private collectionRightsBackendApiService: CollectionRightsBackendApiService,
 private collectionRightsObjectFactory: CollectionRightsObjectFactory,
 private collectionValidationService: CollectionValidationService,
-private computationDataObjectFactory: ComputationDataObjectFactory,
 private computeGraphService: ComputeGraphService,
 private conceptCardObjectFactory: ConceptCardObjectFactory,
 private contextService: ContextService,
@@ -1415,7 +1411,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.collectionRightsBackendApiService = this.collectionRightsBackendApiService;
     OppiaAngularRootComponent.collectionRightsObjectFactory = this.collectionRightsObjectFactory;
     OppiaAngularRootComponent.collectionValidationService = this.collectionValidationService;
-    OppiaAngularRootComponent.computationDataObjectFactory = this.computationDataObjectFactory;
     OppiaAngularRootComponent.computeGraphService = this.computeGraphService;
     OppiaAngularRootComponent.conceptCardObjectFactory = this.conceptCardObjectFactory;
     OppiaAngularRootComponent.contextService = this.contextService;

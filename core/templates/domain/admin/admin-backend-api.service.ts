@@ -30,8 +30,7 @@ import {
 import {
   ComputationData,
   ComputationDataBackendDict,
-  ComputationDataObjectFactory
-} from 'domain/admin/computation-data-object.factory';
+} from 'domain/admin/computation-data.model';
 import {
   Job,
   JobDataBackendDict,
@@ -102,7 +101,6 @@ export interface AdminPageData {
 export class AdminBackendApiService {
   constructor(
     private http: HttpClient,
-    private computationDataObjectFactory: ComputationDataObjectFactory,
     private jobDataObjectFactory: JobDataObjectFactory,
     private jobStatusSummaryObjectFactory: JobStatusSummaryObjectFactory,
     private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
@@ -129,7 +127,7 @@ export class AdminBackendApiService {
           recentJobData: response.recent_job_data.map(
             this.jobDataObjectFactory.createFromBackendDict),
           continuousComputationsData: response.continuous_computations_data.map(
-            this.computationDataObjectFactory.createFromBackendDict),
+            ComputationData.createFromBackendDict),
           topicSummaries: response.topic_summaries.map(
             this.topicSummaryObjectFactory.createFromBackendDict)
         });

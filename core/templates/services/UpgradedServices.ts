@@ -102,8 +102,6 @@ import { CollectionCreationBackendService } from
   'components/entity-creation-services/collection-creation-backend-api.service';
 import { CollectionCreationService } from
   'components/entity-creation-services/collection-creation.service';
-import { ComputationDataObjectFactory } from
-  'domain/admin/computation-data-object.factory';
 import { CollectionNodeObjectFactory } from
   'domain/collection/collection-node-object.factory';
 import { CollectionObjectFactory } from
@@ -720,8 +718,6 @@ export class UpgradedServices {
       new CollectionRightsObjectFactory();
     upgradedServices['CollectionValidationService'] =
       new CollectionValidationService();
-    upgradedServices['ComputationDataObjectFactory'] =
-      new ComputationDataObjectFactory();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
     upgradedServices['ConstructTranslationIdsService'] =
       new ConstructTranslationIdsService();
@@ -1268,7 +1264,6 @@ export class UpgradedServices {
     // Topological level: 3.
     upgradedServices['AdminBackendApiService'] = new AdminBackendApiService(
       upgradedServices['HttpClient'],
-      upgradedServices['ComputationDataObjectFactory'],
       upgradedServices['JobDataObjectFactory'],
       upgradedServices['JobStatusSummaryObjectFactory'],
       upgradedServices['TopicSummaryObjectFactory']);

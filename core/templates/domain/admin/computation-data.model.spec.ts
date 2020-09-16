@@ -16,16 +16,10 @@
  * @fileoverview Unit tests for ComputationDataObjectFactory.ts.
  */
 
-import { ComputationDataObjectFactory } from
-  'domain/admin/computation-data-object.factory';
+import { ComputationData } from
+  'domain/admin/computation-data.model';
 
 describe('Computation Data Object Factory', () => {
-  let cdof: ComputationDataObjectFactory;
-
-  beforeEach(() => {
-    cdof = new ComputationDataObjectFactory();
-  });
-
   it('should correctly convert backend dict to Computation Data Object.',
     () => {
       let backendDict = {
@@ -39,7 +33,8 @@ describe('Computation Data Object Factory', () => {
         last_stopped_msec: null
       };
 
-      let computationDataObject = cdof.createFromBackendDict(backendDict);
+      let computationDataObject =
+        ComputationData.createFromBackendDict(backendDict);
 
       expect(computationDataObject.isStoppable).toEqual(false);
       expect(computationDataObject.isStartable).toEqual(true);

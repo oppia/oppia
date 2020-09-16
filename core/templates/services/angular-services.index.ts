@@ -45,7 +45,6 @@ import { StateSolicitAnswerDetailsService } from 'components/state-editor/state-
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { StateWrittenTranslationsService } from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
-import { ComputationDataObjectFactory } from 'domain/admin/computation-data-object.factory';
 import { JobDataObjectFactory } from 'domain/admin/job-data-object.factory';
 import { JobStatusSummaryObjectFactory } from 'domain/admin/job-status-summary-object.factory';
 import { AnswerClassificationResultObjectFactory } from 'domain/classifier/AnswerClassificationResultObjectFactory';
@@ -402,7 +401,6 @@ export const angularServices: [string, unknown][] = [
   ['CollectionRightsBackendApiService', CollectionRightsBackendApiService],
   ['CollectionRightsObjectFactory', CollectionRightsObjectFactory],
   ['CollectionValidationService', CollectionValidationService],
-  ['ComputationDataObjectFactory', ComputationDataObjectFactory],
   ['ComputeGraphService', ComputeGraphService],
   ['ConceptCardBackendApiService', ConceptCardBackendApiService],
   ['ConceptCardObjectFactory', ConceptCardObjectFactory],

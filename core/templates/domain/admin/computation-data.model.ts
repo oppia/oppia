@@ -16,9 +16,6 @@
  * @fileoverview Frontend domain object factory for computation data.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface ComputationDataBackendDict {
   'last_stopped_msec': number;
   'is_startable': boolean;
@@ -53,13 +50,8 @@ export class ComputationData {
     this.activeRealtimeLayerIndex = activeRealtimeLayerIndex;
     this.computationType = computationType;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ComputationDataObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       backendDict: ComputationDataBackendDict): ComputationData {
     return new ComputationData(
       backendDict.last_stopped_msec, backendDict.is_startable,
@@ -68,7 +60,3 @@ export class ComputationDataObjectFactory {
       backendDict.active_realtime_layer_index, backendDict.computation_type);
   }
 }
-
-angular.module('oppia').factory(
-  'ComputationDataObjectFactory',
-  downgradeInjectable(ComputationDataObjectFactory));
