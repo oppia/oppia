@@ -16,9 +16,6 @@
  * @fileoverview Frontend domain object factory for review test.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 interface SkillDescriptions {
   [skillId: string]: string;
 }
@@ -32,19 +29,10 @@ export class ReviewTest {
   constructor(
     public storyName: string,
     public skillDescriptions: SkillDescriptions) {}
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ReviewTestObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       backendDict: ReviewTestBackendDict): ReviewTest {
     return new ReviewTest(
       backendDict.story_name, backendDict.skill_descriptions);
   }
 }
-
-angular.module('oppia').factory(
-  'ReviewTestObjectFactory',
-  downgradeInjectable(ReviewTestObjectFactory));

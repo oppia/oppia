@@ -16,23 +16,17 @@
  * @fileoverview Unit tests for Review test object factory.
  */
 
-import { ReviewTestObjectFactory } from
-  'domain/review_test/review-test-object.factory';
+import { ReviewTest } from
+  'domain/review_test/review-test.model';
 
 describe('Review Test Object Factory', () => {
-  let rtof: ReviewTestObjectFactory;
-
-  beforeEach(() => {
-    rtof = new ReviewTestObjectFactory();
-  });
-
   it('should correctly convert backend dict to Review Test Object.', () => {
     let backendDict = {
       story_name: 'Story Name',
       skill_descriptions: {}
     };
 
-    let reviewTest = rtof.createFromBackendDict(backendDict);
+    let reviewTest = ReviewTest.createFromBackendDict(backendDict);
 
     expect(reviewTest.storyName).toEqual('Story Name');
     expect(reviewTest.skillDescriptions).toEqual({});
