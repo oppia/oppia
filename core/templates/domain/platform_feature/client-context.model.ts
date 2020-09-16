@@ -16,9 +16,6 @@
  * @fileoverview Factory for creating ClientContext domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface ClientContextBackendDict {
   'client_type': string;
   'browser_type': string;
@@ -41,6 +38,12 @@ export class ClientContext {
     this.userLocale = userLocale;
   }
 
+  static create(
+      clientType: string, browserType: string, userLocale: string
+  ): ClientContext {
+    return new ClientContext(clientType, browserType, userLocale);
+  }
+
   /**
    * Creates a dict representation of the instance.
    *
@@ -55,18 +58,3 @@ export class ClientContext {
     };
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class ClientContextObjectFactory {
-  create(
-      clientType: string, browserType: string, userLocale: string
-  ): ClientContext {
-    return new ClientContext(clientType, browserType, userLocale);
-  }
-}
-
-angular.module('oppia').factory(
-  'ClientContextObjectFactory',
-  downgradeInjectable(ClientContextObjectFactory));

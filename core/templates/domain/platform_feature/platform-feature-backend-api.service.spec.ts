@@ -20,19 +20,17 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { ClientContextObjectFactory } from
-  'domain/platform_feature/client-context-object.factory';
 import { FeatureStatusSummaryObjectFactory } from
   'domain/platform_feature/feature-status-summary-object.factory';
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
 import { PlatformFeatureDomainConstants } from
   'domain/platform_feature/platform-feature-domain.constants';
+import { ClientContext } from './client-context.model';
 
 describe('PlatformFeatureBackendApiService', () => {
   let httpTestingController: HttpTestingController;
   let platformFeatureBackendApiService: PlatformFeatureBackendApiService;
-  let clientContextObjectFactory: ClientContextObjectFactory;
   let featureStatusSummaryObjectFactory: FeatureStatusSummaryObjectFactory;
 
   beforeEach(() => {
@@ -43,7 +41,6 @@ describe('PlatformFeatureBackendApiService', () => {
     platformFeatureBackendApiService = TestBed.get(
       PlatformFeatureBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
-    clientContextObjectFactory = TestBed.get(ClientContextObjectFactory);
     featureStatusSummaryObjectFactory = TestBed.get(
       FeatureStatusSummaryObjectFactory);
   });
@@ -58,7 +55,7 @@ describe('PlatformFeatureBackendApiService', () => {
         const successHandler = jasmine.createSpy('success');
         const failHandler = jasmine.createSpy('fail');
 
-        const context = clientContextObjectFactory.create(
+        const context = ClientContext.create(
           'Web', 'Chrome', 'en');
         const contextDict = context.toBackendDict();
         const responseDict = {
@@ -89,7 +86,7 @@ describe('PlatformFeatureBackendApiService', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      const context = clientContextObjectFactory.create(
+      const context = ClientContext.create(
         'Web', 'Chrome', 'en');
       const contextDict = context.toBackendDict();
 

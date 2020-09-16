@@ -13,23 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ClientContextObjectFactory.
+ * @fileoverview Unit tests for client-context-model.
  */
 
-import { TestBed } from '@angular/core/testing';
-
-import { ClientContextObjectFactory } from
-  'domain/platform_feature/client-context-object.factory';
+import { ClientContext } from
+  'domain/platform_feature/client-context.model';
 
 describe('PlatformParameterMetadataObjectFactory', () => {
-  let factory: ClientContextObjectFactory;
-
-  beforeEach(() => {
-    factory = TestBed.get(ClientContextObjectFactory);
-  });
-
   it('should create an instance.', () => {
-    const context = factory.create('Web', 'Chrome', 'en');
+    const context = ClientContext.create('Web', 'Chrome', 'en');
 
     expect(context.clientType).toEqual('Web');
     expect(context.browserType).toEqual('Chrome');
@@ -37,7 +29,7 @@ describe('PlatformParameterMetadataObjectFactory', () => {
   });
 
   it('should convert an instance to a dict.', () => {
-    const context = factory.create('Web', 'Chrome', 'en');
+    const context = ClientContext.create('Web', 'Chrome', 'en');
 
     expect(context.toBackendDict()).toEqual({
       client_type: 'Web',

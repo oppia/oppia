@@ -37,8 +37,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { isEqual } from 'lodash';
 
-import { ClientContext, ClientContextObjectFactory } from
-  'domain/platform_feature/client-context-object.factory';
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
 import {
@@ -53,6 +51,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
+import { ClientContext } from 'domain/platform_feature/client-context.model';
 
 interface FeatureFlagsCacheItem {
   timestamp: number;
@@ -83,7 +82,6 @@ export class PlatformFeatureService {
   static initializationPromise: Promise<void> = null;
 
   constructor(
-      private clientContextObjectFactory: ClientContextObjectFactory,
       private platformFeatureBackendApiService:
         PlatformFeatureBackendApiService,
       private featureStatusSummaryObjectFactory:
@@ -288,7 +286,7 @@ export class PlatformFeatureService {
     const userLocale = (
       this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
 
-    return this.clientContextObjectFactory.create(
+    return ClientContext.create(
       clientType, browserType, userLocale);
   }
 

@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ClientContext } from
-  'domain/platform_feature/client-context-object.factory';
+  'domain/platform_feature/client-context.model';
 import {
   FeatureStatusSummary,
   FeatureStatusSummaryBackendDict,

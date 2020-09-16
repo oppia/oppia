@@ -89,8 +89,6 @@ import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { ClassroomDataObjectFactory } from
   'domain/classroom/ClassroomDataObjectFactory';
-import { ClientContextObjectFactory } from
-  'domain/platform_feature/client-context-object.factory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { CodeReplPredictionService } from
   'interactions/CodeRepl/code-repl-prediction.service';
@@ -691,8 +689,6 @@ export class UpgradedServices {
     upgradedServices['CamelCaseToHyphensPipe'] = new CamelCaseToHyphensPipe();
     upgradedServices['ChangeObjectFactory'] = new ChangeObjectFactory();
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
-    upgradedServices['ClientContextObjectFactory'] =
-      new ClientContextObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
     upgradedServices['CollectionNodeObjectFactory'] =
       new CollectionNodeObjectFactory();
@@ -1515,7 +1511,6 @@ export class UpgradedServices {
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
     upgradedServices['PlatformFeatureService'] = new PlatformFeatureService(
-      upgradedServices['ClientContextObjectFactory'],
       upgradedServices['PlatformFeatureBackendApiService'],
       upgradedServices['FeatureStatusSummaryObjectFactory'],
       upgradedServices['I18nLanguageCodeService'],
