@@ -1142,28 +1142,30 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
                 self.translation_reviewer_counts_per_lang):
             if reviewer_count < 0:
                 raise utils.ValidationError(
-                    'Invalid translation reviewer count: %s, the translation '
-                    'language code is %s.' % (reviewer_count, language_code)
+                    'Expected the translation reviewer count to be positive, '
+                    'recieved: %s. The language code for the translation was '
+                    '%s.' % (reviewer_count, language_code)
                 )
 
         for language_code, suggestion_count in (
                 self.translation_suggestion_counts_per_lang):
             if suggestion_count < 0:
                 raise utils.ValidationError(
-                    'Invalid translation suggestion count: %s, the translation'
-                    ' language code is %s.' % (suggestion_count, language_code)
+                    'Expected the translation suggestion count to be positive, '
+                    'recieved: %s. The language code for the translation was '
+                    '%s.' % (suggestion_count, language_code)
                 )
 
         if self.question_reviewer_count < 0:
             raise utils.ValidationError(
-                'Invalid question reviewer count: %s.' % (
-                    self.question_reviewer_count)
+                'Expected the question reviewer count to be positive, '
+                    'recieved: %s.' % (self.question_reviewer_count)
             )
 
         if self.question_suggestion_count < 0:
             raise utils.ValidationError(
-                'Invalid question suggestion count: %s.' % (
-                    self.question_suggestion_count)
+                'Expected the question suggestion count to be positive, '
+                    'recieved: %s.' % (self.question_suggestion_count)
             )
 
     def are_reviewers_needed_for_translation_suggestions_in_language(
