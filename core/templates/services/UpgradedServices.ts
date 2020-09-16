@@ -423,8 +423,6 @@ import { ProfileLinkImageBackendApiService } from
   'components/profile-link-directives/profile-link-image-backend-api.service';
 import { ProfilePageBackendApiService } from
   'pages/profile-page/profile-page-backend-api.service';
-import { ProfileSummaryObjectFactory } from
-  'domain/user/profile-summary-object.factory';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
@@ -830,8 +828,6 @@ export class UpgradedServices {
       new PlaythroughIssueObjectFactory();
     upgradedServices['PredictionResultObjectFactory'] =
       new PredictionResultObjectFactory();
-    upgradedServices['ProfileSummaryObjectFactory'] =
-      new ProfileSummaryObjectFactory();
     upgradedServices['QuestionSummaryObjectFactory'] =
       new QuestionSummaryObjectFactory();
     upgradedServices['RatingComputationService'] =
@@ -1329,7 +1325,6 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['CreatorDashboardStatsObjectFactory'],
         upgradedServices['CreatorExplorationSummaryObjectFactory'],
-        upgradedServices['ProfileSummaryObjectFactory'],
         upgradedServices['FeedbackThreadObjectFactory'],
         upgradedServices['SuggestionObjectFactory'],
         upgradedServices['SuggestionThreadObjectFactory'],
@@ -1374,8 +1369,7 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['FeedbackThreadSummaryObjectFactory'],
         upgradedServices['LearnerExplorationSummaryObjectFactory'],
-        upgradedServices['NonExistentActivitiesObjectFactory'],
-        upgradedServices['ProfileSummaryObjectFactory']);
+        upgradedServices['NonExistentActivitiesObjectFactory']);
     upgradedServices['LearnerDashboardIdsBackendApiService'] =
         new LearnerDashboardIdsBackendApiService(
           upgradedServices['HttpClient'],

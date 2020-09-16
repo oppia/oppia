@@ -16,9 +16,6 @@
  * @fileoverview Frontend domain object factory for subscriber summary.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface SubscriberSummaryBackendDict {
   'subscriber_picture_data_url': string;
   'subscriber_username': string;
@@ -36,13 +33,8 @@ export class ProfileSummary {
     public pictureDataUrl: string,
     public username: string,
     public impact: number) { }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ProfileSummaryObjectFactory {
-  createFromSubscriberBackendDict(
+  static createFromSubscriberBackendDict(
       sumamryBackendDict: SubscriberSummaryBackendDict): ProfileSummary {
     return new ProfileSummary(
       sumamryBackendDict.subscriber_picture_data_url,
@@ -50,7 +42,7 @@ export class ProfileSummaryObjectFactory {
       sumamryBackendDict.subscriber_impact);
   }
 
-  createFromCreatorBackendDict(
+  static createFromCreatorBackendDict(
       sumamryBackendDict: CreatorSummaryBackendDict): ProfileSummary {
     return new ProfileSummary(
       sumamryBackendDict.creator_picture_data_url,
@@ -58,7 +50,3 @@ export class ProfileSummaryObjectFactory {
       sumamryBackendDict.creator_impact);
   }
 }
-
-angular.module('oppia').factory(
-  'ProfileSummaryObjectFactory',
-  downgradeInjectable(ProfileSummaryObjectFactory));

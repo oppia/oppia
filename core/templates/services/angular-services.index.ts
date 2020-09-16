@@ -186,7 +186,6 @@ import { NewlyCreatedTopicObjectFactory } from 'domain/topics_and_skills_dashboa
 import { TopicsAndSkillsDashboardFilterObjectFactory } from 'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
-import { ProfileSummaryObjectFactory } from 'domain/user/profile-summary-object.factory';
 import { UserProfileObjectFactory } from 'domain/user/user-profile-object.factory';
 import { AudioFileObjectFactory } from 'domain/utilities/AudioFileObjectFactory';
 import { AudioLanguageObjectFactory } from 'domain/utilities/AudioLanguageObjectFactory';
@@ -592,7 +591,6 @@ export const angularServices: [string, unknown][] = [
   ['PretestQuestionBackendApiService', PretestQuestionBackendApiService],
   ['ProfileLinkImageBackendApiService', ProfileLinkImageBackendApiService],
   ['ProfilePageBackendApiService', ProfilePageBackendApiService],
-  ['ProfileSummaryObjectFactory', ProfileSummaryObjectFactory],
   ['PythonProgramTokenizer', PythonProgramTokenizer],
   ['QuestionBackendApiService', QuestionBackendApiService],
   ['QuestionSummaryForOneSkillObjectFactory',

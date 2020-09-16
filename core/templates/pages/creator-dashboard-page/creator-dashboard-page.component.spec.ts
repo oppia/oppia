@@ -20,6 +20,7 @@
 // creator-dashboard-page.component.ts is upgraded to Angular 8.
 
 import { CollectionSummary, CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
+import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/creator-dashboard-page/creator-dashboard-page.component.ts');
@@ -59,7 +60,6 @@ describe('Creator dashboard controller', () => {
   var creatorExplorationSummaryObjectFactory = null;
   var CsrfService = null;
   var feedbackThreadObjectFactory = null;
-  var profileSummaryObjectFactory = null;
   var SuggestionModalForCreatorDashboardService = null;
   var suggestionObjectFactory = null;
   var suggestionsService = null;
@@ -93,8 +93,6 @@ describe('Creator dashboard controller', () => {
     CsrfService = $injector.get('CsrfTokenService');
     feedbackThreadObjectFactory = $injector.get(
       'FeedbackThreadObjectFactory');
-    profileSummaryObjectFactory = $injector.get(
-      'ProfileSummaryObjectFactory');
     SuggestionModalForCreatorDashboardService = $injector.get(
       'SuggestionModalForCreatorDashboardService');
     suggestionObjectFactory = $injector.get(
@@ -289,7 +287,7 @@ describe('Creator dashboard controller', () => {
                 .createFromBackendDict(dashboardData.last_week_stats)) : null,
             displayPreference: dashboardData.display_preference,
             subscribersList: dashboardData.subscribers_list.map(
-              subscriber => profileSummaryObjectFactory
+              subscriber => ProfileSummary
                 .createFromSubscriberBackendDict(subscriber)),
             threadsForCreatedSuggestionsList: (
               dashboardData.threads_for_created_suggestions_list.map(
@@ -591,7 +589,7 @@ describe('Creator dashboard controller', () => {
               .createFromBackendDict(dashboardData.last_week_stats)) : null,
           displayPreference: dashboardData.display_preference,
           subscribersList: dashboardData.subscribers_list.map(
-            subscriber => profileSummaryObjectFactory
+            subscriber => ProfileSummary
               .createFromSubscriberBackendDict(subscriber)),
           threadsForCreatedSuggestionsList: (
             dashboardData.threads_for_created_suggestions_list.map(
@@ -690,7 +688,7 @@ describe('Creator dashboard controller', () => {
               .createFromBackendDict(dashboardData.last_week_stats)) : null,
           displayPreference: dashboardData.display_preference,
           subscribersList: dashboardData.subscribers_list.map(
-            subscriber => profileSummaryObjectFactory
+            subscriber => ProfileSummary
               .createFromSubscriberBackendDict(subscriber)),
           threadsForCreatedSuggestionsList: (
             dashboardData.threads_for_created_suggestions_list.map(

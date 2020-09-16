@@ -48,8 +48,7 @@ import {
 import {
   ProfileSummary,
   SubscriberSummaryBackendDict,
-  ProfileSummaryObjectFactory
-} from 'domain/user/profile-summary-object.factory';
+} from 'domain/user/profile-summary.model';
 import {
   SuggestionThread,
   SuggestionThreadObjectFactory
@@ -103,7 +102,6 @@ export class CreatorDashboardBackendApiService {
     CreatorDashboardStatsObjectFactory,
     private creatorExplorationSummaryObjectFactory:
     CreatorExplorationSummaryObjectFactory,
-    private profileSummaryObjectFactory: ProfileSummaryObjectFactory,
     private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
     private suggestionObjectFactory: SuggestionObjectFactory,
     private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
@@ -151,7 +149,7 @@ export class CreatorDashboardBackendApiService {
             .createFromBackendDict(dashboardData.last_week_stats)) : null,
         displayPreference: dashboardData.display_preference,
         subscribersList: dashboardData.subscribers_list.map(
-          subscriber => this.profileSummaryObjectFactory
+          subscriber => ProfileSummary
             .createFromSubscriberBackendDict(subscriber)),
         threadsForCreatedSuggestionsList: (
           dashboardData.threads_for_created_suggestions_list.map(

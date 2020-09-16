@@ -43,8 +43,7 @@ import {
 import {
   CreatorSummaryBackendDict,
   ProfileSummary,
-  ProfileSummaryObjectFactory
-} from 'domain/user/profile-summary-object.factory';
+} from 'domain/user/profile-summary.model';
 
 interface LearnerDashboardDataBackendDict {
   'completed_explorations_list': LearnerExplorationSummaryBackendDict[];
@@ -85,8 +84,7 @@ export class LearnerDashboardBackendApiService {
     private learnerExplorationSummaryObjectFactory:
     LearnerExplorationSummaryObjectFactory,
     private nonExistentActivitiesObjectFactory:
-    NonExistentActivitiesObjectFactory,
-    private profileSummaryObjectFactory: ProfileSummaryObjectFactory) {}
+    NonExistentActivitiesObjectFactory) {}
 
   _fetchLearnerDashboardData(): Promise<LearnerDashboardData> {
     return new Promise((resolve, reject) => {
@@ -129,7 +127,7 @@ export class LearnerDashboardBackendApiService {
               dashboardData.number_of_nonexistent_activities)),
           subscriptionList: (
             dashboardData.subscription_list.map(
-              profileSummary => this.profileSummaryObjectFactory
+              profileSummary => ProfileSummary
                 .createFromCreatorBackendDict(profileSummary)))
         });
       }, errorResponse => {

@@ -16,16 +16,10 @@
  * @fileoverview Unit tests for Subscriber Summary Object Factory.
  */
 
-import { ProfileSummaryObjectFactory } from
-  'domain/user/profile-summary-object.factory';
+import { ProfileSummary } from
+  'domain/user/profile-summary.model';
 
 describe('Subscriber Summary object factory', () => {
-  let psof: ProfileSummaryObjectFactory;
-
-  beforeEach(() => {
-    psof = new ProfileSummaryObjectFactory();
-  });
-
   it('should correctly convert subscriber backend dict to object', () => {
     let backendDict = {
       subscriber_picture_data_url: 'path/to/img',
@@ -33,7 +27,8 @@ describe('Subscriber Summary object factory', () => {
       subscriber_impact: 0,
     };
 
-    let subscriberObject = psof.createFromSubscriberBackendDict(backendDict);
+    let subscriberObject =
+      ProfileSummary.createFromSubscriberBackendDict(backendDict);
 
     expect(subscriberObject.pictureDataUrl).toEqual('path/to/img');
     expect(subscriberObject.username).toEqual('username');
@@ -47,7 +42,8 @@ describe('Subscriber Summary object factory', () => {
       creator_impact: 0,
     };
 
-    let creatorObject = psof.createFromCreatorBackendDict(backendDict);
+    let creatorObject =
+    ProfileSummary.createFromCreatorBackendDict(backendDict);
 
     expect(creatorObject.pictureDataUrl).toEqual('path/to/img');
     expect(creatorObject.username).toEqual('username');

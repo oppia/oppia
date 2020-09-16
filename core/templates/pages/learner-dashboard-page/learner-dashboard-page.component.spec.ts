@@ -22,6 +22,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
+import { ProfileSummary } from 'domain/user/profile-summary.model';
 require(
   'pages/learner-dashboard-page/learner-dashboard-page.component.ts');
 
@@ -42,7 +43,6 @@ describe('Learner dashboard page', function() {
   var LearnerDashboardBackendApiService = null;
   var learnerExplorationSummaryObjectFactory = null;
   var nonExistentActivitiesObjectFactory = null;
-  var profileSummaryObjectFactory = null;
   var SuggestionModalForLearnerDashboardService = null;
   var UserService = null;
 
@@ -78,8 +78,6 @@ describe('Learner dashboard page', function() {
         'LearnerExplorationSummaryObjectFactory');
       nonExistentActivitiesObjectFactory = $injector.get(
         'NonExistentActivitiesObjectFactory');
-      profileSummaryObjectFactory = $injector.get(
-        'ProfileSummaryObjectFactory');
       SuggestionModalForLearnerDashboardService = $injector.get(
         'SuggestionModalForLearnerDashboardService');
       UserService = $injector.get('UserService');
@@ -275,7 +273,7 @@ describe('Learner dashboard page', function() {
               learnerDashboardData.number_of_nonexistent_activities)),
           subscriptionList: (
             learnerDashboardData.subscription_list.map(
-              profileSummary => profileSummaryObjectFactory
+              profileSummary => ProfileSummary
                 .createFromCreatorBackendDict(profileSummary)))
         }));
 
