@@ -943,6 +943,45 @@ def validate_math_content_attribute_in_html(html_string):
     return error_list
 
 
+def does_svg_tag_contains_xmlns_attribute(svg_string):
+    """Checks whether the svg tag in the given svg string contains the xmlns
+    attribute.
+
+    Args:
+        svg_string: str. The SVG string.
+
+    Returns:
+        bool. Whether the svg tag in the given svg string contains the xmlns
+        attribute.
+    """
+    # We don't need to encode the svg_string here because, beautiful soup can
+    # detect the encoding automatically and process the string.
+    # see https://beautiful-soup-4.readthedocs.io/en/latest/#encodings for info
+    # on auto encoding detection.
+    # Also if we encode the svg_string here manually, then it fails to process
+    # SVGs having non-ascii unicode characters and raises a UnicodeDecodeError.
+    soup = bs4.BeautifulSoup(svg_string, 'html.parser')
+    return all(
+        svg_tag.get('xmlns') != None for svg_tag in soup.findAll(name='svg'))
+
+
+def get_svg_with_xmlns_attribute(svg_string):
+    """Returns the svg_string with xmlns attribute if it does not exist in the
+    svg tag.
+
+    Args:
+        svg_string: str. The SVG string.
+
+    Returns:
+        str. The svg_string with xmlns attribute in the svg tag.
+    """
+    soup = bs4.BeautifulSoup(svg_string, 'html.parser')
+    for svg_tag in soup.findAll(name='svg'):
+        svg_tag['xmlns'] = 'http://www.w3.org/2000/svg'
+
+    return python_utils.UNICODE(soup)
+
+
 def get_invalid_svg_tags_and_attrs(svg_string):
     """Returns a set of all invalid tags and attributes for the provided SVG.
 
