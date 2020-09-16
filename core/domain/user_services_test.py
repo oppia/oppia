@@ -2288,6 +2288,55 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.assertTrue(
             user_services.can_review_question_suggestions(self.voice_artist_id))
 
+    def test_get_users_contribution_rights_with_multiple_reviewer_user_ids(
+            self):
+        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'en')
+        expected_reviewer_ids = [self.question_reviewer_id, self.translator_id]
+
+        # Get the contribution rights for both reviewers.
+        users_contribution_rights = (
+            user_services.get_users_contribution_rights(expected_reviewer_ids)
+        )
+
+        reviewer_ids = [
+            user_contribution_rights.id for user_contribution_rights in
+            users_contribution_rights
+        ]
+        self.assertEqual(len(users_contribution_rights), 2)
+        self.assertItemsEqual(reviewer_ids, expected_reviewer_ids)
+
+    def test_get_users_contribution_rights_with_one_reviewer_user_id(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'en')
+
+        users_contribution_rights = (
+            user_services.get_users_contribution_rights([self.translator_id])
+        )
+
+        self.assertEqual(len(users_contribution_rights), 1)
+        self.assertEqual(users_contribution_rights[0].id, self.translator_id)
+        self.assertEqual(
+            (
+                users_contribution_rights[0]
+                .can_review_translation_for_language_codes
+            ), ['en', 'hi']
+        )
+
+    def test_get_users_contribution_rights_returns_empty_for_no_reviewers_ids(
+            self):
+        users_contribution_rights = (
+            user_services.get_users_contribution_rights([])
+        )
+
+        self.assertEqual(len(users_contribution_rights), 0)
+
     def test_get_all_reviewers_contribution_rights(self):
         self.assertEqual(
             user_services.get_all_reviewers_contribution_rights(), [])
