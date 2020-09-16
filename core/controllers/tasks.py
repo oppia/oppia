@@ -164,6 +164,17 @@ class FlagExplorationEmailHandler(base.BaseHandler):
 
 class DeferredTasksHandler(base.BaseHandler):
     """Handles special singular function tasks."""
+    DEFERRED_TASK_FUNCTIONS = {
+        taskqueue_services.FUNCTION_ID_DISPATCH_EVENT: (
+            jobs_registry.ContinuousComputationEventDispatcher.dispatch_event),
+        taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS: (
+            exp_services.delete_explorations_from_subscribed_users),
+        taskqueue_services.FUNCTION_ID_UPDATE_STATS: (
+            stats_services.update_stats),
+        taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS: (
+            question_services.untag_deleted_misconceptions),
+    }
+
     def get(self):
         import logging
         logging.info("Received get request")
@@ -172,22 +183,7 @@ class DeferredTasksHandler(base.BaseHandler):
         payload = json.loads(self.request.body.decode())
         if 'fn_identifier' not in payload: #TODO: add header id
             raise Exception('This request cannot defer.')
-        if (payload['fn_identifier'] ==
-            taskqueue_services.FUNCTION_ID_DISPATCH_EVENT):
-            jobs_registry.ContinuousComputationEventDispatcher.dispatch_event(
-                *payload['args'], **payload['kwargs'])
-        elif (payload['fn_identifier'] ==
-              taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS):
-            exp_services.delete_explorations_from_subscribed_users(
-                *payload['args'], **payload['kwargs'])
-        elif (payload['fn_identifier'] ==
-              taskqueue_services.FUNCTION_ID_UPDATE_STATS): #TODO: figure out whether we can pass arguments in this way
-            stats_services.update_stats(
-                *payload['args'], **payload['kwargs'])
-        elif (payload['fn_identifier'] ==
-              taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS):
-              question_services.untag_deleted_misconceptions(
-                  *payload['args'], **payload['kwargs'])
 
-
-
+        deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
+            payload['fn_identifier']]
+        deferred_task_function(*payload['args'], **payload['kwargs'])

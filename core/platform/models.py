@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
+import os
 
 from constants import constants
 import feconf
@@ -259,7 +260,11 @@ class _Gae(Platform):
         Returns:
             module. The core.platform.taskqueue services module.
         """
-        if constants.DEV_MODE:
+        # Detects if the current code is running in production or
+        # locally. More information can be found here:
+        # https://cloud.google.com/appengine/docs/standard/python/tools/using-local-server#detecting_application_runtime_environment
+        if (constants.DEV_MODE or
+            os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine/')):
             from core.platform.taskqueue import dev_mode_tasks_services
             return dev_mode_tasks_services
         else:

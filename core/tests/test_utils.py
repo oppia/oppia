@@ -179,7 +179,7 @@ class TaskqueueServicesStub(python_utils.OBJECT):
     def __init__(self, test_base):
         self.test_base = test_base
         self.client = cloud_tasks_emulator.Emulator(
-            task_handler=self._task_handler, automatic_queue_handling=False)
+            task_handler=self._task_handler, automatic_task_handling=False)
 
     def _task_handler(self, url, payload, queue_name, task_name=None):
         headers = {

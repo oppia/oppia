@@ -14,13 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-'''Provides functionality for Google Cloud Tasks-related operations.'''
+"""Provides functionality for Google Cloud Tasks-related operations."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import json
+import logging
+
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 
@@ -29,8 +31,25 @@ import feconf
 client = tasks_v2.CloudTasksClient()
 
 def create_http_task(
-    queue_name, url, payload=None, scheduled_for=None, task_name=None
-):
+        queue_name, url, payload=None, scheduled_for=None, task_name=None):
+    """Creates an http task with the correct http headers/payload and sends
+    that task to the Cloud Tasks API. An http task is an asynchronous task that
+    consists of a post request to a specified url with the specified payload.
+    The post request will be made by the Cloud Tasks Cloud Service when the
+    `scheduled_for` countdown expires.
+
+    Args:
+        queue_name: str. The name of the queue to add the http task to.
+        url: str. URL of the handler function.
+        payload: dict(str: *)|None. Payload to pass to the request. Defaults to
+            None if no payload is required.
+        scheduled_for: int|None. Amount of time, in seconds, to wait before
+            executing the task. Pass in 0 or None to schedule the task for
+            immediate execution.
+        task_name: str|None. Optional. The name of the task.
+    """
+    # The cloud tasks library requires the Oppia project id and region, as well
+    # as the queue name as the path to be able to find the correct queue.
     parent = client.queue_path(
         feconf.OPPIA_PROJECT_ID, feconf.GOOGLE_APP_ENGINE_REGION, queue_name)
 
@@ -44,9 +63,7 @@ def create_http_task(
 
     if payload is not None:
         if isinstance(payload, dict):
-            # Convert dict to JSON string
             payload = json.dumps(payload)
-            # specify http content-type to application/json
             task['http_request']['headers'] = {
                 'Content-type': 'application/json'
             }
@@ -59,7 +76,8 @@ def create_http_task(
 
     if scheduled_for is not None:
         # Convert 'seconds from now' into an rfc3339 datetime string.
-        d = datetime.datetime.utcnow() + datetime.timedelta(seconds=scheduled_for)
+        d = datetime.datetime.utcnow() + datetime.timedelta(
+            seconds=scheduled_for)
 
         # Create Timestamp protobuf.
         timestamp = timestamp_pb2.Timestamp()
@@ -75,6 +93,6 @@ def create_http_task(
     # Use the client to build and send the task.
     response = client.create_task(request={'parent': parent, 'task': task})
 
-    print('Created task {}'.format(response.name))
+    logging.info('Created task {}'.format(response.name))
     # [END cloud_tasks_create_http_task]
     return response

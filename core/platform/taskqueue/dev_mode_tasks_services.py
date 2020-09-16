@@ -19,12 +19,20 @@
 import requests
 import requests_toolbelt.adapters.appengine
 import feconf
-import json
 from core.platform.taskqueue import cloud_tasks_emulator
 
 requests_toolbelt.adapters.appengine.monkeypatch()
 
-def task_handler(url, payload, queue_name, task_name=None):
+def _task_handler(url, payload, queue_name, task_name=None):
+    """Makes a POST request to the task URL
+
+    Args:
+        url: str. URL of the handler function.
+        payload: dict(str: *)|None. Payload to pass to the request. Defaults
+            to None if no payload is required.
+        queue_name: str. The name of the queue to add the task to.
+        task_name: str|None. Optional. The name of the task.
+    """
     headers = {}
     headers['X-Appengine-QueueName'] = queue_name
     headers['X-Appengine-TaskName'] = task_name
@@ -38,10 +46,21 @@ def task_handler(url, payload, queue_name, task_name=None):
         json=payload,
         headers=headers)
 
-client = cloud_tasks_emulator.Emulator(
-    task_handler=task_handler)
+client = cloud_tasks_emulator.Emulator(task_handler=_task_handler)
 
 def create_http_task(
-    queue_name, url, payload=None, scheduled_for=None, task_name=None):
-    client.create_task(
-        queue_name, url, payload, scheduled_for, task_name)
+        queue_name, url, payload=None, scheduled_for=None, task_name=None):
+    """Creates a Task in the corresponding queue that will be executed when
+    the 'scheduled_for' countdown expires using the cloud tasks emulator.
+
+    Args:
+        queue_name: str. The name of the queue to add the task to.
+        url: str. URL of the handler function.
+        payload: dict(str: *)|None. Payload to pass to the request. Defaults
+            to None if no payload is required.
+        scheduled_for: int|None. Amount of time, in seconds, to wait before
+            executing the task. Pass in 0 or None to schedule the task for
+            immediate execution.
+        task_name: str|None. Optional. The name of the task.
+    """
+    client.create_task(queue_name, url, payload, scheduled_for, task_name)

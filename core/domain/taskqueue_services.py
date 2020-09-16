@@ -14,18 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-'''Provides a seam for taskqueue-related operations.'''
+"""Provides a seam for taskqueue-related operations."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import json
-
-from google.appengine.api import taskqueue
-from google.appengine.ext import deferred
 import feconf
-import datetime
 import json
+import python_utils
 from core.platform import models
 
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
@@ -48,8 +44,14 @@ QUEUE_NAME_ONE_OFF_JOBS = 'one-off-jobs'
 # Taskqueue for updating stats models.
 QUEUE_NAME_STATS = 'stats'
 
-# Function identifiers that informs the deferred task handler what task is being
-# run.
+# Function identifiers informs the deferred task handler of what deferred
+# function should be run for the relevant task.
+# NOTE for developers: If you want to defer a function, visit the file,
+# core/controllers/tasks.py, and check the DeferredTasksHandler.
+# 1. If the function you want to defer already exists in the handler, choose the
+#    correct FUNCTION_ID and defer the function using that FUNCTION_ID.
+# 2. If the function does not exist in the handler, add it to the handler and
+#    add another FUNCTION_ID to this list.
 FUNCTION_ID_DISPATCH_EVENT = 'dispatch_event'
 FUNCTION_ID_UPDATE_STATS = 'update_stats'
 FUNCTION_ID_DELETE_EXPLORATIONS = 'delete_explorations'
@@ -66,19 +68,28 @@ def defer(fn_identifier, queue_name, *args, **kwargs):
         *args: list(*). Positional arguments for fn. Positional arguments should
         be json serializable.
         **kwargs: dict(str : *). Keyword arguments for fn.
+
+    Raises:
+        Exception. The arguments and keyword arguments that are passed in are
+            not JSON serializable.
     '''
-    # See https://developers.google.com/appengine/articles/deferred for details
-    # on the _queue kwarg.
-    print("INNNNNNN+===================")
     payload = {
         'fn_identifier': fn_identifier,
         'args': (args if args else []),
         'kwargs': (kwargs if kwargs else {})
     }
+    json.dumps(payload)
+    try:
+        json.dumps(payload)
+    except Exception:
+        raise Exception(
+            'The arguments %s or the keyword arguments %s are not JSON '
+            'serializable.' % (
+                python_utils.convert_to_bytes(args),
+                python_utils.convert_to_bytes(kwargs)))
     platform_taskqueue_services.create_http_task(
         queue_name=queue_name, url=feconf.TASK_URL_DEFERRED,
         payload=payload)
-    #deferred.defer(fn, *args, _queue=queue_name, **kwargs)
 
 
 def enqueue_task(url, params, countdown):
@@ -86,18 +97,12 @@ def enqueue_task(url, params, countdown):
 
     Args:
         url: str. Url of the handler function.
-        params: dict(str : *). Parameters that will be passed as payload to
-            handler function.
+        params: dict(str : *). Payload to pass to the request. Defaults
+            to None if no payload is required.
         countdown: int. Amount of time, in seconds, to wait before executing
             task.
     '''
-    # See https://googleapis.dev/python/cloudtasks/latest/gapic/v2/api.html for
-    # details of various parameters set when adding a new task.
     platform_taskqueue_services.create_http_task(
         queue_name=QUEUE_NAME_EMAILS, url=url, payload=params,
         scheduled_for=countdown)
 
-
-# A special exception that ensures that the task is not tried again, if it
-# fails.
-#PermanentTaskFailure = deferred.PermanentTaskFailure
