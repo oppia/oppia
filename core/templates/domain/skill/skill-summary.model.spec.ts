@@ -12,20 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Unit tests for Skill summary object factory.
  */
 
-import { SkillSummaryObjectFactory } from
-  'domain/skill/skill-summary-object.factory';
+import { SkillSummary } from './skill-summary.model';
 
 describe('Skill Summary Object Factory', () => {
-  let ssof: SkillSummaryObjectFactory;
-
-  beforeEach(() => {
-    ssof = new SkillSummaryObjectFactory();
-  });
-
   it('should correctly convert backend dict to domain object.', () => {
     let backendDict = {
       language_code: 'en',
@@ -38,7 +32,7 @@ describe('Skill Summary Object Factory', () => {
       version: 1
     };
 
-    let skillSummary = ssof.createFromBackendDict(backendDict);
+    let skillSummary = SkillSummary.createFromBackendDict(backendDict);
 
     expect(skillSummary.languageCode).toEqual('en');
     expect(skillSummary.id).toEqual('Q5JuLf64rzV0');

@@ -20,6 +20,7 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 import { EventEmitter } from '@angular/core';
+import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 
 // ^^^ This block is to be removed.
 
@@ -45,7 +46,6 @@ describe('Topics and Skills Dashboard Page', function() {
   var $timeout = null;
   var TopicsAndSkillsDashboardFilterObjectFactory = null;
   var TopicSummaryObjectFactory = null;
-  var SkillSummaryObjectFactory = null;
   var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
 
   var mocktasdReinitalizedEventEmitter = null;
@@ -89,8 +89,6 @@ describe('Topics and Skills Dashboard Page', function() {
         'TopicsAndSkillsDashboardFilterObjectFactory');
       TopicSummaryObjectFactory = $injector.get(
         'TopicSummaryObjectFactory');
-      SkillSummaryObjectFactory = $injector.get(
-        'SkillSummaryObjectFactory');
 
       mocktasdReinitalizedEventEmitter = new EventEmitter();
 
@@ -103,8 +101,9 @@ describe('Topics and Skills Dashboard Page', function() {
                 .createFromBackendDict(backendDict)),
             untriagedSkillSummaries: (
               sampleDataResults.untriaged_skill_summary_dicts.map(
-                backendDict => SkillSummaryObjectFactory
-                  .createFromBackendDict(backendDict))),
+                (backendDict: unknown) => SkillSummary
+                  .createFromBackendDict(
+                    backendDict as SkillSummaryBackendDict))),
             allClassroomNames: sampleDataResults.all_classroom_names,
             canCreateTopic: sampleDataResults.can_create_topic,
             canCreateSkill: sampleDataResults.can_create_skill,
@@ -168,7 +167,7 @@ describe('Topics and Skills Dashboard Page', function() {
           dict => TopicSummaryObjectFactory.createFromBackendDict(dict)));
       expect(ctrl.untriagedSkillSummaries).toEqual(
         sampleDataResults.untriaged_skill_summary_dicts.map(
-          dict => SkillSummaryObjectFactory.createFromBackendDict(dict)));
+          dict => SkillSummary.createFromBackendDict(dict)));
       expect(ctrl.totalEntityCountToDisplay).toEqual(1);
       expect(ctrl.userCanCreateTopic).toEqual(true);
       expect(ctrl.userCanCreateSkill).toEqual(true);
@@ -368,8 +367,6 @@ describe('Topics and Skills Dashboard Page', function() {
         'TopicsAndSkillsDashboardFilterObjectFactory');
       TopicSummaryObjectFactory = $injector.get(
         'TopicSummaryObjectFactory');
-      SkillSummaryObjectFactory = $injector.get(
-        'SkillSummaryObjectFactory');
       var sampleDataResults2 = {
         topic_summary_dicts: [],
         skill_summary_dicts: [],
@@ -391,7 +388,8 @@ describe('Topics and Skills Dashboard Page', function() {
             topicSummaries: sampleDataResults2.topic_summary_dicts,
             untriagedSkillSummaries: (
               sampleDataResults2.untriaged_skill_summary_dicts.map(
-                dict => SkillSummaryObjectFactory.createFromBackendDict(dict))),
+                (dict: unknown) => SkillSummary.createFromBackendDict(
+                  dict as SkillSummaryBackendDict))),
             canCreateTopic: sampleDataResults2.can_create_topic,
             canCreateSkill: sampleDataResults2.can_create_skill
           });

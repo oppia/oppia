@@ -152,7 +152,6 @@ import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-
 import { SkillCreationBackendApiService } from 'domain/skill/skill-creation-backend-api.service';
 import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backend-api.service';
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service.ts';
-import { SkillSummaryObjectFactory } from 'domain/skill/skill-summary-object.factory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
 import { ExplorationStatsObjectFactory } from 'domain/statistics/ExplorationStatsObjectFactory';
@@ -646,7 +645,6 @@ export const angularServices: [string, unknown][] = [
   ['SkillOpportunityObjectFactory', SkillOpportunityObjectFactory],
   ['SkillRightsBackendApiService', SkillRightsBackendApiService],
   ['SkillRightsObjectFactory', SkillRightsObjectFactory],
-  ['SkillSummaryObjectFactory', SkillSummaryObjectFactory],
   ['SolutionObjectFactory', SolutionObjectFactory],
   ['SolutionValidityService', SolutionValidityService],
   ['SpeechSynthesisChunkerService', SpeechSynthesisChunkerService],

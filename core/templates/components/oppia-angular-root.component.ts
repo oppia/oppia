@@ -542,8 +542,6 @@ import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service.ts';
 import { SkillRightsObjectFactory } from
   'domain/skill/SkillRightsObjectFactory';
-import { SkillSummaryObjectFactory } from
-  'domain/skill/skill-summary-object.factory';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
@@ -965,7 +963,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static skillOpportunityObjectFactory: SkillOpportunityObjectFactory;
   static skillRightsBackendApiService: SkillRightsBackendApiService;
   static skillRightsObjectFactory: SkillRightsObjectFactory;
-  static skillSummaryObjectFactory: SkillSummaryObjectFactory;
   static solutionObjectFactory: SolutionObjectFactory;
   static solutionValidityService: SolutionValidityService;
   static speechSynthesisChunkerService: SpeechSynthesisChunkerService;
@@ -1299,7 +1296,6 @@ private skillObjectFactory: SkillObjectFactory,
 private skillOpportunityObjectFactory: SkillOpportunityObjectFactory,
 private skillRightsBackendApiService: SkillRightsBackendApiService,
 private skillRightsObjectFactory: SkillRightsObjectFactory,
-private skillSummaryObjectFactory: SkillSummaryObjectFactory,
 private solutionObjectFactory: SolutionObjectFactory,
 private solutionValidityService: SolutionValidityService,
 private speechSynthesisChunkerService: SpeechSynthesisChunkerService,
@@ -1634,7 +1630,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.skillOpportunityObjectFactory = this.skillOpportunityObjectFactory;
     OppiaAngularRootComponent.skillRightsBackendApiService = this.skillRightsBackendApiService;
     OppiaAngularRootComponent.skillRightsObjectFactory = this.skillRightsObjectFactory;
-    OppiaAngularRootComponent.skillSummaryObjectFactory = this.skillSummaryObjectFactory;
     OppiaAngularRootComponent.solutionObjectFactory = this.solutionObjectFactory;
     OppiaAngularRootComponent.solutionValidityService = this.solutionValidityService;
     OppiaAngularRootComponent.speechSynthesisChunkerService = this.speechSynthesisChunkerService;

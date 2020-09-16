@@ -501,8 +501,6 @@ import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service.ts';
 import { SkillRightsObjectFactory } from
   'domain/skill/SkillRightsObjectFactory';
-import { SkillSummaryObjectFactory } from
-  'domain/skill/skill-summary-object.factory';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
@@ -882,8 +880,6 @@ export class UpgradedServices {
       new SkillOpportunityObjectFactory();
     upgradedServices['SkillRightsObjectFactory'] =
       new SkillRightsObjectFactory();
-    upgradedServices['SkillSummaryObjectFactory'] =
-      new SkillSummaryObjectFactory();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
     upgradedServices['StateEditorRefreshService'] =
       new StateEditorRefreshService();
@@ -1534,7 +1530,6 @@ export class UpgradedServices {
         upgradedServices['AugmentedSkillSummaryObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['ShortSkillSummaryObjectFactory'],
-        upgradedServices['SkillSummaryObjectFactory'],
         upgradedServices['TopicSummaryObjectFactory'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['TopicViewerBackendApiService'] =
