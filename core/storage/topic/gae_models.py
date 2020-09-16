@@ -381,11 +381,12 @@ class SubtopicPageModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, unused_user_id):
         """Check whether SubtopicPageModel snapshots references the given user.
 
         Args:
-            user_id: str. The ID of the user whose data should be checked.
+            unused_user_id: str. The ID of the user whose data should be
+                checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.

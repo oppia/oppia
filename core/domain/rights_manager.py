@@ -116,7 +116,7 @@ def _update_exploration_summary(activity_rights):
     """
     # TODO(msl): Get rid of inline imports by refactoring code.
     from core.domain import exp_services
-    exp_services.update_exploration_summary(activity_rights.id, None)
+    exp_services.regenerate_exploration_summary(activity_rights.id, None)
 
 
 def _update_collection_summary(activity_rights):
@@ -131,7 +131,7 @@ def _update_collection_summary(activity_rights):
     """
 
     from core.domain import collection_services
-    collection_services.update_collection_summary(activity_rights.id, None)
+    collection_services.regenerate_collection_summary(activity_rights.id, None)
 
 
 def _update_activity_summary(activity_type, activity_rights):
@@ -776,12 +776,12 @@ def _assign_role(
 
 
 def _deassign_role(committer, removed_user_id, activity_id, activity_type):
-    """Deassigns given user from any role in activity.
+    """Deassigns given user from their current role in the activity.
 
     Args:
         committer: UserActionsInfo. UserActionsInfo object for the user
             who is performing the action.
-        removed_user_id: str. ID of the user whom is being deassigned from
+        removed_user_id: str. ID of the user who is being deassigned from
             the activity.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
@@ -790,7 +790,7 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
 
     Raises:
         Exception. UnauthorizedUserException: Could not deassign role.
-        Exception. This user does not have any role.
+        Exception. This user does not have any role for the given activity.
     """
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
@@ -821,7 +821,7 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
             % (activity_type, activity_id))
 
     assignee_username = user_services.get_username(removed_user_id)
-    commit_message = 'Remove %s (role %s) from %s ' % (
+    commit_message = 'Remove %s from role %s for %s' % (
         assignee_username, old_role, activity_type)
     commit_cmds = [{
         'cmd': rights_domain.CMD_REMOVE_ROLE,

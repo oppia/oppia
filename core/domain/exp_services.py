@@ -683,7 +683,7 @@ def _create_exploration(
     stats_services.create_exp_issues_for_new_exploration(
         exploration.id, exploration.version)
 
-    create_exploration_summary(exploration.id, committer_id)
+    regenerate_exploration_summary(exploration.id, committer_id)
 
 
 def save_new_exploration(committer_id, exploration):
@@ -938,7 +938,7 @@ def update_exploration(
 
     discard_draft(exploration_id, committer_id)
     # Update summary of changed exploration.
-    update_exploration_summary(exploration_id, committer_id)
+    regenerate_exploration_summary(exploration_id, committer_id)
 
     if committer_id != feconf.MIGRATION_BOT_USER_ID:
         user_services.add_edited_exploration_id(committer_id, exploration_id)
@@ -953,7 +953,7 @@ def update_exploration(
             exploration_id)
 
 
-def create_exploration_summary(exploration_id, contributor_id_to_add):
+def regenerate_exploration_summary(exploration_id, contributor_id_to_add):
     """Create the summary model for an exploration, and store it in the
     datastore.
 
@@ -968,21 +968,6 @@ def create_exploration_summary(exploration_id, contributor_id_to_add):
     exp_summary = compute_summary_of_exploration(
         exploration, contributor_id_to_add)
     save_exploration_summary(exp_summary)
-
-
-def update_exploration_summary(exploration_id, contributor_id_to_add):
-    """Update the summary of an exploration.
-
-    Args:
-        exploration_id: str. The id of the exploration whose summary is
-            to be updated.
-        contributor_id_to_add: str|None. The user_id of user who have
-            contributed (humans who have made a positive (not just a revert)
-            update to the exploration's content) will be added to the list of
-            contributors for the exploration if the argument is not None and it
-            is not a system id.
-    """
-    create_exploration_summary(exploration_id, contributor_id_to_add)
 
 
 def compute_summary_of_exploration(exploration, contributor_id_to_add):
@@ -1080,13 +1065,13 @@ def compute_exploration_contributors_summary(exploration_id):
         else:
             current_version -= 1
 
-    # Remove IDs that are deleted or do not exists.
-    users_settings = user_services.get_users_settings(
-        list(contributors_summary))
-    for key, user_settings in python_utils.ZIP(
-            list(contributors_summary), users_settings):
+    contributor_ids = list(contributors_summary)
+    # Remove IDs that are deleted or do not exist.
+    users_settings = user_services.get_users_settings(contributor_ids)
+    for contributor_id, user_settings in python_utils.ZIP(
+            contributor_ids, users_settings):
         if user_settings is None:
-            del contributors_summary[key]
+            del contributors_summary[contributor_id]
 
     return contributors_summary
 
@@ -1203,7 +1188,7 @@ def revert_exploration(
 
     # Update the exploration summary, but since this is just a revert do
     # not add the committer of the revert to the list of contributors.
-    update_exploration_summary(exploration_id, None)
+    regenerate_exploration_summary(exploration_id, None)
 
     exploration_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, current_version + 1, exploration.states,

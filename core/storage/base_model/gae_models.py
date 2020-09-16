@@ -1117,8 +1117,8 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Collection rights are deleted only if the corresponding collection
-        is not public.
+        """Metadata models should always be psoudonymized in the context of
+        their parent models.
         """
         return DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
@@ -1223,8 +1223,9 @@ class BaseSnapshotContentModel(BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Collection rights are deleted only if the corresponding collection
-        is not public.
+        """The content models do not contain any user ID fields, they might be
+        hidden inside the content field but that is handled in the wipeout
+        service.
         """
         return DELETION_POLICY.NOT_APPLICABLE
 

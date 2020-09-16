@@ -172,6 +172,8 @@ def pre_delete_user(user_id):
         exp_services.delete_explorations(
             user_id, explorations_to_be_deleted_ids)
 
+        # Release ownership of explorations that are public and are solely owned
+        # by the to-be-deleted user.
         explorations_to_release_ownership_ids = [
             exp_summary.id for exp_summary in subscribed_exploration_summaries
             if not exp_summary.is_private() and
@@ -199,6 +201,8 @@ def pre_delete_user(user_id):
         collection_services.delete_collections(
             user_id, collections_to_be_deleted_ids)
 
+        # Release ownership of collections that are public and are solely owned
+        # by the to-be-deleted user.
         collections_to_release_ownership_ids = [
             col_summary.id for col_summary in subscribed_collection_summaries
             if not col_summary.is_private() and
@@ -643,22 +647,13 @@ def _pseudonymize_col_or_exp_models(
             if isinstance(model, rights_snapshot_content_model_class)]
         for rights_snapshot_content_model in rights_snapshot_content_models:
             model_dict = rights_snapshot_content_model.content
-            model_dict['owner_ids'] = [
-                pseudonymized_id if owner_id == user_id else owner_id
-                for owner_id in model_dict['owner_ids']
-            ]
-            model_dict['editor_ids'] = [
-                pseudonymized_id if editor_id == user_id else editor_id
-                for editor_id in model_dict['editor_ids']
-            ]
-            model_dict['voice_artist_ids'] = [
-                pseudonymized_id if voice_art_id == user_id else voice_art_id
-                for voice_art_id in model_dict['voice_artist_ids']
-            ]
-            model_dict['viewer_ids'] = [
-                pseudonymized_id if viewer_id == user_id else viewer_id
-                for viewer_id in model_dict['viewer_ids']
-            ]
+            for field_name in (
+                    'owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids'
+            ):
+                model_dict[field_name] = [
+                    pseudonymized_id if field_id == user_id else field_id
+                    for field_id in model_dict[field_name]
+                ]
             rights_snapshot_content_model.content = model_dict
 
         commit_log_models = [
