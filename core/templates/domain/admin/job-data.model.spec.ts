@@ -13,18 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for JobDataObjectFactory.
+ * @fileoverview Unit tests for job-data.model.
  */
 
-import { JobDataObjectFactory } from 'domain/admin/job-data-object.factory';
+import { Job } from 'domain/admin/job-data.model';
 
 describe('Job Data Object Factory', () => {
-  let jdof: JobDataObjectFactory;
-
-  beforeEach(() => {
-    jdof = new JobDataObjectFactory();
-  });
-
   it('should correctly convert backend dict to JobData object.', () => {
     let backendDict = {
       human_readable_time_started: 'June 04 12:17:36',
@@ -39,7 +33,7 @@ describe('Job Data Object Factory', () => {
       error: null
     };
 
-    let jobDataObject = jdof.createFromBackendDict(backendDict);
+    let jobDataObject = Job.createFromBackendDict(backendDict);
 
     expect(jobDataObject.humanReadableTimeStarted).toEqual('June 04 12:17:36');
     expect(jobDataObject.timeStartedMsec).toEqual(1591273056433.883);

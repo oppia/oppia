@@ -34,8 +34,7 @@ import {
 import {
   Job,
   JobDataBackendDict,
-  JobDataObjectFactory
-} from 'domain/admin/job-data-object.factory';
+} from 'domain/admin/job-data.model';
 import {
   JobStatusSummary,
   JobStatusSummaryBackendDict,
@@ -100,7 +99,6 @@ export interface AdminPageData {
 export class AdminBackendApiService {
   constructor(
     private http: HttpClient,
-    private jobDataObjectFactory: JobDataObjectFactory,
     private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
 
   getData(): Promise<AdminPageData> {
@@ -121,9 +119,9 @@ export class AdminBackendApiService {
           configProperties: response.config_properties,
           viewableRoles: response.viewable_roles,
           unfinishedJobData: response.unfinished_job_data.map(
-            this.jobDataObjectFactory.createFromBackendDict),
+            Job.createFromBackendDict),
           recentJobData: response.recent_job_data.map(
-            this.jobDataObjectFactory.createFromBackendDict),
+            Job.createFromBackendDict),
           continuousComputationsData: response.continuous_computations_data.map(
             ComputationData.createFromBackendDict),
           topicSummaries: response.topic_summaries.map(

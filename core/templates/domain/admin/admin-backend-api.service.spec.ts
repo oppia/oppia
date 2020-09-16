@@ -22,16 +22,14 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AdminPageData, AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
-import { JobDataObjectFactory } from
-  'domain/admin/job-data-object.factory';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 import { ComputationData } from './computation-data.model';
+import { Job } from './job-data.model';
 import { JobStatusSummary } from './job-status-summary.model';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
-  let jdof: JobDataObjectFactory;
   let tsof: TopicSummaryObjectFactory;
   let httpTestingController: HttpTestingController;
   let adminBackendResponse = {
@@ -113,7 +111,6 @@ describe('Admin backend api service', () => {
     });
 
     abas = TestBed.get(AdminBackendApiService);
-    jdof = TestBed.get(JobDataObjectFactory);
     tsof = TestBed.get(TopicSummaryObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
     adminDataObject = {
@@ -133,9 +130,9 @@ describe('Admin backend api service', () => {
       configProperties: adminBackendResponse.config_properties,
       viewableRoles: adminBackendResponse.viewable_roles,
       unfinishedJobData: adminBackendResponse.unfinished_job_data.map(
-        jdof.createFromBackendDict),
+        Job.createFromBackendDict),
       recentJobData: adminBackendResponse.recent_job_data.map(
-        jdof.createFromBackendDict),
+        Job.createFromBackendDict),
       continuousComputationsData:
         adminBackendResponse.continuous_computations_data.map(
           ComputationData.createFromBackendDict),

@@ -24,17 +24,15 @@ import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
 import { AdminPageData } from
   'domain/admin/admin-backend-api.service';
-import { JobDataObjectFactory } from
-  'domain/admin/job-data-object.factory';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 import { ComputationData } from 'domain/admin/computation-data.model';
 import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
+import { Job } from 'domain/admin/job-data.model';
 
 
 describe('Admin Data Service', () => {
   let adminDataService: AdminDataService = null;
-  let jdof: JobDataObjectFactory;
   let tsof: TopicSummaryObjectFactory;
   let httpTestingController: HttpTestingController;
   var sampleAdminData = {
@@ -116,7 +114,6 @@ describe('Admin Data Service', () => {
       providers: [AdminDataService]
     });
     adminDataService = TestBed.get(AdminDataService);
-    jdof = TestBed.get(JobDataObjectFactory);
     tsof = TestBed.get(TopicSummaryObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
     adminDataResponse = {
@@ -136,9 +133,9 @@ describe('Admin Data Service', () => {
       configProperties: sampleAdminData.config_properties,
       viewableRoles: sampleAdminData.viewable_roles,
       unfinishedJobData: sampleAdminData.unfinished_job_data.map(
-        jdof.createFromBackendDict),
+        Job.createFromBackendDict),
       recentJobData: sampleAdminData.recent_job_data.map(
-        jdof.createFromBackendDict),
+        Job.createFromBackendDict),
       continuousComputationsData:
         sampleAdminData.continuous_computations_data.map(
           ComputationData.createFromBackendDict),

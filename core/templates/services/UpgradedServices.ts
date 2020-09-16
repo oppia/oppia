@@ -273,8 +273,6 @@ import { InteractionObjectFactory } from
 import { InteractionRulesRegistryService } from
   'services/interaction-rules-registry.service';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
-import { JobDataObjectFactory } from
-  'domain/admin/job-data-object.factory';
 import { InteractiveMapRulesService } from
   'interactions/InteractiveMap/directives/interactive-map-rules.service';
 import { InteractiveMapValidationService } from
@@ -782,7 +780,6 @@ export class UpgradedServices {
     upgradedServices['InteractionSpecsService'] = new InteractionSpecsService();
     upgradedServices['ItemSelectionInputRulesService'] =
       new ItemSelectionInputRulesService();
-    upgradedServices['JobDataObjectFactory'] = new JobDataObjectFactory();
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
     upgradedServices['LearnerAnswerDetailsObjectFactory'] =
@@ -1260,7 +1257,6 @@ export class UpgradedServices {
     // Topological level: 3.
     upgradedServices['AdminBackendApiService'] = new AdminBackendApiService(
       upgradedServices['HttpClient'],
-      upgradedServices['JobDataObjectFactory'],
       upgradedServices['TopicSummaryObjectFactory']);
     upgradedServices['AdminDataService'] = new AdminDataService(
       upgradedServices['HttpClient']);

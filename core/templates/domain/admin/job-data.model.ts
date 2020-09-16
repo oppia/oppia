@@ -16,9 +16,6 @@
  * @fileoverview Frontend domain object factory for job data.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface JobDataBackendDict {
   'human_readable_time_finished': string;
   'time_finished_msec': number;
@@ -63,13 +60,8 @@ export class Job {
     this.timeStartedMsec = timeStartedMsec;
     this.humanReadableTimeStarted = humanReadableTimeStarted;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class JobDataObjectFactory {
-  createFromBackendDict(backendDict: JobDataBackendDict): Job {
+  static createFromBackendDict(backendDict: JobDataBackendDict): Job {
     return new Job(
       backendDict.human_readable_time_finished, backendDict.time_finished_msec,
       backendDict.job_type, backendDict.status_code, backendDict.error,
@@ -77,7 +69,3 @@ export class JobDataObjectFactory {
       backendDict.time_started_msec, backendDict.human_readable_time_started);
   }
 }
-
-angular.module('oppia').factory(
-  'JobDataObjectFactory',
-  downgradeInjectable(JobDataObjectFactory));

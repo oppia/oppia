@@ -321,8 +321,6 @@ import { ItemSelectionInputRulesService } from
 import { ItemSelectionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
-import { JobDataObjectFactory } from
-  'domain/admin/job-data-object.factory';
 import { KeyboardShortcutService } from
   'services/keyboard-shortcut.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
@@ -840,7 +838,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static interactiveMapValidationService: InteractiveMapValidationService;
   static itemSelectionInputRulesService: ItemSelectionInputRulesService;
   static itemSelectionInputValidationService: ItemSelectionInputValidationService;
-  static jobDataObjectFactory: JobDataObjectFactory;
   static languageUtilService: LanguageUtilService;
   static learnerActionObjectFactory: LearnerActionObjectFactory;
   static learnerAnswerDetailsBackendApiService: LearnerAnswerDetailsBackendApiService;
@@ -1168,7 +1165,6 @@ private interactiveMapRulesService: InteractiveMapRulesService,
 private interactiveMapValidationService: InteractiveMapValidationService,
 private itemSelectionInputRulesService: ItemSelectionInputRulesService,
 private itemSelectionInputValidationService: ItemSelectionInputValidationService,
-private jobDataObjectFactory: JobDataObjectFactory,
 private languageUtilService: LanguageUtilService,
 private learnerActionObjectFactory: LearnerActionObjectFactory,
 private learnerAnswerDetailsBackendApiService: LearnerAnswerDetailsBackendApiService,
@@ -1497,7 +1493,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.interactiveMapValidationService = this.interactiveMapValidationService;
     OppiaAngularRootComponent.itemSelectionInputRulesService = this.itemSelectionInputRulesService;
     OppiaAngularRootComponent.itemSelectionInputValidationService = this.itemSelectionInputValidationService;
-    OppiaAngularRootComponent.jobDataObjectFactory = this.jobDataObjectFactory;
     OppiaAngularRootComponent.languageUtilService = this.languageUtilService;
     OppiaAngularRootComponent.learnerActionObjectFactory = this.learnerActionObjectFactory;
     OppiaAngularRootComponent.learnerAnswerDetailsBackendApiService = this.learnerAnswerDetailsBackendApiService;
