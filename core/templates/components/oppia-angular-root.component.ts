@@ -320,8 +320,6 @@ import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
 import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
-import { LearnerAnswerInfoObjectFactory } from
-  'domain/statistics/LearnerAnswerInfoObjectFactory';
 import { LearnerDashboardActivityIdsObjectFactory } from
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
 import { LearnerDashboardBackendApiService } from
@@ -819,7 +817,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static learnerActionObjectFactory: LearnerActionObjectFactory;
   static learnerAnswerDetailsBackendApiService: LearnerAnswerDetailsBackendApiService;
   static learnerAnswerDetailsObjectFactory: LearnerAnswerDetailsObjectFactory;
-  static learnerAnswerInfoObjectFactory: LearnerAnswerInfoObjectFactory;
   static learnerDashboardActivityIdsObjectFactory: LearnerDashboardActivityIdsObjectFactory;
   static learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   static learnerDashboardIdsBackendApiService: LearnerDashboardIdsBackendApiService;
@@ -1137,7 +1134,6 @@ private languageUtilService: LanguageUtilService,
 private learnerActionObjectFactory: LearnerActionObjectFactory,
 private learnerAnswerDetailsBackendApiService: LearnerAnswerDetailsBackendApiService,
 private learnerAnswerDetailsObjectFactory: LearnerAnswerDetailsObjectFactory,
-private learnerAnswerInfoObjectFactory: LearnerAnswerInfoObjectFactory,
 private learnerDashboardActivityIdsObjectFactory: LearnerDashboardActivityIdsObjectFactory,
 private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
 private learnerDashboardIdsBackendApiService: LearnerDashboardIdsBackendApiService,
@@ -1456,7 +1452,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.learnerActionObjectFactory = this.learnerActionObjectFactory;
     OppiaAngularRootComponent.learnerAnswerDetailsBackendApiService = this.learnerAnswerDetailsBackendApiService;
     OppiaAngularRootComponent.learnerAnswerDetailsObjectFactory = this.learnerAnswerDetailsObjectFactory;
-    OppiaAngularRootComponent.learnerAnswerInfoObjectFactory = this.learnerAnswerInfoObjectFactory;
     OppiaAngularRootComponent.learnerDashboardActivityIdsObjectFactory = this.learnerDashboardActivityIdsObjectFactory;
     OppiaAngularRootComponent.learnerDashboardBackendApiService = this.learnerDashboardBackendApiService;
     OppiaAngularRootComponent.learnerDashboardIdsBackendApiService = this.learnerDashboardIdsBackendApiService;

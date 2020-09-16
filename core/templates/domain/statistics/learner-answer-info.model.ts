@@ -17,9 +17,6 @@
  * domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 export interface LearnerAnswerInfoBackendDict {
   'id': string;
   'answer': string;
@@ -42,6 +39,22 @@ export class LearnerAnswerInfo {
     this._createdOn = createdOn;
   }
 
+  static createDefaultLearnerAnswerInfo(
+      answer: string, answerDetails: string): LearnerAnswerInfo {
+    return new LearnerAnswerInfo(
+      null, answer, answerDetails, null);
+  }
+
+  static createFromBackendDict(
+      learnerAnswerInfoDict: LearnerAnswerInfoBackendDict): LearnerAnswerInfo {
+    return new LearnerAnswerInfo(
+      learnerAnswerInfoDict.id,
+      learnerAnswerInfoDict.answer,
+      learnerAnswerInfoDict.answer_details,
+      learnerAnswerInfoDict.created_on
+    );
+  }
+
   getId(): string {
     return this._id;
   }
@@ -58,28 +71,3 @@ export class LearnerAnswerInfo {
     return this._createdOn;
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class LearnerAnswerInfoObjectFactory {
-  createDefaultLearnerAnswerInfo(
-      answer: string, answerDetails: string): LearnerAnswerInfo {
-    return new LearnerAnswerInfo(
-      null, answer, answerDetails, null);
-  }
-
-  createFromBackendDict(
-      learnerAnswerInfoDict: LearnerAnswerInfoBackendDict): LearnerAnswerInfo {
-    return new LearnerAnswerInfo(
-      learnerAnswerInfoDict.id,
-      learnerAnswerInfoDict.answer,
-      learnerAnswerInfoDict.answer_details,
-      learnerAnswerInfoDict.created_on
-    );
-  }
-}
-
-angular.module('oppia').factory(
-  'LearnerAnswerInfoObjectFactory',
-  downgradeInjectable(LearnerAnswerInfoObjectFactory));

@@ -13,14 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for LearnerAnswerInfoObjectFactory.
+ * @fileoverview Tests for learner-answer-info.model.
  */
 
-import { LearnerAnswerInfoObjectFactory } from
-  'domain/statistics/LearnerAnswerInfoObjectFactory';
+import { LearnerAnswerInfo } from
+  'domain/statistics/learner-answer-info.model';
 
 describe('Learner answer info object factory', () => {
-  var laiof = new LearnerAnswerInfoObjectFactory();
   it('should create a learner answer info object from a backend dict',
     () => {
       var learnerAnswerInfoBackendDict = {
@@ -30,7 +29,7 @@ describe('Learner answer info object factory', () => {
         created_on: 1000
       };
       var learnerAnswerInfo = (
-        laiof.createFromBackendDict(
+        LearnerAnswerInfo.createFromBackendDict(
           learnerAnswerInfoBackendDict));
       expect(learnerAnswerInfo.getId()).toEqual('sample_id');
       expect(learnerAnswerInfo.getAnswer()).toEqual('sample_answer');
@@ -41,7 +40,7 @@ describe('Learner answer info object factory', () => {
 
   it('should create a default learner answer info object', () => {
     var learnerAnswerInfo = (
-      laiof.createDefaultLearnerAnswerInfo(
+      LearnerAnswerInfo.createDefaultLearnerAnswerInfo(
         'This is answer', 'This is answer details'));
 
     expect(learnerAnswerInfo.getId()).toBeNull();

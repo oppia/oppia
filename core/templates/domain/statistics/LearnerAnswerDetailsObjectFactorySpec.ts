@@ -16,15 +16,14 @@
  * @fileoverview Tests for LearnerAnswerDetailsObjectFactory.
  */
 
-import { LearnerAnswerInfoObjectFactory } from
-  'domain/statistics/LearnerAnswerInfoObjectFactory';
 import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
+import { LearnerAnswerInfo } from './learner-answer-info.model';
 
 describe('Learner answer details object factory', () => {
   it('should create a default learner answer details object', () => {
     var learnerAnswerInfo = (
-      new LearnerAnswerInfoObjectFactory().createDefaultLearnerAnswerInfo(
+      LearnerAnswerInfo.createDefaultLearnerAnswerInfo(
         'This is answer', 'This is answer details'));
     var learnerAnswerDetails = (
       new LearnerAnswerDetailsObjectFactory().createDefaultLearnerAnswerDetails(
@@ -70,16 +69,14 @@ describe('A LearnerAnswerInfoObject', () => {
       created_on: 20191119.2003
     };
 
-    var laiof = new LearnerAnswerInfoObjectFactory();
-
     var learnerAnswerDetails = (
       new LearnerAnswerDetailsObjectFactory().createDefaultLearnerAnswerDetails(
         'fakeExpId', 'fakeStateName', 'fakeInteractionId',
         'fakeCustomizationArgs', [
-          laiof.createFromBackendDict(testLaiDict1),
-          laiof.createFromBackendDict(testLaiDict2),
-          laiof.createFromBackendDict(testLaiDict3),
-          laiof.createFromBackendDict(testLaiDict4)
+          LearnerAnswerInfo.createFromBackendDict(testLaiDict1),
+          LearnerAnswerInfo.createFromBackendDict(testLaiDict2),
+          LearnerAnswerInfo.createFromBackendDict(testLaiDict3),
+          LearnerAnswerInfo.createFromBackendDict(testLaiDict4)
         ]
       ));
 

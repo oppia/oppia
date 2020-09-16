@@ -280,8 +280,6 @@ import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
 import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
-import { LearnerAnswerInfoObjectFactory } from
-  'domain/statistics/LearnerAnswerInfoObjectFactory';
 import { LearnerDashboardActivityIdsObjectFactory } from
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
 import { LearnerDashboardBackendApiService } from
@@ -756,8 +754,6 @@ export class UpgradedServices {
       new LearnerActionObjectFactory();
     upgradedServices['LearnerAnswerDetailsObjectFactory'] =
       new LearnerAnswerDetailsObjectFactory();
-    upgradedServices['LearnerAnswerInfoObjectFactory'] =
-      new LearnerAnswerInfoObjectFactory();
     upgradedServices['LearnerDashboardActivityIdsObjectFactory'] =
       new LearnerDashboardActivityIdsObjectFactory();
     upgradedServices['LearnerExplorationSummaryObjectFactory'] =
