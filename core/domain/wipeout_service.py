@@ -211,6 +211,7 @@ def delete_user(pending_deletion_request):
     user_id = pending_deletion_request.user_id
     user_role = pending_deletion_request.role
     _delete_models(user_id, user_role, models.NAMES.user)
+    _delete_models(user_id, user_role, models.NAMES.feedback)
     _delete_models(user_id, user_role, models.NAMES.improvements)
     if user_role != feconf.ROLE_ID_LEARNER:
         _hard_delete_explorations_and_collections(pending_deletion_request)
@@ -303,10 +304,11 @@ def _delete_models(user_id, user_role, module_name):
     for model_class in models.Registry.get_storage_model_classes([module_name]):
         deletion_policy = model_class.get_deletion_policy()
         lowest_role_for_class = model_class.get_lowest_supported_role()
-        if (user_role != lowest_role_for_class) and (
+        if (
+                user_role != lowest_role_for_class and
                 role_services.check_if_path_exists_in_roles_graph(
                     lowest_role_for_class, user_role) is False
-            ):
+        ):
             continue
 
         if deletion_policy == base_models.DELETION_POLICY.DELETE:
@@ -545,9 +547,6 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
         )
         save_pending_deletion_requests([pending_deletion_request])
 
-    suggestion_ids_to_pids = (
-        pending_deletion_request.activity_mappings[models.NAMES.suggestion])
-
     def _pseudonymize_models(voiceover_application_models):
         """Pseudonymize user ID fields in the models.
 
@@ -570,6 +569,8 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
                 )
         voiceover_application_class.put_multi(voiceover_application_models)
 
+    suggestion_ids_to_pids = (
+        pending_deletion_request.activity_mappings[models.NAMES.suggestion])
     for i in python_utils.RANGE(
             0,
             len(voiceover_application_models),
