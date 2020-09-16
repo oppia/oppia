@@ -112,7 +112,8 @@ describe('Story playthrough object factory', () => {
         secondSampleReadOnlyStoryNodeBackendDict],
       story_title: 'Story',
       story_description: 'Description',
-      topic_name: 'Topic 1'
+      topic_name: 'Topic 1',
+      meta_tag_content: 'Story meta tag content'
     };
     _samplePlaythroughObject =
       storyPlaythroughObjectFactory.createFromBackendDict(
@@ -130,5 +131,7 @@ describe('Story playthrough object factory', () => {
     expect(_samplePlaythroughObject.getNextPendingNodeId()).toEqual('node_2');
     expect(_samplePlaythroughObject.hasStartedStory()).toEqual(true);
     expect(_samplePlaythroughObject.getStoryId()).toEqual('qwerty');
+    expect(_samplePlaythroughObject.getMetaTagContent()).toEqual(
+      'Story meta tag content');
   });
 });

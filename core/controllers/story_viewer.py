@@ -78,7 +78,8 @@ class StoryPageDataHandler(base.BaseHandler):
             'story_title': story.title,
             'story_description': story.description,
             'story_nodes': ordered_node_dicts,
-            'topic_name': topic_name
+            'topic_name': topic_name,
+            'meta_tag_content': story.meta_tag_content
         })
         self.render_json(self.values)
 

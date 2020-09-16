@@ -32,6 +32,7 @@ export interface StoryPlaythroughBackendDict {
   'story_title': string;
   'story_description': string;
   'topic_name': string;
+  'meta_tag_content': string;
 }
 
 export class StoryPlaythrough {
@@ -40,18 +41,21 @@ export class StoryPlaythrough {
   title: string;
   description: string;
   topicName: string;
+  metaTagContent: string;
 
   constructor(
       id: string,
       nodes: ReadOnlyStoryNode[],
       title: string,
       description: string,
-      topicName: string) {
+      topicName: string,
+      metaTagContent: string) {
     this.id = id;
     this.nodes = nodes;
     this.title = title;
     this.description = description;
     this.topicName = topicName;
+    this.metaTagContent = metaTagContent;
   }
 
   getInitialNode(): ReadOnlyStoryNode {
@@ -85,6 +89,10 @@ export class StoryPlaythrough {
   getStoryId(): string {
     return this.id;
   }
+
+  getMetaTagContent(): string {
+    return this.metaTagContent;
+  }
 }
 
 @Injectable({
@@ -106,7 +114,8 @@ export class StoryPlaythroughObjectFactory {
       nodeObjects,
       storyPlaythroughBackendDict.story_title,
       storyPlaythroughBackendDict.story_description,
-      storyPlaythroughBackendDict.topic_name);
+      storyPlaythroughBackendDict.topic_name,
+      storyPlaythroughBackendDict.meta_tag_content);
   }
 }
 

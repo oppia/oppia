@@ -20,6 +20,11 @@
 // App.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
+
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
+import { PageTitleService } from 'services/page-title.service';
 
 require('pages/subtopic-viewer-page/subtopic-viewer-page.component.ts');
 
@@ -28,7 +33,6 @@ describe('Subtopic viewer page', function() {
   var $q = null;
   var $scope = null;
   var AlertsService = null;
-  var PageTitleService = null;
   var ReadOnlySubtopicPageObjectFactory = null;
   var SubtopicViewerBackendApiService = null;
   var UrlService = null;
@@ -47,13 +51,17 @@ describe('Subtopic viewer page', function() {
       $provide.value(key, value);
     }
   }));
+  beforeEach(() => {
+    OppiaAngularRootComponent.pageTitleService = (
+      TestBed.get(PageTitleService)
+    );
+  });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
     AlertsService = $injector.get('AlertsService');
     ContextService = $injector.get('ContextService');
-    PageTitleService = $injector.get('PageTitleService');
     ReadOnlySubtopicPageObjectFactory = $injector.get(
       'ReadOnlySubtopicPageObjectFactory');
     SubtopicViewerBackendApiService = $injector.get(
@@ -99,7 +107,12 @@ describe('Subtopic viewer page', function() {
       }));
     spyOn(SubtopicViewerBackendApiService, 'fetchSubtopicData').and.returnValue(
       $q.resolve(subtopicDataObject));
-    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(
+      OppiaAngularRootComponent.pageTitleService,
+      'setPageTitle').and.callThrough();
+    spyOn(
+      OppiaAngularRootComponent.pageTitleService,
+      'updateMetaTag').and.callThrough();
     spyOn(ContextService, 'setCustomEntityContext').and.callThrough();
     spyOn(ContextService, 'removeCustomEntityContext').and.callThrough();
 
@@ -110,8 +123,13 @@ describe('Subtopic viewer page', function() {
 
     expect(ctrl.pageContents.getHtml()).toBe('This is a html');
     expect(ctrl.subtopicTitle).toBe(subtopicTitle);
-    expect(PageTitleService.setPageTitle).toHaveBeenCalledWith(
-      `Review ${subtopicTitle} | Oppia`);
+    expect(
+      OppiaAngularRootComponent.pageTitleService.setPageTitle
+    ).toHaveBeenCalledWith(`Review ${subtopicTitle} | Oppia`);
+    expect(
+      OppiaAngularRootComponent.pageTitleService.updateMetaTag
+    ).toHaveBeenCalledWith(
+      `Review the skill of ${subtopicTitle.toLowerCase()}.`);
     expect(ContextService.setCustomEntityContext).toHaveBeenCalledWith(
       'topic', topicId);
 

@@ -64,7 +64,8 @@ describe('Topic viewer page', () => {
     subtopics: [],
     degrees_of_mastery: {},
     skill_descriptions: {},
-    practice_tab_is_displayed: true
+    practice_tab_is_displayed: true,
+    meta_tag_content: 'Topic Meta Tag'
   };
 
   beforeEach(() => {
@@ -93,6 +94,7 @@ describe('Topic viewer page', () => {
       'math');
 
     spyOn(pageTitleService, 'setPageTitle').and.callThrough();
+    spyOn(pageTitleService, 'updateMetaTag').and.callThrough();
 
     topicViewerPageComponent.ngOnInit();
     expect(topicViewerPageComponent.canonicalStorySummaries).toEqual([]);
@@ -107,6 +109,8 @@ describe('Topic viewer page', () => {
     expect(topicViewerPageComponent.topicName).toBe('Topic Name');
     expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(
       `Learn ${topicName} | Topic Description | Oppia`);
+    expect(pageTitleService.updateMetaTag).toHaveBeenCalledWith(
+      'Topic Meta Tag');
     expect(topicViewerPageComponent.topicDescription).toBe(
       'Topic Description');
     expect(topicViewerPageComponent.canonicalStorySummaries.length).toBe(1);

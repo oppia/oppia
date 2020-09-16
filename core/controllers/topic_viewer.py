@@ -124,6 +124,7 @@ class TopicPageDataHandler(base.BaseHandler):
             'subtopics': subtopics,
             'degrees_of_mastery': degrees_of_mastery,
             'skill_descriptions': skill_descriptions,
-            'practice_tab_is_displayed': topic.practice_tab_is_displayed
+            'practice_tab_is_displayed': topic.practice_tab_is_displayed,
+            'meta_tag_content': topic.meta_tag_content
         })
         self.render_json(self.values)
