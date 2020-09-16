@@ -2297,7 +2297,6 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             self.translator_id, 'en')
         expected_reviewer_ids = [self.question_reviewer_id, self.translator_id]
 
-        # Get the contribution rights for both reviewers.
         users_contribution_rights = (
             user_services.get_users_contribution_rights(expected_reviewer_ids)
         )
