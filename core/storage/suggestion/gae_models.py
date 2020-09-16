@@ -569,8 +569,8 @@ class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
     total number of suggestions in review for each suggestion type. There is
     only ever one instance of this model with ID
     REVIEWER_AND_SUGGESTION_COUNTS_ID.
-   
-    Fields: 
+
+    Fields:
         translation_reviewer_counts_per_lang: dict. A dictionary where the keys
             are the languages that translation suggestions are offered in and
             the values are the number of reviewers who have permission to
@@ -582,8 +582,8 @@ class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
         question_reviewer_count: int. The number of reviewers who have
             permission to review question suggestions.
         question_suggestion_count: int. The number of question suggestions that
-            are currently in review.  
-    """  
+            are currently in review.
+    """
 
     # A dictionary that contains the total number of translation reviewers for
     # each language.
@@ -600,13 +600,15 @@ class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
     question_suggestion_count = ndb.IntegerProperty(
         required=True, indexed=True)
 
-    def get_deletion_policy():
+    @classmethod
+    def get_deletion_policy(cls):
         """NOT_APPLICABLE - this model does not directly contain user
         information because the data is aggregated.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """NOT_APPLICABLE - this model does not directly contain user
         information because the data is aggregated.
         """

@@ -2393,13 +2393,10 @@ class ReviewerAndSuggestionCountsUnitTests(test_utils.GenericTestBase):
     }
     translation_suggestion_counts_per_lang = {
         'fr': 6,
-        'en': 5 
+        'en': 5
     }
     question_reviewer_count = 1
     question_suggestion_count = 4
-
-    def setUp(self):
-        super(ReviewerAndSuggestionCountsUnitTests, self).setUp()
 
     def test_initialize_reviewer_and_suggestion_counts(self):
         reviewer_and_suggestion_counts = (
@@ -2416,7 +2413,10 @@ class ReviewerAndSuggestionCountsUnitTests(test_utils.GenericTestBase):
             reviewer_and_suggestion_counts.translation_reviewer_counts_per_lang,
             self.translation_reviewer_counts_per_lang)
         self.assertEqual(
-            reviewer_and_suggestion_counts.translation_suggestion_counts_per_lang,
+            (
+                reviewer_and_suggestion_counts
+                .translation_suggestion_counts_per_lang
+            ),
             self.translation_suggestion_counts_per_lang
         )
         self.assertEqual(
@@ -2445,7 +2445,7 @@ class ReviewerAndSuggestionCountsUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Expected the translation reviewer count to be positive, '
-            'recieved: %s. The language code for the translation was en.'  % (
+            'recieved: %s. The language code for the translation was en.' % (
                 negative_translation_reviewer_counts['en'])):
             reviewer_and_suggestion_counts.validate()
 
@@ -2466,20 +2466,20 @@ class ReviewerAndSuggestionCountsUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Expected the translation suggestion count to be positive, '
-            'recieved: %s. The language code for the translation was en.'  % (
+            'recieved: %s. The language code for the translation was en.' % (
                 negative_translation_suggestion_counts['en'])):
             reviewer_and_suggestion_counts.validate()
 
     def test_validate_question_reviewer_count_fails_for_negative_counts(self):
         negative_question_reviewer_count = -1
         reviewer_and_suggestion_counts = (
-                suggestion_registry.ReviewerAndSuggestionCounts(
-                    self.translation_reviewer_counts_per_lang,
-                    self.translation_suggestion_counts_per_lang,
-                    negative_question_reviewer_count,
-                    self.question_suggestion_count
-                )
-            )   
+            suggestion_registry.ReviewerAndSuggestionCounts(
+                self.translation_reviewer_counts_per_lang,
+                self.translation_suggestion_counts_per_lang,
+                negative_question_reviewer_count,
+                self.question_suggestion_count
+            )
+        )
 
         with self.assertRaisesRegexp(
             Exception,
@@ -2490,21 +2490,16 @@ class ReviewerAndSuggestionCountsUnitTests(test_utils.GenericTestBase):
     def test_validate_question_suggestion_count_fails_for_negative_counts(self):
         negative_question_suggestion_count = -1
         reviewer_and_suggestion_counts = (
-                suggestion_registry.ReviewerAndSuggestionCounts(
-                    self.translation_reviewer_counts_per_lang,
-                    self.translation_suggestion_counts_per_lang,
-                    self.question_reviewer_count,
-                    negative_question_suggestion_count
-                )
-            )   
+            suggestion_registry.ReviewerAndSuggestionCounts(
+                self.translation_reviewer_counts_per_lang,
+                self.translation_suggestion_counts_per_lang,
+                self.question_reviewer_count,
+                negative_question_suggestion_count
+            )
+        )
 
         with self.assertRaisesRegexp(
             Exception,
             'Expected the question suggestion count to be positive, recieved: '
             '%s.' % (negative_question_suggestion_count)):
             reviewer_and_suggestion_counts.validate()
-    
-
-
-
-        

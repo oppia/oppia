@@ -43,6 +43,7 @@ import utils
 # that the suggestions of a specific type need more reviewers.
 MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = 5
 
+
 class BaseSuggestion(python_utils.OBJECT):
     """Base class for a suggestion.
 
@@ -1100,6 +1101,7 @@ SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: SuggestionAddQuestion
 }
 
+
 class ReviewerAndSuggestionCounts(python_utils.OBJECT):
     """Domain object for the ReviewerAndSuggestionCountsModel.
 
@@ -1115,7 +1117,7 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
         question_reviewer_count: int. The number of reviewers who have
             permission to review question suggestions.
         question_suggestion_count: int. The number of question suggestions that
-            are currently in review.  
+            are currently in review.
     """
 
     def __init__(
@@ -1174,8 +1176,9 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
         translation suggestions in the given language.
 
         Args:
-            language_code: str. The language code of the translation suggestions.
-    
+            language_code: str. The language code of the translation
+                suggestions.
+
         Returns:
             Bool. Whether or not more reviewers are needed to review
             translation suggestions in the given language.
@@ -1207,7 +1210,6 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
         else:
             # There are neither translation suggestions nor reviewers.
             return False
-
 
     def are_reviewers_needed_for_question_suggestions(self):
         """Returns whether or not more reviewers are needed to review question
