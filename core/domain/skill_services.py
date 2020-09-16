@@ -755,7 +755,7 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
     ])
     if misconception_is_deleted:
         deleted_skill_misconception_ids = [
-            '%s-%d' % (skill.id, change.misconception_id)
+            skill.generate_skill_misconception_id(change.misconception_id)
             for change in change_list
             if change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION
         ]

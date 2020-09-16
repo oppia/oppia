@@ -1307,7 +1307,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid-1']
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
             },
             'skill_id': skill_id,
             'skill_difficulty': 0.3

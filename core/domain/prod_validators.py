@@ -2167,25 +2167,34 @@ class QuestionModelValidator(base_model_validators.BaseModelValidator):
         """
         inapplicable_skill_misconception_ids = (
             item.inapplicable_skill_misconception_ids)
+        skill_misconception_id_mapping = {}
         for skill_misconception_id in inapplicable_skill_misconception_ids:
             skill_id, misconception_id = skill_misconception_id.split('-')
-            skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
+            skill_misconception_id_mapping[skill_id] = misconception_id
+        skills = skill_fetchers.get_multi_skills(
+            skill_misconception_id_mapping.keys(), strict=False)
+        for skill in skills:
             if skill is not None:
                 misconception_ids = [
                     misconception.id
                     for misconception in skill.misconceptions
                 ]
-                if int(misconception_id) not in misconception_ids:
+                expected_misconception_id = (
+                    skill_misconception_id_mapping[skill.id])
+                if int(expected_misconception_id) not in misconception_ids:
                     cls._add_error(
                         'misconception id',
                         'Entity id %s: misconception with the id %s does '
                         'not exist in the skill with id %s' % (
-                            item.id, misconception_id, skill_id))
-            else:
-                cls._add_error(
-                    'skill id',
-                    'Entity id %s: skill with the following id does not exist:'
-                    ' %s' % (item.id, skill_id))
+                            item.id, expected_misconception_id, skill.id))
+        missing_skill_ids = utils.compute_list_difference(
+            skill_misconception_id_mapping.keys(),
+            [skill.id for skill in skills if skill is not None])
+        for skill_id in missing_skill_ids:
+            cls._add_error(
+                'skill id',
+                'Entity id %s: skill with the following id does not exist:'
+                ' %s' % (item.id, skill_id))
 
     @classmethod
     def _get_custom_validation_functions(cls):

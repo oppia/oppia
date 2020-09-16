@@ -5633,7 +5633,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 '<p>default_feedback</p>', False)
         ]
         skills = [skill_domain.Skill.create_default_skill(
-            '%s' % i,
+            '%s' % i * 12,    
             'description %d' % i,
             rubrics
         ) for i in python_utils.RANGE(6)]
@@ -5645,7 +5645,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
         language_codes = ['ar', 'en', 'en']
         questions = [question_domain.Question.create_default_question(
             '%s' % i,
-            ['%s' % (i * 2), '%s' % (i * 2 + 1)]
+            ['%s' % (i * 2) * 12, '%s' % (i * 2 + 1) * 12]
         ) for i in python_utils.RANGE(3)]
 
         for index, question in enumerate(questions):
@@ -5728,15 +5728,15 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=True, literal_eval=False)
 
     def test_missing_linked_skill_model_failure(self):
-        skill_models.SkillModel.get_by_id('1').delete(
+        skill_models.SkillModel.get_by_id('111111111111').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for linked_skill_ids field '
                 'check of QuestionModel\', '
                 '[u"Entity id 0: based on field linked_skill_ids '
-                'having value 1, expect model SkillModel with id 1 but it '
-                'doesn\'t exist"]]'),
+                'having value 111111111111, expect model SkillModel with id '
+                '111111111111 but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -5829,14 +5829,14 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
             self.owner_id, '0', [question_domain.QuestionChange({
                 'cmd': 'update_question_property',
                 'property_name': 'inapplicable_skill_misconception_ids',
-                'new_value': ['0-99'],
+                'new_value': ['000000000000-99'],
                 'old_value': []
             })], 'Add invalid skill misconception id.')
 
         expected_output = [
             u'[u\'failed validation check for misconception id of '
             u'QuestionModel\', [u\'Entity id 0: misconception with '
-            u'the id 99 does not exist in the skill with id 0\']]',
+            u'the id 99 does not exist in the skill with id 000000000000\']]',
             u'[u\'fully-validated QuestionModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
@@ -5846,7 +5846,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
             self.owner_id, '0', [question_domain.QuestionChange({
                 'cmd': 'update_question_property',
                 'property_name': 'inapplicable_skill_misconception_ids',
-                'new_value': ['0-0', '0-1'],
+                'new_value': ['000000000000-0', '000000000000-1'],
                 'old_value': []
             })], 'Add invalid skill misconception id.')
 
@@ -9276,7 +9276,7 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['0'],
-                'inapplicable_skill_misconception_ids': ['skillid-0']
+                'inapplicable_skill_misconception_ids': ['skillid12345-0']
             },
             'skill_id': '0',
             'skill_difficulty': 0.3,
