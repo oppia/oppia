@@ -239,6 +239,9 @@ angular.module('oppia').component('learnerDashboardPage', {
           sort: function(e, ui) {
             // Making top : 0px to avoid irregular change in position.
             ui.helper.css(
+              // This throws "Unnecessarily quoted property 'top' found". We
+              // need to manually supress this warning as the 'top' is a css
+              // property and we cannot pass it without using quotes around it.
               /* eslint-disable-next-line quote-props */
               {'top': '0 px'});
           },

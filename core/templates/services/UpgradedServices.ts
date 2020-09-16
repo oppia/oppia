@@ -686,6 +686,9 @@ interface UpgradedServicesDict {
 export class UpgradedServices {
   getUpgradedServices(): UpgradedServicesDict {
     var upgradedServices = {};
+    // We are using eslint disable here for multilines because we have not used
+    // dot notation at a lot of places so it is not possible to use
+    // eslint disable next line for each of them.
     /* eslint-disable-next-line oppia/no-multiline-disable */
     /* eslint-disable dot-notation */
 

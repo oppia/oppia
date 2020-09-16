@@ -119,9 +119,6 @@ export class ParamTypeObjectFactory {
     if (!this.registry.hasOwnProperty(backendName)) {
       throw new Error(backendName + ' is not a registered parameter type.');
     }
-    // The bracket notation is needed since 'backendName' is a dynamic property
-    // and is not defined on 'registry'.
-    /* eslint-disable-next-line dot-notation */
     return this.registry[backendName];
   }
 }
