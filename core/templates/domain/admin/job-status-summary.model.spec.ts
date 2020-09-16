@@ -16,23 +16,17 @@
  * @fileoverview Unit tests for JobSpecObjectFactory.ts.
  */
 
-import { JobStatusSummaryObjectFactory } from
-  'domain/admin/job-status-summary-object.factory';
+import { JobStatusSummary } from
+  'domain/admin/job-status-summary.model';
 
 describe('Job Spec Object Factory', () => {
-  let jsof: JobStatusSummaryObjectFactory;
-
-  beforeEach(() => {
-    jsof = new JobStatusSummaryObjectFactory();
-  });
-
   it('should correctly convert backend dict to JobSpec object.', () => {
     let backendDict = {
       job_type: 'ActivityReferencesModelAuditOneOffJob',
       is_queued_or_running: false
     };
 
-    let jobSpecObject = jsof.createFromBackendDict(backendDict);
+    let jobSpecObject = JobStatusSummary.createFromBackendDict(backendDict);
 
     expect(jobSpecObject.jobType).toEqual(
       'ActivityReferencesModelAuditOneOffJob');

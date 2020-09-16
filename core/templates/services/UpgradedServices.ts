@@ -275,8 +275,6 @@ import { InteractionRulesRegistryService } from
 import { InteractionSpecsService } from 'services/interaction-specs.service';
 import { JobDataObjectFactory } from
   'domain/admin/job-data-object.factory';
-import { JobStatusSummaryObjectFactory } from
-  'domain/admin/job-status-summary-object.factory';
 import { InteractiveMapRulesService } from
   'interactions/InteractiveMap/directives/interactive-map-rules.service';
 import { InteractiveMapValidationService } from
@@ -785,8 +783,6 @@ export class UpgradedServices {
     upgradedServices['ItemSelectionInputRulesService'] =
       new ItemSelectionInputRulesService();
     upgradedServices['JobDataObjectFactory'] = new JobDataObjectFactory();
-    upgradedServices['JobStatusSummaryObjectFactory'] =
-      new JobStatusSummaryObjectFactory();
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
     upgradedServices['LearnerAnswerDetailsObjectFactory'] =
@@ -1265,7 +1261,6 @@ export class UpgradedServices {
     upgradedServices['AdminBackendApiService'] = new AdminBackendApiService(
       upgradedServices['HttpClient'],
       upgradedServices['JobDataObjectFactory'],
-      upgradedServices['JobStatusSummaryObjectFactory'],
       upgradedServices['TopicSummaryObjectFactory']);
     upgradedServices['AdminDataService'] = new AdminDataService(
       upgradedServices['HttpClient']);

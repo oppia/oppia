@@ -323,8 +323,6 @@ import { ItemSelectionInputValidationService } from
   'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
 import { JobDataObjectFactory } from
   'domain/admin/job-data-object.factory';
-import { JobStatusSummaryObjectFactory } from
-  'domain/admin/job-status-summary-object.factory';
 import { KeyboardShortcutService } from
   'services/keyboard-shortcut.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
@@ -843,7 +841,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static itemSelectionInputRulesService: ItemSelectionInputRulesService;
   static itemSelectionInputValidationService: ItemSelectionInputValidationService;
   static jobDataObjectFactory: JobDataObjectFactory;
-  static jobStatusSummaryObjectFactory: JobStatusSummaryObjectFactory;
   static languageUtilService: LanguageUtilService;
   static learnerActionObjectFactory: LearnerActionObjectFactory;
   static learnerAnswerDetailsBackendApiService: LearnerAnswerDetailsBackendApiService;
@@ -1172,7 +1169,6 @@ private interactiveMapValidationService: InteractiveMapValidationService,
 private itemSelectionInputRulesService: ItemSelectionInputRulesService,
 private itemSelectionInputValidationService: ItemSelectionInputValidationService,
 private jobDataObjectFactory: JobDataObjectFactory,
-private jobStatusSummaryObjectFactory: JobStatusSummaryObjectFactory,
 private languageUtilService: LanguageUtilService,
 private learnerActionObjectFactory: LearnerActionObjectFactory,
 private learnerAnswerDetailsBackendApiService: LearnerAnswerDetailsBackendApiService,
@@ -1502,7 +1498,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.itemSelectionInputRulesService = this.itemSelectionInputRulesService;
     OppiaAngularRootComponent.itemSelectionInputValidationService = this.itemSelectionInputValidationService;
     OppiaAngularRootComponent.jobDataObjectFactory = this.jobDataObjectFactory;
-    OppiaAngularRootComponent.jobStatusSummaryObjectFactory = this.jobStatusSummaryObjectFactory;
     OppiaAngularRootComponent.languageUtilService = this.languageUtilService;
     OppiaAngularRootComponent.learnerActionObjectFactory = this.learnerActionObjectFactory;
     OppiaAngularRootComponent.learnerAnswerDetailsBackendApiService = this.learnerAnswerDetailsBackendApiService;

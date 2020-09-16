@@ -16,9 +16,6 @@
  * @fileoverview Frontend domain object factory for job specs.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface JobStatusSummaryBackendDict {
   'job_type': string;
   'is_queued_or_running': boolean;
@@ -32,19 +29,10 @@ export class JobStatusSummary {
     this.jobType = jobType;
     this.isQueuedOrRunning = isQueuedOrRunning;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class JobStatusSummaryObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       backendDict: JobStatusSummaryBackendDict): JobStatusSummary {
     return new JobStatusSummary(
       backendDict.job_type, backendDict.is_queued_or_running);
   }
 }
-
-angular.module('oppia').factory(
-  'JobStatusSummaryObjectFactory',
-  downgradeInjectable(JobStatusSummaryObjectFactory));

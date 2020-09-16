@@ -46,7 +46,6 @@ import { StateSolutionService } from 'components/state-editor/state-editor-prope
 import { StateWrittenTranslationsService } from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { JobDataObjectFactory } from 'domain/admin/job-data-object.factory';
-import { JobStatusSummaryObjectFactory } from 'domain/admin/job-status-summary-object.factory';
 import { AnswerClassificationResultObjectFactory } from 'domain/classifier/AnswerClassificationResultObjectFactory';
 import { ClassifierObjectFactory } from 'domain/classifier/ClassifierObjectFactory';
 import { PredictionResultObjectFactory } from 'domain/classifier/PredictionResultObjectFactory';
@@ -512,7 +511,6 @@ export const angularServices: [string, unknown][] = [
   ['ItemSelectionInputRulesService', ItemSelectionInputRulesService],
   ['ItemSelectionInputValidationService', ItemSelectionInputValidationService],
   ['JobDataObjectFactory', JobDataObjectFactory],
-  ['JobStatusSummaryObjectFactory', JobStatusSummaryObjectFactory],
   ['KeyboardShortcutService', KeyboardShortcutService],
   ['LanguageUtilService', LanguageUtilService],
   ['LearnerActionObjectFactory', LearnerActionObjectFactory],

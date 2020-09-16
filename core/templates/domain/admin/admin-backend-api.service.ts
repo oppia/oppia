@@ -39,8 +39,7 @@ import {
 import {
   JobStatusSummary,
   JobStatusSummaryBackendDict,
-  JobStatusSummaryObjectFactory
-} from 'domain/admin/job-status-summary-object.factory';
+} from 'domain/admin/job-status-summary.model';
 
 
 interface UserRoles {
@@ -102,7 +101,6 @@ export class AdminBackendApiService {
   constructor(
     private http: HttpClient,
     private jobDataObjectFactory: JobDataObjectFactory,
-    private jobStatusSummaryObjectFactory: JobStatusSummaryObjectFactory,
     private topicSummaryObjectFactory: TopicSummaryObjectFactory) {}
 
   getData(): Promise<AdminPageData> {
@@ -114,10 +112,10 @@ export class AdminBackendApiService {
           demoCollections: response.demo_collections,
           demoExplorationIds: response.demo_exploration_ids,
           oneOffJobStatusSummaries: response.one_off_job_status_summaries.map(
-            this.jobStatusSummaryObjectFactory.createFromBackendDict),
+            JobStatusSummary.createFromBackendDict),
           humanReadableCurrentTime: response.human_readable_current_time,
           auditJobStatusSummaries: response.audit_job_status_summaries.map(
-            this.jobStatusSummaryObjectFactory.createFromBackendDict),
+            JobStatusSummary.createFromBackendDict),
           updatableRoles: response.updatable_roles,
           roleGraphData: response.role_graph_data,
           configProperties: response.config_properties,

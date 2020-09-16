@@ -24,16 +24,14 @@ import { AdminPageData, AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
 import { JobDataObjectFactory } from
   'domain/admin/job-data-object.factory';
-import { JobStatusSummaryObjectFactory } from
-  'domain/admin/job-status-summary-object.factory';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 import { ComputationData } from './computation-data.model';
+import { JobStatusSummary } from './job-status-summary.model';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
   let jdof: JobDataObjectFactory;
-  let jsof: JobStatusSummaryObjectFactory;
   let tsof: TopicSummaryObjectFactory;
   let httpTestingController: HttpTestingController;
   let adminBackendResponse = {
@@ -116,7 +114,6 @@ describe('Admin backend api service', () => {
 
     abas = TestBed.get(AdminBackendApiService);
     jdof = TestBed.get(JobDataObjectFactory);
-    jsof = TestBed.get(JobStatusSummaryObjectFactory);
     tsof = TestBed.get(TopicSummaryObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
     adminDataObject = {
@@ -125,12 +122,12 @@ describe('Admin backend api service', () => {
       demoExplorationIds: adminBackendResponse.demo_exploration_ids,
       oneOffJobStatusSummaries:
         adminBackendResponse.one_off_job_status_summaries.map(
-          jsof.createFromBackendDict),
+          JobStatusSummary.createFromBackendDict),
       humanReadableCurrentTime:
         adminBackendResponse.human_readable_current_time,
       auditJobStatusSummaries:
         adminBackendResponse.audit_job_status_summaries.map(
-          jsof.createFromBackendDict),
+          JobStatusSummary.createFromBackendDict),
       updatableRoles: adminBackendResponse.updatable_roles,
       roleGraphData: adminBackendResponse.role_graph_data,
       configProperties: adminBackendResponse.config_properties,
