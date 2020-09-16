@@ -27,6 +27,8 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
 
+import python_utils
+
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
 
@@ -191,7 +193,8 @@ class InteractionCustomizationArgsValidationOneOffJob(
                     fail_on_validation_errors=True
                 )
             except Exception as e:
-                error_messages.append('%s: %s' % (state.interaction.id, e))
+                error_messages.append(
+                    '%s: %s' % (state.interaction.id, python_utils.UNICODE(e)))
 
         if error_messages:
             yield (
