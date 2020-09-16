@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -537,6 +538,25 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             with swap_is_dir:
                 install_backend_python_libs.validate_metadata_directories()
 
+    def test_that_libraries_in_requirements_are_correctly_named(self):
+        # Matches strings starting with a normal library name that contains
+        # regular letters, digits, periods, underscores, or hyphens and ending
+        # with an optional suffix of the pattern [str] with no brackets inside
+        # the outside brackets.
+        library_name_pattern = re.compile(r'^[a-zA-Z0-9_.-]+(\[[^\[^\]]+\])*$')
+        with python_utils.open_file(
+            common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                trimmed_line = line.strip()
+                if trimmed_line.startswith('#') or len(trimmed_line) == 0:
+                    continue
+                library_name_and_version_string = trimmed_line.split(
+                    ' ')[0].split('==')
+                library_name = library_name_and_version_string[0]
+                self.assertIsNotNone(
+                    re.match(library_name_pattern, library_name))
+
     def test_pip_install_without_import_error(self):
         with self.swap_Popen:
             install_backend_python_libs.pip_install(
@@ -602,3 +622,39 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertTrue(
             'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
             'Windows%29' in self.print_arr)
+
+    def test_uniqueness_of_normalized_lib_names_in_requirements_file(self):
+        normalized_library_names = set()
+        with python_utils.open_file(common.REQUIREMENTS_FILE_PATH, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                trimmed_line = line.strip()
+                if trimmed_line.startswith('#') or len(trimmed_line) == 0:
+                    continue
+                library_name_and_version_string = trimmed_line.split(
+                    ' ')[0].split('==')
+                normalized_library_name = (
+                    install_backend_python_libs.normalize_python_library_name(
+                        library_name_and_version_string[0]))
+                self.assertNotIn(
+                    normalized_library_name, normalized_library_names)
+                normalized_library_names.add(normalized_library_name)
+
+    def test_uniqueness_of_normalized_lib_names_in_compiled_requirements_file(
+            self):
+        normalized_library_names = set()
+        with python_utils.open_file(
+            common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                trimmed_line = line.strip()
+                if trimmed_line.startswith('#') or len(trimmed_line) == 0:
+                    continue
+                library_name_and_version_string = trimmed_line.split(
+                    ' ')[0].split('==')
+                normalized_library_name = (
+                    install_backend_python_libs.normalize_python_library_name(
+                        library_name_and_version_string[0]))
+                self.assertNotIn(
+                    normalized_library_name, normalized_library_names)
+                normalized_library_names.add(normalized_library_name)
