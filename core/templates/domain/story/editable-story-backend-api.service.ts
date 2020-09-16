@@ -21,7 +21,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-//import { storyDataObjectFactory } from 'domain/story/StoryObjectFactory'
 import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -47,12 +46,6 @@ export class EditableStoryBackendApiService {
       (response) => {
         this.storyDataDict = cloneDeep(response);
         if (successCallback) {
-        /*  var storyDataDicts=response.story_data_dicts;
-          storyDataDicts.forEach(storyDataDict => {
-              storyDataObjects.push(
-              this.storyDataObjectFactory.createFromBackendDict(
-                storyDataDict));
-          });*/
           successCallback(this.storyDataDict);
         }
       }, (errorResponse) => {
