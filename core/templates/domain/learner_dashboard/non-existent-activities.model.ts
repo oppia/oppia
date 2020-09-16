@@ -17,9 +17,6 @@
  * activities.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface NonExistentActivitiesBackendDict {
   'incomplete_explorations': number;
   'incomplete_collections': number;
@@ -37,13 +34,8 @@ export class NonExistentActivities {
     public completedCollections: number,
     public explorationPlaylist: number,
     public collectionPlaylist: number) { }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class NonExistentActivitiesObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       backendDict: NonExistentActivitiesBackendDict): NonExistentActivities {
     return new NonExistentActivities(
       backendDict.incomplete_explorations,
@@ -54,7 +46,3 @@ export class NonExistentActivitiesObjectFactory {
       backendDict.collection_playlist);
   }
 }
-
-angular.module('oppia').factory(
-  'NonExistentActivitiesObjectFactory',
-  downgradeInjectable(NonExistentActivitiesObjectFactory));

@@ -13,19 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Non existent activities object factory.
+ * @fileoverview Unit tests for Non existent activities model.
  */
 
-import { NonExistentActivitiesObjectFactory } from
-  'domain/learner_dashboard/non-existent-activities-object.factory';
+import { NonExistentActivities } from
+  'domain/learner_dashboard/non-existent-activities.model';
 
 describe('Non existent activities object factory', () => {
-  let neaof: NonExistentActivitiesObjectFactory;
-
-  beforeEach(() => {
-    neaof = new NonExistentActivitiesObjectFactory();
-  });
-
   it('should correctly convert backend dict to object', () => {
     let backendDict = {
       incomplete_explorations: 1,
@@ -36,7 +30,7 @@ describe('Non existent activities object factory', () => {
       collection_playlist: 6
     };
 
-    let object = neaof.createFromBackendDict(backendDict);
+    let object = NonExistentActivities.createFromBackendDict(backendDict);
 
     expect(object.incompleteExplorations).toEqual(1);
     expect(object.incompleteCollections).toEqual(2);

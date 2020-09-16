@@ -338,8 +338,6 @@ import { NeedsGuidingResponsesTaskObjectFactory } from
   'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
 import { NewlyCreatedTopicObjectFactory } from
   'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
-import { NonExistentActivitiesObjectFactory } from
-  'domain/learner_dashboard/non-existent-activities-object.factory';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 import { NormalizeWhitespacePunctuationAndCasePipe } from
@@ -805,8 +803,6 @@ export class UpgradedServices {
       new NumericInputRulesService();
     upgradedServices['NewlyCreatedTopicObjectFactory'] =
         new NewlyCreatedTopicObjectFactory();
-    upgradedServices['NonExistentActivitiesObjectFactory'] =
-      new NonExistentActivitiesObjectFactory();
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
     upgradedServices['ParamMetadataObjectFactory'] =
@@ -1356,8 +1352,7 @@ export class UpgradedServices {
       new LearnerDashboardBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['FeedbackThreadSummaryObjectFactory'],
-        upgradedServices['LearnerExplorationSummaryObjectFactory'],
-        upgradedServices['NonExistentActivitiesObjectFactory']);
+        upgradedServices['LearnerExplorationSummaryObjectFactory']);
     upgradedServices['LearnerDashboardIdsBackendApiService'] =
         new LearnerDashboardIdsBackendApiService(
           upgradedServices['HttpClient'],

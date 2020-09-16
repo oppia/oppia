@@ -38,8 +38,7 @@ import {
 import {
   NonExistentActivities,
   NonExistentActivitiesBackendDict,
-  NonExistentActivitiesObjectFactory
-} from 'domain/learner_dashboard/non-existent-activities-object.factory';
+} from 'domain/learner_dashboard/non-existent-activities.model';
 import {
   CreatorSummaryBackendDict,
   ProfileSummary,
@@ -82,9 +81,7 @@ export class LearnerDashboardBackendApiService {
     private feedbackThreadSummaryObjectFactory:
     FeedbackThreadSummaryObjectFactory,
     private learnerExplorationSummaryObjectFactory:
-    LearnerExplorationSummaryObjectFactory,
-    private nonExistentActivitiesObjectFactory:
-    NonExistentActivitiesObjectFactory) {}
+    LearnerExplorationSummaryObjectFactory) {}
 
   _fetchLearnerDashboardData(): Promise<LearnerDashboardData> {
     return new Promise((resolve, reject) => {
@@ -123,7 +120,7 @@ export class LearnerDashboardBackendApiService {
           completedToIncompleteCollections: (
             dashboardData.completed_to_incomplete_collections),
           numberOfNonexistentActivities: (
-            this.nonExistentActivitiesObjectFactory.createFromBackendDict(
+            NonExistentActivities.createFromBackendDict(
               dashboardData.number_of_nonexistent_activities)),
           subscriptionList: (
             dashboardData.subscription_list.map(

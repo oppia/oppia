@@ -23,6 +23,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
+import { NonExistentActivities } from 'domain/learner_dashboard/non-existent-activities.model';
 require(
   'pages/learner-dashboard-page/learner-dashboard-page.component.ts');
 
@@ -42,7 +43,6 @@ describe('Learner dashboard page', function() {
   var feedbackThreadSummaryObjectFactory = null;
   var LearnerDashboardBackendApiService = null;
   var learnerExplorationSummaryObjectFactory = null;
-  var nonExistentActivitiesObjectFactory = null;
   var SuggestionModalForLearnerDashboardService = null;
   var UserService = null;
 
@@ -76,8 +76,6 @@ describe('Learner dashboard page', function() {
         'LearnerDashboardBackendApiService');
       learnerExplorationSummaryObjectFactory = $injector.get(
         'LearnerExplorationSummaryObjectFactory');
-      nonExistentActivitiesObjectFactory = $injector.get(
-        'NonExistentActivitiesObjectFactory');
       SuggestionModalForLearnerDashboardService = $injector.get(
         'SuggestionModalForLearnerDashboardService');
       UserService = $injector.get('UserService');
@@ -269,7 +267,7 @@ describe('Learner dashboard page', function() {
           completedToIncompleteCollections: (
             learnerDashboardData.completed_to_incomplete_collections),
           numberOfNonexistentActivities: (
-            nonExistentActivitiesObjectFactory.createFromBackendDict(
+            NonExistentActivities.createFromBackendDict(
               learnerDashboardData.number_of_nonexistent_activities)),
           subscriptionList: (
             learnerDashboardData.subscription_list.map(

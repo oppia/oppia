@@ -108,7 +108,6 @@ import { TaskEntryObjectFactory } from 'domain/improvements/TaskEntryObjectFacto
 import { LearnerDashboardActivityIdsObjectFactory } from 'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
-import { NonExistentActivitiesObjectFactory } from 'domain/learner_dashboard/non-existent-activities-object.factory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
 import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
@@ -542,7 +541,6 @@ export const angularServices: [string, unknown][] = [
     NeedsGuidingResponsesTaskObjectFactory],
   ['NewlyCreatedStoryObjectFactory', NewlyCreatedStoryObjectFactory],
   ['NewlyCreatedTopicObjectFactory', NewlyCreatedTopicObjectFactory],
-  ['NonExistentActivitiesObjectFactory', NonExistentActivitiesObjectFactory],
   ['NormalizeWhitespacePipe', NormalizeWhitespacePipe],
   ['NormalizeWhitespacePunctuationAndCasePipe',
     NormalizeWhitespacePunctuationAndCasePipe],
