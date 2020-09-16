@@ -2168,11 +2168,13 @@ class QuestionModelValidator(base_model_validators.BaseModelValidator):
         inapplicable_skill_misconception_ids = (
             item.inapplicable_skill_misconception_ids)
         skill_misconception_id_mapping = {}
+        skill_ids = []
         for skill_misconception_id in inapplicable_skill_misconception_ids:
             skill_id, misconception_id = skill_misconception_id.split('-')
             skill_misconception_id_mapping[skill_id] = misconception_id
-        skills = skill_fetchers.get_multi_skills(
-            skill_misconception_id_mapping.keys(), strict=False)
+            skill_ids.append(skill_id)
+
+        skills = skill_fetchers.get_multi_skills(skill_ids, strict=False)
         for skill in skills:
             if skill is not None:
                 misconception_ids = [
@@ -2188,7 +2190,7 @@ class QuestionModelValidator(base_model_validators.BaseModelValidator):
                         'not exist in the skill with id %s' % (
                             item.id, expected_misconception_id, skill.id))
         missing_skill_ids = utils.compute_list_difference(
-            skill_misconception_id_mapping.keys(),
+            skill_ids,
             [skill.id for skill in skills if skill is not None])
         for skill_id in missing_skill_ids:
             cls._add_error(

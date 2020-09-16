@@ -5633,7 +5633,7 @@ class QuestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 '<p>default_feedback</p>', False)
         ]
         skills = [skill_domain.Skill.create_default_skill(
-            '%s' % i * 12,    
+            '%s' % i * 12,
             'description %d' % i,
             rubrics
         ) for i in python_utils.RANGE(6)]
