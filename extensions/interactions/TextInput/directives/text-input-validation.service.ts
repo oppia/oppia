@@ -25,12 +25,16 @@ import { AppConstants } from 'app.constants';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
 import { TextInputCustomizationArgs } from
   'interactions/customization-args-defs';
+import { TextInputRulesService } from './text-input-rules.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { UtilsService } from 'services/utils.service';
 
 interface Warning {
   type: string,
@@ -44,12 +48,12 @@ export class TextInputValidationService {
   constructor(private bivs: baseInteractionValidationService) {}
   getCustomizationArgsWarnings(
       customizationArgs: TextInputCustomizationArgs): Warning[] {
-    var warningsList = [];
+    let warningsList = [];
     this.bivs.requireCustomizationArguments(
       customizationArgs,
       ['placeholder', 'rows']);
 
-    var placeholder = customizationArgs.placeholder.value;
+    let placeholder = customizationArgs.placeholder.value;
 
     if (
       !(placeholder instanceof SubtitledUnicode) ||
@@ -62,17 +66,17 @@ export class TextInputValidationService {
       });
     }
 
-    var isInt = function(n) {
+    let isInt = function(n) {
       return angular.isNumber(n) && n % 1 === 0;
     };
 
-    var rows = customizationArgs.rows.value;
+    let rows = customizationArgs.rows.value;
     if (isInt(rows)) {
-      var textSpecs = InteractionSpecsConstants.INTERACTION_SPECS.TextInput;
-      var customizationArgSpecs = textSpecs.customization_arg_specs;
-      var rowsSpecs = customizationArgSpecs[1];
-      var minRows = rowsSpecs.schema.validators[0].min_value;
-      var maxRows = rowsSpecs.schema.validators[1].max_value;
+      let textSpecs = InteractionSpecsConstants.INTERACTION_SPECS.TextInput;
+      let customizationArgSpecs = textSpecs.customization_arg_specs;
+      let rowsSpecs = customizationArgSpecs[1];
+      let minRows = rowsSpecs.schema.validators[0].min_value;
+      let maxRows = rowsSpecs.schema.validators[1].max_value;
       if (rows < minRows || rows > maxRows) {
         warningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
@@ -95,9 +99,88 @@ export class TextInputValidationService {
       stateName: string,
       customizationArgs: TextInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
-    return this.getCustomizationArgsWarnings(customizationArgs).concat(
-      this.bivs.getAllOutcomeWarnings(
-        answerGroups, defaultOutcome, stateName));
+    let warningsList: Warning[] = [];
+    let textInputRulesService = (
+      new TextInputRulesService(
+        new NormalizeWhitespacePipe(new UtilsService())));
+
+    warningsList = warningsList.concat(
+      this.getCustomizationArgsWarnings(customizationArgs));
+
+    let seenStringsContains: string[] = [];
+    let seenStringsStartsWith: string[] = [];
+    let seenStringsEquals: string[] = [];
+    let seenStringsFuzzyEquals: string[] = [];
+
+    for (let [answerGroupIndex, answerGroup] of answerGroups.entries()) {
+      for (let [ruleIndex, rule] of answerGroup.rules.entries()) {
+        let currentString = <string> rule.inputs.x;
+        if (rule.type === 'Contains') {
+          // Check if the current string contains any of the previously seen
+          // strings as a substring.
+          if (seenStringsContains.some(
+            (seenString) => currentString.includes(seenString)) ||
+            seenStringsStartsWith.includes('')) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: `Rule ${ruleIndex + 1} from answer group ` +
+                `${answerGroupIndex + 1} will never be matched because it ` +
+                'is preceded by a \'Contains\' rule with a matching input.'
+            });
+          }
+          seenStringsContains.push(currentString);
+        } else if (rule.type === 'StartsWith') {
+          // Check if the current string contains any of the previously seen
+          // strings as a prefix.
+          if (seenStringsStartsWith.concat(seenStringsContains).some(
+            (seenString) => currentString.indexOf(seenString) === 0)) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: `Rule ${ruleIndex + 1} from answer group ` +
+                `${answerGroupIndex + 1} will never be matched because it ` +
+                'is preceded by a \'StartsWith\' rule with a matching prefix.'
+            });
+          }
+          seenStringsStartsWith.push(currentString);
+        } else if (rule.type === 'Equals') {
+          if (seenStringsEquals.some(
+            (seenString) => textInputRulesService.Equals(
+              currentString, {x: seenString}))) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: `Rule ${ruleIndex + 1} from answer group ` +
+                `${answerGroupIndex + 1} will never be matched because it ` +
+                'is preceded by a \'Equals\' rule with a matching input.'
+            });
+          } else if (seenStringsFuzzyEquals.some(
+            (seenString) => textInputRulesService.FuzzyEquals(
+              currentString, {x: seenString}))) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: `Rule ${ruleIndex + 1} from answer group ` +
+                `${answerGroupIndex + 1} will never be matched because it ` +
+                'is preceded by a \'FuzzyEquals\' rule with a matching input.'
+            });
+          }
+          seenStringsEquals.push(currentString);
+        } else if (rule.type === 'FuzzyEquals') {
+          if (seenStringsFuzzyEquals.some(
+            (seenString) => textInputRulesService.FuzzyEquals(
+              currentString, {x: seenString}))) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: `Rule ${ruleIndex + 1} from answer group ` +
+                `${answerGroupIndex + 1} will never be matched because it ` +
+                'is preceded by a \'FuzzyEquals\' rule with a matching input.'
+            });
+          }
+          seenStringsFuzzyEquals.push(currentString);
+        }
+      }
+    }
+
+    return warningsList.concat(this.bivs.getAllOutcomeWarnings(
+      answerGroups, defaultOutcome, stateName));
   }
 }
 

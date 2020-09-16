@@ -184,7 +184,7 @@ describe('Fraction Object Factory', () => {
       fraction.fromRawInputString('5/5').isImproperFraction()).toBe(true);
   });
 
-  it('shoud covert to simplest form', () => {
+  it('should convert to simplest form', () => {
     expect(fraction.fromRawInputString('1').convertToSimplestForm())
       .toEqual(new Fraction(false, 1, 0, 1));
     expect(fraction.fromRawInputString('0').convertToSimplestForm())

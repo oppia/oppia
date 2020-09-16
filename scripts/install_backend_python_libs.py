@@ -22,6 +22,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 
 import python_utils
 from scripts import common
@@ -29,25 +30,64 @@ from scripts import common
 import pkg_resources
 
 
-def _normalize_python_library_name(library_name):
-    """Returns a normalized (lowercase) version of the python library name.
+def normalize_python_library_name(library_name):
+    """Returns a normalized version of the python library name.
 
-    Python library name strings are case insensitive which means that
-    libraries are equivalent even if the casing of the library names are
-    different. This function normalizes python library names such that
-    identical libraries have the same library name strings.
+    Normalization of a library name means converting the library name to
+    lowercase, and removing any "[...]" suffixes that occur. The reason we do
+    this is because of 2 potential confusions when comparing library names that
+    will cause this script to find incorrect mismatches.
+
+    1. Python library name strings are case-insensitive, which means that
+       libraries are considered equivalent even if the casing of the library
+       names is different.
+    2. There are certain python libraries with a default version and multiple
+       variants. These variants have names like `library[sub-library]` and
+       signify that it is a version of the library with special support for
+       the sub-library. These variants can be considered equivalent to an
+       individual developer and project because at any point in time, only one
+       of these variants is allowed to be installed/used in a project.
+
+    Here are some examples of ambiguities that this function resolves:
+    - 'googleappenginemapreduce' is listed in the 'requirements.txt' file as
+      all lowercase. However, the installed directories have names starting with
+      the string 'GoogleAppEngineMapReduce'. This causes confusion when
+      searching for mismatches because python treats the two library names as
+      different even though they are equivalent.
+    - If the name 'google-api-core[grpc]' is listed in the 'requirements.txt'
+      file, this means that a variant of the 'google-api-core' package that
+      supports grpc is required. However, the import names, the package
+      directory names, and the metadata directory names of the installed package
+      do not actually contain the sub-library identifier. This causes
+      incorrect mismatches to be found because the script treats the installed
+      package's library name, 'library', differently from the 'requirements.txt'
+      listed library name, 'library[sub-library]'
 
     Args:
         library_name: str. The library name to be normalized.
 
     Returns:
-        str. A normalized library name that is all lowercase.
+        str. A normalized library name.
     """
-    library_name = re.sub('\[[^\]]+\]', '', library_name)
+    # Remove the special support package designation (e.g [grpc]) in the
+    # brackets when parsing the requirements file to resolve confusion 2 in the
+    # docstring.
+    # NOTE: This does not cause ambiguities because there is no viable scenario
+    # where both the library and a variant of the library exist in the
+    # directory. Both the default version and the variant are imported in the
+    # same way (e.g import google.api.core) and if pip allowed a scenario where
+    # both versions were installed, then there would be ambiguities in the
+    # imports. For this reason, it is safe to disambiguate the names by removing
+    # the suffix. We have also implemented the backend tests,
+    # test_uniqueness_of_lib_names_in_requirements_file and
+    # test_uniqueness_of_lib_names_in_compiled_requirements_file, in
+    # scripts/install_backend_python_libs_test.py to ensure that all
+    # library names in the requirements files are distinct when normalized.
+    library_name = re.sub(r'\[[^\[^\]]+\]', '', library_name)
     return library_name.lower()
 
 
-def _normalize_directory_name(directory_name):
+def normalize_directory_name(directory_name):
     """Returns a normalized (lowercase) version of the directory name.
 
     Python library name strings are case insensitive which means that
@@ -84,17 +124,18 @@ def _get_requirements_file_contents():
     with python_utils.open_file(
         common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
         lines = f.readlines()
-        for l in lines:
-            l = l.strip()
-            if l.startswith('#') or len(l) == 0:
+        for line in lines:
+            trimmed_line = line.strip()
+            if trimmed_line.startswith('#') or len(trimmed_line) == 0:
                 continue
-            library_name_and_version_string = l.split(' ')[0].split('==')
+            library_name_and_version_string = trimmed_line.split(
+                ' ')[0].split('==')
             # Libraries with different case are considered equivalent libraries:
             # e.g 'Flask' is the same library as 'flask'. Therefore, we
             # normalize all library names in order to compare libraries without
             # ambiguities.
             normalized_library_name = (
-                _normalize_python_library_name(
+                normalize_python_library_name(
                     library_name_and_version_string[0]))
             version_string = library_name_and_version_string[1]
             requirements_contents[normalized_library_name] = version_string
@@ -120,7 +161,7 @@ def _get_third_party_python_libs_directory_contents():
     # normalize all library names in order to compare libraries without
     # ambiguities.
     directory_contents = {
-        _normalize_python_library_name(library_name): version_string
+        normalize_python_library_name(library_name): version_string
         for library_name, version_string in installed_packages
     }
 
@@ -145,7 +186,7 @@ def _remove_metadata(library_name, version_string):
         _get_possible_normalized_metadata_directory_names(
             library_name, version_string))
     normalized_directory_names = [
-        _normalize_directory_name(name)
+        normalize_directory_name(name)
         for name in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR)
         if os.path.isdir(
             os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, name))
@@ -238,28 +279,23 @@ def _install_library(library_name, version_string):
         library_name: str. Name of the library to install.
         version_string: str. Stringified version of the library to install.
     """
-    subprocess.check_call([
-        'pip', 'install', '--target',
+    pip_install(
+        library_name,
+        version_string,
         common.THIRD_PARTY_PYTHON_LIBS_DIR,
-        '--no-dependencies',
-        '%s==%s' % (
-            library_name,
-            version_string),
-        '--upgrade'
-    ])
+        upgrade=True,
+        no_dependencies=True
+    )
 
 
 def _reinstall_all_dependencies():
     """Reinstalls all of the libraries detailed in the compiled
     'requirements.txt' file to the 'third_party/python_libs' folder.
     """
-    subprocess.check_call([
-        'pip', 'install', '--target',
+    _pip_install_requirements(
         common.THIRD_PARTY_PYTHON_LIBS_DIR,
-        '--no-dependencies', '-r',
-        common.COMPILED_REQUIREMENTS_FILE_PATH,
-        '--upgrade'
-    ])
+        common.COMPILED_REQUIREMENTS_FILE_PATH
+    )
 
 
 def _get_possible_normalized_metadata_directory_names(
@@ -283,17 +319,114 @@ def _get_possible_normalized_metadata_directory_names(
     # Some metadata folders replace the hyphens in the library name with
     # underscores.
     return {
-        _normalize_directory_name(
+        normalize_directory_name(
             '%s-%s.dist-info' % (library_name, version_string)),
-        _normalize_directory_name(
+        normalize_directory_name(
             '%s-%s.dist-info' % (
                 library_name.replace('-', '_'), version_string)),
-        _normalize_directory_name(
+        normalize_directory_name(
             '%s-%s.egg-info' % (library_name, version_string)),
-        _normalize_directory_name(
+        normalize_directory_name(
             '%s-%s.egg-info' % (
                 library_name.replace('-', '_'), version_string)),
     }
+
+
+def _verify_pip_is_installed():
+    """Verify that pip is installed.
+
+    Raises:
+        ImportError. Error importing pip.
+    """
+    try:
+        python_utils.PRINT('Checking if pip is installed on the local machine')
+        # Importing pip just to check if its installed.
+        import pip  #pylint: disable=unused-variable
+    except ImportError as e:
+        common.print_each_string_after_two_new_lines([
+            'Pip is required to install Oppia dependencies, but pip wasn\'t '
+            'found on your local machine.',
+            'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
+            'page:'])
+
+        if common.is_mac_os():
+            python_utils.PRINT(
+                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
+                'OS%29')
+        elif common.is_linux_os():
+            python_utils.PRINT(
+                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
+                '%29')
+        else:
+            python_utils.PRINT(
+                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
+                'Windows%29')
+        raise ImportError('Error importing pip: %s' % e)
+
+
+def _run_pip_command(cmd_parts):
+    """Run pip command with some flags and configs. If it fails try to rerun it
+    with additional flags and else raise an exception.
+
+    Args:
+        cmd_parts: list(str). List of cmd parts to be run with pip.
+
+    Raises:
+        Exception. Error installing package.
+    """
+    _verify_pip_is_installed()
+    # The call to python -m is used to ensure that Python and Pip versions are
+    # compatible.
+    command = [sys.executable, '-m', 'pip'] + cmd_parts
+    process = subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode == 0:
+        python_utils.PRINT(stdout)
+    elif 'can\'t combine user with prefix' in stderr:
+        python_utils.PRINT('Trying by setting --user and --prefix flags.')
+        subprocess.check_call(
+            command + ['--user', '--prefix=', '--system'])
+    else:
+        python_utils.PRINT(stderr)
+        python_utils.PRINT(
+            'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
+        raise Exception('Error installing package')
+
+
+def pip_install(
+        package, version, install_path, upgrade=False, no_dependencies=False):
+    """Installs third party libraries with pip.
+
+    Args:
+        package: str. The package name.
+        version: str. The package version.
+        install_path: str. The installation path for the package.
+        upgrade: bool. Whether call the pip with --upgrade flag.
+        no_dependencies: bool. Whether call the pip with --no-dependencies flag.
+    """
+    additional_pip_args = []
+    if upgrade:
+        additional_pip_args.append('--upgrade')
+    if no_dependencies:
+        additional_pip_args.append('--no-dependencies')
+
+    _run_pip_command([
+        'install', '%s==%s' % (package, version), '--target', install_path
+    ] + additional_pip_args)
+
+
+def _pip_install_requirements(install_path, requirements_path):
+    """Installs third party libraries from requirements files with pip.
+
+    Args:
+        install_path: str. The installation path for the packages.
+        requirements_path: str. The path to the requirements file.
+    """
+    _run_pip_command([
+        'install', '--target', install_path, '--no-dependencies',
+        '-r', requirements_path, '--upgrade'
+    ])
 
 
 def get_mismatches():
@@ -374,7 +507,7 @@ def validate_metadata_directories():
     # we would need to check every permutation of the casing.
     normalized_directory_names = set(
         [
-            _normalize_directory_name(name)
+            normalize_directory_name(name)
             for name in os.listdir(common.THIRD_PARTY_PYTHON_LIBS_DIR)
             if os.path.isdir(
                 os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, name))
