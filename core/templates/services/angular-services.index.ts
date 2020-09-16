@@ -110,7 +110,6 @@ import { IneffectiveFeedbackLoopTaskObjectFactory } from 'domain/improvements/In
 import { NeedsGuidingResponsesTaskObjectFactory } from 'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
 import { SuccessiveIncorrectAnswersTaskObjectFactory } from 'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
 import { TaskEntryObjectFactory } from 'domain/improvements/TaskEntryObjectFactory';
-import { ExplorationImprovementsConfigObjectFactory } from 'domain/improvements/exploration-improvements-config-object.factory';
 import { LearnerDashboardActivityIdsObjectFactory } from 'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
@@ -447,8 +446,6 @@ export const angularServices: [string, unknown][] = [
   ['ExplorationHtmlFormatterService', ExplorationHtmlFormatterService],
   ['ExplorationImprovementsBackendApiService',
     ExplorationImprovementsBackendApiService],
-  ['ExplorationImprovementsConfigObjectFactory',
-    ExplorationImprovementsConfigObjectFactory],
   ['ExplorationImprovementsTaskRegistryService',
     ExplorationImprovementsTaskRegistryService],
   ['ExplorationMetadataObjectFactory', ExplorationMetadataObjectFactory],

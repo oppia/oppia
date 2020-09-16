@@ -183,8 +183,6 @@ import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { ExplorationImprovementsBackendApiService } from
   'services/exploration-improvements-backend-api.service';
-import { ExplorationImprovementsConfigObjectFactory } from
-  'domain/improvements/exploration-improvements-config-object.factory';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 import { ExplorationMetadataObjectFactory } from
@@ -750,8 +748,6 @@ export class UpgradedServices {
       new ExplorationDraftObjectFactory();
     upgradedServices['ExplorationFeaturesService'] =
       new ExplorationFeaturesService();
-    upgradedServices['ExplorationImprovementsConfigObjectFactory'] =
-      new ExplorationImprovementsConfigObjectFactory();
     upgradedServices['ExplorationPermissionsObjectFactory'] =
       new ExplorationPermissionsObjectFactory();
     upgradedServices['ExplorationMetadataObjectFactory'] =
@@ -1373,7 +1369,6 @@ export class UpgradedServices {
     upgradedServices['ExplorationImprovementsBackendApiService'] =
       new ExplorationImprovementsBackendApiService(
         upgradedServices['ExplorationTaskObjectFactory'],
-        upgradedServices['ExplorationImprovementsConfigObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationStatsBackendApiService'] =

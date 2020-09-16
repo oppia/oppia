@@ -16,9 +16,6 @@
  * @fileoverview Domain object for explorations' improvements configuration.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 export interface ExplorationImprovementsConfigBackendDict {
   'exploration_id': string;
   'exploration_version': number;
@@ -65,13 +62,8 @@ export class ExplorationImprovementsConfig {
         ' < ' + highBounceRateTaskStateBounceRateObsoletionThreshold);
     }
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ExplorationImprovementsConfigObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       backendDict: ExplorationImprovementsConfigBackendDict
   ): ExplorationImprovementsConfig {
     return new ExplorationImprovementsConfig(
@@ -83,7 +75,3 @@ export class ExplorationImprovementsConfigObjectFactory {
       backendDict.high_bounce_rate_task_minimum_exploration_starts);
   }
 }
-
-angular.module('oppia').factory(
-  'ExplorationImprovementsConfigObjectFactory',
-  downgradeInjectable(ExplorationImprovementsConfigObjectFactory));

@@ -12,26 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
+/**
+ * @fileoverview Tests for ExplorationImprovementsConfigModel.
+ */
+
 import {
   ExplorationImprovementsConfig,
   ExplorationImprovementsConfigBackendDict,
-  ExplorationImprovementsConfigObjectFactory,
-} from 'domain/improvements/exploration-improvements-config-object.factory';
-import { TestBed } from '@angular/core/testing';
+} from 'domain/improvements/exploration-improvements-config.model';
 
-/**
- * @fileoverview Tests for ExplorationImprovementsConfigObjectFactory.
- */
-
-describe('ExplorationImprovementsConfigObjectFactory', function() {
-  let explorationImprovementsConfigObjectFactory:
-    ExplorationImprovementsConfigObjectFactory;
-
-  beforeEach(() => {
-    explorationImprovementsConfigObjectFactory = (
-      TestBed.get(ExplorationImprovementsConfigObjectFactory));
-  });
-
+describe('ExplorationImprovementsConfigModel', function() {
   it('should return an instance with specified backend values', () => {
     let backendDict: ExplorationImprovementsConfigBackendDict = {
       exploration_id: 'eid',
@@ -43,7 +34,7 @@ describe('ExplorationImprovementsConfigObjectFactory', function() {
     };
 
     expect(
-      explorationImprovementsConfigObjectFactory.createFromBackendDict(
+      ExplorationImprovementsConfig.createFromBackendDict(
         backendDict))
       .toEqual(
         new ExplorationImprovementsConfig('eid', 1, true, 0.6, 0.5, 350));

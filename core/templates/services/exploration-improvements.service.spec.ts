@@ -21,7 +21,7 @@ import { StateObjectsBackendDict } from
 import { ExplorationPermissions } from
   'domain/exploration/exploration-permissions-object.factory';
 import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
+  'domain/improvements/exploration-improvements-config.model';
 import { HighBounceRateTaskObjectFactory } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
