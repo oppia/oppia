@@ -21,6 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { CollectionSummary } from 'domain/collection/collection-summary.model';
 require(
   'pages/learner-dashboard-page/learner-dashboard-page.component.ts');
 
@@ -34,7 +35,6 @@ describe('Learner dashboard page', function() {
   var $window = null;
   var AlertsService = null;
   var CollectionObjectFactory = null;
-  var collectionSummaryObjectFactory = null;
   var CsrfTokenService = null;
   var DateTimeFormatService = null;
   var ExplorationObjectFactory = null;
@@ -67,8 +67,6 @@ describe('Learner dashboard page', function() {
       $uibModal = $injector.get('$uibModal');
       $window = $injector.get('$window');
       CollectionObjectFactory = $injector.get('CollectionObjectFactory');
-      collectionSummaryObjectFactory = $injector.get(
-        'CollectionSummaryObjectFactory');
       CsrfTokenService = $injector.get('CsrfTokenService');
       DateTimeFormatService = $injector.get('DateTimeFormatService');
       ExplorationObjectFactory = $injector.get('ExplorationObjectFactory');
@@ -255,15 +253,15 @@ describe('Learner dashboard page', function() {
                 .createFromBackendDict(expSummary))),
           completedCollectionsList: (
             learnerDashboardData.completed_collections_list.map(
-              collectionSummary => collectionSummaryObjectFactory
+              collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
           incompleteCollectionsList: (
             learnerDashboardData.incomplete_collections_list.map(
-              collectionSummary => collectionSummaryObjectFactory
+              collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
           collectionPlaylist: (
             learnerDashboardData.collection_playlist.map(
-              collectionSummary => collectionSummaryObjectFactory
+              collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
           numberOfUnreadThreads: learnerDashboardData.number_of_unread_threads,
           threadSummaries: (
@@ -789,7 +787,7 @@ describe('Learner dashboard page', function() {
       var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
       // Get collection with id 11.
 
-      var activity = collectionSummaryObjectFactory.createFromBackendDict(
+      var activity = CollectionSummary.createFromBackendDict(
         learnerDashboardData.incomplete_collections_list[2]);
 
       ctrl.openRemoveActivityModal(
@@ -833,7 +831,7 @@ describe('Learner dashboard page', function() {
       var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
       var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
       // Get collection with id 2.
-      var activity = collectionSummaryObjectFactory.createFromBackendDict(
+      var activity = CollectionSummary.createFromBackendDict(
         learnerDashboardData.collection_playlist[1]);
 
       ctrl.openRemoveActivityModal(

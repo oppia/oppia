@@ -118,8 +118,6 @@ import { CollectionRightsBackendApiService } from
   'domain/collection/collection-rights-backend-api.service';
 import { CollectionRightsObjectFactory } from
   'domain/collection/CollectionRightsObjectFactory';
-import { CollectionSummaryObjectFactory } from
-  'domain/collection/collection-summary-object.factory';
 import { CollectionValidationService } from
   'domain/collection/collection-validation.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
@@ -732,8 +730,6 @@ export class UpgradedServices {
       new CollectionPlaythroughObjectFactory();
     upgradedServices['CollectionRightsObjectFactory'] =
       new CollectionRightsObjectFactory();
-    upgradedServices['CollectionSummaryObjectFactory'] =
-      new CollectionSummaryObjectFactory();
     upgradedServices['CollectionValidationService'] =
       new CollectionValidationService();
     upgradedServices['ComputationDataObjectFactory'] =
@@ -1361,7 +1357,6 @@ export class UpgradedServices {
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['CollectionSummaryObjectFactory'],
         upgradedServices['CreatorDashboardStatsObjectFactory'],
         upgradedServices['CreatorExplorationSummaryObjectFactory'],
         upgradedServices['ProfileSummaryObjectFactory'],
@@ -1408,7 +1403,6 @@ export class UpgradedServices {
     upgradedServices['LearnerDashboardBackendApiService'] =
       new LearnerDashboardBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['CollectionSummaryObjectFactory'],
         upgradedServices['FeedbackThreadSummaryObjectFactory'],
         upgradedServices['LearnerExplorationSummaryObjectFactory'],
         upgradedServices['NonExistentActivitiesObjectFactory'],

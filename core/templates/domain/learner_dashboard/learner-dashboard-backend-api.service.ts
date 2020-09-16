@@ -24,8 +24,7 @@ import { Injectable } from '@angular/core';
 import {
   CollectionSummary,
   CollectionSummaryBackendDict,
-  CollectionSummaryObjectFactory
-} from 'domain/collection/collection-summary-object.factory';
+} from 'domain/collection/collection-summary.model';
 import {
   FeedbackThreadSummary,
   FeedbackThreadSummaryObjectFactory,
@@ -81,7 +80,6 @@ interface LearnerDashboardData {
 export class LearnerDashboardBackendApiService {
   constructor(
     private http: HttpClient,
-    private collectionSummaryObjectFactory: CollectionSummaryObjectFactory,
     private feedbackThreadSummaryObjectFactory:
     FeedbackThreadSummaryObjectFactory,
     private learnerExplorationSummaryObjectFactory:
@@ -109,15 +107,15 @@ export class LearnerDashboardBackendApiService {
                 .createFromBackendDict(expSummary))),
           completedCollectionsList: (
             dashboardData.completed_collections_list.map(
-              collectionSummary => this.collectionSummaryObjectFactory
+              collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
           incompleteCollectionsList: (
             dashboardData.incomplete_collections_list.map(
-              collectionSummary => this.collectionSummaryObjectFactory
+              collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
           collectionPlaylist: (
             dashboardData.collection_playlist.map(
-              collectionSummary => this.collectionSummaryObjectFactory
+              collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
           numberOfUnreadThreads: dashboardData.number_of_unread_threads,
           threadSummaries: (

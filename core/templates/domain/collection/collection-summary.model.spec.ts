@@ -12,20 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Unit tests for collectio  Summary Object Factory.
  */
 
-import { CollectionSummaryObjectFactory } from
-  'domain/collection/collection-summary-object.factory';
+import { CollectionSummary } from './collection-summary.model';
 
 describe('Collection summary object factory', () => {
-  let csof: CollectionSummaryObjectFactory;
-
-  beforeEach(() => {
-    csof = new CollectionSummaryObjectFactory();
-  });
-
   it('should correctly convert dict to collection summary object', () => {
     let backendDict = {
       last_updated_msec: 1591296737470.528,
@@ -42,7 +36,8 @@ describe('Collection summary object factory', () => {
       node_count: 0
     };
 
-    let collectionSummaryObject = csof.createFromBackendDict(backendDict);
+    let collectionSummaryObject =
+      CollectionSummary.createFromBackendDict(backendDict);
 
     expect(collectionSummaryObject.lastUpdatedMsec).toEqual(1591296737470.528);
     expect(collectionSummaryObject.communityOwned).toEqual(false);

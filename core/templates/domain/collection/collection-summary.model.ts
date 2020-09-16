@@ -16,9 +16,6 @@
  * @fileoverview Frontend domain object factory for collection summary.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface CollectionSummaryBackendDict {
   'category': string;
   'community_owned': boolean;
@@ -48,13 +45,8 @@ export class CollectionSummary {
     public thumbnailIconUrl: string,
     public title: string,
     public nodeCount: number) {}
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class CollectionSummaryObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       collectionSummaryDict: CollectionSummaryBackendDict): CollectionSummary {
     return new CollectionSummary(
       collectionSummaryDict.category,
@@ -71,7 +63,3 @@ export class CollectionSummaryObjectFactory {
       collectionSummaryDict.node_count);
   }
 }
-
-angular.module('oppia').factory(
-  'CollectionSummaryObjectFactory',
-  downgradeInjectable(CollectionSummaryObjectFactory));

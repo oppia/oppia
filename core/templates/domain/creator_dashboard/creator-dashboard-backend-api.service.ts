@@ -24,8 +24,7 @@ import { Injectable } from '@angular/core';
 import {
   CollectionSummary,
   CollectionSummaryBackendDict,
-  CollectionSummaryObjectFactory
-} from 'domain/collection/collection-summary-object.factory';
+} from 'domain/collection/collection-summary.model';
 import {
   CreatorDashboardStatsBackendDict,
   CreatorDashboardStats,
@@ -100,8 +99,6 @@ interface CreatorDashboardData {
 export class CreatorDashboardBackendApiService {
   constructor(
     private http: HttpClient,
-    private collectionSummaryObjectFactory:
-    CollectionSummaryObjectFactory,
     private creatorDashboardStatsObjectFactory:
     CreatorDashboardStatsObjectFactory,
     private creatorExplorationSummaryObjectFactory:
@@ -182,7 +179,7 @@ export class CreatorDashboardBackendApiService {
           expSummary => this.creatorExplorationSummaryObjectFactory
             .createFromBackendDict(expSummary)),
         collectionsList: dashboardData.collections_list.map(
-          collectionSummary => this.collectionSummaryObjectFactory
+          collectionSummary => CollectionSummary
             .createFromBackendDict(collectionSummary)),
         topicSummaries: (
           dashboardData.topic_summary_dicts ? (

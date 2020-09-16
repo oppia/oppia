@@ -18,6 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // creator-dashboard-page.component.ts is upgraded to Angular 8.
+
+import { CollectionSummary, CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/creator-dashboard-page/creator-dashboard-page.component.ts');
@@ -52,7 +54,6 @@ describe('Creator dashboard controller', () => {
   var $rootScope = null;
   var $window = null;
   var AlertsService = null;
-  var collectionSummaryObjectFactory = null;
   var CreatorDashboardBackendApiService = null;
   var creatorDashboardStatsObjectFactory = null;
   var creatorExplorationSummaryObjectFactory = null;
@@ -83,8 +84,6 @@ describe('Creator dashboard controller', () => {
     $window = $injector.get('$window');
 
     AlertsService = $injector.get('AlertsService');
-    collectionSummaryObjectFactory = $injector.get(
-      'CollectionSummaryObjectFactory');
     CreatorDashboardBackendApiService = $injector.get(
       'CreatorDashboardBackendApiService');
     creatorDashboardStatsObjectFactory = $injector.get(
@@ -322,7 +321,7 @@ describe('Creator dashboard controller', () => {
               expSummary => creatorExplorationSummaryObjectFactory
                 .createFromBackendDict(expSummary)),
             collectionsList: dashboardData.collections_list.map(
-              collectionSummary => collectionSummaryObjectFactory
+              collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))
           }));
         spyOn(UserService, 'getUserInfoAsync').and.returnValue(
@@ -624,8 +623,9 @@ describe('Creator dashboard controller', () => {
             expSummary => creatorExplorationSummaryObjectFactory
               .createFromBackendDict(expSummary)),
           collectionsList: dashboardData.collections_list.map(
-            collectionSummary => collectionSummaryObjectFactory
-              .createFromBackendDict(collectionSummary))
+            (collectionSummary: unknown) => CollectionSummary
+              .createFromBackendDict(
+                collectionSummary as CollectionSummaryBackendDict))
         }));
 
       ctrl.$onInit();
@@ -722,7 +722,7 @@ describe('Creator dashboard controller', () => {
             expSummary => creatorExplorationSummaryObjectFactory
               .createFromBackendDict(expSummary)),
           collectionsList: dashboardData.collections_list.map(
-            collectionSummary => collectionSummaryObjectFactory
+            collectionSummary => CollectionSummary
               .createFromBackendDict(collectionSummary))
         }));
 
