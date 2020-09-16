@@ -20,18 +20,16 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { FeatureStatusSummaryObjectFactory } from
-  'domain/platform_feature/feature-status-summary-object.factory';
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
 import { PlatformFeatureDomainConstants } from
   'domain/platform_feature/platform-feature-domain.constants';
 import { ClientContext } from './client-context.model';
+import { FeatureStatusSummary } from './feature-status-summary.model';
 
 describe('PlatformFeatureBackendApiService', () => {
   let httpTestingController: HttpTestingController;
   let platformFeatureBackendApiService: PlatformFeatureBackendApiService;
-  let featureStatusSummaryObjectFactory: FeatureStatusSummaryObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -41,8 +39,6 @@ describe('PlatformFeatureBackendApiService', () => {
     platformFeatureBackendApiService = TestBed.get(
       PlatformFeatureBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
-    featureStatusSummaryObjectFactory = TestBed.get(
-      FeatureStatusSummaryObjectFactory);
   });
 
   afterEach(() => {
@@ -76,7 +72,7 @@ describe('PlatformFeatureBackendApiService', () => {
 
         flushMicrotasks();
         expect(successHandler).toHaveBeenCalledWith(
-          featureStatusSummaryObjectFactory.createFromBackendDict(responseDict)
+          FeatureStatusSummary.createFromBackendDict(responseDict)
         );
         expect(failHandler).not.toHaveBeenCalled();
       })

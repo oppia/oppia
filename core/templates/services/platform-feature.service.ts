@@ -42,9 +42,8 @@ import { PlatformFeatureBackendApiService } from
 import {
   FeatureNames,
   FeatureStatusSummary,
-  FeatureStatusSummaryObjectFactory,
   FeatureStatusChecker
-} from 'domain/platform_feature/feature-status-summary-object.factory';
+} from 'domain/platform_feature/feature-status-summary.model';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -84,8 +83,6 @@ export class PlatformFeatureService {
   constructor(
       private platformFeatureBackendApiService:
         PlatformFeatureBackendApiService,
-      private featureStatusSummaryObjectFactory:
-        FeatureStatusSummaryObjectFactory,
       private i18nLanguageCodeService: I18nLanguageCodeService,
       private windowRef: WindowRef,
       private loggerService: LoggerService,
@@ -168,8 +165,8 @@ export class PlatformFeatureService {
       // erased, leading to the 'Registration session expired' error.
       if (this.urlService.getPathname() === '/signup') {
         PlatformFeatureService._isSkipped = true;
-        PlatformFeatureService.featureStatusSummary = this
-          .featureStatusSummaryObjectFactory.createDefault();
+        PlatformFeatureService.featureStatusSummary =
+          FeatureStatusSummary.createDefault();
         return;
       }
 
@@ -181,8 +178,8 @@ export class PlatformFeatureService {
         'Error during initialization of PlatformFeatureService: ' +
         `${err.message ? err.message : err}`);
       // If any error, just disable all features.
-      PlatformFeatureService.featureStatusSummary = this
-        .featureStatusSummaryObjectFactory.createDefault();
+      PlatformFeatureService.featureStatusSummary =
+        FeatureStatusSummary.createDefault();
       PlatformFeatureService._isInitializedWithError = true;
       this.clearSavedResults();
     }
@@ -231,7 +228,7 @@ export class PlatformFeatureService {
         timestamp: savedObj.timestamp,
         sessionId: savedObj.sessionId,
         featureStatusSummary: (
-          this.featureStatusSummaryObjectFactory.createFromBackendDict(
+          FeatureStatusSummary.createFromBackendDict(
             savedObj.featureStatusSummary))
       };
     }

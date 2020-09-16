@@ -212,8 +212,6 @@ import { ExtractImageFilenamesFromStateService } from
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 import { FeaturedTranslationLanguageObjectFactory } from
   'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
-import { FeatureStatusSummaryObjectFactory } from
-  'domain/platform_feature/feature-status-summary-object.factory';
 import { FeedbackMessageSummaryObjectFactory } from
   'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from
@@ -730,8 +728,6 @@ export class UpgradedServices {
     upgradedServices['ExternalSaveService'] = new ExternalSaveService();
     upgradedServices['FeaturedTranslationLanguageObjectFactory'] =
       new FeaturedTranslationLanguageObjectFactory();
-    upgradedServices['FeatureStatusSummaryObjectFactory'] =
-      new FeatureStatusSummaryObjectFactory();
     upgradedServices['FeedbackMessageSummaryObjectFactory'] =
       new FeedbackMessageSummaryObjectFactory();
     upgradedServices['FeedbackThreadSummaryObjectFactory'] =
@@ -1350,8 +1346,7 @@ export class UpgradedServices {
           upgradedServices['LearnerDashboardActivityIdsObjectFactory']);
     upgradedServices['PlatformFeatureBackendApiService'] =
       new PlatformFeatureBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['FeatureStatusSummaryObjectFactory']
+        upgradedServices['HttpClient']
       );
     upgradedServices['PlatformFeatureAdminBackendApiService'] =
       new PlatformFeatureAdminBackendApiService(
@@ -1512,7 +1507,6 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe']);
     upgradedServices['PlatformFeatureService'] = new PlatformFeatureService(
       upgradedServices['PlatformFeatureBackendApiService'],
-      upgradedServices['FeatureStatusSummaryObjectFactory'],
       upgradedServices['I18nLanguageCodeService'],
       upgradedServices['WindowRef'],
       upgradedServices['LoggerService'],

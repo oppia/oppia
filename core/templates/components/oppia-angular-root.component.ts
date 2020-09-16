@@ -244,8 +244,6 @@ import { ExtractImageFilenamesFromStateService } from
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 import { FeaturedTranslationLanguageObjectFactory } from
   'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
-import { FeatureStatusSummaryObjectFactory } from
-  'domain/platform_feature/feature-status-summary-object.factory';
 import { FeedbackMessageSummaryObjectFactory } from
   'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from
@@ -784,7 +782,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static externalSaveService: ExternalSaveService;
   static extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService;
   static featuredTranslationLanguageObjectFactory: FeaturedTranslationLanguageObjectFactory;
-  static featureStatusSummaryObjectFactory: FeatureStatusSummaryObjectFactory;
   static feedbackMessageSummaryObjectFactory: FeedbackMessageSummaryObjectFactory;
   static feedbackThreadObjectFactory: FeedbackThreadObjectFactory;
   static feedbackThreadSummaryObjectFactory: FeedbackThreadSummaryObjectFactory;
@@ -1104,7 +1101,6 @@ private extensionTagAssemblerService: ExtensionTagAssemblerService,
 private externalSaveService: ExternalSaveService,
 private extractImageFilenamesFromStateService: ExtractImageFilenamesFromStateService,
 private featuredTranslationLanguageObjectFactory: FeaturedTranslationLanguageObjectFactory,
-private featureStatusSummaryObjectFactory: FeatureStatusSummaryObjectFactory,
 private feedbackMessageSummaryObjectFactory: FeedbackMessageSummaryObjectFactory,
 private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
 private feedbackThreadSummaryObjectFactory: FeedbackThreadSummaryObjectFactory,
@@ -1425,7 +1421,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.externalSaveService = this.externalSaveService;
     OppiaAngularRootComponent.extractImageFilenamesFromStateService = this.extractImageFilenamesFromStateService;
     OppiaAngularRootComponent.featuredTranslationLanguageObjectFactory = this.featuredTranslationLanguageObjectFactory;
-    OppiaAngularRootComponent.featureStatusSummaryObjectFactory = this.featureStatusSummaryObjectFactory;
     OppiaAngularRootComponent.feedbackMessageSummaryObjectFactory = this.feedbackMessageSummaryObjectFactory;
     OppiaAngularRootComponent.feedbackThreadObjectFactory = this.feedbackThreadObjectFactory;
     OppiaAngularRootComponent.feedbackThreadSummaryObjectFactory = this.feedbackThreadSummaryObjectFactory;

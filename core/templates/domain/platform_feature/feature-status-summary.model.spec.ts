@@ -13,22 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for FeatureStatusSummaryObjectFactory.
+ * @fileoverview Unit tests for feature-status-summary-model.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { FeatureStatusSummaryObjectFactory, FeatureNames } from
-  './feature-status-summary-object.factory';
+import { FeatureStatusSummary, FeatureNames } from
+  './feature-status-summary.model';
 
 describe('FeatureStatusSummaryObjectFactory', () => {
-  let factory: FeatureStatusSummaryObjectFactory;
-
-  beforeEach(() => {
-    factory = TestBed.get(FeatureStatusSummaryObjectFactory);
-  });
-
   it('should create an instance from a backend dict.', () => {
-    const summary = factory.createFromBackendDict({
+    const summary = FeatureStatusSummary.createFromBackendDict({
       [FeatureNames.DummyFeature]: true,
     });
 
@@ -39,13 +32,13 @@ describe('FeatureStatusSummaryObjectFactory', () => {
     const backendDict = {
       [FeatureNames.DummyFeature]: true,
     };
-    const summary = factory.createFromBackendDict(backendDict);
+    const summary = FeatureStatusSummary.createFromBackendDict(backendDict);
     expect(summary.toBackendDict()).toEqual(backendDict);
   });
 
   describe('.isFeatureEnabled', () => {
     it('should return the value of the parameter', () => {
-      const summary = factory.createFromBackendDict({
+      const summary = FeatureStatusSummary.createFromBackendDict({
         [FeatureNames.DummyFeature]: true
       });
       const checker = summary.toStatusChecker();
@@ -54,7 +47,7 @@ describe('FeatureStatusSummaryObjectFactory', () => {
     });
 
     it('should throw if the feature status is missing in backend dict.', () => {
-      const summary = factory.createFromBackendDict({});
+      const summary = FeatureStatusSummary.createFromBackendDict({});
       const checker = summary.toStatusChecker();
 
       expect(

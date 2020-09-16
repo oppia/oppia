@@ -16,9 +16,6 @@
  * @fileoverview Factory for creating FeatureStatusSummary domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 /**
  * Names of all feature flags should be defined here, with format:
  * FeatureName = 'feature_name', where the LHS is the feature name in
@@ -80,6 +77,25 @@ export class FeatureStatusSummary {
     this.featureNameToFlag = new Map(Object.entries(backendDict));
   }
 
+  static createFromBackendDict(
+      backendDict: FeatureStatusSummaryBackendDict): FeatureStatusSummary {
+    return new FeatureStatusSummary(backendDict);
+  }
+
+  /**
+   * Creates a default FeatureStatusSummary object such that all features are
+   * disabled.
+   *
+   * @returns {FeatureStatusSummary} - The FeatureStatusSummary object instance
+   *     with all feature disabled.
+   */
+  static createDefault(): FeatureStatusSummary {
+    const defaultDict: FeatureStatusSummaryBackendDict = {};
+    Object.keys(FeatureNames).forEach(
+      name => defaultDict[FeatureNames[name]] = false);
+    return this.createFromBackendDict(defaultDict);
+  }
+
   /**
    * Creates a dict representation of the instance.
    *
@@ -124,31 +140,3 @@ export class FeatureStatusSummary {
     return this.featureNameToFlag.get(featureName);
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class FeatureStatusSummaryObjectFactory {
-  createFromBackendDict(
-      backendDict: FeatureStatusSummaryBackendDict): FeatureStatusSummary {
-    return new FeatureStatusSummary(backendDict);
-  }
-
-  /**
-   * Creates a default FeatureStatusSummary object such that all features are
-   * disabled.
-   *
-   * @returns {FeatureStatusSummary} - The FeatureStatusSummary object instance
-   *     with all feature disabled.
-   */
-  createDefault(): FeatureStatusSummary {
-    const defaultDict: FeatureStatusSummaryBackendDict = {};
-    Object.keys(FeatureNames).forEach(
-      name => defaultDict[FeatureNames[name]] = false);
-    return this.createFromBackendDict(defaultDict);
-  }
-}
-
-angular.module('oppia').factory(
-  'FeatureStatusSummaryObjectFactory',
-  downgradeInjectable(FeatureStatusSummaryObjectFactory));

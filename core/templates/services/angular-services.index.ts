@@ -114,7 +114,6 @@ import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { ExplorationOpportunitySummaryObjectFactory } from 'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 import { FeaturedTranslationLanguageObjectFactory } from 'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
 import { SkillOpportunityObjectFactory } from 'domain/opportunity/SkillOpportunityObjectFactory';
-import { FeatureStatusSummaryObjectFactory } from 'domain/platform_feature/feature-status-summary-object.factory';
 import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformFeatureBackendApiService } from 'domain/platform_feature/platform-feature-backend-api.service';
 import { PlatformParameterFilterObjectFactory } from 'domain/platform_feature/platform-parameter-filter-object.factory';
@@ -456,7 +455,6 @@ export const angularServices: [string, unknown][] = [
   ['ExternalSaveService', ExternalSaveService],
   ['ExtractImageFilenamesFromStateService',
     ExtractImageFilenamesFromStateService],
-  ['FeatureStatusSummaryObjectFactory', FeatureStatusSummaryObjectFactory],
   ['FeaturedTranslationLanguageObjectFactory',
     FeaturedTranslationLanguageObjectFactory],
   ['FeedbackMessageSummaryObjectFactory', FeedbackMessageSummaryObjectFactory],
