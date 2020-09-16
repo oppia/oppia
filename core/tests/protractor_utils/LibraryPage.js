@@ -17,6 +17,7 @@
  * tests.
  */
 
+var action = require('./action.js');
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
@@ -51,6 +52,7 @@ var LibraryPage = function() {
   var searchInputs = element.all(
     by.css('.protractor-test-search-input'));
   var mainHeader = element(by.css('.protractor-test-library-main-header'));
+  var searchButton = element(by.css('.protractor-test-search-button'));
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = async function(name) {
@@ -77,6 +79,11 @@ var LibraryPage = function() {
       await searchInputs.first());
     await searchInput.clear();
     await searchInput.sendKeys(searchQuery);
+    let currentUrl = await browser.getCurrentUrl();
+    if (currentUrl.includes('/learn')) {
+      await action.click('Search button', searchButton);
+      await waitFor.pageToFullyLoad();
+    }
   };
 
   this.get = async function() {

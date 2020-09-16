@@ -13,7 +13,7 @@
                ng-change="$ctrl.classroomPageIsActive ? null : $ctrl.onSearchQueryChangeExec()"
                ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 1000, 'blur': 0 } }" aria-label="Search bar">
         <div ng-if="$ctrl.classroomPageIsActive"
-             class="oppia-search-button"
+             class="oppia-search-button protractor-test-search-button"
              ng-click="$ctrl.onSearchQueryChangeExec()"
              title="Click here to search">
           Go!
