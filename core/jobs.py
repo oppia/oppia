@@ -26,6 +26,7 @@ import json
 import logging
 import traceback
 
+from core.domain import taskqueue_services
 from core.platform import models
 import python_utils
 import utils
@@ -42,7 +43,7 @@ from pipeline import pipeline
 
 (base_models, job_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.job])
-taskqueue_services = models.Registry.import_taskqueue_services()
+#taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
 MAPPER_PARAM_KEY_ENTITY_KINDS = 'entity_kinds'
@@ -895,6 +896,9 @@ class BaseMapReduceJobManager(BaseJobManager):
 
         mr_pipeline = MapReduceJobPipeline(
             job_id, '%s.%s' % (cls.__module__, cls.__name__), kwargs)
+        print("#######")
+        print(queue_name)
+
         mr_pipeline.start(
             base_path='/mapreduce/worker/pipeline', queue_name=queue_name)
 

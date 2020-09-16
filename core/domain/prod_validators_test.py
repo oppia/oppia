@@ -52,13 +52,13 @@ from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
+from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_query_services
 from core.domain import user_services
 from core.domain import wipeout_service
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils

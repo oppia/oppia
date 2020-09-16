@@ -86,7 +86,7 @@ class TasksTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
             # Send task and subsequent email to Editor.
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_oppia_tasks()
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
             expected_message = (
@@ -111,7 +111,7 @@ class TasksTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 3)
 
             # Send task and subsequent email to Editor.
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_oppia_tasks()
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
 
@@ -182,7 +182,7 @@ class TasksTests(test_utils.EmailTestBase):
                 self.assertEqual(len(messages), 0)
                 taskqueue_services.enqueue_task(
                     feconf.TASK_URL_SUGGESTION_EMAILS, payload, 0)
-                self.process_and_flush_pending_tasks()
+                self.process_and_flush_oppia_tasks()
 
                 # Check that user B received message.
                 messages = self._get_sent_email_messages(
@@ -223,7 +223,7 @@ class TasksTests(test_utils.EmailTestBase):
 
             # Invoke InstantFeedbackMessageEmail which sends
             # instantFeedbackMessage.
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_oppia_tasks()
 
             # Ensure that user A has an email sent now.
             messages = self._get_sent_email_messages(
@@ -263,7 +263,7 @@ class TasksTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
             # Invoke feedback status change email handler.
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_oppia_tasks()
 
             # Check that user A has 2 emails sent to him.
             # 1 instant feedback message email and 1 status change.
@@ -314,7 +314,7 @@ class TasksTests(test_utils.EmailTestBase):
                 self.assertEqual(len(messages), 0)
 
                 # Invoke Flag Exploration Email Handler.
-                self.process_and_flush_pending_tasks()
+                self.process_and_flush_oppia_tasks()
 
                 # Ensure moderator has 1 email now.
                 messages = self._get_sent_email_messages(

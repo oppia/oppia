@@ -32,6 +32,7 @@ from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import rights_manager
 from core.domain import state_domain
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -44,7 +45,6 @@ import utils
         models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
         models.NAMES.classifier]))
 search_services = models.Registry.import_search_services()
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 # This mock should be used only in ExplorationContentValidationJobForCKEditor

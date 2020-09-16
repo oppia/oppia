@@ -23,8 +23,8 @@ from core import jobs_registry
 from core.domain import event_services
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
+from core.domain import taskqueue_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
@@ -129,7 +129,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
 
             feedback_services.create_thread(
                 'exploration', exp_id_1, self.owner_id, 'subject', 'text')
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_oppia_tasks()
             feedback_threads = (
                 MockFeedbackAnalyticsAggregator.get_thread_analytics_multi(
                     [exp_id_1, exp_id_2]))
@@ -478,7 +478,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
         """Processes and flushes the pending tasks, then checks the thread
         analytics dict.
         """
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_oppia_tasks()
         self.assertEqual(
             MockFeedbackAnalyticsAggregator.get_thread_analytics(
                 exp_id).to_dict(), expected_thread_analytics_dict)
@@ -596,7 +596,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(exp_id, self.owner_id)
 
             # Trigger thread creation events.
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_oppia_tasks()
             feedback_services.create_thread(
                 'exploration', exp_id, None, 'a subject', 'some text')
 
@@ -681,8 +681,21 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
             user_id = 'uid'
             exp_id = 'eid'
             self.save_new_valid_exploration(exp_id, self.owner_id)
+
+            self._flush_tasks_and_check_analytics(
+                exp_id, {
+                    'num_open_threads': 0,
+                    'num_total_threads': 0,
+                })
+
             feedback_services.create_thread(
                 'exploration', exp_id, None, 'a subject', 'some text')
+
+            self._flush_tasks_and_check_analytics(
+                exp_id, {
+                    'num_open_threads': 1,
+                    'num_total_threads': 1,
+                })
 
             # Start job.
             self.process_and_flush_pending_tasks()

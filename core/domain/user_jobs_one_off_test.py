@@ -33,6 +33,7 @@ from core.domain import rating_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import subscription_services
+from core.domain import taskqueue_services
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
 from core.domain import user_services
@@ -43,7 +44,6 @@ import python_utils
 
 (user_models, feedback_models, exp_models) = models.Registry.import_models(
     [models.NAMES.user, models.NAMES.feedback, models.NAMES.exploration])
-taskqueue_services = models.Registry.import_taskqueue_services()
 search_services = models.Registry.import_search_services()
 
 
@@ -1111,6 +1111,8 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
+        self.process_and_flush_oppia_tasks()
+
         MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
@@ -1149,6 +1151,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
+        self.process_and_flush_oppia_tasks()
         MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
@@ -1184,6 +1187,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
+        self.process_and_flush_oppia_tasks()
         MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 

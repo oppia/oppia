@@ -23,6 +23,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import interaction_jobs_one_off
 from core.domain import rights_manager
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -32,7 +33,6 @@ from core.tests import test_utils
         models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
         models.NAMES.classifier]))
 search_services = models.Registry.import_search_services()
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 # This mock should be used only in InteractionCustomizationArgsValidationJob.
@@ -59,13 +59,14 @@ def run_job_for_deleted_exp(
     # Check there is one job in the taskqueue corresponding to
     # delete_exploration_from_subscribed_users.
     self.assertEqual(
-        self.count_jobs_in_taskqueue(
+        self.count_jobs_in_oppia_taskqueue(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
     job_class.enqueue(job_id)
     self.assertEqual(
         self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 2)
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
     self.process_and_flush_pending_tasks()
+    self.process_and_flush_oppia_tasks()
 
     if check_error:
         with self.assertRaisesRegexp(error_type, error_msg):

@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import taskqueue_services
 from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
 from core.platform import models
@@ -26,7 +27,6 @@ import feconf
 (user_models, email_models) = models.Registry.import_models(
     [models.NAMES.user, models.NAMES.email])
 
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):

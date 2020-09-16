@@ -94,8 +94,9 @@ class StatsEventsHandler(BaseEventHandler):
         if cls._is_latest_version(exploration_id, exp_version):
             taskqueue_services.defer(
                 taskqueue_services.FUNCTION_ID_UPDATE_STATS,
-                taskqueue_services.QUEUE_NAME_STATS, exploration_id,
-                exp_version, aggregated_stats)
+                taskqueue_services.QUEUE_NAME_STATS,
+                exploration_id,
+                exp_version, aggregated_stats,)
             # taskqueue_services.defer(
             #     stats_services.update_stats,
             #     taskqueue_services.QUEUE_NAME_STATS, exploration_id,

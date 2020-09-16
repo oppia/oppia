@@ -32,10 +32,10 @@ from core.domain import exp_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import user_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils

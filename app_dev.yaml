@@ -244,6 +244,8 @@ libraries:
   version: "2.7.11"
 - name: webapp2
   version: "2.5.2"
+- name: grpcio
+  version: 1.0.0
 
 # This is an access connector that connects to the Google Cloud Redis instance
 # used for memory caching. Please replace PROJECT_ID with the correct project id

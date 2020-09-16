@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 
 from core.domain import takeout_domain_jobs_one_off
+from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -31,7 +32,6 @@ from google.appengine.ext import ndb
 (base_models, config_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.config])
 
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class SnapshotMetadataCommitMsgMigrationOneOffJobTests(

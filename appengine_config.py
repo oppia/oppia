@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import os
 import sys
 
+import pkg_resources
 from google.appengine.ext import vendor
 # Root path of the app.
 ROOT_PATH = os.path.dirname(__file__)
@@ -47,3 +48,9 @@ if os.path.isdir(OPPIA_TOOLS_PATH):
 # add it using the vendor library. More information can be found here:
 # https://cloud.google.com/appengine/docs/standard/python/tools/using-libraries-python-27
 vendor.add(os.path.join(THIRD_PARTY_PATH, 'python_libs'))
+pkg_resources.working_set.add_entry(
+    os.path.join(THIRD_PARTY_PATH, 'python_libs'))
+
+
+import six
+reload(six)

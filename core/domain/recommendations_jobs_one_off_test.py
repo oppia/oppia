@@ -27,13 +27,12 @@ from core.domain import recommendations_jobs_one_off
 from core.domain import recommendations_services
 from core.domain import recommendations_services_test
 from core.domain import rights_manager
+from core.domain import taskqueue_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 
 (exp_models, recommendations_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class ExplorationRecommendationsOneOffJobUnitTests(

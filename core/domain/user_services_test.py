@@ -995,7 +995,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
                 'average_ratings': None
             })
         MockUserStatsAggregator.start_computation()
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_oppia_tasks()
         self.assertEqual(
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.owner_id),
@@ -1045,12 +1045,12 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
                 'num_completions': 0,
                 'state_stats_mapping': {}
             })
-
         self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
         self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
+        self.process_and_flush_oppia_tasks()
         MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 

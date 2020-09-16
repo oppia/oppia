@@ -32,6 +32,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
+from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.platform import models
@@ -39,7 +40,6 @@ from core.tests import test_utils
 import python_utils
 
 
-taskqueue_services = models.Registry.import_taskqueue_services()
 (opportunity_models, story_models, exp_models) = models.Registry.import_models(
     [models.NAMES.opportunity, models.NAMES.story, models.NAMES.exploration])
 

@@ -48,9 +48,8 @@ class Emulator:
     """The queues in the Emulator are not FIFO. Rather, they are priority queues: Elements are popped in the
     order of the time they are scheduled for, and only after the scheduled time.
     """
-    __hibernation_file = os.path.abspath('hibernate-emulator-task-queue.json')
 
-    def __init__(self, task_handler):
+    def __init__(self, task_handler, automatic_queue_handling=True):
         """
         :param task_handler: A callback function: It will receive the tasks
         :param hibernation: If True, queue state will be persisted at shutdown and reloaded at startup.
@@ -60,15 +59,16 @@ class Emulator:
         self.__lock = threading.Lock()
         self.__task_handler = task_handler
         self.__queues = {}
+        self.automatic_queue_handling = automatic_queue_handling
 
         tot = self.total_enqueued_tasks()
-        if tot:  # Walrus in Python 3.8!
+        if tot:
             log.info('Loaded %d tasks in %s queues', tot, len(self.__queues))
 
         self.__queue_threads = {}
-
-        for queue_name in self.__queues:  # Launch threads for loaded queues, if any.
-            self.__launch_queue_thread(queue_name)
+        if self.automatic_queue_handling:
+            for queue_name in self.__queues:  # Launch threads for loaded queues, if any.
+                self.__launch_queue_thread(queue_name)
 
     def __process_queue(self, queue_path):
         while True:
@@ -102,7 +102,8 @@ class Emulator:
         with self.__lock:
             if queue_name not in self.__queues:
                 self.__queues[queue_name] = []
-                self.__launch_queue_thread(queue_name)
+                if self.automatic_queue_handling:
+                    self.__launch_queue_thread(queue_name)
             queue = self.__queues[queue_name]
             task = Task(
                 queue_name, url, payload, scheduled_for=scheduled_for,
@@ -121,11 +122,32 @@ class Emulator:
     def total_enqueued_tasks(self):
         return sum(len(q) for q in self.__queues.values())
 
-    def get_filtered_tasks(self, queue_name=None):
-        if queue_name == None:
+    def get_number_of_tasks(self, queue_name=None):
+        if queue_name and queue_name in self.__queues:
+            return len(self.__queues[queue_name])
+        else:
+            return self.total_enqueued_tasks()
+
+    def _execute_tasks(self, task_list=[]):
+        for task in task_list:
+            self.__task_handler(
+                url=task.url, payload=task.payload,
+                queue_name=task.queue_name,
+                task_name=task.task_name)
+
+    def process_and_flush_tasks(self, queue_name=None):
+        if queue_name and queue_name in self.__queues:
+            self._execute_tasks(self.__queues[queue_name])
+            self.__queues[queue_name] = []
+        else:
+            for queue_name, task_list in self.__queues.items():
+                self._execute_tasks(task_list)
+                self.__queues[queue_name] = []
+
+    def get_tasks(self, queue_name):
+        if queue_name in self.__queues:
+            return self.__queues[queue_name]
+        else:
             tasks_list = []
             for queue_name, task_list in self.__queues.items():
                 tasks_list.extend(task_list)
-            return tasks_list
-        else:
-            return self.__queues[queue_name]

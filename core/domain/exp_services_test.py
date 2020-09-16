@@ -410,7 +410,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             subscription_services.get_exploration_ids_subscribed_to(
                 self.owner_id))
         exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_oppia_tasks()
         self.assertNotIn(
             self.EXP_ID_0,
             subscription_services.get_exploration_ids_subscribed_to(
@@ -597,7 +597,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_deletion_of_multiple_explorations_empty(self):
         """Test that delete_explorations with empty list works correctly."""
         exp_services.delete_explorations(self.owner_id, [])
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_oppia_tasks()
 
     def test_soft_deletion_of_multiple_explorations(self):
         """Test that soft deletion of explorations works correctly."""
@@ -3706,14 +3706,14 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
         rating_services.assign_rating_to_exploration(
             self.USER_ID_1, self.EXP_0_ID, 3)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_oppia_tasks()
         exp = exp_fetchers.get_exploration_summary_by_id(self.EXP_0_ID)
         self.assertEqual(
             exp_services.get_number_of_ratings(exp.ratings), 2)
 
         rating_services.assign_rating_to_exploration(
             self.USER_ID_2, self.EXP_0_ID, 5)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_oppia_tasks()
         exp = exp_fetchers.get_exploration_summary_by_id(self.EXP_0_ID)
         self.assertEqual(
             exp_services.get_number_of_ratings(exp.ratings), 3)

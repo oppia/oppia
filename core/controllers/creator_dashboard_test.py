@@ -32,6 +32,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
 from core.domain import user_services
@@ -44,7 +45,7 @@ import python_utils
     models.Registry.import_models(
         [models.NAMES.user, models.NAMES.statistics, models.NAMES.suggestion,
          models.NAMES.feedback]))
-taskqueue_services = models.Registry.import_taskqueue_services()
+#taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class OldNotificationsDashboardRedirectPageTest(test_utils.GenericTestBase):
@@ -195,7 +196,7 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         # Generate unique user ids to rate an exploration. Each user id needs
         # to be unique since each user can only give an exploration one rating.
         user_ids = ['user%d' % i for i in python_utils.RANGE(len(ratings))]
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_tasks()
         for ind, user_id in enumerate(user_ids):
             rating_services.assign_rating_to_exploration(
                 user_id, exp_id, ratings[ind])

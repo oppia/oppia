@@ -69,11 +69,12 @@ def defer(fn_identifier, queue_name, *args, **kwargs):
     '''
     # See https://developers.google.com/appengine/articles/deferred for details
     # on the _queue kwarg.
+    print("INNN==========================================")
     payload = {
         'fn_identifier': fn_identifier,
         'args': (args if args else []),
         'kwargs': (kwargs if kwargs else {})
-}
+    }
     platform_taskqueue_services.create_http_task(
         queue_name=queue_name, url=feconf.TASK_URL_DEFERRED,
         payload=payload)

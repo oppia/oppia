@@ -36,10 +36,10 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import taskqueue_services
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -1155,7 +1155,7 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
             'You can change your email preferences via the Preferences page.')
 
         with self.can_send_emails_ctx:
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_oppia_tasks()
 
             messages = self._get_sent_email_messages(
                 self.MODERATOR_EMAIL)
@@ -1567,7 +1567,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'issue_schema_version': 1,
             'playthrough_id': None
         }, csrf_token=self.csrf_token)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_oppia_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 1)
@@ -1584,7 +1584,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'playthrough_data': self.playthrough_data,
             'issue_schema_version': 1,
         }, csrf_token=self.csrf_token)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_oppia_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 2)
@@ -1652,7 +1652,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'playthrough_data': self.playthrough_data,
             'issue_schema_version': 1,
         }, csrf_token=self.csrf_token)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_oppia_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 2)
@@ -1720,7 +1720,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'playthrough_data': self.playthrough_data,
             'issue_schema_version': 1,
         }, csrf_token=self.csrf_token)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_oppia_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 3)
@@ -1742,7 +1742,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'playthrough_data': self.playthrough_data,
             'issue_schema_version': 1,
         }, csrf_token=self.csrf_token)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_oppia_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 1)
@@ -1820,9 +1820,9 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
                 'aggregated_stats': self.aggregated_stats,
                 'exp_version': self.exp_version})
 
-        self.assertEqual(self.count_jobs_in_taskqueue(
+        self.assertEqual(self.count_jobs_in_oppia_taskqueue(
             taskqueue_services.QUEUE_NAME_STATS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_oppia_tasks()
 
         # Check that the models are updated.
         exploration_stats = stats_services.get_exploration_stats_by_id(

@@ -175,26 +175,38 @@ class TaskqueueServicesStub(python_utils.OBJECT):
     """The stub class that mocks the API functionality offered by the platform
     layer, namely the platform.taskqueue taskqueue services API.
     """
-    client = cloud_tasks_emulator.Emulator(task_handler=self._task_handler)
+
     def __init__(self, test_base):
         self.test_base = test_base
+        self.client = cloud_tasks_emulator.Emulator(
+            task_handler=self._task_handler, automatic_queue_handling=False)
 
     def _task_handler(self, url, payload, queue_name, task_name=None):
-        headers = {}
-        headers['X-Appengine-QueueName'] = queue_name
-        headers['X-Appengine-TaskName'] = task_name
-        headers['X-Appengine-TaskRetryCount'] = '0'
-        headers['X-Appengine-TaskExecutionCount'] = '0'
-        headers['X-Appengine-TaskETA'] = '0'
-        headers['X-AppEngine-Fake-Is-Admin'] = '1'
-        self.test_base.post_task(url=url, payload=payload, headers=headers)
+        headers = {
+            'X-Appengine-QueueName': python_utils.convert_to_bytes(queue_name),
+            'X-Appengine-TaskName': task_name if task_name else python_utils.convert_to_bytes('None'),
+            'X-AppEngine-Fake-Is-Admin': python_utils.convert_to_bytes('1')
+        }
+        csrf_token = self.test_base.get_new_csrf_token()
+        self.test_base.post_task(
+            url=url, payload=payload, csrf_token=csrf_token, headers=headers)
 
-    def create_http_task(
+    def create_http_task(self,
             queue_name, url, payload=None, scheduled_for=None, task_name=None):
-        client.create_task(queue_name, url, payload, scheduled_for, task_name)
+        # Causes the task to execute immediately by setting the scheduled_for
+        # time to 0. If we allow scheduled_for to be non-zero, then tests that
+        # rely on the actions made by the task will become unreliable.
+        scheduled_for = 0
+        self.client.create_task(queue_name, url, payload, scheduled_for, task_name)
 
+    def count_jobs_in_taskqueue(self, queue_name=None):
+        return self.client.get_number_of_tasks(queue_name=queue_name)
 
+    def process_and_flush_tasks(self, queue_name=None):
+        self.client.process_and_flush_tasks(queue_name=queue_name)
 
+    def get_pending_tasks(self, queue_name=None):
+        return self.client.get_tasks(queue_name=queue_name)
 class MemoryCacheServicesStub(python_utils.OBJECT):
     """The stub class that mocks the API functionality offered by the platform
     layer, namely the platform.cache cache services API.
@@ -1067,16 +1079,18 @@ tags: []
             expect_errors, headers=headers,
             expected_status_int=expected_status_int)
 
-    def post_task(self, url, payload, headers, expected_status_int=200):
+    def post_task(
+            self, url, payload, headers, csrf_token=None, expect_errors=False,
+            expected_status_int=200):
         """Put an object to the server by JSON with the specific headers
         specified; return the received object."""
-        data = {'payload': json.dumps(payload)}
+        if csrf_token:
+            payload['csrf_token'] = csrf_token
         app = webtest.TestApp(main_taskqueue.app)
-
-        json_response = self._send_post_request(
-            app, url, data,
-            expect_errors, headers=headers,
-            expected_status_int=expected_status_int)
+        json_response = app.post(
+            url, json.dumps(payload), content_type='application/json',
+            expect_errors=expect_errors, headers=headers,
+            status=expected_status_int)
 
     def put_json(self, url, payload, csrf_token=None, expected_status_int=200):
         """Put an object to the server by JSON; return the received object."""
@@ -2371,7 +2385,10 @@ class AppEngineTestBase(TestBase):
     # We can't instantiate the stub in setUp because the overrided
     # method run() executes before setUp() and run() requires the memory
     # cache stub.
-    memory_cache_services_stub = MemoryCacheServicesStub()
+    def __init__(self, *args, **kwargs):
+        super(AppEngineTestBase, self).__init__(*args, **kwargs)
+        self.memory_cache_services_stub = MemoryCacheServicesStub()
+        self.taskqueue_services_stub = TaskqueueServicesStub(self)
 
     def _delete_all_models(self):
         """Deletes all models from the NDB datastore."""
@@ -2403,13 +2420,9 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_files_stub()
         self.testbed.init_search_stub()
 
-        # The root path tells the testbed where to find the queue.yaml file.
-        self.taskqueue_stub = cloud_tasks_emulator.Emulator(
-            task_handler=post_json, hibernation=False)
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
         self.taskqueue_stub = self.testbed.get_stub(
             testbed.TASKQUEUE_SERVICE_NAME)
-
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
 
@@ -2430,6 +2443,9 @@ class AppEngineTestBase(TestBase):
                 https://docs.python.org/3/library/unittest.html#unittest.
                 TestCase.run.
         """
+        swap_create_task = self.swap(
+            platform_taskqueue_services, 'create_http_task',
+            self.taskqueue_services_stub.create_http_task)
         swap_flush_cache = self.swap(
             memory_cache_services, 'flush_cache',
             self.memory_cache_services_stub.flush_cache)
@@ -2445,7 +2461,7 @@ class AppEngineTestBase(TestBase):
         swap_delete_multi = self.swap(
             memory_cache_services, 'delete_multi',
             self.memory_cache_services_stub.delete_multi)
-        with swap_flush_cache, swap_get_multi, swap_set_multi:
+        with swap_flush_cache, swap_get_multi, swap_set_multi, swap_create_task:
             with swap_get_memory_cache_stats, swap_delete_multi:
                 super(AppEngineTestBase, self).run(result=result)
 
@@ -2500,6 +2516,19 @@ class AppEngineTestBase(TestBase):
             # Enables the testbed urlfetch mock.
             self.testbed.init_urlfetch_stub()
 
+    def count_jobs_in_oppia_taskqueue(self, queue_name=None):
+        """Counts the jobs in the given queue."""
+        return self.taskqueue_services_stub.count_jobs_in_taskqueue(
+            queue_name=queue_name)
+
+    def process_and_flush_oppia_tasks(self, queue_name=None):
+        return self.taskqueue_services_stub.process_and_flush_tasks(
+            queue_name=queue_name)
+
+    def get_pending_oppia_tasks(self, queue_name=None):
+        return self.taskqueue_services_stub.get_pending_tasks(
+            queue_name=queue_name)
+
     def count_jobs_in_taskqueue(self, queue_name):
         """Counts the jobs in the given queue."""
         return len(self.get_pending_tasks(queue_name=queue_name))
@@ -2508,7 +2537,11 @@ class AppEngineTestBase(TestBase):
         """Returns the jobs in the given queue. If queue_name is None, defaults
         to returning the jobs in all available queues.
         """
-        return self.taskqueue_stub.get_filtered_tasks(queue_name=queue_name)
+        if queue_name is not None:
+            return self.taskqueue_stub.get_filtered_tasks(
+                queue_names=[queue_name])
+        else:
+            return self.taskqueue_stub.get_filtered_tasks()
 
     def _execute_tasks(self, tasks):
         """Execute queued tasks.
@@ -2761,6 +2794,7 @@ class AuditJobsTestBase(GenericTestBase):
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
+        self.process_and_flush_oppia_tasks()
         actual_output = self.job_class.get_output(job_id)
         if literal_eval:
             actual_output_dict = {}

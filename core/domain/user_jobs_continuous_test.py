@@ -34,6 +34,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import stats_domain
 from core.domain import stats_services
+from core.domain import taskqueue_services
 from core.domain import user_jobs_continuous
 from core.domain import user_services
 from core.platform import models
@@ -44,7 +45,6 @@ import utils
 
 (exp_models, stats_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics, models.NAMES.user])
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 COLLECTION_ID = 'cid'
 COLLECTION_TITLE = 'Title'
@@ -669,6 +669,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
             stats_services, 'get_exploration_stats', self.mock_get_statistics)
         with get_statistics_swap, user_stats_aggregator_swap:
             MockUserStatsAggregator.start_computation()
+            self.process_and_flush_oppia_tasks()
             self.process_and_flush_pending_tasks()
 
     def _generate_user_ids(self, count):
@@ -710,21 +711,21 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         id.
         """
         user_ids = self._generate_user_ids(len(ratings))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_oppia_tasks()
         for ind, user_id in enumerate(user_ids):
             event_services.RateExplorationEventHandler.record(
                 exp_id, user_id, ratings[ind], None)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_oppia_tasks()
 
     def _record_exploration_rating_for_user(
             self, exp_id, user_id, rating, old_rating=None):
         """Records the exploration rating provided by the user corresponding to
         the given user id.
         """
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_oppia_tasks()
         event_services.RateExplorationEventHandler.record(
             exp_id, user_id, rating, old_rating)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_oppia_tasks()
 
     def test_stats_for_user_with_no_explorations(self):
         """Test that a user who is not a contributor on any exploration

@@ -1956,7 +1956,8 @@ def update_dashboard_stats_log(user_id):
 
     if model.schema_version != feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
         _migrate_dashboard_stats_to_latest_schema(model)
-
+    print("+++++++++")
+    print(model.total_plays)
     weekly_dashboard_stats = {
         get_current_date_as_string(): {
             'num_ratings': model.num_ratings or 0,

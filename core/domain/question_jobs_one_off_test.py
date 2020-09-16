@@ -23,11 +23,11 @@ import ast
 
 from core.domain import question_jobs_one_off
 from core.domain import question_services
+from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
 
-taskqueue_services = models.Registry.import_taskqueue_services()
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
 
