@@ -765,6 +765,35 @@ def get_user_role_from_id(user_id):
     return user_settings.role
 
 
+def _create_user_contribution_rights_from_model(user_contribution_rights_model):
+    """Creates a UserContributionRights object from the given model. If the
+    model is None, an empty UserContributionRights object is returned.
+
+    Args:
+        user_contribution_rights_model: UserContributionRightsModel. The model
+            used to create the UserContributionRights domain object.
+
+    Returns:
+        UserContributionRights. The UserContributionRights domain object
+        associated with the model, or an empty UserContributionRights domain
+        object if the model is None.
+    """
+    if user_contribution_rights_model is not None:
+        return user_domain.UserContributionRights(
+            user_contribution_rights_model.id,
+            (
+                user_contribution_rights_model
+                .can_review_translation_for_language_codes
+            ),
+            (
+                user_contribution_rights_model
+                .can_review_voiceover_for_language_codes
+            ),
+            user_contribution_rights_model.can_review_questions)
+    else:
+        return user_domain.UserContributionRights('', [], [], False)
+
+
 def get_user_contribution_rights(user_id):
     """Returns the UserContributionRights domain object for the given user_id.
 
@@ -796,22 +825,13 @@ def get_users_contribution_rights(user_ids):
     users_contribution_rights = []
     for index, user_contribution_rights_model in enumerate(
             user_contribution_rights_models):
-        if user_contribution_rights_model is not None:
-            users_contribution_rights.append(user_domain.UserContributionRights(
-                user_ids[index],
-                (
-                    user_contribution_rights_model
-                    .can_review_translation_for_language_codes
-                ),
-                (
-                    user_contribution_rights_model
-                    .can_review_voiceover_for_language_codes
-                ),
-                user_contribution_rights_model.can_review_questions))
-        else:
-            users_contribution_rights.append(
-                user_domain.UserContributionRights(
-                    user_ids[index], [], [], False))
+        user_contribution_rights = _create_user_contribution_rights_from_model(
+            user_contribution_rights_model
+        )
+        if user_contribution_rights_model is None:
+            # Need to initalize the user id.
+            user_contribution_rights.id = user_ids[index]
+        users_contribution_rights.append(user_contribution_rights)
 
     return users_contribution_rights
 
@@ -847,11 +867,15 @@ def get_all_reviewers_contribution_rights():
     Returns:
         list(UserContributionRights). A list of UserContributionRights objects.
     """
-    reviewer_models = user_models.UserContributionRightsModel.get_all()
-    return [user_domain.UserContributionRights(
-        model.id, model.can_review_translation_for_language_codes,
-        model.can_review_voiceover_for_language_codes,
-        model.can_review_questions) for model in reviewer_models]
+    user_contribution_rights_models = (
+        user_models.UserContributionRightsModel.get_all()
+    )
+
+    return [
+        _create_user_contribution_rights_from_model(
+            user_contribution_rights_model) for user_contribution_rights_model
+        in user_contribution_rights_models
+    ]
 
 
 def _save_user_contribution_rights(user_contribution_rights):
