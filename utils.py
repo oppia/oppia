@@ -841,6 +841,36 @@ def compute_list_difference(list_a, list_b):
     return list(set(list_a) - set(list_b))
 
 
+def is_appengine_development_environment():
+    """Returns if the app is being run locally in a development server.
+    More information can be found here:
+    https://cloud.google.com/appengine/docs/standard/python/tools/
+    using-local-server#detecting_application_runtime_environment
+
+    Returns:
+        bool. Whether the current instance is running locally on a developer's
+        computer.
+    """
+    return ('APPENGINE_RUNTIME' in os.environ and
+            'Development/' in os.environ['SERVER_SOFTWARE'])
+
+
+def is_appengine_production_environment():
+    """Returns if the app is being run in production in the Google App Engine
+    Cloud.
+
+    More information can be found here:
+    https://cloud.google.com/appengine/docs/standard/python/tools/
+    using-local-server#detecting_application_runtime_environment
+
+    Returns:
+        bool. Whether the current instance is running in production.
+    """
+    return ('APPENGINE_RUNTIME' in os.environ and
+            'Google App Engine/' in os.environ['SERVER_SOFTWARE'] and
+            not is_prod_appengine_mvms())
+
+
 class OrderedCounter(collections.Counter, collections.OrderedDict):
     """Counter that remembers the order elements are first encountered."""
 

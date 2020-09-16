@@ -235,8 +235,8 @@ def main(args=None):
     sys.path.insert(1, os.path.join(
         common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webob_0_9'))
     sys.path.insert(1, common.GOOGLE_APP_ENGINE_SDK_HOME)
-    import dev_appserver
-    dev_appserver.fix_sys_path()
+    # import dev_appserver
+    # dev_appserver.fix_sys_path()
 
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
@@ -248,9 +248,16 @@ def main(args=None):
         sys.path.insert(1, directory)
 
     if 'google' in sys.modules:
+        print("IN")
         google_path = os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
         google_module = sys.modules['google']
-        google_module.__path__.append(google_path)
+        google_module.__path__ = [google_path]
+        google_module.__file__ = os.path.join(google_path, '__init__.py')
+        if not hasattr(google_module, '__file__') or not google_module.__file__:
+            google_module.__file__ = os.path.join(google_path, '__init__.py')
+        print(google_module.__file__)
+
+    from google.cloud import tasks_v2
 
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(

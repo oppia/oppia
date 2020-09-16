@@ -51,6 +51,5 @@ vendor.add(os.path.join(THIRD_PARTY_PATH, 'python_libs'))
 pkg_resources.working_set.add_entry(
     os.path.join(THIRD_PARTY_PATH, 'python_libs'))
 
-
 import six
 reload(six)

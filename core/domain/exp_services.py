@@ -783,10 +783,6 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
     taskqueue_services.defer(
         taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS,
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
-    # taskqueue_services.defer(
-    #     delete_explorations_from_subscribed_users,
-    #     taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
-    #     exploration_ids)
 
 
 def delete_explorations_from_subscribed_users(exploration_ids):

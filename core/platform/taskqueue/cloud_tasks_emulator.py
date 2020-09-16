@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""An emulator for that mocks the core.platform.taskqueue API."""
+"""An emulator for that mocks the core.platform.taskqueue API. This emulator
+models the third party library Google Cloud Tasks.
+"""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -23,8 +25,10 @@ import atexit
 import threading
 import time
 
+import python_utils
 
-class Task:
+
+class Task(python_utils.OBJECT):
     def __init__(
         self, queue_name, url, payload=None, scheduled_for=None,
         task_name=None):
@@ -48,7 +52,7 @@ class Task:
         self.task_name = task_name
 
 
-class Emulator:
+class Emulator(python_utils.OBJECT):
     """The emulator mocks the core.platform.taskqueue API. The queues in this
     emulator are priority queues: Elements are popped in the order of the time
     they are scheduled for and executed after the time for execution has
@@ -79,18 +83,18 @@ class Emulator:
                 via user function calls as detailed in the docstring for this
                 emulator.
         """
-        self.__lock = threading.Lock()
-        self.__task_handler = task_handler
-        self.__queues = {}
+        self._lock = threading.Lock()
+        self._task_handler = task_handler
+        self._queues = {}
         self.automatic_task_handling = automatic_task_handling
 
-        self.__queue_threads = {}
+        self._queue_threads = {}
         if self.automatic_task_handling:
             # Launch threads for loaded queues, if any.
-            for queue_name in self.__queues:
-                self.__launch_queue_thread(queue_name)
+            for queue_name in self._queues:
+                self._launch_queue_thread(queue_name)
 
-    def __process_queue(self, queue_name):
+    def _process_queue(self, queue_name):
         """Callback function for each individual queue thread. The queue thread
         repeatedly queries the queue, pops tasks, and executes the tasks that
         need to be executed.
@@ -100,22 +104,22 @@ class Emulator:
         """
         while True:
             task = None
-            with self.__lock:
-                queue = self.__queues[queue_name]
+            with self._lock:
+                queue = self._queues[queue_name]
                 if queue:
                     peek = queue[0]
                     now = time.time()
                     if peek.scheduled_for <= now:
                         task = queue.pop(0)
             if task:
-                self.__task_handler(
+                self._task_handler(
                     url=task.url, payload=task.payload,
                     queue_name=task.queue_name,
                     task_name=task.task_name)
 
             time.sleep(0.01)
 
-    def __launch_queue_thread(self, queue_name):
+    def _launch_queue_thread(self, queue_name):
         """Launches a persistent thread for an individual queue in the
         taskqueue.
 
@@ -123,10 +127,10 @@ class Emulator:
             queue_name: str. The name of the queue.
         """
         new_thread = threading.Thread(
-            target=self.__process_queue,
+            target=self._process_queue,
             name=('Thread-%s' % queue_name), args=[queue_name])
         new_thread.daemon = True
-        self.__queue_threads[queue_name] = new_thread
+        self._queue_threads[queue_name] = new_thread
         new_thread.start()
 
     def _execute_tasks(self, task_list=[]):
@@ -137,7 +141,7 @@ class Emulator:
             task_list: list(Task). List of tasks to execute.
         """
         for task in task_list:
-            self.__task_handler(
+            self._task_handler(
                 url=task.url, payload=task.payload,
                 queue_name=task.queue_name,
                 task_name=task.task_name)
@@ -149,7 +153,7 @@ class Emulator:
         Returns:
             int. The total number of tasks in the taskqueue.
         """
-        return sum(len(q) for q in self.__queues.values())
+        return sum(len(q) for q in self._queues.values())
 
     def create_task(
             self, queue_name, url, payload, scheduled_for=None, task_name=None):
@@ -168,12 +172,12 @@ class Emulator:
             task_name: str|None. Optional. The name of the task.
         """
         scheduled_for = scheduled_for or time.time()
-        with self.__lock:
-            if queue_name not in self.__queues:
-                self.__queues[queue_name] = []
+        with self._lock:
+            if queue_name not in self._queues:
+                self._queues[queue_name] = []
                 if self.automatic_task_handling:
-                    self.__launch_queue_thread(queue_name)
-            queue = self.__queues[queue_name]
+                    self._launch_queue_thread(queue_name)
+            queue = self._queues[queue_name]
             task = Task(
                 queue_name, url, payload, scheduled_for=scheduled_for,
                 task_name=task_name)
@@ -192,8 +196,8 @@ class Emulator:
             int. The total number of tasks in a single queue or in the entire
             taskqueue.
         """
-        if queue_name and queue_name in self.__queues:
-            return len(self.__queues[queue_name])
+        if queue_name and queue_name in self._queues:
+            return len(self._queues[queue_name])
         else:
             return self._total_enqueued_tasks()
 
@@ -206,13 +210,13 @@ class Emulator:
             queue_name: str|None. Name of the queue. Pass in None if no specific
                 queue is designated.
         """
-        if queue_name and queue_name in self.__queues:
-            self._execute_tasks(self.__queues[queue_name])
-            self.__queues[queue_name] = []
+        if queue_name and queue_name in self._queues:
+            self._execute_tasks(self._queues[queue_name])
+            self._queues[queue_name] = []
         else:
-            for queue_name, task_list in self.__queues.items():
+            for queue_name, task_list in self._queues.items():
                 self._execute_tasks(task_list)
-                self.__queues[queue_name] = []
+                self._queues[queue_name] = []
 
     def get_tasks(self, queue_name):
         """Returns a list of the tasks in a single queue if a queue name is
@@ -227,9 +231,9 @@ class Emulator:
             list(Task). List of tasks in a single queue or in the entire
             taskqueue.
         """
-        if queue_name in self.__queues:
-            return self.__queues[queue_name]
+        if queue_name in self._queues:
+            return self._queues[queue_name]
         else:
             tasks_list = []
-            for queue_name, task_list in self.__queues.items():
+            for queue_name, task_list in self._queues.items():
                 tasks_list.extend(task_list)

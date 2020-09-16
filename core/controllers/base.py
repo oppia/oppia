@@ -446,8 +446,6 @@ class BaseHandler(webapp2.RequestHandler):
             unused_debug_mode: bool. True if the web application is running
                 in debug mode.
         """
-        logging.info("Handling exception: ")
-        logging.info(exception)
         if isinstance(exception, self.NotLoggedInException):
             # This checks if the response should be JSON or HTML.
             # For GET requests, there is no payload, so we check against

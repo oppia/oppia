@@ -33,7 +33,6 @@ from google.appengine.ext import ndb
     models.NAMES.base_model, models.NAMES.config])
 
 
-
 class SnapshotMetadataCommitMsgMigrationOneOffJobTests(
         test_utils.GenericTestBase):
     """Tests for the one-off commit message indexing job."""

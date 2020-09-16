@@ -17,12 +17,12 @@ certifi==2020.6.20        # via requests
 chardet==3.0.4            # via requests
 enum34==1.1.10            # via google-cloud-tasks, grpcio
 funcsigs==1.0.2           # via mock
+future==0.18.2            # via -r requirements.in
 futures==3.3.0            # via google-api-core, grpcio
 google-api-core[grpc]==1.22.2  # via google-cloud-tasks
 google-auth==1.21.1       # via google-api-core
 google-cloud-tasks==1.5.0  # via -r requirements.in
 googleapis-common-protos[grpc]==1.52.0  # via google-api-core, grpc-google-iam-v1
-future==0.18.2            # via -r requirements.in
 googleappenginecloudstorageclient==1.9.22.1  # via -r requirements.in, googleappenginemapreduce, googleappenginepipeline
 googleappenginemapreduce==1.9.22.0  # via -r requirements.in
 googleappenginepipeline==1.9.22.1  # via -r requirements.in, googleappenginemapreduce

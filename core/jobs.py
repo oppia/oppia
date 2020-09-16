@@ -43,7 +43,6 @@ from pipeline import pipeline
 
 (base_models, job_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.job])
-#taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
 MAPPER_PARAM_KEY_ENTITY_KINDS = 'entity_kinds'
@@ -605,11 +604,13 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
         # generally supposed to only yield 1 object which messes up the
         # indentation checking. This is the only case of this happening.
         """Returns a coroutine which runs the job pipeline and stores results.
+
         Args:
             job_id: str. The ID of the job to run.
             job_class_str: str. Should uniquely identify each type of job.
             kwargs: dict(str : object). Extra arguments used to build the
                 MapreducePipeline.
+
         Yields:
             MapreducePipeline. Ready to start processing. Expects the output of
             that pipeline to be sent back.
@@ -823,9 +824,6 @@ class BaseMapReduceJobManager(BaseJobManager):
 
         mr_pipeline = MapReduceJobPipeline(
             job_id, '%s.%s' % (cls.__module__, cls.__name__), kwargs)
-        print("#######")
-        print(queue_name)
-
         mr_pipeline.start(
             base_path='/mapreduce/worker/pipeline', queue_name=queue_name)
 

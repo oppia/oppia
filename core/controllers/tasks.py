@@ -38,6 +38,7 @@ from core.platform import models
     [models.NAMES.job, models.NAMES.email])
 transaction_services = models.Registry.import_transaction_services()
 
+
 class UnsentFeedbackEmailHandler(base.BaseHandler):
     """Handler task of sending emails of feedback messages."""
 

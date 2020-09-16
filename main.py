@@ -61,8 +61,6 @@ from core.controllers import topic_editor
 from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
 from core.controllers import voice_artist
-#TODO: Remove
-from core.controllers import tasks
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -831,8 +829,6 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
-    #TODO: Remove
-
 ]
 
 # Adding redirects for topic landing pages.

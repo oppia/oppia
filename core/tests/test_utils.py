@@ -2420,9 +2420,11 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_files_stub()
         self.testbed.init_search_stub()
 
+        # The root path tells the testbed where to find the queue.yaml file.
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
         self.taskqueue_stub = self.testbed.get_stub(
             testbed.TASKQUEUE_SERVICE_NAME)
+
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
 

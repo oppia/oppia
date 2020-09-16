@@ -51,10 +51,6 @@ class BaseEventHandler(python_utils.OBJECT):
             taskqueue_services.FUNCTION_ID_DISPATCH_EVENT,
             taskqueue_services.QUEUE_NAME_EVENTS, cls.EVENT_TYPE, *args,
             **kwargs)
-        # taskqueue_services.defer(
-        #     jobs_registry.ContinuousComputationEventDispatcher.dispatch_event,
-        #     taskqueue_services.QUEUE_NAME_EVENTS, cls.EVENT_TYPE, *args,
-        #     **kwargs)
 
     @classmethod
     def _handle_event(cls, *args, **kwargs):
@@ -96,11 +92,7 @@ class StatsEventsHandler(BaseEventHandler):
                 taskqueue_services.FUNCTION_ID_UPDATE_STATS,
                 taskqueue_services.QUEUE_NAME_STATS,
                 exploration_id,
-                exp_version, aggregated_stats,)
-            # taskqueue_services.defer(
-            #     stats_services.update_stats,
-            #     taskqueue_services.QUEUE_NAME_STATS, exploration_id,
-            #     exp_version, aggregated_stats)
+                exp_version, aggregated_stats)
 
 
 class AnswerSubmissionEventHandler(BaseEventHandler):

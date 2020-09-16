@@ -31,7 +31,6 @@ import feconf
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 
 
-
 class EmailHashRegenerationOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off update hash job."""
 

@@ -277,10 +277,10 @@ class RegistryUnitTest(test_utils.GenericTestBase):
     def test_import_taskqueue_services(self):
         """Tests import taskqueue services function."""
         with self.swap(constants, 'DEV_MODE', False):
-            from core.platform.taskqueue import cloud_tasks_services
+            from core.platform.taskqueue import cloud_taskqueue_services
             self.assertEqual(
                 self.registry_instance.import_taskqueue_services(),
-                cloud_tasks_services)
+                cloud_taskqueue_services)
 
     def test_import_search_services(self):
         """Tests import search services function."""

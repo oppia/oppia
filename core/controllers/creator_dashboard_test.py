@@ -45,7 +45,6 @@ import python_utils
     models.Registry.import_models(
         [models.NAMES.user, models.NAMES.statistics, models.NAMES.suggestion,
          models.NAMES.feedback]))
-#taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class OldNotificationsDashboardRedirectPageTest(test_utils.GenericTestBase):
