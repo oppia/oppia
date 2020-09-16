@@ -70,6 +70,8 @@ export class PlatformFeatureService {
   private static COOKIE_NAME_FOR_SESSION_ID = 'SACSID';
   private static COOKIE_NAME_FOR_SESSION_ID_IN_DEV = 'dev_appserver_login';
 
+  // The following attributes are made static to avoid potential inconsistencies
+  // caused by multi-instantiation of the service.
   static featureStatusSummary: FeatureStatusSummary = null;
   static initializationPromise: Promise<void> = null;
   static _isInitializedWithError = false;
