@@ -1139,7 +1139,7 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
                 ReviewerAndSuggestionCounts object is invalid.
         """
         for language_code, reviewer_count in (
-                self.translation_reviewer_counts_per_lang):
+                self.translation_reviewer_counts_per_lang.items()):
             if reviewer_count < 0:
                 raise utils.ValidationError(
                     'Expected the translation reviewer count to be positive, '
@@ -1148,7 +1148,7 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
                 )
 
         for language_code, suggestion_count in (
-                self.translation_suggestion_counts_per_lang):
+                self.translation_suggestion_counts_per_lang.items()):
             if suggestion_count < 0:
                 raise utils.ValidationError(
                     'Expected the translation suggestion count to be positive, '
@@ -1159,13 +1159,13 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
         if self.question_reviewer_count < 0:
             raise utils.ValidationError(
                 'Expected the question reviewer count to be positive, '
-                    'recieved: %s.' % (self.question_reviewer_count)
+                'recieved: %s.' % (self.question_reviewer_count)
             )
 
         if self.question_suggestion_count < 0:
             raise utils.ValidationError(
                 'Expected the question suggestion count to be positive, '
-                    'recieved: %s.' % (self.question_suggestion_count)
+                'recieved: %s.' % (self.question_suggestion_count)
             )
 
     def are_reviewers_needed_for_translation_suggestions_in_language(

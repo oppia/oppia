@@ -2449,6 +2449,60 @@ class ReviewerAndSuggestionCountsUnitTests(test_utils.GenericTestBase):
                 negative_translation_reviewer_counts['en'])):
             reviewer_and_suggestion_counts.validate()
 
+    def test_validate_translation_suggestion_counts_fails_for_negative_counts(
+            self):
+        negative_translation_suggestion_counts = {
+            'en': -1
+        }
+        reviewer_and_suggestion_counts = (
+            suggestion_registry.ReviewerAndSuggestionCounts(
+                self.translation_reviewer_counts_per_lang,
+                negative_translation_suggestion_counts,
+                self.question_reviewer_count,
+                self.question_suggestion_count
+            )
+        )
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected the translation suggestion count to be positive, '
+            'recieved: %s. The language code for the translation was en.'  % (
+                negative_translation_suggestion_counts['en'])):
+            reviewer_and_suggestion_counts.validate()
+
+    def test_validate_question_reviewer_count_fails_for_negative_counts(self):
+        negative_question_reviewer_count = -1
+        reviewer_and_suggestion_counts = (
+                suggestion_registry.ReviewerAndSuggestionCounts(
+                    self.translation_reviewer_counts_per_lang,
+                    self.translation_suggestion_counts_per_lang,
+                    negative_question_reviewer_count,
+                    self.question_suggestion_count
+                )
+            )   
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected the question reviewer count to be positive, recieved: '
+            '%s.' % (negative_question_reviewer_count)):
+            reviewer_and_suggestion_counts.validate()
+
+    def test_validate_question_suggestion_count_fails_for_negative_counts(self):
+        negative_question_suggestion_count = -1
+        reviewer_and_suggestion_counts = (
+                suggestion_registry.ReviewerAndSuggestionCounts(
+                    self.translation_reviewer_counts_per_lang,
+                    self.translation_suggestion_counts_per_lang,
+                    self.question_reviewer_count,
+                    negative_question_suggestion_count
+                )
+            )   
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected the question suggestion count to be positive, recieved: '
+            '%s.' % (negative_question_suggestion_count)):
+            reviewer_and_suggestion_counts.validate()
     
 
 
