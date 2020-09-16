@@ -231,7 +231,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/Polyfills.ts',
             'core/templates/filters/translate.pipe.spec.ts',
             'core/templates/components/ck-editor-helpers/' +
-            'ck-editor-copy-content-service.spec.ts'),
+            'ck-editor-copy-content-service.spec.ts',
+            'core/templates/tests/unit-test-utils.ts'),
         'excluded_dirs': ('core/tests/',)
     },
     {
@@ -325,6 +326,12 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
         'message': 'Please do not access parent properties ' +
                    'using $parent. Use the scope object ' +
                    'for this purpose.',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'\s+style\s*=\s*'),
+        'message': 'Please do not use inline styling.',
         'excluded_files': (),
         'excluded_dirs': ()
     }

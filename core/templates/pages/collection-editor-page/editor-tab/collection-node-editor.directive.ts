@@ -18,7 +18,6 @@
  * and also delete the collection node represented by this directive.
  */
 
-require('domain/collection/collection-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
@@ -40,11 +39,11 @@ angular.module('oppia').directive('collectionNodeEditor', [
         'collection-node-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'CollectionEditorStateService', 'CollectionLinearizerService',
-        'CollectionUpdateService', 'AlertsService',
+        'AlertsService', 'CollectionEditorStateService',
+        'CollectionLinearizerService',
         function(
-            CollectionEditorStateService, CollectionLinearizerService,
-            CollectionUpdateService, AlertsService) {
+            AlertsService, CollectionEditorStateService,
+            CollectionLinearizerService) {
           var ctrl = this;
           // Deletes this collection node from the frontend collection
           // object and also updates the changelist.

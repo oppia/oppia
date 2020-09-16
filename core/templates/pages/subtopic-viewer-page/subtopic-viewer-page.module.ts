@@ -43,9 +43,6 @@ import { SubtopicViewerNavbarBreadcrumbComponent } from
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
-import { SubtopicViewerDomainConstants } from
-  'domain/subtopic_viewer/subtopic-viewer-domain.constants';
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -61,7 +58,6 @@ import { SubtopicViewerDomainConstants } from
     SubtopicViewerNavbarBreadcrumbComponent
   ],
   providers: [
-    SubtopicViewerDomainConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

@@ -40,12 +40,12 @@ import cloneDeep from 'lodash/cloneDeep';
 angular.module('oppia').component('historyTab', {
   template: require('./history-tab.component.html'),
   controller: [
-    '$http', '$log', '$scope', '$uibModal', 'CompareVersionsService',
+    '$http', '$log', '$uibModal', 'CompareVersionsService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
     'LoaderService', 'RouterService', 'UrlInterpolationService',
     'VersionTreeService', 'WindowRef',
     function(
-        $http, $log, $scope, $uibModal, CompareVersionsService,
+        $http, $log, $uibModal, CompareVersionsService,
         DateTimeFormatService, EditabilityService, ExplorationDataService,
         LoaderService, RouterService, UrlInterpolationService,
         VersionTreeService, WindowRef) {
@@ -261,6 +261,10 @@ angular.module('oppia').component('historyTab', {
 
       ctrl.toggleHistoryOptions = function(index) {
         ctrl.highlightedIndex = !ctrl.highlightedIndex ? index : null;
+      };
+
+      ctrl.reverseDateOrder = function() {
+        ctrl.explorationVersionMetadata.reverse();
       };
 
       ctrl.$onInit = function() {

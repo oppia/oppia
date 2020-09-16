@@ -44,20 +44,6 @@ import { OppiaAngularRootComponent } from
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
-import { AppConstants } from 'app.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { QuestionDomainConstants } from
-  'domain/question/question-domain.constants';
-import { QuestionsListConstants } from
-  'components/question-directives/questions-list/questions-list.constants';
-import { ServicesConstants } from 'services/services.constants';
-import { StoryDomainConstants } from 'domain/story/story-domain.constants';
-import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
-import { TopicEditorPageConstants } from
-  'pages/topic-editor-page/topic-editor-page.constants';
 import { PracticeTabComponent } from
   'pages/topic-viewer-page/practice-tab/practice-tab.component';
 import { StoriesListComponent } from
@@ -84,15 +70,6 @@ import { SubtopicsListComponent } from
     SubtopicsListComponent,
   ],
   providers: [
-    AppConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    QuestionDomainConstants,
-    QuestionsListConstants,
-    ServicesConstants,
-    StoryDomainConstants,
-    TopicDomainConstants,
-    TopicEditorPageConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

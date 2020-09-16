@@ -112,9 +112,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
           });
         }
         buttonNames.pop();
-        // All icons on the toolbar except the Rich Text components.
-        var allIcons = ['undo', 'redo', 'bold', 'Italic', 'numberedList',
-          'bulletedList', 'pre', 'indent', 'outdent'];
 
         // Add external plugins.
         CKEDITOR.plugins.addExternal(
@@ -204,7 +201,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
           // Set the css and icons for each toolbar button.
           names.forEach(function(name, index) {
             var icon = icons[index];
-            var upperCasedName = name.charAt(0).toUpperCase() + name.slice(1);
             $('.cke_button__oppia' + name)
               .css('background-image', 'url("/extensions' + icon + '")')
               .css('background-position', 'center')

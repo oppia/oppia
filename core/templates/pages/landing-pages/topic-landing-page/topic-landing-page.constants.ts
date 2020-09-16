@@ -19,8 +19,8 @@
 // Note: This oppia constant needs to be keep in sync with
 // AVAILABLE_LANDING_PAGES constant defined in feconf.py file.
 
-export class TopicLandingPageConstants {
-  public static TOPIC_LANDING_PAGE_DATA = {
+export const TopicLandingPageConstants = {
+  TOPIC_LANDING_PAGE_DATA: {
     math: {
       fractions: {
         topicTitle: 'Fractions',
@@ -42,5 +42,5 @@ export class TopicLandingPageConstants {
         chapters: ['The meaning of equivalent ratios', 'Combining Ratios']
       }
     }
-  };
-}
+  }
+} as const;

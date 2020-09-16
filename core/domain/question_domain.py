@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import collections
 import copy
 import datetime
 
@@ -48,8 +47,8 @@ from pylatexenc import latex2text
 QUESTION_PROPERTY_LANGUAGE_CODE = 'language_code'
 QUESTION_PROPERTY_QUESTION_STATE_DATA = 'question_state_data'
 QUESTION_PROPERTY_LINKED_SKILL_IDS = 'linked_skill_ids'
-QUESTION_PROPERTY_INAPPLICABLE_MISCONCEPTION_IDS = (
-    'inapplicable_misconception_ids')
+QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS = (
+    'inapplicable_skill_misconception_ids')
 
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
@@ -85,25 +84,29 @@ class QuestionChange(change_domain.BaseChange):
         QUESTION_PROPERTY_QUESTION_STATE_DATA,
         QUESTION_PROPERTY_LANGUAGE_CODE,
         QUESTION_PROPERTY_LINKED_SKILL_IDS,
-        QUESTION_PROPERTY_INAPPLICABLE_MISCONCEPTION_IDS)
+        QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS)
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': [],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_UPDATE_QUESTION_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': QUESTION_PROPERTIES}
     }, {
         'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
         'required_attribute_names': ['question_dict', 'skill_id'],
-        'optional_attribute_names': ['topic_name']
+        'optional_attribute_names': ['topic_name'],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
 
@@ -120,7 +123,8 @@ class QuestionSuggestionChange(change_domain.BaseChange):
             'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'required_attribute_names': [
                 'question_dict', 'skill_id', 'skill_difficulty'],
-            'optional_attribute_names': []
+            'optional_attribute_names': [],
+            'user_id_attribute_names': []
         }
     ]
 
@@ -131,7 +135,7 @@ class Question(python_utils.OBJECT):
     def __init__(
             self, question_id, question_state_data,
             question_state_data_schema_version, language_code, version,
-            linked_skill_ids, inapplicable_misconception_ids,
+            linked_skill_ids, inapplicable_skill_misconception_ids,
             created_on=None, last_updated=None):
         """Constructs a Question domain object.
 
@@ -147,8 +151,9 @@ class Question(python_utils.OBJECT):
             version: int. The version of the question.
             linked_skill_ids: list(str). Skill ids linked to the question.
                 Note: Do not update this field manually.
-            inapplicable_misconception_ids: list(str). Optional misconception
-                ids that are marked as not relevant to the question.
+            inapplicable_skill_misconception_ids: list(str). Optional
+                misconception ids that are marked as not relevant to the
+                question.
             created_on: datetime.datetime. Date and time when the question was
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -161,8 +166,8 @@ class Question(python_utils.OBJECT):
             question_state_data_schema_version)
         self.version = version
         self.linked_skill_ids = linked_skill_ids
-        self.inapplicable_misconception_ids = (
-            inapplicable_misconception_ids)
+        self.inapplicable_skill_misconception_ids = (
+            inapplicable_skill_misconception_ids)
         self.created_on = created_on
         self.last_updated = last_updated
 
@@ -180,8 +185,8 @@ class Question(python_utils.OBJECT):
             'language_code': self.language_code,
             'version': self.version,
             'linked_skill_ids': self.linked_skill_ids,
-            'inapplicable_misconception_ids': (
-                self.inapplicable_misconception_ids)
+            'inapplicable_skill_misconception_ids': (
+                self.inapplicable_skill_misconception_ids)
         }
 
     @classmethod
@@ -344,8 +349,7 @@ class Question(python_utils.OBJECT):
         question_state_dict = state_domain.State.convert_html_fields_in_state(
             question_state_dict,
             html_validation_service.add_math_content_to_math_rte_components,
-            state_uses_old_interaction_cust_args_schema=True,
-            state_uses_old_rule_spec_schema=True)
+            state_uses_old_interaction_cust_args_schema=True)
         return question_state_dict
 
     @classmethod
@@ -727,49 +731,6 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v38_dict_to_v39_dict(cls, question_state_dict):
-        """Converts from version 38 to 39. Version 39 removes the fields
-        rule_specs in AnswerGroups, and adds new fields rule_types_to_inputs and
-        rule_input_translations. rule_types_to_inputs is a dictionary that maps
-        rule type to a list of rule inputs that share the rule type.
-        rule_input_translations is a dict mapping abbreviated language
-        codes to a mapping of rule type to rule inputs.
-
-        Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
-
-        Returns:
-            dict. The converted question_state_dict.
-        """
-        answer_group_dicts = question_state_dict['interaction']['answer_groups']
-        for i, answer_group_dict in enumerate(answer_group_dicts):
-            # Convert the list of rule specs into the new
-            # rule_types_to_inputs dict format. Instead of a list of
-            # dictionaries that have properties 'rule_type' and
-            # 'inputs', the new format groups rule inputs of the same
-            # rule type by mapping rule type to a list of rule inputs.
-            # E.g. Old format: rule_specs = [
-            #   {rule_type: 'Equals', 'inputs': {x: 'Yes'}},
-            #   {rule_type: 'Equals', 'inputs': {x: 'Y'}}
-            # ]
-            # New format: rule_types_to_inputs = {
-            #   'Equals': [
-            #       {x: 'Yes'}, {x: 'Y'}
-            #   ]
-            # }
-            rule_types_to_inputs = collections.defaultdict(list)
-            for rule_spec_dict in answer_group_dict['rule_specs']:
-                rule_type = rule_spec_dict['rule_type']
-                rule_types_to_inputs[rule_type].append(rule_spec_dict['inputs'])
-            del answer_group_dicts[i]['rule_specs']
-            answer_group_dicts[i]['rule_input_translations'] = {}
-            answer_group_dicts[i]['rule_types_to_inputs'] = dict(
-                rule_types_to_inputs)
-        return question_state_dict
-
-    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
@@ -822,19 +783,21 @@ class Question(python_utils.OBJECT):
         if len(set(self.linked_skill_ids)) != len(self.linked_skill_ids):
             raise utils.ValidationError(
                 'linked_skill_ids has duplicate skill ids')
-
-        if not (isinstance(self.inapplicable_misconception_ids, list) and (
+        inapplicable_skill_misconception_ids_is_list = isinstance(
+            self.inapplicable_skill_misconception_ids, list)
+        if not (inapplicable_skill_misconception_ids_is_list and (
                 all(isinstance(
                     elem, python_utils.BASESTRING) for elem in (
-                        self.inapplicable_misconception_ids)))):
+                        self.inapplicable_skill_misconception_ids)))):
             raise utils.ValidationError(
-                'Expected inapplicable_misconception_ids to be a list of '
-                'strings, received %s' % self.inapplicable_misconception_ids)
+                'Expected inapplicable_skill_misconception_ids to be a list '
+                'of strings, received %s'
+                % self.inapplicable_skill_misconception_ids)
 
-        if len(set(self.inapplicable_misconception_ids)) != len(
-                self.inapplicable_misconception_ids):
+        if len(set(self.inapplicable_skill_misconception_ids)) != len(
+                self.inapplicable_skill_misconception_ids):
             raise utils.ValidationError(
-                'inapplicable_misconception_ids has duplicate values')
+                'inapplicable_skill_misconception_ids has duplicate values')
 
         if not isinstance(self.question_state_data_schema_version, int):
             raise utils.ValidationError(
@@ -916,7 +879,7 @@ class Question(python_utils.OBJECT):
             question_dict['question_state_data_schema_version'],
             question_dict['language_code'], question_dict['version'],
             question_dict['linked_skill_ids'],
-            question_dict['inapplicable_misconception_ids'])
+            question_dict['inapplicable_skill_misconception_ids'])
 
         return question
 
@@ -955,17 +918,17 @@ class Question(python_utils.OBJECT):
         """
         self.linked_skill_ids = list(set(linked_skill_ids))
 
-    def update_inapplicable_misconception_ids(
-            self, inapplicable_misconception_ids):
+    def update_inapplicable_skill_misconception_ids(
+            self, inapplicable_skill_misconception_ids):
         """Updates the optional misconception ids marked as not applicable
         to the question.
 
         Args:
-            inapplicable_misconception_ids: list(str). The optional
+            inapplicable_skill_misconception_ids: list(str). The optional
                 misconception ids marked as not applicable to the question.
         """
-        self.inapplicable_misconception_ids = list(
-            set(inapplicable_misconception_ids))
+        self.inapplicable_skill_misconception_ids = list(
+            set(inapplicable_skill_misconception_ids))
 
     def update_question_state_data(self, question_state_data):
         """Updates the question data of the question.
@@ -982,7 +945,8 @@ class QuestionSummary(python_utils.OBJECT):
 
     def __init__(
             self, question_id, question_content, misconception_ids,
-            question_model_created_on=None, question_model_last_updated=None):
+            interaction_id, question_model_created_on=None,
+            question_model_last_updated=None):
         """Constructs a Question Summary domain object.
 
         Args:
@@ -992,6 +956,7 @@ class QuestionSummary(python_utils.OBJECT):
             misconception_ids: str. The misconception ids addressed in
                 the question. This includes tagged misconceptions ids as well
                 as inapplicable misconception ids in the question.
+            interaction_id: str. The ID of the interaction.
             question_model_created_on: datetime.datetime. Date and time when
                 the question model is created.
             question_model_last_updated: datetime.datetime. Date and time
@@ -1000,6 +965,7 @@ class QuestionSummary(python_utils.OBJECT):
         self.id = question_id
         self.question_content = html_cleaner.clean(question_content)
         self.misconception_ids = misconception_ids
+        self.interaction_id = interaction_id
         self.created_on = question_model_created_on
         self.last_updated = question_model_last_updated
 
@@ -1012,6 +978,7 @@ class QuestionSummary(python_utils.OBJECT):
         return {
             'id': self.id,
             'question_content': self.question_content,
+            'interaction_id': self.interaction_id,
             'last_updated_msec': utils.get_time_in_millisecs(self.last_updated),
             'created_on_msec': utils.get_time_in_millisecs(self.created_on),
             'misconception_ids': self.misconception_ids
@@ -1032,6 +999,11 @@ class QuestionSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected question content to be a string, received %s' %
                 self.question_content)
+
+        if not isinstance(self.interaction_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected interaction id to be a string, received %s' %
+                self.interaction_id)
 
         if not isinstance(self.created_on, datetime.datetime):
             raise utils.ValidationError(

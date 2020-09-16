@@ -36,12 +36,6 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-
-import { AppConstants } from 'app.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
@@ -60,9 +54,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

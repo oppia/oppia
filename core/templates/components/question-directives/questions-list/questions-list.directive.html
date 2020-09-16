@@ -71,10 +71,13 @@
         <div ng-click="$ctrl.editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
           <div class="question-data">
             <angular-html-bind class="question-text" html-data="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()"></angular-html-bind>
-            <span ng-click="$ctrl.deleteQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription())"
+            <span ng-click="$ctrl.deleteQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription());$event.stopPropagation();"
                   class="link-off-icon">
               <i class="material-icons">link_off</i>
             </span>
+          </div>
+          <div class="question-interaction-id">
+            <span><[questionSummaryForOneSkill.getQuestionSummary().getInteractionId()]></span>
           </div>
         </div>
       </div>
@@ -219,7 +222,9 @@
     width: 60%;
   }
   questions-list .question-editor-open-container {
-    width: 35%;
+    position: fixed;
+    right: 13%;
+    width: 26%;
   }
   questions-list .checklist-item {
     display: flex;
@@ -300,6 +305,9 @@
   questions-list .difficulty-card-header i {
     display: none;
   }
+  questions-list .question-interaction-id {
+    color: #707070;
+  }
   @media screen and (max-width: 768px) {
     questions-list .question-editor-container {
       margin-top: 30px;
@@ -337,6 +345,9 @@
     }
     questions-list .difficulty-card-header h3 {
       margin: 0;
+    }
+    questions-list .question-editor-open-container {
+      position: inherit;
     }
   }
 </style>

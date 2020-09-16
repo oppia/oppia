@@ -17,7 +17,6 @@
  */
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require('domain/skill/RubricObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
@@ -50,13 +49,11 @@ angular.module('oppia').directive('rubricsEditor', [
         '/components/rubrics-editor/rubrics-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$uibModal', 'ContextService',
-        'RubricObjectFactory', 'SkillCreationService', 'PAGE_CONTEXT',
-        'SKILL_DIFFICULTY_MEDIUM', 'SKILL_DESCRIPTION_STATUS_VALUES',
+        '$scope', 'ContextService', 'SkillCreationService',
+        'SKILL_DESCRIPTION_STATUS_VALUES', 'SKILL_DIFFICULTY_MEDIUM',
         function(
-            $scope, $filter, $uibModal, ContextService,
-            RubricObjectFactory, SkillCreationService, PAGE_CONTEXT,
-            SKILL_DIFFICULTY_MEDIUM, SKILL_DESCRIPTION_STATUS_VALUES) {
+            $scope, ContextService, SkillCreationService,
+            SKILL_DESCRIPTION_STATUS_VALUES, SKILL_DIFFICULTY_MEDIUM) {
           var ctrl = this;
           var explanationsMemento = {};
 
@@ -70,6 +67,10 @@ angular.module('oppia').directive('rubricsEditor', [
 
           ctrl.openExplanationEditor = function(difficulty, index) {
             ctrl.explanationEditorIsOpen[difficulty][index] = true;
+          };
+
+          ctrl.isExplanationValid = function(difficulty, index) {
+            return Boolean(ctrl.editableExplanations[difficulty][index]);
           };
 
           ctrl.saveExplanation = function(difficulty, index) {

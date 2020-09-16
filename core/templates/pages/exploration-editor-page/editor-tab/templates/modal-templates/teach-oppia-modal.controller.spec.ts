@@ -54,13 +54,10 @@ describe('Teach Oppia Modal Controller', function() {
   var stateInteractionIdService = null;
   var stateObjectFactory = null;
   var explorationStatesService = null;
-  var externalSaveService = null;
   var responsesService = null;
   var trainingDataService = null;
   var trainingModalService = null;
-
   var mockExternalSaveEventEmitter = null;
-
   var explorationId = 'exp1';
   var stateName = 'Introduction';
   var state = {
@@ -80,14 +77,10 @@ describe('Teach Oppia Modal Controller', function() {
         }
       },
       answer_groups: [{
-        rule_input_translations: {},
-        rule_types_to_inputs: {
-          Equals: [
-            {
-              x: 'Correct Answer'
-            }
-          ]
-        },
+        rule_specs: [{
+          rule_type: 'Equals',
+          inputs: { x: 'Correct Answer' }
+        }],
         outcome: {
           dest: 'outcome 1',
           feedback: {
@@ -167,7 +160,6 @@ describe('Teach Oppia Modal Controller', function() {
       explorationStatesService = $injector.get('ExplorationStatesService');
       stateEditorService = $injector.get('StateEditorService');
       responsesService = $injector.get('ResponsesService');
-      externalSaveService = $injector.get('ExternalSaveService');
       trainingDataService = $injector.get('TrainingDataService');
       trainingModalService = $injector.get('TrainingModalService');
 
@@ -286,7 +278,6 @@ describe('Teach Oppia Modal Controller', function() {
       explorationStatesService = $injector.get('ExplorationStatesService');
       stateEditorService = $injector.get('StateEditorService');
       responsesService = $injector.get('ResponsesService');
-      externalSaveService = $injector.get('ExternalSaveService');
       trainingDataService = $injector.get('TrainingDataService');
       trainingModalService = $injector.get('TrainingModalService');
 

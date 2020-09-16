@@ -61,7 +61,6 @@ angular.module('oppia').factory('SkillEditorStateService', [
 
     var _updateGroupedSkillSummaries = function(groupedSkillSummaries) {
       var topicName = null;
-      var sortedSkillSummaries = [];
       _groupedSkillSummaries.current = [];
       _groupedSkillSummaries.others = [];
 

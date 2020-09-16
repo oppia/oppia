@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
+
 from core import jobs_registry
 from core.domain import exp_services
 from core.domain import recommendations_jobs_one_off
@@ -27,6 +29,7 @@ from core.domain import recommendations_services_test
 from core.domain import rights_manager
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
+from core.tests import test_utils
 
 (exp_models, recommendations_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
@@ -130,3 +133,73 @@ class ExplorationRecommendationsOneOffJobUnitTests(
                         'exp_id_1'))
                 self.assertEqual(
                     recommendations, [])
+
+
+class DeleteAllExplorationRecommendationsOneOffJobTests(
+        test_utils.GenericTestBase):
+    """Test delete exploration recommendations one-off job."""
+
+    RECOMMENDATION_1_ID = 'rec_1_id'
+    RECOMMENDATION_2_ID = 'rec_2_id'
+    RECOMMENDATION_3_ID = 'rec_3_id'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            recommendations_jobs_one_off
+            .DeleteAllExplorationRecommendationsOneOffJob.create_new())
+        (
+            recommendations_jobs_one_off
+            .DeleteAllExplorationRecommendationsOneOffJob.enqueue(
+                job_id)
+        )
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            recommendations_jobs_one_off
+            .DeleteAllExplorationRecommendationsOneOffJob.get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def test_delete_one_exploration_recommendations_is_successful(self):
+        recommendations_models.ExplorationRecommendationsModel(
+            id=self.RECOMMENDATION_1_ID,
+            recommended_exploration_ids=['exp_1']
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual([['DELETED', 1]], output)
+
+        self.assertIsNone(
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                self.RECOMMENDATION_1_ID))
+
+    def test_delete_multiple_explorations_recommendations_is_successful(self):
+        recommendations_models.ExplorationRecommendationsModel(
+            id=self.RECOMMENDATION_1_ID,
+            recommended_exploration_ids=['exp_1']
+        ).put()
+        recommendations_models.ExplorationRecommendationsModel(
+            id=self.RECOMMENDATION_2_ID,
+            recommended_exploration_ids=['exp_1']
+        ).put()
+        recommendations_models.ExplorationRecommendationsModel(
+            id=self.RECOMMENDATION_3_ID,
+            recommended_exploration_ids=['exp_1']
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual([['DELETED', 3]], output)
+
+        self.assertIsNone(
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                self.RECOMMENDATION_1_ID))
+        self.assertIsNone(
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                self.RECOMMENDATION_2_ID))
+        self.assertIsNone(
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                self.RECOMMENDATION_3_ID))

@@ -37,8 +37,6 @@ import { OppiaAngularRootComponent } from
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
-import { AppConstants } from 'app.constants';
-
 
 @NgModule({
   imports: [
@@ -53,7 +51,6 @@ import { AppConstants } from 'app.constants';
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

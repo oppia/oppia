@@ -40,16 +40,6 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
-import { AppConstants } from 'app.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { ServicesConstants } from 'services/services.constants';
-import { TopicLandingPageConstants } from
-  'pages/landing-pages/topic-landing-page/topic-landing-page.constants';
-
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -65,11 +55,6 @@ import { TopicLandingPageConstants } from
     TopicLandingPageComponent
   ],
   providers: [
-    AppConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    ServicesConstants,
-    TopicLandingPageConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

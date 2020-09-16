@@ -42,13 +42,6 @@ import { CollectionFooterComponent } from
 import { CollectionNodeListComponent } from
 // eslint-disable-next-line max-len
   'pages/collection-player-page/collection-node-list/collection-node-list.component';
-
-
-import { AppConstants } from 'app.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
@@ -69,9 +62,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     CollectionNodeListComponent
   ],
   providers: [
-    AppConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

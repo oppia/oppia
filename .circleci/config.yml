@@ -108,6 +108,9 @@ jobs:
       - checkout
       - merge_target_branch
       - run:
+          name: Setup python by installing wheel
+          command: pip install wheel==0.35.0
+      - run:
           name: Install dependencies
           command: python -m scripts.install_third_party_libs
       - run:
@@ -245,7 +248,7 @@ jobs:
       - run:
           name: Run e2e contributor dashboard test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --contributor_dashboard_enabled
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard"
 
   e2e_non_prod_new_structure_tests:
     <<: *job_defaults

@@ -82,8 +82,6 @@ angular.module('oppia').factory('QuestionCreationService', [
     var skillId = null;
     var questionId = null;
     var questionStateData = null;
-    var questionIsBeingUpdated = null;
-    var newQuestionIsBeingCreated = null;
     var skillIdToRubricsObject = {};
     var misconceptionsBySkill = {};
     var groupedSkillSummaries = null;
@@ -172,8 +170,6 @@ angular.module('oppia').factory('QuestionCreationService', [
           QuestionObjectFactory.createDefaultQuestion(newQuestionSkillIds);
       questionId = question.getId();
       questionStateData = question.getStateData();
-      questionIsBeingUpdated = false;
-      newQuestionIsBeingCreated = true;
       openQuestionEditor(newQuestionSkillDifficulties[0]);
     };
 
@@ -213,7 +209,6 @@ angular.module('oppia').factory('QuestionCreationService', [
       var newQuestionIsBeingCreated = true;
 
       QuestionUndoRedoService.clearChanges();
-      var editorIsOpen = true;
       var selectedSkillId = SkillEditorStateService.getSkill().getId();
       $location.hash(questionId);
       var skillIdToNameMapping = (
@@ -248,7 +243,6 @@ angular.module('oppia').factory('QuestionCreationService', [
         controller: 'QuestionEditorModalController',
       }).result.then(function() {
         $location.hash(null);
-        editorIsOpen = false;
         saveAndPublishQuestion();
       });
     };

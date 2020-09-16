@@ -23,8 +23,11 @@ from core import jobs
 from core.domain import customization_args_util
 from core.domain import exp_fetchers
 from core.domain import interaction_registry
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
+
+import python_utils
 
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
@@ -45,7 +48,7 @@ class DragAndDropSortInputInteractionOneOffJob(
         if item.deleted:
             return
         exp_status = rights_manager.get_exploration_rights(item.id).status
-        if exp_status == rights_manager.ACTIVITY_STATUS_PRIVATE:
+        if exp_status == rights_domain.ACTIVITY_STATUS_PRIVATE:
             return
         exploration = exp_fetchers.get_exploration_from_model(item)
         validation_errors = []
@@ -53,24 +56,17 @@ class DragAndDropSortInputInteractionOneOffJob(
             if state.interaction.id == 'DragAndDropSortInput':
                 for answer_group_index, answer_group in enumerate(
                         state.interaction.answer_groups):
-                    for rule_type in answer_group.rule_types_to_inputs:
-                        for rule_input_index, rule_input in enumerate(
-                                answer_group.rule_types_to_inputs[rule_type]):
-                            for rule_input_name in rule_input:
-                                value = rule_input[rule_input_name]
-                                if value == '' or value == []:
-                                    validation_errors.append(
-                                        'State name: %s, AnswerGroup: %s,' % (
-                                            state_name,
-                                            answer_group_index) +
-                                        ' Rule input %s in rule with rule type'
-                                        ' %s and rule input index %s'
-                                        ' is empty. ' % (
-                                            rule_input_name,
-                                            rule_type,
-                                            rule_input_index
-                                        )
-                                    )
+                    for rule_index, rule_spec in enumerate(
+                            answer_group.rule_specs):
+                        for rule_input in rule_spec.inputs:
+                            value = rule_spec.inputs[rule_input]
+                            if value == '' or value == []:
+                                validation_errors.append(
+                                    'State name: %s, AnswerGroup: %s,' % (
+                                        state_name,
+                                        answer_group_index) +
+                                    ' Rule input %s in rule with index %s'
+                                    ' is empty. ' % (rule_input, rule_index))
         if validation_errors:
             yield (item.id, validation_errors)
 
@@ -101,20 +97,16 @@ class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     state.interaction.customization_args['choices'].value)
                 for answer_group_index, answer_group in enumerate(
                         state.interaction.answer_groups):
-                    for rule_type in answer_group.rule_types_to_inputs:
-                        for rule_input_index, rule_input in enumerate(
-                                answer_group.rule_types_to_inputs[rule_type]):
-                            if rule_input['x'] >= choices_length:
-                                yield (
-                                    item.id,
-                                    'State name: %s, AnswerGroup: %s,' % (
-                                        state_name.encode('utf-8'),
-                                        answer_group_index) +
-                                    ' Rule with (rule type: %s, rule input'
-                                    ' index: %s) is invalid.' % (
-                                        rule_type, rule_input_index
-                                    )
-                                )
+                    for rule_index, rule_spec in enumerate(
+                            answer_group.rule_specs):
+                        if rule_spec.inputs['x'] >= choices_length:
+                            yield (
+                                item.id,
+                                'State name: %s, AnswerGroup: %s,' % (
+                                    state_name.encode('utf-8'),
+                                    answer_group_index) +
+                                ' Rule: %s is invalid.' % (rule_index) +
+                                '(Indices here are 0-indexed.)')
 
     @staticmethod
     def reduce(key, values):
@@ -146,15 +138,14 @@ class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 ]
 
                 for group in state.interaction.answer_groups:
-                    for rule_type in group.rule_types_to_inputs:
-                        for rule_input in group.rule_types_to_inputs[rule_type]:
-                            for rule_item in rule_input['x']:
-                                if rule_item not in choices:
-                                    yield (
-                                        item.id,
-                                        '%s: %s' % (
-                                            state_name.encode('utf-8'),
-                                            rule_item.encode('utf-8')))
+                    for rule_spec in group.rule_specs:
+                        for rule_item in rule_spec.inputs['x']:
+                            if rule_item not in choices:
+                                yield (
+                                    item.id,
+                                    '%s: %s' % (
+                                        state_name.encode('utf-8'),
+                                        rule_item.encode('utf-8')))
 
     @staticmethod
     def reduce(key, values):
@@ -202,7 +193,8 @@ class InteractionCustomizationArgsValidationOneOffJob(
                     fail_on_validation_errors=True
                 )
             except Exception as e:
-                error_messages.append('%s: %s' % (state.interaction.id, e))
+                error_messages.append(
+                    '%s: %s' % (state.interaction.id, python_utils.UNICODE(e)))
 
         if error_messages:
             yield (

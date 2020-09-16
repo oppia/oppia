@@ -40,14 +40,6 @@ import { OppiaAngularRootComponent } from
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
-import { AppConstants } from 'app.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { StoryViewerDomainConstants } from
-  'domain/story_viewer/story-viewer-domain.constants';
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -61,10 +53,6 @@ import { StoryViewerDomainConstants } from
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    StoryViewerDomainConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

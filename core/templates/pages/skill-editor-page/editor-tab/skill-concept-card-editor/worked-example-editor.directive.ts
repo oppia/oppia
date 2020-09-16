@@ -33,8 +33,8 @@ angular.module('oppia').directive('workedExampleEditor', [
         '/pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
         'worked-example-editor.directive.html'),
       controller: [
-        '$scope', 'SkillUpdateService', 'SkillEditorStateService',
-        function($scope, SkillUpdateService, SkillEditorStateService) {
+        '$scope', 'SkillEditorStateService', 'SkillUpdateService',
+        function($scope, SkillEditorStateService, SkillUpdateService) {
           var ctrl = this;
 
           $scope.openQuestionEditor = function() {

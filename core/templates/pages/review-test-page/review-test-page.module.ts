@@ -39,17 +39,6 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
-
-import { AppConstants } from 'app.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { QuestionPlayerConstants } from
-  'components/question-directives/question-player/question-player.constants';
-import { ServicesConstants } from 'services/services.constants';
-import { ReviewTestPageConstants } from
-  'pages/review-test-page/review-test-page.constants';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
@@ -66,12 +55,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    QuestionPlayerConstants,
-    ServicesConstants,
-    ReviewTestPageConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

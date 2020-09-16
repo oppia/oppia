@@ -54,10 +54,24 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'chapter_title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'content_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'incomplete_translation_language_codes':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'translation_counts': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'assigned_voice_artist_in_language_codes':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'need_voice_artist_in_language_codes':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
@@ -189,10 +203,13 @@ class SkillOpportunityModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'skill_description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_count': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):

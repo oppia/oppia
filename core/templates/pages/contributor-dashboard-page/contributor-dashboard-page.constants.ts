@@ -16,8 +16,8 @@
  * @fileoverview Constants for the creator dashboard page.
  */
 
-export class ContributorDashboardConstants {
-  public static CONTRIBUTOR_DASHBOARD_TABS_DETAILS = {
+export const ContributorDashboardConstants = {
+  CONTRIBUTOR_DASHBOARD_TABS_DETAILS: {
     myContributionTab: {
       ariaLabel: 'Check your contributions.',
       tabName: 'My Contributions',
@@ -38,7 +38,7 @@ export class ContributorDashboardConstants {
         'follow the lessons.',
       customizationOptions: ['language', 'sort']
     }
-  };
+  },
 
-  public static DEFAULT_OPPORTUNITY_LANGUAGE_CODE= 'hi';
-}
+  DEFAULT_OPPORTUNITY_LANGUAGE_CODE: 'hi'
+} as const;

@@ -45,30 +45,12 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { platformFeatureInitFactory, PlatformFeatureService } from
+  'services/platform-feature.service';
 
-import { AppConstants } from 'app.constants';
 import { CkEditorCopyToolbarComponent } from
   /* eslint-disable max-len */
   'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
-import { ClassifiersExtensionConstants } from
-  'classifiers/classifiers-extension.constants';
-import { CollectionSummaryTileConstants } from
-  'components/summary-tile/collection-summary-tile.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { QuestionDomainConstants } from
-  'domain/question/question-domain.constants';
-import { ServicesConstants } from 'services/services.constants';
-import { StateEditorConstants } from
-  'components/state-editor/state-editor.constants';
-import { StatisticsDomainConstants } from
-  'domain/statistics/statistics-domain.constants';
-import { ExplorationEditorPageConstants } from
-  'pages/exploration-editor-page/exploration-editor-page.constants';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 
 @NgModule({
   imports: [
@@ -85,16 +67,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
-    ClassifiersExtensionConstants,
-    CollectionSummaryTileConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    QuestionDomainConstants,
-    ServicesConstants,
-    StateEditorConstants,
-    StatisticsDomainConstants,
-    ExplorationEditorPageConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
