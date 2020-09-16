@@ -130,8 +130,6 @@ import { ConstructTranslationIdsService } from
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CreatorDashboardBackendApiService } from
   'domain/creator_dashboard/creator-dashboard-backend-api.service';
-import { CreatorExplorationSummaryObjectFactory } from
-  'domain/summary/creator-exploration-summary-object.factory';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { CurrentInteractionService } from
   'pages/exploration-player-page/services/current-interaction.service';
@@ -701,8 +699,6 @@ export class UpgradedServices {
       new ConstructTranslationIdsService();
     upgradedServices['ContinueRulesService'] = new ContinueRulesService();
     upgradedServices['CountVectorizerService'] = new CountVectorizerService();
-    upgradedServices['CreatorExplorationSummaryObjectFactory'] =
-      new CreatorExplorationSummaryObjectFactory();
     upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
@@ -1295,7 +1291,6 @@ export class UpgradedServices {
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['CreatorExplorationSummaryObjectFactory'],
         upgradedServices['FeedbackThreadObjectFactory'],
         upgradedServices['SuggestionObjectFactory'],
         upgradedServices['SuggestionThreadObjectFactory'],

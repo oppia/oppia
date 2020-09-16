@@ -21,6 +21,7 @@
 
 import { CollectionSummary, CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
 import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboard-stats.model';
+import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 
@@ -57,7 +58,6 @@ describe('Creator dashboard controller', () => {
   var $window = null;
   var AlertsService = null;
   var CreatorDashboardBackendApiService = null;
-  var creatorExplorationSummaryObjectFactory = null;
   var CsrfService = null;
   var feedbackThreadObjectFactory = null;
   var SuggestionModalForCreatorDashboardService = null;
@@ -86,9 +86,6 @@ describe('Creator dashboard controller', () => {
     AlertsService = $injector.get('AlertsService');
     CreatorDashboardBackendApiService = $injector.get(
       'CreatorDashboardBackendApiService');
-
-    creatorExplorationSummaryObjectFactory = $injector.get(
-      'CreatorExplorationSummaryObjectFactory');
     CsrfService = $injector.get('CsrfTokenService');
     feedbackThreadObjectFactory = $injector.get(
       'FeedbackThreadObjectFactory');
@@ -315,7 +312,7 @@ describe('Creator dashboard controller', () => {
               suggestionsService,
               SuggestionThreadObjectFactory),
             explorationsList: dashboardData.explorations_list.map(
-              expSummary => creatorExplorationSummaryObjectFactory
+              expSummary => CreatorExplorationSummary
                 .createFromBackendDict(expSummary)),
             collectionsList: dashboardData.collections_list.map(
               collectionSummary => CollectionSummary
@@ -617,7 +614,7 @@ describe('Creator dashboard controller', () => {
             suggestionsService,
             SuggestionThreadObjectFactory),
           explorationsList: dashboardData.explorations_list.map(
-            expSummary => creatorExplorationSummaryObjectFactory
+            expSummary => CreatorExplorationSummary
               .createFromBackendDict(expSummary)),
           collectionsList: dashboardData.collections_list.map(
             (collectionSummary: unknown) => CollectionSummary
@@ -716,7 +713,7 @@ describe('Creator dashboard controller', () => {
             suggestionsService,
             SuggestionThreadObjectFactory),
           explorationsList: dashboardData.explorations_list.map(
-            expSummary => creatorExplorationSummaryObjectFactory
+            expSummary => CreatorExplorationSummary
               .createFromBackendDict(expSummary)),
           collectionsList: dashboardData.collections_list.map(
             collectionSummary => CollectionSummary

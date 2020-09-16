@@ -162,7 +162,6 @@ import { ReadOnlySubtopicPageObjectFactory } from 'domain/subtopic_viewer/ReadOn
 import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { SuggestionObjectFactory } from 'domain/suggestion/SuggestionObjectFactory';
 import { SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
-import { CreatorExplorationSummaryObjectFactory } from 'domain/summary/creator-exploration-summary-object.factory';
 import { LearnerExplorationSummaryObjectFactory } from 'domain/summary/learner-exploration-summary-object.factory';
 import { NewlyCreatedStoryObjectFactory } from 'domain/topic/NewlyCreatedStoryObjectFactory';
 import { StoryReferenceObjectFactory } from 'domain/topic/StoryReferenceObjectFactory';
@@ -401,8 +400,6 @@ export const angularServices: [string, unknown][] = [
     ContributionOpportunitiesBackendApiService],
   ['CountVectorizerService', CountVectorizerService],
   ['CreatorDashboardBackendApiService', CreatorDashboardBackendApiService],
-  ['CreatorExplorationSummaryObjectFactory',
-    CreatorExplorationSummaryObjectFactory],
   ['CsrfTokenService', CsrfTokenService],
   ['CurrentInteractionService', CurrentInteractionService],
   ['DateTimeFormatService', DateTimeFormatService],

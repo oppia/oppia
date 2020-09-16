@@ -31,9 +31,8 @@ import {
 } from 'domain/creator_dashboard/creator-dashboard-stats.model';
 import {
   CreatorExplorationSummary,
-  CreatorExplorationSummaryBackendDict,
-  CreatorExplorationSummaryObjectFactory
-} from 'domain/summary/creator-exploration-summary-object.factory';
+  CreatorExplorationSummaryBackendDict
+} from 'domain/summary/creator-exploration-summary.model';
 import {
   FeedbackThread,
   FeedbackThreadObjectFactory,
@@ -97,8 +96,6 @@ interface CreatorDashboardData {
 export class CreatorDashboardBackendApiService {
   constructor(
     private http: HttpClient,
-    private creatorExplorationSummaryObjectFactory:
-    CreatorExplorationSummaryObjectFactory,
     private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
     private suggestionObjectFactory: SuggestionObjectFactory,
     private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
@@ -171,7 +168,7 @@ export class CreatorDashboardBackendApiService {
           dashboardData.threads_for_suggestions_to_review_list,
           dashboardData.suggestions_to_review_list),
         explorationsList: dashboardData.explorations_list.map(
-          expSummary => this.creatorExplorationSummaryObjectFactory
+          expSummary => CreatorExplorationSummary
             .createFromBackendDict(expSummary)),
         collectionsList: dashboardData.collections_list.map(
           collectionSummary => CollectionSummary

@@ -16,9 +16,6 @@
  * @fileoverview Frontend domain object factory for creator exploration summary.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 interface ExplorationRatings {
   '1': number;
   '2': number;
@@ -75,13 +72,8 @@ export class CreatorExplorationSummary {
       HumanReadableContributorsSummary,
       public numTotalThreads: number,
       public numOpenThreads: number) {}
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class CreatorExplorationSummaryObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       expSummaryBacknedDict: CreatorExplorationSummaryBackendDict):
       CreatorExplorationSummary {
     return new CreatorExplorationSummary(
@@ -99,7 +91,3 @@ export class CreatorExplorationSummaryObjectFactory {
       expSummaryBacknedDict.num_open_threads);
   }
 }
-
-angular.module('oppia').factory(
-  'CreatorExplorationSummaryObjectFactory',
-  downgradeInjectable(CreatorExplorationSummaryObjectFactory));

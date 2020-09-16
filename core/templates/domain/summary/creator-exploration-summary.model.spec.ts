@@ -16,16 +16,10 @@
  * @fileoverview Unit tests for Exploration Summary Object Factory.
  */
 
-import { CreatorExplorationSummaryObjectFactory } from
-  'domain/summary/creator-exploration-summary-object.factory';
+import { CreatorExplorationSummary } from
+  'domain/summary/creator-exploration-summary.model';
 
 describe('Creator Exploration summary object factory', () => {
-  let cesof: CreatorExplorationSummaryObjectFactory;
-
-  beforeEach(() => {
-    cesof = new CreatorExplorationSummaryObjectFactory();
-  });
-
   it('should correctly convert backend dict to exp summary object', () => {
     let backendDict = {
       last_updated_msec: 1591296737470.528,
@@ -54,7 +48,8 @@ describe('Creator Exploration summary object factory', () => {
       num_open_threads: 0
     };
 
-    let expSummaryObject = cesof.createFromBackendDict(backendDict);
+    let expSummaryObject =
+      CreatorExplorationSummary.createFromBackendDict(backendDict);
 
     expect(expSummaryObject.lastUpdatedMsec).toEqual(1591296737470.528);
     expect(expSummaryObject.communityOwned).toEqual(false);
