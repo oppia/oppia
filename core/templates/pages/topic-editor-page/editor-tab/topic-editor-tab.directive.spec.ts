@@ -42,8 +42,6 @@ describe('Topic editor tab directive', function() {
   var skillSummary = null;
   var story1 = null;
   var story2 = null;
-  var ContextService = null;
-  var ImageUploadHelperService = null;
   var directive = null;
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
@@ -55,7 +53,6 @@ describe('Topic editor tab directive', function() {
   var SubtopicObjectFactory = null;
   var StoryReferenceObjectFactory = null;
   var UndoRedoService = null;
-  var WindowDimensionsService = null;
   var TopicEditorRoutingService = null;
   var mockStorySummariesInitializedEventEmitter = new EventEmitter();
 
@@ -75,11 +72,8 @@ describe('Topic editor tab directive', function() {
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    ContextService = $injector.get('ContextService');
     $uibModalInstance = $injector.get('$uibModal');
     $q = $injector.get('$q');
-    ImageUploadHelperService = $injector.get('ImageUploadHelperService');
-    WindowDimensionsService = $injector.get('WindowDimensionsService');
     directive = $injector.get('topicEditorTabDirective')[0];
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
@@ -253,7 +247,7 @@ describe('Topic editor tab directive', function() {
     expect(skillSpy).toHaveBeenCalled();
   });
 
-  it('show mark the changes in description', function() {
+  it('should show mark the changes in description', function() {
     expect($scope.topicDescriptionChanged).toEqual(false);
     $scope.updateTopicDescriptionStatus('New description');
     expect($scope.topicDescriptionChanged).toEqual(true);

@@ -1,5 +1,4 @@
 var argv = require('yargs').argv;
-var path = require('path');
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (argv.prodEnv) {
   generatedJs = (
@@ -18,7 +17,6 @@ module.exports = function(config) {
       'third_party/static/angularjs-1.7.9/angular.js',
       'core/templates/karma.module.ts',
       'third_party/static/angularjs-1.7.9/angular-mocks.js',
-      'third_party/static/math-expressions-1.7.0/math-expressions.js',
       generatedJs,
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
@@ -150,7 +148,14 @@ module.exports = function(config) {
           'node_modules',
           'third_party',
         ],
-        extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
+        extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
+        alias: {
+          // This is needed because in app.constants.ts we need to import
+          // assets/constants.ts. We can't directly write import 'constants'
+          // because a module named 'constants' is defined in '@types/node'
+          // package.
+          'assets/constants': 'constants.ts'
+        }
       },
       devtool: 'inline-cheap-source-map',
       module: {

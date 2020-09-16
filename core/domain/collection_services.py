@@ -36,6 +36,7 @@ from core.domain import caching_services
 from core.domain import collection_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import subscription_services
@@ -687,7 +688,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
             'save collection %s: %s' % (collection.id, change_list))
 
     collection_rights = rights_manager.get_collection_rights(collection.id)
-    if collection_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
+    if collection_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
         collection.validate(strict=True)
     else:
         collection.validate(strict=False)

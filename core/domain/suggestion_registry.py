@@ -23,6 +23,8 @@ from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_services
+from core.domain import html_cleaner
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
@@ -56,6 +58,9 @@ class BaseSuggestion(python_utils.OBJECT):
         score_category: str. The scoring category for the suggestion.
         last_updated: datetime.datetime. Date and time when the suggestion
             was last updated.
+        language_code: str|None. The ISO 639-1 code used to query suggestions
+            by language, or None if the suggestion type is not queryable by
+            language.
     """
 
     def __init__(self, status, final_reviewer_id):
@@ -80,6 +85,7 @@ class BaseSuggestion(python_utils.OBJECT):
             'final_reviewer_id': self.final_reviewer_id,
             'change': self.change.to_dict(),
             'score_category': self.score_category,
+            'language_code': self.language_code,
             'last_updated': utils.get_time_in_millisecs(self.last_updated)
         }
 
@@ -269,6 +275,43 @@ class BaseSuggestion(python_utils.OBJECT):
             'Subclasses of BaseSuggestion should implement '
             'get_all_html_content_strings.')
 
+    def get_target_entity_html_strings(self):
+        """Gets all html content strings from target entity used in the
+        suggestion.
+        """
+        raise NotImplementedError(
+            'Subclasses of BaseSuggestion should implement '
+            'get_target_entity_html_strings.')
+
+    def get_new_image_filenames_added_in_suggestion(self):
+        """Returns the list of newly added image filenames in the suggestion.
+
+        Returns:
+            list(str). A list of newly added image filenames in the suggestion.
+        """
+        html_list = self.get_all_html_content_strings()
+        all_image_filenames = (
+            html_cleaner.get_image_filenames_from_html_strings(html_list))
+
+        target_entity_html_list = self.get_target_entity_html_strings()
+        target_image_filenames = (
+            html_cleaner.get_image_filenames_from_html_strings(
+                target_entity_html_list))
+
+        new_image_filenames = utils.compute_list_difference(
+            all_image_filenames, target_image_filenames)
+
+        return new_image_filenames
+
+    def _copy_new_images_to_target_entity_storage(self):
+        """Copy newly added images in suggestion to the target entity
+        storage.
+        """
+        new_image_filenames = self.get_new_image_filenames_added_in_suggestion()
+        fs_services.copy_images(
+            self.image_context, self.target_id, self.target_type,
+            self.target_id, new_image_filenames)
+
     def convert_html_in_suggestion_change(self, conversion_fn):
         """Checks for HTML fields in a suggestion change and converts it
         according to the conversion function.
@@ -295,7 +338,7 @@ class SuggestionEditStateContent(BaseSuggestion):
     def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, last_updated=None):
+            change, score_category, language_code, last_updated=None):
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
         """
@@ -310,7 +353,11 @@ class SuggestionEditStateContent(BaseSuggestion):
         self.author_id = author_id
         self.change = exp_domain.ExplorationChange(change)
         self.score_category = score_category
+        self.language_code = language_code
         self.last_updated = last_updated
+        # Currently, we don't allow adding images in the "edit state content"
+        # suggestion, so the image_context is None.
+        self.image_context = None
 
     def validate(self):
         """Validates a suggestion object of type SuggestionEditStateContent.
@@ -344,6 +391,13 @@ class SuggestionEditStateContent(BaseSuggestion):
                 'Expected property_name to be %s, received %s' % (
                     exp_domain.STATE_PROPERTY_CONTENT,
                     self.change.property_name))
+
+        # Suggestions of this type do not have an associated language code,
+        # since they are not translation-related.
+        if self.language_code != None:
+            raise utils.ValidationError(
+                'Expected language_code to be None, received %s' % (
+                    self.language_code))
 
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
@@ -434,6 +488,19 @@ class SuggestionEditStateContent(BaseSuggestion):
             html_string_list.append(self.change.old_value['html'])
         return html_string_list
 
+    def get_target_entity_html_strings(self):
+        """Gets all html content strings from target entity used in the
+        suggestion.
+
+        Returns:
+            list(str). The list of html content strings from target entity used
+            in the suggestion.
+        """
+        if self.change.old_value is not None:
+            return [self.change.old_value['html']]
+
+        return []
+
     def convert_html_in_suggestion_change(self, conversion_fn):
         """Checks for HTML fields in a suggestion change and converts it
         according to the conversion function.
@@ -457,7 +524,7 @@ class SuggestionTranslateContent(BaseSuggestion):
     def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, last_updated=None):
+            change, score_category, language_code, last_updated=None):
         """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
         """
@@ -472,7 +539,9 @@ class SuggestionTranslateContent(BaseSuggestion):
         self.author_id = author_id
         self.change = exp_domain.ExplorationChange(change)
         self.score_category = score_category
+        self.language_code = language_code
         self.last_updated = last_updated
+        self.image_context = feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
 
     def validate(self):
         """Validates a suggestion object of type SuggestionTranslateContent.
@@ -508,6 +577,14 @@ class SuggestionTranslateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.change.language_code)
 
+        if self.language_code is None:
+            raise utils.ValidationError('language_code cannot be None')
+
+        if self.language_code != self.change.language_code:
+            raise utils.ValidationError(
+                'Expected language_code to be %s, received %s' % (
+                    self.change.language_code, self.language_code))
+
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
@@ -530,6 +607,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         Args:
             commit_message: str. The commit message.
         """
+        self._copy_new_images_to_target_entity_storage()
         exp_services.update_exploration(
             self.final_reviewer_id, self.target_id, [self.change],
             commit_message, is_suggestion=True)
@@ -541,6 +619,16 @@ class SuggestionTranslateContent(BaseSuggestion):
             list(str). The list of html content strings.
         """
         return [self.change.translation_html, self.change.content_html]
+
+    def get_target_entity_html_strings(self):
+        """Gets all html content strings from target entity used in the
+        suggestion.
+
+        Returns:
+            list(str). The list of html content strings from target entity used
+            in the suggestion.
+        """
+        return [self.change.content_html]
 
     def convert_html_in_suggestion_change(self, conversion_fn):
         """Checks for HTML fields in a suggestion change and converts it
@@ -575,12 +663,14 @@ class SuggestionAddQuestion(BaseSuggestion):
         score_category: str. The scoring category for the suggestion.
         last_updated: datetime.datetime. Date and time when the suggestion
             was last updated.
+        language_code: str. The ISO 639-1 code used to query suggestions
+            by language. In this case it is the language code of the question.
     """
 
     def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
-            change, score_category, last_updated=None):
+            change, score_category, language_code, last_updated=None):
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
         """
@@ -597,7 +687,9 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.change.question_dict['question_state_data_schema_version'] = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.score_category = score_category
+        self.language_code = language_code
         self.last_updated = last_updated
+        self.image_context = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
 
     def validate(self):
         """Validates a suggestion object of type SuggestionAddQuestion.
@@ -633,6 +725,15 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected change to contain question_dict')
 
+        if self.language_code is None:
+            raise utils.ValidationError('language_code cannot be None')
+
+        if self.language_code != self.change.question_dict['language_code']:
+            raise utils.ValidationError(
+                'Expected language_code to be %s, received %s' % (
+                    self.change.question_dict['language_code'],
+                    self.language_code))
+
         if not self.change.skill_difficulty:
             raise utils.ValidationError(
                 'Expected change to contain skill_difficulty')
@@ -649,7 +750,8 @@ class SuggestionAddQuestion(BaseSuggestion):
                 self.change.question_dict['question_state_data']),
             self.change.question_dict['question_state_data_schema_version'],
             self.change.question_dict['language_code'], None,
-            self.change.question_dict['linked_skill_ids'])
+            self.change.question_dict['linked_skill_ids'],
+            self.change.question_dict['inapplicable_skill_misconception_ids'])
         question.partial_validate()
         question_state_data_schema_version = (
             self.change.question_dict['question_state_data_schema_version'])
@@ -700,7 +802,11 @@ class SuggestionAddQuestion(BaseSuggestion):
         question_dict['linked_skill_ids'] = [self.change.skill_id]
         question = question_domain.Question.from_dict(question_dict)
         question.validate()
+
+        self._copy_new_images_to_target_entity_storage()
+
         question_services.add_question(self.author_id, question)
+
         skill = skill_fetchers.get_skill_by_id(
             self.change.skill_id, strict=False)
         if skill is None:
@@ -752,6 +858,12 @@ class SuggestionAddQuestion(BaseSuggestion):
                 self.change.question_dict['question_state_data']))
         html_string_list = state_object.get_all_html_content_strings()
         return html_string_list
+
+    def get_target_entity_html_strings(self):
+        """Gets all html content strings from target entity used in the
+        suggestion.
+        """
+        return []
 
     def convert_html_in_suggestion_change(self, conversion_fn):
         """Checks for HTML fields in the suggestion change  and converts it

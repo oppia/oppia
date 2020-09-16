@@ -1,4 +1,4 @@
-name: End-to-End Tests
+name: End-to-End tests
 on:
   push:
     branches:
@@ -21,24 +21,18 @@ jobs:
         with:
           python-version: '2.x'
           architecture: 'x64'
+      - name: Setup python by installing wheel
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: pip install wheel==0.35.0
       - name: Install third party
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_third_party_libs
-      - name: Set Environment Variable
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: echo "::set-env name=DISPLAY:::99.0"
-      - name: Run Contributor Dashboard E2E Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --suite="contributorDashboard"  --contributor_dashboard_enabled
-      - name: Run Exploration Statistics Tab E2E Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationStatisticsTab" --prod_env
       - name: Run Exploration Translation Tab E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationTranslationTab" --prod_env
-      - name: Run Learner E2E Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learner" --prod_env
+        run: xvfb-run -a python -m scripts.run_e2e_tests --suite="explorationTranslationTab" --prod_env
       - name: Run Learner Dashboard E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learnerDashboard" --prod_env
+      - name: Run Classroom Page E2E Test
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="classroomPage" --prod_env

@@ -19,8 +19,54 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+/**
+ * Names of all feature flags should be defined here, with format:
+ * FeatureName = 'feature_name', where the LHS is the feature name in
+ * PascalCase, and the RHS is in snake_case, which is the naming convention
+ * of features in the backend.
+ */
+export enum FeatureNames {
+  DummyFeature = 'dummy_feature',
+}
+
 export interface FeatureStatusSummaryBackendDict {
   [featureName: string]: boolean;
+}
+
+/**
+ * Status checker of feature flags, which are keyed on their names defined in
+ * FeatureNames. This provides interface for developer to access feature flag
+ * values with feature name hint:
+ *   featureStatusChecker.DummyFeature.isEnabled === true
+ */
+export type FeatureStatusChecker = {
+  [name in keyof typeof FeatureNames]: {
+      isEnabled: boolean;
+  }
+};
+
+/**
+ * Item of the status checker of feature flags, which represents the status of
+ * one feature flag, providing the '.isEnabled' interface to check the status
+ * of that feature flag.
+ */
+class FeatureStatusCheckerItem {
+  /**
+   * Constructor of the FeatureStatusCheckerDictItem class.
+   *
+   * @param {() => boolean} getterFn - Function that returns the status of
+   *     the feature.
+   */
+  constructor(private getterFn: () => boolean) {}
+
+  /**
+   * Checks if the feature is enabled.
+   *
+   * @returns {boolean} - True if the feature is enabled.
+   */
+  get isEnabled(): boolean {
+    return this.getterFn();
+  }
 }
 
 /**
@@ -49,6 +95,21 @@ export class FeatureStatusSummary {
   }
 
   /**
+   * Construct and returns the feature status checker.
+   *
+   * @returns {FeatureStatusChecker} - The feature status checker.
+   */
+  toStatusChecker(): FeatureStatusChecker {
+    const checker = <FeatureStatusChecker>{};
+    Object.keys(FeatureNames).forEach(name => {
+      checker[name] = new FeatureStatusCheckerItem(
+        () => this.isFeatureEnabled(FeatureNames[name])
+      );
+    });
+    return checker;
+  }
+
+  /**
    * Gets the value of a feature flag in the result.
    *
    * @param {string} featureName - The name of the feature.
@@ -56,7 +117,7 @@ export class FeatureStatusSummary {
    * @returns {boolean} - The value of the feature flag, true if enabled.
    * @throws {Error} - If the feature with the specified name doesn't exist.
    */
-  isFeatureEnabled(featureName: string): boolean {
+  private isFeatureEnabled(featureName: string): boolean {
     if (!this.featureNameToFlag.has(featureName)) {
       throw new Error(`Feature '${featureName}' does not exist.`);
     }
@@ -71,6 +132,20 @@ export class FeatureStatusSummaryObjectFactory {
   createFromBackendDict(
       backendDict: FeatureStatusSummaryBackendDict): FeatureStatusSummary {
     return new FeatureStatusSummary(backendDict);
+  }
+
+  /**
+   * Creates a default FeatureStatusSummary object such that all features are
+   * disabled.
+   *
+   * @returns {FeatureStatusSummary} - The FeatureStatusSummary object instance
+   *     with all feature disabled.
+   */
+  createDefault(): FeatureStatusSummary {
+    const defaultDict: FeatureStatusSummaryBackendDict = {};
+    Object.keys(FeatureNames).forEach(
+      name => defaultDict[FeatureNames[name]] = false);
+    return this.createFromBackendDict(defaultDict);
   }
 }
 

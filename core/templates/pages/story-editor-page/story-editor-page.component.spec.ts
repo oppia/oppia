@@ -34,8 +34,6 @@ describe('Story editor page', function() {
   var $uibModal = null;
   var PageTitleService = null;
   var StoryEditorStateService = null;
-  var StoryEditorNavigationService = null;
-  var EditableStoryBackendApiService = null;
   var StoryObjectFactory = null;
   var UndoRedoService = null;
   var UrlService = null;
@@ -77,11 +75,7 @@ describe('Story editor page', function() {
     $uibModal = $injector.get('$uibModal');
     PageTitleService = $injector.get('PageTitleService');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
-    StoryEditorNavigationService = $injector.get(
-      'StoryEditorNavigationService');
     StoryObjectFactory = $injector.get('StoryObjectFactory');
-    EditableStoryBackendApiService = $injector.get(
-      'EditableStoryBackendApiService');
     UndoRedoService = $injector.get('UndoRedoService');
     UrlService = $injector.get('UrlService');
     story = StoryObjectFactory.createFromBackendDict({
@@ -161,6 +155,15 @@ describe('Story editor page', function() {
     expect(PageTitleService.setPageTitle).toHaveBeenCalledTimes(2);
 
     ctrl.$onDestroy();
+  });
+
+  it('should call confirm before leaving', function() {
+    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
+    spyOn(window, 'addEventListener');
+    ctrl.setUpBeforeUnload();
+    ctrl.confirmBeforeLeaving({returnValue: ''});
+    expect(window.addEventListener).toHaveBeenCalledWith(
+      'beforeunload', ctrl.confirmBeforeLeaving);
   });
 
   it('should return to topic editor page when closing confirmation modal',
@@ -307,7 +310,7 @@ describe('Story editor page', function() {
 
   it('should init page on undo redo change applied', () => {
     let mockUndoRedoChangeEventEmitter = new EventEmitter();
-    spyOn(UndoRedoService, 'onUndoRedoChangeApplied').and.returnValue(
+    spyOn(UndoRedoService, 'onUndoRedoChangeApplied$').and.returnValue(
       mockUndoRedoChangeEventEmitter);
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
     spyOn(PageTitleService, 'setPageTitle');

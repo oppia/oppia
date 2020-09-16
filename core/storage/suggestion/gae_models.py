@@ -84,7 +84,7 @@ SCORE_CATEGORY_DELIMITER = '.'
 
 ALLOWED_QUERY_FIELDS = ['suggestion_type', 'target_type', 'target_id',
                         'status', 'author_id', 'final_reviewer_id',
-                        'score_category']
+                        'score_category', 'language_code']
 
 # Threshold number of days after which suggestion will be accepted.
 THRESHOLD_DAYS_BEFORE_ACCEPT = 7
@@ -153,16 +153,31 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # separated by a ., the first will be a value from SCORE_TYPE_CHOICES and
     # the second will be the subcategory of the suggestion.
     score_category = ndb.StringProperty(required=True, indexed=True)
+    # The ISO 639-1 code used to query suggestions by language, or None if the
+    # suggestion type is not queryable by language.
+    language_code = ndb.StringProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy():
         """General suggestion needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'suggestion_type': base_models.EXPORT_POLICY.EXPORTED,
+            'target_type': base_models.EXPORT_POLICY.EXPORTED,
+            'target_id': base_models.EXPORT_POLICY.EXPORTED,
+            'target_version_at_submission':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'status': base_models.EXPORT_POLICY.EXPORTED,
+            'author_id': base_models.EXPORT_POLICY.EXPORTED,
+            'final_reviewer_id': base_models.EXPORT_POLICY.EXPORTED,
+            'change_cmd': base_models.EXPORT_POLICY.EXPORTED,
+            'score_category': base_models.EXPORT_POLICY.EXPORTED,
+            'language_code': base_models.EXPORT_POLICY.EXPORTED
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -181,9 +196,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, suggestion_type, target_type, target_id,
-            target_version_at_submission, status, author_id,
-            final_reviewer_id, change_cmd, score_category,
-            thread_id):
+            target_version_at_submission, status, author_id, final_reviewer_id,
+            change_cmd, score_category, thread_id, language_code):
         """Creates a new SuggestionModel entry.
 
         Args:
@@ -200,6 +214,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
             score_category: str. The scoring category for the suggestion.
             thread_id: str. The ID of the feedback thread linked to the
                 suggestion.
+            language_code: str|None. The ISO 639-1 code used to query
+                suggestions by language, or None if the suggestion type is not
+                queryable by language.
 
         Raises:
             Exception. There is already a suggestion with the given id.
@@ -217,7 +234,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             target_version_at_submission=target_version_at_submission,
             status=status, author_id=author_id,
             final_reviewer_id=final_reviewer_id, change_cmd=change_cmd,
-            score_category=score_category).put()
+            score_category=score_category, language_code=language_code).put()
 
     @classmethod
     def query_suggestions(cls, query_fields_and_values):
@@ -384,7 +401,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     suggestion_model
                     .target_version_at_submission),
                 'status': suggestion_model.status,
-                'change_cmd': suggestion_model.change_cmd,
+                'change_cmd': suggestion_model.change_cmd
             }
 
         return user_data
@@ -500,10 +517,20 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             cls.target_type == target_type, cls.target_id == target_id,
             cls.language_code == language_code)).fetch()
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'target_type': base_models.EXPORT_POLICY.EXPORTED,
+            'target_id': base_models.EXPORT_POLICY.EXPORTED,
+            'language_code': base_models.EXPORT_POLICY.EXPORTED,
+            'status': base_models.EXPORT_POLICY.EXPORTED,
+            'content': base_models.EXPORT_POLICY.EXPORTED,
+            'filename': base_models.EXPORT_POLICY.EXPORTED,
+            'author_id': base_models.EXPORT_POLICY.EXPORTED,
+            'final_reviewer_id': base_models.EXPORT_POLICY.EXPORTED,
+            'rejection_message': base_models.EXPORT_POLICY.EXPORTED
+        })
 
     @classmethod
     def export_data(cls, user_id):

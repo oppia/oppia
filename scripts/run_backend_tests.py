@@ -71,24 +71,10 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-%s' % common.PSUTIL_VERSION),
     os.path.join(
         common.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common.PYGITHUB_VERSION),
+    os.path.join(
+        common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
     common.CURR_DIR,
-    os.path.join(common.THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.6.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'beautifulsoup4-4.9.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'bleach-3.1.5'),
-    os.path.join(common.THIRD_PARTY_DIR, 'callbacks-0.3.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'graphy-1.0.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'html5lib-python-1.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'mutagen-1.43.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'packaging-20.4'),
-    os.path.join(common.THIRD_PARTY_DIR, 'pylatexenc-2.6'),
-    os.path.join(common.THIRD_PARTY_DIR, 'redis-3.5.3'),
-    os.path.join(common.THIRD_PARTY_DIR, 'simplejson-3.17.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'six-1.15.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'soupsieve-1.9.5'),
-    os.path.join(common.THIRD_PARTY_DIR, 'webencodings-0.5.1'),
+    common.THIRD_PARTY_PYTHON_LIBS_DIR
 ]
 
 COVERAGE_DIR = os.path.join(
@@ -180,7 +166,10 @@ class TestingTaskSpec(python_utils.OBJECT):
         else:
             exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
-        return run_shell_cmd(exc_list)
+        result = run_shell_cmd(exc_list)
+
+        return [concurrent_task_utils.TaskResult(
+            None, None, None, [result])]
 
 
 def _get_all_test_targets(test_path=None, include_load_tests=True):
@@ -312,7 +301,8 @@ def main(args=None):
         test = TestingTaskSpec(
             test_target, parsed_args.generate_coverage_report)
         task = concurrent_task_utils.create_task(
-            test.run, parsed_args.verbose, semaphore, name=test_target)
+            test.run, parsed_args.verbose, semaphore, name=test_target,
+            report_enabled=False)
         task_to_taskspec[task] = test
         tasks.append(task)
 
@@ -384,7 +374,8 @@ def main(args=None):
         else:
             try:
                 tests_run_regex_match = re.search(
-                    r'Ran ([0-9]+) tests? in ([0-9\.]+)s', task.output)
+                    r'Ran ([0-9]+) tests? in ([0-9\.]+)s',
+                    task.task_results[0].get_report()[0])
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
                 python_utils.PRINT(
@@ -393,7 +384,7 @@ def main(args=None):
             except Exception:
                 python_utils.PRINT(
                     'An unexpected error occurred. '
-                    'Task output:\n%s' % task.output)
+                    'Task output:\n%s' % task.task_results[0].get_report()[0])
 
         total_count += test_count
 

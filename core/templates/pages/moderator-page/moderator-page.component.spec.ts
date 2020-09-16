@@ -93,6 +93,18 @@ describe('Moderator Page', function() {
     expect(ctrl.getDatetimeAsString(NOW_MILLIS)).toEqual('11/21/14');
   });
 
+  it('should return correct bool for isMessageFromExploration', function() {
+    expect(
+      ctrl.isMessageFromExploration({entityType: 'exploration'})
+    ).toBeTrue();
+    expect(
+      ctrl.isMessageFromExploration({entityType: 'collection'})
+    ).toBeFalse();
+    expect(
+      ctrl.isMessageFromExploration({entityType: 'topic'})
+    ).toBeFalse();
+  });
+
   it('should get exploration create url', function() {
     expect(ctrl.getExplorationCreateUrl('1')).toEqual('/create/1');
   });

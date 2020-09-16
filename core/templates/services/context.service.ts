@@ -41,7 +41,7 @@ export class ContextService {
   questionId = null;
   editorContext = null;
   customEntityContext = null;
-  imageSaveDestination = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
+  imageSaveDestination: string = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
 
   init(editorName: string): void {
     this.editorContext = editorName;
@@ -109,6 +109,10 @@ export class ContextService {
           this.pageContext = (
             ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD);
           return ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD;
+        } else if (pathnameArray[i] === 'contributor-dashboard') {
+          this.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD);
+          return ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD;
         }
       }
 
@@ -257,6 +261,12 @@ export class ContextService {
         this.questionPlayerIsManuallySet);
   }
 
+  isInExplorationPlayerPage(): boolean {
+    return (
+      this.getPageContext() ===
+        ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
+  }
+
   isInExplorationEditorPage(): boolean {
     return (
       this.getPageContext() ===
@@ -265,14 +275,15 @@ export class ContextService {
 
   canAddOrEditComponents(): boolean {
     var currentPageContext = this.getPageContext();
-    var allowedPageContext = [
+    var allowedPageContext: string[] = [
       ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR,
       ServicesConstants.PAGE_CONTEXT.QUESTION_EDITOR,
       ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR,
       ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR,
       ServicesConstants.PAGE_CONTEXT.STORY_EDITOR,
       ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR,
-      ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD
+      ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD,
+      ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD
     ];
     return (allowedPageContext.includes(currentPageContext));
   }

@@ -52,8 +52,8 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-chapter-exploration-input'));
   var confirmChapterCreationButton = element(
     by.css('.protractor-test-confirm-chapter-creation-button'));
-  var destinationSelect = element(
-    by.css('.protractor-test-destination-select'));
+  var cancelChapterCreationButton = element(
+    by.css('.protractor-test-cancel-chapter-creation-button'));
   var chapterTitles = element.all(by.css('.protractor-test-chapter-title'));
   var deleteChapterButton = element(
     by.css('.protractor-test-delete-chapter-button'));
@@ -121,6 +121,9 @@ var StoryEditorPage = function() {
     by.css('.chapter-input-thumbnail .protractor-test-photo-button'));
   var explorationAlreadyPresentMsg = element(
     by.css('.protractor-test-invalid-exp-id'));
+  var discardOption = element(by.css('.protractor-test-show-discard-option'));
+  var discardChangesButton = element(
+    by.css('.protractor-test-discard-story-changes'));
 
   this.get = async function(storyId) {
     await browser.get(EDITOR_URL_PREFIX + storyId);
@@ -173,9 +176,19 @@ var StoryEditorPage = function() {
       'New chapter exploration ID', newChapterExplorationField, explorationId);
     await workflow.submitImage(
       createChapterThumbnailButton, thumbnailContainer, imgPath, false);
-
-    await confirmChapterCreationButton.click();
+    await action.click(
+      'Confirm chapter creation button', confirmChapterCreationButton);
     await general.scrollToTop();
+  };
+
+  this.cancelChapterCreation = async function() {
+    await action.click(
+      'Cancel chapter creation button', cancelChapterCreationButton);
+  };
+
+  this.discardStoryChanges = async function() {
+    await action.click('Show discard option button', discardOption);
+    await action.click('Discard changes button', discardChangesButton);
   };
 
   this.navigateToChapterWithName = async function(chapterName) {

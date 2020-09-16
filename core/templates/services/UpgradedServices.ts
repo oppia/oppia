@@ -212,6 +212,8 @@ import { ExplorationStatsObjectFactory } from
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ExplorationTaskObjectFactory } from
   'domain/improvements/ExplorationTaskObjectFactory';
+import { ExpressionEvaluatorService } from
+  'expressions/expression-evaluator.service';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExplorationRecommendationsService } from
   // eslint-disable-next-line max-len
@@ -236,6 +238,7 @@ import { FeedbackThreadSummaryObjectFactory } from
   'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { FractionInputValidationService } from
@@ -396,6 +399,11 @@ import { PencilCodeEditorRulesService } from
 import { PencilCodeEditorValidationService } from
   // eslint-disable-next-line max-len
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { PlatformFeatureAdminBackendApiService } from
+  'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformFeatureBackendApiService } from
+  'domain/platform_feature/platform-feature-backend-api.service';
 import { PlatformParameterFilterObjectFactory } from
   'domain/platform_feature/platform-parameter-filter-object.factory';
 import { PlatformParameterObjectFactory } from
@@ -1187,6 +1195,10 @@ export class UpgradedServices {
     upgradedServices['ExplorationImprovementsTaskRegistryService'] =
       new ExplorationImprovementsTaskRegistryService(
         upgradedServices['ExplorationTaskObjectFactory']);
+    upgradedServices['ExpressionEvaluatorService'] =
+      new ExpressionEvaluatorService(
+        upgradedServices['ExpressionParserService'],
+        upgradedServices['ExpressionSyntaxTreeService']);
     upgradedServices['ExtensionTagAssemblerService'] =
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
@@ -1194,6 +1206,9 @@ export class UpgradedServices {
     upgradedServices['ExtractImageFilenamesFromStateService'] =
       new ExtractImageFilenamesFromStateService(
         upgradedServices['HtmlEscaperService']);
+    upgradedServices['FocusManagerService'] = new FocusManagerService(
+      upgradedServices['DeviceInfoService'],
+      upgradedServices['IdGenerationService']);
     upgradedServices['HttpClient'] = new HttpClient(
       upgradedServices['HttpXhrBackend']);
     upgradedServices['LanguageUtilService'] = new LanguageUtilService(
@@ -1402,6 +1417,14 @@ export class UpgradedServices {
         new LearnerDashboardIdsBackendApiService(
           upgradedServices['HttpClient'],
           upgradedServices['LearnerDashboardActivityIdsObjectFactory']);
+    upgradedServices['PlatformFeatureBackendApiService'] =
+      new PlatformFeatureBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['FeatureStatusSummaryObjectFactory']
+      );
+    upgradedServices['PlatformFeatureAdminBackendApiService'] =
+      new PlatformFeatureAdminBackendApiService(
+        upgradedServices['HttpClient']);
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
       upgradedServices['PlayerTranscriptService']);
     upgradedServices['PlaythroughBackendApiService'] =
@@ -1561,6 +1584,15 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
+    upgradedServices['PlatformFeatureService'] = new PlatformFeatureService(
+      upgradedServices['ClientContextObjectFactory'],
+      upgradedServices['PlatformFeatureBackendApiService'],
+      upgradedServices['FeatureStatusSummaryObjectFactory'],
+      upgradedServices['I18nLanguageCodeService'],
+      upgradedServices['WindowRef'],
+      upgradedServices['LoggerService'],
+      upgradedServices['UrlService'],
+      upgradedServices['BrowserCheckerService']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],

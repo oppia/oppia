@@ -1,12 +1,12 @@
 // Code - https://github.com/jiggzson/nerdamer/blob/master/nerdamer.core.js
 
-namespace nerdamer {
+declare namespace nerdamer {
   interface Expression {
     // Returns all variables in the given Expression.
     variables: () => string[];
 
     // Returns the text representation of the Expression.
-    text: (option: string, n: string) => string;
+    text: (outputType?: 'decimals' | 'fractions') => string;
 
     // Evaluates the Expression into the simplest form.
     evaluate: () => Expression;

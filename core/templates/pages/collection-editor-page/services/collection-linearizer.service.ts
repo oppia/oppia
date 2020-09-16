@@ -41,8 +41,7 @@ angular.module('oppia').factory('CollectionLinearizerService', [
     };
 
     var addAfter = function(collection, curExplorationId, newExplorationId) {
-      var curCollectionNode = collection.getCollectionNodeByExplorationId(
-        curExplorationId);
+      collection.getCollectionNodeByExplorationId(curExplorationId);
     };
 
     var findNodeIndex = function(linearNodeList, explorationId) {
@@ -59,7 +58,6 @@ angular.module('oppia').factory('CollectionLinearizerService', [
     // Swap the node at the specified index with the node immediately to the
     // left of it.
     var swapLeft = function(collection, linearNodeList, nodeIndex) {
-      var node = linearNodeList[nodeIndex];
       var leftNodeIndex = nodeIndex > 0 ? nodeIndex - 1 : null;
 
       if (leftNodeIndex === null) {
