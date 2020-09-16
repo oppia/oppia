@@ -222,15 +222,12 @@ def update_and_check_indexes(app_name):
         '?project=%s') % app_name
     gcloud_adapter.update_indexes(INDEX_YAML_PATH, app_name)
 
-    if gcloud_adapter.check_all_indexes_are_serving(app_name):
-        return
-
-    # Sleep for a minute before checking that all indexes are serving.
-    common.open_new_tab_in_browser_if_possible(indexes_page_url)
-    python_utils.PRINT('Waiting for all indexes to serve...')
-    time.sleep(60)
-
+    counter = 1
     while not gcloud_adapter.check_all_indexes_are_serving(app_name):
+        if counter == 1:
+            common.open_new_tab_in_browser_if_possible(indexes_page_url)
+            python_utils.PRINT('Waiting for all indexes to serve...')
+        counter += 1
         time.sleep(30)
 
 

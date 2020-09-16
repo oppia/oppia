@@ -634,8 +634,8 @@ class DeployTests(test_utils.GenericTestBase):
         }
         expected_check_function_calls = {
             'update_indexes_gets_called': True,
-            'check_all_indexes_are_serving_gets_called': 3,
-            'sleep_gets_called': 2
+            'check_all_indexes_are_serving_gets_called': 2,
+            'sleep_gets_called': 1
         }
         def mock_update_indexes(unused_index_yaml_path, unused_app_name):
             check_function_calls['update_indexes_gets_called'] = True
@@ -643,7 +643,7 @@ class DeployTests(test_utils.GenericTestBase):
             check_function_calls[
                 'check_all_indexes_are_serving_gets_called'] += 1
             if check_function_calls[
-                    'check_all_indexes_are_serving_gets_called'] == 3:
+                    'check_all_indexes_are_serving_gets_called'] == 2:
                 return True
             return False
         def mock_sleep(unused_time):
