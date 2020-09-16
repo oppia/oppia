@@ -17,7 +17,6 @@ module.exports = function(config) {
       'third_party/static/angularjs-1.7.9/angular.js',
       'core/templates/karma.module.ts',
       'third_party/static/angularjs-1.7.9/angular-mocks.js',
-      'third_party/static/math-expressions-1.7.0/math-expressions.js',
       generatedJs,
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
