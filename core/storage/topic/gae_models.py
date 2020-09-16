@@ -100,16 +100,17 @@ class TopicModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, unused_user_id):
         """Check whether TopicModel snapshots references the given user.
 
         Args:
-            user_id: str. The ID of the user whose data should be checked.
+            unused_user_id: str. The ID of the user whose data should be
+                checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+        return False
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -389,7 +390,7 @@ class SubtopicPageModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+        return False
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -520,9 +521,9 @@ class TopicRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return (cls.query(
-            cls.manager_ids == user_id).get(keys_only=True) is not None
-                or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+        return cls.query(
+            cls.manager_ids == user_id
+        ).get(keys_only=True) is not None
 
     @classmethod
     def get_by_user(cls, user_id):
