@@ -167,8 +167,6 @@ import { ConstructTranslationIdsService } from
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CreatorDashboardBackendApiService } from
   'domain/creator_dashboard/creator-dashboard-backend-api.service';
-import { CreatorDashboardStatsObjectFactory } from
-  'domain/creator_dashboard/creator-dashboard-stats-object.factory';
 import { CreatorExplorationSummaryObjectFactory } from
   'domain/summary/creator-exploration-summary-object.factory';
 import { CsrfTokenService } from 'services/csrf-token.service';
@@ -747,7 +745,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static constructTranslationIdsService: ConstructTranslationIdsService;
   static countVectorizerService: CountVectorizerService;
   static creatorDashboardBackendApiService: CreatorDashboardBackendApiService;
-  static creatorDashboardStatsObjectFactory: CreatorDashboardStatsObjectFactory;
   static creatorExplorationSummaryObjectFactory: CreatorExplorationSummaryObjectFactory;
   static csrfTokenService: CsrfTokenService;
   static currentInteractionService: CurrentInteractionService;
@@ -1069,7 +1066,6 @@ private contributionOpportunitiesBackendApiService: ContributionOpportunitiesBac
 private constructTranslationIdsService: ConstructTranslationIdsService,
 private countVectorizerService: CountVectorizerService,
 private creatorDashboardBackendApiService: CreatorDashboardBackendApiService,
-private creatorDashboardStatsObjectFactory: CreatorDashboardStatsObjectFactory,
 private creatorExplorationSummaryObjectFactory: CreatorExplorationSummaryObjectFactory,
 private csrfTokenService: CsrfTokenService,
 private currentInteractionService: CurrentInteractionService,
@@ -1392,7 +1388,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.constructTranslationIdsService = this.constructTranslationIdsService;
     OppiaAngularRootComponent.countVectorizerService = this.countVectorizerService;
     OppiaAngularRootComponent.creatorDashboardBackendApiService = this.creatorDashboardBackendApiService;
-    OppiaAngularRootComponent.creatorDashboardStatsObjectFactory = this.creatorDashboardStatsObjectFactory;
     OppiaAngularRootComponent.creatorExplorationSummaryObjectFactory = this.creatorExplorationSummaryObjectFactory;
     OppiaAngularRootComponent.csrfTokenService = this.csrfTokenService;
     OppiaAngularRootComponent.currentInteractionService = this.currentInteractionService;

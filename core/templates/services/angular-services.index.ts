@@ -62,7 +62,6 @@ import { GuestCollectionProgressService } from 'domain/collection/guest-collecti
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { SearchExplorationsBackendApiService } from 'domain/collection/search-explorations-backend-api.service';
 import { CreatorDashboardBackendApiService } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
-import { CreatorDashboardStatsObjectFactory } from 'domain/creator_dashboard/creator-dashboard-stats-object.factory';
 import { ChangeObjectFactory } from 'domain/editor/undo_redo/ChangeObjectFactory';
 import { EmailDashboardBackendApiService } from 'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EmailDashboardQueryObjectFactory } from 'domain/email-dashboard/email-dashboard-query-object.factory';
@@ -405,7 +404,6 @@ export const angularServices: [string, unknown][] = [
     ContributionOpportunitiesBackendApiService],
   ['CountVectorizerService', CountVectorizerService],
   ['CreatorDashboardBackendApiService', CreatorDashboardBackendApiService],
-  ['CreatorDashboardStatsObjectFactory', CreatorDashboardStatsObjectFactory],
   ['CreatorExplorationSummaryObjectFactory',
     CreatorExplorationSummaryObjectFactory],
   ['CsrfTokenService', CsrfTokenService],

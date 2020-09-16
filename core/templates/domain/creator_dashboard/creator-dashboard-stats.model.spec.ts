@@ -16,16 +16,10 @@
  * @fileoverview Unit tests for Creator Dashboard Stats Object Factory.
  */
 
-import { CreatorDashboardStatsObjectFactory } from
-  'domain/creator_dashboard/creator-dashboard-stats-object.factory';
+import { CreatorDashboardStats } from
+  'domain/creator_dashboard/creator-dashboard-stats.model';
 
 describe('Creator dashboard stats object factory', () => {
-  let cdsof: CreatorDashboardStatsObjectFactory;
-
-  beforeEach(() => {
-    cdsof = new CreatorDashboardStatsObjectFactory();
-  });
-
   it('should correctly convert backend dict to object', () => {
     let backendDict = {
       average_ratings: 1,
@@ -34,7 +28,8 @@ describe('Creator dashboard stats object factory', () => {
       total_plays: 4
     };
 
-    let dashboardStatsObject = cdsof.createFromBackendDict(backendDict);
+    let dashboardStatsObject =
+      CreatorDashboardStats.createFromBackendDict(backendDict);
 
     expect(dashboardStatsObject.averageRatings).toEqual(1);
     expect(dashboardStatsObject.numRatings).toEqual(2);

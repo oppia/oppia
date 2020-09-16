@@ -20,6 +20,7 @@
 // creator-dashboard-page.component.ts is upgraded to Angular 8.
 
 import { CollectionSummary, CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
+import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboard-stats.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 
@@ -56,7 +57,6 @@ describe('Creator dashboard controller', () => {
   var $window = null;
   var AlertsService = null;
   var CreatorDashboardBackendApiService = null;
-  var creatorDashboardStatsObjectFactory = null;
   var creatorExplorationSummaryObjectFactory = null;
   var CsrfService = null;
   var feedbackThreadObjectFactory = null;
@@ -86,8 +86,7 @@ describe('Creator dashboard controller', () => {
     AlertsService = $injector.get('AlertsService');
     CreatorDashboardBackendApiService = $injector.get(
       'CreatorDashboardBackendApiService');
-    creatorDashboardStatsObjectFactory = $injector.get(
-      'CreatorDashboardStatsObjectFactory');
+
     creatorExplorationSummaryObjectFactory = $injector.get(
       'CreatorExplorationSummaryObjectFactory');
     CsrfService = $injector.get('CsrfTokenService');
@@ -279,11 +278,11 @@ describe('Creator dashboard controller', () => {
       beforeEach(function() {
         spyOn(CreatorDashboardBackendApiService, 'fetchDashboardData')
           .and.returnValue($q.resolve({
-            dashboardStats: creatorDashboardStatsObjectFactory
+            dashboardStats: CreatorDashboardStats
               .createFromBackendDict(dashboardData.dashboard_stats),
             // Because lastWeekStats may be null.
             lastWeekStats: dashboardData.last_week_stats ? (
-              creatorDashboardStatsObjectFactory
+              CreatorDashboardStats
                 .createFromBackendDict(dashboardData.last_week_stats)) : null,
             displayPreference: dashboardData.display_preference,
             subscribersList: dashboardData.subscribers_list.map(
@@ -581,11 +580,11 @@ describe('Creator dashboard controller', () => {
     beforeEach(function() {
       spyOn(CreatorDashboardBackendApiService, 'fetchDashboardData')
         .and.returnValue($q.resolve({
-          dashboardStats: creatorDashboardStatsObjectFactory
+          dashboardStats: CreatorDashboardStats
             .createFromBackendDict(dashboardData.dashboard_stats),
           // Because lastWeekStats may be null.
           lastWeekStats: dashboardData.last_week_stats ? (
-            creatorDashboardStatsObjectFactory
+            CreatorDashboardStats
               .createFromBackendDict(dashboardData.last_week_stats)) : null,
           displayPreference: dashboardData.display_preference,
           subscribersList: dashboardData.subscribers_list.map(
@@ -680,11 +679,11 @@ describe('Creator dashboard controller', () => {
     beforeEach(function() {
       spyOn(CreatorDashboardBackendApiService, 'fetchDashboardData')
         .and.returnValue($q.resolve({
-          dashboardStats: creatorDashboardStatsObjectFactory
+          dashboardStats: CreatorDashboardStats
             .createFromBackendDict(dashboardData.dashboard_stats),
           // Because lastWeekStats may be null.
           lastWeekStats: dashboardData.last_week_stats ? (
-            creatorDashboardStatsObjectFactory
+            CreatorDashboardStats
               .createFromBackendDict(dashboardData.last_week_stats)) : null,
           displayPreference: dashboardData.display_preference,
           subscribersList: dashboardData.subscribers_list.map(

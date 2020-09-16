@@ -16,9 +16,6 @@
  * @fileoverview Frontend domain object factory for creator dashboard stats.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface CreatorDashboardStatsBackendDict {
   'average_ratings': number;
   'num_ratings': number;
@@ -32,13 +29,8 @@ export class CreatorDashboardStats {
     public numRatings: number,
     public totalOpenFeedback: number,
     public totalPlays: number) { }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class CreatorDashboardStatsObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       dashboardStatsBackendDict: CreatorDashboardStatsBackendDict):
       CreatorDashboardStats {
     return new CreatorDashboardStats(
@@ -48,7 +40,3 @@ export class CreatorDashboardStatsObjectFactory {
       dashboardStatsBackendDict.total_plays);
   }
 }
-
-angular.module('oppia').factory(
-  'CreatorDashboardStatsObjectFactory',
-  downgradeInjectable(CreatorDashboardStatsObjectFactory));

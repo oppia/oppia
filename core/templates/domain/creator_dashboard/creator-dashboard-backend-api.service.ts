@@ -28,8 +28,7 @@ import {
 import {
   CreatorDashboardStatsBackendDict,
   CreatorDashboardStats,
-  CreatorDashboardStatsObjectFactory
-} from 'domain/creator_dashboard/creator-dashboard-stats-object.factory';
+} from 'domain/creator_dashboard/creator-dashboard-stats.model';
 import {
   CreatorExplorationSummary,
   CreatorExplorationSummaryBackendDict,
@@ -98,8 +97,6 @@ interface CreatorDashboardData {
 export class CreatorDashboardBackendApiService {
   constructor(
     private http: HttpClient,
-    private creatorDashboardStatsObjectFactory:
-    CreatorDashboardStatsObjectFactory,
     private creatorExplorationSummaryObjectFactory:
     CreatorExplorationSummaryObjectFactory,
     private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
@@ -141,11 +138,11 @@ export class CreatorDashboardBackendApiService {
     return this.http.get<CreatorDashboardDataBackendDict>(
       '/creatordashboardhandler/data').toPromise().then(dashboardData => {
       return {
-        dashboardStats: this.creatorDashboardStatsObjectFactory
+        dashboardStats: CreatorDashboardStats
           .createFromBackendDict(dashboardData.dashboard_stats),
         // Because lastWeekStats may be null.
         lastWeekStats: dashboardData.last_week_stats ? (
-          this.creatorDashboardStatsObjectFactory
+          CreatorDashboardStats
             .createFromBackendDict(dashboardData.last_week_stats)) : null,
         displayPreference: dashboardData.display_preference,
         subscribersList: dashboardData.subscribers_list.map(
