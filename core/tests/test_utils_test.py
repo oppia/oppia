@@ -24,9 +24,9 @@ import os
 from constants import constants
 from core import jobs
 from core.domain import param_domain
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils

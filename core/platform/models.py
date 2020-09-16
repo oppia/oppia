@@ -253,10 +253,11 @@ class _Gae(Platform):
 
     @classmethod
     def import_taskqueue_services(cls):
-        """Imports and returns gae_taskqueue_services module.
+        """Imports and returns a taskqueue_services module from
+        core.platform.taskqueue.
 
         Returns:
-            module. The gae_taskqueue_services module.
+            module. The core.platform.taskqueue services module.
         """
         if constants.DEV_MODE:
             from core.platform.taskqueue import dev_mode_tasks_services

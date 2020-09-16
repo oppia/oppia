@@ -592,77 +592,6 @@ class BaseJobManager(python_utils.OBJECT):
         pass
 
 
-class BaseDeferredJobManager(BaseJobManager):
-    """Base class to run a job/method as deferred task. These tasks will be
-    pushed to the default taskqueue.
-    """
-
-    @classmethod
-    def _run(cls, additional_job_params):
-        """Function that performs the main business logic of the job.
-
-        Args:
-            additional_job_params: dict(str : *). Additional parameters on jobs.
-        """
-        raise NotImplementedError
-
-    @classmethod
-    def _run_job(cls, job_id, additional_job_params):
-        """Starts the job.
-
-        Args:
-            job_id: str. The ID of the job to run.
-            additional_job_params: dict(str : *). Additional parameters on job.
-
-        Raises:
-            PermanentTaskFailure. No further work can be scheduled.
-        """
-        logging.info(
-            'Job %s started at %s' %
-            (job_id, utils.get_current_time_in_millisecs()))
-        cls.register_start(job_id)
-
-        try:
-            result = cls._run(additional_job_params)
-        except Exception as e:
-            logging.error(traceback.format_exc())
-            logging.error(
-                'Job %s failed at %s' %
-                (job_id, utils.get_current_time_in_millisecs()))
-            cls.register_failure(
-                job_id, '%s\n%s'
-                % (python_utils.UNICODE(e), traceback.format_exc()))
-            raise taskqueue_services.PermanentTaskFailure(
-                'Task failed: %s\n%s'
-                % (python_utils.UNICODE(e), traceback.format_exc()))
-
-        # Note that the job may have been canceled after it started and before
-        # it reached this stage. This will result in an exception when the
-        # validity of the status code transition is checked.
-        cls.register_completion(job_id, [result])
-        logging.info(
-            'Job %s completed at %s' %
-            (job_id, utils.get_current_time_in_millisecs()))
-
-    @classmethod
-    def _real_enqueue(
-            cls, job_id, queue_name, additional_job_params, unused_shard_count):
-        """Puts the job in the task queue.
-
-        Args:
-            job_id: str. The ID of the job to enqueue.
-            queue_name: str. The queue name the job should be run in. See
-                core.platform.taskqueue.gae_taskqueue_services for supported
-                values.
-            additional_job_params: dict(str : *) or None. Additional params to
-                pass into the job's _run() method.
-            unused_shard_count: int. Number of shards used for the job.
-        """
-        taskqueue_services.defer(
-            cls._run_job, queue_name,
-            job_id, additional_job_params)
-
-
 class MapReduceJobPipeline(base_handler.PipelineBase):
     """This class inherits from the PipelineBase class which are used to
     connect various workflows/functional procedures together. It implements
@@ -676,13 +605,11 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
         # generally supposed to only yield 1 object which messes up the
         # indentation checking. This is the only case of this happening.
         """Returns a coroutine which runs the job pipeline and stores results.
-
         Args:
             job_id: str. The ID of the job to run.
             job_class_str: str. Should uniquely identify each type of job.
             kwargs: dict(str : object). Extra arguments used to build the
                 MapreducePipeline.
-
         Yields:
             MapreducePipeline. Ready to start processing. Expects the output of
             that pipeline to be sent back.
@@ -1843,6 +1770,6 @@ def get_continuous_computations_info(cc_classes):
 
 
 ABSTRACT_BASE_CLASSES = frozenset([
-    BaseJobManager, BaseDeferredJobManager, BaseMapReduceJobManager,
+    BaseJobManager, BaseMapReduceJobManager,
     BaseMapReduceOneOffJobManager,
     BaseMapReduceJobManagerForContinuousComputations])
