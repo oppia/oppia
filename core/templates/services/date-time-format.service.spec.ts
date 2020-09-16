@@ -17,7 +17,6 @@
  */
 
 import { DateTimeFormatService } from 'services/date-time-format.service';
-import moment from 'moment';
 
 describe('datetimeformatter', () => {
   // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
@@ -73,8 +72,7 @@ describe('datetimeformatter', () => {
 
   it('should provide date time hour string', function() {
     expect(
-      df.getLocaleDateTimeHourString(NOW_MILLIS)).toBe(
-      moment(new Date(NOW_MILLIS)).format('MMM D HH:mm A'));
+      df.getLocaleDateTimeHourString(NOW_MILLIS)).toBe('Nov 21 10:45 AM');
   });
 
   it('should provide correct date format MM/DD/YYY string', () => {
