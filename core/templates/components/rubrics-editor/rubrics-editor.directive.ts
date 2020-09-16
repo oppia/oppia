@@ -69,6 +69,10 @@ angular.module('oppia').directive('rubricsEditor', [
             ctrl.explanationEditorIsOpen[difficulty][index] = true;
           };
 
+          ctrl.isExplanationValid = function(difficulty, index) {
+            return Boolean(ctrl.editableExplanations[difficulty][index]);
+          };
+
           ctrl.saveExplanation = function(difficulty, index) {
             if (difficulty === SKILL_DIFFICULTY_MEDIUM && index === 0) {
               SkillCreationService.disableSkillDescriptionStatusMarker();
