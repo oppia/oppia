@@ -16,9 +16,6 @@
  * @fileoverview Frontend domain object for visualization info.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { AnswerStats } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { InteractionAnswer } from
@@ -63,13 +60,8 @@ export class VisualizationInfo {
     this.id = id;
     this.options = options;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class VisualizationInfoObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       backendDict: VisualizationInfoBackendDict): VisualizationInfo {
     let answerStatsDicts = backendDict.data;
     let answerStatsObjects = answerStatsDicts.map((
@@ -86,7 +78,3 @@ export class VisualizationInfoObjectFactory {
       backendDict.id, backendDict.options);
   }
 }
-
-angular.module('oppia').factory(
-  'VisualizationInfoObjectFactory',
-  downgradeInjectable(VisualizationInfoObjectFactory));

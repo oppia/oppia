@@ -13,20 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for VisualizationInfoObjectFactory.
+ * @fileoverview Unit tests for visualization-info.model.
  */
 
-import { VisualizationInfoObjectFactory } from
-  'domain/exploration/visualization-info-object.factory';
+import { VisualizationInfo } from
+  'domain/exploration/visualization-info.model';
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 
 describe('Visualization info object factory', () => {
-  let viof: VisualizationInfoObjectFactory;
   let asof: AnswerStatsObjectFactory;
 
   beforeEach(() =>{
-    viof = new VisualizationInfoObjectFactory();
     asof = new AnswerStatsObjectFactory();
   });
 
@@ -42,7 +40,8 @@ describe('Visualization info object factory', () => {
     };
 
     let answerStatObjects = backendDict.data.map(asof.createFromBackendDict);
-    let visualizationInfoObject = viof.createFromBackendDict(backendDict);
+    let visualizationInfoObject =
+      VisualizationInfo.createFromBackendDict(backendDict);
 
     expect(visualizationInfoObject.addressedInfoIsSupported).toEqual(true);
     expect(visualizationInfoObject.id).toEqual('testId');

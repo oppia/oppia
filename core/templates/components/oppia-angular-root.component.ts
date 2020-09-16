@@ -672,8 +672,6 @@ import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';
-import { VisualizationInfoObjectFactory } from
-  'domain/exploration/visualization-info-object.factory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { WindowDimensionsService } from
@@ -1011,7 +1009,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static utilsService: UtilsService;
   static validatorsService: ValidatorsService;
   static versionTreeService: VersionTreeService;
-  static visualizationInfoObjectFactory: VisualizationInfoObjectFactory;
   static voiceoverObjectFactory: VoiceoverObjectFactory;
   static windowDimensionsService: WindowDimensionsService;
   static windowRef: WindowRef;
@@ -1335,7 +1332,6 @@ private userProfileObjectFactory: UserProfileObjectFactory,
 private utilsService: UtilsService,
 private validatorsService: ValidatorsService,
 private versionTreeService: VersionTreeService,
-private visualizationInfoObjectFactory: VisualizationInfoObjectFactory,
 private voiceoverObjectFactory: VoiceoverObjectFactory,
 private windowDimensionsService: WindowDimensionsService,
 private windowRef: WindowRef,
@@ -1660,7 +1656,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.utilsService = this.utilsService;
     OppiaAngularRootComponent.validatorsService = this.validatorsService;
     OppiaAngularRootComponent.versionTreeService = this.versionTreeService;
-    OppiaAngularRootComponent.visualizationInfoObjectFactory = this.visualizationInfoObjectFactory;
     OppiaAngularRootComponent.voiceoverObjectFactory = this.voiceoverObjectFactory;
     OppiaAngularRootComponent.windowDimensionsService = this.windowDimensionsService;
     OppiaAngularRootComponent.windowRef = this.windowRef;

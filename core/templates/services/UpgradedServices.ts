@@ -640,8 +640,6 @@ import { VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
-import { VisualizationInfoObjectFactory } from
-  'domain/exploration/visualization-info-object.factory';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -891,8 +889,6 @@ export class UpgradedServices {
     upgradedServices['UtilsService'] = new UtilsService();
     upgradedServices['VersionTreeService'] = new VersionTreeService();
     upgradedServices['VoiceoverObjectFactory'] = new VoiceoverObjectFactory();
-    upgradedServices['VisualizationInfoObjectFactory'] =
-      new VisualizationInfoObjectFactory();
     upgradedServices['WindowRef'] = new WindowRef();
     upgradedServices['WinnowingPreprocessingService'] =
       new WinnowingPreprocessingService();
@@ -1445,7 +1441,6 @@ export class UpgradedServices {
     upgradedServices['StateInteractionStatsBackendApiService'] =
       new StateInteractionStatsBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['VisualizationInfoObjectFactory'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['StateParamChangesService'] =
       new StateParamChangesService(
