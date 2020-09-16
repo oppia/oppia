@@ -24,8 +24,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import {
   AssignedSkill,
   AssignedSkillBackendDict,
-  AssignedSkillObjectFactory
-} from 'domain/skill/assigned-skill-object.factory';
+} from 'domain/skill/assigned-skill.model';
 import {
   AugmentedSkillSummary,
   AugmentedSkillSummaryBackendDict,
@@ -112,7 +111,6 @@ interface AssignedSkillDataBackendDict {
 
 export class TopicsAndSkillsDashboardBackendApiService {
   constructor(
-    private assignedSkillObjectFactory: AssignedSkillObjectFactory,
     private augmentedSkillSummaryObjectFactory:
     AugmentedSkillSummaryObjectFactory,
     private http: HttpClient,
@@ -173,7 +171,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
     return this.http.get<AssignedSkillDataBackendDict>(
       assignSkillDataUrl).toPromise().then(dict => {
       return dict.topic_assignment_dicts.map(
-        backendDict => this.assignedSkillObjectFactory
+        backendDict => AssignedSkill
           .createFromBackendDict(backendDict));
     }, errorResponse => {
       throw new Error(errorResponse.error.error);

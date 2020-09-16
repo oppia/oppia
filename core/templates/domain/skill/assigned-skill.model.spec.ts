@@ -13,19 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for AssignedSkillObjectFactory.ts.
+ * @fileoverview Unit tests for assigned-skill.model.ts.
  */
 
-import { AssignedSkillObjectFactory } from
-  'domain/skill/assigned-skill-object.factory';
+import { AssignedSkill} from
+  'domain/skill/assigned-skill.model';
 
 describe('Assigned Skill Object Factory', () => {
-  let asof: AssignedSkillObjectFactory;
-
-  beforeEach(() => {
-    asof = new AssignedSkillObjectFactory();
-  });
-
   it('should correctly convert backend dict to Assigned Skill Object.',
     () => {
       let backendDict = {
@@ -35,7 +29,7 @@ describe('Assigned Skill Object Factory', () => {
         subtopic_id: 2
       };
 
-      let assignedSkill = asof.createFromBackendDict(backendDict);
+      let assignedSkill = AssignedSkill.createFromBackendDict(backendDict);
 
       expect(assignedSkill.topicId).toEqual('topicId');
       expect(assignedSkill.topicName).toEqual('topic');

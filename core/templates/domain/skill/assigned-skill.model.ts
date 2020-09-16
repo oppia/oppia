@@ -16,9 +16,6 @@
  * @fileoverview Frontend domain object factory for assigned skill.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface AssignedSkillBackendDict {
   'topic_id': string;
   'topic_name': string;
@@ -32,13 +29,8 @@ export class AssignedSkill {
     public topicName: string,
     public topicVersion: number,
     public subtopicId: number) {}
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class AssignedSkillObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       backendDict: AssignedSkillBackendDict): AssignedSkill {
     return new AssignedSkill(
       backendDict.topic_id,
@@ -47,7 +39,3 @@ export class AssignedSkillObjectFactory {
       backendDict.subtopic_id);
   }
 }
-
-angular.module('oppia').factory(
-  'AssignedSkillObjectFactory',
-  downgradeInjectable(AssignedSkillObjectFactory));

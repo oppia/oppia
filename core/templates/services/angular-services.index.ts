@@ -146,7 +146,6 @@ import { SkillMasteryObjectFactory } from 'domain/skill/SkillMasteryObjectFactor
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillRightsObjectFactory } from 'domain/skill/SkillRightsObjectFactory';
 import { WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
-import { AssignedSkillObjectFactory } from 'domain/skill/assigned-skill-object.factory';
 import { AugmentedSkillSummaryObjectFactory } from 'domain/skill/augmented-skill-summary-object.factory';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
 import { SkillCreationBackendApiService } from 'domain/skill/skill-creation-backend-api.service';
@@ -374,7 +373,6 @@ export const angularServices: [string, unknown][] = [
   ['AnswerGroupsCacheService', AnswerGroupsCacheService],
   ['AnswerStatsObjectFactory', AnswerStatsObjectFactory],
   ['AppService', AppService],
-  ['AssignedSkillObjectFactory', AssignedSkillObjectFactory],
   ['AudioBarStatusService', AudioBarStatusService],
   ['AudioFileObjectFactory', AudioFileObjectFactory],
   ['AudioLanguageObjectFactory', AudioLanguageObjectFactory],
