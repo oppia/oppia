@@ -609,6 +609,15 @@ class GeneralVoiceoverApplicationModelAuditOneOffJob(
         return [suggestion_models.GeneralVoiceoverApplicationModel]
 
 
+class ReviewerAndSuggestionCountsModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates ReviewerAndSuggestionCountsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.ReviewerAndSuggestionCountsModel]
+
+
 class TopicModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates TopicModel."""
 

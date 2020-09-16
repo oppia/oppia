@@ -3117,29 +3117,11 @@ class ReviewerAndSuggestionCountsModelValidator(
         return []
 
     @classmethod
-    def _validate_reviewer_and_suggestion_counts(cls, item):
-        """Validate the ReviewerAndSuggestionCountsModel by ensuring that all
-        of the counts stored are nonnegative.
-
-        Args:
-            item: ndb.Model. ReviewerAndSuggestionCountsModel to validate.
-        """
-        reviewer_and_suggestion_counts = (
+    def _get_model_domain_object_instance(cls, item):
+        return (
             suggestion_services
             .create_reviewer_and_suggestion_counts_from_model(item)
         )
-
-        try:
-            reviewer_and_suggestion_counts.validate()
-        except Exception as e:
-            cls._add_error(
-                'reviewer and suggestion counts check',
-                'Entity id %s: ReviewerAndSuggestionCounts validation fails '
-                'with error: %s' % (item.id, e))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._reviewer_and_suggestion_counts]
 
 
 class TopicModelValidator(base_model_validators.BaseModelValidator):

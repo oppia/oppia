@@ -766,3 +766,33 @@ def get_voiceover_application(voiceover_application_id):
         voiceover_application_model.filename,
         voiceover_application_model.content,
         voiceover_application_model.rejection_message)
+
+
+def create_reviewer_and_suggestion_counts_from_model(
+        reviewer_and_suggestion_counts_model):
+    """Creates a ReviewerAndSuggestionCounts domain object from the
+    ReviewerAndSuggestionCountsModel.
+
+    Args:
+        reviewer_and_suggestion_counts_model: ReviewerAndSuggestionCountsModel.
+            The model to convert to a domain object.
+
+    Returns:
+        ReviewerAndSuggestionCounts|None. The corresponding
+        ReviewerAndSuggestionCounts domain object, or None if the model doesn't
+        exist.
+    """
+    if reviewer_and_suggestion_counts_model is not None:
+        return suggestion_registry.ReviewerAndSuggestionCounts(
+            (
+                reviewer_and_suggestion_counts_model
+                .translation_reviewer_counts_per_lang
+            ),
+            (
+                reviewer_and_suggestion_counts_model
+                .translation_suggestion_counts_per_lang
+            ),
+            reviewer_and_suggestion_counts_model.question_reviewer_count,
+            reviewer_and_suggestion_counts_model.question_suggestion_count
+        )
+    return None
