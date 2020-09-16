@@ -22,13 +22,9 @@ module.exports = {
       'numberOfRuns': 1,
       'puppeteerScript': 'puppeteer-login-script.js',
       'url': [
-        'http://127.0.0.1:8181/admin',
-        `http://127.0.0.1:8181/create/${process.env.exploration_editor}`,
-        `http://127.0.0.1:8181/collection_editor/create/${process.env.collection_editor}`,
-        `http://127.0.0.1:8181/topic_editor/${process.env.topic_editor}`,
-        `http://127.0.0.1:8181/skill_editor/${process.env.skill_editor}`,
-        `http://127.0.0.1:8181/story_editor/${process.env.story_editor}`,
+        'http://127.0.0.1:8181/',
         'http://127.0.0.1:8181/about',
+        'http://127.0.0.1:8181/admin',
         'http://127.0.0.1:8181/community-library',
         'http://127.0.0.1:8181/contact',
         'http://127.0.0.1:8181/contributor-dashboard',
@@ -45,12 +41,18 @@ module.exports = {
         'http://127.0.0.1:8181/preferences',
         'http://127.0.0.1:8181/privacy-policy',
         'http://127.0.0.1:8181/profile/username1',
+        'http://127.0.0.1:8181/signup?return_url=%2F',
         'http://127.0.0.1:8181/teach',
         'http://127.0.0.1:8181/teachers',
         'http://127.0.0.1:8181/topics-and-skills-dashboard',
         'http://127.0.0.1:8181/terms',
         'http://127.0.0.1:8181/thanks',
-        'http://127.0.0.1:8181/volunteers'
+        'http://127.0.0.1:8181/volunteers',
+        `http://127.0.0.1:8181/create/${process.env.exploration_editor}`,
+        `http://127.0.0.1:8181/collection_editor/create/${process.env.collection_editor}`,
+        `http://127.0.0.1:8181/topic_editor/${process.env.topic_editor}`,
+        `http://127.0.0.1:8181/skill_editor/${process.env.skill_editor}`,
+        `http://127.0.0.1:8181/story_editor/${process.env.story_editor}`,
       ]
     },
     'assert': {
@@ -58,9 +60,9 @@ module.exports = {
         {
           'matchingUrlPattern': '.*',
           'assertions': {
-            'categories:accessibility': ['error', {'minScore': 1}],
+            'categories:accessibility': ['error', {'minScore': 1}]
           }
-        },
+        }
       ]
     },
     'upload': {
