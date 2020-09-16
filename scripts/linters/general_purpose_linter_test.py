@@ -378,9 +378,11 @@ class JsTsLintTests(test_utils.LinterTestBase):
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_LODASH_IMPORT_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-                'Line 20: Please do not use "import { someFunction } from \'lodash\'". '
-                'Use "import someFunction from \'lodash/someFunction\'" instead.',
+        self.assert_same_list_elements(
+            [
+                'Line 20: Please do not use "import { someFunction } '
+                'from \'lodash\'". Use "import someFunction '
+                'from \'lodash/someFunction\'" instead.',
             ],
             lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
