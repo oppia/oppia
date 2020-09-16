@@ -28,8 +28,7 @@ import {
 import {
   AugmentedSkillSummary,
   AugmentedSkillSummaryBackendDict,
-  AugmentedSkillSummaryObjectFactory
-} from 'domain/skill/augmented-skill-summary-object.factory';
+} from 'domain/skill/augmented-skill-summary.model';
 import {
   ShortSkillSummary,
   ShortSkillSummaryBackendDict,
@@ -111,8 +110,6 @@ interface AssignedSkillDataBackendDict {
 
 export class TopicsAndSkillsDashboardBackendApiService {
   constructor(
-    private augmentedSkillSummaryObjectFactory:
-    AugmentedSkillSummaryObjectFactory,
     private http: HttpClient,
     private shortSkillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
     private topicSummaryObjectFactory: TopicSummaryObjectFactory,
@@ -192,7 +189,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
       }).toPromise().then(response => {
       return {
         skillSummaries: response.skill_summary_dicts.map(
-          backendDict => this.augmentedSkillSummaryObjectFactory
+          backendDict => AugmentedSkillSummary
             .createFromBackendDict(backendDict)),
         nextCursor: response.next_cursor,
         more: response.more

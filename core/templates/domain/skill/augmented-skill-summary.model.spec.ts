@@ -16,16 +16,10 @@
  * @fileoverview Unit tests for Augmented skill summary object factory.
  */
 
-import { AugmentedSkillSummaryObjectFactory } from
-  'domain/skill/augmented-skill-summary-object.factory';
+import { AugmentedSkillSummary } from
+  'domain/skill/augmented-skill-summary.model';
 
 describe('Augmented Skill Summary Object Factory', () => {
-  let assof: AugmentedSkillSummaryObjectFactory;
-
-  beforeEach(() => {
-    assof = new AugmentedSkillSummaryObjectFactory();
-  });
-
   it('should correctly convert backend dict to domain object.', () => {
     let backendDict = {
       language_code: 'en',
@@ -40,7 +34,7 @@ describe('Augmented Skill Summary Object Factory', () => {
       topic_name: 'topic'
     };
 
-    let skillSummary = assof.createFromBackendDict(backendDict);
+    let skillSummary = AugmentedSkillSummary.createFromBackendDict(backendDict);
 
     expect(skillSummary.languageCode).toEqual('en');
     expect(skillSummary.id).toEqual('Q5JuLf64rzV0');

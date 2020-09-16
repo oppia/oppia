@@ -17,9 +17,6 @@
  * skill summary domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 export interface AugmentedSkillSummaryBackendDict {
   'id': string;
   'description': string;
@@ -45,13 +42,8 @@ export class AugmentedSkillSummary {
     public skillModelLastUpdated: number,
     public topicName: string,
     public classroomName: string) { }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class AugmentedSkillSummaryObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       summaryDict: AugmentedSkillSummaryBackendDict): AugmentedSkillSummary {
     return new AugmentedSkillSummary(
       summaryDict.id,
@@ -66,7 +58,3 @@ export class AugmentedSkillSummaryObjectFactory {
       summaryDict.classroom_name);
   }
 }
-
-angular.module('oppia').factory(
-  'AugmentedSkillSummaryObjectFactory',
-  downgradeInjectable(AugmentedSkillSummaryObjectFactory));
