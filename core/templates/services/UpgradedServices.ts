@@ -191,8 +191,6 @@ import { ExplorationOpportunitySummaryObjectFactory } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 import { ExplorationPermissionsBackendApiService } from
   'domain/exploration/exploration-permissions-backend-api.service';
-import { ExplorationPermissionsObjectFactory } from
-  'domain/exploration/exploration-permissions-object.factory';
 import { ExplorationRecommendationsBackendApiService } from
   'domain/recommendations/exploration-recommendations-backend-api.service';
 import { ExplorationStatsBackendApiService } from
@@ -736,8 +734,6 @@ export class UpgradedServices {
       new ExplorationDraftObjectFactory();
     upgradedServices['ExplorationFeaturesService'] =
       new ExplorationFeaturesService();
-    upgradedServices['ExplorationPermissionsObjectFactory'] =
-      new ExplorationPermissionsObjectFactory();
     upgradedServices['ExplorationMetadataObjectFactory'] =
       new ExplorationMetadataObjectFactory();
     upgradedServices['ExplorationOpportunitySummaryObjectFactory'] =
@@ -1262,8 +1258,7 @@ export class UpgradedServices {
       new ExplorationPermissionsBackendApiService(
         upgradedServices['ContextService'],
         upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['ExplorationPermissionsObjectFactory']);
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['ExplorationRecommendationsBackendApiService'] =
       new ExplorationRecommendationsBackendApiService(
         upgradedServices['HttpClient'],

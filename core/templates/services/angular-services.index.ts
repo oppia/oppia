@@ -92,7 +92,6 @@ import { VoiceoverObjectFactory } from 'domain/exploration/VoiceoverObjectFactor
 import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { ExplorationPermissionsBackendApiService } from 'domain/exploration/exploration-permissions-backend-api.service';
-import { ExplorationPermissionsObjectFactory } from 'domain/exploration/exploration-permissions-object.factory';
 import { StateInteractionStatsBackendApiService } from 'domain/exploration/state-interaction-stats-backend-api.service';
 import { StatsReportingBackendApiService } from 'domain/exploration/stats-reporting-backend-api.service';
 import { VisualizationInfoObjectFactory } from 'domain/exploration/visualization-info-object.factory';
@@ -448,7 +447,6 @@ export const angularServices: [string, unknown][] = [
     ExplorationOpportunitySummaryObjectFactory],
   ['ExplorationPermissionsBackendApiService',
     ExplorationPermissionsBackendApiService],
-  ['ExplorationPermissionsObjectFactory', ExplorationPermissionsObjectFactory],
   ['ExplorationRecommendationsBackendApiService',
     ExplorationRecommendationsBackendApiService],
   ['ExplorationRecommendationsService', ExplorationRecommendationsService],

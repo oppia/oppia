@@ -13,19 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ExplorationPermissionsObjectFactory.
+ * @fileoverview Unit tests for exploration-permissions-model.
  */
 
-import { ExplorationPermissionsObjectFactory } from
-  'domain/exploration/exploration-permissions-object.factory';
+import { ExplorationPermissions } from
+  'domain/exploration/exploration-permissions.model';
 
 describe('Exploration permissions object factory', () => {
-  let epof: ExplorationPermissionsObjectFactory;
-
-  beforeEach(() => {
-    epof = new ExplorationPermissionsObjectFactory();
-  });
-
   it('should correctly convert backend dict to permissions object.', () => {
     let backendDict = {
       can_unpublish: true,
@@ -37,7 +31,8 @@ describe('Exploration permissions object factory', () => {
       can_edit: true
     };
 
-    let permissionsObject = epof.createFromBackendDict(backendDict);
+    let permissionsObject =
+      ExplorationPermissions.createFromBackendDict(backendDict);
 
     expect(permissionsObject.canUnpublish).toEqual(true);
     expect(permissionsObject.canReleaseOwnership).toEqual(false);

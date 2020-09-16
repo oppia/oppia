@@ -17,9 +17,6 @@
  * permissions.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface ExplorationPermissionsBackendDict {
   'can_unpublish': boolean;
   'can_release_ownership': boolean;
@@ -51,14 +48,8 @@ export class ExplorationPermissions {
     this.canModifyRoles = canModifyRoles;
     this.canEdit = canEdit;
   }
-}
 
-
-@Injectable({
-  providedIn: 'root'
-})
-export class ExplorationPermissionsObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       backendDict: ExplorationPermissionsBackendDict): ExplorationPermissions {
     return new ExplorationPermissions(
       backendDict.can_unpublish, backendDict.can_release_ownership,
@@ -67,7 +58,3 @@ export class ExplorationPermissionsObjectFactory {
       backendDict.can_edit);
   }
 }
-
-angular.module('oppia').factory(
-  'ExplorationPermissionsObjectFactory',
-  downgradeInjectable(ExplorationPermissionsObjectFactory));
