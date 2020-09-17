@@ -183,7 +183,6 @@ import { TopicSummaryObjectFactory } from 'domain/topic/TopicSummaryObjectFactor
 import { TopicCreationBackendApiService } from 'domain/topic/topic-creation-backend-api.service.ts';
 import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
-import { NewlyCreatedTopicObjectFactory } from 'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { ProfileSummaryObjectFactory } from 'domain/user/profile-summary-object.factory';
@@ -534,7 +533,6 @@ export const angularServices: [string, unknown][] = [
   ['NeedsGuidingResponsesTaskObjectFactory',
     NeedsGuidingResponsesTaskObjectFactory],
   ['NewlyCreatedStoryObjectFactory', NewlyCreatedStoryObjectFactory],
-  ['NewlyCreatedTopicObjectFactory', NewlyCreatedTopicObjectFactory],
   ['NonExistentActivitiesObjectFactory', NonExistentActivitiesObjectFactory],
   ['NormalizeWhitespacePipe', NormalizeWhitespacePipe],
   ['NormalizeWhitespacePunctuationAndCasePipe',

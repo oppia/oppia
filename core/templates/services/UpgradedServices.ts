@@ -332,8 +332,6 @@ import { MusicPhrasePlayerService } from
   'interactions/MusicNotesInput/directives/music-phrase-player.service';
 import { NeedsGuidingResponsesTaskObjectFactory } from
   'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
-import { NewlyCreatedTopicObjectFactory } from
-  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { NonExistentActivitiesObjectFactory } from
   'domain/learner_dashboard/non-existent-activities-object.factory';
 import { NormalizeWhitespacePipe } from
@@ -793,8 +791,6 @@ export class UpgradedServices {
       new NumericExpressionInputRulesService();
     upgradedServices['NumericInputRulesService'] =
       new NumericInputRulesService();
-    upgradedServices['NewlyCreatedTopicObjectFactory'] =
-        new NewlyCreatedTopicObjectFactory();
     upgradedServices['NonExistentActivitiesObjectFactory'] =
       new NonExistentActivitiesObjectFactory();
     upgradedServices['ParamChangeObjectFactory'] =

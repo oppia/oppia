@@ -17,9 +17,6 @@
  * that are used in topics dashboard.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { AppConstants } from 'app.constants';
 
 export class NewlyCreatedTopic {
@@ -48,20 +45,11 @@ export class NewlyCreatedTopic {
       validUrlFragmentRegex.test(this.urlFragment) &&
       this.urlFragment.length <= urlFragmentCharLimit);
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class NewlyCreatedTopicObjectFactory {
   /**
    * @returns {NewlyCreatedTopic} - A new NewlyCreatedTopic instance.
    */
-  createDefault(): NewlyCreatedTopic {
+  static createDefault(): NewlyCreatedTopic {
     return new NewlyCreatedTopic('', '', '');
   }
 }
-
-angular.module('oppia').factory(
-  'NewlyCreatedTopicObjectFactory',
-  downgradeInjectable(NewlyCreatedTopicObjectFactory));

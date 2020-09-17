@@ -375,8 +375,6 @@ import { NeedsGuidingResponsesTaskObjectFactory } from
   'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
 import { NewlyCreatedStoryObjectFactory } from
   'domain/topic/NewlyCreatedStoryObjectFactory';
-import { NewlyCreatedTopicObjectFactory } from
-  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
 import { NonExistentActivitiesObjectFactory } from
   'domain/learner_dashboard/non-existent-activities-object.factory';
 import { NormalizeWhitespacePipe } from
@@ -849,7 +847,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static musicPhrasePlayerService: MusicPhrasePlayerService;
   static needsGuidingResponsesTaskObjectFactory: NeedsGuidingResponsesTaskObjectFactory;
   static newlyCreatedStoryObjectFactory: NewlyCreatedStoryObjectFactory;
-  static newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory;
   static nonExistentActivitiesObjectFactory: NonExistentActivitiesObjectFactory;
   static normalizeWhitespacePipe: NormalizeWhitespacePipe;
   static normalizeWhitespacePunctuationAndCasePipe: NormalizeWhitespacePunctuationAndCasePipe;
@@ -1169,7 +1166,6 @@ private musicNotesInputValidationService: MusicNotesInputValidationService,
 private musicPhrasePlayerService: MusicPhrasePlayerService,
 private needsGuidingResponsesTaskObjectFactory: NeedsGuidingResponsesTaskObjectFactory,
 private newlyCreatedStoryObjectFactory: NewlyCreatedStoryObjectFactory,
-private newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory,
 private nonExistentActivitiesObjectFactory: NonExistentActivitiesObjectFactory,
 private normalizeWhitespacePipe: NormalizeWhitespacePipe,
 private normalizeWhitespacePunctuationAndCasePipe: NormalizeWhitespacePunctuationAndCasePipe,
@@ -1489,7 +1485,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.musicNotesInputValidationService = this.musicNotesInputValidationService;
     OppiaAngularRootComponent.musicPhrasePlayerService = this.musicPhrasePlayerService;
     OppiaAngularRootComponent.newlyCreatedStoryObjectFactory = this.newlyCreatedStoryObjectFactory;
-    OppiaAngularRootComponent.newlyCreatedTopicObjectFactory = this.newlyCreatedTopicObjectFactory;
     OppiaAngularRootComponent.needsGuidingResponsesTaskObjectFactory = this.needsGuidingResponsesTaskObjectFactory;
     OppiaAngularRootComponent.nonExistentActivitiesObjectFactory = this.nonExistentActivitiesObjectFactory;
     OppiaAngularRootComponent.normalizeWhitespacePipe = this.normalizeWhitespacePipe;

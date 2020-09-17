@@ -23,8 +23,8 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
-import { NewlyCreatedTopic, NewlyCreatedTopicObjectFactory } from
-  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
+import { NewlyCreatedTopic } from
+  'domain/topics_and_skills_dashboard/newly-created-topic.model';
 import { TopicCreationBackendApiService } from
   'domain/topic/topic-creation-backend-api.service.ts';
 
@@ -32,7 +32,6 @@ describe('Topic creation backend api service', () => {
   let csrfService: CsrfTokenService = null;
   let httpTestingController: HttpTestingController = null;
   let topicCreationBackendApiService: TopicCreationBackendApiService = null;
-  let newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory = null;
   let topic: NewlyCreatedTopic = null;
   let imagesData: ImageData[] = null;
   const thumbnailBgColor = '#e3e3e3';
@@ -52,11 +51,9 @@ describe('Topic creation backend api service', () => {
 
     csrfService = TestBed.get(CsrfTokenService);
     httpTestingController = TestBed.get(HttpTestingController);
-    newlyCreatedTopicObjectFactory = TestBed.get(
-      NewlyCreatedTopicObjectFactory);
     topicCreationBackendApiService = TestBed.get(
       TopicCreationBackendApiService);
-    topic = newlyCreatedTopicObjectFactory.createDefault();
+    topic = NewlyCreatedTopic.createDefault();
     topic.name = 'topic-name';
     topic.description = 'Description';
     topic.urlFragment = 'url-fragment';

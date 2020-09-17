@@ -14,19 +14,17 @@
 
 
 /**
- * @fileoverview Unit tests for NewlyCreatedTopicObjectFactory.
+ * @fileoverview Unit tests for NewlyCreatedTopic.
  */
 
-import { NewlyCreatedTopic, NewlyCreatedTopicObjectFactory } from
-  'domain/topics_and_skills_dashboard/NewlyCreatedTopicObjectFactory';
+import { NewlyCreatedTopic } from
+  'domain/topics_and_skills_dashboard/newly-created-topic.model';
 
 describe('Newly Created Topic Object Factory', () => {
-  let newlyCreatedTopicObjectFactory: NewlyCreatedTopicObjectFactory = null;
   let topic: NewlyCreatedTopic = null;
 
   beforeEach(() => {
-    newlyCreatedTopicObjectFactory = new NewlyCreatedTopicObjectFactory();
-    topic = newlyCreatedTopicObjectFactory.createDefault();
+    topic = NewlyCreatedTopic.createDefault();
   });
 
   it('should create a new default topic for the topics dashboard', () => {
