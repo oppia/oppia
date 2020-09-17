@@ -193,8 +193,6 @@ import { ExplorationImprovementsConfigObjectFactory } from
   'domain/improvements/exploration-improvements-config-object.factory';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
-import { ExplorationMetadataObjectFactory } from
-  'domain/exploration/ExplorationMetadataObjectFactory';
 import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
 import { ExplorationOpportunitySummaryObjectFactory } from
@@ -764,8 +762,6 @@ export class UpgradedServices {
       new ExplorationImprovementsConfigObjectFactory();
     upgradedServices['ExplorationPermissionsObjectFactory'] =
       new ExplorationPermissionsObjectFactory();
-    upgradedServices['ExplorationMetadataObjectFactory'] =
-      new ExplorationMetadataObjectFactory();
     upgradedServices['ExplorationOpportunitySummaryObjectFactory'] =
       new ExplorationOpportunitySummaryObjectFactory();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();

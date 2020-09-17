@@ -17,9 +17,6 @@
  * exploration metadata domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface ExplorationMetaDataBackendDict {
   id: string;
   objective: string;
@@ -31,22 +28,13 @@ export class ExplorationMetadata {
     public id: string,
     public objective: string,
     public title: string) {}
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ExplorationMetadataObjectFactory {
   static createFromBackendDict(
       explorationMetadataBackendDict: ExplorationMetaDataBackendDict):
-      ExplorationMetadata {
+        ExplorationMetadata {
     return new ExplorationMetadata(
       explorationMetadataBackendDict.id,
       explorationMetadataBackendDict.objective,
       explorationMetadataBackendDict.title);
   }
 }
-
-angular.module('oppia').factory(
-  'ExplorationMetadataObjectFactory',
-  downgradeInjectable(ExplorationMetadataObjectFactory));

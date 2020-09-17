@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for ExplorationMetadataObjectFactory.
+ * @fileoverview Tests for ExplorationMetadata.
  */
-import { ExplorationMetadata, ExplorationMetadataObjectFactory } from
-  'domain/exploration/ExplorationMetadataObjectFactory';
+import { ExplorationMetadata } from
+  'domain/exploration/exploration-metadata.model';
 
 describe('Exploration Metadata object factory', () => {
   let sampleExplorationMetadata: ExplorationMetadata = null;
@@ -30,9 +30,8 @@ describe('Exploration Metadata object factory', () => {
     };
 
 
-    sampleExplorationMetadata = (
-      ExplorationMetadataObjectFactory.
-        createFromBackendDict(sampleExplorationMetadataBackendDict));
+    sampleExplorationMetadata = ExplorationMetadata.
+        createFromBackendDict(sampleExplorationMetadataBackendDict);
   });
 
   it('should be able to get all the values', function() {
