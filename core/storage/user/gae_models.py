@@ -139,7 +139,7 @@ class UserSettingsModel(base_models.BaseModel):
         return {
             'export_method': base_models.EXPORT_METHOD.DIRECT_EXPORT,
             'per_field_policy': 
-                dict(super(cls, cls).get_export_policy()['per_field_policy'],
+                dict(super(cls, cls).get_export_policy(),
                 **{
                     'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                     'email': base_models.EXPORT_POLICY.EXPORTED,

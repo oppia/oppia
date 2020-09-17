@@ -136,12 +136,9 @@ class BaseModel(ndb.Model):
     def get_export_policy(cls):
         """Model creation time is not relevant to user data."""
         return {
-            'export_method': EXPORT_METHOD.NOT_EXPORTED,
-            'per_field_policy': {
                 'created_on': EXPORT_POLICY.NOT_APPLICABLE,
                 'last_updated': EXPORT_POLICY.NOT_APPLICABLE,
                 'deleted': EXPORT_POLICY.NOT_APPLICABLE
-            }
         }
 
     @classmethod

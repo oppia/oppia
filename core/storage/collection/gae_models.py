@@ -249,7 +249,15 @@ class CollectionRightsModel(base_models.VersionedModel):
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return {
+            'export_method': base_models.EXPORT_METHOD.LIST_OF_IDS,
+            'list_of_ids_mapping': {
+                'owner_ids': 'owned_collection_ids',
+                'editor_ids': 'editable_collection_ids',
+                'voice_artist_ids': 'voiced_collection_ids',
+                'viewer_ids': 'viewable_collection_ids'
+            },
+            'per_field_policy': dict(super(cls, cls).get_export_policy(), **{
             'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
             'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
             'voice_artist_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -261,6 +269,7 @@ class CollectionRightsModel(base_models.VersionedModel):
             # DEPRECATED in v2.8.3.
             'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

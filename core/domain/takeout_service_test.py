@@ -673,6 +673,35 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         """Nontrivial test of direct export."""
         self.set_up_non_trivial()
 
+        # We set up the feedback_thread_model here so that we can easily
+        # access it when computing the expected data later.
+        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
+            entity_type=self.THREAD_ENTITY_TYPE,
+            entity_id=self.THREAD_ENTITY_ID,
+            original_author_id=self.USER_ID_1,
+            status=self.THREAD_STATUS,
+            subject=self.THREAD_SUBJECT,
+            has_suggestion=self.THREAD_HAS_SUGGESTION,
+            summary=self.THREAD_SUMMARY,
+            message_count=self.THREAD_MESSAGE_COUNT
+        )
+        feedback_thread_model.put()
+
+        thread_id = feedback_services.create_thread(
+            self.THREAD_ENTITY_TYPE,
+            self.THREAD_ENTITY_ID,
+            self.USER_ID_1,
+            self.THREAD_SUBJECT,
+            self.MESSAGE_TEXT
+        )
+        feedback_services.create_message(
+            thread_id,
+            self.USER_ID_1,
+            self.THREAD_STATUS,
+            self.THREAD_SUBJECT,
+            self.MESSAGE_TEXT
+        )
+
         all_models = [
             clazz
             for clazz in self._get_model_classes()
@@ -680,21 +709,47 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         ]
         for model in all_models:
             export_policy = model.get_export_policy()
-            if 'export_method' in export_policy:
+            if 'export_method' in export_policy and export_policy['export_method'] != base_models.EXPORT_METHOD.NOT_EXPORTED:
+                print(export_policy)
                 per_field_policy = export_policy['per_field_policy']
+                exported_props = [
+                    prop for prop in model._properties
+                    if (per_field_policy[prop] ==
+                    base_models.EXPORT_POLICY.EXPORTED)
+                ]
                 if (
                     export_policy['export_method'] ==
                     base_models.EXPORT_METHOD.DIRECT_EXPORT):
-                    exported_props = [
-                        prop for prop in model._properties
-                        if (per_field_policy[prop] ==
-                        base_models.EXPORT_POLICY.EXPORTED)
-                    ]
                     exported_data = model.export_data(self.USER_ID_1)
                     self.assertEqual(
                         sorted([python_utils.UNICODE(key) for key in exported_data.keys()]),
                         sorted(exported_props)
                     )
+                elif (
+                    export_policy['export_method'] ==
+                    base_models.EXPORT_METHOD.LIST_OF_IDS):
+                    exported_data = model.export_data(self.USER_ID_1)
+                    self.assertEqual(
+                        sorted(exported_props),
+                        sorted(export_policy['list_of_ids_mapping'].keys())
+                    )
+                    self.assertEqual(
+                        sorted(exported_data.keys()),
+                        sorted(export_policy['list_of_ids_mapping'].values())
+                    )
+                elif (
+                    export_policy['export_method'] ==
+                    base_models.EXPORT_METHOD.EXPORT_BY_MODEL_ID):
+                    exported_data = model.export_data(self.USER_ID_1)
+                    
+                    # Retrieve the first ID.
+                    print(exported_data)
+                    model_id = exported_data.keys()[0]
+                    self.assertEqual(
+                        sorted(exported_data[model_id].keys()),
+                        sorted(exported_props)
+                    )
+
 
     # def test_export_data_nontrivial(self):
     #     """Nontrivial test of export_data functionality."""

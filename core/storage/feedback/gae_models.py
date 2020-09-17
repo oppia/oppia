@@ -257,15 +257,18 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
-        return dict(super(cls, cls).get_export_policy(), **{
+        return {
+            'export_method': base_models.EXPORT_METHOD.EXPORT_BY_MODEL_ID,
+            'per_field_policy': dict(super(cls, cls).get_export_policy(), **{
             'thread_id': base_models.EXPORT_POLICY.EXPORTED,
             'message_id': base_models.EXPORT_POLICY.EXPORTED,
-            'author_id': base_models.EXPORT_POLICY.EXPORTED,
+            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'updated_status': base_models.EXPORT_POLICY.EXPORTED,
             'updated_subject': base_models.EXPORT_POLICY.EXPORTED,
             'text': base_models.EXPORT_POLICY.EXPORTED,
             'received_via_email': base_models.EXPORT_POLICY.EXPORTED
-        })
+            })
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
