@@ -344,13 +344,13 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         """Runs the MockFeedbackAnalyticsAggregator computation."""
         MockFeedbackAnalyticsAggregator.start_computation()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_get_threads_single_exploration(self):
         threads = feedback_services.get_threads('exploration', self.EXP_ID_1)
@@ -759,10 +759,10 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
         user_id = 'user'
         feedback_services.enqueue_feedback_message_batch_email_task(user_id)
         self.assertEqual(
-            self.count_jobs_in_oppia_taskqueue(taskqueue_services.QUEUE_NAME_EMAILS),
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_EMAILS),
             1)
 
-        tasks = self.get_pending_oppia_tasks(
+        tasks = self.get_pending_tasks(
             queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
         self.assertEqual(
             tasks[0].url, feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS)
@@ -782,10 +782,10 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
         feedback_services.enqueue_feedback_message_instant_email_task(
             user_id, reference)
         self.assertEqual(
-            self.count_jobs_in_oppia_taskqueue(taskqueue_services.QUEUE_NAME_EMAILS),
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_EMAILS),
             1)
 
-        tasks = self.get_pending_oppia_tasks(
+        tasks = self.get_pending_tasks(
             queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
         self.assertEqual(
             tasks[0].url, feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS)
@@ -908,10 +908,10 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # event associated with creating a thread, and one for sending
             # the email.
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
             model = feedback_models.UnsentFeedbackEmailModel.get(self.editor_id)
 
@@ -936,10 +936,10 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # event associated with creating a thread, and one for sending
             # the email.
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
 
             messagelist = feedback_services.get_messages(thread_id)
@@ -981,9 +981,9 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # Note: the job in the taskqueue represents the realtime
             # event emitted by create_thread().
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -1001,9 +1001,9 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # Note: the job in the taskqueue represents the realtime
             # event emitted by create_thread().
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -1017,9 +1017,9 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # Note: the job in the taskqueue represents the realtime
             # event emitted by create_thread().
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -1034,17 +1034,17 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # event associated with creating a thread, and one for sending
             # the email.
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
 
-            tasks = self.get_pending_oppia_tasks(
+            tasks = self.get_pending_tasks(
                 queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
             self.assertEqual(
                 tasks[0].url, feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS)
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
@@ -1063,9 +1063,9 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # Note: the job in the taskqueue represents the realtime
             # event emitted by create_thread().
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -1079,9 +1079,9 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # Note: the job in the taskqueue represents the realtime
             # event emitted by create_thread().
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -1095,9 +1095,9 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # Note: the job in the taskqueue represents the realtime
             # event emitted by create_thread().
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -1111,12 +1111,12 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # event associated with creating a thread, and one for sending
             # the email.
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
             threadlist = feedback_services.get_all_threads(
                 'exploration', self.exploration.id, False)
@@ -1125,12 +1125,12 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             feedback_services.create_message(
                 thread_id, self.editor_id, None, None, 'editor message')
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 0)
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
     def test_that_email_is_sent_for_changing_status_of_thread(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
@@ -1141,12 +1141,12 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # event associated with creating a thread, and one for sending
             # the email.
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
             threadlist = feedback_services.get_all_threads(
                 'exploration', self.exploration.id, False)
@@ -1159,12 +1159,12 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # event associated with changing subject of thread, and one for
             # sending the email.
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
     def test_that_email_is_sent_for_each_feedback_message(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
@@ -1178,32 +1178,32 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # event associated with creating a thread, and one for sending
             # the email.
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
             feedback_services.create_message(
                 thread_id, self.editor_id, None, None, 'editor message')
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 0)
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
             feedback_services.create_message(
                 thread_id, self.editor_id, None, None, 'editor message2')
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 0)
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
     def test_that_reply_to_id_is_created(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
@@ -1300,7 +1300,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             messagelist = feedback_services.get_messages(thread_id)
             self.assertEqual(len(messagelist), 1)
 
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
@@ -1364,7 +1364,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             messagelist = feedback_services.get_messages(thread_id)
             self.assertEqual(len(messagelist), 2)
 
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
@@ -1391,7 +1391,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
                     feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, thread_id),
                 {'thread_id': thread_id}, csrf_token=csrf_token)
 
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
             messages = self._get_sent_email_messages(
                 self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
@@ -1445,7 +1445,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
             threadlist = feedback_services.get_all_threads(
                 'exploration', self.exploration.id, False)
@@ -1453,7 +1453,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
 
             feedback_services.create_message(
                 thread_id, self.editor_id, None, None, 'editor message')
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
             messages = self._get_sent_email_messages(
                 self.NEW_USER_EMAIL)
@@ -1493,7 +1493,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
             threadlist = feedback_services.get_all_threads(
                 'exploration', self.exploration.id, False)
@@ -1502,7 +1502,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             feedback_services.create_message(
                 thread_id, self.editor_id,
                 feedback_models.STATUS_CHOICES_FIXED, None, '')
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
             messages = self._get_sent_email_messages(
                 self.NEW_USER_EMAIL)
@@ -1568,7 +1568,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 self.new_user_id, 'a subject', 'some text')
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
             threadlist = feedback_services.get_all_threads(
                 'exploration', self.exploration.id, False)
@@ -1578,7 +1578,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
                 thread_id, self.editor_id,
                 feedback_models.STATUS_CHOICES_FIXED, None,
                 'editor message')
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
             messages = self._get_sent_email_messages(
                 self.NEW_USER_EMAIL)
@@ -1598,7 +1598,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
                 None, 'a subject', 'some text')
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
             threadlist = feedback_services.get_all_threads(
                 'exploration', self.exploration.id, False)
@@ -1608,7 +1608,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
                 thread_id, self.editor_id,
                 feedback_models.STATUS_CHOICES_FIXED, None,
                 'editor message')
-            self.process_and_flush_oppia_tasks()
+            self.process_and_flush_pending_tasks()
 
             messages = self._get_sent_email_messages(
                 self.NEW_USER_EMAIL)

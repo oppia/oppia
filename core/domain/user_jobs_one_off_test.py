@@ -66,9 +66,9 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         job_id = user_jobs_one_off.UserContributionsOneOffJob.create_new()
         user_jobs_one_off.UserContributionsOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def setUp(self):
         super(UserContributionsOneOffJobTests, self).setUp()
@@ -215,9 +215,9 @@ class PopulateUserAuthDetailsModelOneOffJobTests(test_utils.GenericTestBase):
         )
         user_jobs_one_off.PopulateUserAuthDetailsModelOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         stringified_output = (
             user_jobs_one_off.PopulateUserAuthDetailsModelOneOffJob.get_output(
@@ -374,9 +374,9 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.UsernameLengthDistributionOneOffJob.create_new())
         user_jobs_one_off.UsernameLengthDistributionOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             user_jobs_one_off.UsernameLengthDistributionOneOffJob.get_output(
                 job_id))
@@ -451,9 +451,9 @@ class UsernameLengthAuditOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.UsernameLengthAuditOneOffJob.create_new())
         user_jobs_one_off.UsernameLengthAuditOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         return user_jobs_one_off.UsernameLengthAuditOneOffJob.get_output(job_id)
 
     def test_username_length_limit(self):
@@ -493,9 +493,9 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.LongUserBiosOneOffJob.create_new())
         user_jobs_one_off.LongUserBiosOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         stringified_output = (
             user_jobs_one_off.LongUserBiosOneOffJob.get_output(
@@ -588,9 +588,9 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         job_id = user_jobs_one_off.DashboardSubscriptionsOneOffJob.create_new()
         user_jobs_one_off.DashboardSubscriptionsOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def _null_fn(self, *args, **kwargs):
         """A mock for functions of the form subscribe_to_*() to represent
@@ -763,7 +763,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
             # User A deletes the exploration.
             exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         self._run_one_off_job()
 
@@ -863,7 +863,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
             # User A deletes the exploration from earlier.
             exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         self._run_one_off_job()
 
@@ -1007,9 +1007,9 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         job_id = user_jobs_one_off.DashboardStatsOneOffJob.create_new()
         user_jobs_one_off.DashboardStatsOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def setUp(self):
         super(DashboardStatsOneOffJobTests, self).setUp()
@@ -1078,7 +1078,7 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_weekly_stats_if_no_explorations(self):
         MockUserStatsAggregator.start_computation()
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         with self.swap(
             user_services,
@@ -1111,10 +1111,10 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        self.process_and_flush_oppia_tasks()
+        self.process_and_flush_pending_tasks()
 
         MockUserStatsAggregator.start_computation()
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         with self.swap(
             user_services,
@@ -1151,9 +1151,9 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        self.process_and_flush_oppia_tasks()
-        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
+        MockUserStatsAggregator.start_computation()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         with self.swap(
             user_services,
@@ -1187,9 +1187,9 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
 
-        self.process_and_flush_oppia_tasks()
-        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
+        MockUserStatsAggregator.start_computation()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         with self.swap(
             user_services,
@@ -1208,12 +1208,12 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
             }])
 
         MockUserStatsAggregator.stop_computation(self.owner_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         self._rate_exploration('user2', exp_id, 2)
 
         MockUserStatsAggregator.start_computation()
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         def _mock_get_date_after_one_week():
             """Returns the date of the next week."""
@@ -1276,7 +1276,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertIsNone(
             user_services.get_user_settings(
                 self.admin_id).first_contribution_msec)
@@ -1310,7 +1310,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertIsNotNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
         self.assertIsNotNone(user_services.get_user_settings(
@@ -1339,7 +1339,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertIsNone(user_services.get_user_settings(
             self.owner_id).first_contribution_msec)
 
@@ -1355,7 +1355,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertIsNone(user_services.get_user_settings(
             self.owner_id).first_contribution_msec)
@@ -1377,9 +1377,9 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.UserLastExplorationActivityOneOffJob.create_new())
         user_jobs_one_off.UserLastExplorationActivityOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_that_last_created_time_is_updated(self):
         self.login(self.OWNER_EMAIL)
@@ -1535,7 +1535,7 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
         for exp in explorations:
             subscription_services.subscribe_to_exploration(
                 self.user_id, exp.id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_standard_operation(self):
         for exp_id in python_utils.RANGE(3):
@@ -1554,9 +1554,9 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
         job_id = job.create_new()
         job.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         owner_subscription_model = user_models.UserSubscriptionsModel.get(
             self.owner_id)

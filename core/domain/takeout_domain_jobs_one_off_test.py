@@ -47,11 +47,11 @@ class SnapshotMetadataCommitMsgMigrationOneOffJobTests(
             .SnapshotMetadataCommitMsgMigrationOneOffJob.enqueue(job_id))
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
         stringified_output = (
             takeout_domain_jobs_one_off

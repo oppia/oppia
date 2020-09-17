@@ -229,10 +229,10 @@ class TestUtilsTests(test_utils.GenericTestBase):
         FailingMapReduceJobManager.enqueue(
             job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(None), 1)
+            self.count_jobs_in_mapreduce_taskqueue(None), 1)
         with self.assertRaisesRegexp(
             RuntimeError, 'MapReduce task to URL .+ failed'):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
     def test_get_static_asset_url(self):
         asset_url = self.get_static_asset_url('/images/subjects/Lightbulb.svg')

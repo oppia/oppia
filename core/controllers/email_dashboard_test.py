@@ -78,13 +78,13 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
 
         # Check that MR job has been enqueued.
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             0)
 
@@ -279,15 +279,15 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             job_id, additional_job_params={'query_id': query_id})
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             1)
         # Complete execution of query.
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             0)
 
@@ -322,15 +322,15 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             job_id_1, additional_job_params={'query_id': query_id_1})
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             2)
         # Complete execution of query.
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             0)
 
@@ -360,15 +360,15 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             job_id, additional_job_params={'query_id': query_id})
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             1)
         # Complete execution of query.
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             0)
 
@@ -402,15 +402,15 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             job_id_1, additional_job_params={'query_id': query_id_1})
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             2)
         # Complete execution of query.
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             0)
 
@@ -439,15 +439,15 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             job_id, additional_job_params={'query_id': query_id})
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             1)
         # Complete execution of query.
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             0)
 
@@ -481,15 +481,15 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             job_id_1, additional_job_params={'query_id': query_id_1})
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             2)
         # Complete execution of query.
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             0)
 
@@ -528,10 +528,10 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
         # Check that MR job has been enqueued.
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             # Check that qualified users are valid.
             query_models = user_models.UserQueryModel.query().fetch()
             self.assertEqual(len(query_models[0].user_ids), 2)
@@ -633,11 +633,11 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.logout()
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         # Complete execution of query.
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             query_models = user_models.UserQueryModel.query().fetch()
             self.assertEqual(
                 query_models[0].query_status,
@@ -701,7 +701,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         query_models = user_models.UserQueryModel.query().fetch()
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             # Check that qualified users are valid.
             query_models = user_models.UserQueryModel.query().fetch()
             self.assertEqual(len(query_models[0].user_ids), 2)
@@ -750,7 +750,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         query_models = user_models.UserQueryModel.query().fetch()
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             # Check that qualified users are valid.
             query_models = user_models.UserQueryModel.query().fetch()
             self.assertEqual(len(query_models[0].user_ids), 2)
@@ -789,7 +789,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         query_models = user_models.UserQueryModel.query().fetch()
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             email_subject = 'email_subject'
             email_body = 'email_body'
@@ -851,7 +851,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         query_models = user_models.UserQueryModel.query().fetch()
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             self.login(self.SUBMITTER_EMAIL)
             csrf_token = self.get_new_csrf_token()

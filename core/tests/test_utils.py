@@ -209,6 +209,8 @@ class TaskqueueServicesStub(python_utils.OBJECT):
 
     def get_pending_tasks(self, queue_name=None):
         return self.client.get_tasks(queue_name=queue_name)
+
+
 class MemoryCacheServicesStub(python_utils.OBJECT):
     """The stub class that mocks the API functionality offered by the platform
     layer, namely the platform.cache cache services API.
@@ -2520,24 +2522,24 @@ class AppEngineTestBase(TestBase):
             # Enables the testbed urlfetch mock.
             self.testbed.init_urlfetch_stub()
 
-    def count_jobs_in_oppia_taskqueue(self, queue_name=None):
+    def count_jobs_in_taskqueue(self, queue_name=None):
         """Counts the jobs in the given queue."""
         return self.taskqueue_services_stub.count_jobs_in_taskqueue(
             queue_name=queue_name)
 
-    def process_and_flush_oppia_tasks(self, queue_name=None):
+    def process_and_flush_pending_tasks(self, queue_name=None):
         return self.taskqueue_services_stub.process_and_flush_tasks(
             queue_name=queue_name)
 
-    def get_pending_oppia_tasks(self, queue_name=None):
+    def get_pending_tasks(self, queue_name=None):
         return self.taskqueue_services_stub.get_pending_tasks(
             queue_name=queue_name)
 
-    def count_jobs_in_taskqueue(self, queue_name):
+    def count_jobs_in_mapreduce_taskqueue(self, queue_name):
         """Counts the jobs in the given queue."""
-        return len(self.get_pending_tasks(queue_name=queue_name))
+        return len(self.get_pending_mapreduce_tasks(queue_name=queue_name))
 
-    def get_pending_tasks(self, queue_name=None):
+    def get_pending_mapreduce_tasks(self, queue_name=None):
         """Returns the jobs in the given queue. If queue_name is None, defaults
         to returning the jobs in all available queues.
         """
@@ -2547,7 +2549,7 @@ class AppEngineTestBase(TestBase):
         else:
             return self.taskqueue_stub.get_filtered_tasks()
 
-    def _execute_tasks(self, tasks):
+    def _execute_map_reduce_tasks(self, tasks):
         """Execute queued tasks.
 
         Args:
@@ -2580,7 +2582,7 @@ class AppEngineTestBase(TestBase):
                     raise RuntimeError(
                         'MapReduce task to URL %s failed' % task.url)
 
-    def process_and_flush_pending_tasks(self, queue_name=None):
+    def process_and_flush_pending_mapreduce_tasks(self, queue_name=None):
         """Runs and flushes pending tasks. If queue_name is None, does so for
         all queues; otherwise, this only runs and flushes tasks for the
         specified queue.
@@ -2597,13 +2599,13 @@ class AppEngineTestBase(TestBase):
             self.taskqueue_stub.FlushQueue(queue)
 
         while tasks:
-            self._execute_tasks(tasks)
+            self._execute_map_reduce_tasks(tasks)
             tasks = self.taskqueue_stub.get_filtered_tasks(
                 queue_names=queue_names)
             for queue in queue_names:
                 self.taskqueue_stub.FlushQueue(queue)
 
-    def run_but_do_not_flush_pending_tasks(self):
+    def run_but_do_not_flush_pending_mapreduce_tasks(self):
         """"Runs but not flushes pending tasks."""
         queue_names = self._get_all_queue_names()
 
@@ -2611,7 +2613,7 @@ class AppEngineTestBase(TestBase):
         for queue in queue_names:
             self.taskqueue_stub.FlushQueue(queue)
 
-        self._execute_tasks(tasks)
+        self._execute_map_reduce_tasks(tasks)
 
     def _create_valid_question_data(self, default_dest_state_name):
         """Creates a valid question_data dict.
@@ -2791,14 +2793,14 @@ class AuditJobsTestBase(GenericTestBase):
         """
         job_id = self.job_class.create_new()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
         self.job_class.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
         self.process_and_flush_pending_tasks()
-        self.process_and_flush_oppia_tasks()
         actual_output = self.job_class.get_output(job_id)
         if literal_eval:
             actual_output_dict = {}

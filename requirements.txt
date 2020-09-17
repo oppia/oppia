@@ -22,7 +22,7 @@ futures==3.3.0            # via google-api-core, grpcio
 google-api-core[grpc]==1.22.2  # via google-cloud-tasks
 google-auth==1.21.1       # via google-api-core
 google-cloud-tasks==1.5.0  # via -r requirements.in
-googleapis-common-protos[grpc]==1.52.0  # via google-api-core, grpc-google-iam-v1
+googleapis-common-protos[grpc]==1.52.0  # via -r requirements.in, google-api-core, grpc-google-iam-v1
 googleappenginecloudstorageclient==1.9.22.1  # via -r requirements.in, googleappenginemapreduce, googleappenginepipeline
 googleappenginemapreduce==1.9.22.0  # via -r requirements.in
 googleappenginepipeline==1.9.22.1  # via -r requirements.in, googleappenginemapreduce

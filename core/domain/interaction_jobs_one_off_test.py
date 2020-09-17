@@ -59,14 +59,14 @@ def run_job_for_deleted_exp(
     # Check there is one job in the taskqueue corresponding to
     # delete_exploration_from_subscribed_users.
     self.assertEqual(
-        self.count_jobs_in_oppia_taskqueue(
+        self.count_jobs_in_taskqueue(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
     job_class.enqueue(job_id)
     self.assertEqual(
-        self.count_jobs_in_taskqueue(
+        self.count_jobs_in_mapreduce_taskqueue(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+    self.process_and_flush_pending_mapreduce_tasks()
     self.process_and_flush_pending_tasks()
-    self.process_and_flush_oppia_tasks()
 
     if check_error:
         with self.assertRaisesRegexp(error_type, error_msg):
@@ -95,7 +95,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
         """Checks output pairs are produced only for
@@ -227,7 +227,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         (
             interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
@@ -249,7 +249,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         (
             interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
@@ -275,7 +275,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         (
             interaction_jobs_one_off
             .DragAndDropSortInputInteractionOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         actual_output = (
             interaction_jobs_one_off.DragAndDropSortInputInteractionOneOffJob
             .get_output(job_id))
@@ -355,7 +355,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
         """Checks output pairs are produced only for
@@ -412,7 +412,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
             .MultipleChoiceInteractionOneOffJob.create_new())
         interaction_jobs_one_off.MultipleChoiceInteractionOneOffJob.enqueue(
             job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
@@ -472,7 +472,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
             .MultipleChoiceInteractionOneOffJob.create_new())
         interaction_jobs_one_off.MultipleChoiceInteractionOneOffJob.enqueue(
             job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
@@ -557,7 +557,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
         """Checks (exp, state) pairs are produced only for
@@ -622,7 +622,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             .ItemSelectionInteractionOneOffJob.create_new())
         interaction_jobs_one_off.ItemSelectionInteractionOneOffJob.enqueue(
             job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
@@ -681,7 +681,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             .ItemSelectionInteractionOneOffJob.create_new())
         interaction_jobs_one_off.ItemSelectionInteractionOneOffJob.enqueue(
             job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
@@ -772,7 +772,7 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_for_customization_arg_validation_job(self):
         """Check that expected errors are produced for invalid
@@ -808,7 +808,7 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
         (
             interaction_jobs_one_off
             .InteractionCustomizationArgsValidationOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off
@@ -835,7 +835,7 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
         (
             interaction_jobs_one_off
             .InteractionCustomizationArgsValidationOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             interaction_jobs_one_off

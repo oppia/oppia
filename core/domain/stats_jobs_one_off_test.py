@@ -44,7 +44,7 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
 
     def count_one_off_jobs_in_queue(self):
         """Counts one off jobs in the taskqueue."""
-        return self.count_jobs_in_taskqueue(
+        return self.count_jobs_in_mapreduce_taskqueue(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
 
     def run_one_off_job(self):
@@ -60,7 +60,7 @@ class OneOffJobTestBase(test_utils.GenericTestBase):
         self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
         self.ONE_OFF_JOB_CLASS.enqueue(job_id)
         self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
         return self.ONE_OFF_JOB_CLASS.get_output(job_id)
 
@@ -336,7 +336,7 @@ class RegenerateMissingV1StatsModelsOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
 
         exp_services.delete_exploration('owner', self.EXP_ID)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
 
         output = self.ONE_OFF_JOB_CLASS.get_output(job_id)

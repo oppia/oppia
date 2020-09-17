@@ -144,14 +144,14 @@ class ParamNameTests(test_utils.GenericTestBase):
             job_id, additional_job_params=params)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'MapReduce task to URL .+ failed')
 
         with assert_raises_regexp_context_manager:
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
     def test_job_with_correct_param_name(self):
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -167,13 +167,13 @@ class ParamNameTests(test_utils.GenericTestBase):
             job_id, additional_job_params=params)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
 
@@ -186,16 +186,16 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exp_services.save_new_exploration('owner_id', exploration)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_count_all_explorations(self):
         job_id = SampleMapReduceJobManager.create_new()
         SampleMapReduceJobManager.enqueue(
             job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_DEFAULT), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(jobs.get_job_output(job_id), ['[u\'sum\', 1]'])
         self.assertEqual(
@@ -402,7 +402,7 @@ class TwoClassesMapReduceJobIntegrationTests(test_utils.GenericTestBase):
         # Note that this ends up creating an entry in the
         # ExplorationRightsModel as well.
         exp_services.save_new_exploration('owner_id', exploration)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_count_entities(self):
         self.assertEqual(exp_models.ExplorationModel.query().count(), 1)
@@ -412,9 +412,9 @@ class TwoClassesMapReduceJobIntegrationTests(test_utils.GenericTestBase):
         TwoClassesMapReduceJobManager.enqueue(
             job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            self.count_jobs_in_mapreduce_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
             1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
             TwoClassesMapReduceJobManager.get_output(job_id), ['[u\'sum\', 2]'])
@@ -576,7 +576,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID)
         exp_services.save_new_exploration('owner_id', exploration)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_cannot_get_entity_with_invalid_id(self):
         with self.assertRaisesRegexp(
@@ -609,15 +609,15 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 0)
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 1)
 
             # When the task queue is flushed, the data is recorded in the two
             # realtime layers.
-            self.process_and_flush_oppia_tasks()
             self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_oppia_taskqueue(
+                self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EVENTS), 0)
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
@@ -644,13 +644,13 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 '1:%s' % self.EXP_ID, strict=False))
 
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.assertTrue(
                 MockStartExplorationMRJobManager.is_active(batch_job_id))
             self.assertFalse(
                 MockStartExplorationMRJobManager.has_finished(batch_job_id))
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertFalse(
                 MockStartExplorationMRJobManager.is_active(batch_job_id))
             self.assertTrue(
@@ -696,7 +696,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
 
             # Finish the job.
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             # When the batch job completes, the overall count is still 1.
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
@@ -720,7 +720,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 'which is already running'):
                 StartExplorationEventCounter.start_computation()
 
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             StartExplorationEventCounter.stop_computation('admin_user_id')
 
     def test_get_continuous_computations_info_with_existing_model(self):
@@ -759,7 +759,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         with self.swap(logging, 'error', _mock_logging_function):
             StartExplorationEventCounter.on_batch_job_failure()
 
-        self.run_but_do_not_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_mapreduce_tasks()
         StartExplorationEventCounter.stop_computation('admin_user_id')
 
         self.assertEqual(
@@ -781,7 +781,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         with self.swap(logging, 'info', _mock_logging_function):
             StartExplorationEventCounter.on_batch_job_canceled()
 
-        self.run_but_do_not_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_mapreduce_tasks()
         StartExplorationEventCounter.stop_computation('admin_user_id')
 
         self.assertEqual(
@@ -804,7 +804,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
 
-            self.run_but_do_not_flush_pending_tasks()
+            self.run_but_do_not_flush_pending_mapreduce_tasks()
             MockContinuousComputationManager.stop_computation('admin_user_id')
             status = MockContinuousComputationManager.get_status_code()
 

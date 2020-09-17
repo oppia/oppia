@@ -208,21 +208,21 @@ class EventHandlerTaskQueueUnitTests(test_utils.GenericTestBase):
 
     def test_events_go_into_the_events_queue(self):
         self.assertEqual(
-            self.count_jobs_in_oppia_taskqueue(
+            self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_EVENTS),
             0)
 
         event_services.CompleteExplorationEventHandler.record(
             'eid1', 1, 'sid1', 'session1', 100, {}, feconf.PLAY_TYPE_NORMAL)
         self.assertEqual(
-            self.count_jobs_in_oppia_taskqueue(
+            self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_EVENTS),
             1)
 
-        self.process_and_flush_oppia_tasks()
+        self.process_and_flush_pending_tasks()
 
         self.assertEqual(
-            self.count_jobs_in_oppia_taskqueue(
+            self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_EVENTS),
             0)
 

@@ -39,9 +39,9 @@ class EmailHashRegenerationOneOffJobTests(test_utils.GenericTestBase):
         job_id = email_jobs_one_off.EmailHashRegenerationOneOffJob.create_new()
         email_jobs_one_off.EmailHashRegenerationOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_hashes_get_generated(self):
         def _generate_hash_for_tests(

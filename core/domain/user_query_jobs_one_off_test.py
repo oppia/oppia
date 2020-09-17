@@ -60,10 +60,10 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
             job_id, additional_job_params=params)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
     def _run_one_off_job_resulting_in_failure(self, query_id):
         """Runs the one-off MapReduce job and fails it. After failing the job,

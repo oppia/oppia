@@ -58,7 +58,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def mock_generate_new_exploration_thread_id(
             self, unused_entity_type, unused_entity_id):
@@ -286,7 +286,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.
             SuggestionMathRteAuditOneOffJob.create_new())
         suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off.
@@ -384,7 +384,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.
             SuggestionMathRteAuditOneOffJob.create_new())
         suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off.
@@ -533,7 +533,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.
             SuggestionMathRteAuditOneOffJob.create_new())
         suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off.
@@ -587,7 +587,7 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
         self.author_id_1 = self.get_user_id_from_email(self.AUTHOR_EMAIL_1)
         self.signup(self.REVIEWER_EMAIL_1, 'reviewer1')
         self.reviewer_id_1 = self.get_user_id_from_email(self.REVIEWER_EMAIL_1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_job_when_suggestions_have_invalid_filenames(self):
         invalid_html_content1 = (
@@ -653,7 +653,7 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
         (
             suggestion_jobs_one_off.
             SuggestionSvgFilenameValidationOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off.
@@ -714,7 +714,7 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
         (
             suggestion_jobs_one_off.
             SuggestionSvgFilenameValidationOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off.
@@ -763,7 +763,7 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
         (
             suggestion_jobs_one_off.
             SuggestionSvgFilenameValidationOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off.
@@ -825,7 +825,7 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
         (
             suggestion_jobs_one_off.
             SuggestionSvgFilenameValidationOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off.
@@ -849,7 +849,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def mock_generate_new_exploration_thread_id(
             self, unused_entity_type, unused_entity_id):
@@ -1070,7 +1070,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
         (
             suggestion_jobs_one_off.
             SuggestionMathMigrationOneOffJob.enqueue(job_id))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         observed_translation_suggestion = (
             suggestion_services.get_suggestion_by_id(
                 'exploration.exp1.thread_1'))
@@ -1200,7 +1200,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.
             SuggestionMathMigrationOneOffJob.create_new())
         suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         observed_translation_suggestion = (
             suggestion_services.get_suggestion_by_id(
                 'exploration.exp1.thread_1'))
@@ -1299,7 +1299,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             suggestion_jobs_one_off.
             SuggestionMathMigrationOneOffJob.create_new())
         suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off.
@@ -1451,7 +1451,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             (
                 suggestion_jobs_one_off.
                 SuggestionMathMigrationOneOffJob.enqueue(job_id))
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
         actual_output = (
             suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob.
             get_output(job_id))
@@ -1607,7 +1607,7 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             (
                 suggestion_jobs_one_off.
                 SuggestionMathMigrationOneOffJob.enqueue(job_id))
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
         actual_output = (
             suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob.
             get_output(job_id))
@@ -1713,7 +1713,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
             .PopulateSuggestionLanguageCodeMigrationOneOffJob
             .enqueue(job_id)
         )
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off
@@ -1772,7 +1772,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         self.add_question_change_dict['question_dict'][
             'question_state_data'] = self._create_valid_question_data(
                 'default_state').to_dict()
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_migrate_language_code_for_edit_state_content_suggestions(
             self):

@@ -933,7 +933,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.editor_id, 'skill_with_misconceptions',
             change_list, 'Delete misconceptions.')
         skill_fetchers.get_skill_by_id('skill_with_misconceptions')
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         updated_question = question_services.get_question_by_id(
             self.question_id)
         updated_answer_groups = (

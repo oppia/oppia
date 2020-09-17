@@ -179,9 +179,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
 
@@ -214,9 +214,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
 
@@ -237,9 +237,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
 
@@ -266,9 +266,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
         expected = [['SUCCESS', 2]]
@@ -300,9 +300,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
         expected = [['FAILED (2)', [
@@ -337,9 +337,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
         expected = [['FAILED (1)', [
@@ -373,9 +373,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
         expected = [['FAILED (1)', [
@@ -402,9 +402,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         exp_opp_summary_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
         self.assertEqual(output, [])
@@ -445,9 +445,9 @@ class SkillOpportunityModelRegenerationJobTest(test_utils.GenericTestBase):
         skill_opp_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = skill_opp_model_regen_job_class.get_output(job_id)
 
@@ -480,9 +480,9 @@ class SkillOpportunityModelRegenerationJobTest(test_utils.GenericTestBase):
         skill_opp_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = skill_opp_model_regen_job_class.get_output(job_id)
         expected = [['SUCCESS', 2]]
@@ -507,9 +507,9 @@ class SkillOpportunityModelRegenerationJobTest(test_utils.GenericTestBase):
         skill_opp_model_regen_job_class.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = skill_opp_model_regen_job_class.get_output(job_id)
         self.assertEqual(output, [])

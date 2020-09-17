@@ -40,9 +40,9 @@ class UserDeletionOneOffJobTests(test_utils.GenericTestBase):
         job_id = wipeout_jobs_one_off.UserDeletionOneOffJob.create_new()
         wipeout_jobs_one_off.UserDeletionOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             wipeout_jobs_one_off.UserDeletionOneOffJob.get_output(job_id))
         eval_output = [ast.literal_eval(stringified_item)
@@ -63,7 +63,7 @@ class UserDeletionOneOffJobTests(test_utils.GenericTestBase):
             id=self.user_1_id, exploration_ids=[], collection_ids=[]
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_repeated_deletion_is_successful(self):
         output = self._run_one_off_job()
@@ -99,15 +99,15 @@ class FullyCompleteUserDeletionOneOffJobTests(test_utils.GenericTestBase):
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         job_id = (
             wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob
             .create_new())
         wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob
             .get_output(job_id))
@@ -129,7 +129,7 @@ class FullyCompleteUserDeletionOneOffJobTests(test_utils.GenericTestBase):
             id=self.user_1_id, exploration_ids=[], collection_ids=[]
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_verification_when_user_is_not_deleted(self):
         output = self._run_one_off_job()

@@ -88,10 +88,10 @@ class CronJobTests(test_utils.GenericTestBase):
         SampleMapReduceJobManager.enqueue(
             job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_DEFAULT), 1)
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(
             SampleMapReduceJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
@@ -118,14 +118,14 @@ class CronJobTests(test_utils.GenericTestBase):
     def test_cron_dashboard_stats_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
         with self.testapp_swap:
             self.get_html_response('/cron/users/dashboard_stats')
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
         all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
@@ -136,14 +136,14 @@ class CronJobTests(test_utils.GenericTestBase):
     def test_cron_user_deletion_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
         with self.testapp_swap:
             self.get_html_response('/cron/users/user_deletion')
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
         all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
@@ -154,14 +154,14 @@ class CronJobTests(test_utils.GenericTestBase):
     def test_cron_fully_complete_user_deletion_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
         with self.testapp_swap:
             self.get_html_response('/cron/users/fully_complete_user_deletion')
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
         all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
@@ -173,14 +173,14 @@ class CronJobTests(test_utils.GenericTestBase):
     def test_cron_exploration_recommendations_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
         with self.testapp_swap:
             self.get_html_response('/cron/explorations/recommendations')
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
         all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
@@ -191,14 +191,14 @@ class CronJobTests(test_utils.GenericTestBase):
     def test_cron_activity_search_rank_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
         with self.testapp_swap:
             self.get_html_response('/cron/explorations/search_rank')
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
         all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
@@ -222,15 +222,15 @@ class CronJobTests(test_utils.GenericTestBase):
         SampleMapReduceJobManager.enqueue(
             job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_DEFAULT), 1)
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(
             SampleMapReduceJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_DEFAULT), 0)
 
         with self.testapp_swap, logging_swap, recency_msec_swap:
@@ -245,10 +245,10 @@ class CronJobTests(test_utils.GenericTestBase):
             ]
         )
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_DEFAULT), 1)
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_cannot_clean_data_item_of_jobs_with_existing_running_cleanup_job(
             self):
@@ -264,7 +264,7 @@ class CronJobTests(test_utils.GenericTestBase):
 
         job_id = cron_services.MapReduceStateModelsCleanupManager.create_new()
         cron_services.MapReduceStateModelsCleanupManager.enqueue(job_id)
-        self.run_but_do_not_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
             cron_services.MapReduceStateModelsCleanupManager
@@ -297,7 +297,7 @@ class CronJobTests(test_utils.GenericTestBase):
 
         job_id = cron_services.JobModelsCleanupManager.create_new()
         cron_services.JobModelsCleanupManager.enqueue(job_id)
-        self.run_but_do_not_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
             cron_services.JobModelsCleanupManager.get_status_code(job_id),
@@ -329,9 +329,9 @@ class JobModelsCleanupManagerTests(test_utils.GenericTestBase):
         job_id = cron_services.JobModelsCleanupManager.create_new()
         cron_services.JobModelsCleanupManager.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             cron_services.JobModelsCleanupManager.get_output(job_id))
         eval_output = [ast.literal_eval(stringified_item) for

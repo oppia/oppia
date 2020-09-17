@@ -43,12 +43,12 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         feedback_jobs_one_off.FeedbackThreadCacheOneOffJob.enqueue(job_id)
         self.assertEqual(
             1,
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS))
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(
             0,
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS))
         job_output = (
             feedback_jobs_one_off.FeedbackThreadCacheOneOffJob.get_output(

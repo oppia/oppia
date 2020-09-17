@@ -81,9 +81,9 @@ class ActivityContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
         activity_jobs_one_off.ActivityContributorsSummaryOneOffJob.enqueue(
             job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             activity_jobs_one_off.ActivityContributorsSummaryOneOffJob
             .get_output(job_id))
@@ -246,7 +246,7 @@ class ActivityContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
             self.EXP_ID, self.user_a_id)
         exp_services.delete_exploration(feconf.SYSTEM_COMMITTER_ID, self.EXP_ID)
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         output = self._run_one_off_job()
         self.assertEqual([], output)
@@ -264,9 +264,9 @@ class AuditContributorsOneOffJobTests(test_utils.GenericTestBase):
         job_id = activity_jobs_one_off.AuditContributorsOneOffJob.create_new()
         activity_jobs_one_off.AuditContributorsOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             activity_jobs_one_off.AuditContributorsOneOffJob.get_output(job_id))
         eval_output = [ast.literal_eval(stringified_item) for
@@ -494,7 +494,7 @@ class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
             collection_services.save_new_collection(self.owner_id, collection)
             rights_manager.publish_collection(self.owner, collection.id)
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_standard_operation(self):
         job_id = (
@@ -502,7 +502,7 @@ class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
         activity_jobs_one_off.IndexAllActivitiesJobManager.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
         indexed_docs = []
@@ -518,7 +518,7 @@ class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
             mock_add_documents_to_index)
 
         with add_docs_swap:
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
         ids = [doc['id'] for doc in indexed_docs]
         titles = [doc['title'] for doc in indexed_docs]
@@ -551,9 +551,9 @@ class RemoveCommitUsernamesOneOffJobTests(test_utils.GenericTestBase):
             activity_jobs_one_off.RemoveCommitUsernamesOneOffJob.create_new())
         activity_jobs_one_off.RemoveCommitUsernamesOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             activity_jobs_one_off.RemoveCommitUsernamesOneOffJob
             .get_output(job_id))
@@ -645,9 +645,9 @@ class FixCommitLastUpdatedOneOffJobTests(test_utils.GenericTestBase):
             activity_jobs_one_off.FixCommitLastUpdatedOneOffJob.create_new())
         activity_jobs_one_off.FixCommitLastUpdatedOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             activity_jobs_one_off.FixCommitLastUpdatedOneOffJob
             .get_output(job_id))
@@ -1084,9 +1084,9 @@ class AddContentUserIdsContentJobTests(test_utils.GenericTestBase):
             activity_jobs_one_off.AddContentUserIdsContentJob.create_new())
         activity_jobs_one_off.AddContentUserIdsContentJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             activity_jobs_one_off.AddContentUserIdsContentJob.get_output(
                 job_id))
@@ -1357,9 +1357,9 @@ class AddCommitCmdsUserIdsMetadataJobTests(test_utils.GenericTestBase):
             activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob.create_new())
         activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob.get_output(
                 job_id))
@@ -1890,9 +1890,9 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
             activity_jobs_one_off.AuditSnapshotMetadataModelsJob.create_new())
         activity_jobs_one_off.AuditSnapshotMetadataModelsJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             activity_jobs_one_off.AuditSnapshotMetadataModelsJob.get_output(
                 job_id))
