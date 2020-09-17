@@ -79,8 +79,8 @@ var LibraryPage = function() {
       await searchInputs.first());
     await searchInput.clear();
     await searchInput.sendKeys(searchQuery);
-    let currentUrl = await browser.getCurrentUrl();
-    if (currentUrl.includes('/learn')) {
+    let searchButtonExists = await searchButton.isPresent();
+    if (searchButtonExists) {
       await action.click('Search button', searchButton);
       await waitFor.pageToFullyLoad();
     }
