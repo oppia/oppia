@@ -28,14 +28,14 @@ require('services/alerts.service.ts');
 
 angular.module('oppia').controller(
   'QuestionsOpportunitiesSelectSkillAndDifficultyModalController', [
-    '$controller', '$scope', '$uibModalInstance', 'AlertsService',
+    '$controller', '$rootScope', '$scope', '$uibModalInstance', 'AlertsService',
     'SkillBackendApiService', 'SkillDifficultyObjectFactory',
-    'SkillObjectFactory', 'skillId', 'DEFAULT_SKILL_DIFFICULTY',
+    'skillId', 'DEFAULT_SKILL_DIFFICULTY',
     'MODE_SELECT_DIFFICULTY',
     function(
-        $controller, $scope, $uibModalInstance, AlertsService,
+        $controller, $rootScope, $scope, $uibModalInstance, AlertsService,
         SkillBackendApiService, SkillDifficultyObjectFactory,
-        SkillObjectFactory, skillId, DEFAULT_SKILL_DIFFICULTY,
+        skillId, DEFAULT_SKILL_DIFFICULTY,
         MODE_SELECT_DIFFICULTY) {
       $controller('ConfirmOrCancelModalController', {
         $scope: $scope,
@@ -46,9 +46,7 @@ angular.module('oppia').controller(
       $scope.currentMode = MODE_SELECT_DIFFICULTY;
       SkillBackendApiService.fetchSkill(skillId)
         .then(function(backendSkillObject) {
-          $scope.skill =
-            SkillObjectFactory.createFromBackendDict(
-              backendSkillObject.skill);
+          $scope.skill = backendSkillObject.skill;
           $scope.linkedSkillsWithDifficulty = [
             SkillDifficultyObjectFactory.create(
               skillId, $scope.skill.getDescription(),
@@ -57,6 +55,7 @@ angular.module('oppia').controller(
           $scope.skillIdToRubricsObject = {};
           $scope.skillIdToRubricsObject[skillId] =
             $scope.skill.getRubrics();
+          $rootScope.$apply();
         }, function(error) {
           AlertsService.addWarning(
             `Error populating skill: ${error}.`);

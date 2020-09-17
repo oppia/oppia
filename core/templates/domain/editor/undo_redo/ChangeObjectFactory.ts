@@ -212,7 +212,7 @@ interface SkillDeletePrerequisiteChange {
   'skill_id': string;
 }
 
-type SkillChange = (
+export type SkillChange = (
   SkillPropertyChange |
   SkillMisconceptionPropertyChange |
   SkillRubricsChange |

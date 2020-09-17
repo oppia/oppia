@@ -19,7 +19,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 describe('Skill editor main tab directive', function() {
@@ -31,12 +31,9 @@ describe('Skill editor main tab directive', function() {
   var SkillEditorStateService = null;
   var assignedSkillTopicData = {topic1: 'subtopic1', topic2: 'subtopic2'};
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+
+  importAllAngularServices();
+
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();

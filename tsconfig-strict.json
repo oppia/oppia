@@ -18,7 +18,6 @@
     "baseUrl": ".",
     "paths": {
       "app.constants": ["core/templates/app.constants"],
-      "app-type.constants": ["core/templates/app-type.constants"],
       "components/*": ["core/templates/components/*"],
       "domain/*": ["core/templates/domain/*"],
       "expressions/*": ["core/templates/expressions/*"],
