@@ -24,7 +24,6 @@ import { UrlInterpolationService } from
 import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 import cloneDeep from 'lodash/cloneDeep';
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -43,10 +42,24 @@ export class EditableStoryBackendApiService {
       });
     this.http.get(
       editableStoryDataUrl).toPromise().then(
-      (response) => {
-        this.storyDataDict = cloneDeep(response);
+      (response: any) => {
+        this.storyDataDict = cloneDeep(response.body);
+        var story = angular.copy(response.body.story);
+        var topicName = angular.copy(response.body.topic_name);
+        var storyIsPublished = response.body.story_is_published;
+        var skillSummaries = angular.copy(response.body.skill_summaries);
+        var topicUrlFragment = response.body.topic_url_fragment;
+        var classroomUrlFragment = response.body.classroomUrlFragment;
         if (successCallback) {
-          successCallback(this.storyDataDict);
+          successCallback({
+            story: story,
+            topicName: topicName,
+            storyIsPublished: storyIsPublished,
+            skillSummaries: skillSummaries,
+            topicUrlFragment: topicUrlFragment,
+            classroomUrlFragment: classroomUrlFragment
+          });
+          // SuccessCallback(this.storyDataDict);
         }
       }, (errorResponse) => {
         if (errorCallback) {
