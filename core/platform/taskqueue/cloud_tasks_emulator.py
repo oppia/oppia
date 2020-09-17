@@ -40,14 +40,13 @@ class Task(python_utils.OBJECT):
             url: str. URL of the handler function.
             payload: dict(str: *)|None. Payload to pass to the request. Defaults
                 to None if no payload is required.
-            scheduled_for: int|None. Amount of time, in seconds, to wait before
-                executing the task. Pass in 0 or None to schedule the task for
-                immediate execution.
+            scheduled_for: time|None. The time in which to execute the task,
+                relative to time.time().
             task_name: str|None. Optional. The name of the task.
         """
         self.payload = payload
         self.url = url
-        self.scheduled_for = scheduled_for or time.time()
+        self.scheduled_for = scheduled_for
         self.queue_name = queue_name
         self.task_name = task_name
 
@@ -166,12 +165,13 @@ class Emulator(python_utils.OBJECT):
             url: str. URL of the handler function.
             payload: dict(str: *)|None. Payload to pass to the request. Defaults
                 to None if no payload is required.
-            scheduled_for: int|None. Amount of time, in seconds, to wait before
-                executing the task. Pass in 0 or None to schedule the task for
-                immediate execution.
+            scheduled_for: datetime|None. The naive datetime object for the
+                time to execute the task. Pass in None for immediate execution.
             task_name: str|None. Optional. The name of the task.
         """
-        scheduled_for = scheduled_for or time.time()
+        scheduled_for_time = (
+            time.mktime(scheduled_for.timetuple())
+            if scheduled_for else time.time())
         with self._lock:
             if queue_name not in self._queues:
                 self._queues[queue_name] = []
@@ -179,7 +179,7 @@ class Emulator(python_utils.OBJECT):
                     self._launch_queue_thread(queue_name)
             queue = self._queues[queue_name]
             task = Task(
-                queue_name, url, payload, scheduled_for=scheduled_for,
+                queue_name, url, payload, scheduled_for=scheduled_for_time,
                 task_name=task_name)
             queue.append(task)
             queue.sort(key=lambda t: t.scheduled_for)

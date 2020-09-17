@@ -21,7 +21,10 @@ import requests_toolbelt.adapters.appengine
 import feconf
 from core.platform.taskqueue import cloud_tasks_emulator
 
+# Special app engine monkey patch. More details can be found here:
+# https://cloud.google.com/appengine/docs/standard/python/issue-requests#issuing_an_http_request
 requests_toolbelt.adapters.appengine.monkeypatch()
+
 
 def _task_handler(url, payload, queue_name, task_name=None):
     """Makes a POST request to the task URL
@@ -39,14 +42,15 @@ def _task_handler(url, payload, queue_name, task_name=None):
     headers['X-Appengine-TaskRetryCount'] = '0'
     headers['X-Appengine-TaskExecutionCount'] = '0'
     headers['X-Appengine-TaskETA'] = '0'
-    headers['X-AppEngine-Fake-Is-Admin'] = '1'
     headers['method'] = 'POST'
     resp = requests.post(
         'http://localhost:8181%s' % feconf.TASK_URL_DEFERRED,
         json=payload,
         headers=headers)
 
+
 client = cloud_tasks_emulator.Emulator(task_handler=_task_handler)
+
 
 def create_http_task(
         queue_name, url, payload=None, scheduled_for=None, task_name=None):
@@ -58,9 +62,8 @@ def create_http_task(
         url: str. URL of the handler function.
         payload: dict(str: *)|None. Payload to pass to the request. Defaults
             to None if no payload is required.
-        scheduled_for: int|None. Amount of time, in seconds, to wait before
-            executing the task. Pass in 0 or None to schedule the task for
-            immediate execution.
+        scheduled_for: datetime|None. The naive datetime object for the
+            time to execute the task. Pass in None for immediate execution.
         task_name: str|None. Optional. The name of the task.
     """
     client.create_task(queue_name, url, payload, scheduled_for, task_name)

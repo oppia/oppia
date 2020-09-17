@@ -36,16 +36,15 @@ def create_http_task(
     that task to the Cloud Tasks API. An http task is an asynchronous task that
     consists of a post request to a specified url with the specified payload.
     The post request will be made by the Cloud Tasks Cloud Service when the
-    `scheduled_for` countdown expires.
+    `scheduled_for` time is reached.
 
     Args:
         queue_name: str. The name of the queue to add the http task to.
         url: str. URL of the handler function.
         payload: dict(str: *)|None. Payload to pass to the request. Defaults to
             None if no payload is required.
-        scheduled_for: int|None. Amount of time, in seconds, to wait before
-            executing the task. Pass in 0 or None to schedule the task for
-            immediate execution.
+        scheduled_for: datetime|None. The naive datetime object for the
+            time to execute the task. Pass in None for immediate execution.
         task_name: str|None. Optional. The name of the task.
     """
     # The cloud tasks library requires the Oppia project id and region, as well
@@ -56,7 +55,7 @@ def create_http_task(
     # Construct the request body.
     task = {
         'http_request': {  # Specify the type of request.
-            'http_method': tasks_v2.HttpMethod.POST,
+            'http_method': 1,
             'url': url,  # The full url path that the task will be sent to.
         }
     }
@@ -75,13 +74,10 @@ def create_http_task(
         task['http_request']['body'] = converted_payload
 
     if scheduled_for is not None:
-        # Convert 'seconds from now' into an rfc3339 datetime string.
-        d = datetime.datetime.utcnow() + datetime.timedelta(
-            seconds=scheduled_for)
 
         # Create Timestamp protobuf.
         timestamp = timestamp_pb2.Timestamp()
-        timestamp.FromDatetime(d)
+        timestamp.FromDatetime(scheduled_for)
 
         # Add the timestamp to the tasks.
         task['schedule_time'] = timestamp
@@ -91,7 +87,7 @@ def create_http_task(
         task['name'] = task_name
 
     # Use the client to build and send the task.
-    response = client.create_task(request={'parent': parent, 'task': task})
+    response = client.create_task(parent, task)
 
     logging.info('Created task {}'.format(response.name))
     # [END cloud_tasks_create_http_task]

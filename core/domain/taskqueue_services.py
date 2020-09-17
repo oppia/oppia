@@ -102,7 +102,9 @@ def enqueue_task(url, params, countdown):
         countdown: int. Amount of time, in seconds, to wait before executing
             task.
     '''
+    scheduled_datetime = datetime.datetime.utcnow() + datetime.timedelta(
+            seconds=scheduled_for)
     platform_taskqueue_services.create_http_task(
         queue_name=QUEUE_NAME_EMAILS, url=url, payload=params,
-        scheduled_for=countdown)
+        scheduled_for=scheduled_datetime)
 

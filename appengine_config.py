@@ -51,5 +51,8 @@ vendor.add(os.path.join(THIRD_PARTY_PATH, 'python_libs'))
 pkg_resources.working_set.add_entry(
     os.path.join(THIRD_PARTY_PATH, 'python_libs'))
 
+# It is necessary to reload the six module because of a bug in the google cloud
+# ndb imports. More details can be found here:
+# https://github.com/googleapis/python-ndb/issues/249.
 import six
 reload(six)

@@ -54,6 +54,7 @@ import sys
 import threading
 import time
 import unittest
+from constants import constants
 
 
 from . import install_third_party_libs
@@ -237,6 +238,8 @@ def main(args=None):
     sys.path.insert(1, common.GOOGLE_APP_ENGINE_SDK_HOME)
     # import dev_appserver
     # dev_appserver.fix_sys_path()
+    os.environ['CLOUDSDK_CORE_PROJECT'] = 'oppia-dev'
+    os.environ['APPLICATION_ID'] = 'oppia-dev'
 
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):

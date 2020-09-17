@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
+import shutil
 import subprocess
 import sys
 
@@ -159,6 +160,37 @@ def main():
     # Download and install required JS and zip files.
     python_utils.PRINT('Installing third-party JS libraries and zip files.')
     install_third_party.main(args=[])
+
+    # This solves the problem of multiple google paths by copying the required
+    # google appengine libraries from the Google Cloud SDK into the correct
+    # google directory in the third_party/python_libs directory.
+    python_utils.PRINT(
+        'Copying Google Cloud SDK modules to third_party/python_libs...')
+    correct_google_path = os.path.join(
+        common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+    if not os.path.isdir(correct_google_path):
+        os.mkdir(correct_google_path)
+
+    if not os.path.isdir(os.path.join(correct_google_path, 'appengine')):
+        shutil.copytree(
+            os.path.join(
+                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
+            os.path.join(correct_google_path, 'appengine'))
+
+    # The following function populates all of the google modules with
+    # the correct __init__.py files if they do not exist. This solves the bug
+    # mentioned here:
+    # https://github.com/googleapis/python-ndb/issues/518
+    python_utils.PRINT(
+        'Checking that all google library modules contain __init__.py.')
+    for root_path, sub_directory_name_list, file_name_list in os.walk(
+        correct_google_path):
+        if not root_path.endswith('__pycache__'):
+            with python_utils.open_file(
+                os.path.join(root_path, '__init__.py'), 'a'):
+                # If the file doesn't exist, it is created. If it does exist,
+                # this open does nothing.
+                pass
 
     if common.is_windows_os():
         tweak_yarn_executable()
