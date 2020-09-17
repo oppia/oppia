@@ -264,11 +264,9 @@ var TopicsAndSkillsDashboardPage = function() {
   this.filterSkillsByStatus = async function(status) {
     await action.click(
       'Skill Dashboard status filter', skillStatusFilterDropdown);
-    var filterSkillsByStatusInput = (
-      await browser.driver.switchTo().activeElement());
-    await action.sendKeys(
-      'Filter Skills By Status input',
-      filterSkillsByStatusInput, status + '\n');
+    await (
+      await browser.driver.switchTo().activeElement()
+    ).sendKeys(status + '\n');
   };
 
   this.filterTopicsByKeyword = async function(keyword) {
@@ -289,10 +287,9 @@ var TopicsAndSkillsDashboardPage = function() {
 
     await action.click(
       'Topic Dashboard classroom filter', topicFilterClassroomField);
-    var filterClassroomInput = await browser.driver.switchTo().activeElement();
-    await action.sendKeys(
-      'Topic Dashboard classroom filter',
-      filterClassroomInput, keyword + '\n');
+    await (
+      await browser.driver.switchTo().activeElement()
+    ).sendKeys(keyword + '\n');
   };
 
   this.resetTopicFilters = async function() {
