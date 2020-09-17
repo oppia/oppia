@@ -17,9 +17,6 @@
  * and skill dashboard.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import {
   ETopicPublishedOptions,
   ETopicSortOptions,
@@ -58,23 +55,14 @@ export class TopicsAndSkillsDashboardFilter {
     this.sort = ETopicSortOptions.IncreasingCreatedOn;
     this.status = ETopicPublishedOptions.All;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class TopicsAndSkillsDashboardFilterObjectFactory {
   /**
    * @returns {TopicsAndSkillsDashboardFilter} - A new
    *   TopicsAndSkillsDashboardFilter instance.
    */
-  createDefault(): TopicsAndSkillsDashboardFilter {
+  static createDefault(): TopicsAndSkillsDashboardFilter {
     return new TopicsAndSkillsDashboardFilter(
       TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL,
       [], ETopicSortOptions.IncreasingCreatedOn, ETopicPublishedOptions.All);
   }
 }
-
-angular.module('oppia').factory(
-  'TopicsAndSkillsDashboardFilterObjectFactory',
-  downgradeInjectable(TopicsAndSkillsDashboardFilterObjectFactory));

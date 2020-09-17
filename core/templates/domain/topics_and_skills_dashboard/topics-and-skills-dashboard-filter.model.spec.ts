@@ -13,28 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for TopicsAndSkillsDashboardFilterObjectFactory.
+ * @fileoverview Unit tests for TopicsAndSkillsDashboardFilter.
  */
 
 import { ETopicPublishedOptions, ETopicSortOptions } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 
-import {
-  TopicsAndSkillsDashboardFilter,
-  TopicsAndSkillsDashboardFilterObjectFactory } from
+import { TopicsAndSkillsDashboardFilter } from
   // eslint-disable-next-line max-len
-  'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
 
 describe('Topics And Skills Dashboard Filter Object', () => {
-  let topicsAndSkillsDashboardFilterObjectFactory:
-      TopicsAndSkillsDashboardFilterObjectFactory = null;
   let filter: TopicsAndSkillsDashboardFilter = null;
 
   beforeEach(() => {
-    topicsAndSkillsDashboardFilterObjectFactory =
-        new TopicsAndSkillsDashboardFilterObjectFactory();
-    filter = topicsAndSkillsDashboardFilterObjectFactory.createDefault();
+    filter = TopicsAndSkillsDashboardFilter.createDefault();
   });
 
   it('should create a new dashboard filter object', () => {

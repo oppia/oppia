@@ -609,9 +609,6 @@ import { TopicsAndSkillsDashboardBackendApiService } from
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
-import { TopicsAndSkillsDashboardFilterObjectFactory } from
-  // eslint-disable-next-line max-len
-  'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
 import { TopicsAndSkillsDashboardPageService } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
@@ -869,8 +866,6 @@ export class UpgradedServices {
     upgradedServices['ThreadStatusDisplayService'] =
       new ThreadStatusDisplayService();
     upgradedServices['Title'] = new Title({});
-    upgradedServices['TopicsAndSkillsDashboardFilterObjectFactory'] =
-        new TopicsAndSkillsDashboardFilterObjectFactory();
     upgradedServices['TopicsAndSkillsDashboardPageService'] =
         new TopicsAndSkillsDashboardPageService();
     upgradedServices['TopicSummaryObjectFactory'] =

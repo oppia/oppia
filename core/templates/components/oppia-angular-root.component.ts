@@ -645,9 +645,6 @@ import { TopicsAndSkillsDashboardBackendApiService } from
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
-import { TopicsAndSkillsDashboardFilterObjectFactory } from
-  // eslint-disable-next-line max-len
-  'domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardFilterObjectFactory';
 import { TopicsAndSkillsDashboardPageService } from
   // eslint-disable-next-line max-len
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
@@ -989,7 +986,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static topicObjectFactory: TopicObjectFactory;
   static topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService;
   static topicSummaryObjectFactory: TopicSummaryObjectFactory;
-  static topicsAndSkillsDashboardFilterObjectFactory: TopicsAndSkillsDashboardFilterObjectFactory;
   static topicsAndSkillsDashboardPageService: TopicsAndSkillsDashboardPageService;
   static topicViewerBackendApiService: TopicViewerBackendApiService;
   static translateService: TranslateService;
@@ -1310,7 +1306,6 @@ private topicCreationBackendApiService: TopicCreationBackendApiService,
 private topicObjectFactory: TopicObjectFactory,
 private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService,
 private topicSummaryObjectFactory: TopicSummaryObjectFactory,
-private topicsAndSkillsDashboardFilterObjectFactory: TopicsAndSkillsDashboardFilterObjectFactory,
 private topicsAndSkillsDashboardPageService: TopicsAndSkillsDashboardPageService,
 private topicViewerBackendApiService: TopicViewerBackendApiService,
 private translateService: TranslateService,
@@ -1632,7 +1627,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.topicObjectFactory = this.topicObjectFactory;
     OppiaAngularRootComponent.topicsAndSkillsDashboardBackendApiService = this.topicsAndSkillsDashboardBackendApiService;
     OppiaAngularRootComponent.topicSummaryObjectFactory = this.topicSummaryObjectFactory;
-    OppiaAngularRootComponent.topicsAndSkillsDashboardFilterObjectFactory = this.topicsAndSkillsDashboardFilterObjectFactory;
     OppiaAngularRootComponent.topicsAndSkillsDashboardPageService = this.topicsAndSkillsDashboardPageService;
     OppiaAngularRootComponent.topicViewerBackendApiService = this.topicViewerBackendApiService;
     OppiaAngularRootComponent.translateService = this.translateService;
