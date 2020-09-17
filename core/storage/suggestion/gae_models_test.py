@@ -941,49 +941,80 @@ class ReviewerAndSuggestionCountsModelUnitTests(test_utils.GenericTestBase):
     question_reviewer_count = 1
     question_suggestion_count = 4
 
-    def setUp(self):
-        super(ReviewerAndSuggestionCountsModelUnitTests, self).setUp()
+    def test_get_returns_reviewer_and_suggestion_counts_model_when_it_exists(
+            self):
+        suggestion_models.ReviewerAndSuggestionCountsModel(
+            id=suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_ID,
+            translation_reviewer_counts_per_lang=(
+                self.translation_reviewer_counts_per_lang),
+            translation_suggestion_counts_per_lang=(
+                self.translation_suggestion_counts_per_lang),
+            question_reviewer_count=self.question_reviewer_count,
+            question_suggestion_count=self.question_suggestion_count
+        ).put()
 
-        self.model_instance = (
-            suggestion_models.ReviewerAndSuggestionCountsModel.create(
-                translation_reviewer_counts_per_lang=(
-                    self.translation_reviewer_counts_per_lang),
-                translation_suggestion_counts_per_lang=(
-                    self.translation_suggestion_counts_per_lang),
-                question_reviewer_count=self.question_reviewer_count,
-                question_suggestion_count=self.question_suggestion_count
-            )
+        reviewer_and_suggestion_counts_model = (
+            suggestion_models.ReviewerAndSuggestionCountsModel.get()
         )
 
-    def test_successful_create(self):
         self.assertEqual(
-            self.model_instance.id,
+            reviewer_and_suggestion_counts_model.id,
             suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_ID
         )
         self.assertEqual(
-            self.model_instance.translation_reviewer_counts_per_lang,
+            (
+                reviewer_and_suggestion_counts_model
+                .translation_reviewer_counts_per_lang
+            ),
             self.translation_reviewer_counts_per_lang
         )
         self.assertEqual(
-            self.model_instance.translation_suggestion_counts_per_lang,
+            (
+                reviewer_and_suggestion_counts_model
+                .translation_suggestion_counts_per_lang
+            ),
             self.translation_suggestion_counts_per_lang
         )
         self.assertEqual(
-            self.model_instance.question_reviewer_count,
+            reviewer_and_suggestion_counts_model.question_reviewer_count,
             self.question_reviewer_count
         )
         self.assertEqual(
-            self.model_instance.question_suggestion_count,
+            reviewer_and_suggestion_counts_model.question_suggestion_count,
             self.question_suggestion_count
         )
 
-    def test_create_fails_if_reviewer_and_suggestion_counts_model_exists(
+    def test_get_returns_new_reviewer_and_suggestion_counts_model_if_not_found(
             self):
+        """If the model has not been created yet, get should create the model
+        with default values.
+        """
+        reviewer_and_suggestion_counts_model = (
+            suggestion_models.ReviewerAndSuggestionCountsModel.get()
+        )
 
-        with self.assertRaisesRegexp(
-            Exception,
-            'The ReviewerAndSuggestionCountsModel has already been created.'):
-            suggestion_models.ReviewerAndSuggestionCountsModel.create()
+        self.assertEqual(
+            reviewer_and_suggestion_counts_model.id,
+            suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_ID
+        )
+        self.assertEqual(
+            (
+                reviewer_and_suggestion_counts_model
+                .translation_reviewer_counts_per_lang
+            ), {}
+        )
+        self.assertEqual(
+            (
+                reviewer_and_suggestion_counts_model
+                .translation_suggestion_counts_per_lang
+            ), {}
+        )
+        self.assertEqual(
+            reviewer_and_suggestion_counts_model.question_reviewer_count, 0
+        )
+        self.assertEqual(
+            reviewer_and_suggestion_counts_model.question_suggestion_count, 0
+        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(

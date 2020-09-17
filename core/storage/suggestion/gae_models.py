@@ -652,52 +652,33 @@ class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
         required=True, indexed=True)
 
     @classmethod
-    def create(
-            cls, translation_reviewer_counts_per_lang=0,
-            translation_suggestion_counts_per_lang=0,
-            question_reviewer_count=0, question_suggestion_count=0):
-        """Creates a new ReviewerAndSuggestionCountsModel entry.
-
-        Args:
-            translation_reviewer_counts_per_lang: dict. A dictionary where the
-                keys are the languages that translation suggestions are offered
-                in and the values are the number of reviewers who have
-                permission to review translation suggestions for each language.
-            translation_suggestion_counts_per_lang: dict. A dictionary where
-                the keys are the languages that translation suggestions are
-                offered in and the values are the number of translation
-                suggestions that are currently in review for each language.
-            question_reviewer_count: int. The number of reviewers who have
-                permission to review question suggestions.
-            question_suggestion_count: int. The number of question suggestions
-                that are currently in review.
+    def get(cls, strict=True):
+        """Gets the ReviewerAndSuggestionCountsModel instance. If the
+        ReviewerAndSuggestionCountsModel does not exist yet, it is created.
+        This method is enforcing that there should only ever be one instance
+        of this model.
 
         Returns:
             ReviewerAndSuggestionCountsModel. The
-            ReviewerAndSuggestionCountsModel that was created.
-
-        Raises:
-            Exception. There is already a suggestion with the given id.
+            ReviewerAndSuggestionCountsModel.
         """
-        if cls.get_by_id(REVIEWER_AND_SUGGESTION_COUNTS_ID):
-            raise Exception(
-                'The ReviewerAndSuggestionCountsModel has already been created.'
-            )
-
-        reviewer_and_suggestion_counts_instance = cls(
-            id=REVIEWER_AND_SUGGESTION_COUNTS_ID,
-            translation_reviewer_counts_per_lang=(
-                translation_reviewer_counts_per_lang),
-            translation_suggestion_counts_per_lang=(
-                translation_suggestion_counts_per_lang),
-            question_reviewer_count=question_reviewer_count,
-            question_suggestion_count=question_suggestion_count
+        reviewer_and_suggestion_counts_model = cls.get_by_id(
+            REVIEWER_AND_SUGGESTION_COUNTS_ID
         )
 
-        reviewer_and_suggestion_counts_instance.put()
+        if reviewer_and_suggestion_counts_model is None:
+            cls(
+                id=REVIEWER_AND_SUGGESTION_COUNTS_ID,
+                translation_reviewer_counts_per_lang={},
+                translation_suggestion_counts_per_lang={},
+                question_reviewer_count=0,
+                question_suggestion_count=0
+            ).put()
 
-        return reviewer_and_suggestion_counts_instance
-
+        return super(
+            ReviewerAndSuggestionCountsModel, cls).get(
+                REVIEWER_AND_SUGGESTION_COUNTS_ID, strict=strict)
+    
     @classmethod
     def get_deletion_policy(cls):
         """NOT_APPLICABLE - this model does not directly contain user

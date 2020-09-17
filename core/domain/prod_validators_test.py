@@ -9399,76 +9399,76 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
     def setUp(self):
         super(ReviewerAndSuggestionCountsModelValidatorTests, self).setUp()
 
-        self.model_instance = (
-            suggestion_models.ReviewerAndSuggestionCountsModel.create(
-                translation_reviewer_counts_per_lang=(
-                    self.translation_reviewer_counts_per_lang),
-                translation_suggestion_counts_per_lang=(
-                    self.translation_suggestion_counts_per_lang),
-                question_reviewer_count=self.question_reviewer_count,
-                question_suggestion_count=self.question_suggestion_count
-            )
-        )
-
         self.job_class = (
             prod_validation_jobs_one_off
             .ReviewerAndSuggestionCountsModelAuditOneOffJob
         )
 
-    def test_model_validation_success(self):
+    def test_model_validation_success_when_model_has_non_zero_counts(self):
+        suggestion_models.ReviewerAndSuggestionCountsModel(
+            id=suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_ID,
+            translation_reviewer_counts_per_lang=(
+                self.translation_reviewer_counts_per_lang),
+            translation_suggestion_counts_per_lang=(
+                self.translation_suggestion_counts_per_lang),
+            question_reviewer_count=self.question_reviewer_count,
+            question_suggestion_count=self.question_suggestion_count
+        ).put()
         expected_output = [(
             u'[u\'fully-validated ReviewerAndSuggestionCountsModel\', 1]')]
 
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
+    def test_model_validation_success_when_model_has_default_values(self):
+        suggestion_models.ReviewerAndSuggestionCountsModel(
+            id=suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_ID,
+            translation_reviewer_counts_per_lang={},
+            translation_suggestion_counts_per_lang={},
+            question_reviewer_count=0,
+            question_suggestion_count=0
+        ).put()
+        expected_output = [
+            u'[u\'fully-validated ReviewerAndSuggestionCountsModel\', 1]'
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
     def test_model_validation_fails_with_invalid_model_id(self):
-        model_with_invalid_id = (
-            suggestion_models.ReviewerAndSuggestionCountsModel(
-                id='invalid_id',
-                translation_reviewer_counts_per_lang=(
-                    self.translation_reviewer_counts_per_lang),
-                translation_suggestion_counts_per_lang=(
-                    self.translation_suggestion_counts_per_lang),
-                question_reviewer_count=self.question_reviewer_count,
-                question_suggestion_count=self.question_suggestion_count
-            )
-        )
-        model_with_invalid_id.put()
+        suggestion_models.ReviewerAndSuggestionCountsModel(
+            id='invalid_id',
+            translation_reviewer_counts_per_lang=(
+                self.translation_reviewer_counts_per_lang),
+            translation_suggestion_counts_per_lang=(
+                self.translation_suggestion_counts_per_lang),
+            question_reviewer_count=self.question_reviewer_count,
+            question_suggestion_count=self.question_suggestion_count
+        ).put()
 
         expected_output = [
-            (
-                u'[u\'failed validation check for model id check of '
-                'ReviewerAndSuggestionCountsModel\', '
-                '[u\'Entity id invalid_id: Entity id does not match regex '
-                'pattern\']]'
-            ),
-            u'[u\'fully-validated ReviewerAndSuggestionCountsModel\', 1]']
+            u'[u\'failed validation check for model id check of '
+            'ReviewerAndSuggestionCountsModel\', '
+            '[u\'Entity id invalid_id: Entity id does not match regex '
+            'pattern\']]'
+        ]
 
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
     def test_model_validation_fails_for_negative_translation_reviewer_counts(
             self):
-        model_with_negative_counts = self.model_instance
-        model_with_negative_counts.translation_reviewer_counts_per_lang = {
-            'en': -1
-        }
-        model_with_negative_counts.put()
+        counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
+        counts_model.translation_reviewer_counts_per_lang = {'en': -1}
+        counts_model.put()
         expected_output = [
-            (
-                u'[u\'failed validation check for domain object check of '
-                'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
-                'fails domain validation with the error Expected the '
-                'translation reviewer count to be positive, recieved: %s. The '
-                'language code for the translation was en.\']]' % (
-                    model_with_negative_counts.id,
-                    (
-                        model_with_negative_counts
-                        .translation_reviewer_counts_per_lang['en']
-                    )
-                )
-            )
+            u'[u\'failed validation check for domain object check of '
+            'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the '
+            'translation reviewer count to be positive, recieved: %s. The '
+            'language code for the translation was en.\']]' % (
+                counts_model.id,
+                counts_model.translation_reviewer_counts_per_lang['en'])
         ]
 
         self.run_job_and_check_output(
@@ -9476,25 +9476,17 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
 
     def test_model_validation_fails_for_negative_translation_suggestion_counts(
             self):
-        model_with_negative_counts = self.model_instance
-        model_with_negative_counts.translation_suggestion_counts_per_lang = {
-            'en': -1
-        }
-        model_with_negative_counts.put()
+        counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
+        counts_model.translation_suggestion_counts_per_lang = {'en': -1}
+        counts_model.put()
         expected_output = [
-            (
-                u'[u\'failed validation check for domain object check of '
-                'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
-                'fails domain validation with the error Expected the '
-                'translation suggestion count to be positive, recieved: %s. The'
-                ' language code for the translation was en.\']]' % (
-                    model_with_negative_counts.id,
-                    (
-                        model_with_negative_counts
-                        .translation_suggestion_counts_per_lang['en']
-                    )
-                )
-            )
+            u'[u\'failed validation check for domain object check of '
+            'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the '
+            'translation suggestion count to be positive, recieved: %s. The'
+            ' language code for the translation was en.\']]' % (
+                counts_model.id,
+                counts_model.translation_suggestion_counts_per_lang['en'])
         ]
 
         self.run_job_and_check_output(
@@ -9502,18 +9494,15 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
 
     def test_model_validation_fails_for_negative_question_reviewer_count(
             self):
-        model_with_negative_count = self.model_instance
-        model_with_negative_count.question_reviewer_count = -1
-        model_with_negative_count.put()
+        counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
+        counts_model.question_reviewer_count = -1
+        counts_model.put()
         expected_output = [
-            (
-                u'[u\'failed validation check for domain object check of '
-                'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
-                'fails domain validation with the error Expected the '
-                'question reviewer count to be positive, recieved: %s.\']]' % (
-                    model_with_negative_count.id,
-                    model_with_negative_count.question_reviewer_count)
-            )
+            u'[u\'failed validation check for domain object check of '
+            'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the '
+            'question reviewer count to be positive, recieved: %s.\']]' % (
+                counts_model.id, counts_model.question_reviewer_count)
         ]
 
         self.run_job_and_check_output(
@@ -9521,19 +9510,16 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
 
     def test_model_validation_fails_for_negative_question_suggestion_count(
             self):
-        model_with_negative_count = self.model_instance
-        model_with_negative_count.question_suggestion_count = -1
-        model_with_negative_count.put()
+        counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
+        counts_model.question_suggestion_count = -1
+        counts_model.put()
         expected_output = [
-            (
-                u'[u\'failed validation check for domain object check of '
-                'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
-                'fails domain validation with the error Expected the '
-                'question suggestion count to be positive, recieved: '
-                '%s.\']]' % (
-                    model_with_negative_count.id,
-                    model_with_negative_count.question_suggestion_count)
-            )
+            u'[u\'failed validation check for domain object check of '
+            'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the '
+            'question suggestion count to be positive, recieved: '
+            '%s.\']]' % (
+                counts_model.id, counts_model.question_suggestion_count)
         ]
 
         self.run_job_and_check_output(
