@@ -13,20 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for StopwatchObjectFactory.
+ * @fileoverview Unit tests for Stopwatch.
  */
 
 import { TestBed } from '@angular/core/testing';
 
-import { StopwatchObjectFactory } from
-  'domain/utilities/StopwatchObjectFactory';
+import { Stopwatch } from
+  'domain/utilities/stopwatch.model';
 
 describe('Stopwatch object factory', () => {
-  let stopwatchObjectFactory: StopwatchObjectFactory = null;
   let nowSpy = null;
 
   beforeEach(() => {
-    stopwatchObjectFactory = TestBed.get(StopwatchObjectFactory);
     nowSpy = spyOn(Date, 'now');
   });
 
@@ -35,7 +33,7 @@ describe('Stopwatch object factory', () => {
   };
 
   it('should correctly record time intervals', () => {
-    let stopwatch = stopwatchObjectFactory.create();
+    let stopwatch = Stopwatch.create();
     changeCurrentTime(0);
     expect(stopwatch._getCurrentTime()).toBe(0);
     stopwatch.reset();
@@ -45,7 +43,7 @@ describe('Stopwatch object factory', () => {
   });
 
   it('should not reset stopwatch when current time is retrieved', () => {
-    let stopwatch = stopwatchObjectFactory.create();
+    let stopwatch = Stopwatch.create();
     changeCurrentTime(0);
     expect(stopwatch._getCurrentTime()).toBe(0);
     stopwatch.reset();
@@ -56,7 +54,7 @@ describe('Stopwatch object factory', () => {
   });
 
   it('should correctly reset the stopwatch', () => {
-    let stopwatch = stopwatchObjectFactory.create();
+    let stopwatch = Stopwatch.create();
     changeCurrentTime(0);
     expect(stopwatch._getCurrentTime()).toBe(0);
     stopwatch.reset();
@@ -74,7 +72,7 @@ describe('Stopwatch object factory', () => {
     // LoggerService is private, so to check if it's being called
     // console.error needs to be spied.
     const errorLog = spyOn(console, 'error').and.callThrough();
-    let stopwatch = stopwatchObjectFactory.create();
+    let stopwatch = Stopwatch.create();
     changeCurrentTime(29);
     expect(stopwatch._getCurrentTime()).toBe(29);
     expect(stopwatch.getTimeInSecs()).toBeNull();
@@ -83,8 +81,8 @@ describe('Stopwatch object factory', () => {
   });
 
   it('should instantiate independent stopwatches', () => {
-    let stopwatch1 = stopwatchObjectFactory.create();
-    let stopwatch2 = stopwatchObjectFactory.create();
+    let stopwatch1 = Stopwatch.create();
+    let stopwatch2 = Stopwatch.create();
 
     changeCurrentTime(0);
     expect(stopwatch1._getCurrentTime()).toBe(0);

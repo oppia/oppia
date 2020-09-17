@@ -19,9 +19,6 @@
 // A simple service that provides stopwatch instances. Each stopwatch can be
 // independently reset and queried for the current time.
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { LoggerService } from 'services/contextual/logger.service';
 
 export class Stopwatch {
@@ -46,17 +43,8 @@ export class Stopwatch {
     }
     return (this._getCurrentTime() - this.startTime) / 1000;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class StopwatchObjectFactory {
-  create(): Stopwatch {
+  static create(): Stopwatch {
     return new Stopwatch(new LoggerService());
   }
 }
-
-angular.module('oppia').factory(
-  'StopwatchObjectFactory',
-  downgradeInjectable(StopwatchObjectFactory));

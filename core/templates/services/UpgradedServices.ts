@@ -563,8 +563,6 @@ import { StatsReportingBackendApiService } from
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { StatsReportingService } from
   'pages/exploration-player-page/services/stats-reporting.service';
-import { StopwatchObjectFactory } from
-  'domain/utilities/StopwatchObjectFactory';
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
 import { StoryEditorNavigationService } from
@@ -869,7 +867,6 @@ export class UpgradedServices {
     upgradedServices['StateGraphLayoutService'] = new StateGraphLayoutService();
     upgradedServices['StateNameService'] = new StateNameService();
     upgradedServices['StateStatsObjectFactory'] = new StateStatsObjectFactory();
-    upgradedServices['StopwatchObjectFactory'] = new StopwatchObjectFactory();
     upgradedServices['StoryNodeObjectFactory'] = new StoryNodeObjectFactory();
     upgradedServices['StoryContentsObjectFactory'] =
       new StoryContentsObjectFactory(
@@ -1612,8 +1609,7 @@ export class UpgradedServices {
         upgradedServices['ExplorationFeaturesService'],
         upgradedServices['LearnerActionObjectFactory'],
         upgradedServices['PlaythroughBackendApiService'],
-        upgradedServices['PlaythroughObjectFactory'],
-        upgradedServices['StopwatchObjectFactory']);
+        upgradedServices['PlaythroughObjectFactory']);
     upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['ExplorationHtmlFormatterService']);
@@ -1633,8 +1629,7 @@ export class UpgradedServices {
       upgradedServices['MessengerService'],
       upgradedServices['PlaythroughService'],
       upgradedServices['SiteAnalyticsService'],
-      upgradedServices['StatsReportingBackendApiService'],
-      upgradedServices['StopwatchObjectFactory']);
+      upgradedServices['StatsReportingBackendApiService']);
 
     // Topological level: 7.
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(

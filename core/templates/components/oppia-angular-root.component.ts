@@ -601,8 +601,6 @@ import { StatsReportingBackendApiService } from
   'domain/exploration/stats-reporting-backend-api.service';
 import { StatsReportingService } from
   'pages/exploration-player-page/services/stats-reporting.service';
-import { StopwatchObjectFactory } from
-  'domain/utilities/StopwatchObjectFactory';
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
 import { StoryEditorNavigationService } from
@@ -979,7 +977,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static statesObjectFactory: StatesObjectFactory;
   static statsReportingBackendApiService: StatsReportingBackendApiService;
   static statsReportingService: StatsReportingService;
-  static stopwatchObjectFactory: StopwatchObjectFactory;
   static storyContentsObjectFactory: StoryContentsObjectFactory;
   static storyEditorNavigationService: StoryEditorNavigationService;
   static storyNodeObjectFactory: StoryNodeObjectFactory;
@@ -1307,7 +1304,6 @@ private stateWrittenTranslationsService: StateWrittenTranslationsService,
 private statesObjectFactory: StatesObjectFactory,
 private statsReportingBackendApiService: StatsReportingBackendApiService,
 private statsReportingService: StatsReportingService,
-private stopwatchObjectFactory: StopwatchObjectFactory,
 private storyContentsObjectFactory: StoryContentsObjectFactory,
 private storyEditorNavigationService: StoryEditorNavigationService,
 private storyNodeObjectFactory: StoryNodeObjectFactory,
@@ -1636,7 +1632,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.statesObjectFactory = this.statesObjectFactory;
     OppiaAngularRootComponent.statsReportingBackendApiService = this.statsReportingBackendApiService;
     OppiaAngularRootComponent.statsReportingService = this.statsReportingService;
-    OppiaAngularRootComponent.stopwatchObjectFactory = this.stopwatchObjectFactory;
     OppiaAngularRootComponent.storyContentsObjectFactory = this.storyContentsObjectFactory;
     OppiaAngularRootComponent.storyEditorNavigationService = this.storyEditorNavigationService;
     OppiaAngularRootComponent.storyNodeObjectFactory = this.storyNodeObjectFactory;

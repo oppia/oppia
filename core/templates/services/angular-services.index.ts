@@ -195,7 +195,6 @@ import { UserProfileObjectFactory } from 'domain/user/user-profile-object.factor
 import { AudioFileObjectFactory } from 'domain/utilities/AudioFileObjectFactory';
 import { EntityContextObjectFactory } from 'domain/utilities/EntityContextObjectFactory';
 import { FileDownloadRequestObjectFactory } from 'domain/utilities/FileDownloadRequestObjectFactory';
-import { StopwatchObjectFactory } from 'domain/utilities/StopwatchObjectFactory';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -666,7 +665,6 @@ export const angularServices: [string, unknown][] = [
   ['StatesObjectFactory', StatesObjectFactory],
   ['StatsReportingBackendApiService', StatsReportingBackendApiService],
   ['StatsReportingService', StatsReportingService],
-  ['StopwatchObjectFactory', StopwatchObjectFactory],
   ['StoryContentsObjectFactory', StoryContentsObjectFactory],
   ['StoryEditorNavigationService', StoryEditorNavigationService],
   ['StoryNodeObjectFactory', StoryNodeObjectFactory],
