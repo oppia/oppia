@@ -184,7 +184,9 @@ class TaskqueueServicesStub(python_utils.OBJECT):
     def _task_handler(self, url, payload, queue_name, task_name=None):
         headers = {
             'X-Appengine-QueueName': python_utils.convert_to_bytes(queue_name),
-            'X-Appengine-TaskName': task_name if task_name else python_utils.convert_to_bytes('None'),
+            'X-Appengine-TaskName': (
+                task_name
+                if task_name else python_utils.convert_to_bytes('None')),
             'X-AppEngine-Fake-Is-Admin': python_utils.convert_to_bytes('1')
         }
         csrf_token = self.test_base.get_new_csrf_token()

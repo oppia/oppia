@@ -182,7 +182,7 @@ def main():
     # mentioned here:
     # https://github.com/googleapis/python-ndb/issues/518
     python_utils.PRINT(
-        'Checking that all google library modules contain __init__.py.')
+        'Checking that all google library modules contain __init__.py files.')
     for root_path, sub_directory_name_list, file_name_list in os.walk(
         correct_google_path):
         if not root_path.endswith('__pycache__'):

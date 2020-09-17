@@ -338,7 +338,7 @@ def _send_email(
     def _send_email_in_transaction():
         """Sends the email to a single recipient."""
         sender_name_email = '%s <%s>' % (sender_name, sender_email)
-
+        print("SENDING MAIL IN TRANSACTION")
         email_services.send_mail(
             sender_name_email, recipient_email, email_subject,
             cleaned_plaintext_body, cleaned_html_body, bcc_admin=bcc_admin,
@@ -950,6 +950,7 @@ def send_flag_exploration_email(
 
     recipient_list = user_services.get_user_ids_by_role(
         feconf.ROLE_ID_MODERATOR)
+
     for recipient_id in recipient_list:
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,

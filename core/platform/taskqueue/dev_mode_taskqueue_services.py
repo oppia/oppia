@@ -42,9 +42,12 @@ def _task_handler(url, payload, queue_name, task_name=None):
     headers['X-Appengine-TaskRetryCount'] = '0'
     headers['X-Appengine-TaskExecutionCount'] = '0'
     headers['X-Appengine-TaskETA'] = '0'
+    # Special header to fake the admin role when making requests to the task
+    # handlers in DEV_mode.
+    headers['X-AppEngine-Fake-Is-Admin'] = '1'
     headers['method'] = 'POST'
     resp = requests.post(
-        'http://localhost:8181%s' % feconf.TASK_URL_DEFERRED,
+        'http://localhost:8181%s' % url,
         json=payload,
         headers=headers)
 

@@ -39,6 +39,7 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             'X-Appengine-TaskRetryCount': task_name,
             'X-Appengine-TaskExecutionCount': '0',
             'X-Appengine-TaskETA': '0',
+            'X-AppEngine-Fake-Is-Admin': '1',
             'method': 'POST'
         }
         def mock_post(self, url, json, headers):

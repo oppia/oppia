@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
 import feconf
 import json
 import python_utils
@@ -103,7 +104,7 @@ def enqueue_task(url, params, countdown):
             task.
     '''
     scheduled_datetime = datetime.datetime.utcnow() + datetime.timedelta(
-            seconds=scheduled_for)
+            seconds=countdown)
     platform_taskqueue_services.create_http_task(
         queue_name=QUEUE_NAME_EMAILS, url=url, payload=params,
         scheduled_for=scheduled_datetime)
