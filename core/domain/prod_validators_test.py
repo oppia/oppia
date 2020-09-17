@@ -9400,8 +9400,7 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
         super(ReviewerAndSuggestionCountsModelValidatorTests, self).setUp()
 
         self.model_instance = (
-            suggestion_models.ReviewerAndSuggestionCountsModel(
-                id=suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_ID,
+            suggestion_models.ReviewerAndSuggestionCountsModel.create(
                 translation_reviewer_counts_per_lang=(
                     self.translation_reviewer_counts_per_lang),
                 translation_suggestion_counts_per_lang=(
@@ -9410,7 +9409,6 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
                 question_suggestion_count=self.question_suggestion_count
             )
         )
-        self.model_instance.put()
 
         self.job_class = (
             prod_validation_jobs_one_off

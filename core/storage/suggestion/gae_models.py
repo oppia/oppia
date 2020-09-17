@@ -601,6 +601,53 @@ class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
         required=True, indexed=True)
 
     @classmethod
+    def create(
+            cls, translation_reviewer_counts_per_lang={},
+            translation_suggestion_counts_per_lang={},
+            question_reviewer_count=0, question_suggestion_count=0):
+        """Creates a new ReviewerAndSuggestionCountsModel entry.
+
+        Args:
+            translation_reviewer_counts_per_lang: dict. A dictionary where the
+            keys are the languages that translation suggestions are offered in
+            and the values are the number of reviewers who have permission to
+            review translation suggestions for each language.
+        translation_suggestion_counts_per_lang: dict. A dictionary where the
+            keys are the languages that translation suggestions are offered in
+            and the values are the number of translation suggestions that are
+            currently in review for each language.
+        question_reviewer_count: int. The number of reviewers who have
+            permission to review question suggestions.
+        question_suggestion_count: int. The number of question suggestions that
+            are currently in review.
+
+        Returns:
+            ReviewerAndSuggestionCountsModel. The
+            ReviewerAndSuggestionCountsModel that was created.
+
+        Raises:
+            Exception. There is already a suggestion with the given id.
+        """
+        if cls.get_by_id(REVIEWER_AND_SUGGESTION_COUNTS_ID):
+            raise Exception(
+                'The ReviewerAndSuggestionCountsModel has already been created.'
+            )
+
+        reviewer_and_suggestion_counts_instance = cls(
+            id=REVIEWER_AND_SUGGESTION_COUNTS_ID,
+            translation_reviewer_counts_per_lang=(
+                translation_reviewer_counts_per_lang),
+            translation_suggestion_counts_per_lang=(
+                translation_suggestion_counts_per_lang),
+            question_reviewer_count=question_reviewer_count,
+            question_suggestion_count=question_suggestion_count
+        )
+
+        reviewer_and_suggestion_counts_instance.put()
+
+        return reviewer_and_suggestion_counts_instance
+
+    @classmethod
     def get_deletion_policy(cls):
         """NOT_APPLICABLE - this model does not directly contain user
         information because the data is aggregated.

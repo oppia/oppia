@@ -796,3 +796,26 @@ def create_reviewer_and_suggestion_counts_from_model(
             reviewer_and_suggestion_counts_model.question_suggestion_count
         )
     return None
+
+def get_reviewer_and_suggestion_counts():
+    """Retrieves the ReviewerAndSuggestionCountsModel and converts it to a
+    ReviewerAndSuggestionCounts domain object. The model is created if it does
+    not already exist.
+
+    Returns:
+        ReviewerAndSuggestionCounts. The corresponding
+        ReviewerAndSuggestionCounts domain object.
+    """
+    reviewer_and_suggestion_counts_model = (
+        suggestion_models.ReviewerAndSuggestionCountsModel.get_by_id(
+            suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_ID
+        )
+    )
+
+    if reviewer_and_suggestion_counts_model is None:
+        reviewer_and_suggestion_counts_model = (
+            suggestion_models.ReviewerAndSuggestionCountsModel.create()
+        )
+
+    return create_reviewer_and_suggestion_counts_from_model(
+        reviewer_and_suggestion_counts_model)

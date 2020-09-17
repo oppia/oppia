@@ -39,11 +39,6 @@ import utils
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
-# The maximum number of suggestions per reviewer before an admin gets notified
-# that the suggestions of a specific type need more reviewers.
-MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = 5
-
-
 class BaseSuggestion(python_utils.OBJECT):
     """Base class for a suggestion.
 
@@ -1169,58 +1164,3 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
                 'Expected the question suggestion count to be positive, '
                 'recieved: %s.' % (self.question_suggestion_count)
             )
-
-    def are_reviewers_needed_for_translation_suggestions_in_language(
-            self, language_code):
-        """Returns whether or not more reviewers are needed to review
-        translation suggestions in the given language.
-
-        Args:
-            language_code: str. The language code of the translation
-                suggestions.
-
-        Returns:
-            Bool. Whether or not more reviewers are needed to review
-            translation suggestions in the given language.
-       """
-        if language_code in self.translation_reviewer_counts_per_lang and (
-                language_code in self.translation_suggestion_counts_per_lang):
-            number_of_reviewers = (
-                self.translation_reviewer_counts_per_lang[language_code]
-            )
-            number_of_suggestions = (
-                self.translation_suggestion_counts_per_lang[
-                    language_code]
-            )
-            if number_of_reviewers == 0:
-                return True
-            else:
-                return python_utils.divide(
-                    number_of_suggestions, number_of_reviewers) > (
-                        MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER)
-        elif language_code in self.translation_reviewer_counts_per_lang:
-            # There are no translation suggestions in this language
-            # currently in review, but there are reviewers. Therefore,
-            # there is not a shortage of reviewers.
-            return False
-        elif language_code in self.translation_suggestion_counts_per_lang:
-            # There are no reviewers but there are translation suggestions that
-            # need review. Therefore, there is a shortage of reviewers.
-            return True
-        else:
-            # There are neither translation suggestions nor reviewers.
-            return False
-
-    def are_reviewers_needed_for_question_suggestions(self):
-        """Returns whether or not more reviewers are needed to review question
-        suggestions.
-
-        Returns:
-            Bool. Whether or not more reviewers are needed to review
-            question suggestions.
-       """
-        if self.question_reviewer_count == 0:
-            return True
-        else:
-            return python_utils.divide(
-                self.question_suggestion_count, self.question_reviewer_count)

@@ -753,6 +753,63 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
 class ReviewerAndSuggestionCountsModelUnitTests(test_utils.GenericTestBase):
     """Tests the ReviewerAndSuggestionCountsModel class."""
 
+    translation_reviewer_counts_per_lang = {
+        'hi': 0,
+        'en': 1
+    }
+
+    translation_suggestion_counts_per_lang = {
+        'fr': 6,
+        'en': 5
+    }
+
+    question_reviewer_count = 1
+    question_suggestion_count = 4
+
+    def setUp(self):
+        super(ReviewerAndSuggestionCountsModelUnitTests, self).setUp()
+
+        self.model_instance = (
+            suggestion_models.ReviewerAndSuggestionCountsModel.create(
+                translation_reviewer_counts_per_lang=(
+                    self.translation_reviewer_counts_per_lang),
+                translation_suggestion_counts_per_lang=(
+                    self.translation_suggestion_counts_per_lang),
+                question_reviewer_count=self.question_reviewer_count,
+                question_suggestion_count=self.question_suggestion_count
+            )
+        )
+
+    def test_successful_create(self):
+        self.assertEqual(
+            self.model_instance.id,
+            suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_ID
+        )
+        self.assertEqual(
+            self.model_instance.translation_reviewer_counts_per_lang,
+            self.translation_reviewer_counts_per_lang
+        )
+        self.assertEqual(
+            self.model_instance.translation_suggestion_counts_per_lang,
+            self.translation_suggestion_counts_per_lang
+        )
+        self.assertEqual(
+            self.model_instance.question_reviewer_count,
+            self.question_reviewer_count
+        )
+        self.assertEqual(
+            self.model_instance.question_suggestion_count,
+            self.question_suggestion_count
+        )
+
+    def test_create_fails_if_reviewer_and_suggestion_counts_model_exists(
+            self):
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The ReviewerAndSuggestionCountsModel has already been created.'):
+            suggestion_models.ReviewerAndSuggestionCountsModel.create()
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             (
