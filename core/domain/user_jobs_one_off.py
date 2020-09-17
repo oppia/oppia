@@ -439,3 +439,29 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
     @staticmethod
     def reduce(key, values):
         yield (key, len(values))
+
+class RemoveGaeUserIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that deletes the gae_user_id from the UserSettingsModel
+     """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(user_settings_model):
+        if 'gae_user_id' in user_settings_model._properties:  # pylint: disable=protected-access
+            del user_settings_model._properties['gae_user_id']  # pylint: disable=protected-access
+            if 'gae_user_id' in user_settings_model._values:  # pylint: disable=protected-access
+                del user_settings_model._values['gae_user_id']  # pylint: disable=protected-access
+            user_settings_model.put(update_last_updated_time=False)
+            yield (
+                'SUCCESS_REMOVED - UserSettingsModel', user_settings_model.id)
+        else:
+            yield (
+                'SUCCESS_ALREADY_REMOVED - UserSettingsModel',
+                user_settings_model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
