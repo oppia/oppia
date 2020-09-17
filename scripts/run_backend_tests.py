@@ -239,6 +239,9 @@ def main(args=None):
     os.environ['CLOUDSDK_CORE_PROJECT'] = 'oppia-dev'
     os.environ['APPLICATION_ID'] = 'oppia-dev'
 
+    import dev_appserver
+    dev_appserver.fix_sys_path()
+
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)
