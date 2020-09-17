@@ -192,7 +192,6 @@ import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_ski
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { ProfileSummaryObjectFactory } from 'domain/user/profile-summary-object.factory';
 import { UserProfileObjectFactory } from 'domain/user/user-profile-object.factory';
-import { AudioFileObjectFactory } from 'domain/utilities/AudioFileObjectFactory';
 import { EntityContextObjectFactory } from 'domain/utilities/EntityContextObjectFactory';
 import { FileDownloadRequestObjectFactory } from 'domain/utilities/FileDownloadRequestObjectFactory';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
@@ -370,7 +369,6 @@ export const angularServices: [string, unknown][] = [
   ['AppService', AppService],
   ['AssignedSkillObjectFactory', AssignedSkillObjectFactory],
   ['AudioBarStatusService', AudioBarStatusService],
-  ['AudioFileObjectFactory', AudioFileObjectFactory],
   ['AudioTranslationLanguageService', AudioTranslationLanguageService],
   ['AudioTranslationManagerService', AudioTranslationManagerService],
   ['AugmentedSkillSummaryObjectFactory', AugmentedSkillSummaryObjectFactory],

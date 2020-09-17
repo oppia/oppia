@@ -58,8 +58,6 @@ import { AppService } from 'services/app.service';
 import { AssignedSkillObjectFactory } from
   'domain/skill/assigned-skill-object.factory';
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
-import { AudioFileObjectFactory } from
-  'domain/utilities/AudioFileObjectFactory';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { AudioTranslationManagerService } from
@@ -684,12 +682,10 @@ export class UpgradedServices {
       new AnswerGroupsCacheService();
     upgradedServices['AnswerStatsObjectFactory'] =
       new AnswerStatsObjectFactory();
-    upgradedServices['AudioFileObjectFactory'] = new AudioFileObjectFactory();
     upgradedServices['AppService'] = new AppService();
     upgradedServices['AssignedSkillObjectFactory'] =
       new AssignedSkillObjectFactory();
     upgradedServices['AudioBarStatusService'] = new AudioBarStatusService();
-    upgradedServices['AudioFileObjectFactory'] = new AudioFileObjectFactory();
     upgradedServices['AudioTranslationManagerService'] =
       new AudioTranslationManagerService();
     upgradedServices['AugmentedSkillSummaryObjectFactory'] =

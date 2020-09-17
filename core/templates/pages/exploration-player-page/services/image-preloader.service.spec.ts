@@ -20,8 +20,6 @@
 // image-preloader.service.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { AudioFileObjectFactory } from
-  'domain/utilities/AudioFileObjectFactory';
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -80,7 +78,6 @@ describe('Image preloader service', function() {
         'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
           new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
           new RuleObjectFactory()));
-      $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
       $provide.value(
         'FileDownloadRequestObjectFactory',
         new FileDownloadRequestObjectFactory());

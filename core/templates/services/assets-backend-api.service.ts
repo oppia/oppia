@@ -19,20 +19,20 @@
 // Jquery import is needed here in order to spy ajax method on unit tests.
 import $ from 'jquery';
 
-require('domain/utilities/AudioFileObjectFactory.ts');
 require('domain/utilities/FileDownloadRequestObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/csrf-token.service.ts');
 
+import { AudioFile } from 'domain/utilities/audio-file.model';
 import { ImageFile } from 'domain/utilities/image-file.model';
 
 angular.module('oppia').factory('AssetsBackendApiService', [
-  '$http', '$q', 'AudioFileObjectFactory', 'CsrfTokenService',
+  '$http', '$q', 'CsrfTokenService',
   'FileDownloadRequestObjectFactory',
   'UrlInterpolationService', 'DEV_MODE', 'ENTITY_TYPE',
   'GCS_RESOURCE_BUCKET_NAME',
   function(
-      $http, $q, AudioFileObjectFactory, CsrfTokenService,
+      $http, $q, CsrfTokenService,
       FileDownloadRequestObjectFactory,
       UrlInterpolationService, DEV_MODE, ENTITY_TYPE,
       GCS_RESOURCE_BUCKET_NAME) {
@@ -96,7 +96,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
         assetsCache[filename] = assetBlob;
         if (assetType === ASSET_TYPE_AUDIO) {
           successCallback(
-            AudioFileObjectFactory.createNew(filename, assetBlob));
+            AudioFile.createNew(filename, assetBlob));
         } else {
           successCallback(
             ImageFile.createNew(filename, assetBlob));
@@ -259,7 +259,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       loadAudio: function(explorationId, filename) {
         return $q(function(resolve, reject) {
           if (_isCached(filename)) {
-            resolve(AudioFileObjectFactory.createNew(
+            resolve(AudioFile.createNew(
               filename, assetsCache[filename]));
           } else {
             _fetchFile(

@@ -95,8 +95,6 @@ import { AppService } from 'services/app.service';
 import { AssignedSkillObjectFactory } from
   'domain/skill/assigned-skill-object.factory';
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
-import { AudioFileObjectFactory } from
-  'domain/utilities/AudioFileObjectFactory';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { AudioTranslationManagerService } from
@@ -719,7 +717,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static appService: AppService;
   static assignedSkillObjectFactory: AssignedSkillObjectFactory;
   static audioBarStatusService: AudioBarStatusService;
-  static audioFileObjectFactory: AudioFileObjectFactory;
   static audioTranslationLanguageService: AudioTranslationLanguageService;
   static audioTranslationManagerService: AudioTranslationManagerService;
   static augmentedSkillSummaryObjectFactory: AugmentedSkillSummaryObjectFactory;
@@ -1046,7 +1043,6 @@ private answerStatsObjectFactory: AnswerStatsObjectFactory,
 private appService: AppService,
 private assignedSkillObjectFactory: AssignedSkillObjectFactory,
 private audioBarStatusService: AudioBarStatusService,
-private audioFileObjectFactory: AudioFileObjectFactory,
 private audioTranslationLanguageService: AudioTranslationLanguageService,
 private audioTranslationManagerService: AudioTranslationManagerService,
 private augmentedSkillSummaryObjectFactory: AugmentedSkillSummaryObjectFactory,
@@ -1374,7 +1370,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.appService = this.appService;
     OppiaAngularRootComponent.assignedSkillObjectFactory = this.assignedSkillObjectFactory;
     OppiaAngularRootComponent.audioBarStatusService = this.audioBarStatusService;
-    OppiaAngularRootComponent.audioFileObjectFactory = this.audioFileObjectFactory;
     OppiaAngularRootComponent.audioTranslationLanguageService = this.audioTranslationLanguageService;
     OppiaAngularRootComponent.audioTranslationManagerService = this.audioTranslationManagerService;
     OppiaAngularRootComponent.augmentedSkillSummaryObjectFactory = this.augmentedSkillSummaryObjectFactory;
