@@ -250,8 +250,6 @@ import { FeedbackMessageSummaryObjectFactory } from
   'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { FeedbackThreadSummaryObjectFactory } from
-  'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
@@ -780,7 +778,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static featureStatusSummaryObjectFactory: FeatureStatusSummaryObjectFactory;
   static feedbackMessageSummaryObjectFactory: FeedbackMessageSummaryObjectFactory;
   static feedbackThreadObjectFactory: FeedbackThreadObjectFactory;
-  static feedbackThreadSummaryObjectFactory: FeedbackThreadSummaryObjectFactory;
   static formatTimePipe: FormatTimePipe;
   static fractionInputRulesService: FractionInputRulesService;
   static fractionInputValidationService: FractionInputValidationService;
@@ -1097,7 +1094,6 @@ private featuredTranslationLanguageObjectFactory: FeaturedTranslationLanguageObj
 private featureStatusSummaryObjectFactory: FeatureStatusSummaryObjectFactory,
 private feedbackMessageSummaryObjectFactory: FeedbackMessageSummaryObjectFactory,
 private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
-private feedbackThreadSummaryObjectFactory: FeedbackThreadSummaryObjectFactory,
 private formatTimePipe: FormatTimePipe,
 private fractionInputRulesService: FractionInputRulesService,
 private fractionInputValidationService: FractionInputValidationService,
@@ -1415,7 +1411,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.featureStatusSummaryObjectFactory = this.featureStatusSummaryObjectFactory;
     OppiaAngularRootComponent.feedbackMessageSummaryObjectFactory = this.feedbackMessageSummaryObjectFactory;
     OppiaAngularRootComponent.feedbackThreadObjectFactory = this.feedbackThreadObjectFactory;
-    OppiaAngularRootComponent.feedbackThreadSummaryObjectFactory = this.feedbackThreadSummaryObjectFactory;
     OppiaAngularRootComponent.formatTimePipe = this.formatTimePipe;
     OppiaAngularRootComponent.fractionInputRulesService = this.fractionInputRulesService;
     OppiaAngularRootComponent.fractionInputValidationService = this.fractionInputValidationService;

@@ -98,7 +98,6 @@ import { FeedbackMessageSummaryObjectFactory } from 'domain/feedback_message/Fee
 import { ThreadMessageObjectFactory } from 'domain/feedback_message/ThreadMessageObjectFactory';
 import { ThreadMessageSummaryObjectFactory } from 'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { FeedbackThreadSummaryObjectFactory } from 'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
 import { ExplorationTaskObjectFactory } from 'domain/improvements/ExplorationTaskObjectFactory';
 import { HighBounceRateTaskObjectFactory } from 'domain/improvements/HighBounceRateTaskObjectFactory';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from 'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -457,7 +456,6 @@ export const angularServices: [string, unknown][] = [
     FeaturedTranslationLanguageObjectFactory],
   ['FeedbackMessageSummaryObjectFactory', FeedbackMessageSummaryObjectFactory],
   ['FeedbackThreadObjectFactory', FeedbackThreadObjectFactory],
-  ['FeedbackThreadSummaryObjectFactory', FeedbackThreadSummaryObjectFactory],
   ['FocusManagerService', FocusManagerService],
   ['FormatTimePipe', FormatTimePipe],
   ['FractionInputRulesService', FractionInputRulesService],

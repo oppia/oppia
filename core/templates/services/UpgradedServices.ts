@@ -218,8 +218,6 @@ import { FeedbackMessageSummaryObjectFactory } from
   'domain/feedback_message/FeedbackMessageSummaryObjectFactory';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { FeedbackThreadSummaryObjectFactory } from
-  'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
@@ -729,8 +727,6 @@ export class UpgradedServices {
       new FeatureStatusSummaryObjectFactory();
     upgradedServices['FeedbackMessageSummaryObjectFactory'] =
       new FeedbackMessageSummaryObjectFactory();
-    upgradedServices['FeedbackThreadSummaryObjectFactory'] =
-      new FeedbackThreadSummaryObjectFactory();
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
@@ -1333,7 +1329,6 @@ export class UpgradedServices {
       new LearnerDashboardBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['CollectionSummaryObjectFactory'],
-        upgradedServices['FeedbackThreadSummaryObjectFactory'],
         upgradedServices['LearnerExplorationSummaryObjectFactory'],
         upgradedServices['NonExistentActivitiesObjectFactory'],
         upgradedServices['ProfileSummaryObjectFactory']);

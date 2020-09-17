@@ -17,9 +17,6 @@
    domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 export interface FeedbackThreadSummaryBackendDict {
   'status': string;
   'original_author_id': string;
@@ -85,13 +82,8 @@ export class FeedbackThreadSummary {
     this.lastMessageIsRead = true;
     this.secondLastMessageIsRead = true;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class FeedbackThreadSummaryObjectFactory {
-  create(
+  static create(
       status: string, originalAuthorId: string, lastUpdatedMsecs: number,
       lastMessageText: string, totalMessageCount: number,
       lastMessageIsRead: boolean, secondLastMessageIsRead: boolean,
@@ -102,10 +94,11 @@ export class FeedbackThreadSummaryObjectFactory {
       status, originalAuthorId, lastUpdatedMsecs,
       lastMessageText, totalMessageCount, lastMessageIsRead,
       secondLastMessageIsRead, authorLastMessage, authorSecondLastMessage,
-      explorationTitle, explorationId, threadId);
+      explorationTitle, explorationId, threadId
+    );
   }
 
-  createFromBackendDict(
+  static createFromBackendDict(
       feedbackThreadSummaryBackendDict: FeedbackThreadSummaryBackendDict):
       FeedbackThreadSummary {
     return new FeedbackThreadSummary(
@@ -120,10 +113,7 @@ export class FeedbackThreadSummaryObjectFactory {
       feedbackThreadSummaryBackendDict.author_second_last_message,
       feedbackThreadSummaryBackendDict.exploration_title,
       feedbackThreadSummaryBackendDict.exploration_id,
-      feedbackThreadSummaryBackendDict.thread_id);
+      feedbackThreadSummaryBackendDict.thread_id
+    );
   }
 }
-
-angular.module('oppia').factory(
-  'FeedbackThreadSummaryObjectFactory',
-  downgradeInjectable(FeedbackThreadSummaryObjectFactory));

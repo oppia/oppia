@@ -13,23 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for FeedbackThreadSummaryObjectFactory.
+ * @fileoverview Tests for FeedbackThreadSummary.
  */
 
-import { FeedbackThreadSummaryObjectFactory } from
-  'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
+import { FeedbackThreadSummary } from
+  'domain/feedback_thread/feedback-thread-summary.model';
 
 describe('Feedback thread object factory', () => {
-  let feedbackThreadSummaryObjectFactory: FeedbackThreadSummaryObjectFactory;
-
-  beforeEach(() => {
-    feedbackThreadSummaryObjectFactory =
-      new FeedbackThreadSummaryObjectFactory();
-  });
-
   it('should update the summary of the thread on addition of a ' +
      'message', () => {
-    var feedbackThreadSummary = feedbackThreadSummaryObjectFactory.create(
+    var feedbackThreadSummary = FeedbackThreadSummary.create(
       'open', 'Test user 1', new Date().getTime(), 'last message', 2, false,
       false, 'Test user 2', 'Test user 2', 'Test exploration name', '0',
       'thread_id');
@@ -59,7 +52,7 @@ describe('Feedback thread object factory', () => {
     };
 
     var feedbackThreadSummary = (
-      feedbackThreadSummaryObjectFactory.createFromBackendDict(threadSummary));
+      FeedbackThreadSummary.createFromBackendDict(threadSummary));
 
     expect(feedbackThreadSummary.explorationTitle).toEqual(
       'Sample exploration 1');
