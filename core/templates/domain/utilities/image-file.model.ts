@@ -16,9 +16,6 @@
  * @fileoverview Object factory for creating image files.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 export class ImageFile {
   filename: string;
   data: Blob;
@@ -27,17 +24,8 @@ export class ImageFile {
     this.filename = filename;
     this.data = data;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ImageFileObjectFactory {
-  createNew(filename: string, data: Blob): ImageFile {
+  static createNew(filename: string, data: Blob): ImageFile {
     return new ImageFile(filename, data);
   }
 }
-
-angular.module('oppia').factory(
-  'ImageFileObjectFactory',
-  downgradeInjectable(ImageFileObjectFactory));

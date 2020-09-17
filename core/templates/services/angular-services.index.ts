@@ -196,7 +196,6 @@ import { AudioFileObjectFactory } from 'domain/utilities/AudioFileObjectFactory'
 import { AudioLanguageObjectFactory } from 'domain/utilities/AudioLanguageObjectFactory';
 import { EntityContextObjectFactory } from 'domain/utilities/EntityContextObjectFactory';
 import { FileDownloadRequestObjectFactory } from 'domain/utilities/FileDownloadRequestObjectFactory';
-import { ImageFileObjectFactory } from 'domain/utilities/ImageFileObjectFactory';
 import { StopwatchObjectFactory } from 'domain/utilities/StopwatchObjectFactory';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
@@ -501,7 +500,6 @@ export const angularServices: [string, unknown][] = [
   ['IdGenerationService', IdGenerationService],
   ['ImageClickInputRulesService', ImageClickInputRulesService],
   ['ImageClickInputValidationService', ImageClickInputValidationService],
-  ['ImageFileObjectFactory', ImageFileObjectFactory],
   ['ImprovementsService', ImprovementsService],
   ['IneffectiveFeedbackLoopTaskObjectFactory',
     IneffectiveFeedbackLoopTaskObjectFactory],

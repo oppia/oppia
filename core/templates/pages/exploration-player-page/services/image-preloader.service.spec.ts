@@ -26,8 +26,6 @@ import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { ImageFileObjectFactory } from
-  'domain/utilities/ImageFileObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
@@ -90,7 +88,6 @@ describe('Image preloader service', function() {
       $provide.value(
         'HintObjectFactory', new HintObjectFactory(
           new SubtitledHtmlObjectFactory()));
-      $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
       $provide.value(
         'OutcomeObjectFactory', new OutcomeObjectFactory(
           new SubtitledHtmlObjectFactory()));

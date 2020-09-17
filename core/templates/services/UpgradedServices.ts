@@ -264,8 +264,6 @@ import { ImageClickInputRulesService } from
 import { ImageClickInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
-import { ImageFileObjectFactory } from
-  'domain/utilities/ImageFileObjectFactory';
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -781,7 +779,6 @@ export class UpgradedServices {
     upgradedServices['IdGenerationService'] = new IdGenerationService();
     upgradedServices['ImageClickInputRulesService'] =
       new ImageClickInputRulesService();
-    upgradedServices['ImageFileObjectFactory'] = new ImageFileObjectFactory();
     upgradedServices['ImprovementsService'] = new ImprovementsService();
     upgradedServices['IneffectiveFeedbackLoopTaskObjectFactory'] =
       new IneffectiveFeedbackLoopTaskObjectFactory();

@@ -21,18 +21,19 @@ import $ from 'jquery';
 
 require('domain/utilities/AudioFileObjectFactory.ts');
 require('domain/utilities/FileDownloadRequestObjectFactory.ts');
-require('domain/utilities/ImageFileObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/csrf-token.service.ts');
 
+import { ImageFile } from 'domain/utilities/image-file.model';
+
 angular.module('oppia').factory('AssetsBackendApiService', [
   '$http', '$q', 'AudioFileObjectFactory', 'CsrfTokenService',
-  'FileDownloadRequestObjectFactory', 'ImageFileObjectFactory',
+  'FileDownloadRequestObjectFactory',
   'UrlInterpolationService', 'DEV_MODE', 'ENTITY_TYPE',
   'GCS_RESOURCE_BUCKET_NAME',
   function(
       $http, $q, AudioFileObjectFactory, CsrfTokenService,
-      FileDownloadRequestObjectFactory, ImageFileObjectFactory,
+      FileDownloadRequestObjectFactory,
       UrlInterpolationService, DEV_MODE, ENTITY_TYPE,
       GCS_RESOURCE_BUCKET_NAME) {
     if (!DEV_MODE && !GCS_RESOURCE_BUCKET_NAME) {
@@ -98,7 +99,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
             AudioFileObjectFactory.createNew(filename, assetBlob));
         } else {
           successCallback(
-            ImageFileObjectFactory.createNew(filename, assetBlob));
+            ImageFile.createNew(filename, assetBlob));
         }
       })['catch'](function() {
         errorCallback(filename);
@@ -270,7 +271,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       loadImage: function(entityType, entityId, filename) {
         return $q(function(resolve, reject) {
           if (_isCached(filename)) {
-            resolve(ImageFileObjectFactory.createNew(
+            resolve(ImageFile.createNew(
               filename, assetsCache[filename]));
           } else {
             _fetchFile(

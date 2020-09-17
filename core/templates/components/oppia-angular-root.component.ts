@@ -302,8 +302,6 @@ import { ImageClickInputRulesService } from
 import { ImageClickInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
-import { ImageFileObjectFactory } from
-  'domain/utilities/ImageFileObjectFactory';
 import { ImprovementsService } from 'services/improvements.service';
 import { IneffectiveFeedbackLoopTaskObjectFactory } from
   'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
@@ -835,7 +833,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static idGenerationService: IdGenerationService;
   static imageClickInputRulesService: ImageClickInputRulesService;
   static imageClickInputValidationService: ImageClickInputValidationService;
-  static imageFileObjectFactory: ImageFileObjectFactory;
   static improvementsService: ImprovementsService;
   static ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory;
   static interactionAttributesExtractorService: InteractionAttributesExtractorService;
@@ -1165,7 +1162,6 @@ private i18nLanguageCodeService: I18nLanguageCodeService,
 private idGenerationService: IdGenerationService,
 private imageClickInputRulesService: ImageClickInputRulesService,
 private imageClickInputValidationService: ImageClickInputValidationService,
-private imageFileObjectFactory: ImageFileObjectFactory,
 private improvementsService: ImprovementsService,
 private ineffectiveFeedbackLoopTaskObjectFactory: IneffectiveFeedbackLoopTaskObjectFactory,
 private interactionAttributesExtractorService: InteractionAttributesExtractorService,
@@ -1496,7 +1492,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.idGenerationService = this.idGenerationService;
     OppiaAngularRootComponent.imageClickInputRulesService = this.imageClickInputRulesService;
     OppiaAngularRootComponent.imageClickInputValidationService = this.imageClickInputValidationService;
-    OppiaAngularRootComponent.imageFileObjectFactory = this.imageFileObjectFactory;
     OppiaAngularRootComponent.improvementsService = this.improvementsService;
     OppiaAngularRootComponent.ineffectiveFeedbackLoopTaskObjectFactory = this.ineffectiveFeedbackLoopTaskObjectFactory;
     OppiaAngularRootComponent.interactionAttributesExtractorService = this.interactionAttributesExtractorService;
