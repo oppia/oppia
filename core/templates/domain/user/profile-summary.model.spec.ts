@@ -27,8 +27,8 @@ describe('Subscriber Summary object factory', () => {
       subscriber_impact: 0,
     };
 
-    let subscriberObject =
-      ProfileSummary.createFromSubscriberBackendDict(backendDict);
+    let subscriberObject = (
+      ProfileSummary.createFromSubscriberBackendDict(backendDict));
 
     expect(subscriberObject.pictureDataUrl).toEqual('path/to/img');
     expect(subscriberObject.username).toEqual('username');
@@ -42,8 +42,8 @@ describe('Subscriber Summary object factory', () => {
       creator_impact: 0,
     };
 
-    let creatorObject =
-    ProfileSummary.createFromCreatorBackendDict(backendDict);
+    let creatorObject = (
+      ProfileSummary.createFromCreatorBackendDict(backendDict));
 
     expect(creatorObject.pictureDataUrl).toEqual('path/to/img');
     expect(creatorObject.username).toEqual('username');
