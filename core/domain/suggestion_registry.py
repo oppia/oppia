@@ -1164,3 +1164,29 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
                 'Expected the question suggestion count to be positive, '
                 'recieved: %s.' % (self.question_suggestion_count)
             )
+
+    def set_translation_reviewer_count_for_language_code(
+            self, language_code, count):
+        """Sets the translation reviewer count to be count, for the language
+        code given.
+
+        Args:
+            language_code: str. The language code of translation suggestions
+                that reviewers have the rights to review.
+            count: int. The number of reviewers that have the rights to review
+                translations in language_code.
+        """
+        self.translation_reviewer_counts_per_lang[language_code] = count
+
+    def set_translation_suggestion_count_for_language_code(
+            self, language_code, count):
+        """Sets the translation suggestion count to be count, for the language
+        code given.
+
+        Args:
+            language_code: str. The language code of translation suggestions
+                that are currently in review.
+            count: int. The number of translation suggestions in language_code
+                that are currently in review.
+        """
+        self.translation_suggestion_counts_per_lang[language_code] = count

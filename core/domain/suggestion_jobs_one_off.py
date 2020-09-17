@@ -277,9 +277,9 @@ class PopulateReviewerAndSuggestionCountsOneOffJob(
             if item.can_review_translation_for_language_codes:
                 for language_code in (
                         item.can_review_translation_for_language_codes):
-                    yield('translation_reviewer_%s' % language_code, item.id)
+                    yield('reviewer_translation_%s' % language_code, item.id)
             if item.can_review_questions:
-                yield('question_reviewer', item.id)
+                yield('reviewer_question', item.id)
 
     @staticmethod
     def reduce(key, values):
@@ -287,10 +287,27 @@ class PopulateReviewerAndSuggestionCountsOneOffJob(
             suggestion_services.get_reviewer_and_suggestion_counts()
         )
         keys = key.split('_')
-        if keys[0] == 'question':
-            reviewer_and_suggestion_counts.question_reviewer_count = len(values)
-        elif keys[0] == 'translation':
-            reviewer_and_suggestion_counts.translation_reviewer_counts[
-                key[2]] = len(values)
 
+        # Update the reviewer counts.
+        if keys[0] == 'reviewer':
+            if keys[1] == 'question':
+                reviewer_and_suggestion_counts.question_reviewer_count = len(
+                    values)
+            elif keys[1] == 'translation':
+                (
+                    reviewer_and_suggestion_counts
+                    .set_translation_reviewer_count_for_language_code(
+                        key[:-1], len(values))
+                )
+        # Update the suggestion counts.
+        else:
+            if keys[1] == 'add':
+                reviewer_and_suggestion_counts.question_suggestion_count = len(
+                    values)
+            elif keys[1] == 'translate':
+                (
+                    reviewer_and_suggestion_counts
+                    .set_translation_suggestion_count_for_language_code(
+                        key[:-1], len(values))
+                )
         yield (key, len(values))
