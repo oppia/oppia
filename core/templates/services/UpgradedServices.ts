@@ -165,8 +165,6 @@ import { EndExplorationValidationService } from
   'interactions/EndExploration/directives/end-exploration-validation.service';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
 import { ExplorationFeaturesBackendApiService } from
   'services/exploration-features-backend-api.service';
 import { ExplorationFeaturesService } from
@@ -709,8 +707,6 @@ export class UpgradedServices {
     upgradedServices['EndExplorationRulesService'] =
       new EndExplorationRulesService();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
-    upgradedServices['ExplorationDraftObjectFactory'] =
-      new ExplorationDraftObjectFactory();
     upgradedServices['ExplorationFeaturesService'] =
       new ExplorationFeaturesService();
     upgradedServices['ExplorationImprovementsConfigObjectFactory'] =
@@ -955,8 +951,7 @@ export class UpgradedServices {
     upgradedServices['ItemSelectionInputValidationService'] =
       new ItemSelectionInputValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['LocalStorageService'] = new LocalStorageService(
-      upgradedServices['ExplorationDraftObjectFactory']);
+    upgradedServices['LocalStorageService'] = new LocalStorageService();
     upgradedServices['LogicProofValidationService'] =
       new LogicProofValidationService(
         upgradedServices['baseInteractionValidationService']);

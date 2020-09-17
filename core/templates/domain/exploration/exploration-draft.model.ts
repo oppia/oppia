@@ -17,9 +17,6 @@
  * domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface AddStateNameChangeList {
   'cmd': 'add_state';
   'state_name': string;
@@ -109,19 +106,15 @@ export class ExplorationDraft {
   getChanges(): ExplorationChangeList[] {
     return this.draftChanges;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ExplorationDraftObjectFactory {
-  createFromLocalStorageDict(
+  static createFromLocalStorageDict(
       explorationDraftDict: ExplorationDraftDict): ExplorationDraft {
     return new ExplorationDraft(
       explorationDraftDict.draftChanges,
       explorationDraftDict.draftChangeListId);
   }
-  toLocalStorageDict(
+
+  static toLocalStorageDict(
       changeList: ExplorationChangeList[],
       draftChangeListId: number): ExplorationDraftDict {
     return {
@@ -130,7 +123,3 @@ export class ExplorationDraftObjectFactory {
     };
   }
 }
-
-angular.module('oppia').factory(
-  'ExplorationDraftObjectFactory',
-  downgradeInjectable(ExplorationDraftObjectFactory));

@@ -26,8 +26,6 @@ import { AnswerGroupsCacheService } from
 /* eslint-enable max-len */
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
@@ -102,8 +100,6 @@ describe('TrainingDataService', function() {
         'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
           new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
           new RuleObjectFactory()));
-      $provide.value(
-        'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
       $provide.value('FractionObjectFactory', new FractionObjectFactory());
       $provide.value(
         'HintObjectFactory', new HintObjectFactory(

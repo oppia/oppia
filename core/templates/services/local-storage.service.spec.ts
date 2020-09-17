@@ -18,14 +18,13 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
+import { ExplorationDraft } from
+  'domain/exploration/exploration-draft.model';
 import { LocalStorageService } from 'services/local-storage.service';
 
 describe('LocalStorageService', () => {
   describe('behavior in editor', () => {
     let localStorageService = null;
-    let explorationDraftObjectFactory = null;
     const explorationIdOne = '100';
     const draftChangeListIdOne = 2;
     const changeList = [];
@@ -44,12 +43,10 @@ describe('LocalStorageService', () => {
 
     beforeEach(() => {
       localStorageService = TestBed.get(LocalStorageService);
-      explorationDraftObjectFactory = TestBed.get(
-        ExplorationDraftObjectFactory);
 
-      draftOne = explorationDraftObjectFactory.createFromLocalStorageDict(
+      draftOne = ExplorationDraft.createFromLocalStorageDict(
         draftDictOne);
-      draftTwo = explorationDraftObjectFactory.createFromLocalStorageDict(
+      draftTwo = ExplorationDraft.createFromLocalStorageDict(
         draftDictTwo);
     });
 
@@ -75,7 +72,7 @@ describe('LocalStorageService', () => {
         explorationIdOne)).toEqual(draftOne);
 
       const draftChangeListIdOneChanged = 3;
-      const draftOneChanged = explorationDraftObjectFactory
+      const draftOneChanged = ExplorationDraft
         .createFromLocalStorageDict({
           draftChanges: changeList,
           draftChangeListId: draftChangeListIdOneChanged

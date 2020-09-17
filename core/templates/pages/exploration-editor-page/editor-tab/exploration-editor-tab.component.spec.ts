@@ -24,8 +24,6 @@ import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -108,9 +106,6 @@ describe('Exploration editor tab component', function() {
       'AnswerGroupObjectFactory', answerGroupObjectFactory);
     $provide.value(
       'AnswerStatsObjectFactory', TestBed.get(AnswerStatsObjectFactory));
-    $provide.value(
-      'ExplorationDraftObjectFactory',
-      TestBed.get(ExplorationDraftObjectFactory));
     $provide.value(
       'ExplorationFeaturesService', explorationFeaturesService);
     $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));

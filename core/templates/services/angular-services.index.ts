@@ -69,7 +69,6 @@ import { EmailDashboardQueryObjectFactory } from 'domain/email-dashboard/email-d
 import { EmailDashboardQueryResultsObjectFactory } from 'domain/email-dashboard/email-dashboard-query-results-object.factory';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from 'domain/exploration/AnswerStatsObjectFactory';
-import { ExplorationDraftObjectFactory } from 'domain/exploration/ExplorationDraftObjectFactory';
 import { ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
@@ -419,7 +418,6 @@ export const angularServices: [string, unknown][] = [
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
   ['ExplorationDiffService', ExplorationDiffService],
-  ['ExplorationDraftObjectFactory', ExplorationDraftObjectFactory],
   ['ExplorationFeaturesBackendApiService',
     ExplorationFeaturesBackendApiService],
   ['ExplorationFeaturesService', ExplorationFeaturesService],

@@ -16,12 +16,11 @@
  * @fileoverview unit tests for the local save services.
  */
 
-import { ExplorationDraftObjectFactory, ExplorationDraft } from
-  'domain/exploration/ExplorationDraftObjectFactory';
+import { ExplorationDraft } from
+  'domain/exploration/exploration-draft.model';
 
 describe('ExplorationDraftObjectFactory', () => {
   describe('exploration draft object factory', () => {
-    let explorationDraftObjectFactory: ExplorationDraftObjectFactory;
     var draftChangeListId = 2;
     var changeList = [];
     var draftDict = {
@@ -31,9 +30,8 @@ describe('ExplorationDraftObjectFactory', () => {
     let draft: ExplorationDraft;
 
     beforeEach(() => {
-      explorationDraftObjectFactory = new ExplorationDraftObjectFactory();
       draft = (
-        explorationDraftObjectFactory.createFromLocalStorageDict(
+        ExplorationDraft.createFromLocalStorageDict(
           draftDict));
     });
 
@@ -49,7 +47,7 @@ describe('ExplorationDraftObjectFactory', () => {
     });
 
     it('should create a valid local storage dict', () => {
-      expect(explorationDraftObjectFactory.toLocalStorageDict(
+      expect(ExplorationDraft.toLocalStorageDict(
         changeList, draftChangeListId)).toEqual(draftDict);
     });
   });
