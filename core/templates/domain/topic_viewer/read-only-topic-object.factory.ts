@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
 import { StorySummaryBackendDict, StorySummary } from
-  'domain/story/StorySummaryObjectFactory';
+  'domain/story/story-summary.model';
 import {
   SkillIdToDescriptionMap,
   SubtopicBackendDict,

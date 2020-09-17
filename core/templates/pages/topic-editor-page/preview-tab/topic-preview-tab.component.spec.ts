@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for topic preview tab.
  */
 
-import { TestBed } from '@angular/core/testing';
 import { StorySummary } from
   'domain/story/story-summary.model';
 
@@ -42,7 +41,8 @@ describe('Topic preview tab', function() {
       thumbnail_bg_color: '#F8BF74',
       description: 'Description',
       story_is_published: true,
-      completed_node_titles: ['Chapter 1']
+      completed_node_titles: ['Chapter 1'],
+      url_fragment: 'story-url-fragment'
     };
     var story = StorySummary.createFromBackendDict(
       sampleStorySummaryBackendDict);
