@@ -54,6 +54,7 @@ import argparse
 import fnmatch
 import multiprocessing
 import os
+import re
 import subprocess
 import sys
 import threading
@@ -453,6 +454,17 @@ def _print_errors_stacktrace(errors_stacktrace):
         ' above errors gets fixed')
 
 
+def _get_space_separated_linter_name(linter):
+    """Returns the space separated name of the linter class.
+
+    Returns:
+        str. Space separated name of the linter class.
+    """
+    return re.sub(
+        r'((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))',
+        r' \1', type(linter).__name__)
+
+
 def main(args=None):
     """Main method for pre commit linter script that lints Python, JavaScript,
     HTML, and CSS files.
@@ -504,15 +516,17 @@ def main(args=None):
     tasks_third_party = []
 
     for linter in custom_linters:
+        name = _get_space_separated_linter_name(linter)
         task_custom = concurrent_task_utils.create_task(
             linter.perform_all_lint_checks, verbose_mode_enabled,
-            custom_semaphore, name='custom')
+            custom_semaphore, name=name)
         tasks_custom.append(task_custom)
 
     for linter in third_party_linters:
+        name = _get_space_separated_linter_name(linter)
         task_third_party = concurrent_task_utils.create_task(
             linter.perform_all_lint_checks, verbose_mode_enabled,
-            third_party_semaphore, name='third_party')
+            third_party_semaphore, name=name)
         tasks_third_party.append(task_third_party)
 
     # Execute tasks.

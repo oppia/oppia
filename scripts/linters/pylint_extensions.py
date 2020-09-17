@@ -1581,7 +1581,7 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0010': (
-            'Not using \'yield\' or a single space after yield statement.',
+            'Please use a single space after yield statement.',
             'single-space-after-yield',
             'Ensure a single space is used after yield statement.',
         ),
@@ -1612,7 +1612,7 @@ class DivisionOperatorChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0015': (
-            'Division Operator is used.',
+            'Do not use division operator.',
             'division-operator-used',
             'Please use python_utils.divide() instead of the "/" operator'
         )
@@ -1643,12 +1643,12 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             'Please use valid punctuation.'
         ),
         'C0017': (
-            'No space is used at beginning of comment.',
+            'Please use single space at beginning of comment.',
             'no-space-at-beginning',
             'Please use single space at the beginning of comment.'
         ),
         'C0018': (
-            'No capital letter is used at the beginning of comment.',
+            'Please use a capital letter at the beginning of comment.',
             'no-capital-letter-at-beginning',
             'Please use capital letter to begin the content of comment.'
         )
@@ -1766,7 +1766,7 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0024': (
-            'No empty line used below the fileoverview docstring.',
+            'Please add an empty line below the fileoverview docstring.',
             'no-empty-line-provided-below-fileoverview',
             'please provide an empty line below the fileoverview.'
         ),
