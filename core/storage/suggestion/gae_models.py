@@ -678,7 +678,7 @@ class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
         return super(
             ReviewerAndSuggestionCountsModel, cls).get(
                 REVIEWER_AND_SUGGESTION_COUNTS_ID, strict=strict)
-    
+
     @classmethod
     def get_deletion_policy(cls):
         """NOT_APPLICABLE - this model does not directly contain user

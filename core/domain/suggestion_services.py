@@ -855,7 +855,7 @@ def get_reviewer_and_suggestion_counts():
         reviewer_and_suggestion_counts_model)
 
 
-def update_reviewer_and_suggestion_counts(self, reviewer_and_suggestion_counts):
+def update_reviewer_and_suggestion_counts(reviewer_and_suggestion_counts):
     """Updates the ReviewerAndSuggestionCountsModel.
 
     Args:
@@ -867,7 +867,7 @@ def update_reviewer_and_suggestion_counts(self, reviewer_and_suggestion_counts):
     reviewer_and_suggestion_counts.validate()
 
     counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
- 
+
     counts_model.translation_reviewer_counts_per_lang = (
         reviewer_and_suggestion_counts.translation_reviewer_counts_per_lang
     )
@@ -881,4 +881,4 @@ def update_reviewer_and_suggestion_counts(self, reviewer_and_suggestion_counts):
         reviewer_and_suggestion_counts.question_suggestion_count
     )
 
-    reviewer_and_suggestion_counts_model.put()
+    counts_model.put()

@@ -2488,13 +2488,16 @@ class ReviewerAndSuggestionCountsUnitTests(test_utils.GenericTestBase):
             {'en': 1, 'hi': 2}
         )
 
-    def test_set_translation_reviewer_count_for_language_code_if_empty_dict(
+    def test_set_translation_suggestion_count_for_language_code_if_empty_dict(
             self):
         reviewer_and_suggestion_counts = (
             suggestion_services.get_reviewer_and_suggestion_counts()
         )
         reviewer_and_suggestion_counts.validate()
-        reviewer_and_suggestion_counts.translation_suggestion_counts_per_lang = {}
+        (
+            reviewer_and_suggestion_counts
+            .translation_suggestion_counts_per_lang
+        ) = {}
 
         (
             reviewer_and_suggestion_counts
@@ -2514,8 +2517,10 @@ class ReviewerAndSuggestionCountsUnitTests(test_utils.GenericTestBase):
             suggestion_services.get_reviewer_and_suggestion_counts()
         )
         reviewer_and_suggestion_counts.validate()
-        reviewer_and_suggestion_counts.translation_suggestion_counts_per_lang = {
-            'en': 1}
+        (
+            reviewer_and_suggestion_counts
+            .translation_suggestion_counts_per_lang
+        ) = {'en': 1}
 
         (
             reviewer_and_suggestion_counts
@@ -2523,7 +2528,10 @@ class ReviewerAndSuggestionCountsUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertDictEqual(
-            reviewer_and_suggestion_counts.translation_suggestion_counts_per_lang,
+            (
+                reviewer_and_suggestion_counts
+                .translation_suggestion_counts_per_lang
+            ),
             {'en': 2}
         )
 
@@ -2533,8 +2541,10 @@ class ReviewerAndSuggestionCountsUnitTests(test_utils.GenericTestBase):
             suggestion_services.get_reviewer_and_suggestion_counts()
         )
         reviewer_and_suggestion_counts.validate()
-        reviewer_and_suggestion_counts.translation_suggestion_counts_per_lang = {
-            'en': 1}
+        (
+            reviewer_and_suggestion_counts
+            .translation_suggestion_counts_per_lang
+        ) = {'en': 1}
 
         (
             reviewer_and_suggestion_counts
@@ -2542,7 +2552,10 @@ class ReviewerAndSuggestionCountsUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertDictEqual(
-            reviewer_and_suggestion_counts.translation_suggestion_counts_per_lang,
+            (
+                reviewer_and_suggestion_counts
+                .translation_suggestion_counts_per_lang
+            ),
             {'en': 1, 'hi': 2}
         )
 
