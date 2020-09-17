@@ -16,9 +16,6 @@
  * @fileoverview Object factory for creating audio files.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 export class FileDownloadRequest {
   filename: string;
   canceler: Q.Deferred<Object>;
@@ -27,18 +24,9 @@ export class FileDownloadRequest {
     this.filename = filename;
     this.canceler = canceler;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class FileDownloadRequestObjectFactory {
-  createNew(
+  static createNew(
       filename: string, canceler: Q.Deferred<Object>): FileDownloadRequest {
     return new FileDownloadRequest(filename, canceler);
   }
 }
-
-angular.module('oppia').factory(
-  'FileDownloadRequestObjectFactory',
-  downgradeInjectable(FileDownloadRequestObjectFactory));

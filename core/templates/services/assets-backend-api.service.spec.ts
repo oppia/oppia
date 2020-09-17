@@ -20,8 +20,6 @@
 // AssetsBackendApiService.ts is upgraded to Angular 8.
 import { AudioFile } from
   'domain/utilities/audio-file.model';
-import { FileDownloadRequestObjectFactory } from
-  'domain/utilities/FileDownloadRequestObjectFactory';
 import { ImageFile } from
   'domain/utilities/image-file.model';
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -47,11 +45,6 @@ describe('Assets Backend API Service', function() {
     var imageRequestUrl = null;
 
     beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value(
-        'FileDownloadRequestObjectFactory',
-        new FileDownloadRequestObjectFactory());
-    }));
     beforeEach(angular.mock.module('oppia', function($provide) {
       var ugs = new UpgradedServices();
       for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -476,9 +469,6 @@ describe('Assets Backend API Service', function() {
   describe('without dev mode settings', function() {
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value(
-        'FileDownloadRequestObjectFactory',
-        new FileDownloadRequestObjectFactory());
       $provide.constant('DEV_MODE', false);
       $provide.constant('GCS_RESOURCE_BUCKET_NAME', false);
     }));
@@ -506,9 +496,6 @@ describe('Assets Backend API Service', function() {
 
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value(
-        'FileDownloadRequestObjectFactory',
-        new FileDownloadRequestObjectFactory());
       $provide.constant('DEV_MODE', false);
     }));
     beforeEach(angular.mock.module('oppia', function($provide) {

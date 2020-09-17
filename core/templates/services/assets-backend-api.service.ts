@@ -19,21 +19,20 @@
 // Jquery import is needed here in order to spy ajax method on unit tests.
 import $ from 'jquery';
 
-require('domain/utilities/FileDownloadRequestObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/csrf-token.service.ts');
 
 import { AudioFile } from 'domain/utilities/audio-file.model';
+import { FileDownloadRequest } from 
+  'domain/utilities/file-download-request.model';
 import { ImageFile } from 'domain/utilities/image-file.model';
 
 angular.module('oppia').factory('AssetsBackendApiService', [
   '$http', '$q', 'CsrfTokenService',
-  'FileDownloadRequestObjectFactory',
   'UrlInterpolationService', 'DEV_MODE', 'ENTITY_TYPE',
   'GCS_RESOURCE_BUCKET_NAME',
   function(
       $http, $q, CsrfTokenService,
-      FileDownloadRequestObjectFactory,
       UrlInterpolationService, DEV_MODE, ENTITY_TYPE,
       GCS_RESOURCE_BUCKET_NAME) {
     if (!DEV_MODE && !GCS_RESOURCE_BUCKET_NAME) {
@@ -78,10 +77,10 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       var canceler = $q.defer();
       if (assetType === ASSET_TYPE_AUDIO) {
         _audioFilesCurrentlyBeingRequested.push(
-          FileDownloadRequestObjectFactory.createNew(filename, canceler));
+          FileDownloadRequest.createNew(filename, canceler));
       } else {
         _imageFilesCurrentlyBeingRequested.push(
-          FileDownloadRequestObjectFactory.createNew(filename, canceler));
+          FileDownloadRequest.createNew(filename, canceler));
       }
 
       $http({
