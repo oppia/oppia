@@ -233,11 +233,9 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
 def main(args=None):
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
-    sys.path.insert(1, os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webob_0_9'))
-    sys.path.insert(1, common.GOOGLE_APP_ENGINE_SDK_HOME)
-    # import dev_appserver
-    # dev_appserver.fix_sys_path()
+    # Required to allow Google Cloud Tasks to operate in a local development
+    # environment without connecting to the internet. These environment
+    # variables allow Cloud APIs to be instantiated.
     os.environ['CLOUDSDK_CORE_PROJECT'] = 'oppia-dev'
     os.environ['APPLICATION_ID'] = 'oppia-dev'
 
@@ -251,16 +249,12 @@ def main(args=None):
         sys.path.insert(1, directory)
 
     if 'google' in sys.modules:
-        print("IN")
         google_path = os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
         google_module = sys.modules['google']
         google_module.__path__ = [google_path]
         google_module.__file__ = os.path.join(google_path, '__init__.py')
         if not hasattr(google_module, '__file__') or not google_module.__file__:
             google_module.__file__ = os.path.join(google_path, '__init__.py')
-        print(google_module.__file__)
-
-    from google.cloud import tasks_v2
 
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(

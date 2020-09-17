@@ -19,16 +19,15 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
 import json
 import logging
 
+import feconf
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 
-import feconf
+CLIENT = tasks_v2.CloudTasksClient()
 
-client = tasks_v2.CloudTasksClient()
 
 def create_http_task(
         queue_name, url, payload=None, scheduled_for=None, task_name=None):
@@ -46,10 +45,13 @@ def create_http_task(
         scheduled_for: datetime|None. The naive datetime object for the
             time to execute the task. Pass in None for immediate execution.
         task_name: str|None. Optional. The name of the task.
+
+    Returns:
+        Response. Response object that is returned by the Cloud Tasks API.
     """
     # The cloud tasks library requires the Oppia project id and region, as well
     # as the queue name as the path to be able to find the correct queue.
-    parent = client.queue_path(
+    parent = CLIENT.queue_path(
         feconf.OPPIA_PROJECT_ID, feconf.GOOGLE_APP_ENGINE_REGION, queue_name)
 
     # Construct the request body.
@@ -86,9 +88,8 @@ def create_http_task(
         # Add the name to tasks.
         task['name'] = task_name
 
-    # Use the client to build and send the task.
-    response = client.create_task(parent, task)
+    # Use the CLIENT to build and send the task.
+    response = CLIENT.create_task(parent, task)
 
-    logging.info('Created task {}'.format(response.name))
-    # [END cloud_tasks_create_http_task]
+    logging.info('Created task %s' % response.name)
     return response

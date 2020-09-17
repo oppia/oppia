@@ -22,14 +22,23 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import json
 
-from core.tests import test_utils
 from core.domain import taskqueue_services
 from core.platform.taskqueue import cloud_taskqueue_services
+from core.tests import test_utils
 from google.protobuf import timestamp_pb2
 import python_utils
 
+
 class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
     """Tests for cloud_taskqueue_services."""
+
+    class Response(python_utils.OBJECT):
+        """Mock for the response object that is returned from a Cloud
+        Tasks query.
+        """
+
+        def __init__(self, name):
+            self.name = name
 
     def test_http_task_scheduled_immediately_sends_correct_request(self):
         queue_name = 'queue'
@@ -39,13 +48,9 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
             'args': [['1', '2', '3']],
             'kwargs': {}
         }
-
         task_name = 'task1'
-        def mock_create_task(parent, task):
-            class Response(python_utils.OBJECT):
-                def __init__(self, name):
-                    self.name = name
 
+        def mock_create_task(parent, task):
             self.assertEqual(
                 parent,
                 u'projects/my-project-id/locations/us-central1/queues/queue')
@@ -63,13 +68,12 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
                     'name': task_name
                 }
             )
-            return Response(task_name)
+            return self.Response(task_name)
 
         with self.swap(
             cloud_taskqueue_services.client, 'create_task', mock_create_task):
-                cloud_taskqueue_services.create_http_task(
-                    queue_name, dummy_url, payload=payload,
-                    task_name=task_name)
+            cloud_taskqueue_services.create_http_task(
+                queue_name, dummy_url, payload=payload, task_name=task_name)
 
     def test_http_task_scheduled_for_later_sends_correct_request(self):
         queue_name = 'queue'
@@ -80,15 +84,12 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
             'kwargs': {}
         }
         # Create Timestamp protobuf.
-        d = datetime.datetime.utcnow() + datetime.timedelta(seconds=20)
+        datetime_to_execute_task = (
+            datetime.datetime.utcnow() + datetime.timedelta(seconds=20))
         timestamp = timestamp_pb2.Timestamp()
-        timestamp.FromDatetime(d)
+        timestamp.FromDatetime(datetime_to_execute_task)
         task_name = 'task1'
         def mock_create_task(parent, task):
-            class Response(python_utils.OBJECT):
-                def __init__(self, name):
-                    self.name = name
-
             self.assertEqual(
                 parent,
                 u'projects/my-project-id/locations/us-central1/queues/queue')
@@ -107,10 +108,10 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
                     'name': task_name
                 }
             )
-            return Response(task_name)
+            return self.Response(task_name)
 
         with self.swap(
             cloud_taskqueue_services.client, 'create_task', mock_create_task):
-                cloud_taskqueue_services.create_http_task(
-                    queue_name, dummy_url, payload=payload, scheduled_for=d,
-                    task_name=task_name)
+            cloud_taskqueue_services.create_http_task(
+                queue_name, dummy_url, payload=payload,
+                scheduled_for=datetime_to_execute_task, task_name=task_name)
