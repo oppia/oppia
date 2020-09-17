@@ -75,8 +75,6 @@ import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
 import { CkEditorCopyContentService } from
   'components/ck-editor-helpers/ck-editor-copy-content-service';
 import { ClassroomBackendApiService } from
@@ -678,7 +676,6 @@ export class UpgradedServices {
     upgradedServices['BrowserCheckerService'] =
       new BrowserCheckerService(new WindowRef());
     upgradedServices['CamelCaseToHyphensPipe'] = new CamelCaseToHyphensPipe();
-    upgradedServices['ChangeObjectFactory'] = new ChangeObjectFactory();
     upgradedServices['ClientContextObjectFactory'] =
       new ClientContextObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();

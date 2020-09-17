@@ -18,8 +18,6 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // skill-editor-state.service.ts is upgraded to Angular 8.
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
 import { QuestionSummaryObjectFactory } from
   'domain/question/QuestionSummaryObjectFactory';
 import { QuestionSummaryForOneSkillObjectFactory } from
@@ -126,7 +124,6 @@ describe('Skill editor state service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     fakeSkillBackendApiService = (
       FakeSkillBackendApiService());
-    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value(
       'QuestionSummaryObjectFactory', new QuestionSummaryObjectFactory());
     $provide.value(

@@ -112,8 +112,6 @@ import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
 import { CkEditorCopyContentService } from
   'components/ck-editor-helpers/ck-editor-copy-content-service.ts';
 import { ClassroomBackendApiService } from
@@ -709,7 +707,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static bottomNavbarStatusService: BottomNavbarStatusService;
   static browserCheckerService: BrowserCheckerService;
   static camelCaseToHyphensPipe: CamelCaseToHyphensPipe;
-  static changeObjectFactory: ChangeObjectFactory;
   static ckEditorCopyContentService: CkEditorCopyContentService;
   static classroomBackendApiService: ClassroomBackendApiService;
   static classroomDataObjectFactory: ClassroomDataObjectFactory;
@@ -1027,7 +1024,6 @@ private baseInteractionValidationService: baseInteractionValidationService,
 private bottomNavbarStatusService: BottomNavbarStatusService,
 private browserCheckerService: BrowserCheckerService,
 private camelCaseToHyphensPipe: CamelCaseToHyphensPipe,
-private changeObjectFactory: ChangeObjectFactory,
 private ckEditorCopyContentService: CkEditorCopyContentService,
 private classroomBackendApiService: ClassroomBackendApiService,
 private classroomDataObjectFactory: ClassroomDataObjectFactory,
@@ -1346,7 +1342,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.bottomNavbarStatusService = this.bottomNavbarStatusService;
     OppiaAngularRootComponent.browserCheckerService = this.browserCheckerService;
     OppiaAngularRootComponent.camelCaseToHyphensPipe = this.camelCaseToHyphensPipe;
-    OppiaAngularRootComponent.changeObjectFactory = this.changeObjectFactory;
     OppiaAngularRootComponent.ckEditorCopyContentService = this.ckEditorCopyContentService,
     OppiaAngularRootComponent.classroomBackendApiService = this.classroomBackendApiService;
     OppiaAngularRootComponent.classroomDataObjectFactory = this.classroomDataObjectFactory;

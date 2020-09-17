@@ -18,8 +18,6 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // topic-editor-state.service.ts is upgraded to Angular 8.
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RubricObjectFactory } from 'domain/skill/RubricObjectFactory';
@@ -148,7 +146,6 @@ describe('Topic editor state service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value(
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));

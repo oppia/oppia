@@ -23,9 +23,6 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { MisconceptionBackendDict } from
   'domain/skill/MisconceptionObjectFactory';
 import { RecordedVoiceOverBackendDict } from
@@ -631,12 +628,7 @@ export class Change {
   reverseChange(domainObject: BackendChangeObject): void {
     this._reverseChangeToObject(this._backendChangeObject, domainObject);
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ChangeObjectFactory {
   // Static class methods. Note that "this" is not available in static
   // contexts. The first parameter is a JSON representation of a backend
   // python dict for the given change. The second parameter is a callback
@@ -645,13 +637,10 @@ export class ChangeObjectFactory {
   // parameter is a callback which behaves in the same way as the second
   // parameter and takes the same inputs, except it should reverse the change
   // for the provided domain object.
-  create(
+  static create(
       backendChangeObject: BackendChangeObject, applyChangeToObject: Function,
       reverseChangeToObject: Function): Change {
     return new Change(
       backendChangeObject, applyChangeToObject, reverseChangeToObject);
   }
 }
-
-angular.module('oppia').factory(
-  'ChangeObjectFactory', downgradeInjectable(ChangeObjectFactory));

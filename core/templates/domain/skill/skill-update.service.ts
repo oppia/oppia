@@ -16,13 +16,14 @@
  * @fileoverview Service to handle the updating of a skill.
  */
 
-require('domain/editor/undo_redo/ChangeObjectFactory.ts');
+import { Change } from
+  'domain/editor/undo_redo/change.model';
+
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/skill/SkillObjectFactory.ts');
 require('domain/skill/skill-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('SkillUpdateService', [
-  'ChangeObjectFactory',
   'UndoRedoService', 'CMD_ADD_PREREQUISITE_SKILL',
   'CMD_ADD_SKILL_MISCONCEPTION', 'CMD_DELETE_PREREQUISITE_SKILL',
   'CMD_DELETE_SKILL_MISCONCEPTION', 'CMD_UPDATE_RUBRICS',
@@ -36,7 +37,6 @@ angular.module('oppia').factory('SkillUpdateService', [
   'SKILL_MISCONCEPTIONS_PROPERTY_NAME',
   'SKILL_MISCONCEPTIONS_PROPERTY_NOTES', 'SKILL_PROPERTY_DESCRIPTION',
   function(
-      ChangeObjectFactory,
       UndoRedoService, CMD_ADD_PREREQUISITE_SKILL,
       CMD_ADD_SKILL_MISCONCEPTION, CMD_DELETE_PREREQUISITE_SKILL,
       CMD_DELETE_SKILL_MISCONCEPTION, CMD_UPDATE_RUBRICS,
@@ -52,7 +52,7 @@ angular.module('oppia').factory('SkillUpdateService', [
     var _applyChange = function(skill, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
-      var changeObj = ChangeObjectFactory.create(changeDict, apply, reverse);
+      var changeObj = Change.create(changeDict, apply, reverse);
       UndoRedoService.applyChange(changeObj, skill);
     };
 

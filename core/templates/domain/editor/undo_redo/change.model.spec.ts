@@ -13,19 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for ChangeObjectFactory.
+ * @fileoverview Tests for Change.
  */
 
-import { BackendChangeObject, ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
+import { BackendChangeObject, Change } from
+  'domain/editor/undo_redo/change.model';
 
 describe('Factory for Change domain objects', () => {
-  let changeObjectFactory: ChangeObjectFactory = null;
-
-  beforeEach(() => {
-    changeObjectFactory = new ChangeObjectFactory();
-  });
-
   it('should invoke no callbacks after creation', () => {
     const applyFunc = jasmine.createSpy('applyChange');
     const reverseFunc = jasmine.createSpy('reverseChange');
@@ -36,7 +30,7 @@ describe('Factory for Change domain objects', () => {
       new_value: 'newVal',
       old_value: 'oldVal'
     };
-    changeObjectFactory.create(backendChangeObject, applyFunc, reverseFunc);
+    Change.create(backendChangeObject, applyFunc, reverseFunc);
 
     expect(applyFunc).not.toHaveBeenCalled();
     expect(reverseFunc).not.toHaveBeenCalled();
@@ -52,7 +46,7 @@ describe('Factory for Change domain objects', () => {
       new_value: 'newVal',
       old_value: 'oldVal'
     };
-    const changeDomainObject = changeObjectFactory.create(
+    const changeDomainObject = Change.create(
       backendChangeObject, applyFunc, reverseFunc);
 
     const fakeDomainObject: BackendChangeObject = {
@@ -78,7 +72,7 @@ describe('Factory for Change domain objects', () => {
       new_value: 'newVal',
       old_value: 'oldVal'
     };
-    const changeDomainObject = changeObjectFactory.create(
+    const changeDomainObject = Change.create(
       backendChangeObject, applyFunc, reverseFunc);
 
     const fakeDomainObject: BackendChangeObject = {
@@ -102,7 +96,7 @@ describe('Factory for Change domain objects', () => {
         new_value: 'newVal',
         old_value: 'oldVal'
       };
-      const changeDomainObject = changeObjectFactory.create(
+      const changeDomainObject = Change.create(
         backendChangeObject, () => {}, () => {});
 
       const returnedBackendObject = changeDomainObject.getBackendChangeObject();
@@ -118,7 +112,7 @@ describe('Factory for Change domain objects', () => {
     });
 
   it('should set new backend change object when using specific method', () => {
-    const changeDomainObject = changeObjectFactory.create({
+    const changeDomainObject = Change.create({
       cmd: 'update_question_property',
       property_name: 'language_code',
       new_value: 'newVal',
