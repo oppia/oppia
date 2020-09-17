@@ -757,8 +757,7 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
         taskqueue_services.defer(
             taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS,
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
-            committer_id, skill_id, skill.description
-        )
+            committer_id, skill_id, skill.description)
 
 
 def delete_skill(committer_id, skill_id, force_deletion=False):

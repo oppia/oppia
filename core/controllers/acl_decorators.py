@@ -1583,7 +1583,6 @@ def require_user_id_else_redirect_to_homepage(handler):
             self.redirect('/')
             return
         return handler(self, **kwargs)
-    import logging
     test_login.__wrapped__ = True
 
     return test_login

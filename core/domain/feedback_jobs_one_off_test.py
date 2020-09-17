@@ -21,11 +21,11 @@ import ast
 
 from core.domain import feedback_jobs_one_off
 from core.domain import feedback_services
+from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):

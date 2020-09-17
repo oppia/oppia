@@ -233,9 +233,9 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
 def main(args=None):
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
-    # Required to allow Google Cloud Tasks to operate in a local development
-    # environment without connecting to the internet. These environment
-    # variables allow Cloud APIs to be instantiated.
+    # These environmental variables are required to allow Google Cloud Tasks to
+    # operate in a local development environment without connecting to the
+    # internet. These environment variables allow Cloud APIs to be instantiated.
     os.environ['CLOUDSDK_CORE_PROJECT'] = 'oppia-dev'
     os.environ['APPLICATION_ID'] = 'oppia-dev'
 
@@ -253,8 +253,6 @@ def main(args=None):
         google_module = sys.modules['google']
         google_module.__path__ = [google_path]
         google_module.__file__ = os.path.join(google_path, '__init__.py')
-        if not hasattr(google_module, '__file__') or not google_module.__file__:
-            google_module.__file__ = os.path.join(google_path, '__init__.py')
 
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(

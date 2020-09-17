@@ -119,6 +119,7 @@ _PATHS_TO_INSERT = [
         _PARENT_DIR, 'oppia_tools', 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
     common.THIRD_PARTY_PYTHON_LIBS_DIR
 ]
+
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
@@ -461,6 +462,13 @@ def main(args=None):
     # File extension to be linted.
     file_extension_types = _get_file_extensions(
         parsed_args.only_check_file_extensions)
+
+    # These environmental variables are required to allow Google Cloud Tasks to
+    # operate in a local development environment without connecting to the
+    # internet. These environment variables allow Cloud APIs to be instantiated.
+    os.environ['CLOUDSDK_CORE_PROJECT'] = 'oppia-dev'
+    os.environ['APPLICATION_ID'] = 'oppia-dev'
+
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)

@@ -1503,6 +1503,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
                 'num_completions': 0,
                 'state_stats_mapping': {}
             })
+
         self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
         self.assertEqual(

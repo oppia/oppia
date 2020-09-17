@@ -60,10 +60,10 @@ class Emulator(python_utils.OBJECT):
     This emulator exposes functionality that is used to provide a taskqueue API
     for both the App Engine development server and the backend unit tests.
 
-    This emulator provides 2 types of functionality for automatic task handling:
-        1. The emulator will handle multiple priority queues containg tasks.
+    This emulator provides 2 types of functionality for task handling:
+        1. The emulator will handle multiple priority queues containing tasks.
            One persistent thread is instantiated per priority queue and will
-           constantly try to execute the next task ordered by the
+           constantly try to execute the next task prioritized by the
            'scheduled_for' attribute which determines when the task should be
            run.
         2. If automatic task handling is disabled, then the threads for each
@@ -76,7 +76,8 @@ class Emulator(python_utils.OBJECT):
         task_handler callback.
 
         Args:
-            task_handler: function. The function that will handle the tasks.
+            task_handler: function. The function that will handle the task
+                execution.
             automatic_task_handling: bool. Boolean value to determine whether
                 the emulator will handle tasks automatically via threads or
                 via user function calls as detailed in the docstring for this
@@ -94,9 +95,9 @@ class Emulator(python_utils.OBJECT):
                 self._launch_queue_thread(queue_name)
 
     def _process_queue(self, queue_name):
-        """Callback function for each individual queue thread. The queue thread
-        repeatedly queries the queue, pops tasks, and executes the tasks that
-        need to be executed.
+        """The callback function for each individual queue thread. Each queue
+        thread repeatedly queries the queue, pops tasks, and executes the tasks
+        that need to be executed.
 
         Args:
             queue_name: str. The name of the queue.
@@ -157,7 +158,7 @@ class Emulator(python_utils.OBJECT):
     def create_task(
             self, queue_name, url, payload, scheduled_for=None, task_name=None):
         """Creates a Task in the corresponding queue that will be executed when
-        the 'scheduled_for' countdown expires. If the queue doesn't exist yet,
+        the 'scheduled_for' time is reached. If the queue doesn't exist yet,
         it will be created.
 
         Args:

@@ -27,7 +27,6 @@ from core.platform import models
 
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
 
-# Construct the fully qualified queue name.
 
 # NOTE: The following constants should match the queue names in queue.yaml.
 # Taskqueue for backing up state.
@@ -60,10 +59,12 @@ FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS = 'untag_deleted_misconceptions'
 
 
 def defer(fn_identifier, queue_name, *args, **kwargs):
-    '''Adds a new task to a specified deferred queue.
+    """Adds a new task to a specified deferred queue scheduled for immediate
+    execution.
 
     Args:
-        fn_identifier: str. The string identifier of the function being deferred.
+        fn_identifier: str. The string identifier of the function being
+            deferred.
         queue_name: str. The name of the queue to place the task into. Should be
             one of the QUEUE_NAME_* constants listed above.
         *args: list(*). Positional arguments for fn. Positional arguments should
@@ -73,18 +74,17 @@ def defer(fn_identifier, queue_name, *args, **kwargs):
     Raises:
         Exception. The arguments and keyword arguments that are passed in are
             not JSON serializable.
-    '''
+    """
     payload = {
         'fn_identifier': fn_identifier,
         'args': (args if args else []),
         'kwargs': (kwargs if kwargs else {})
     }
-    json.dumps(payload)
     try:
         json.dumps(payload)
     except Exception:
         raise Exception(
-            'The arguments %s or the keyword arguments %s are not JSON '
+            'The arguments, %s, or the keyword arguments, %s, are not JSON '
             'serializable.' % (
                 python_utils.convert_to_bytes(args),
                 python_utils.convert_to_bytes(kwargs)))

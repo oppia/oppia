@@ -842,7 +842,7 @@ def compute_list_difference(list_a, list_b):
 
 
 def is_appengine_development_environment():
-    """Returns if the app is being run locally in a development server.
+    """Returns wheter the app is being run locally in a development server.
     More information can be found here:
     https://cloud.google.com/appengine/docs/standard/python/tools/
     using-local-server#detecting_application_runtime_environment
@@ -856,8 +856,8 @@ def is_appengine_development_environment():
 
 
 def is_appengine_production_environment():
-    """Returns if the app is being run in production in the Google App Engine
-    Cloud.
+    """Returns whether the app is being run in production in the Google App
+    Engine Cloud.
 
     More information can be found here:
     https://cloud.google.com/appengine/docs/standard/python/tools/

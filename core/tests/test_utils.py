@@ -1086,7 +1086,7 @@ tags: []
     def post_task(
             self, url, payload, headers, csrf_token=None, expect_errors=False,
             expected_status_int=200):
-        """Put an object to the server by JSON with the specific headers
+        """Posts an object to the server by JSON with the specific headers
         specified; return the received object."""
         if csrf_token:
             payload['csrf_token'] = csrf_token
@@ -1095,6 +1095,7 @@ tags: []
             url, json.dumps(payload), content_type='application/json',
             expect_errors=expect_errors, headers=headers,
             status=expected_status_int)
+        return json_response
 
     def put_json(self, url, payload, csrf_token=None, expected_status_int=200):
         """Put an object to the server by JSON; return the received object."""
@@ -2426,7 +2427,7 @@ class AppEngineTestBase(TestBase):
 
         # The root path tells the testbed where to find the queue.yaml file.
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
-        self.taskqueue_stub = self.testbed.get_stub(
+        self.mapreduce_taskqueue_stub = self.testbed.get_stub(
             testbed.TASKQUEUE_SERVICE_NAME)
 
         # Set up the app to be tested.
@@ -2482,7 +2483,7 @@ class AppEngineTestBase(TestBase):
         Returns:
             list(str). All the queue names.
         """
-        return [q['name'] for q in self.taskqueue_stub.GetQueues()]
+        return [q['name'] for q in self.mapreduce_taskqueue_stub.GetQueues()]
 
     @contextlib.contextmanager
     def urlfetch_mock(
@@ -2544,10 +2545,10 @@ class AppEngineTestBase(TestBase):
         to returning the jobs in all available queues.
         """
         if queue_name is not None:
-            return self.taskqueue_stub.get_filtered_tasks(
+            return self.mapreduce_taskqueue_stub.get_filtered_tasks(
                 queue_names=[queue_name])
         else:
-            return self.taskqueue_stub.get_filtered_tasks()
+            return self.mapreduce_taskqueue_stub.get_filtered_tasks()
 
     def _execute_map_reduce_tasks(self, tasks):
         """Execute queued tasks.
@@ -2587,31 +2588,33 @@ class AppEngineTestBase(TestBase):
         all queues; otherwise, this only runs and flushes tasks for the
         specified queue.
 
-        For more information on self.taskqueue_stub see
+        For more information on self.mapreduce_taskqueue_stub see
 
             https://code.google.com/p/googleappengine/source/browse/trunk/python/google/appengine/api/taskqueue/taskqueue_stub.py
         """
         queue_names = (
             [queue_name] if queue_name else self._get_all_queue_names())
 
-        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
+        tasks = self.mapreduce_taskqueue_stub.get_filtered_tasks(
+            queue_names=queue_names)
         for queue in queue_names:
-            self.taskqueue_stub.FlushQueue(queue)
+            self.mapreduce_taskqueue_stub.FlushQueue(queue)
 
         while tasks:
             self._execute_map_reduce_tasks(tasks)
-            tasks = self.taskqueue_stub.get_filtered_tasks(
+            tasks = self.mapreduce_taskqueue_stub.get_filtered_tasks(
                 queue_names=queue_names)
             for queue in queue_names:
-                self.taskqueue_stub.FlushQueue(queue)
+                self.mapreduce_taskqueue_stub.FlushQueue(queue)
 
     def run_but_do_not_flush_pending_mapreduce_tasks(self):
         """"Runs but not flushes pending tasks."""
         queue_names = self._get_all_queue_names()
 
-        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
+        tasks = self.mapreduce_taskqueue_stub.get_filtered_tasks(
+            queue_names=queue_names)
         for queue in queue_names:
-            self.taskqueue_stub.FlushQueue(queue)
+            self.mapreduce_taskqueue_stub.FlushQueue(queue)
 
         self._execute_map_reduce_tasks(tasks)
 

@@ -161,9 +161,12 @@ def main():
     python_utils.PRINT('Installing third-party JS libraries and zip files.')
     install_third_party.main(args=[])
 
-    # This solves the problem of multiple google paths by copying the required
-    # google appengine libraries from the Google Cloud SDK into the correct
-    # google directory in the third_party/python_libs directory.
+    # The following steps solves the problem of multiple google paths confusing
+    # the python interpreter. Namely, there are two modules named google/, one
+    # that is installed with google-cloud libraries and another that comes with
+    # the google cloud sdk. We solve this by copying the required Google Cloud
+    # SDK libraries into the correct google module directory in the
+    # 'third_party/python_libs' directory.
     python_utils.PRINT(
         'Copying Google Cloud SDK modules to third_party/python_libs...')
     correct_google_path = os.path.join(
@@ -177,12 +180,13 @@ def main():
                 common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
             os.path.join(correct_google_path, 'appengine'))
 
-    # The following function populates all of the google modules with
+    # The following for loop populates all of the google modules with
     # the correct __init__.py files if they do not exist. This solves the bug
-    # mentioned here:
+    # mentioned here where namespace packages sometimes install modules without
+    # __init__.py files:
     # https://github.com/googleapis/python-ndb/issues/518
     python_utils.PRINT(
-        'Checking that all google library modules contain __init__.py files.')
+        'Checking that all google library modules contain __init__.py files...')
     for root_path, sub_directory_name_list, file_name_list in os.walk(
         correct_google_path):
         if not root_path.endswith('__pycache__'):

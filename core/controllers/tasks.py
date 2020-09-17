@@ -165,6 +165,7 @@ class FlagExplorationEmailHandler(base.BaseHandler):
 
 class DeferredTasksHandler(base.BaseHandler):
     """Handles special singular function tasks."""
+
     DEFERRED_TASK_FUNCTIONS = {
         taskqueue_services.FUNCTION_ID_DISPATCH_EVENT: (
             jobs_registry.ContinuousComputationEventDispatcher.dispatch_event),
@@ -175,10 +176,6 @@ class DeferredTasksHandler(base.BaseHandler):
         taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS: (
             question_services.untag_deleted_misconceptions),
     }
-
-    def get(self):
-        import logging
-        logging.info("Received get request")
 
     def post(self):
         payload = json.loads(self.request.body.decode())

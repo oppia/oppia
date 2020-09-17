@@ -27,7 +27,7 @@ requests_toolbelt.adapters.appengine.monkeypatch()
 
 
 def _task_handler(url, payload, queue_name, task_name=None):
-    """Makes a POST request to the task URL
+    """Makes a POST request to the task URL.
 
     Args:
         url: str. URL of the handler function.
