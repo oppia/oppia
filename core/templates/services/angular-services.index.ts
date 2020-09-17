@@ -49,7 +49,6 @@ import { ComputationDataObjectFactory } from 'domain/admin/computation-data-obje
 import { JobDataObjectFactory } from 'domain/admin/job-data-object.factory';
 import { JobStatusSummaryObjectFactory } from 'domain/admin/job-status-summary-object.factory';
 import { AnswerClassificationResultObjectFactory } from 'domain/classifier/AnswerClassificationResultObjectFactory';
-import { PredictionResultObjectFactory } from 'domain/classifier/PredictionResultObjectFactory';
 import { ClassroomDataObjectFactory } from 'domain/classroom/ClassroomDataObjectFactory';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionObjectFactory } from 'domain/collection/CollectionObjectFactory';
@@ -580,7 +579,6 @@ export const angularServices: [string, unknown][] = [
   ['PlaythroughObjectFactory', PlaythroughObjectFactory],
   ['PlaythroughService', PlaythroughService],
   ['PredictionAlgorithmRegistryService', PredictionAlgorithmRegistryService],
-  ['PredictionResultObjectFactory', PredictionResultObjectFactory],
   ['PretestQuestionBackendApiService', PretestQuestionBackendApiService],
   ['ProfileLinkImageBackendApiService', ProfileLinkImageBackendApiService],
   ['ProfilePageBackendApiService', ProfilePageBackendApiService],

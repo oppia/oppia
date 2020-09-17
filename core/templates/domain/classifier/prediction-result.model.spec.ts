@@ -13,22 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the PredictionResultObjectFactory.
+ * @fileoverview Unit tests for the PredictionResult.
  */
-import { PredictionResultObjectFactory } from
-  'domain/classifier/PredictionResultObjectFactory';
+import { PredictionResult } from
+  'domain/classifier/prediction-result.model';
 
 describe('Prediction Result Object Factory', () => {
-  let prof;
-
-  beforeEach(() => {
-    prof = new PredictionResultObjectFactory();
-  });
-
   it('should create a new result object', () => {
     const label = 1;
     const confidence = 1;
-    const predictionResultObject = prof.createNew(label, confidence);
+    const predictionResultObject = PredictionResult.createNew(label, confidence);
 
     expect(predictionResultObject.getLabel()).toBe(label);
     expect(predictionResultObject.getConfidence()).toBe(confidence);

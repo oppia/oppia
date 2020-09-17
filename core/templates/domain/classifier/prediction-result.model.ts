@@ -17,9 +17,6 @@
  *     result domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export class PredictionResult {
   /**
    * Stores the prediction result for an answer as returned by the
@@ -45,17 +42,8 @@ export class PredictionResult {
   getConfidence(): number {
     return this.predictionConfidence;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class PredictionResultObjectFactory {
-  createNew(label: number, confidence: number): PredictionResult {
+  static createNew(label: number, confidence: number): PredictionResult {
     return new PredictionResult(label, confidence);
   }
 }
-
-angular.module('oppia').factory(
-  'PredictionResultObjectFactory',
-  downgradeInjectable(PredictionResultObjectFactory));

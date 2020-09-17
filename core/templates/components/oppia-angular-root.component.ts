@@ -449,8 +449,6 @@ import { PlaythroughObjectFactory } from
 import { PlaythroughService } from 'services/playthrough.service';
 import { PredictionAlgorithmRegistryService } from
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
-import { PredictionResultObjectFactory } from
-  'domain/classifier/PredictionResultObjectFactory';
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
 import { ProfileLinkImageBackendApiService } from
@@ -893,7 +891,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static playthroughObjectFactory: PlaythroughObjectFactory;
   static playthroughService: PlaythroughService;
   static predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
-  static predictionResultObjectFactory: PredictionResultObjectFactory;
   static pretestQuestionBackendApiService: PretestQuestionBackendApiService;
   static profileLinkImageBackendApiService: ProfileLinkImageBackendApiService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
@@ -1216,7 +1213,6 @@ private playthroughIssuesBackendApiService: PlaythroughIssuesBackendApiService,
 private playthroughObjectFactory: PlaythroughObjectFactory,
 private playthroughService: PlaythroughService,
 private predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService,
-private predictionResultObjectFactory: PredictionResultObjectFactory,
 private pretestQuestionBackendApiService: PretestQuestionBackendApiService,
 private profileLinkImageBackendApiService: ProfileLinkImageBackendApiService,
 private profilePageBackendApiService: ProfilePageBackendApiService,
@@ -1540,7 +1536,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.playthroughBackendApiService = this.playthroughBackendApiService;
     OppiaAngularRootComponent.playthroughService = this.playthroughService;
     OppiaAngularRootComponent.predictionAlgorithmRegistryService = this.predictionAlgorithmRegistryService;
-    OppiaAngularRootComponent.predictionResultObjectFactory = this.predictionResultObjectFactory;
     OppiaAngularRootComponent.pretestQuestionBackendApiService = this.pretestQuestionBackendApiService;
     OppiaAngularRootComponent.profileLinkImageBackendApiService = this.profileLinkImageBackendApiService;
     OppiaAngularRootComponent.profilePageBackendApiService = this.profilePageBackendApiService;

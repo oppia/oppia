@@ -409,8 +409,6 @@ import { PlaythroughService } from 'services/playthrough.service';
 import { PredictionAlgorithmRegistryService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
-import { PredictionResultObjectFactory } from
-  'domain/classifier/PredictionResultObjectFactory';
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
 import { ProfileLinkImageBackendApiService } from
@@ -815,8 +813,6 @@ export class UpgradedServices {
       new PlayerCorrectnessFeedbackEnabledService();
     upgradedServices['PlaythroughIssueObjectFactory'] =
       new PlaythroughIssueObjectFactory();
-    upgradedServices['PredictionResultObjectFactory'] =
-      new PredictionResultObjectFactory();
     upgradedServices['ProfileSummaryObjectFactory'] =
       new ProfileSummaryObjectFactory();
     upgradedServices['QuestionSummaryObjectFactory'] =
@@ -1066,8 +1062,7 @@ export class UpgradedServices {
     upgradedServices['SpeechSynthesisChunkerService'] =
         new SpeechSynthesisChunkerService(
           upgradedServices['HtmlEscaperService']);
-    upgradedServices['SVMPredictionService'] = new SVMPredictionService(
-      upgradedServices['PredictionResultObjectFactory']);
+    upgradedServices['SVMPredictionService'] = new SVMPredictionService();
     upgradedServices['SchemaDefaultValueService'] =
       new SchemaDefaultValueService(
         upgradedServices['LoggerService'],
