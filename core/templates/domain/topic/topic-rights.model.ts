@@ -17,9 +17,6 @@
  * topic rights domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 interface TopicRightsBackendDict {
   'published': boolean;
   'can_publish_topic': boolean;
@@ -72,15 +69,10 @@ export class TopicRights {
     this._canEditTopic = otherTopicRights.canEditTopic();
     this._canPublishTopic = otherTopicRights.canPublishTopic();
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class TopicRightsObjectFactory {
   // This function takes a JSON object which represents a backend
   // topic python dict.
-  createFromBackendDict(
+  static createFromBackendDict(
       topicRightsBackendObject: TopicRightsBackendDict): TopicRights {
     return new TopicRights(
       topicRightsBackendObject.published,
@@ -93,11 +85,9 @@ export class TopicRightsObjectFactory {
   // placeholder until the actual topic rights object is fetched from
   // the backend. Since it is acting as a placeholder, it should be valid and
   // hence the most restrictive rights are given to the object.
-  createInterstitialRights(): TopicRights {
+  static createInterstitialRights(): TopicRights {
     return new TopicRights(false, false, false);
   }
 }
 
-angular.module('oppia').factory(
-  'TopicRightsObjectFactory',
-  downgradeInjectable(TopicRightsObjectFactory));
+

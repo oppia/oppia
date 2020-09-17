@@ -185,7 +185,6 @@ import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { SubtopicPageContentsObjectFactory } from 'domain/topic/SubtopicPageContentsObjectFactory';
 import { SubtopicPageObjectFactory } from 'domain/topic/SubtopicPageObjectFactory';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
-import { TopicRightsObjectFactory } from 'domain/topic/TopicRightsObjectFactory';
 import { TopicSummaryObjectFactory } from 'domain/topic/TopicSummaryObjectFactory';
 import { TopicCreationBackendApiService } from 'domain/topic/topic-creation-backend-api.service.ts';
 import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
@@ -712,7 +711,6 @@ export const angularServices: [string, unknown][] = [
   ['ThreadStatusDisplayService', ThreadStatusDisplayService],
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
   ['TopicObjectFactory', TopicObjectFactory],
-  ['TopicRightsObjectFactory', TopicRightsObjectFactory],
   ['TopicSummaryObjectFactory', TopicSummaryObjectFactory],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],
   ['TopicsAndSkillsDashboardBackendApiService',

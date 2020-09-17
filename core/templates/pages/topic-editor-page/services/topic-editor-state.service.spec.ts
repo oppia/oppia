@@ -36,8 +36,8 @@ import { SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory';
 import { SubtopicPageObjectFactory } from
   'domain/topic/SubtopicPageObjectFactory';
-import { TopicRightsObjectFactory } from
-  'domain/topic/TopicRightsObjectFactory';
+import { TopicRights } from
+  'domain/topic/topic-rights.model';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -54,7 +54,6 @@ describe('Topic editor state service', function() {
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
   var subtopicPageObjectFactory = null;
-  var topicRightsObjectFactory = null;
   var TopicUpdateService = null;
   var fakeEditableTopicBackendApiService = null;
   var fakeTopicRightsBackendApiService = null;
@@ -179,8 +178,6 @@ describe('Topic editor state service', function() {
         new SubtopicPageContentsObjectFactory(
           new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
           new SubtitledHtmlObjectFactory())));
-    $provide.value(
-      'TopicRightsObjectFactory', new TopicRightsObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -211,8 +208,6 @@ describe('Topic editor state service', function() {
       'TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     subtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
-    topicRightsObjectFactory = $injector.get(
-      'TopicRightsObjectFactory');
     TopicUpdateService = $injector.get('TopicUpdateService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
@@ -628,7 +623,7 @@ describe('Topic editor state service', function() {
   it('should be able to set a new topic rights with an in-place copy',
     function() {
       var previousTopicRights = TopicEditorStateService.getTopicRights();
-      var expectedTopicRights = topicRightsObjectFactory.createFromBackendDict(
+      var expectedTopicRights = TopicRights.createFromBackendDict(
         secondTopicRightsObject);
       expect(previousTopicRights).not.toEqual(expectedTopicRights);
 

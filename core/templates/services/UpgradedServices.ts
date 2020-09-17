@@ -630,8 +630,6 @@ import { ThreadStatusDisplayService } from
 import { TopicCreationBackendApiService } from
   'domain/topic/topic-creation-backend-api.service.ts';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
-import { TopicRightsObjectFactory } from
-  'domain/topic/TopicRightsObjectFactory';
 import { TopicsAndSkillsDashboardBackendApiService } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
@@ -924,8 +922,6 @@ export class UpgradedServices {
         new TopicsAndSkillsDashboardFilterObjectFactory();
     upgradedServices['TopicsAndSkillsDashboardPageService'] =
         new TopicsAndSkillsDashboardPageService();
-    upgradedServices['TopicRightsObjectFactory'] =
-      new TopicRightsObjectFactory();
     upgradedServices['TopicSummaryObjectFactory'] =
       new TopicSummaryObjectFactory();
     upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();

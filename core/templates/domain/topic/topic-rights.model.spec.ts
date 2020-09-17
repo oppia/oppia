@@ -13,25 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for TopicRightsObjectFactory.
+ * @fileoverview Tests for TopicRights.
  */
 
-import { TopicRightsObjectFactory, TopicRights } from
-  'domain/topic/TopicRightsObjectFactory';
+import { TopicRights } from
+  'domain/topic/topic-rights.model';
 
 describe('Topic rights object factory', () => {
-  let topicRightsObjectFactory: TopicRightsObjectFactory;
   let sampleTopicRights: TopicRights = null;
 
   beforeEach(() => {
-    topicRightsObjectFactory = new TopicRightsObjectFactory();
     var initialTopicRightsBackendObject = {
       published: false,
       can_edit_topic: true,
       can_publish_topic: true
     };
 
-    sampleTopicRights = topicRightsObjectFactory.createFromBackendDict(
+    sampleTopicRights = TopicRights.createFromBackendDict(
       initialTopicRightsBackendObject);
   });
 
@@ -57,7 +55,7 @@ describe('Topic rights object factory', () => {
       can_publish_topic: false
     };
 
-    var exampleTopicRights = topicRightsObjectFactory.createFromBackendDict(
+    var exampleTopicRights = TopicRights.createFromBackendDict(
       exampleTopicRightsBackendObject);
 
     expect(() => {
@@ -71,7 +69,7 @@ describe('Topic rights object factory', () => {
 
   it('should create an empty topic rights object', () => {
     var emptyTopicRightsBackendObject = (
-      topicRightsObjectFactory.createInterstitialRights());
+      TopicRights.createInterstitialRights());
 
     expect(emptyTopicRightsBackendObject.isPublished()).toEqual(false);
     expect(emptyTopicRightsBackendObject.canEditTopic()).toEqual(false);
@@ -80,7 +78,7 @@ describe('Topic rights object factory', () => {
 
   it('should make a copy from another topic rights', () => {
     var emptyTopicRightsBackendObject = (
-      topicRightsObjectFactory.createInterstitialRights());
+      TopicRights.createInterstitialRights());
 
     emptyTopicRightsBackendObject.copyFromTopicRights(sampleTopicRights);
 

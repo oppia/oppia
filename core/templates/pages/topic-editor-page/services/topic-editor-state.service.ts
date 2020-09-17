@@ -26,7 +26,6 @@ require('domain/topic/editable-topic-backend-api.service.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/topic-rights-backend-api.service.ts');
-require('domain/topic/TopicRightsObjectFactory.ts');
 require('services/alerts.service.ts');
 require('services/questions-list.service.ts');
 
@@ -34,20 +33,22 @@ require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 
 import { EventEmitter } from '@angular/core';
 
+import { TopicRights } from 'domain/topic/topic-rights.model';
+
 angular.module('oppia').factory('TopicEditorStateService', [
   'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
   'RubricObjectFactory', 'StorySummaryObjectFactory',
   'SubtopicPageObjectFactory', 'TopicObjectFactory',
-  'TopicRightsBackendApiService', 'TopicRightsObjectFactory', 'UndoRedoService',
+  'TopicRightsBackendApiService', 'UndoRedoService',
   function(
       AlertsService,
       EditableStoryBackendApiService, EditableTopicBackendApiService,
       RubricObjectFactory, StorySummaryObjectFactory,
       SubtopicPageObjectFactory, TopicObjectFactory,
-      TopicRightsBackendApiService, TopicRightsObjectFactory, UndoRedoService) {
+      TopicRightsBackendApiService, UndoRedoService) {
     var _topic = TopicObjectFactory.createInterstitialTopic();
-    var _topicRights = TopicRightsObjectFactory.createInterstitialRights();
+    var _topicRights = TopicRights.createInterstitialRights();
     // The array that caches all the subtopic pages loaded by the user.
     var _cachedSubtopicPages = [];
     // The array that stores all the ids of the subtopic pages that were not
@@ -151,7 +152,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
       _topicRights.copyFromTopicRights(topicRights);
     };
     var _updateTopicRights = function(newBackendTopicRightsObject) {
-      _setTopicRights(TopicRightsObjectFactory.createFromBackendDict(
+      _setTopicRights(TopicRights.createFromBackendDict(
         newBackendTopicRightsObject));
     };
     var _setCanonicalStorySummaries = function(canonicalStorySummaries) {
