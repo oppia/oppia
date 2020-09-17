@@ -440,9 +440,11 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
     def reduce(key, values):
         yield (key, len(values))
 
+
 class RemoveGaeUserIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that deletes the gae_user_id from the UserSettingsModel
-     """
+    """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.UserSettingsModel]

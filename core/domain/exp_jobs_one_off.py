@@ -477,9 +477,11 @@ class RTECustomizationArgsValidationOneOffJob(
         output_values.sort()
         yield (key, output_values)
 
+
 class RemoveTranslatorIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that deletes the translator_ids from the ExpSummaryModel
-     """
+    """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExpSummaryModel]

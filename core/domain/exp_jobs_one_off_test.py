@@ -2220,6 +2220,7 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(actual_output, expected_output)
 
+
 class MockExpSummaryModel(exp_models.ExpSummaryModel):
     """Mock ExpSummaryModel so that it allows to set `translator_ids`."""
 
@@ -2274,7 +2275,8 @@ class RemoveTranslatorIdsOneOffJobTests(test_utils.GenericTestBase):
             migrated_summary_model = exp_models.ExpSummaryModel.get_by_id('id')
 
             self.assertNotIn('translator_ids', migrated_summary_model._values)  # pylint: disable=protected-access
-            self.assertNotIn('translator_ids', migrated_summary_model._properties)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'translator_ids', migrated_summary_model._properties)  # pylint: disable=protected-access
             self.assertEqual(
                 original_summary_model.last_updated,
                 migrated_summary_model.last_updated)

@@ -1573,6 +1573,7 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
             self.user_id]
         self.assertEqual(sorted(actual_output), sorted(expected_output))
 
+
 class MockUserSettingsModel(user_models.UserSettingsModel):
     """Mock UserSettingsModel so that it allows to set `gae_user_id`."""
 
@@ -1617,7 +1618,8 @@ class RemoveGaeUserIdOneOffJobTests(test_utils.GenericTestBase):
             self.assertItemsEqual(
                 [['SUCCESS_REMOVED - UserSettingsModel', 1]], output)
 
-            migrated_setting_model = user_models.UserSettingsModel.get_by_id('id')
+            migrated_setting_model = (
+                user_models.UserSettingsModel.get_by_id('id'))
 
             self.assertNotIn('gae_user_id', migrated_setting_model._values)  # pylint: disable=protected-access
             self.assertNotIn('gae_user_id', migrated_setting_model._properties)  # pylint: disable=protected-access
