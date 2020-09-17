@@ -560,8 +560,6 @@ import { StoryPlaythroughObjectFactory } from
   'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { StoryReferenceObjectFactory } from
   'domain/topic/StoryReferenceObjectFactory';
-import { StorySummaryObjectFactory } from
-  'domain/story/StorySummaryObjectFactory';
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { SubtitledHtmlObjectFactory } from
@@ -845,8 +843,6 @@ export class UpgradedServices {
       upgradedServices['StoryContentsObjectFactory']);
     upgradedServices['StoryReferenceObjectFactory'] =
       new StoryReferenceObjectFactory();
-    upgradedServices['StorySummaryObjectFactory'] =
-      new StorySummaryObjectFactory();
     upgradedServices['SubtitledHtmlObjectFactory'] =
       new SubtitledHtmlObjectFactory();
     upgradedServices['SubtitledUnicodeObjectFactory'] =

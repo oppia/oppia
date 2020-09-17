@@ -21,7 +21,6 @@
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/skill/RubricObjectFactory.ts');
 require('domain/story/editable-story-backend-api.service.ts');
-require('domain/story/StorySummaryObjectFactory.ts');
 require('domain/topic/editable-topic-backend-api.service.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicObjectFactory.ts');
@@ -33,19 +32,18 @@ require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 
 import { EventEmitter } from '@angular/core';
 
+import { StorySummary } from 'domain/story/story-summary.model'; 
 import { TopicRights } from 'domain/topic/topic-rights.model';
 
 angular.module('oppia').factory('TopicEditorStateService', [
   'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
-  'RubricObjectFactory', 'StorySummaryObjectFactory',
-  'SubtopicPageObjectFactory', 'TopicObjectFactory',
-  'TopicRightsBackendApiService', 'UndoRedoService',
+  'RubricObjectFactory', 'SubtopicPageObjectFactory', 
+  'TopicObjectFactory', 'TopicRightsBackendApiService', 'UndoRedoService',
   function(
       AlertsService,
       EditableStoryBackendApiService, EditableTopicBackendApiService,
-      RubricObjectFactory, StorySummaryObjectFactory,
-      SubtopicPageObjectFactory, TopicObjectFactory,
+      RubricObjectFactory, SubtopicPageObjectFactory, TopicObjectFactory,
       TopicRightsBackendApiService, UndoRedoService) {
     var _topic = TopicObjectFactory.createInterstitialTopic();
     var _topicRights = TopicRights.createInterstitialRights();
@@ -158,7 +156,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
     var _setCanonicalStorySummaries = function(canonicalStorySummaries) {
       _canonicalStorySummaries = canonicalStorySummaries.map(
         function(storySummaryDict) {
-          return StorySummaryObjectFactory.createFromBackendDict(
+          return StorySummary.createFromBackendDict(
             storySummaryDict);
         });
       _storySummariesInitializedEventEmitter.emit();

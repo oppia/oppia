@@ -598,8 +598,6 @@ import { StoryPlaythroughObjectFactory } from
   'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { StoryReferenceObjectFactory } from
   'domain/topic/StoryReferenceObjectFactory';
-import { StorySummaryObjectFactory } from
-  'domain/story/StorySummaryObjectFactory';
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { SubtitledHtmlObjectFactory } from
@@ -959,7 +957,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static storyObjectFactory: StoryObjectFactory;
   static storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory;
   static storyReferenceObjectFactory: StoryReferenceObjectFactory;
-  static storySummaryObjectFactory: StorySummaryObjectFactory;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
   static subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory;
   static subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
@@ -1278,7 +1275,6 @@ private storyNodeObjectFactory: StoryNodeObjectFactory,
 private storyObjectFactory: StoryObjectFactory,
 private storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory,
 private storyReferenceObjectFactory: StoryReferenceObjectFactory,
-private storySummaryObjectFactory: StorySummaryObjectFactory,
 private storyViewerBackendApiService: StoryViewerBackendApiService,
 private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
 private subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory,
@@ -1598,7 +1594,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.storyObjectFactory = this.storyObjectFactory;
     OppiaAngularRootComponent.storyPlaythroughObjectFactory = this.storyPlaythroughObjectFactory;
     OppiaAngularRootComponent.storyReferenceObjectFactory = this.storyReferenceObjectFactory;
-    OppiaAngularRootComponent.storySummaryObjectFactory = this.storySummaryObjectFactory;
     OppiaAngularRootComponent.storyViewerBackendApiService = this.storyViewerBackendApiService;
     OppiaAngularRootComponent.subtitledHtmlObjectFactory = this.subtitledHtmlObjectFactory;
     OppiaAngularRootComponent.subtitledUnicodeObjectFactory = this.subtitledUnicodeObjectFactory;

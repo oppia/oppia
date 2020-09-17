@@ -163,7 +163,6 @@ import { StateTopAnswersStatsObjectFactory } from 'domain/statistics/state-top-a
 import { StoryContentsObjectFactory } from 'domain/story/StoryContentsObjectFactory';
 import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
-import { StorySummaryObjectFactory } from 'domain/story/StorySummaryObjectFactory';
 import { ReadOnlyStoryNodeObjectFactory } from 'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 import { StoryPlaythroughObjectFactory } from 'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
@@ -655,7 +654,6 @@ export const angularServices: [string, unknown][] = [
   ['StoryObjectFactory', StoryObjectFactory],
   ['StoryPlaythroughObjectFactory', StoryPlaythroughObjectFactory],
   ['StoryReferenceObjectFactory', StoryReferenceObjectFactory],
-  ['StorySummaryObjectFactory', StorySummaryObjectFactory],
   ['StoryViewerBackendApiService', StoryViewerBackendApiService],
   ['SubtitledHtmlObjectFactory', SubtitledHtmlObjectFactory],
   ['SubtitledUnicodeObjectFactory', SubtitledUnicodeObjectFactory],

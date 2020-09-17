@@ -13,21 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for StorySummaryObjectFactory.
+ * @fileoverview Tests for StorySummary.
  */
 
-import { TestBed } from '@angular/core/testing';
-
-import { StorySummary, StorySummaryObjectFactory } from
-  'domain/story/StorySummaryObjectFactory';
+import { StorySummary } from
+  'domain/story/story-summary.model';
 
 describe('Story summary object factory', () => {
-  let factory: StorySummaryObjectFactory;
   let _sampleStorySummary: StorySummary;
 
   beforeEach(() => {
-    factory = TestBed.get(StorySummaryObjectFactory);
-
     const sampleStorySummaryBackendDict = {
       id: 'sample_story_id',
       title: 'Story title',
@@ -39,7 +34,7 @@ describe('Story summary object factory', () => {
       completed_node_titles: ['Chapter 1'],
       url_fragment: 'story-url-fragment'
     };
-    _sampleStorySummary = factory.createFromBackendDict(
+    _sampleStorySummary = StorySummary.createFromBackendDict(
       sampleStorySummaryBackendDict
     );
   });

@@ -17,9 +17,6 @@
  * story summary domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface StorySummaryBackendDict {
   'id': string;
   'title': string;
@@ -80,13 +77,8 @@ export class StorySummary {
   getUrlFragment(): string {
     return this._urlFragment;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class StorySummaryObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       storySummaryBackendDict: StorySummaryBackendDict): StorySummary {
     return new StorySummary(
       storySummaryBackendDict.id,
@@ -101,7 +93,3 @@ export class StorySummaryObjectFactory {
     );
   }
 }
-
-angular.module('oppia').factory(
-  'StorySummaryObjectFactory', downgradeInjectable(StorySummaryObjectFactory)
-);
