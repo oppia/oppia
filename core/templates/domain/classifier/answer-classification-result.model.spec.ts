@@ -13,30 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the AnswerClassificationResultObjectFactory.
+ * @fileoverview Unit tests for the AnswerClassificationResult.
  */
 
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
+import { AnswerClassificationResult } from
+  'domain/classifier/answer-classification-result.model';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 
 describe('Answer classification result object factory', () => {
-  let acrof: AnswerClassificationResultObjectFactory;
   let oof: OutcomeObjectFactory;
   let DEFAULT_OUTCOME_CLASSIFICATION: string;
 
   beforeEach(() => {
-    acrof = new AnswerClassificationResultObjectFactory();
     oof = new OutcomeObjectFactory(
       new SubtitledHtmlObjectFactory());
     DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
   });
 
   it('should create a new result', () => {
-    var answerClassificationResult = acrof.createNew(
+    var answerClassificationResult = AnswerClassificationResult.createNew(
       oof.createNew('default', '', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
     );
 

@@ -80,8 +80,6 @@ import { AlgebraicExpressionInputValidationService } from
   'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { AnswerGroupsCacheService } from
@@ -701,7 +699,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static algebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService;
   static algebraicExpressionInputValidationService: AlgebraicExpressionInputValidationService;
   static angularNameService: AngularNameService;
-  static answerClassificationResultObjectFactory: AnswerClassificationResultObjectFactory;
   static answerClassificationService: AnswerClassificationService;
   static answerGroupsCacheService: AnswerGroupsCacheService;
   static answerGroupObjectFactory: AnswerGroupObjectFactory;
@@ -1023,7 +1020,6 @@ private alertsService: AlertsService,
 private algebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService,
 private algebraicExpressionInputValidationService: AlgebraicExpressionInputValidationService,
 private angularNameService: AngularNameService,
-private answerClassificationResultObjectFactory: AnswerClassificationResultObjectFactory,
 private answerClassificationService: AnswerClassificationService,
 private answerGroupsCacheService: AnswerGroupsCacheService,
 private answerGroupObjectFactory: AnswerGroupObjectFactory,
@@ -1346,7 +1342,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.algebraicExpressionInputRulesService = this.algebraicExpressionInputRulesService;
     OppiaAngularRootComponent.algebraicExpressionInputValidationService = this.algebraicExpressionInputValidationService;
     OppiaAngularRootComponent.angularNameService = this.angularNameService;
-    OppiaAngularRootComponent.answerClassificationResultObjectFactory = this.answerClassificationResultObjectFactory;
     OppiaAngularRootComponent.answerClassificationService = this.answerClassificationService;
     OppiaAngularRootComponent.answerGroupsCacheService = this.answerGroupsCacheService;
     OppiaAngularRootComponent.answerGroupObjectFactory = this.answerGroupObjectFactory;

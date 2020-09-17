@@ -20,8 +20,6 @@
 // training-data.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
 /* eslint-disable max-len */
 import { AnswerGroupsCacheService } from
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
@@ -98,9 +96,6 @@ describe('TrainingDataService', function() {
     // descendant dependencies.
     angular.mock.module(function($provide) {
       $provide.value('AngularNameService', new AngularNameService());
-      $provide.value(
-        'AnswerClassificationResultObjectFactory',
-        new AnswerClassificationResultObjectFactory());
       $provide.value(
         'AnswerGroupsCacheService', new AnswerGroupsCacheService());
       $provide.value(

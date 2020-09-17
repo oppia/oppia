@@ -20,8 +20,6 @@ import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from
@@ -106,9 +104,6 @@ describe('Exploration editor tab component', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
-    $provide.value(
-      'AnswerClassificationResultObjectFactory',
-      TestBed.get(AnswerClassificationResultObjectFactory));
     $provide.value(
       'AnswerGroupObjectFactory', answerGroupObjectFactory);
     $provide.value(

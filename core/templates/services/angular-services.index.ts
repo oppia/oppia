@@ -48,7 +48,6 @@ import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { ComputationDataObjectFactory } from 'domain/admin/computation-data-object.factory';
 import { JobDataObjectFactory } from 'domain/admin/job-data-object.factory';
 import { JobStatusSummaryObjectFactory } from 'domain/admin/job-status-summary-object.factory';
-import { AnswerClassificationResultObjectFactory } from 'domain/classifier/AnswerClassificationResultObjectFactory';
 import { ClassroomDataObjectFactory } from 'domain/classroom/ClassroomDataObjectFactory';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionObjectFactory } from 'domain/collection/CollectionObjectFactory';
@@ -356,8 +355,6 @@ export const angularServices: [string, unknown][] = [
   ['AlgebraicExpressionInputValidationService',
     AlgebraicExpressionInputValidationService],
   ['AngularNameService', AngularNameService],
-  ['AnswerClassificationResultObjectFactory',
-    AnswerClassificationResultObjectFactory],
   ['AnswerClassificationService', AnswerClassificationService],
   ['AnswerGroupObjectFactory', AnswerGroupObjectFactory],
   ['AnswerGroupsCacheService', AnswerGroupsCacheService],

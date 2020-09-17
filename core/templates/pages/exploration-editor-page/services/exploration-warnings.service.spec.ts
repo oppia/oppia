@@ -26,8 +26,6 @@ import { StateTopAnswersStats } from
 // exploration-editor-tab.directive.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from
@@ -85,9 +83,6 @@ describe('Exploration Warnings Service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', new AngularNameService());
-    $provide.value(
-      'AnswerClassificationResultObjectFactory',
-      new AnswerClassificationResultObjectFactory());
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),

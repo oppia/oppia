@@ -43,8 +43,6 @@ import { AlgebraicExpressionInputValidationService } from
   'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { AnswerGroupsCacheService } from
@@ -668,8 +666,6 @@ export class UpgradedServices {
     upgradedServices['AlgebraicExpressionInputRulesService'] =
       new AlgebraicExpressionInputRulesService();
     upgradedServices['AngularNameService'] = new AngularNameService();
-    upgradedServices['AnswerClassificationResultObjectFactory'] =
-      new AnswerClassificationResultObjectFactory();
     upgradedServices['AnswerGroupsCacheService'] =
       new AnswerGroupsCacheService();
     upgradedServices['AnswerStatsObjectFactory'] =
@@ -1565,7 +1561,6 @@ export class UpgradedServices {
     upgradedServices['AnswerClassificationService'] =
       new AnswerClassificationService(
         upgradedServices['AlertsService'],
-        upgradedServices['AnswerClassificationResultObjectFactory'],
         upgradedServices['AppService'],
         upgradedServices['InteractionSpecsService'],
         upgradedServices['PredictionAlgorithmRegistryService'],

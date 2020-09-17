@@ -17,9 +17,6 @@
  *     Classification Result domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
 export class AnswerClassificationResult {
@@ -36,20 +33,11 @@ export class AnswerClassificationResult {
     this.ruleIndex = ruleIndex;
     this.classificationCategorization = classificationCategorization;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class AnswerClassificationResultObjectFactory {
-  createNew(
+  static createNew(
       outcome: Outcome, answerGroupIndex: number, ruleIndex: number,
       classificationCategorization: string): AnswerClassificationResult {
     return new AnswerClassificationResult(
       outcome, answerGroupIndex, ruleIndex, classificationCategorization);
   }
 }
-
-angular.module('oppia').factory(
-  'AnswerClassificationResultObjectFactory',
-  downgradeInjectable(AnswerClassificationResultObjectFactory));

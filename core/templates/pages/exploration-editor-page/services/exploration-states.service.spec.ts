@@ -20,8 +20,6 @@
 // exploration-states.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { ExplorationDraftObjectFactory } from
@@ -75,9 +73,6 @@ describe('ExplorationStatesService', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(function($provide) {
     $provide.value('AngularNameService', new AngularNameService());
-    $provide.value(
-      'AnswerClassificationResultObjectFactory',
-      new AnswerClassificationResultObjectFactory());
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
