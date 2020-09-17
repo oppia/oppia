@@ -109,7 +109,7 @@ jobs:
       - merge_target_branch
       - run:
           name: Setup python by installing wheel
-          command: pip install wheel==0.35.0
+          command: pip install wheel==0.35.0 enum34==1.1.10 protobuf==3.13.0
       - run:
           name: Install dependencies
           command: python -m scripts.install_third_party_libs
