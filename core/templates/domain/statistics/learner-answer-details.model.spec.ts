@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for LearnerAnswerDetailsObjectFactory.
+ * @fileoverview Tests for learner-answer-detail-model.
  */
 
-import { LearnerAnswerDetailsObjectFactory } from
-  'domain/statistics/LearnerAnswerDetailsObjectFactory';
+import { LearnerAnswerDetails } from
+  'domain/statistics/learner-answer-details.model';
 import { LearnerAnswerInfo } from './learner-answer-info.model';
 
 describe('Learner answer details object factory', () => {
@@ -26,7 +26,7 @@ describe('Learner answer details object factory', () => {
       LearnerAnswerInfo.createDefaultLearnerAnswerInfo(
         'This is answer', 'This is answer details'));
     var learnerAnswerDetails = (
-      new LearnerAnswerDetailsObjectFactory().createDefaultLearnerAnswerDetails(
+      LearnerAnswerDetails.createDefaultLearnerAnswerDetails(
         'fakeExpId', 'fakeStateName', 'fakeInteractionId',
         'fakeCustomizationArgs', [learnerAnswerInfo]));
 
@@ -70,7 +70,7 @@ describe('A LearnerAnswerInfoObject', () => {
     };
 
     var learnerAnswerDetails = (
-      new LearnerAnswerDetailsObjectFactory().createDefaultLearnerAnswerDetails(
+      LearnerAnswerDetails.createDefaultLearnerAnswerDetails(
         'fakeExpId', 'fakeStateName', 'fakeInteractionId',
         'fakeCustomizationArgs', [
           LearnerAnswerInfo.createFromBackendDict(testLaiDict1),

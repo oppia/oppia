@@ -17,18 +17,16 @@
  * @fileoverview Service to get learner answer info data and to delete
  * any learner answer info.
  */
+import { LearnerAnswerDetails } from 'domain/statistics/learner-answer-details.model';
 import { LearnerAnswerInfo } from 'domain/statistics/learner-answer-info.model';
 
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('domain/statistics/LearnerAnswerDetailsObjectFactory.ts');
 
 angular.module('oppia').factory('LearnerAnswerDetailsDataService', [
-  '$http', '$q', 'ExplorationDataService', 'LearnerAnswerDetailsObjectFactory',
-  'UrlInterpolationService',
+  '$http', '$q', 'ExplorationDataService', 'UrlInterpolationService',
   function(
-      $http, $q, ExplorationDataService, LearnerAnswerDetailsObjectFactory,
-      UrlInterpolationService) {
+      $http, $q, ExplorationDataService, UrlInterpolationService) {
     var _expId = ExplorationDataService.explorationId;
     var _data = [];
     var learnerAnswerInfoData = null;
@@ -75,7 +73,7 @@ angular.module('oppia').factory('LearnerAnswerDetailsDataService', [
               learnerAnswerInfoData[i].learner_answer_info_dicts);
             var learnerAnswerDetails = (
               // eslint-disable-next-line max-len
-              LearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails(
+              LearnerAnswerDetails.createDefaultLearnerAnswerDetails(
                 _expId, stateName, interactionId, customizationArgs,
                 learnerAnswerInfoDicts.map(
                   LearnerAnswerInfo.createFromBackendDict)));

@@ -18,8 +18,6 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // learner-answer-details-data.service.ts is upgraded to Angular 8.
-import { LearnerAnswerDetailsObjectFactory } from
-  'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 import { LearnerAnswerInfo } from 'domain/statistics/learner-answer-info.model';
@@ -43,9 +41,6 @@ describe('Learner answer details service', function() {
       $provide.value('ExplorationDataService', {
         explorationId: expId
       });
-      $provide.value(
-        'LearnerAnswerDetailsObjectFactory',
-        new LearnerAnswerDetailsObjectFactory());
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {

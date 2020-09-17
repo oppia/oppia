@@ -143,7 +143,6 @@ import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
 import { ExplorationStatsObjectFactory } from 'domain/statistics/ExplorationStatsObjectFactory';
 import { LearnerActionObjectFactory } from 'domain/statistics/LearnerActionObjectFactory';
-import { LearnerAnswerDetailsObjectFactory } from 'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { PlaythroughIssueObjectFactory } from 'domain/statistics/PlaythroughIssueObjectFactory';
 import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFactory';
 import { StateStatsObjectFactory } from 'domain/statistics/StateStatsObjectFactory';
@@ -498,7 +497,6 @@ export const angularServices: [string, unknown][] = [
   ['LearnerActionObjectFactory', LearnerActionObjectFactory],
   ['LearnerAnswerDetailsBackendApiService',
     LearnerAnswerDetailsBackendApiService],
-  ['LearnerAnswerDetailsObjectFactory', LearnerAnswerDetailsObjectFactory],
   ['LearnerDashboardActivityIdsObjectFactory',
     LearnerDashboardActivityIdsObjectFactory],
   ['LearnerDashboardBackendApiService', LearnerDashboardBackendApiService],

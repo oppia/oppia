@@ -278,8 +278,6 @@ import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
-import { LearnerAnswerDetailsObjectFactory } from
-  'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerDashboardActivityIdsObjectFactory } from
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
 import { LearnerDashboardBackendApiService } from
@@ -752,8 +750,6 @@ export class UpgradedServices {
       new ItemSelectionInputRulesService();
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
-    upgradedServices['LearnerAnswerDetailsObjectFactory'] =
-      new LearnerAnswerDetailsObjectFactory();
     upgradedServices['LearnerDashboardActivityIdsObjectFactory'] =
       new LearnerDashboardActivityIdsObjectFactory();
     upgradedServices['LearnerExplorationSummaryObjectFactory'] =

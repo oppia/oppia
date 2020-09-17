@@ -17,9 +17,6 @@
  * domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 import { LearnerAnswerInfo } from
   'domain/statistics/learner-answer-info.model';
 import { InteractionCustomizationArgs } from
@@ -43,6 +40,15 @@ export class LearnerAnswerDetails {
     this.learnerAnswerInfoData = learnerAnswerInfoData;
   }
 
+  static createDefaultLearnerAnswerDetails(
+      expId: string, stateName: string, interactionId: string,
+      customizationArgs: InteractionCustomizationArgs,
+      learnerAnswerInfoData: LearnerAnswerInfo[]): LearnerAnswerDetails {
+    return new LearnerAnswerDetails(
+      expId, stateName, interactionId, customizationArgs,
+      learnerAnswerInfoData);
+  }
+
   getExpId(): string {
     return this.expId;
   }
@@ -61,21 +67,3 @@ export class LearnerAnswerDetails {
     return Math.max(...createdOnValues);
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class LearnerAnswerDetailsObjectFactory {
-  createDefaultLearnerAnswerDetails(
-      expId: string, stateName: string, interactionId: string,
-      customizationArgs: InteractionCustomizationArgs,
-      learnerAnswerInfoData: LearnerAnswerInfo[]): LearnerAnswerDetails {
-    return new LearnerAnswerDetails(
-      expId, stateName, interactionId, customizationArgs,
-      learnerAnswerInfoData);
-  }
-}
-
-angular.module('oppia').factory(
-  'LearnerAnswerDetailsObjectFactory',
-  downgradeInjectable(LearnerAnswerDetailsObjectFactory));
