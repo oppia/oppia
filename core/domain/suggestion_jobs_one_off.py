@@ -266,9 +266,9 @@ class PopulateReviewerAndSuggestionCountsOneOffJob(
             if item.suggestion_type == (
                     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT) or (
                         item.status != suggestion_models.STATUS_IN_REVIEW):
-                return    
+                return
             suggestion = suggestion_services.get_suggestion_from_model(item)
-            yield('suggestion_%s_%s' % (
+            yield ('suggestion_%s_%s' % (
                 suggestion.suggestion_type, suggestion.language_code), item.id)
 
         else:
@@ -277,9 +277,9 @@ class PopulateReviewerAndSuggestionCountsOneOffJob(
             if item.can_review_translation_for_language_codes:
                 for language_code in (
                         item.can_review_translation_for_language_codes):
-                    yield('reviewer_translation_%s' % language_code, item.id)
+                    yield ('reviewer_translation_%s' % language_code, item.id)
             if item.can_review_questions:
-                yield('reviewer_question', item.id)
+                yield ('reviewer_question', item.id)
 
     @staticmethod
     def reduce(key, values):
