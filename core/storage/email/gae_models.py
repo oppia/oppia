@@ -340,8 +340,8 @@ class BulkEmailModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.sender_id == user_id).get(
-            keys_only=True) is not None
+        return (
+            cls.query(cls.sender_id == user_id).get(keys_only=True) is not None)
 
     @classmethod
     def create(
@@ -409,6 +409,16 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instance of GeneralFeedbackEmailReplyToIdModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def _generate_id(cls, user_id, thread_id):
