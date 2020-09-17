@@ -90,7 +90,7 @@ angular.module('oppia').directive('questionsList', [
         'questions-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$location', '$timeout', '$uibModal', 'AlertsService',
+        '$location', '$rootScope', '$timeout', '$uibModal', 'AlertsService',
         'ContextService', 'EditableQuestionBackendApiService',
         'ImageLocalStorageService', 'MisconceptionObjectFactory',
         'QuestionCreationService', 'QuestionObjectFactory',
@@ -99,7 +99,7 @@ angular.module('oppia').directive('questionsList', [
         'SkillBackendApiService', 'SkillDifficultyObjectFactory',
         'WindowDimensionsService', 'NUM_QUESTIONS_PER_PAGE',
         function(
-            $location, $timeout, $uibModal, AlertsService,
+            $location, $rootScope, $timeout, $uibModal, AlertsService,
             ContextService, EditableQuestionBackendApiService,
             ImageLocalStorageService, MisconceptionObjectFactory,
             QuestionCreationService, QuestionObjectFactory,
@@ -315,15 +315,12 @@ angular.module('oppia').directive('questionsList', [
             ctrl.misconceptionsBySkill = {};
             SkillBackendApiService.fetchMultiSkills(
               skillIds).then(
-              function(skillDicts) {
-                skillDicts.forEach(function(skillDict) {
-                  ctrl.misconceptionsBySkill[skillDict.id] =
-                    skillDict.misconceptions.map(
-                      function(misconceptionsBackendDict) {
-                        return MisconceptionObjectFactory
-                          .createFromBackendDict(misconceptionsBackendDict);
-                      });
+              function(skills) {
+                skills.forEach(function(skill) {
+                  ctrl.misconceptionsBySkill[skill.getId()] =
+                    skill.getMisconceptions();
                 });
+                $rootScope.$apply();
               }, function(error) {
                 AlertsService.addWarning();
               });
