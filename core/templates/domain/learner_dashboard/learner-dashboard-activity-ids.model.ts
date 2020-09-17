@@ -17,9 +17,6 @@
    dashboard activity ids domain object.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 export interface LearnerDashboardActivityIdsDict {
   'incomplete_exploration_ids': string[];
   'incomplete_collection_ids': string[];
@@ -131,13 +128,8 @@ export class LearnerDashboardActivityIds {
       this.collectionPlaylistIds.splice(index, 1);
     }
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class LearnerDashboardActivityIdsObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       learnerDashboardActivityIdsDict: LearnerDashboardActivityIdsDict):
       LearnerDashboardActivityIds {
     return new LearnerDashboardActivityIds(
@@ -149,7 +141,3 @@ export class LearnerDashboardActivityIdsObjectFactory {
       learnerDashboardActivityIdsDict.collection_playlist_ids);
   }
 }
-
-angular.module('oppia').factory(
-  'LearnerDashboardActivityIdsObjectFactory',
-  downgradeInjectable(LearnerDashboardActivityIdsObjectFactory));

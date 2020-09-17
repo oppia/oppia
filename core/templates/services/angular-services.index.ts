@@ -110,7 +110,6 @@ import { NeedsGuidingResponsesTaskObjectFactory } from 'domain/improvements/Need
 import { SuccessiveIncorrectAnswersTaskObjectFactory } from 'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
 import { TaskEntryObjectFactory } from 'domain/improvements/TaskEntryObjectFactory';
 import { ExplorationImprovementsConfigObjectFactory } from 'domain/improvements/exploration-improvements-config-object.factory';
-import { LearnerDashboardActivityIdsObjectFactory } from 'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
 import { NonExistentActivitiesObjectFactory } from 'domain/learner_dashboard/non-existent-activities-object.factory';
@@ -528,8 +527,6 @@ export const angularServices: [string, unknown][] = [
     LearnerAnswerDetailsBackendApiService],
   ['LearnerAnswerDetailsObjectFactory', LearnerAnswerDetailsObjectFactory],
   ['LearnerAnswerInfoObjectFactory', LearnerAnswerInfoObjectFactory],
-  ['LearnerDashboardActivityIdsObjectFactory',
-    LearnerDashboardActivityIdsObjectFactory],
   ['LearnerDashboardBackendApiService', LearnerDashboardBackendApiService],
   ['LearnerDashboardIdsBackendApiService',
     LearnerDashboardIdsBackendApiService],

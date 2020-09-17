@@ -304,8 +304,6 @@ import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerAnswerInfoObjectFactory } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
-import { LearnerDashboardActivityIdsObjectFactory } from
-  'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
 import { LearnerDashboardBackendApiService } from
   'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from
@@ -807,8 +805,6 @@ export class UpgradedServices {
       new LearnerAnswerDetailsObjectFactory();
     upgradedServices['LearnerAnswerInfoObjectFactory'] =
       new LearnerAnswerInfoObjectFactory();
-    upgradedServices['LearnerDashboardActivityIdsObjectFactory'] =
-      new LearnerDashboardActivityIdsObjectFactory();
     upgradedServices['LearnerExplorationSummaryObjectFactory'] =
       new LearnerExplorationSummaryObjectFactory();
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
@@ -1401,8 +1397,7 @@ export class UpgradedServices {
         upgradedServices['ProfileSummaryObjectFactory']);
     upgradedServices['LearnerDashboardIdsBackendApiService'] =
         new LearnerDashboardIdsBackendApiService(
-          upgradedServices['HttpClient'],
-          upgradedServices['LearnerDashboardActivityIdsObjectFactory']);
+          upgradedServices['HttpClient']);
     upgradedServices['PlatformFeatureBackendApiService'] =
       new PlatformFeatureBackendApiService(
         upgradedServices['HttpClient'],

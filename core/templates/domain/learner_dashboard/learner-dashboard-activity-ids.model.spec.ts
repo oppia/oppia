@@ -13,22 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for LearnerDashboardActivityIdsObjectFactory.
+ * @fileoverview Tests for LearnerDashboardActivityIds.
  */
 
 import {
-  LearnerDashboardActivityIdsDict,
-  LearnerDashboardActivityIdsObjectFactory
-} from 'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
+  LearnerDashboardActivityIds,
+  LearnerDashboardActivityIdsDict
+} from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 
 describe('Learner dashboard activity ids object factory', () => {
-  let learnerDashboardActivityIdsObjectFactory:
-    LearnerDashboardActivityIdsObjectFactory;
   let learnerDashboardActivityIdsDict: LearnerDashboardActivityIdsDict;
 
   beforeEach(() => {
-    learnerDashboardActivityIdsObjectFactory = (
-      new LearnerDashboardActivityIdsObjectFactory());
     learnerDashboardActivityIdsDict = {
       incomplete_exploration_ids: ['0', '1'],
       incomplete_collection_ids: ['2', '3'],
@@ -42,7 +38,7 @@ describe('Learner dashboard activity ids object factory', () => {
   it('should check if activity id is present among learner dashboard ' +
      'activity ids', () => {
     var learnerDashboardActivityIds = (
-      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     expect(learnerDashboardActivityIds.includesActivity('0')).toEqual(true);
@@ -57,7 +53,7 @@ describe('Learner dashboard activity ids object factory', () => {
 
   it('should add exploration to learner playlist', () => {
     var learnerDashboardActivityIds = (
-      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     learnerDashboardActivityIds.addToExplorationLearnerPlaylist('12');
@@ -71,7 +67,7 @@ describe('Learner dashboard activity ids object factory', () => {
 
   it('should add collection to learner playlist', () => {
     var learnerDashboardActivityIds = (
-      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     learnerDashboardActivityIds.addToCollectionLearnerPlaylist('12');
@@ -85,7 +81,7 @@ describe('Learner dashboard activity ids object factory', () => {
 
   it('should remove exploration from learner playlist', () => {
     var learnerDashboardActivityIds = (
-      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist('9');
@@ -98,7 +94,7 @@ describe('Learner dashboard activity ids object factory', () => {
 
   it('should remove collection from learner playlist', () => {
     var learnerDashboardActivityIds = (
-      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist('11');
@@ -112,7 +108,7 @@ describe('Learner dashboard activity ids object factory', () => {
   it('should fetch the learner dashboard activity ids domain object from ' +
      'the backend summary dict', () => {
     var learnerDashboardActivityIds = (
-      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     expect(learnerDashboardActivityIds.incompleteExplorationIds).toEqual(
@@ -131,7 +127,7 @@ describe('Learner dashboard activity ids object factory', () => {
 
   it('should check if explorationId belongs to exploration playlist', () => {
     var learnerDashboardActivityIds = (
-      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('8'))
@@ -153,7 +149,7 @@ describe('Learner dashboard activity ids object factory', () => {
 
   it('should check if collectionId belongs to collection playlist', () => {
     var learnerDashboardActivityIds = (
-      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('10'))
@@ -175,7 +171,7 @@ describe('Learner dashboard activity ids object factory', () => {
 
   it('should check if explorationId belongs to completed explorations', () => {
     var learnerDashboardActivityIds = (
-      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     expect(learnerDashboardActivityIds.belongsToCompletedExplorations('4'))
@@ -197,7 +193,7 @@ describe('Learner dashboard activity ids object factory', () => {
 
   it('should check if collectionId belongs to completed collections', () => {
     var learnerDashboardActivityIds = (
-      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     expect(learnerDashboardActivityIds.belongsToCompletedCollections('6'))
@@ -219,7 +215,7 @@ describe('Learner dashboard activity ids object factory', () => {
 
   it('should check if explorationId belongs to incomplete explorations', () => {
     var learnerDashboardActivityIds = (
-      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     expect(learnerDashboardActivityIds.belongsToIncompleteExplorations('0'))
@@ -241,7 +237,7 @@ describe('Learner dashboard activity ids object factory', () => {
 
   it('should check if collectionId belongs to incomplete collections', () => {
     var learnerDashboardActivityIds = (
-      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+      LearnerDashboardActivityIds.createFromBackendDict(
         learnerDashboardActivityIdsDict));
 
     expect(learnerDashboardActivityIds.belongsToIncompleteCollections('2'))
