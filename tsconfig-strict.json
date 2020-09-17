@@ -31,6 +31,11 @@
     }
   },
   "files": [
+    "core/templates/services/code-normalizer.service.ts",
+    "core/templates/services/audio-bar-status.service.ts",
+    "core/templates/filters/string-utility-filters/camel-case-to-hyphens.pipe.ts",
+    "core/templates/domain/skill/assigned-skill-object.factory.ts",
+    "core/templates/domain/utilities/AudioFileObjectFactory.ts",
     "core/templates/pages/admin-page/services/admin-router.service.ts",
     "core/templates/pages/admin-page/services/admin-router.service.spec.ts",
     "core/templates/pages/admin-page/services/admin-task-manager.service.ts",
