@@ -559,6 +559,46 @@ def get_reviewable_suggestions(user_id, suggestion_type):
     return all_suggestions
 
 
+def get_question_suggestions_waiting_longest_for_review():
+    """Returns MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS number
+    of question suggestions, sorted in descending order by review wait time.
+
+    Returns:
+        list(Suggestion). A list of question suggestions, sorted in descending
+        order based on how long the suggestions have been waiting for review.
+    """
+    return [
+        get_suggestion_from_model(suggestion_model) for suggestion_model in (
+            suggestion_models.GeneralSuggestionModel
+            .get_question_suggestions_waiting_longest_for_review()
+        )
+    ]
+
+
+def get_translation_suggestions_waiting_longest_for_review_per_lang(
+        language_code):
+    """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
+    number of translation suggestions in the specified language code,
+    sorted in descending order by review wait time.
+
+    Args:
+        language_code: str. The ISO 639-1 language code of the translation
+            suggestions.
+
+    Returns:
+        list(Suggestion). A list of translation suggestions, sorted in
+        descending order based on how long the suggestions have been waiting
+        for review.
+    """
+    return [
+        get_suggestion_from_model(suggestion_model) for suggestion_model in (
+            suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_waiting_longest_for_review_per_lang(
+                language_code)
+        )
+    ]
+
+
 def get_submitted_suggestions(user_id, suggestion_type):
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.

@@ -62,6 +62,13 @@ SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
+# Daily emails are sent to reviewers to notify them of suggestions on the
+# Contributor Dashboard to review. The constants below define the number of
+# question and translation suggestions to fetch to come up with these daily
+# suggestion recommendations.
+MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS = 30
+MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS = 30
+
 # Defines what is the minimum role required to review suggestions
 # of a particular type.
 SUGGESTION_MINIMUM_ROLE_FOR_REVIEW = {
@@ -345,6 +352,50 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
             cls.suggestion_type == suggestion_type).filter(
                 cls.author_id != user_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_question_suggestions_waiting_longest_for_review(cls):
+        """Returns MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS number
+        of question suggestions, sorted in descending order by review wait
+        time.
+
+        Returns:
+            list(GeneralSuggestionModel). A list of question suggestions,
+            sorted in descending order based on how long the suggestions have
+            been waiting for review.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.suggestion_type == SUGGESTION_TYPE_ADD_QUESTION)
+            .order(cls.last_updated)
+            .fetch(MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
+        )
+
+    @classmethod
+    def get_translation_suggestions_waiting_longest_for_review_per_lang(
+            cls, language_code):
+        """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
+        number of translation suggestions in the specified language code,
+        sorted in descending order by review wait time.
+
+        Args:
+            language_code: str. The ISO 639-1 language code of the translation
+                suggestions.
+
+        Returns:
+            list(GeneralSuggestionModel). A list of translation suggestions,
+            sorted in descending order based on how long the suggestions have
+            been waiting for review.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            .filter(cls.language_code == language_code)
+            .order(cls.last_updated)
+            .fetch(MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
+        )
 
     @classmethod
     def get_user_created_suggestions_of_suggestion_type(
