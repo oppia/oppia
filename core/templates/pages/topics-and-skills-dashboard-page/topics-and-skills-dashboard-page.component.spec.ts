@@ -167,7 +167,8 @@ describe('Topics and Skills Dashboard Page', function() {
           dict => TopicSummaryObjectFactory.createFromBackendDict(dict)));
       expect(ctrl.untriagedSkillSummaries).toEqual(
         sampleDataResults.untriaged_skill_summary_dicts.map(
-          dict => SkillSummary.createFromBackendDict(dict)));
+          (dict: unknown) => SkillSummary.createFromBackendDict(
+            dict as SkillSummaryBackendDict)));
       expect(ctrl.totalEntityCountToDisplay).toEqual(1);
       expect(ctrl.userCanCreateTopic).toEqual(true);
       expect(ctrl.userCanCreateSkill).toEqual(true);
