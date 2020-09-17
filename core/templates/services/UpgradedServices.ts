@@ -386,8 +386,6 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { ParamMetadataObjectFactory } from
-  'domain/exploration/ParamMetadataObjectFactory';
 import { ParamSpecObjectFactory } from
   'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from
@@ -846,8 +844,6 @@ export class UpgradedServices {
       new NonExistentActivitiesObjectFactory();
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
-    upgradedServices['ParamMetadataObjectFactory'] =
-      new ParamMetadataObjectFactory();
     upgradedServices['ParamTypeObjectFactory'] = new ParamTypeObjectFactory();
     upgradedServices['PlatformParameterFilterObjectFactory'] =
       new PlatformParameterFilterObjectFactory();
@@ -1069,8 +1065,6 @@ export class UpgradedServices {
     upgradedServices['ParamChangesObjectFactory'] =
       new ParamChangesObjectFactory(
         upgradedServices['ParamChangeObjectFactory']);
-    upgradedServices['ParamMetadataObjectFactory'] =
-      new ParamMetadataObjectFactory();
     upgradedServices['ParamSpecObjectFactory'] = new ParamSpecObjectFactory(
       upgradedServices['ParamTypeObjectFactory']);
     upgradedServices['PencilCodeEditorValidationService'] =

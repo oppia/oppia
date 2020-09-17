@@ -13,21 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ParamMetadataObjectFactory.
+ * @fileoverview Unit tests for ParamMetadata.
  */
 
-import { ParamMetadata, ParamMetadataObjectFactory } from
-  'domain/exploration/ParamMetadataObjectFactory';
+import { ParamMetadata } from
+  'domain/exploration/param-metadata.model';
 
 describe('ParameterMetadata object factory', () => {
   let parameterMetadata: ParamMetadata = null;
-  let pmof: ParamMetadataObjectFactory = null;
-  beforeEach(() => {
-    pmof = new ParamMetadataObjectFactory();
-  });
 
   it('should have correct metadata for SET action', () => {
-    parameterMetadata = pmof.createWithSetAction(
+    parameterMetadata = ParamMetadata.createWithSetAction(
       'answer', 'param_changes', '1');
     expect(parameterMetadata.action).toEqual('set');
     expect(parameterMetadata.paramName).toEqual('answer');
@@ -36,7 +32,7 @@ describe('ParameterMetadata object factory', () => {
   });
 
   it('should have correct metadata for GET action', () => {
-    parameterMetadata = pmof.createWithGetAction('x', 'content', '5');
+    parameterMetadata = ParamMetadata.createWithGetAction('x', 'content', '5');
     expect(parameterMetadata.action).toEqual('get');
     expect(parameterMetadata.paramName).toEqual('x');
     expect(parameterMetadata.source).toEqual('content');

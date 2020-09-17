@@ -429,8 +429,6 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { ParamMetadataObjectFactory } from
-  'domain/exploration/ParamMetadataObjectFactory';
 import { ParamSpecObjectFactory } from
   'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from
@@ -904,7 +902,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static pageTitleService: PageTitleService;
   static paramChangeObjectFactory: ParamChangeObjectFactory;
   static paramChangesObjectFactory: ParamChangesObjectFactory;
-  static paramMetadataObjectFactory: ParamMetadataObjectFactory;
   static paramSpecObjectFactory: ParamSpecObjectFactory;
   static paramSpecsObjectFactory: ParamSpecsObjectFactory;
   static paramTypeObjectFactory: ParamTypeObjectFactory;
@@ -1238,7 +1235,6 @@ private outcomeObjectFactory: OutcomeObjectFactory,
 private pageTitleService: PageTitleService,
 private paramChangeObjectFactory: ParamChangeObjectFactory,
 private paramChangesObjectFactory: ParamChangesObjectFactory,
-private paramMetadataObjectFactory: ParamMetadataObjectFactory,
 private paramSpecObjectFactory: ParamSpecObjectFactory,
 private paramSpecsObjectFactory: ParamSpecsObjectFactory,
 private paramTypeObjectFactory: ParamTypeObjectFactory,
@@ -1573,7 +1569,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.pageTitleService = this.pageTitleService;
     OppiaAngularRootComponent.paramChangeObjectFactory = this.paramChangeObjectFactory;
     OppiaAngularRootComponent.paramChangesObjectFactory = this.paramChangesObjectFactory;
-    OppiaAngularRootComponent.paramMetadataObjectFactory = this.paramMetadataObjectFactory;
     OppiaAngularRootComponent.paramSpecObjectFactory = this.paramSpecObjectFactory;
     OppiaAngularRootComponent.paramSpecsObjectFactory = this.paramSpecsObjectFactory;
     OppiaAngularRootComponent.paramTypeObjectFactory = this.paramTypeObjectFactory;

@@ -17,9 +17,6 @@
  * domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { ExplorationEditorPageConstants } from
   'pages/exploration-editor-page/exploration-editor-page.constants';
 
@@ -44,12 +41,7 @@ export class ParamMetadata {
     this.source = source;
     this.sourceInd = sourceInd;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ParamMetadataObjectFactory {
   /**
    * Metadata about the SET action of a parameter
    * @param {String} paramName - parameter's name
@@ -58,7 +50,7 @@ export class ParamMetadataObjectFactory {
    * @param {String} sourceInd - index of this parameter in a set of changes
    * @returns {ParamMetadata} - A new ParamMetadata instance
    */
-  createWithSetAction(
+  static createWithSetAction(
       paramName: string, source: string, sourceInd: string): ParamMetadata {
     return new ParamMetadata(
       ExplorationEditorPageConstants.PARAM_ACTION_SET, paramName, source,
@@ -73,14 +65,10 @@ export class ParamMetadataObjectFactory {
    * @param {String} sourceInd - index of this parameter in a set of changes
    * @returns {ParamMetadata} - A new ParamMetadata instance
    */
-  createWithGetAction(
+  static createWithGetAction(
       paramName: string, source: string, sourceInd: string): ParamMetadata {
     return new ParamMetadata(
       ExplorationEditorPageConstants.PARAM_ACTION_GET, paramName, source,
       sourceInd);
   }
 }
-
-angular.module('oppia').factory(
-  'ParamMetadataObjectFactory',
-  downgradeInjectable(ParamMetadataObjectFactory));
