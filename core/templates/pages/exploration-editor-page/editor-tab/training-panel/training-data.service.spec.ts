@@ -28,8 +28,6 @@ import { AnswerGroupsCacheService } from
 /* eslint-enable max-len */
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -109,7 +107,6 @@ describe('TrainingDataService', function() {
         'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
           new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
           new RuleObjectFactory()));
-      $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
       $provide.value('FractionObjectFactory', new FractionObjectFactory());
@@ -130,8 +127,7 @@ describe('TrainingDataService', function() {
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('SolutionValidityService', new SolutionValidityService());
       $provide.value(
-        'StateClassifierMappingService', new StateClassifierMappingService(
-          new ClassifierObjectFactory()));
+        'StateClassifierMappingService', new StateClassifierMappingService());
       $provide.value(
         'StateEditorService', new StateEditorService(
           new SolutionValidityService()));

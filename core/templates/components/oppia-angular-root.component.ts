@@ -118,8 +118,6 @@ import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { CkEditorCopyContentService } from
   'components/ck-editor-helpers/ck-editor-copy-content-service.ts';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { ClassroomDataObjectFactory } from
@@ -725,7 +723,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static camelCaseToHyphensPipe: CamelCaseToHyphensPipe;
   static changeObjectFactory: ChangeObjectFactory;
   static ckEditorCopyContentService: CkEditorCopyContentService;
-  static classifierObjectFactory: ClassifierObjectFactory;
   static classroomBackendApiService: ClassroomBackendApiService;
   static classroomDataObjectFactory: ClassroomDataObjectFactory;
   static clientContextObjectFactory: ClientContextObjectFactory;
@@ -1049,7 +1046,6 @@ private browserCheckerService: BrowserCheckerService,
 private camelCaseToHyphensPipe: CamelCaseToHyphensPipe,
 private changeObjectFactory: ChangeObjectFactory,
 private ckEditorCopyContentService: CkEditorCopyContentService,
-private classifierObjectFactory: ClassifierObjectFactory,
 private classroomBackendApiService: ClassroomBackendApiService,
 private classroomDataObjectFactory: ClassroomDataObjectFactory,
 private clientContextObjectFactory: ClientContextObjectFactory,
@@ -1374,7 +1370,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.camelCaseToHyphensPipe = this.camelCaseToHyphensPipe;
     OppiaAngularRootComponent.changeObjectFactory = this.changeObjectFactory;
     OppiaAngularRootComponent.ckEditorCopyContentService = this.ckEditorCopyContentService,
-    OppiaAngularRootComponent.classifierObjectFactory = this.classifierObjectFactory;
     OppiaAngularRootComponent.classroomBackendApiService = this.classroomBackendApiService;
     OppiaAngularRootComponent.classroomDataObjectFactory = this.classroomDataObjectFactory;
     OppiaAngularRootComponent.clientContextObjectFactory = this.clientContextObjectFactory;

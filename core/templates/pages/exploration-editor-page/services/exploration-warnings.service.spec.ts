@@ -32,8 +32,6 @@ import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { ExplorationFeaturesService } from
@@ -96,7 +94,6 @@ describe('Exploration Warnings Service', function() {
         new RuleObjectFactory()));
     $provide.value(
       'AnswerStatsObjectFactory', new AnswerStatsObjectFactory());
-    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
     $provide.value(
@@ -120,8 +117,7 @@ describe('Exploration Warnings Service', function() {
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value(
-      'StateClassifierMappingService', new StateClassifierMappingService(
-        new ClassifierObjectFactory()));
+      'StateClassifierMappingService', new StateClassifierMappingService());
     $provide.value(
       'StateEditorService', new StateEditorService(
         new SolutionValidityService()));

@@ -49,7 +49,6 @@ import { ComputationDataObjectFactory } from 'domain/admin/computation-data-obje
 import { JobDataObjectFactory } from 'domain/admin/job-data-object.factory';
 import { JobStatusSummaryObjectFactory } from 'domain/admin/job-status-summary-object.factory';
 import { AnswerClassificationResultObjectFactory } from 'domain/classifier/AnswerClassificationResultObjectFactory';
-import { ClassifierObjectFactory } from 'domain/classifier/ClassifierObjectFactory';
 import { PredictionResultObjectFactory } from 'domain/classifier/PredictionResultObjectFactory';
 import { ClassroomDataObjectFactory } from 'domain/classroom/ClassroomDataObjectFactory';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
@@ -378,7 +377,6 @@ export const angularServices: [string, unknown][] = [
   ['CamelCaseToHyphensPipe', CamelCaseToHyphensPipe],
   ['ChangeObjectFactory', ChangeObjectFactory],
   ['CkEditorCopyContentService', CkEditorCopyContentService],
-  ['ClassifierObjectFactory', ClassifierObjectFactory],
   ['ClassroomBackendApiService', ClassroomBackendApiService],
   ['ClassroomDataObjectFactory', ClassroomDataObjectFactory],
   ['ClientContextObjectFactory', ClientContextObjectFactory],

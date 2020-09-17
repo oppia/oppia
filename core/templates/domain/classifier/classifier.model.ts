@@ -17,9 +17,6 @@
  *     domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export class Classifier {
   algorithmId: string;
   classifierData: ClassifierData;
@@ -32,19 +29,10 @@ export class Classifier {
     this.classifierData = classifierData;
     this.dataSchemaVersion = dataSchemaVersion;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ClassifierObjectFactory {
-  create(
+  static create(
       algorithmId: string, classifierData: ClassifierData,
       dataSchemaVersion: number): Classifier {
     return new Classifier(algorithmId, classifierData, dataSchemaVersion);
   }
 }
-
-angular.module('oppia').factory(
-  'ClassifierObjectFactory',
-  downgradeInjectable(ClassifierObjectFactory));

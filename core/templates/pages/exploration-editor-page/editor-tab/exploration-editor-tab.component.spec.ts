@@ -26,8 +26,6 @@ import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { ExplorationFeaturesService } from
@@ -115,8 +113,6 @@ describe('Exploration editor tab component', function() {
       'AnswerGroupObjectFactory', answerGroupObjectFactory);
     $provide.value(
       'AnswerStatsObjectFactory', TestBed.get(AnswerStatsObjectFactory));
-    $provide.value(
-      'ClassifierObjectFactory', TestBed.get(ClassifierObjectFactory));
     $provide.value(
       'ExplorationDraftObjectFactory',
       TestBed.get(ExplorationDraftObjectFactory));

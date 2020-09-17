@@ -81,8 +81,6 @@ import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { CkEditorCopyContentService } from
   'components/ck-editor-helpers/ck-editor-copy-content-service';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { ClassroomDataObjectFactory } from
@@ -694,7 +692,6 @@ export class UpgradedServices {
       new BrowserCheckerService(new WindowRef());
     upgradedServices['CamelCaseToHyphensPipe'] = new CamelCaseToHyphensPipe();
     upgradedServices['ChangeObjectFactory'] = new ChangeObjectFactory();
-    upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
     upgradedServices['ClientContextObjectFactory'] =
       new ClientContextObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
@@ -1079,8 +1076,7 @@ export class UpgradedServices {
     upgradedServices['SiteAnalyticsService'] = new SiteAnalyticsService(
       upgradedServices['WindowRef']);
     upgradedServices['StateClassifierMappingService'] =
-      new StateClassifierMappingService(
-        upgradedServices['ClassifierObjectFactory']);
+      new StateClassifierMappingService();
     upgradedServices['StateEditorService'] = new StateEditorService(
       upgradedServices['SolutionValidityService']);
     upgradedServices['StoryContentsObjectFactory'] =

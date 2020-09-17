@@ -13,14 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the ClassifierObjectFactory.
+ * @fileoverview Unit tests for the Classifier.
  */
 
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
+import { Classifier } from
+  'domain/classifier/classifier.model';
 
-describe('Classifier Object Factory', () => {
-  let classifierObjectFactory: ClassifierObjectFactory;
+describe('Classifier', () => {
   let sampleClassifierData = {
     KNN: {
       occurrence: 0,
@@ -57,13 +56,9 @@ describe('Classifier Object Factory', () => {
     }
   };
 
-  beforeEach(() => {
-    classifierObjectFactory = new ClassifierObjectFactory();
-  });
-
   it('should create a new classifier', () => {
     var classifierObject = (
-      classifierObjectFactory.create(
+      Classifier.create(
         'TestClassifier', sampleClassifierData, 1));
 
     expect(classifierObject.algorithmId).toEqual('TestClassifier');
