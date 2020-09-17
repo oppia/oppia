@@ -13,32 +13,24 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for FeaturedTranslationLanguageObjectFactory.
+ * @fileoverview Tests for Featured Translation Language Model.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import {
-  FeaturedTranslationLanguageObjectFactory,
   FeaturedTranslationLanguage,
   FeaturedTranslationLanguageBackendDict
 } from
-  'domain/opportunity/FeaturedTranslationLanguageObjectFactory';
+  'domain/opportunity/featured-translation-language.model';
 
 describe('Featured Translation Language object factory', () => {
-  let featuredTranslationLanguageObjectFactory:
-    FeaturedTranslationLanguageObjectFactory = null;
   let sampleFTL: FeaturedTranslationLanguage = null;
 
   beforeEach(() => {
-    featuredTranslationLanguageObjectFactory = TestBed.get(
-      FeaturedTranslationLanguageObjectFactory);
-
     let sampleFTLDict: FeaturedTranslationLanguageBackendDict = {
       language_code: 'en',
       explanation: 'English'
     };
-    sampleFTL = featuredTranslationLanguageObjectFactory
+    sampleFTL = FeaturedTranslationLanguage
       .createFromBackendDict(sampleFTLDict);
   });
 

@@ -17,9 +17,6 @@
  * featured translation language domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface FeaturedTranslationLanguageBackendDict {
   'language_code': string;
   explanation: string;
@@ -30,13 +27,8 @@ export class FeaturedTranslationLanguage {
       readonly languageCode: string,
       readonly explanation: string
   ) {}
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class FeaturedTranslationLanguageObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
       featuredTranslationBackendDict: FeaturedTranslationLanguageBackendDict
   ): FeaturedTranslationLanguage {
     return new FeaturedTranslationLanguage(
@@ -45,7 +37,3 @@ export class FeaturedTranslationLanguageObjectFactory {
     );
   }
 }
-
-angular.module('oppia').factory(
-  'FeaturedTranslationLanguageObjectFactory',
-  downgradeInjectable(FeaturedTranslationLanguageObjectFactory));
