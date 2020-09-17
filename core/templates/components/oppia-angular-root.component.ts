@@ -212,8 +212,6 @@ import { ExplorationMetadataObjectFactory } from
   'domain/exploration/ExplorationMetadataObjectFactory';
 import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
-import { ExplorationOpportunitySummaryObjectFactory } from
-  'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExplorationImprovementsBackendApiService } from
   'services/exploration-improvements-backend-api.service';
@@ -759,7 +757,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static explorationImprovementsTaskRegistryService: ExplorationImprovementsTaskRegistryService;
   static explorationMetadataObjectFactory: ExplorationMetadataObjectFactory;
   static explorationObjectFactory: ExplorationObjectFactory;
-  static explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory;
   static expressionParserService: ExpressionParserService;
   static explorationPermissionsBackendApiService: ExplorationPermissionsBackendApiService;
   static explorationRecommendationsBackendApiService: ExplorationRecommendationsBackendApiService;
@@ -1074,7 +1071,6 @@ private explorationImprovementsBackendApiService: ExplorationImprovementsBackend
 private explorationImprovementsTaskRegistryService: ExplorationImprovementsTaskRegistryService,
 private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
 private explorationObjectFactory: ExplorationObjectFactory,
-private explorationOpportunitySummaryObjectFactory: ExplorationOpportunitySummaryObjectFactory,
 private expressionParserService: ExpressionParserService,
 private explorationPermissionsBackendApiService: ExplorationPermissionsBackendApiService,
 private explorationRecommendationsBackendApiService: ExplorationRecommendationsBackendApiService,
@@ -1390,7 +1386,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.explorationImprovementsTaskRegistryService = this.explorationImprovementsTaskRegistryService;
     OppiaAngularRootComponent.explorationMetadataObjectFactory = this.explorationMetadataObjectFactory;
     OppiaAngularRootComponent.explorationObjectFactory = this.explorationObjectFactory;
-    OppiaAngularRootComponent.explorationOpportunitySummaryObjectFactory = this.explorationOpportunitySummaryObjectFactory;
     OppiaAngularRootComponent.expressionParserService = this.expressionParserService;
     OppiaAngularRootComponent.explorationPermissionsBackendApiService = this.explorationPermissionsBackendApiService;
     OppiaAngularRootComponent.explorationRecommendationsBackendApiService = this.explorationRecommendationsBackendApiService;

@@ -181,8 +181,6 @@ import { ExplorationMetadataObjectFactory } from
   'domain/exploration/ExplorationMetadataObjectFactory';
 import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
-import { ExplorationOpportunitySummaryObjectFactory } from
-  'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 import { ExplorationPermissionsBackendApiService } from
   'domain/exploration/exploration-permissions-backend-api.service';
 import { ExplorationRecommendationsBackendApiService } from
@@ -712,8 +710,6 @@ export class UpgradedServices {
       new ExplorationFeaturesService();
     upgradedServices['ExplorationMetadataObjectFactory'] =
       new ExplorationMetadataObjectFactory();
-    upgradedServices['ExplorationOpportunitySummaryObjectFactory'] =
-      new ExplorationOpportunitySummaryObjectFactory();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
     upgradedServices['ExternalSaveService'] = new ExternalSaveService();
     upgradedServices['FeedbackMessageSummaryObjectFactory'] =

@@ -24,7 +24,7 @@ import { Injectable } from '@angular/core';
 import {
   ExplorationOpportunitySummary,
   ExplorationOpportunitySummaryBackendDict
-} from 'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+} from 'domain/opportunity/exploration-opportunity-summary.model';
 import { SkillOpportunity, SkillOpportunityBackendDict } from
   'domain/opportunity/SkillOpportunityObjectFactory';
 import { UrlInterpolationService } from

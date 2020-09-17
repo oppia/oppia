@@ -17,9 +17,6 @@
  * exploration opportunity summary domain object.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export interface TranslationCountsDict {
   [languageCode: string]: number
 }
@@ -53,6 +50,15 @@ export class ExplorationOpportunitySummary {
     this.translationCounts = translationCounts;
   }
 
+  static createFromBackendDict(
+      backendDict: ExplorationOpportunitySummaryBackendDict):
+      ExplorationOpportunitySummary {
+    return new ExplorationOpportunitySummary(
+      backendDict.id, backendDict.topic_name, backendDict.story_title,
+      backendDict.chapter_title, backendDict.content_count,
+      backendDict.translation_counts);
+  }
+
   getExplorationId(): string {
     return this.id;
   }
@@ -79,21 +85,3 @@ export class ExplorationOpportunitySummary {
     return progressPercentage;
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class ExplorationOpportunitySummaryObjectFactory {
-  createFromBackendDict(
-      backendDict: ExplorationOpportunitySummaryBackendDict):
-      ExplorationOpportunitySummary {
-    return new ExplorationOpportunitySummary(
-      backendDict.id, backendDict.topic_name, backendDict.story_title,
-      backendDict.chapter_title, backendDict.content_count,
-      backendDict.translation_counts);
-  }
-}
-
-angular.module('oppia').factory(
-  'ExplorationOpportunitySummaryObjectFactory',
-  downgradeInjectable(ExplorationOpportunitySummaryObjectFactory));

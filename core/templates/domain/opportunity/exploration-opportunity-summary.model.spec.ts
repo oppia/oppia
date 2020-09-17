@@ -17,19 +17,15 @@
  */
 
 import {
+  ExplorationOpportunitySummary,
   ExplorationOpportunitySummaryBackendDict,
-  ExplorationOpportunitySummaryObjectFactory
-} from 'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+} from 'domain/opportunity/exploration-opportunity-summary.model';
 
 describe('Exploration opportunity summary object factory', () => {
   describe('ExplorationOpportunitySummaryObjectFactory', () => {
-    let explorationOpportunitySummaryObjectFactory: (
-      ExplorationOpportunitySummaryObjectFactory);
     let backendDict: ExplorationOpportunitySummaryBackendDict;
 
     beforeEach(() => {
-      explorationOpportunitySummaryObjectFactory = (
-        new ExplorationOpportunitySummaryObjectFactory());
       backendDict = {
         id: 'exp_id',
         topic_name: 'Topic',
@@ -44,7 +40,7 @@ describe('Exploration opportunity summary object factory', () => {
 
     it('should return a correct exploration id', () => {
       let explorationOpportunitySummary = (
-        explorationOpportunitySummaryObjectFactory.createFromBackendDict(
+        ExplorationOpportunitySummary.createFromBackendDict(
           backendDict));
 
       expect(explorationOpportunitySummary.getExplorationId()).toEqual(
@@ -53,7 +49,7 @@ describe('Exploration opportunity summary object factory', () => {
 
     it('should return a correct opportunity heading', () => {
       let explorationOpportunitySummary = (
-        explorationOpportunitySummaryObjectFactory.createFromBackendDict(
+        ExplorationOpportunitySummary.createFromBackendDict(
           backendDict));
 
       expect(explorationOpportunitySummary.getOpportunityHeading()).toEqual(
@@ -62,7 +58,7 @@ describe('Exploration opportunity summary object factory', () => {
 
     it('should return a correct opportunity subheading', () => {
       let explorationOpportunitySummary = (
-        explorationOpportunitySummaryObjectFactory.createFromBackendDict(
+        ExplorationOpportunitySummary.createFromBackendDict(
           backendDict));
 
       expect(explorationOpportunitySummary.getOpportunitySubheading()).toEqual(
@@ -71,7 +67,7 @@ describe('Exploration opportunity summary object factory', () => {
 
     it('should return a correct content count', () => {
       let explorationOpportunitySummary = (
-        explorationOpportunitySummaryObjectFactory.createFromBackendDict(
+        ExplorationOpportunitySummary.createFromBackendDict(
           backendDict));
 
       expect(explorationOpportunitySummary.getContentCount()).toEqual(100);
@@ -79,7 +75,7 @@ describe('Exploration opportunity summary object factory', () => {
 
     it('should return a correct translation progress percentage', () => {
       let explorationOpportunitySummary = (
-        explorationOpportunitySummaryObjectFactory.createFromBackendDict(
+        ExplorationOpportunitySummary.createFromBackendDict(
           backendDict));
 
       expect(
@@ -90,7 +86,7 @@ describe('Exploration opportunity summary object factory', () => {
     it('should return a correct translation progress percentage for non ' +
       'existing language code', () => {
       let explorationOpportunitySummary = (
-        explorationOpportunitySummaryObjectFactory.createFromBackendDict(
+        ExplorationOpportunitySummary.createFromBackendDict(
           backendDict));
 
       expect(
