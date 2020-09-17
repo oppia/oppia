@@ -16,9 +16,6 @@
  * @fileoverview Object factory for creating audio languages.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 export interface AudioLanguageBackendDict {
   id: string;
   description: string;
@@ -35,19 +32,11 @@ export class AudioLanguage {
     this.description = description;
     this.relatedLanguages = relatedLanguages;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class AudioLanguageObjectFactory {
-  createFromDict(audioLanguageDict: AudioLanguageBackendDict): AudioLanguage {
+  static createFromDict(audioLanguageDict: AudioLanguageBackendDict): AudioLanguage {
     return new AudioLanguage(
       audioLanguageDict.id,
       audioLanguageDict.description,
       audioLanguageDict.relatedLanguages);
   }
 }
-angular.module('oppia').factory(
-  'AudioLanguageObjectFactory',
-  downgradeInjectable(AudioLanguageObjectFactory));

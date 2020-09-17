@@ -18,8 +18,6 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // topic-update.service.ts is upgraded to Angular 8.
-import { AudioLanguageObjectFactory } from
-  'domain/utilities/AudioLanguageObjectFactory';
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
@@ -118,8 +116,6 @@ describe('Topic update service', function() {
   };
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AudioLanguageObjectFactory', new AudioLanguageObjectFactory());
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value(
       'RecordedVoiceoversObjectFactory',

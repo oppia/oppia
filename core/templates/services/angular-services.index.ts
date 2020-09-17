@@ -193,7 +193,6 @@ import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { ProfileSummaryObjectFactory } from 'domain/user/profile-summary-object.factory';
 import { UserProfileObjectFactory } from 'domain/user/user-profile-object.factory';
 import { AudioFileObjectFactory } from 'domain/utilities/AudioFileObjectFactory';
-import { AudioLanguageObjectFactory } from 'domain/utilities/AudioLanguageObjectFactory';
 import { EntityContextObjectFactory } from 'domain/utilities/EntityContextObjectFactory';
 import { FileDownloadRequestObjectFactory } from 'domain/utilities/FileDownloadRequestObjectFactory';
 import { StopwatchObjectFactory } from 'domain/utilities/StopwatchObjectFactory';
@@ -373,7 +372,6 @@ export const angularServices: [string, unknown][] = [
   ['AssignedSkillObjectFactory', AssignedSkillObjectFactory],
   ['AudioBarStatusService', AudioBarStatusService],
   ['AudioFileObjectFactory', AudioFileObjectFactory],
-  ['AudioLanguageObjectFactory', AudioLanguageObjectFactory],
   ['AudioTranslationLanguageService', AudioTranslationLanguageService],
   ['AudioTranslationManagerService', AudioTranslationManagerService],
   ['AugmentedSkillSummaryObjectFactory', AugmentedSkillSummaryObjectFactory],

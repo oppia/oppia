@@ -22,8 +22,6 @@ import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory';
-import { AudioLanguageObjectFactory } from
-  'domain/utilities/AudioLanguageObjectFactory';
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -72,8 +70,6 @@ describe('Audio preloader service', function() {
           new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
           new RuleObjectFactory()));
       $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
-      $provide.value(
-        'AudioLanguageObjectFactory', new AudioLanguageObjectFactory());
       $provide.value(
         'FileDownloadRequestObjectFactory',
         new FileDownloadRequestObjectFactory());

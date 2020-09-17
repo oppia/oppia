@@ -13,18 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for AudioLanguageObjectFactory.
+ * @fileoverview Unit tests for AudioLanguage.
  */
 
-import { AudioLanguage, AudioLanguageObjectFactory } from
-  'domain/utilities/AudioLanguageObjectFactory';
+import { AudioLanguage } from
+  'domain/utilities/audio-language.model';
 
 describe('AudioLanguage object factory', () => {
   let audioLanguage: AudioLanguage;
-  let alof: AudioLanguageObjectFactory;
   beforeEach(() => {
-    alof = new AudioLanguageObjectFactory();
-    audioLanguage = alof.createFromDict({
+    audioLanguage = AudioLanguage.createFromDict({
       id: 'a',
       description: 'a description',
       relatedLanguages: ['English'],

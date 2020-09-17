@@ -60,8 +60,6 @@ import { AssignedSkillObjectFactory } from
 import { AudioBarStatusService } from 'services/audio-bar-status.service';
 import { AudioFileObjectFactory } from
   'domain/utilities/AudioFileObjectFactory';
-import { AudioLanguageObjectFactory } from
-  'domain/utilities/AudioLanguageObjectFactory';
 import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { AudioTranslationManagerService } from
@@ -694,8 +692,6 @@ export class UpgradedServices {
       new AssignedSkillObjectFactory();
     upgradedServices['AudioBarStatusService'] = new AudioBarStatusService();
     upgradedServices['AudioFileObjectFactory'] = new AudioFileObjectFactory();
-    upgradedServices['AudioLanguageObjectFactory'] =
-      new AudioLanguageObjectFactory();
     upgradedServices['AudioTranslationManagerService'] =
       new AudioTranslationManagerService();
     upgradedServices['AugmentedSkillSummaryObjectFactory'] =
@@ -1187,7 +1183,6 @@ export class UpgradedServices {
     upgradedServices['HttpClient'] = new HttpClient(
       upgradedServices['HttpXhrBackend']);
     upgradedServices['LanguageUtilService'] = new LanguageUtilService(
-      upgradedServices['AudioLanguageObjectFactory'],
       upgradedServices['BrowserCheckerService']);
     upgradedServices['NumberWithUnitsValidationService'] =
       new NumberWithUnitsValidationService(
