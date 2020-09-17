@@ -653,8 +653,8 @@ class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, translation_reviewer_counts_per_lang={},
-            translation_suggestion_counts_per_lang={},
+            cls, translation_reviewer_counts_per_lang=0,
+            translation_suggestion_counts_per_lang=0,
             question_reviewer_count=0, question_suggestion_count=0):
         """Creates a new ReviewerAndSuggestionCountsModel entry.
 
