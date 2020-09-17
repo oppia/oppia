@@ -169,8 +169,6 @@ import { EndExplorationRulesService } from
   'interactions/EndExploration/directives/end-exploration-rules.service';
 import { EndExplorationValidationService } from
   'interactions/EndExploration/directives/end-exploration-validation.service';
-import { EntityContextObjectFactory } from
-  'domain/utilities/EntityContextObjectFactory';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
 import { ExplorationDraftObjectFactory } from
@@ -733,8 +731,6 @@ export class UpgradedServices {
       new EmailDashboardQueryObjectFactory();
     upgradedServices['EndExplorationRulesService'] =
       new EndExplorationRulesService();
-    upgradedServices['EntityContextObjectFactory'] =
-      new EntityContextObjectFactory();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
     upgradedServices['ExplorationDraftObjectFactory'] =
       new ExplorationDraftObjectFactory();
@@ -1151,8 +1147,7 @@ export class UpgradedServices {
       upgradedServices['RecordedVoiceoversObjectFactory'],
       upgradedServices['WorkedExampleObjectFactory']);
     upgradedServices['ContextService'] = new ContextService(
-      upgradedServices['UrlService'],
-      upgradedServices['EntityContextObjectFactory']);
+      upgradedServices['UrlService']);
     upgradedServices['EditorFirstTimeEventsService'] =
       new EditorFirstTimeEventsService(
         upgradedServices['SiteAnalyticsService']);

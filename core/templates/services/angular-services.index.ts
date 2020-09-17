@@ -192,7 +192,6 @@ import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_ski
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { ProfileSummaryObjectFactory } from 'domain/user/profile-summary-object.factory';
 import { UserProfileObjectFactory } from 'domain/user/user-profile-object.factory';
-import { EntityContextObjectFactory } from 'domain/utilities/EntityContextObjectFactory';
 import { FileDownloadRequestObjectFactory } from 'domain/utilities/FileDownloadRequestObjectFactory';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
@@ -432,7 +431,6 @@ export const angularServices: [string, unknown][] = [
     EmailDashboardQueryResultsObjectFactory],
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
-  ['EntityContextObjectFactory', EntityContextObjectFactory],
   ['ExplorationDiffService', ExplorationDiffService],
   ['ExplorationDraftObjectFactory', ExplorationDraftObjectFactory],
   ['ExplorationFeaturesBackendApiService',

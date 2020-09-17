@@ -204,8 +204,6 @@ import { EmailDashboardQueryObjectFactory } from
   'domain/email-dashboard/email-dashboard-query-object.factory';
 import { EmailDashboardQueryResultsObjectFactory } from
   'domain/email-dashboard/email-dashboard-query-results-object.factory';
-import { EntityContextObjectFactory } from
-  'domain/utilities/EntityContextObjectFactory';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
 import { ExplorationDraftObjectFactory } from
@@ -775,7 +773,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static emailDashboardQueryResultsObjectFactory: EmailDashboardQueryResultsObjectFactory;
   static endExplorationRulesService: EndExplorationRulesService;
   static endExplorationValidationService: EndExplorationValidationService;
-  static entityContextObjectFactory: EntityContextObjectFactory;
   static explorationDiffService: ExplorationDiffService;
   static explorationDraftObjectFactory: ExplorationDraftObjectFactory;
   static explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService;
@@ -1101,7 +1098,6 @@ private emailDashboardQueryObjectFactory: EmailDashboardQueryObjectFactory,
 private emailDashboardQueryResultsObjectFactory: EmailDashboardQueryResultsObjectFactory,
 private endExplorationRulesService: EndExplorationRulesService,
 private endExplorationValidationService: EndExplorationValidationService,
-private entityContextObjectFactory: EntityContextObjectFactory,
 private explorationDiffService: ExplorationDiffService,
 private explorationDraftObjectFactory: ExplorationDraftObjectFactory,
 private explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService,
@@ -1428,7 +1424,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.emailDashboardQueryResultsObjectFactory = this.emailDashboardQueryResultsObjectFactory;
     OppiaAngularRootComponent.endExplorationRulesService = this.endExplorationRulesService;
     OppiaAngularRootComponent.endExplorationValidationService = this.endExplorationValidationService;
-    OppiaAngularRootComponent.entityContextObjectFactory = this.entityContextObjectFactory;
     OppiaAngularRootComponent.explorationDiffService = this.explorationDiffService;
     OppiaAngularRootComponent.explorationDraftObjectFactory = this.explorationDraftObjectFactory;
     OppiaAngularRootComponent.explorationFeaturesBackendApiService = this.explorationFeaturesBackendApiService;

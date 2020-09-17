@@ -17,9 +17,6 @@
  * objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 export class EntityContext {
   _id: string;
   _type: string;
@@ -36,17 +33,8 @@ export class EntityContext {
   getType(): string {
     return this._type;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class EntityContextObjectFactory {
-  create(id: string, type: string): EntityContext {
+  static create(id: string, type: string): EntityContext {
     return new EntityContext(id, type);
   }
 }
-
-angular.module('oppia').factory(
-  'EntityContextObjectFactory',
-  downgradeInjectable(EntityContextObjectFactory));
