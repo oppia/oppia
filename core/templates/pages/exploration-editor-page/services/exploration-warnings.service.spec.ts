@@ -47,8 +47,6 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { ParamMetadataObjectFactory } from
-  'domain/exploration/ParamMetadataObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -116,8 +114,6 @@ describe('Exploration Warnings Service', function() {
     $provide.value(
       'ParamChangesObjectFactory', new ParamChangesObjectFactory(
         new ParamChangeObjectFactory()));
-    $provide.value(
-      'ParamMetadataObjectFactory', new ParamMetadataObjectFactory());
     $provide.value(
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));

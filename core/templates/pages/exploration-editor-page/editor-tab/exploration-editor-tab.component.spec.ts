@@ -41,8 +41,6 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { ParamMetadataObjectFactory } from
-  'domain/exploration/ParamMetadataObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -133,8 +131,6 @@ describe('Exploration editor tab component', function() {
       'ParamChangeObjectFactory', TestBed.get(ParamChangeObjectFactory));
     $provide.value(
       'ParamChangesObjectFactory', TestBed.get(ParamChangesObjectFactory));
-    $provide.value(
-      'ParamMetadataObjectFactory', TestBed.get(ParamMetadataObjectFactory));
     $provide.value(
       'RecordedVoiceoversObjectFactory',
       TestBed.get(RecordedVoiceoversObjectFactory));
