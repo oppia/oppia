@@ -18,7 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { Title } from '@angular/platform-browser';
+import { Meta, Title } from '@angular/platform-browser';
 import {
   HttpClient,
   HttpXhrBackend,
@@ -829,6 +829,7 @@ export class UpgradedServices {
       new UtilsService);
     upgradedServices['MathEquationInputRulesService'] =
       new MathEquationInputRulesService();
+    upgradedServices['Meta'] = new Meta({});
     upgradedServices['MisconceptionObjectFactory'] =
       new MisconceptionObjectFactory();
     upgradedServices['MultipleChoiceInputRulesService'] =
@@ -1077,7 +1078,7 @@ export class UpgradedServices {
     upgradedServices['OutcomeObjectFactory'] =
       new OutcomeObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['PageTitleService'] = new PageTitleService(
-      upgradedServices['Title']);
+      upgradedServices['Meta'], upgradedServices['Title']);
     upgradedServices['ParamChangesObjectFactory'] =
       new ParamChangesObjectFactory(
         upgradedServices['ParamChangeObjectFactory']);
