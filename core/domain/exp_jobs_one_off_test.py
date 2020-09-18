@@ -72,14 +72,14 @@ def run_job_for_deleted_exp(
     # Check there is one job in the taskqueue corresponding to
     # delete_exploration_from_subscribed_users.
     self.assertEqual(
-        self.count_jobs_in_mapreduce_taskqueue(
+        self.count_jobs_in_taskqueue(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
     job_class.enqueue(job_id)
     self.assertEqual(
         self.count_jobs_in_mapreduce_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 2)
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
     self.process_and_flush_pending_mapreduce_tasks()
-
+    self.process_and_flush_pending_tasks()
     if check_error:
         with self.assertRaisesRegexp(error_type, error_msg):
             function_to_be_called(exp_id)

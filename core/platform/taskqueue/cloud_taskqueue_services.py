@@ -54,11 +54,13 @@ def create_http_task(
     parent = CLIENT.queue_path(
         feconf.OPPIA_PROJECT_ID, feconf.GOOGLE_APP_ENGINE_REGION, queue_name)
 
+    complete_url = '%s%s' % (feconf.OPPIA_SITE_URL, url)
     # Construct the request body.
     task = {
         'http_request': {  # Specify the type of request.
             'http_method': 1,
-            'url': url,  # The full url path that the task will be sent to.
+            'url': complete_url,
+            # The full url path that the task will be sent to.
         }
     }
 

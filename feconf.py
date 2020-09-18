@@ -676,6 +676,10 @@ GOOGLE_GROUP_URL = (
 # External URL for the Foundation site.
 FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
 
+# External URL for the oppia production site. Change this for internal testing
+# in testing production environments.
+OPPIA_SITE_URL = 'https://oppia.org'
+
 # Prefix for all taskqueue-related URLs.
 TASKQUEUE_URL_PREFIX = '/task'
 TASK_URL_FEEDBACK_MESSAGE_EMAILS = (
