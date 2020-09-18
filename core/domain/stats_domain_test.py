@@ -427,7 +427,7 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
     """Tests the SessionStateStats domain object."""
 
     def test_from_dict(self):
-        state_stats_dict = {
+        session_state_stats_dict = {
             'total_answers_count': 10,
             'useful_feedback_count': 4,
             'total_hit_count': 18,
@@ -435,32 +435,32 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
             'num_times_solution_viewed': 2,
             'num_completions': 2
         }
-        state_stats = stats_domain.SessionStateStats(10, 4, 18, 7, 2, 2)
-        expected_state_stats = stats_domain.SessionStateStats.from_dict(
-            state_stats_dict)
+        session_state_stats = stats_domain.SessionStateStats(10, 4, 18, 7, 2, 2)
+        expected_session_state_stats = stats_domain.SessionStateStats.from_dict(
+            session_state_stats_dict)
         self.assertEqual(
-            state_stats.total_answers_count,
-            expected_state_stats.total_answers_count)
+            session_state_stats.total_answers_count,
+            expected_session_state_stats.total_answers_count)
         self.assertEqual(
-            state_stats.useful_feedback_count,
-            expected_state_stats.useful_feedback_count)
+            session_state_stats.useful_feedback_count,
+            expected_session_state_stats.useful_feedback_count)
         self.assertEqual(
-            state_stats.total_hit_count,
-            expected_state_stats.total_hit_count)
+            session_state_stats.total_hit_count,
+            expected_session_state_stats.total_hit_count)
         self.assertEqual(
-            state_stats.first_hit_count,
-            expected_state_stats.first_hit_count)
+            session_state_stats.first_hit_count,
+            expected_session_state_stats.first_hit_count)
         self.assertEqual(
-            state_stats.num_times_solution_viewed,
-            expected_state_stats.num_times_solution_viewed)
+            session_state_stats.num_times_solution_viewed,
+            expected_session_state_stats.num_times_solution_viewed)
         self.assertEqual(
-            state_stats.num_completions,
-            expected_state_stats.num_completions)
+            session_state_stats.num_completions,
+            expected_session_state_stats.num_completions)
 
     def test_repr(self):
-        state_stats = stats_domain.SessionStateStats(1, 2, 3, 4, 5, 6)
+        session_state_stats = stats_domain.SessionStateStats(1, 2, 3, 4, 5, 6)
         self.assertEqual(
-            '%r' % (state_stats,),
+            '%r' % (session_state_stats,),
             'SessionStateStats('
             'total_answers_count=1, '
             'useful_feedback_count=2, '
@@ -470,34 +470,34 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
             'num_completions=6)')
 
     def test_create_default(self):
-        state_stats = stats_domain.SessionStateStats.create_default()
-        self.assertEqual(state_stats.total_answers_count, 0)
-        self.assertEqual(state_stats.useful_feedback_count, 0)
-        self.assertEqual(state_stats.total_hit_count, 0)
-        self.assertEqual(state_stats.total_answers_count, 0)
-        self.assertEqual(state_stats.num_times_solution_viewed, 0)
-        self.assertEqual(state_stats.num_completions, 0)
+        session_state_stats = stats_domain.SessionStateStats.create_default()
+        self.assertEqual(session_state_stats.total_answers_count, 0)
+        self.assertEqual(session_state_stats.useful_feedback_count, 0)
+        self.assertEqual(session_state_stats.total_hit_count, 0)
+        self.assertEqual(session_state_stats.total_answers_count, 0)
+        self.assertEqual(session_state_stats.num_times_solution_viewed, 0)
+        self.assertEqual(session_state_stats.num_completions, 0)
 
     def test_equality(self):
-        state_stats_a = stats_domain.SessionStateStats.create_default()
-        state_stats_b = stats_domain.SessionStateStats.create_default()
-        state_stats_c = stats_domain.SessionStateStats.create_default()
+        session_state_stats_a = stats_domain.SessionStateStats.create_default()
+        session_state_stats_b = stats_domain.SessionStateStats.create_default()
+        session_state_stats_c = stats_domain.SessionStateStats.create_default()
 
-        self.assertEqual(state_stats_a, state_stats_b)
-        self.assertEqual(state_stats_b, state_stats_c)
-        self.assertEqual(state_stats_a, state_stats_c)
+        self.assertEqual(session_state_stats_a, session_state_stats_b)
+        self.assertEqual(session_state_stats_b, session_state_stats_c)
+        self.assertEqual(session_state_stats_a, session_state_stats_c)
 
-        state_stats_a.total_answers_count += 1
-        self.assertEqual(state_stats_b, state_stats_c)
-        self.assertNotEqual(state_stats_a, state_stats_b)
-        self.assertNotEqual(state_stats_a, state_stats_c)
+        session_state_stats_a.total_answers_count += 1
+        self.assertEqual(session_state_stats_b, session_state_stats_c)
+        self.assertNotEqual(session_state_stats_a, session_state_stats_b)
+        self.assertNotEqual(session_state_stats_a, session_state_stats_c)
 
-        state_stats_b.total_answers_count += 1
-        state_stats_c.total_answers_count += 1
+        session_state_stats_b.total_answers_count += 1
+        session_state_stats_c.total_answers_count += 1
 
-        self.assertEqual(state_stats_a, state_stats_b)
-        self.assertEqual(state_stats_b, state_stats_c)
-        self.assertEqual(state_stats_a, state_stats_c)
+        self.assertEqual(session_state_stats_a, session_state_stats_b)
+        self.assertEqual(session_state_stats_b, session_state_stats_c)
+        self.assertEqual(session_state_stats_a, session_state_stats_c)
 
     def test_equality_with_different_class(self):
         class DifferentStats(python_utils.OBJECT):
@@ -505,15 +505,15 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
 
             pass
 
-        state_stats = stats_domain.SessionStateStats.create_default()
+        session_state_stats = stats_domain.SessionStateStats.create_default()
         different_stats = DifferentStats()
 
-        self.assertFalse(state_stats == different_stats)
+        self.assertFalse(session_state_stats == different_stats)
 
     def test_hash(self):
-        state_stats = stats_domain.SessionStateStats.create_default()
+        session_state_stats = stats_domain.SessionStateStats.create_default()
         with self.assertRaisesRegexp(TypeError, 'unhashable'):
-            unused_hash = hash(state_stats)
+            unused_hash = hash(session_state_stats)
 
     def test_to_dict(self):
         self.assertEqual(
