@@ -442,7 +442,7 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
 
 
 class RemoveGaeUserIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that deletes the gae_user_id from the UserSettingsModel
+    """Job that deletes the gae_user_id from the UserSettingsModel.
     """
 
     @classmethod
@@ -451,6 +451,9 @@ class RemoveGaeUserIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(user_settings_model):
+        # This is an only way to remove the field from the model,
+        # see https://stackoverflow.com/a/15116016/3688189 and
+        # https://stackoverflow.com/a/12701172/3688189.
         if 'gae_user_id' in user_settings_model._properties:  # pylint: disable=protected-access
             del user_settings_model._properties['gae_user_id']  # pylint: disable=protected-access
             if 'gae_user_id' in user_settings_model._values:  # pylint: disable=protected-access

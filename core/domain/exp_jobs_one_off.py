@@ -479,7 +479,7 @@ class RTECustomizationArgsValidationOneOffJob(
 
 
 class RemoveTranslatorIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that deletes the translator_ids from the ExpSummaryModel
+    """Job that deletes the translator_ids from the ExpSummaryModel.
     """
 
     @classmethod
@@ -488,6 +488,9 @@ class RemoveTranslatorIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(exp_summary_model):
+        # This is an only way to remove the field from the model,
+        # see https://stackoverflow.com/a/15116016/3688189 and
+        # https://stackoverflow.com/a/12701172/3688189.
         if 'translator_ids' in exp_summary_model._properties:  # pylint: disable=protected-access
             del exp_summary_model._properties['translator_ids']  # pylint: disable=protected-access
             if 'translator_ids' in exp_summary_model._values:  # pylint: disable=protected-access
