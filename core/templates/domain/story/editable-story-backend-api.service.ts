@@ -22,8 +22,16 @@ import { HttpClient } from '@angular/common/http';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants';
-import cloneDeep from 'lodash/cloneDeep';
+// Import cloneDeep from 'lodash/cloneDeep';
 
+interface FetchStoryResponse {
+  'story':object;
+  'topic_name':string;
+  'story_is_published':boolean;
+  'skill_summaries':object;
+  'topic_url_fragment':string;
+  'classroomUrlFragment':string;
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -40,16 +48,16 @@ export class EditableStoryBackendApiService {
       StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
         story_id: storyId
       });
-    this.http.get(
+    this.http.get<FetchStoryResponse>(
       editableStoryDataUrl).toPromise().then(
-      (response: any) => {
-        this.storyDataDict = cloneDeep(response.body);
-        var story = angular.copy(response.body.story);
-        var topicName = angular.copy(response.body.topic_name);
-        var storyIsPublished = response.body.story_is_published;
-        var skillSummaries = angular.copy(response.body.skill_summaries);
-        var topicUrlFragment = response.body.topic_url_fragment;
-        var classroomUrlFragment = response.body.classroomUrlFragment;
+      (response) => {
+        // This.storyDataDict = cloneDeep(response);
+        var story = angular.copy(response.story);
+        var topicName = angular.copy(response.topic_name);
+        var storyIsPublished = response.story_is_published;
+        var skillSummaries = angular.copy(response.skill_summaries);
+        var topicUrlFragment = response.topic_url_fragment;
+        var classroomUrlFragment = response.classroomUrlFragment;
         if (successCallback) {
           successCallback({
             story: story,
@@ -57,7 +65,7 @@ export class EditableStoryBackendApiService {
             storyIsPublished: storyIsPublished,
             skillSummaries: skillSummaries,
             topicUrlFragment: topicUrlFragment,
-            classroomUrlFragment: classroomUrlFragment
+            classroomUrlFragment: classroomUrlFragment 
           });
           // SuccessCallback(this.storyDataDict);
         }

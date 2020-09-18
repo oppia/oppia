@@ -88,7 +88,7 @@ describe('Editable story backend API service', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch an existing story from the backend',
+  fit('should successfully fetch an existing story from the backend',
     fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
@@ -105,7 +105,9 @@ describe('Editable story backend API service', () => {
         story: sampleDataResults.story,
         topic_name: sampleDataResults.topic_name,
         story_is_published: true,
-        skill_summaries: sampleDataResults.skill_summaries
+        skill_summaries: sampleDataResults.skill_summaries,
+        topic_url_fragement: undefined,
+        classroomUrlFragement: undefined
       });
       expect(failHandler).not.toHaveBeenCalled();
     }
@@ -128,7 +130,7 @@ describe('Editable story backend API service', () => {
     }
     ));
 
-  it('should use the rejection handler if the backend request failed',
+  fit('should use the rejection handler if the backend request failed',
     fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
