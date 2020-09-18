@@ -859,7 +859,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'activity_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'entity_ids': base_models.EXPORT_POLICY.EXPORTED,
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'general_feedback_thread_ids':
                 base_models.EXPORT_POLICY.EXPORTED,
@@ -916,7 +916,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
             creator.username for creator in creator_user_models]
 
         user_data = {
-            'activity_ids': user_model.activity_ids,
+            'entity_ids': user_model.activity_ids,
             'collection_ids': user_model.collection_ids,
             'general_feedback_thread_ids': (
                 user_model.general_feedback_thread_ids),
@@ -2313,12 +2313,12 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     # IDs of all the private collections created by this user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
-    # A dict mapping model IDs to pseudonymous user IDs. Each type of activity
+    # A dict mapping model IDs to pseudonymous user IDs. Each type of entity
     # is grouped under different key (story, skill, question), the keys need to
-    # be from the core.platform.models.NAMES enum. For each activity, we use
+    # be from the core.platform.models.NAMES enum. For each entity, we use
     # a different pseudonymous user ID. Note that all these pseudonymous
     # user IDs originate from the same about-to-be-deleted user. If a key is
-    # absent from the activity_mappings dict, this means that for this activity
+    # absent from the entity_mappings dict, this means that for this entity
     # type the mappings are not yet generated.
     # Example structure: {
     #     'skill': {'skill_id': 'pseudo_user_id_1'},
@@ -2329,7 +2329,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     #     },
     #     'question': {}
     # }
-    activity_mappings = ndb.JsonProperty(default={})
+    entity_mappings = ndb.JsonProperty(default={})
 
     @staticmethod
     def get_deletion_policy():
@@ -2349,7 +2349,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
             'deletion_complete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'collection_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'activity_mappings': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_mappings': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'role': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 

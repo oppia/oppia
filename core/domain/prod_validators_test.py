@@ -15031,13 +15031,13 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_incorrect_keys_in_activity_mappings(self):
-        self.model_instance.activity_mappings = {'wrong_key': {'some_id': 'id'}}
+        self.model_instance.entity_mappings = {'wrong_key': {'some_id': 'id'}}
         self.model_instance.put()
         expected_output = [
             (
-                u'[u\'failed validation check for correct activity_mappings '
+                u'[u\'failed validation check for correct entity_mappings '
                 'check of PendingDeletionRequestModel\', '
-                '[u"Entity id %s: activity_mappings contains keys '
+                '[u"Entity id %s: entity_mappings contains keys '
                 '[u\'wrong_key\'] that are not allowed"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)

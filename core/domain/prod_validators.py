@@ -4133,7 +4133,7 @@ class UserSubscriptionsModelValidator(
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.ExternalModelFetcherDetails(
-                'activity_ids', exp_models.ExplorationModel, item.activity_ids),
+                'entity_ids', exp_models.ExplorationModel, item.activity_ids),
             base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids', collection_models.CollectionModel,
                 item.collection_ids),
@@ -5148,7 +5148,7 @@ class PendingDeletionRequestModelValidator(
 
     @classmethod
     def _validate_activity_mapping_contains_only_allowed_keys(cls, item):
-        """Validates that activity_mappings keys are only from
+        """Validates that entity_mappings keys are only from
         the core.platform.models.NAMES enum.
 
         Args:
@@ -5156,14 +5156,14 @@ class PendingDeletionRequestModelValidator(
                 to validate.
         """
         incorrect_keys = []
-        for key in item.activity_mappings.keys():
+        for key in item.entity_mappings.keys():
             if key not in [name for name in models.NAMES.__dict__]:
                 incorrect_keys.append(key)
 
         if incorrect_keys:
             cls._add_error(
-                'correct activity_mappings check',
-                'Entity id %s: activity_mappings contains keys %s that are not '
+                'correct entity_mappings check',
+                'Entity id %s: entity_mappings contains keys %s that are not '
                 'allowed' % (item.id, incorrect_keys))
 
     @classmethod

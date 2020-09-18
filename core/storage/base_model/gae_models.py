@@ -1117,7 +1117,7 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Metadata models should always be psoudonymized in the context of
+        """Metadata models should always be pseudonymized in the context of
         their parent models.
         """
         return DELETION_POLICY.LOCALLY_PSEUDONYMIZE
@@ -1223,9 +1223,10 @@ class BaseSnapshotContentModel(BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """The content models do not contain any user ID fields, they might be
-        hidden inside the content field but that is handled in the wipeout
-        service.
+        """The content models do not contain any user ID fields directly,
+        the user ID fields might be hidden inside the content field (because
+        content field contains all the fields from the parent model) but this is
+        handled in the wipeout service.
         """
         return DELETION_POLICY.NOT_APPLICABLE
 
