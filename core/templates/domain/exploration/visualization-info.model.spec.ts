@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for visualization-info.model.
+ * @fileoverview Unit tests for VisualizationInfo.
  */
 
 import { VisualizationInfo } from

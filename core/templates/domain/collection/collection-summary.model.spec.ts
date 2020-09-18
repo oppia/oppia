@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for collectio  Summary Object Factory.
+ * @fileoverview Unit tests for CollectionSummary.
  */
 
 import { CollectionSummary } from './collection-summary.model';

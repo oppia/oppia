@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Review test object factory.
+ * @fileoverview Unit tests for ReviewTest.
  */
 
 import { ReviewTest } from

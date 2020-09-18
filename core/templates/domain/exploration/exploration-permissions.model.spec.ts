@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for exploration-permissions-model.
+ * @fileoverview Unit tests for ExplorationPermissions.
  */
 
 import { ExplorationPermissions } from

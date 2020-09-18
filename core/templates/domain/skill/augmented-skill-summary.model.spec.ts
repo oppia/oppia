@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Augmented skill summary object factory.
+ * @fileoverview Unit tests for AugmentedSkillSummary.
  */
 
 import { AugmentedSkillSummary } from

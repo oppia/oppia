@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for learner-answer-detail-model.
+ * @fileoverview Tests for LearnerAnswerDetail.
  */
 
 import { LearnerAnswerDetails } from

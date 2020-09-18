@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for feature-status-summary-model.
+ * @fileoverview Unit tests for FeatureStatusSummary.
  */
 
 import { FeatureStatusSummary, FeatureNames } from

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ComputationDataObjectFactory.ts.
+ * @fileoverview Unit tests for ComputationData.
  */
 
 import { ComputationData } from

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for assigned-skill.model.ts.
+ * @fileoverview Unit tests for AssignedSkill.
  */
 
 import { AssignedSkill} from

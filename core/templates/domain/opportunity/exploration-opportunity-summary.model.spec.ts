@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ExplorationOpportunitySummaryObjectFactory.
+ * @fileoverview Unit tests for ExplorationOpportunitySummary.
  */
 
 import {

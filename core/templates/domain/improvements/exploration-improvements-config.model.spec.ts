@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Tests for ExplorationImprovementsConfigModel.
+ * @fileoverview Tests for ExplorationImprovementsConfig.
  */
 
 import {

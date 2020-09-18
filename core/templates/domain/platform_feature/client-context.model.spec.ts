@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for client-context-model.
+ * @fileoverview Unit tests for ClientContext.
  */
 
 import { ClientContext } from

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for Featured Translation Language Model.
+ * @fileoverview Tests for FeaturedTranslationLanguage.
  */
 
 import {

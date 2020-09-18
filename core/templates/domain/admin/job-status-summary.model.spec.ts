@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for JobSpecObjectFactory.ts.
+ * @fileoverview Unit tests for JobStatusSummary.
  */
 
 import { JobStatusSummary } from

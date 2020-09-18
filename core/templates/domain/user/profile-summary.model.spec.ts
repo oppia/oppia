@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Subscriber Summary Object Factory.
+ * @fileoverview Unit tests for ProfileSummary.
  */
 
 import { ProfileSummary } from

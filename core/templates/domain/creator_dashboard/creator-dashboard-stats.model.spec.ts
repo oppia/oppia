@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Creator Dashboard Stats Object Factory.
+ * @fileoverview Unit tests for CreatorDashboardStats.
  */
 
 import { CreatorDashboardStats } from

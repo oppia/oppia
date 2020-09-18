@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Skill summary object factory.
+ * @fileoverview Unit tests for SkillSummary.
  */
 
 import { SkillSummary } from './skill-summary.model';

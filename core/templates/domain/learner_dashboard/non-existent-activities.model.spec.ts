@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Non existent activities model.
+ * @fileoverview Unit tests for NonExistentActivities.
  */
 
 import { NonExistentActivities } from
