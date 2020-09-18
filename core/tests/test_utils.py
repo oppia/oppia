@@ -191,7 +191,7 @@ class TaskqueueServicesStub(python_utils.OBJECT):
         Args:
             url: str. URL of the handler function.
             payload: dict(str : *). Payload to pass to the request. Defaults
-                    to None if no payload is required.
+                to None if no payload is required.
             queue_name: str. The name of the queue to add the task to.
             task_name: str|None. Optional. The name of the task.
         """
@@ -1152,7 +1152,7 @@ tags: []
             payload['csrf_token'] = csrf_token
         app = webtest.TestApp(main_taskqueue.app)
         json_response = app.post(
-            url, json.dumps(payload), content_type='application/json',
+            url, params=json.dumps(payload), content_type='application/json',
             expect_errors=expect_errors, headers=headers,
             status=expected_status_int)
         return json_response

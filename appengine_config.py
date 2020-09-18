@@ -57,4 +57,4 @@ pkg_resources.working_set.add_entry(
 # We need to reload at the very end of this file because we have to add the
 # six python path to the app engine vendor first.
 import six # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-reload(six) # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+reload(six) # pylint: disable=reload-builtin

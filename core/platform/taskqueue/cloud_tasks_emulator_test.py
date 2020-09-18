@@ -20,9 +20,11 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import time
-import python_utils
+
 from core.platform.taskqueue import cloud_tasks_emulator
 from core.tests import test_utils
+import python_utils
+
 
 class CloudTasksEmulatorUnitTests(test_utils.TestBase):
     """Tests for cloud tasks emulator."""

@@ -236,6 +236,6 @@ class Emulator(python_utils.OBJECT):
             return self._queues[queue_name]
         else:
             tasks_list = []
-            for queue_name, task_list in self._queues.items():
-                tasks_list.extend(task_list)
+            for items in self._queues.items():
+                tasks_list.extend(items[1])
             return tasks_list
