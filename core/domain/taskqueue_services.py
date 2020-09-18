@@ -93,7 +93,7 @@ def defer(fn_identifier, queue_name, *args, **kwargs):
 
 
 def enqueue_task(url, params, countdown):
-    '''Adds a new task for sending email.
+    """Adds a new task for sending email.
 
     Args:
         url: str. Url of the handler function.
@@ -104,7 +104,7 @@ def enqueue_task(url, params, countdown):
 
     Raises:
         Exception. The params that are passed in are not JSON serializable.
-    '''
+    """
     try:
         json.dumps(params)
     except Exception:

@@ -248,6 +248,8 @@ libraries:
   version: 1.0.0
 - name: setuptools
   version: 36.6.0
+- name: protobuf
+  version: 3.0.0
 
 # This is an access connector that connects to the Google Cloud Redis instance
 # used for memory caching. Please replace PROJECT_ID with the correct project id
@@ -303,6 +305,9 @@ skip_files:
 - third_party/python_libs/google/appengine/
 - third_party/python_libs/google/net/
 - third_party/python_libs/google/pyglib/
+- third_party/python_libs/google/protobuf/
+- third_party/python_libs/google/grpc/
+
 # CKEditor-4.12.1 plugins in the download from the CKEditor website include
 # only a11yhelp, about, clipboard, colordialog, copyformatting, dialog, div,
 # find, flash, forms, iframe, image, link, liststyle, magicline, pagebreak,
