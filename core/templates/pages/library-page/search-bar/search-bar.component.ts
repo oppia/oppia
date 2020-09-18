@@ -54,6 +54,9 @@ angular.module('oppia').component('searchBar', {
       ctrl.classroomBackendApiService = (
         OppiaAngularRootComponent.classroomBackendApiService);
 
+      ctrl.classroomPageIsActive = (
+        UrlService.getPathname().startsWith('/learn'));
+
       ctrl.isSearchInProgress = function() {
         return SearchService.isSearchInProgress();
       };
