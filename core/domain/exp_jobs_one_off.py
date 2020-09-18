@@ -488,7 +488,7 @@ class RemoveTranslatorIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(exp_summary_model):
-        # This is an only way to remove the field from the model,
+        # This is the only way to remove the field from the model,
         # see https://stackoverflow.com/a/15116016/3688189 and
         # https://stackoverflow.com/a/12701172/3688189.
         if 'translator_ids' in exp_summary_model._properties:  # pylint: disable=protected-access
