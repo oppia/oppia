@@ -49,24 +49,24 @@ angular.module('oppia').factory('ParameterMetadataService', [
         if (pc.generatorId === 'Copier') {
           if (!pc.customizationArgs.parse_with_jinja) {
             result.push(ParamMetadata.createWithSetAction(
-              pc.name, PARAM_SOURCE_PARAM_CHANGES, i));
+              pc.name, PARAM_SOURCE_PARAM_CHANGES, String(i)));
           } else {
             var paramsReferenced = (
               ExpressionInterpolationService.getParamsFromString(
                 pc.customizationArgs.value));
             for (var j = 0; j < paramsReferenced.length; j++) {
               result.push(ParamMetadata.createWithGetAction(
-                paramsReferenced[j], PARAM_SOURCE_PARAM_CHANGES, i));
+                paramsReferenced[j], PARAM_SOURCE_PARAM_CHANGES, String(i)));
             }
 
             result.push(ParamMetadata.createWithSetAction(
-              pc.name, PARAM_SOURCE_PARAM_CHANGES, i));
+              pc.name, PARAM_SOURCE_PARAM_CHANGES, String(i)));
           }
         } else {
           // RandomSelector. Elements in the list of possibilities are treated
           // as raw unicode strings, not expressions.
           result.push(ParamMetadata.createWithSetAction(
-            pc.name, PARAM_SOURCE_PARAM_CHANGES, i));
+            pc.name, PARAM_SOURCE_PARAM_CHANGES, String(i)));
         }
       }
 
