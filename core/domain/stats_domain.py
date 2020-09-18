@@ -559,7 +559,7 @@ class SessionStateStats(python_utils.OBJECT):
         self.num_completions = num_completions
 
     def __repr__(self):
-        """Returns a detailed representation of self."""
+        """Returns a detailed string representation of self."""
         props = [
             'total_answers_count',
             'useful_feedback_count',
@@ -574,7 +574,7 @@ class SessionStateStats(python_utils.OBJECT):
 
     def to_dict(self):
         """Returns a dict representation of self."""
-        state_stats_dict = {
+        session_state_stats_dict = {
             'total_answers_count': self.total_answers_count,
             'useful_feedback_count': self.useful_feedback_count,
             'total_hit_count': self.total_hit_count,
@@ -582,7 +582,7 @@ class SessionStateStats(python_utils.OBJECT):
             'num_times_solution_viewed': self.num_times_solution_viewed,
             'num_completions': self.num_completions
         }
-        return state_stats_dict
+        return session_state_stats_dict
 
     def __eq__(self, other):
         """Implements == comparison between two SessionStateStats instances,
@@ -623,9 +623,7 @@ class SessionStateStats(python_utils.OBJECT):
 
     @classmethod
     def from_dict(cls, session_state_stats_dict):
-        """Creates a SessionStateStats domain object from the given dict of
-        values.
-        """
+        """Creates a SessionStateStats domain object from the given dict."""
         return cls(
             session_state_stats_dict['total_answers_count'],
             session_state_stats_dict['useful_feedback_count'],

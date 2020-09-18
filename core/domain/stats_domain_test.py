@@ -426,11 +426,6 @@ class StateStatsTests(test_utils.GenericTestBase):
 class SessionStateStatsTests(test_utils.GenericTestBase):
     """Tests the SessionStateStats domain object."""
 
-    def setUp(self):
-        super(SessionStateStatsTests, self).setUp()
-
-        self.state_stats = stats_domain.SessionStateStats(1, 2, 3, 4, 5, 6)
-
     def test_from_dict(self):
         state_stats_dict = {
             'total_answers_count': 10,
