@@ -38,7 +38,11 @@ _SIMPLE_CRYPT_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools',
     'simple-crypt-' + common.SIMPLE_CRYPT_VERSION)
 sys.path.insert(0, _SIMPLE_CRYPT_PATH)
-import simplecrypt # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
+_GOOGLE_API_PYTHON_CLIENT_PATH = os.path.join(
+    os.getcwd(), '..', 'oppia_tools',
+    'google-api-python-client-' + common.GOOGLE_API_PYTHON_CLIENT_VERSION)
+sys.path.insert(0, _GOOGLE_API_PYTHON_CLIENT_PATH)
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
@@ -62,6 +66,7 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     google.__path__.insert(0, path)
 
+import simplecrypt # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import googleapiclient.discovery # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from google.oauth2 import service_account # isort:skip  pylint: disable=wrong-import-position, wrong-import-order, no-name-in-module, import-error, ungrouped-imports
 
