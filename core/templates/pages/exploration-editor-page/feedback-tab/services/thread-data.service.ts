@@ -128,7 +128,7 @@ angular.module('oppia').factory('ThreadDataService', [
         return threadsById.get(threadId) || null;
       },
 
-      getThreadsAsync: async function(): Promise<SuggestionAndFeedbackThreads> {
+      getThreadsAsync: function(): Promise<SuggestionAndFeedbackThreads> {
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
         let suggestionsPromise = $http.get(getSuggestionListHandlerUrl(), {
@@ -165,7 +165,7 @@ angular.module('oppia').factory('ThreadDataService', [
         () => $q.reject('Error on retrieving feedback threads.'));
       },
 
-      getMessagesAsync: async function(thread: AnyThread): Promise<ThreadMessage[]> {
+      getMessagesAsync: function(thread: AnyThread): Promise<ThreadMessage[]> {
         if (!thread) {
           throw new Error('Trying to update a non-existent thread');
         }
@@ -180,7 +180,7 @@ angular.module('oppia').factory('ThreadDataService', [
         });
       },
 
-      getOpenThreadsCountAsync: async function(): Promise<number> {
+      getOpenThreadsCountAsync: function(): Promise<number> {
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
         return $http.get(getFeedbackStatsHandlerUrl()).then(response => {
@@ -192,7 +192,7 @@ angular.module('oppia').factory('ThreadDataService', [
         return openThreadsCount;
       },
 
-      createNewThreadAsync: async function(
+      createNewThreadAsync: function(
           newSubject: string, newText: string): Promise<void> {
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
@@ -209,7 +209,7 @@ angular.module('oppia').factory('ThreadDataService', [
         });
       },
 
-      markThreadAsSeenAsync: async function(thread: AnyThread): Promise<void> {
+      markThreadAsSeenAsync: function(thread: AnyThread): Promise<void> {
         if (!thread) {
           throw new Error('Trying to update a non-existent thread');
         }
@@ -221,7 +221,7 @@ angular.module('oppia').factory('ThreadDataService', [
         });
       },
 
-      addNewMessageAsync: async function(
+      addNewMessageAsync: function(
           thread: AnyThread, newMessage: string,
           newStatus: string): Promise<ThreadMessage[]> {
         if (!thread) {
@@ -248,7 +248,7 @@ angular.module('oppia').factory('ThreadDataService', [
         });
       },
 
-      resolveSuggestionAsync: async function(
+      resolveSuggestionAsync: function(
           thread: AnyThread, action: string, commitMsg: string,
           reviewMsg: string): Promise<ThreadMessage[]> {
         if (!thread) {
