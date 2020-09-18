@@ -131,7 +131,7 @@ def delete_pending_deletion_request(user_id):
             the PendingDeletionRequestModel belongs to.
     """
     pending_deletion_request_model = (
-        user_models.PendingDeletionRequestModel.get_by_id(user_id)
+        user_models.PendingDeletionRequestModel.get_by_id(user_id))
     pending_deletion_request_model.delete()
 
 
@@ -287,7 +287,7 @@ def delete_user(pending_deletion_request):
             models.NAMES.story,
             story_models.StorySnapshotMetadataModel,
             story_models.StoryCommitLogEntryModel,
-             'story_id ')
+             'story_id')
         _pseudonymize_col_or_exp_models(
             pending_deletion_request,
             models.NAMES.exploration,
@@ -295,7 +295,7 @@ def delete_user(pending_deletion_request):
             exp_models.ExplorationRightsSnapshotMetadataModel,
             exp_models.ExplorationRightsSnapshotContentModel,
             exp_models.ExplorationCommitLogEntryModel,
-             'exploration_id ')
+             'exploration_id')
         _pseudonymize_col_or_exp_models(
             pending_deletion_request,
             models.NAMES.collection,
@@ -546,7 +546,7 @@ def _pseudonymize_config_models(pending_deletion_request):
         ndb.put_multi(metadata_models)
 
     config_ids_to_pids = (
-        pending_deletion_request.entity_mappings[models.NAMES.config]
+        pending_deletion_request.entity_mappings[models.NAMES.config])
     for config_id, pseudonymized_id in config_ids_to_pids.items():
         config_related_models = [
             model for model in snapshot_metadata_models
@@ -824,7 +824,7 @@ def _pseudonymize_topic_models(pending_deletion_request):
     subtopic_models = topic_models.SubtopicPageModel.get_multi(
         subtopic_model_ids, include_deleted=True)
     subtopic_id_to_topic_id = {
-        subtopic_model.id: subtopic_model.topic_ids
+        subtopic_model.id: subtopic_model.topic_id
         for subtopic_model in subtopic_models
     }
     subtopic_topic_model_ids = set(subtopic_id_to_topic_id.values())
@@ -930,7 +930,7 @@ def _pseudonymize_topic_models(pending_deletion_request):
             ] + [
                 model for model in subtopic_commit_log_models
                 if subtopic_id_to_topic_id[
-                       getattr(model, 'subtopic_id')] == topic_id
+                       getattr(model, 'subtopic_page_id')] == topic_id
             ]
         )
 
