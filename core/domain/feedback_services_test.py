@@ -782,7 +782,7 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
             user_id, reference)
         self.assertEqual(
             self.count_jobs_in_taskqueue
-                queue_name=taskqueue_services.QUEUE_NAME_EMAILS),
+                queue_name=taskqueue_services.QUEUE_NAME_EMAILS,
             1)
 
         tasks = self.get_pending_tasks(
