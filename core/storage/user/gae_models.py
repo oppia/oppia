@@ -859,7 +859,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'entity_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'activity_ids': base_models.EXPORT_POLICY.EXPORTED,
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'general_feedback_thread_ids':
                 base_models.EXPORT_POLICY.EXPORTED,
