@@ -301,7 +301,6 @@ skip_files:
 - third_party/static/bower-angular-translate-storage-cookie-2.18.1/
 - third_party/static/bower-material-1.1.19/
 - third_party/python_libs/google/appengine/
-- third_party/python_libs/google/protobuf/
 - third_party/python_libs/google/net/
 - third_party/python_libs/google/pyglib/
 # CKEditor-4.12.1 plugins in the download from the CKEditor website include
