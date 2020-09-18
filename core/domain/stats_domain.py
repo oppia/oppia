@@ -371,7 +371,7 @@ class StateStats(python_utils.OBJECT):
             self.num_completions_v2 += other.num_completions
         else:
             raise TypeError(
-                '%s can not be aggregated from' % other.__class__.__name__)
+                '%s can not be aggregated from' % (other.__class__.__name__,))
 
     def to_dict(self):
         """Returns a dict representation of the domain object."""
