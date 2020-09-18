@@ -346,19 +346,32 @@ class StateStats(python_utils.OBJECT):
         """Aggregates data from the other state stats into self.
 
         Args:
-            other: StateStats. The other state stats instance to aggregate from.
+            other: StateStats | SessionStateStats. The other collection of stats
+            to aggregate from.
         """
-        self.total_answers_count_v1 += other.total_answers_count_v1
-        self.total_answers_count_v2 += other.total_answers_count_v2
-        self.useful_feedback_count_v1 += other.useful_feedback_count_v1
-        self.useful_feedback_count_v2 += other.useful_feedback_count_v2
-        self.total_hit_count_v1 += other.total_hit_count_v1
-        self.total_hit_count_v2 += other.total_hit_count_v2
-        self.first_hit_count_v1 += other.first_hit_count_v1
-        self.first_hit_count_v2 += other.first_hit_count_v2
-        self.num_times_solution_viewed_v2 += other.num_times_solution_viewed_v2
-        self.num_completions_v1 += other.num_completions_v1
-        self.num_completions_v2 += other.num_completions_v2
+        if other.__class__ is self.__class__:
+            self.total_answers_count_v1 += other.total_answers_count_v1
+            self.total_answers_count_v2 += other.total_answers_count_v2
+            self.useful_feedback_count_v1 += other.useful_feedback_count_v1
+            self.useful_feedback_count_v2 += other.useful_feedback_count_v2
+            self.total_hit_count_v1 += other.total_hit_count_v1
+            self.total_hit_count_v2 += other.total_hit_count_v2
+            self.first_hit_count_v1 += other.first_hit_count_v1
+            self.first_hit_count_v2 += other.first_hit_count_v2
+            self.num_times_solution_viewed_v2 += (
+                other.num_times_solution_viewed_v2)
+            self.num_completions_v1 += other.num_completions_v1
+            self.num_completions_v2 += other.num_completions_v2
+        elif other.__class__ is SessionStateStats:
+            self.total_answers_count_v2 += other.total_answers_count
+            self.useful_feedback_count_v2 += other.useful_feedback_count
+            self.total_hit_count_v2 += other.total_hit_count
+            self.first_hit_count_v2 += other.first_hit_count
+            self.num_times_solution_viewed_v2 += other.num_times_solution_viewed
+            self.num_completions_v2 += other.num_completions
+        else:
+            raise TypeError(
+                '%s can not be aggregated from' % other.__class__.__name__)
 
     def to_dict(self):
         """Returns a dict representation of the domain object."""
@@ -487,25 +500,6 @@ class StateStats(python_utils.OBJECT):
             state_stats_dict['num_completions_v1'],
             state_stats_dict['num_completions_v2'])
 
-    @classmethod
-    def from_frontend_dict(cls, frontend_state_stats_dict):
-        """Constructs a StateStats domain object from a frontend dict."""
-        return cls(
-            total_answers_count_v1=0,
-            total_answers_count_v2=(
-                frontend_state_stats_dict['total_answers_count']),
-            useful_feedback_count_v1=0,
-            useful_feedback_count_v2=(
-                frontend_state_stats_dict['useful_feedback_count']),
-            total_hit_count_v1=0,
-            total_hit_count_v2=frontend_state_stats_dict['total_hit_count'],
-            first_hit_count_v1=0,
-            first_hit_count_v2=frontend_state_stats_dict['first_hit_count'],
-            num_times_solution_viewed_v2=(
-                frontend_state_stats_dict['num_times_solution_viewed']),
-            num_completions_v1=0,
-            num_completions_v2=frontend_state_stats_dict['num_completions'])
-
     def validate(self):
         """Validates the StateStats domain object."""
 
@@ -533,6 +527,119 @@ class StateStats(python_utils.OBJECT):
             if state_stats_dict[stat_property] < 0:
                 raise utils.ValidationError(
                     '%s cannot have negative values' % (stat_property))
+
+
+class SessionStateStats(python_utils.OBJECT):
+    """Domain object representing analytic data for a state of an exploration
+    during a continuous learner session.
+    """
+
+    def __init__(
+            self, total_answers_count, useful_feedback_count, total_hit_count,
+            first_hit_count, num_times_solution_viewed, num_completions):
+        """Constructs a SessionStateStats domain object.
+
+        Args:
+            total_answers_count: int. Total number of answers submitted to this
+                state.
+            useful_feedback_count: int. Total number of answers that received
+                useful feedback.
+            total_hit_count: int. Total number of times the state was entered.
+            first_hit_count: int. Number of times the state was entered for the
+                first time.
+            num_times_solution_viewed: int. Number of times the solution button
+                was triggered to answer a state.
+            num_completions: int. Number of times the state was completed.
+        """
+        self.total_answers_count = total_answers_count
+        self.useful_feedback_count = useful_feedback_count
+        self.total_hit_count = total_hit_count
+        self.first_hit_count = first_hit_count
+        self.num_times_solution_viewed = num_times_solution_viewed
+        self.num_completions = num_completions
+
+    def __repr__(self):
+        """Returns a detailed representation of self, distinguishing v1 values
+        from v2 values.
+
+        Returns:
+            str. A string representation of self.
+        """
+        props = [
+            'total_answers_count',
+            'useful_feedback_count',
+            'total_hit_count',
+            'first_hit_count',
+            'num_times_solution_viewed',
+            'num_completions',
+        ]
+        return '%s(%s)' % (
+            self.__class__.__name__,
+            ', '.join('%s=%r' % (prop, getattr(self, prop)) for prop in props))
+
+    def to_dict(self):
+        """Returns a dict representation of the domain object for use in the
+        frontend.
+        """
+        state_stats_dict = {
+            'total_answers_count': self.total_answers_count,
+            'useful_feedback_count': self.useful_feedback_count,
+            'total_hit_count': self.total_hit_count,
+            'first_hit_count': self.first_hit_count,
+            'num_times_solution_viewed': self.num_times_solution_viewed,
+            'num_completions': self.num_completions
+        }
+        return state_stats_dict
+
+    def __eq__(self, other):
+        """Implements == comparison between two SessionStateStats instances,
+        returning whether they both hold the same values.
+
+        Args:
+            other: SessionStateStats. The other instance to compare.
+
+        Returns:
+            bool. Whether the two instances have the same values.
+        """
+        if other.__class__ is self.__class__:
+            return (
+                self.total_answers_count,
+                self.useful_feedback_count,
+                self.total_hit_count,
+                self.first_hit_count,
+                self.num_times_solution_viewed,
+                self.num_completions,
+            ) == (
+                other.total_answers_count,
+                other.useful_feedback_count,
+                other.total_hit_count,
+                other.first_hit_count,
+                other.num_times_solution_viewed,
+                other.num_completions,
+            )
+        return NotImplemented # https://stackoverflow.com/a/44575926
+
+    def __hash__(self):
+        """Disallow hashing StateStats since they are mutable by design."""
+        raise TypeError('%s is unhashable' % self.__class__.__name__)
+
+    @classmethod
+    def create_default(cls):
+        """Creates a StateStats domain object and sets all properties to 0."""
+        return cls(0, 0, 0, 0, 0, 0)
+
+    @classmethod
+    def from_dict(cls, session_state_stats_dict):
+        """Returns a dict representation of the domain object for use in the
+        frontend.
+        """
+        return cls(
+            session_state_stats_dict['total_answers_count'],
+            session_state_stats_dict['useful_feedback_count'],
+            session_state_stats_dict['total_hit_count'],
+            session_state_stats_dict['first_hit_count'],
+            session_state_stats_dict['num_times_solution_viewed'],
+            session_state_stats_dict['num_completions'])
 
 
 class ExplorationIssues(python_utils.OBJECT):

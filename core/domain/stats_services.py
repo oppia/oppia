@@ -144,7 +144,7 @@ def update_stats(exp_id, exp_version, aggregated_stats):
                 'ExplorationStatsModel id="%s.%s": state_stats_mapping[%r] '
                 'does not exist' % (exp_id, exp_version, state_name))
         exp_stats.state_stats_mapping[state_name].aggregate_from(
-            stats_domain.StateStats.from_frontend_dict(stats))
+            stats_domain.SessionStateStats.from_dict(stats))
 
     save_stats_model_transactional(exp_stats)
 
