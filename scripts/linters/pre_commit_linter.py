@@ -58,6 +58,7 @@ import subprocess
 import sys
 import threading
 
+import google
 import python_utils
 
 # Install third party dependencies before proceeding.
@@ -117,10 +118,33 @@ _PATHS_TO_INSERT = [
         _PARENT_DIR, 'oppia_tools', 'psutil-%s' % common.PSUTIL_VERSION),
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools',
+        'simple-crypt-%s' % common.SIMPLE_CRYPT_VERSION),
     common.THIRD_PARTY_PYTHON_LIBS_DIR
 ]
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
+
+_PATHS_TO_INSERT_FOR_GOOGLE = [
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools',
+        'google-auth-%s' % common.GOOGLE_AUTH_VERSION, 'google'),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools',
+        'google-auth-httplib2-%s' % common.GOOGLE_AUTH_HTTPLIB2_VERSION,
+        'google'),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools',
+        'google-auth-oauthlib-%s' % common.GOOGLE_AUTH_OAUTHLIB_VERSION,
+        'google'),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools',
+        'google-api-python-client-%s' %
+        common.GOOGLE_API_PYTHON_CLIENT_VERSION, 'google')
+]
+for path in _PATHS_TO_INSERT_FOR_GOOGLE:
+    google.__path__.insert(0, path)
 
 _TARGET_STDOUT = python_utils.string_io()
 _STDOUT_LIST = multiprocessing.Manager().list()

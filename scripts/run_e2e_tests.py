@@ -27,14 +27,38 @@ import subprocess
 import sys
 import time
 
-from google.oauth2 import service_account
-import googleapiclient.discovery
+import google
 import python_utils
 from scripts import build
 from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 import simplecrypt
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+
+_PATHS_TO_INSERT = [
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools',
+        'google-auth-%s' % common.GOOGLE_AUTH_VERSION, 'google'),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools',
+        'google-auth-httplib2-%s' % common.GOOGLE_AUTH_HTTPLIB2_VERSION,
+        'google'),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools',
+        'google-auth-oauthlib-%s' % common.GOOGLE_AUTH_OAUTHLIB_VERSION,
+        'google'),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools',
+        'google-api-python-client-%s' %
+        common.GOOGLE_API_PYTHON_CLIENT_VERSION, 'google')
+]
+for path in _PATHS_TO_INSERT:
+    google.__path__.insert(0, path)
+
+import googleapiclient.discovery # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from google.oauth2 import service_account # isort:skip  pylint: disable=wrong-import-position, wrong-import-order, no-name-in-module, import-error, ungrouped-imports
 
 MAXIMUM_RUNS = 3
 WEB_DRIVER_PORT = 4444
@@ -675,15 +699,16 @@ def run_tests(args=None):
                                 try:
                                     cleanup_portserver(portserver_process)
                                     cleanup()
-                                finally:
-                                    return 'flake'
+                                except Exception:
+                                    pass
+                                return 'flake'
     sys.exit(p.returncode)
 
 
-def main(args=[]):
+def main(args=None):
     """Run tests, rerunning at most MAXIMUM_RUNS times if they flake."""
     for _ in python_utils.RANGE(MAXIMUM_RUNS):
-        flake_state = run_tests(args)
+        flake_state = run_tests(args=args)
         if flake_state != 'flake':
             break
 
