@@ -33,7 +33,12 @@ from scripts import build
 from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
-import simplecrypt
+
+_SIMPLE_CRYPT_PATH = os.path.join(
+    os.getcwd(), '..', 'oppia_tools',
+    'simple-crypt-' + common.SIMPLE_CRYPT_VERSION)
+sys.path.insert(0, _SIMPLE_CRYPT_PATH)
+import simplecrypt # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
