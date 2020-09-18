@@ -9543,9 +9543,7 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
 
     def test_model_validation_fails_for_invalid_lang_code_in_reviewers_dict(
             self):
-        reviewer_and_suggestion_counts = (
-            suggestion_services.get_reviewer_and_suggestion_counts()
-        )
+        counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
         counts_model.translation_reviewer_counts_by_lang = {
             self.invalid_language_code: 1}
         counts_model.put()
@@ -9553,7 +9551,7 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
             u'[u\'failed validation check for domain object check of '
             'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Invalid language code for '
-            'the translation reviewer counts %s.\']]' % (
+            'the translation reviewer counts: %s.\']]' % (
                 counts_model.id, self.invalid_language_code)
         ]
 
@@ -9562,9 +9560,7 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
 
     def test_model_validation_fails_for_invalid_lang_code_in_suggestions_dict(
             self):
-        reviewer_and_suggestion_counts = (
-            suggestion_services.get_reviewer_and_suggestion_counts()
-        )
+        counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
         counts_model.translation_suggestion_counts_by_lang = {
             self.invalid_language_code: 1}
         counts_model.put()
@@ -9572,7 +9568,7 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
             u'[u\'failed validation check for domain object check of '
             'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Invalid language code for '
-            'the translation suggestion counts %s.\']]' % (
+            'the translation suggestion counts: %s.\']]' % (
                 counts_model.id, self.invalid_language_code)
         ]
 
