@@ -381,6 +381,7 @@ class StateStatsTests(test_utils.GenericTestBase):
     def test_aggregate_from_different_stats(self):
         class DifferentStats(python_utils.OBJECT):
             """A different class."""
+
             pass
 
         state_stats = stats_domain.StateStats.create_default()
@@ -473,27 +474,6 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
             'num_times_solution_viewed=5, '
             'num_completions=6)')
 
-    def test_from_dict(self):
-        actual_state_stats = stats_domain.SessionStateStats.from_dict({
-            'total_answers_count': 10,
-            'useful_feedback_count': 4,
-            'total_hit_count': 18,
-            'first_hit_count': 7,
-            'num_times_solution_viewed': 2,
-            'num_completions': 2
-        })
-
-        # Should interpret each version-less key as a v2 value.
-        expected_state_stats = stats_domain.SessionStateStats(
-            total_answers_count=10,
-            useful_feedback_count=4,
-            total_hit_count=18,
-            first_hit_count=7,
-            num_times_solution_viewed=2,
-            num_completions=2)
-
-        self.assertEqual(actual_state_stats, expected_state_stats)
-
     def test_create_default(self):
         state_stats = stats_domain.SessionStateStats.create_default()
         self.assertEqual(state_stats.total_answers_count, 0)
@@ -527,6 +507,7 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
     def test_equality_with_different_class(self):
         class DifferentStats(python_utils.OBJECT):
             """A different class."""
+
             pass
 
         state_stats = stats_domain.SessionStateStats.create_default()
@@ -542,13 +523,13 @@ class SessionStateStatsTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         self.assertEqual(
             stats_domain.SessionStateStats(1, 2, 3, 4, 5, 6).to_dict(), {
-            'total_answers_count': 1,
-            'useful_feedback_count': 2,
-            'total_hit_count': 3,
-            'first_hit_count': 4,
-            'num_times_solution_viewed': 5,
-            'num_completions': 6
-        })
+                'total_answers_count': 1,
+                'useful_feedback_count': 2,
+                'total_hit_count': 3,
+                'first_hit_count': 4,
+                'num_times_solution_viewed': 5,
+                'num_completions': 6
+            })
 
 
 class ExplorationIssuesTests(test_utils.GenericTestBase):

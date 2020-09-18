@@ -347,7 +347,7 @@ class StateStats(python_utils.OBJECT):
 
         Args:
             other: StateStats | SessionStateStats. The other collection of stats
-            to aggregate from.
+                to aggregate from.
         """
         if other.__class__ is self.__class__:
             self.total_answers_count_v1 += other.total_answers_count_v1
