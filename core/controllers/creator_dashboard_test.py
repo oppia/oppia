@@ -213,7 +213,6 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
-
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         self.assertEqual(

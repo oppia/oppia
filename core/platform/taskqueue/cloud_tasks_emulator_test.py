@@ -16,19 +16,18 @@
 
 """Tests for methods in the Cloud Tasks Emulator."""
 
-import json
-import logging
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import time
 import python_utils
 from core.platform.taskqueue import cloud_tasks_emulator
 from core.tests import test_utils
-from datetime import datetime
-from threading import current_thread
-from time import sleep
 
 class CloudTasksEmulatorUnitTests(test_utils.TestBase):
     """Tests for cloud tasks emulator."""
-    def task_handler(self, url, payload, queue_name, task_name=None):
+
+    def mock_task_handler(self, url, payload, queue_name, task_name=None):
         self.output.append(
             'Task %s in queue %s with payload %s is sent to %s.' % (
                 task_name if task_name else 'Default',
@@ -36,6 +35,7 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
                 python_utils.convert_to_bytes(payload),
                 url)
         )
+
     def setUp(self):
         super(CloudTasksEmulatorUnitTests, self).setUp()
         self.url = 'dummy_url'
@@ -56,21 +56,17 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
         }
         self.output = []
         self.unit_test_emulator = cloud_tasks_emulator.Emulator(
-            task_handler=self.task_handler, automatic_task_handling=False)
+            task_handler=self.mock_task_handler, automatic_task_handling=False)
         self.dev_mode_emulator = cloud_tasks_emulator.Emulator(
-            task_handler=self.task_handler)
+            task_handler=self.mock_task_handler)
 
     def test_task_creation_is_handled_correctly(self):
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 0)
 
         self.unit_test_emulator.create_task(
-            queue_name=self.queue_name1,
-            url=self.url,
-            payload=self.payload1)
+            self.queue_name1, self.url, self.payload1)
         self.unit_test_emulator.create_task(
-            queue_name=self.queue_name2,
-            url=self.url,
-            payload=self.payload2)
+            self.queue_name2, self.url, self.payload2)
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 2)
         task_list = self.unit_test_emulator.get_tasks(
             queue_name=self.queue_name1)
@@ -88,13 +84,9 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 0)
 
         self.unit_test_emulator.create_task(
-            queue_name=self.queue_name1,
-            url=self.url,
-            payload=self.payload1)
+            self.queue_name1, self.url, self.payload1)
         self.unit_test_emulator.create_task(
-            queue_name=self.queue_name2,
-            url=self.url,
-            payload=self.payload2)
+            self.queue_name2, self.url, self.payload2)
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 2)
 
         self.unit_test_emulator.process_and_flush_tasks(
@@ -130,14 +122,10 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
     def test_tasks_scheduled_for_immediate_execution_are_handled_correctly(
             self):
         self.dev_mode_emulator.create_task(
-            queue_name=self.queue_name1,
-            url=self.url,
-            payload=self.payload1)
+            self.queue_name1, self.url, self.payload1)
         self.dev_mode_emulator.create_task(
-            queue_name=self.queue_name2,
-            url=self.url,
-            payload=self.payload2)
-        # Allow the threads to execute the tasks scheduled immediately
+            self.queue_name2, self.url, self.payload2)
+        # Allow the threads to execute the tasks scheduled immediately.
         time.sleep(1)
 
         self.assertEqual(

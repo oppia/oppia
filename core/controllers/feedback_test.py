@@ -744,7 +744,6 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
         feedback_services.create_thread(
             'exploration', self.exp_id, self.owner_id, 'subject', 'text')
 
-
         feedback_analytics_aggregator_swap = self.swap(
             feedback_jobs_continuous, 'FeedbackAnalyticsAggregator',
             MockFeedbackAnalyticsAggregator)

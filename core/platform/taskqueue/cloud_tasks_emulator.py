@@ -21,7 +21,6 @@ models the third party library Google Cloud Tasks.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import atexit
 import threading
 import time
 
@@ -29,16 +28,20 @@ import python_utils
 
 
 class Task(python_utils.OBJECT):
+    """A mock for a Google Cloud Tasks task that is handled by execution using
+    the cloud tasks emulator.
+    """
+
     def __init__(
-        self, queue_name, url, payload=None, scheduled_for=None,
-        task_name=None):
+            self, queue_name, url, payload=None, scheduled_for=None,
+            task_name=None):
         """Initialize a Task that can be executed by making a post request to
         the given url with the correct data payload.
 
         Args:
             queue_name: str. The name of the queue to add the http task to.
             url: str. URL of the handler function.
-            payload: dict(str: *)|None. Payload to pass to the request. Defaults
+            payload: dict(str : *). Payload to pass to the request. Defaults
                 to None if no payload is required.
             scheduled_for: time|None. The time in which to execute the task,
                 relative to time.time().
@@ -71,6 +74,7 @@ class Emulator(python_utils.OBJECT):
            taskqueue by calling create_task() and tasks in an individual queue
            can be executed using process_and_flush_tasks().
     """
+
     def __init__(self, task_handler, automatic_task_handling=True):
         """Initializes the emulator with an empty task queue and the correct
         task_handler callback.
@@ -129,7 +133,7 @@ class Emulator(python_utils.OBJECT):
         self._queue_threads[queue_name] = new_thread
         new_thread.start()
 
-    def _execute_tasks(self, task_list=[]):
+    def _execute_tasks(self, task_list):
         """Executes all of the tasks in the task list using the task handler
         callback.
 
@@ -160,7 +164,7 @@ class Emulator(python_utils.OBJECT):
         Args:
             queue_name: str. The name of the queue to add the task to.
             url: str. URL of the handler function.
-            payload: dict(str: *)|None. Payload to pass to the request. Defaults
+            payload: dict(str : *). Payload to pass to the request. Defaults
                 to None if no payload is required.
             scheduled_for: datetime|None. The naive datetime object for the
                 time to execute the task. Pass in None for immediate execution.
@@ -211,9 +215,9 @@ class Emulator(python_utils.OBJECT):
             self._execute_tasks(self._queues[queue_name])
             self._queues[queue_name] = []
         else:
-            for queue_name, task_list in self._queues.items():
+            for queue, task_list in self._queues.items():
                 self._execute_tasks(task_list)
-                self._queues[queue_name] = []
+                self._queues[queue] = []
 
     def get_tasks(self, queue_name=None):
         """Returns a list of the tasks in a single queue if a queue name is

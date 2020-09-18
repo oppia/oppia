@@ -20,10 +20,10 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import feconf
 import json
-import python_utils
+
 from core.platform import models
+import feconf
 
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
 
@@ -67,7 +67,7 @@ def defer(fn_identifier, queue_name, *args, **kwargs):
             deferred.
         queue_name: str. The name of the queue to place the task into. Should be
             one of the QUEUE_NAME_* constants listed above.
-        *args: tuple(*). Positional arguments for fn. Positional arguments
+        *args: list(*). Positional arguments for fn. Positional arguments
             should be json serializable.
         **kwargs: dict(str : *). Keyword arguments for fn.
 
@@ -111,8 +111,7 @@ def enqueue_task(url, params, countdown):
         raise ValueError(
             'The params added to the email task call cannot be json serialized')
     scheduled_datetime = datetime.datetime.utcnow() + datetime.timedelta(
-            seconds=countdown)
+        seconds=countdown)
     platform_taskqueue_services.create_http_task(
         queue_name=QUEUE_NAME_EMAILS, url=url, payload=params,
         scheduled_for=scheduled_datetime)
-

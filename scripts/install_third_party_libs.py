@@ -106,10 +106,20 @@ def ensure_pip_library_is_installed(package, version, path):
         install_backend_python_libs.pip_install(
             package, version, exact_lib_path)
 
+
 def ensure_system_python_libraries_are_installed(package, version):
+    """Installs the pip library with the corresponding version to the system
+    globally. This is necessary because the development application server
+    requires certain libraries on the host machine.
+
+    Args:
+        package: str. The package name.
+        version: str. The package version.
+    """
     python_utils.PRINT(
         'Checking if %s is installed.' % (package))
     install_backend_python_libs.pip_install_to_system(package, version)
+
 
 def main():
     """Install third-party libraries for Oppia."""
@@ -214,8 +224,9 @@ def main():
     # https://github.com/googleapis/python-ndb/issues/518
     python_utils.PRINT(
         'Checking that all google library modules contain __init__.py files...')
-    for root_path, sub_directory_name_list, file_name_list in os.walk(
-        correct_google_path):
+    for path_list in os.walk(
+            correct_google_path):
+        root_path = path_list[0]
         if not root_path.endswith('__pycache__'):
             with python_utils.open_file(
                 os.path.join(root_path, '__init__.py'), 'a'):

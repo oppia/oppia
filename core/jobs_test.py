@@ -35,7 +35,6 @@ import feconf
 import python_utils
 
 from google.appengine.ext import ndb
-from mapreduce import input_readers
 
 (base_models, exp_models, stats_models, job_models) = (
     models.Registry.import_models([
@@ -412,7 +411,8 @@ class TwoClassesMapReduceJobIntegrationTests(test_utils.GenericTestBase):
         TwoClassesMapReduceJobManager.enqueue(
             job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_DEFAULT),
             1)
         self.process_and_flush_pending_mapreduce_tasks()
 
@@ -610,7 +610,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 StartExplorationEventCounter.get_count(self.EXP_ID), 0)
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
+                    queue_name=taskqueue_services.QUEUE_NAME_EVENTS), 1)
 
             # When the task queue is flushed, the data is recorded in the two
             # realtime layers.
@@ -618,7 +618,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 0)
+                    queue_name=taskqueue_services.QUEUE_NAME_EVENTS), 0)
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
             self.assertEqual(MockStartExplorationRealtimeModel.get(

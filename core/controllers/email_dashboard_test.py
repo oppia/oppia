@@ -28,7 +28,6 @@ import feconf
     [models.NAMES.user, models.NAMES.email])
 
 
-
 class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
 
     SUBMITTER_EMAIL = 'submit@example.com'

@@ -24,10 +24,9 @@ import shutil
 import subprocess
 import sys
 
+import pkg_resources
 import python_utils
 from scripts import common
-
-import pkg_resources
 
 
 def normalize_python_library_name(library_name):
@@ -395,12 +394,12 @@ def _run_pip_command(cmd_parts):
 
 
 def pip_install_to_system(package, version):
-    """Installs third party libraries with pip to the current system.
+    """Installs third party libraries with pip to the current system instead of
+    to a specific path.
 
     Args:
         package: str. The package name.
         version: str. The package version.
-        upgrade: bool. Whether call the pip with --upgrade flag.
     """
     _run_pip_command([
         'install', '%s==%s' % (package, version)])

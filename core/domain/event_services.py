@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 
-from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import stats_domain

@@ -851,8 +851,9 @@ def is_appengine_development_environment():
         bool. Whether the current instance is running locally on a developer's
         computer.
     """
-    return ('APPENGINE_RUNTIME' in os.environ and
-            'Development/' in os.environ['SERVER_SOFTWARE'])
+    return (
+        'APPENGINE_RUNTIME' in os.environ and
+        'Development/' in os.environ['SERVER_SOFTWARE'])
 
 
 def is_appengine_production_environment():
@@ -866,9 +867,9 @@ def is_appengine_production_environment():
     Returns:
         bool. Whether the current instance is running in production.
     """
-    return ('APPENGINE_RUNTIME' in os.environ and
-            'Google App Engine/' in os.environ['SERVER_SOFTWARE'] and
-            not is_prod_appengine_mvms())
+    return (
+        'APPENGINE_RUNTIME' in os.environ and
+        'Google App Engine/' in os.environ['SERVER_SOFTWARE'])
 
 
 class OrderedCounter(collections.Counter, collections.OrderedDict):

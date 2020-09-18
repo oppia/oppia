@@ -54,5 +54,7 @@ pkg_resources.working_set.add_entry(
 # It is necessary to reload the six module because of a bug in the google cloud
 # ndb imports. More details can be found here:
 # https://github.com/googleapis/python-ndb/issues/249.
-import six
-reload(six)
+# We need to reload at the very end of this file because we have to add the
+# six python path to the app engine vendor first.
+import six # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+reload(six) # isort:skip  pylint: disable=wrong-import-position, wrong-import-order

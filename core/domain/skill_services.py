@@ -24,7 +24,6 @@ from core.domain import caching_services
 from core.domain import config_domain
 from core.domain import html_cleaner
 from core.domain import opportunity_services
-from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers

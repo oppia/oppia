@@ -51,8 +51,8 @@ from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
-from core.platform.taskqueue import cloud_tasks_emulator
 from core.platform import models
+from core.platform.taskqueue import cloud_tasks_emulator
 import feconf
 import main
 import main_mail
@@ -178,11 +178,23 @@ class TaskqueueServicesStub(python_utils.OBJECT):
     """
 
     def __init__(self, test_base):
+        """Initializes a taskqueue services stub that replaces the API
+        functionality of core.platform.taskqueue.
+        """
         self.test_base = test_base
         self.client = cloud_tasks_emulator.Emulator(
             task_handler=self._task_handler, automatic_task_handling=False)
 
     def _task_handler(self, url, payload, queue_name, task_name=None):
+        """Makes a POST request to the task URL in the test app.
+
+        Args:
+            url: str. URL of the handler function.
+            payload: dict(str : *). Payload to pass to the request. Defaults
+                    to None if no payload is required.
+            queue_name: str. The name of the queue to add the task to.
+            task_name: str|None. Optional. The name of the task.
+        """
         headers = {
             'X-Appengine-QueueName': python_utils.convert_to_bytes(queue_name),
             'X-Appengine-TaskName': (
@@ -194,21 +206,67 @@ class TaskqueueServicesStub(python_utils.OBJECT):
         self.test_base.post_task(
             url=url, payload=payload, csrf_token=csrf_token, headers=headers)
 
-    def create_http_task(self,
-            queue_name, url, payload=None, scheduled_for=None, task_name=None):
+    def create_http_task(
+            self, queue_name, url, payload=None, scheduled_for=None,
+            task_name=None):
+        """Creates a Task in the corresponding queue that will be executed when
+        the 'scheduled_for' countdown expires using the cloud tasks emulator.
+
+        Args:
+            queue_name: str. The name of the queue to add the task to.
+            url: str. URL of the handler function.
+            payload: dict(str : *). Payload to pass to the request. Defaults
+                to None if no payload is required.
+            scheduled_for: datetime|None. The naive datetime object for the
+                time to execute the task. Pass in None for immediate execution.
+            task_name: str|None. Optional. The name of the task.
+        """
         # Causes the task to execute immediately by setting the scheduled_for
         # time to 0. If we allow scheduled_for to be non-zero, then tests that
         # rely on the actions made by the task will become unreliable.
         scheduled_for = 0
-        self.client.create_task(queue_name, url, payload, scheduled_for, task_name)
+        self.client.create_task(
+            queue_name, url, payload, scheduled_for=scheduled_for,
+            task_name=task_name)
 
     def count_jobs_in_taskqueue(self, queue_name=None):
+        """Returns the total number of tasks in a single queue if a queue name
+        is specified or the entire taskqueue if no queue name is specified.
+
+        Args:
+            queue_name: str|None. Name of the queue. Pass in None if no specific
+                queue is designated.
+
+        Returns:
+            int. The total number of tasks in a single queue or in the entire
+            taskqueue.
+        """
         return self.client.get_number_of_tasks(queue_name=queue_name)
 
     def process_and_flush_tasks(self, queue_name=None):
+        """Executes all of the tasks in a single queue if a queue name is
+        specified or all of the tasks in the taskqueue if no queue name is
+        specified.
+
+        Args:
+            queue_name: str|None. Name of the queue. Pass in None if no specific
+                queue is designated.
+        """
         self.client.process_and_flush_tasks(queue_name=queue_name)
 
     def get_pending_tasks(self, queue_name=None):
+        """Returns a list of the tasks in a single queue if a queue name is
+        specified or a list of all of the tasks in the taskqueue if no queue
+        name is specified.
+
+        Args:
+            queue_name: str|None. Name of the queue. Pass in None if no specific
+                queue is designated.
+
+        Returns:
+            list(Task). List of tasks in a single queue or in the entire
+            taskqueue.
+        """
         return self.client.get_tasks(queue_name=queue_name)
 
 
@@ -1088,7 +1146,8 @@ tags: []
             self, url, payload, headers, csrf_token=None, expect_errors=False,
             expected_status_int=200):
         """Posts an object to the server by JSON with the specific headers
-        specified; return the received object."""
+        specified; return the received object.
+        """
         if csrf_token:
             payload['csrf_token'] = csrf_token
         app = webtest.TestApp(main_taskqueue.app)
@@ -2525,25 +2584,56 @@ class AppEngineTestBase(TestBase):
             self.testbed.init_urlfetch_stub()
 
     def count_jobs_in_taskqueue(self, queue_name=None):
-        """Counts the jobs in the given queue."""
+        """Returns the total number of tasks in a single queue if a queue name
+        is specified or the entire taskqueue if no queue name is specified.
+
+        Args:
+            queue_name: str|None. Name of the queue. Pass in None if no specific
+                queue is designated.
+
+        Returns:
+            int. The total number of tasks in a single queue or in the entire
+            taskqueue.
+        """
         return self.taskqueue_services_stub.count_jobs_in_taskqueue(
             queue_name=queue_name)
 
     def process_and_flush_pending_tasks(self, queue_name=None):
+        """Executes all of the tasks in a single queue if a queue name is
+        specified or all of the tasks in the taskqueue if no queue name is
+        specified.
+
+        Args:
+            queue_name: str|None. Name of the queue. Pass in None if no specific
+                queue is designated.
+        """
         return self.taskqueue_services_stub.process_and_flush_tasks(
             queue_name=queue_name)
 
     def get_pending_tasks(self, queue_name=None):
+        """Returns a list of the tasks in a single queue if a queue name is
+        specified or a list of all of the tasks in the taskqueue if no queue
+        name is specified.
+
+        Args:
+            queue_name: str|None. Name of the queue. Pass in None if no specific
+                queue is designated.
+
+        Returns:
+            list(Task). List of tasks in a single queue or in the entire
+            taskqueue.
+        """
         return self.taskqueue_services_stub.get_pending_tasks(
             queue_name=queue_name)
 
     def count_jobs_in_mapreduce_taskqueue(self, queue_name):
-        """Counts the jobs in the given queue."""
+        """Counts the jobs in the given mapreduce taskqueue."""
         return len(self.get_pending_mapreduce_tasks(queue_name=queue_name))
 
     def get_pending_mapreduce_tasks(self, queue_name=None):
-        """Returns the jobs in the given queue. If queue_name is None, defaults
-        to returning the jobs in all available queues.
+        """Returns the jobs in the given mapreduce taskqueue.
+        If queue_name is None, defaults to returning the jobs in all available
+        queues.
         """
         if queue_name is not None:
             return self.mapreduce_taskqueue_stub.get_filtered_tasks(
@@ -2552,7 +2642,7 @@ class AppEngineTestBase(TestBase):
             return self.mapreduce_taskqueue_stub.get_filtered_tasks()
 
     def _execute_map_reduce_tasks(self, tasks):
-        """Execute queued tasks.
+        """Execute mapreduce queued tasks.
 
         Args:
             tasks: list(google.appengine.api.taskqueue.taskqueue.Task). The
@@ -2585,8 +2675,8 @@ class AppEngineTestBase(TestBase):
                         'MapReduce task to URL %s failed' % task.url)
 
     def process_and_flush_pending_mapreduce_tasks(self, queue_name=None):
-        """Runs and flushes pending tasks. If queue_name is None, does so for
-        all queues; otherwise, this only runs and flushes tasks for the
+        """Runs and flushes pending mapreduce tasks. If queue_name is None, does
+        so for all queues; otherwise, this only runs and flushes tasks for the
         specified queue.
 
         For more information on self.mapreduce_taskqueue_stub see
@@ -2609,7 +2699,7 @@ class AppEngineTestBase(TestBase):
                 self.mapreduce_taskqueue_stub.FlushQueue(queue)
 
     def run_but_do_not_flush_pending_mapreduce_tasks(self):
-        """"Runs but not flushes pending tasks."""
+        """"Runs but not flushes mapreduce pending tasks."""
         queue_names = self._get_all_queue_names()
 
         tasks = self.mapreduce_taskqueue_stub.get_filtered_tasks(

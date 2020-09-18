@@ -486,9 +486,7 @@ def main(args=None):
         google_module = sys.modules['google']
         google_module.__path__ = [google_path]
         google_module.__file__ = os.path.join(google_path, '__init__.py')
-        print(google_module.__file__)
 
-    from google.cloud import tasks_v2
     python_utils.PRINT('Starting Linter....')
 
     if len(all_filepaths) == 0:

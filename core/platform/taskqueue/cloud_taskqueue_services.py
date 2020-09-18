@@ -40,8 +40,8 @@ def create_http_task(
     Args:
         queue_name: str. The name of the queue to add the http task to.
         url: str. URL of the handler function.
-        payload: dict(str: *)|None. Payload to pass to the request. Defaults to
-            None if no payload is required.
+        payload: dict(str : *). Payload to pass to the request. Defaults
+            to None if no payload is required.
         scheduled_for: datetime|None. The naive datetime object for the
             time to execute the task. Pass in None for immediate execution.
         task_name: str|None. Optional. The name of the task.

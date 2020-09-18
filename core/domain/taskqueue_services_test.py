@@ -20,19 +20,22 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import taskqueue_services
-from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
+
 
 class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
     """Tests for domain taskqueue services."""
 
     def test_exception_raised_when_deferred_payload_is_not_serializable(self):
         class NonSerializableArgs(python_utils.OBJECT):
+            """Object that is not JSON serializable."""
+
             def __init__(self):
                 self.x = 1
                 self.y = 2
+
         arg1 = NonSerializableArgs()
         serialization_exception = self.assertRaisesRegexp(
             ValueError,
@@ -60,7 +63,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
     def test_defer_makes_the_correct_request(self):
         correct_queue_name = taskqueue_services.QUEUE_NAME_DEFAULT
         args = (1, 2, 3, 4)
-        kwargs={
+        kwargs = {
             'kwarg1': 'arg1',
             'kwarg2': 'arg2'
         }

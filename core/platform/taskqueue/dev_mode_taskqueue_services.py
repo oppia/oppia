@@ -16,11 +16,16 @@
 
 """Provides cloud tasks api in DEV_MODE."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import os
-import requests
-import requests_toolbelt.adapters.appengine
-import feconf
+
 from core.platform.taskqueue import cloud_tasks_emulator
+import requests_toolbelt.adapters.appengine
+
+import requests
+
 
 # Special app engine monkey patch. More details can be found here:
 # https://cloud.google.com/appengine/docs/standard/python/issue-requests#issuing_an_http_request
@@ -29,12 +34,13 @@ GOOGLE_APP_ENGINE_PORT = (
     os.environ['SERVER_PORT']
     if 'SERVER_PORT' in os.environ else '8181')
 
+
 def _task_handler(url, payload, queue_name, task_name=None):
     """Makes a POST request to the task URL.
 
     Args:
         url: str. URL of the handler function.
-        payload: dict(str: *)|None. Payload to pass to the request. Defaults
+        payload: dict(str : *). Payload to pass to the request. Defaults
             to None if no payload is required.
         queue_name: str. The name of the queue to add the task to.
         task_name: str|None. Optional. The name of the task.
@@ -50,13 +56,13 @@ def _task_handler(url, payload, queue_name, task_name=None):
     headers['X-AppEngine-Fake-Is-Admin'] = '1'
     headers['method'] = 'POST'
     complete_url = 'http://localhost:%s%s' % (GOOGLE_APP_ENGINE_PORT, url)
-    resp = requests.post(
+    requests.post(
         complete_url,
         json=payload,
         headers=headers)
 
 
-client = cloud_tasks_emulator.Emulator(task_handler=_task_handler)
+CLIENT = cloud_tasks_emulator.Emulator(task_handler=_task_handler)
 
 
 def create_http_task(
@@ -67,10 +73,12 @@ def create_http_task(
     Args:
         queue_name: str. The name of the queue to add the task to.
         url: str. URL of the handler function.
-        payload: dict(str: *)|None. Payload to pass to the request. Defaults
+        payload: dict(str : *). Payload to pass to the request. Defaults
             to None if no payload is required.
         scheduled_for: datetime|None. The naive datetime object for the
             time to execute the task. Pass in None for immediate execution.
         task_name: str|None. Optional. The name of the task.
     """
-    client.create_task(queue_name, url, payload, scheduled_for, task_name)
+    CLIENT.create_task(
+        queue_name, url, payload, scheduled_for=scheduled_for,
+        task_name=task_name)

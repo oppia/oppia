@@ -17,9 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import functools
 import json
-from core.controllers import acl_decorators
 
 from core import jobs_registry
 from core.controllers import base
@@ -29,11 +27,10 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import rights_manager
-from core.domain import suggestion_services
 from core.domain import stats_services
+from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.platform import models
-
 import python_utils
 
 (job_models, email_models) = models.Registry.import_models(
