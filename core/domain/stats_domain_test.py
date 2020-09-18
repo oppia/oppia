@@ -422,6 +422,35 @@ class StateStatsTests(test_utils.GenericTestBase):
             '%s cannot have negative values' % ('total_answers_count_v2'))):
             self.state_stats.validate()
 
+    def test_to_frontend_dict(self):
+        state_stats_dict = {
+            'total_answers_count_v1': 0,
+            'total_answers_count_v2': 10,
+            'useful_feedback_count_v1': 0,
+            'useful_feedback_count_v2': 4,
+            'total_hit_count_v1': 0,
+            'total_hit_count_v2': 18,
+            'first_hit_count_v1': 0,
+            'first_hit_count_v2': 7,
+            'num_times_solution_viewed_v2': 2,
+            'num_completions_v1': 0,
+            'num_completions_v2': 2
+        }
+
+        state_stats = stats_domain.StateStats.from_dict(state_stats_dict)
+
+        expected_state_stats_dict = {
+            'total_answers_count': 10,
+            'useful_feedback_count': 4,
+            'total_hit_count': 18,
+            'first_hit_count': 7,
+            'num_times_solution_viewed': 2,
+            'num_completions': 2
+        }
+
+        self.assertEqual(
+            state_stats.to_frontend_dict(), expected_state_stats_dict)
+
 
 class SessionStateStatsTests(test_utils.GenericTestBase):
     """Tests the SessionStateStats domain object."""
