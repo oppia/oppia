@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 // Code - third_party/static/guppy-7509f3/src/guppy.js
 // This guppy version corresponds to the commit on Aug 19 2020.
 // For reference, visit:

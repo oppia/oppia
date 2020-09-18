@@ -117,15 +117,15 @@ describe('TranslatePipe', () => {
 // I18n_rogue_1: '<script>alert(\'Oppia\');</script>Hello',
 // I18n_rogue_2: '<oppia-img>Me</oppia-img>Hola'.
 @Component({
-  /* eslint-disable max-len */
   // eslint-disable-next-line no-multi-str, angular/no-inline-template
   template: '<h1 [innerHTML] = "\'I18n_rogue_1\' | translate"></h1>\
     <h2 [innerHTML] = "\'I18n_rogue_2\' | translate"></h2>\
-    <h3 [innerHTML] = "\'I18n_t_2\' | translate: {val: \'<script>alert(\\\'Hello\\\');</script>\' }"></h3>\
-    <h4 [innerHTML] = "\'I18n_t_2\' | translate: {val: \'<oppia-img>O</oppia-img>\' }"></h4>'
+    <h3 [innerHTML] = "\'I18n_t_2\' | translate: \
+    {val: \'<script>alert(\\\'Hello\\\');</script>\' }"></h3>\
+    <h4 [innerHTML] = "\'I18n_t_2\' | translate: \
+    {val: \'<oppia-img>O</oppia-img>\' }"></h4>'
 })
 class MockComponent { }
-/* eslint-enable max-len */
 describe('Angular', () => {
   let fixture: ComponentFixture<MockComponent>;
 

@@ -84,9 +84,8 @@ export class ParamTypeObjectFactory {
     Object.keys(this.registry).forEach((paramTypeName: string) => {
       // The bracket notation is needed since 'paramTypeName' is a dynamic
       // property and is not defined on 'registry'.
-      /* eslint-disable dot-notation */
+      /* eslint-disable-next-line dot-notation */
       var paramType = this.registry[paramTypeName];
-      /* eslint-enable dot-notation */
       paramType._name = paramTypeName;
       Object.freeze(paramType);
     });
@@ -120,11 +119,7 @@ export class ParamTypeObjectFactory {
     if (!this.registry.hasOwnProperty(backendName)) {
       throw new Error(backendName + ' is not a registered parameter type.');
     }
-    // The bracket notation is needed since 'backendName' is a dynamic property
-    // and is not defined on 'registry'.
-    /* eslint-disable dot-notation */
     return this.registry[backendName];
-    /* eslint-enable dot-notation */
   }
 }
 

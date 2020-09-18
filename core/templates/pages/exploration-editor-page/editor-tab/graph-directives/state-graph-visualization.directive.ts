@@ -30,7 +30,7 @@ require(
 
 import { Subscription } from 'rxjs';
 
-/* eslint-disable angular/directive-restrict */
+/* eslint-disable-next-line angular/directive-restrict */
 angular.module('oppia').directive('stateGraphVisualization', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -423,4 +423,3 @@ angular.module('oppia').directive('stateGraphVisualization', [
       ]
     };
   }]);
-/* eslint-enable angular/directive-restrict */

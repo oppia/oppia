@@ -257,9 +257,8 @@ describe('User Service', function() {
       .respond(500, errorMessage);
 
     UserService.setProfileImageDataUrlAsync(newProfileImageDataurl)
-      /* eslint-disable dot-notation */
+      /* eslint-disable-next-line dot-notation */
       .catch(function(error) {
-      /* eslint-enable dot-notation */
         expect(error.data).toEqual(errorMessage);
       });
     $httpBackend.flush();

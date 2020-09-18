@@ -21,10 +21,7 @@ import { Injectable } from '@angular/core';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
-/* eslint-disable max-len */
-import { NormalizeWhitespacePunctuationAndCasePipe } from
-  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
-/* eslint-enable max-len */
+import { NormalizeWhitespacePunctuationAndCasePipe } from 'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { PencilCodeEditorAnswer } from 'interactions/answer-defs';
 import { PencilCodeEditorRuleInputs } from 'interactions/rule-input-defs';
 
