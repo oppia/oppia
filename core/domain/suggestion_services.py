@@ -824,11 +824,11 @@ def create_reviewer_and_suggestion_counts_from_model(
     return suggestion_registry.ReviewerAndSuggestionCounts(
         (
             reviewer_and_suggestion_counts_model
-            .translation_reviewer_counts_per_lang
+            .translation_reviewer_counts_by_lang
         ),
         (
             reviewer_and_suggestion_counts_model
-            .translation_suggestion_counts_per_lang
+            .translation_suggestion_counts_by_lang
         ),
         reviewer_and_suggestion_counts_model.question_reviewer_count,
         reviewer_and_suggestion_counts_model.question_suggestion_count

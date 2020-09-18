@@ -1101,12 +1101,15 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
     """Domain object for the ReviewerAndSuggestionCountsModel.
 
     Attributes:
-        translation_reviewer_counts_per_lang: dict. A dictionary that contains
-            the total number of translation reviewers for each language that
-            translation suggestions are offered in.
-        translation_suggestion_counts_per_lang: dict. A dictionary that
-            contains the total total number of translation suggestions that are
-            currently in review per language.
+        translation_reviewer_counts_by_lang: dict. A dictionary where the keys
+            represent the languages that translation suggestions are offered in
+            and the values correspond to the total number of reviewers who have
+            permission to review translation suggestions in that language.
+        translation_suggestion_counts_by_lang: dict. A dictionary where the
+            keys represent the languages that translation suggestions are
+            offered in and the values correspond to the total number of
+            translation suggestions that are currently in review in that
+            language.
         question_reviewer_count: int. The total number of reviewers who have
             permission to review question suggestions.
         question_suggestion_count: int. The total number of question
@@ -1114,14 +1117,14 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
     """
 
     def __init__(
-            self, translation_reviewer_counts_per_lang,
-            translation_suggestion_counts_per_lang,
+            self, translation_reviewer_counts_by_lang,
+            translation_suggestion_counts_by_lang,
             question_reviewer_count, question_suggestion_count):
-        self.translation_reviewer_counts_per_lang = (
-            translation_reviewer_counts_per_lang
+        self.translation_reviewer_counts_by_lang = (
+            translation_reviewer_counts_by_lang
         )
-        self.translation_suggestion_counts_per_lang = (
-            translation_suggestion_counts_per_lang
+        self.translation_suggestion_counts_by_lang = (
+            translation_suggestion_counts_by_lang
         )
         self.question_reviewer_count = question_reviewer_count
         self.question_suggestion_count = question_suggestion_count
@@ -1134,32 +1137,32 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
                 ReviewerAndSuggestionCounts object is invalid.
         """
         for language_code, reviewer_count in (
-                self.translation_reviewer_counts_per_lang.items()):
+                self.translation_reviewer_counts_by_lang.items()):
             if reviewer_count < 0:
                 raise utils.ValidationError(
-                    'Expected the translation reviewer count to be positive, '
-                    'recieved: %s. The language code for the translation was '
-                    '%s.' % (reviewer_count, language_code)
+                    'Expected the translation reviewer count to be '
+                    'non-negative, recieved: %s. The language code for the '
+                    'translation was %s.' % (reviewer_count, language_code)
                 )
 
         for language_code, suggestion_count in (
-                self.translation_suggestion_counts_per_lang.items()):
+                self.translation_suggestion_counts_by_lang.items()):
             if suggestion_count < 0:
                 raise utils.ValidationError(
-                    'Expected the translation suggestion count to be positive, '
-                    'recieved: %s. The language code for the translation was '
-                    '%s.' % (suggestion_count, language_code)
+                    'Expected the translation suggestion count to be '
+                    'non-negative, recieved: %s. The language code for the '
+                    'translation was %s.' % (suggestion_count, language_code)
                 )
 
         if self.question_reviewer_count < 0:
             raise utils.ValidationError(
-                'Expected the question reviewer count to be positive, '
+                'Expected the question reviewer count to be non-negative, '
                 'recieved: %s.' % (self.question_reviewer_count)
             )
 
         if self.question_suggestion_count < 0:
             raise utils.ValidationError(
-                'Expected the question suggestion count to be positive, '
+                'Expected the question suggestion count to be non-negative, '
                 'recieved: %s.' % (self.question_suggestion_count)
             )
 
@@ -1174,7 +1177,7 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
             count: int. The number of reviewers that have the rights to review
                 translation suggestions in language_code.
         """
-        self.translation_reviewer_counts_per_lang[language_code] = count
+        self.translation_reviewer_counts_by_lang[language_code] = count
 
     def set_translation_suggestion_count_for_language_code(
             self, language_code, count):
@@ -1186,4 +1189,4 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
             count: int. The number of translation suggestions in language_code
                 that are currently in review.
         """
-        self.translation_suggestion_counts_per_lang[language_code] = count
+        self.translation_suggestion_counts_by_lang[language_code] = count

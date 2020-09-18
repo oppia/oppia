@@ -928,12 +928,12 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
 class ReviewerAndSuggestionCountsModelUnitTests(test_utils.GenericTestBase):
     """Tests the ReviewerAndSuggestionCountsModel class."""
 
-    translation_reviewer_counts_per_lang = {
+    translation_reviewer_counts_by_lang = {
         'hi': 0,
         'en': 1
     }
 
-    translation_suggestion_counts_per_lang = {
+    translation_suggestion_counts_by_lang = {
         'fr': 6,
         'en': 5
     }
@@ -944,11 +944,11 @@ class ReviewerAndSuggestionCountsModelUnitTests(test_utils.GenericTestBase):
     def test_get_returns_reviewer_and_suggestion_counts_model_when_it_exists(
             self):
         suggestion_models.ReviewerAndSuggestionCountsModel(
-            id=suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_ID,
-            translation_reviewer_counts_per_lang=(
-                self.translation_reviewer_counts_per_lang),
-            translation_suggestion_counts_per_lang=(
-                self.translation_suggestion_counts_per_lang),
+            id=suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID,
+            translation_reviewer_counts_by_lang=(
+                self.translation_reviewer_counts_by_lang),
+            translation_suggestion_counts_by_lang=(
+                self.translation_suggestion_counts_by_lang),
             question_reviewer_count=self.question_reviewer_count,
             question_suggestion_count=self.question_suggestion_count
         ).put()
@@ -959,21 +959,21 @@ class ReviewerAndSuggestionCountsModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             reviewer_and_suggestion_counts_model.id,
-            suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_ID
+            suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID
         )
         self.assertEqual(
             (
                 reviewer_and_suggestion_counts_model
-                .translation_reviewer_counts_per_lang
+                .translation_reviewer_counts_by_lang
             ),
-            self.translation_reviewer_counts_per_lang
+            self.translation_reviewer_counts_by_lang
         )
         self.assertEqual(
             (
                 reviewer_and_suggestion_counts_model
-                .translation_suggestion_counts_per_lang
+                .translation_suggestion_counts_by_lang
             ),
-            self.translation_suggestion_counts_per_lang
+            self.translation_suggestion_counts_by_lang
         )
         self.assertEqual(
             reviewer_and_suggestion_counts_model.question_reviewer_count,
@@ -995,18 +995,18 @@ class ReviewerAndSuggestionCountsModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             reviewer_and_suggestion_counts_model.id,
-            suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_ID
+            suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID
         )
         self.assertEqual(
             (
                 reviewer_and_suggestion_counts_model
-                .translation_reviewer_counts_per_lang
+                .translation_reviewer_counts_by_lang
             ), {}
         )
         self.assertEqual(
             (
                 reviewer_and_suggestion_counts_model
-                .translation_suggestion_counts_per_lang
+                .translation_suggestion_counts_by_lang
             ), {}
         )
         self.assertEqual(
