@@ -165,7 +165,7 @@ def switch_version(app_name, version_to_switch_to):
     latest_admin_version = get_latest_deployed_version(
         app_name, 'cloud-datastore-admin')
     subprocess.check_output([
-        common.GCLOUD_PATH, 'app', 'services', 'set-traffic',
+        common.GCLOUD_PATH, '--quiet', 'app', 'services', 'set-traffic',
         'cloud-datastore-admin', '--splits', '%s=1' % latest_admin_version,
         '--project=%s' % app_name])
 
