@@ -5,7 +5,7 @@
     "I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK_TEXT": "to improve your exploration.",
     "I18N_ABOUT_PAGE_ABOUT_TAB_HEADING": "About Oppia",
     "I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_1": "Oppia's mission is to help anyone learn anything they want in an effective and enjoyable way.",
-    "I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_2": "By creating a set of free, high-quality and effective lessons with the help of educators from around the world, Oppia aims to provide students with quality education &mdash; regardless of where they are or what traditional resources they have access to.",
+    "I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_2": "By creating a set of free, high-quality, demonstrably effective lessons with the help of educators from around the world, Oppia aims to provide students with quality education &mdash; regardless of where they are or what traditional resources they have access to.",
     "I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_3": "So far, educators have created more than <[numberOfExplorations]> of these lessons, which we call <em>explorations</em>. And they serve almost <[numberofStudentsServed]> students worldwide.",
     "I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_4": "Explorations help students learn in a fun and creative way, using videos, images, and open-ended questions. And since students often have similar misconceptions, Oppia also provides educators the ability to address these misconceptions directly within explorations, empowering them to provide targeted feedback to multiple students at a time.",
     "I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_5": "If you're a student interested in learning with Oppia, you can <a href=\"/community-library\">begin your learning adventure by browsing our explorations</a>.",
