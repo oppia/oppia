@@ -121,7 +121,18 @@ def main():
         ('esprima', common.ESPRIMA_VERSION, common.OPPIA_TOOLS_DIR),
         ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR)
+        ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR),
+        ('google-auth', common.GOOGLE_AUTH_VERSION, common.OPPIA_TOOLS_DIR),
+        (
+            'google-auth-httplib2', common.GOOGLE_AUTH_HTTPLIB2_VERSION,
+            common.OPPIA_TOOLS_DIR),
+        (
+            'google-api-python-client', common.GOOGLE_API_PYTHON_CLIENT_VERSION,
+            common.OPPIA_TOOLS_DIR),
+        (
+            'google-auth-oauthlib', common.GOOGLE_AUTH_OAUTHLIB_VERSION,
+            common.OPPIA_TOOLS_DIR),
+        ('simple-crypt', common.SIMPLE_CRYPT_VERSION, common.OPPIA_TOOLS_DIR)
     ]
 
     for package, version, path in pip_dependencies:
