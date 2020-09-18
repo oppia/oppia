@@ -29,7 +29,7 @@ class PendingDeletionRequest(python_utils.OBJECT):
 
     def __init__(
             self, user_id, email, role, deletion_complete, exploration_ids,
-            collection_ids, activity_mappings):
+            collection_ids, entity_mappings):
         """Constructs a PendingDeletionRequest domain object.
 
         Args:
@@ -50,7 +50,7 @@ class PendingDeletionRequest(python_utils.OBJECT):
         self.deletion_complete = deletion_complete
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
-        self.activity_mappings = activity_mappings
+        self.entity_mappings = entity_mappings
 
     @classmethod
     def create_default(
@@ -79,9 +79,9 @@ class PendingDeletionRequest(python_utils.OBJECT):
         """Checks that the domain object is valid.
 
         Raises:
-            ValidationError. The field activity_mappings contains wrong key.
+            ValidationError. The field entity_mappings contains wrong key.
         """
         for key in self.activity_mappings.keys():
             if key not in [name for name in models.NAMES.__dict__]:
                 raise utils.ValidationError(
-                    'activity_mappings contain wrong key')
+                    'entity_mappings contain wrong key')
