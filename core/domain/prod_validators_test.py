@@ -9541,7 +9541,7 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-    def test_model_validation_fails_for_invalid_lang_code_in_reviewers_dict(
+    def test_model_validation_fails_for_invalid_lang_code_in_reviewer_counts(
             self):
         counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
         counts_model.translation_reviewer_counts_by_lang_code = {
@@ -9558,7 +9558,7 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-    def test_model_validation_fails_for_invalid_lang_code_in_suggestions_dict(
+    def test_model_validation_fails_for_invalid_lang_code_in_suggestion_counts(
             self):
         counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
         counts_model.translation_suggestion_counts_by_lang_code = {
