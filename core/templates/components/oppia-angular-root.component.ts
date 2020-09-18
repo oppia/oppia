@@ -62,8 +62,8 @@
  */
 
 // We are using eslint disable here for multilines because we have exceeded
-// max-len limit at a lot of places so it is not possible to use eslint disable
-// next line for each of them.
+// max-len limit at a lot of places so it is not possible to use "eslint disable
+// next line" for each of them.
 /* eslint-disable oppia/no-multiline-disable */
 /* eslint-disable max-len */
 import { Component, Output, AfterViewInit, EventEmitter } from '@angular/core';

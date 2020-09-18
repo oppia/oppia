@@ -22,9 +22,7 @@ import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { StateEditorService } from
-  /* eslint-disable-next-line max-len */
-  'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 
 require('directives/angular-html-bind.directive.ts');
 

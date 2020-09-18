@@ -16,9 +16,7 @@
  * @fileoverview Unit tests for multiple choice input rules.
  */
 
-import { MultipleChoiceInputRulesService } from
-  /* eslint-disable-next-line max-len */
-  'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
+import { MultipleChoiceInputRulesService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 
 describe('Multiple choice input rules service', () => {
   let mcirs: MultipleChoiceInputRulesService = null;

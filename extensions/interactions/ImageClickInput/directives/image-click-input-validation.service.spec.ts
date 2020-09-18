@@ -22,9 +22,7 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { ImageClickInputCustomizationArgs } from
   'interactions/customization-args-defs';
-import { ImageClickInputValidationService } from
-  /* eslint-disable-next-line max-len*/
-  'interactions/ImageClickInput/directives/image-click-input-validation.service';
+import { ImageClickInputValidationService } from 'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';

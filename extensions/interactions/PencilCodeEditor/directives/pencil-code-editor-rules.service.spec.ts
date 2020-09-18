@@ -19,9 +19,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
-import { NormalizeWhitespacePunctuationAndCasePipe } from
-  /* eslint-disable-next-line max-len */
-  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
+import { NormalizeWhitespacePunctuationAndCasePipe } from 'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 

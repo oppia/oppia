@@ -56,9 +56,7 @@ import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { StateEditorService } from
-  /* eslint-disable-next-line max-len */
-  'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -73,8 +71,8 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/exploration-editor-page/services/graph-data.service');
 require('pages/exploration-editor-page/services/exploration-property.service');
-/* eslint-disable-next-line max-len */
-require('pages/exploration-editor-page/services/exploration-init-state-name.service');
+require(
+  'pages/exploration-editor-page/services/exploration-init-state-name.service');
 
 describe('Exploration Warnings Service', function() {
   var ExplorationWarningsService = null;

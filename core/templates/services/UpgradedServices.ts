@@ -687,8 +687,10 @@ export class UpgradedServices {
   getUpgradedServices(): UpgradedServicesDict {
     var upgradedServices = {};
     // We are using eslint disable here for multilines because we have not used
-    // dot notation at a lot of places so it is not possible to use
-    // eslint disable next line for each of them.
+    // dot notation at a lot of places so it does not seem practical to use
+    // "eslint disable next line" for each of them and we cant use dot notation
+    // either becuase then "Property 'AdminRouterService' does not exist on
+    // type '{}'" lint error will be raised by the linter.
     /* eslint-disable-next-line oppia/no-multiline-disable */
     /* eslint-disable dot-notation */
 

@@ -18,7 +18,6 @@
 
 import { TestBed } from '@angular/core/testing';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-/* eslint-disable-next-line max-len */
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
 
 describe('State hints service', () => {

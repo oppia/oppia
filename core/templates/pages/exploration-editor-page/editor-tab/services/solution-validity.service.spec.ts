@@ -16,9 +16,7 @@
  * @fileoverview Unit tests for Solution Validity Service.
  */
 
-import { SolutionValidityService } from
-  /* eslint-disable-next-line max-len */
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Solution Validity Service', function() {

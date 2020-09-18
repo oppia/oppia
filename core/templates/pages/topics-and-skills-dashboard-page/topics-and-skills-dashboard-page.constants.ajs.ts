@@ -18,9 +18,7 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { TopicsAndSkillsDashboardPageConstants } from
-  // eslint-disable-next-line max-len
-  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+import { TopicsAndSkillsDashboardPageConstants } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 
 angular.module('oppia').constant(
   'SKILL_DESCRIPTION_STATUS_VALUES',
