@@ -1169,10 +1169,10 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
         code given.
 
         Args:
-            language_code: str. The language code of translation suggestions
-                that reviewers have the rights to review.
+            language_code: str. The translation suggestion language code that
+                reviewers have the rights to review.
             count: int. The number of reviewers that have the rights to review
-                translations in language_code.
+                translation suggestions in language_code.
         """
         self.translation_reviewer_counts_per_lang[language_code] = count
 
@@ -1182,8 +1182,7 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
         code given.
 
         Args:
-            language_code: str. The language code of translation suggestions
-                that are currently in review.
+            language_code: str. The translation suggestion language code.
             count: int. The number of translation suggestions in language_code
                 that are currently in review.
         """
