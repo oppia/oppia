@@ -27,16 +27,16 @@ ruleTester.run('no-multiline-disable', rule, {
     `
     // eslint-disable-next-line max-len
     it('should' +
-    'happen')`,
+    'check if eslint-disable-next-line is allowed')`,
     `
     /* eslint-disable-next-line max-len */
     it('should' +
-    'happen')`,
+    'check if eslint-disable-next-line is allowed')`,
     `
     /* eslint-disable no-multiline-disable */
     /* eslint-disable max-len */
     it('should' +
-    'happen')`
+    'check if we can disable our new lint check')`
   ],
 
   invalid: [
