@@ -3109,7 +3109,8 @@ class ReviewerAndSuggestionCountsModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        # Valid id: reviewer_and_suggestion_counts.
+        # Since this is a singleton model, it has only one valid ID:
+        # reviewer_and_suggestion_counts.
         return '^%s$' % (
             suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID)
 
