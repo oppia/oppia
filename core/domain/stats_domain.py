@@ -613,14 +613,12 @@ class SessionStateStats(python_utils.OBJECT):
         return NotImplemented # https://stackoverflow.com/a/44575926
 
     def __hash__(self):
-        """Disallow hashing SessionStateStats since they are mutable by design.
-        """
+        """Disallow hashing SessionStateStats since it is mutable by design."""
         raise TypeError('%s is unhashable' % self.__class__.__name__)
 
     @classmethod
     def create_default(cls):
-        """Creates a SessionStateStats domain object and sets all values to 0.
-        """
+        """Creates a SessionStateStats domain object with all values at 0."""
         return cls(0, 0, 0, 0, 0, 0)
 
     @classmethod
