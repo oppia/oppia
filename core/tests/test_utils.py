@@ -2607,7 +2607,7 @@ class AppEngineTestBase(TestBase):
             queue_name: str|None. Name of the queue. Pass in None if no specific
                 queue is designated.
         """
-        return self.taskqueue_services_stub.process_and_flush_tasks(
+        self.taskqueue_services_stub.process_and_flush_tasks(
             queue_name=queue_name)
 
     def get_pending_tasks(self, queue_name=None):

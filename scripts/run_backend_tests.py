@@ -61,9 +61,9 @@ from . import install_third_party_libs
 # libraries that use the builtins python module (e.g. build, python_utils).
 install_third_party_libs.main()
 
+import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import . python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.OPPIA_TOOLS_DIR, 'pylint-%s' % common.PYLINT_VERSION),

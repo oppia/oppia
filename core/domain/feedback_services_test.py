@@ -781,8 +781,8 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
         feedback_services.enqueue_feedback_message_instant_email_task(
             user_id, reference)
         self.assertEqual(
-            self.count_jobs_in_taskqueue
-                queue_name=taskqueue_services.QUEUE_NAME_EMAILS,
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_EMAILS),
             1)
 
         tasks = self.get_pending_tasks(
