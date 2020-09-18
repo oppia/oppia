@@ -530,8 +530,8 @@ class StateStats(python_utils.OBJECT):
 
 
 class SessionStateStats(python_utils.OBJECT):
-    """Domain object representing analytic data for a state of an exploration
-    during a continuous learner session.
+    """Domain object representing analytic data for a specifc state of an
+    exploration, aggregated during a continuous learner session.
     """
 
     def __init__(
@@ -559,12 +559,7 @@ class SessionStateStats(python_utils.OBJECT):
         self.num_completions = num_completions
 
     def __repr__(self):
-        """Returns a detailed representation of self, distinguishing v1 values
-        from v2 values.
-
-        Returns:
-            str. A string representation of self.
-        """
+        """Returns a detailed representation of self."""
         props = [
             'total_answers_count',
             'useful_feedback_count',
@@ -578,9 +573,7 @@ class SessionStateStats(python_utils.OBJECT):
             ', '.join('%s=%r' % (prop, getattr(self, prop)) for prop in props))
 
     def to_dict(self):
-        """Returns a dict representation of the domain object for use in the
-        frontend.
-        """
+        """Returns a dict representation of self."""
         state_stats_dict = {
             'total_answers_count': self.total_answers_count,
             'useful_feedback_count': self.useful_feedback_count,
@@ -593,7 +586,7 @@ class SessionStateStats(python_utils.OBJECT):
 
     def __eq__(self, other):
         """Implements == comparison between two SessionStateStats instances,
-        returning whether they both hold the same values.
+        returning whether they hold the same values.
 
         Args:
             other: SessionStateStats. The other instance to compare.
@@ -620,18 +613,20 @@ class SessionStateStats(python_utils.OBJECT):
         return NotImplemented # https://stackoverflow.com/a/44575926
 
     def __hash__(self):
-        """Disallow hashing StateStats since they are mutable by design."""
+        """Disallow hashing SessionStateStats since they are mutable by design.
+        """
         raise TypeError('%s is unhashable' % self.__class__.__name__)
 
     @classmethod
     def create_default(cls):
-        """Creates a StateStats domain object and sets all properties to 0."""
+        """Creates a SessionStateStats domain object and sets all values to 0.
+        """
         return cls(0, 0, 0, 0, 0, 0)
 
     @classmethod
     def from_dict(cls, session_state_stats_dict):
-        """Returns a dict representation of the domain object for use in the
-        frontend.
+        """Creates a SessionStateStats domain object from the given dict of
+        values.
         """
         return cls(
             session_state_stats_dict['total_answers_count'],
