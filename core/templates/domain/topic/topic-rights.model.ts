@@ -89,5 +89,3 @@ export class TopicRights {
     return new TopicRights(false, false, false);
   }
 }
-
-

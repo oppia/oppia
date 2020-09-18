@@ -32,13 +32,13 @@ require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 
 import { EventEmitter } from '@angular/core';
 
-import { StorySummary } from 'domain/story/story-summary.model'; 
+import { StorySummary } from 'domain/story/story-summary.model';
 import { TopicRights } from 'domain/topic/topic-rights.model';
 
 angular.module('oppia').factory('TopicEditorStateService', [
   'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
-  'RubricObjectFactory', 'SubtopicPageObjectFactory', 
+  'RubricObjectFactory', 'SubtopicPageObjectFactory',
   'TopicObjectFactory', 'TopicRightsBackendApiService', 'UndoRedoService',
   function(
       AlertsService,

@@ -53,7 +53,7 @@ require('services/image-local-storage.service.ts');
 
 import { Subscription } from 'rxjs';
 
-import { TopicsAndSkillsDashboardFilter } from 
+import { TopicsAndSkillsDashboardFilter } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
 

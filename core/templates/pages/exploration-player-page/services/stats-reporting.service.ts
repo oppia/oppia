@@ -38,7 +38,7 @@ export class StatsReportingService {
       private playthroughService: PlaythroughService,
       private siteAnalyticsService: SiteAnalyticsService,
       private statsReportingBackendApiService: StatsReportingBackendApiService
-    ) {
+  ) {
     StatsReportingService.editorPreviewMode = (
       this.contextService.isInExplorationEditorPage());
     StatsReportingService.questionPlayerMode = (

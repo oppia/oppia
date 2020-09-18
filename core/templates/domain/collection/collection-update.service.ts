@@ -24,7 +24,7 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 
 require('domain/collection/collection-domain.constants.ajs.ts');
 
-import { Change } from 
+import { Change } from
   'domain/editor/undo_redo/change.model';
 
 angular.module('oppia').factory('CollectionUpdateService', [

@@ -24,8 +24,8 @@ require('services/csrf-token.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { LearnerDashboardActivityIds } from 
-  'domain/learner_dashboard/learner-dashboard-activity-ids.model'
+import { LearnerDashboardActivityIds } from
+  'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 import { TranslatorProviderForTests } from 'tests/test.extras';
 
 describe('Learner playlist service factory', function() {

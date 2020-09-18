@@ -26,7 +26,7 @@ require('pages/exploration-editor-page/services/graph-data.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
-import { ParamMetadata } from 
+import { ParamMetadata } from
   'domain/exploration/param-metadata.model';
 
 angular.module('oppia').factory('ParameterMetadataService', [

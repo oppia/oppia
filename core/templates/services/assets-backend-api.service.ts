@@ -23,7 +23,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/csrf-token.service.ts');
 
 import { AudioFile } from 'domain/utilities/audio-file.model';
-import { FileDownloadRequest } from 
+import { FileDownloadRequest } from
   'domain/utilities/file-download-request.model';
 import { ImageFile } from 'domain/utilities/image-file.model';
 

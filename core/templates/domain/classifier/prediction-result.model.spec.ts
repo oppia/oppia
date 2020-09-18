@@ -22,7 +22,8 @@ describe('Prediction Result Object Factory', () => {
   it('should create a new result object', () => {
     const label = 1;
     const confidence = 1;
-    const predictionResultObject = PredictionResult.createNew(label, confidence);
+    const predictionResultObject = PredictionResult.createNew(
+      label, confidence);
 
     expect(predictionResultObject.getLabel()).toBe(label);
     expect(predictionResultObject.getConfidence()).toBe(confidence);

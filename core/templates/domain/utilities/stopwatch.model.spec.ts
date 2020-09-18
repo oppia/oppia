@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for Stopwatch.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { Stopwatch } from
   'domain/utilities/stopwatch.model';
 

@@ -33,7 +33,9 @@ export class AudioLanguage {
     this.relatedLanguages = relatedLanguages;
   }
 
-  static createFromDict(audioLanguageDict: AudioLanguageBackendDict): AudioLanguage {
+  static createFromDict(
+      audioLanguageDict: AudioLanguageBackendDict
+  ): AudioLanguage {
     return new AudioLanguage(
       audioLanguageDict.id,
       audioLanguageDict.description,

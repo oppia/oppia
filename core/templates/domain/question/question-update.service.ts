@@ -27,7 +27,7 @@ require('domain/question/QuestionObjectFactory.ts');
 require('domain/question/question-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('QuestionUpdateService', [
-  'QuestionUndoRedoService', 'CMD_UPDATE_QUESTION_PROPERTY', 
+  'QuestionUndoRedoService', 'CMD_UPDATE_QUESTION_PROPERTY',
   'QUESTION_PROPERTY_LANGUAGE_CODE',
   'QUESTION_PROPERTY_QUESTION_STATE_DATA',
   function(

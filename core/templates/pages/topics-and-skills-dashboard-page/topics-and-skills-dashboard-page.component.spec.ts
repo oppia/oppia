@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 import { EventEmitter } from '@angular/core';
 
-import { TopicsAndSkillsDashboardFilter } from 
+import { TopicsAndSkillsDashboardFilter } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
 
