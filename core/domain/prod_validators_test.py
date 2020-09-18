@@ -9398,6 +9398,7 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
 
     negative_count = -1
     sample_language_code = 'en'
+    invalid_language_code = 'invalid'
 
     def setUp(self):
         super(ReviewerAndSuggestionCountsModelValidatorTests, self).setUp()
@@ -9406,6 +9407,12 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
             prod_validation_jobs_one_off
             .ReviewerAndSuggestionCountsModelAuditOneOffJob
         )
+
+    def test_model_validation_success_when_no_model_has_been_created(self):
+        expected_output = []
+
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
 
     def test_model_validation_success_when_model_has_non_zero_counts(self):
         suggestion_models.ReviewerAndSuggestionCountsModel(
@@ -9529,6 +9536,44 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
             'question suggestion count to be non-negative, recieved: '
             '%s.\']]' % (
                 counts_model.id, counts_model.question_suggestion_count)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_for_invalid_lang_code_in_reviewers_dict(
+            self):
+        reviewer_and_suggestion_counts = (
+            suggestion_services.get_reviewer_and_suggestion_counts()
+        )
+        counts_model.translation_reviewer_counts_by_lang = {
+            self.invalid_language_code: 1}
+        counts_model.put()
+        expected_output = [
+            u'[u\'failed validation check for domain object check of '
+            'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Invalid language code for '
+            'the translation reviewer counts %s.\']]' % (
+                counts_model.id, self.invalid_language_code)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_for_invalid_lang_code_in_suggestions_dict(
+            self):
+        reviewer_and_suggestion_counts = (
+            suggestion_services.get_reviewer_and_suggestion_counts()
+        )
+        counts_model.translation_suggestion_counts_by_lang = {
+            self.invalid_language_code: 1}
+        counts_model.put()
+        expected_output = [
+            u'[u\'failed validation check for domain object check of '
+            'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Invalid language code for '
+            'the translation suggestion counts %s.\']]' % (
+                counts_model.id, self.invalid_language_code)
         ]
 
         self.run_job_and_check_output(

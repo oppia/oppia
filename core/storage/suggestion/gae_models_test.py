@@ -1016,7 +1016,7 @@ class ReviewerAndSuggestionCountsModelUnitTests(test_utils.GenericTestBase):
             reviewer_and_suggestion_counts_model.question_suggestion_count, 0
         )
 
-    def test_get_deletion_policy(self):
+    def test_get_deletion_policy_returns_not_applicable(self):
         self.assertEqual(
             (
                 suggestion_models.ReviewerAndSuggestionCountsModel

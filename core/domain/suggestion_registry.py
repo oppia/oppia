@@ -1144,6 +1144,10 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
                     'non-negative, recieved: %s. The language code for the '
                     'translation was %s.' % (reviewer_count, language_code)
                 )
+            if not utils.is_valid_language_code(language_code):
+                raise utils.ValidationError(
+                    'Invalid language code for the translation reviewer '
+                    'counts: %s.' % language_code)
 
         for language_code, suggestion_count in (
                 self.translation_suggestion_counts_by_lang.items()):
@@ -1153,6 +1157,10 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
                     'non-negative, recieved: %s. The language code for the '
                     'translation was %s.' % (suggestion_count, language_code)
                 )
+            if not utils.is_valid_language_code(language_code):
+                raise utils.ValidationError(
+                    'Invalid language code for the translation suggestion '
+                    'counts: %s.' % language_code)
 
         if self.question_reviewer_count < 0:
             raise utils.ValidationError(

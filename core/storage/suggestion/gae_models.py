@@ -626,31 +626,26 @@ class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
     # suggestions are offered in and the values correspond to the total number
     # of reviewers who have permission to review translation suggestions in
     # that language.
-    translation_reviewer_counts_by_lang = ndb.JsonProperty(
-        required=True, indexed=True)
+    translation_reviewer_counts_by_lang = ndb.JsonProperty(required=True)
     # A dictionary where the keys represent the languages that translation
     # suggestions are offered in and the values correspond to the total number
     # of translation suggestions that are currently in review in that language.
-    translation_suggestion_counts_by_lang = ndb.JsonProperty(
-        required=True, indexed=True)
+    translation_suggestion_counts_by_lang = ndb.JsonProperty(required=True)
     # The total number of reviewers who have permission to review question
     # suggestions.
-    question_reviewer_count = ndb.IntegerProperty(
-        required=True, indexed=True)
+    question_reviewer_count = ndb.IntegerProperty(required=True)
     # The total number of question suggestions that are currently in review.
-    question_suggestion_count = ndb.IntegerProperty(
-        required=True, indexed=True)
+    question_suggestion_count = ndb.IntegerProperty(required=True)
 
     @classmethod
-    def get(cls, strict=True):
+    def get(cls):
         """Gets the ReviewerAndSuggestionCountsModel instance. If the
         ReviewerAndSuggestionCountsModel does not exist yet, it is created.
         This method helps enforce that there should only ever be one instance
         of this model.
 
         Returns:
-            ReviewerAndSuggestionCountsModel. The
-            ReviewerAndSuggestionCountsModel.
+            ReviewerAndSuggestionCountsModel. The single model instance.
         """
         reviewer_and_suggestion_counts_model = cls.get_by_id(
             REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID
@@ -669,7 +664,7 @@ class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
 
         return super(
             ReviewerAndSuggestionCountsModel, cls).get(
-                REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID, strict=strict)
+                REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID)
 
     @classmethod
     def get_deletion_policy(cls):

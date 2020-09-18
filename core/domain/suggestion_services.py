@@ -810,8 +810,10 @@ def get_voiceover_application(voiceover_application_id):
 
 def create_reviewer_and_suggestion_counts_from_model(
         reviewer_and_suggestion_counts_model):
-    """Creates a ReviewerAndSuggestionCounts domain object from the
-    ReviewerAndSuggestionCountsModel.
+    """Creates a ReviewerAndSuggestionCounts domain object from the model. The
+    domain object contains the counts of reviewers and suggestions in review.
+    Note that each call to this function returns a new domain object, but the
+    data copied into the domain object comes from a single, shared source.
 
     Args:
         reviewer_and_suggestion_counts_model: ReviewerAndSuggestionCountsModel.
@@ -837,8 +839,10 @@ def create_reviewer_and_suggestion_counts_from_model(
 
 def get_reviewer_and_suggestion_counts():
     """Retrieves the ReviewerAndSuggestionCountsModel and converts it to a
-    ReviewerAndSuggestionCounts domain object. The model is created by the
-    storage get call, if the model does not already exist.
+    ReviewerAndSuggestionCounts domain object. The object contains the counts
+    of reviewers and suggestions in review. Note that there is only ever one
+    instance of this model and if the model doesn't exist yet, it will be
+    created.
 
     Returns:
         ReviewerAndSuggestionCounts. The corresponding
