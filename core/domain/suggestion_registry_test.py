@@ -2416,10 +2416,7 @@ class ReviewerAndSuggestionCountsUnitTests(test_utils.GenericTestBase):
         reviewer_and_suggestion_counts.validate()
 
         self.assertEqual(
-            (
-                reviewer_and_suggestion_counts
-                .translation_reviewer_counts_by_lang
-            ),
+            reviewer_and_suggestion_counts.translation_reviewer_counts_by_lang,
             self.translation_reviewer_counts_by_lang)
         self.assertEqual(
             (
