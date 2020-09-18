@@ -744,6 +744,7 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
         feedback_services.create_thread(
             'exploration', self.exp_id, self.owner_id, 'subject', 'text')
 
+
         feedback_analytics_aggregator_swap = self.swap(
             feedback_jobs_continuous, 'FeedbackAnalyticsAggregator',
             MockFeedbackAnalyticsAggregator)
@@ -757,6 +758,7 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
                 self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_mapreduce_tasks()
+            self.process_and_flush_pending_tasks()
 
             response = self.get_json(
                 '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id))

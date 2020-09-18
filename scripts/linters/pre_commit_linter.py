@@ -112,6 +112,9 @@ _PATHS_TO_INSERT = [
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION),
     os.path.join(
+        _PARENT_DIR, 'oppia_tools',
+        'setuptools-%s' % common.SETUPTOOLS_VERSION),
+    os.path.join(
         _PARENT_DIR, 'oppia_tools', 'Pillow-%s' % common.PILLOW_VERSION),
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'psutil-%s' % common.PSUTIL_VERSION),
@@ -475,7 +478,17 @@ def main(args=None):
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
 
     install_third_party_libs.main()
+    import dev_appserver
+    dev_appserver.fix_sys_path()
 
+    if 'google' in sys.modules:
+        google_path = os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+        google_module = sys.modules['google']
+        google_module.__path__ = [google_path]
+        google_module.__file__ = os.path.join(google_path, '__init__.py')
+        print(google_module.__file__)
+
+    from google.cloud import tasks_v2
     python_utils.PRINT('Starting Linter....')
 
     if len(all_filepaths) == 0:

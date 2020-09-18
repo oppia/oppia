@@ -47,6 +47,7 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services

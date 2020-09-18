@@ -16,6 +16,7 @@
 
 """Provides cloud tasks api in DEV_MODE."""
 
+import os
 import requests
 import requests_toolbelt.adapters.appengine
 import feconf
@@ -24,7 +25,9 @@ from core.platform.taskqueue import cloud_tasks_emulator
 # Special app engine monkey patch. More details can be found here:
 # https://cloud.google.com/appengine/docs/standard/python/issue-requests#issuing_an_http_request
 requests_toolbelt.adapters.appengine.monkeypatch()
-
+GOOGLE_APP_ENGINE_PORT = (
+    os.environ['SERVER_PORT']
+    if 'SERVER_PORT' in os.environ else '8181')
 
 def _task_handler(url, payload, queue_name, task_name=None):
     """Makes a POST request to the task URL.
@@ -47,7 +50,7 @@ def _task_handler(url, payload, queue_name, task_name=None):
     headers['X-AppEngine-Fake-Is-Admin'] = '1'
     headers['method'] = 'POST'
     resp = requests.post(
-        'http://localhost:8181%s' % url,
+        'http://localhost:%s%s' % (GOOGLE_APP_ENGINE_PORT, url),
         json=payload,
         headers=headers)
 

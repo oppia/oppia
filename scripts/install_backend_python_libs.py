@@ -394,9 +394,21 @@ def _run_pip_command(cmd_parts):
         raise Exception('Error installing package')
 
 
+def pip_install_to_system(package, version):
+    """Installs third party libraries with pip to the current system.
+
+    Args:
+        package: str. The package name.
+        version: str. The package version.
+        upgrade: bool. Whether call the pip with --upgrade flag.
+    """
+    _run_pip_command([
+        'install', '%s==%s' % (package, version)])
+
+
 def pip_install(
         package, version, install_path, upgrade=False, no_dependencies=False):
-    """Installs third party libraries with pip.
+    """Installs third party libraries with pip to a specific path.
 
     Args:
         package: str. The package name.

@@ -246,6 +246,8 @@ libraries:
   version: "2.5.2"
 - name: grpcio
   version: 1.0.0
+- name: setuptools
+  version: 36.6.0
 
 # This is an access connector that connects to the Google Cloud Redis instance
 # used for memory caching. Please replace PROJECT_ID with the correct project id

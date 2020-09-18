@@ -109,7 +109,7 @@ jobs:
       - merge_target_branch
       - run:
           name: Setup python by installing wheel
-          command: pip install wheel==0.35.0 enum34==1.1.10 protobuf==3.13.0
+          command: pip install wheel==0.35.0
       - run:
           name: Install dependencies
           command: python -m scripts.install_third_party_libs
@@ -143,6 +143,9 @@ jobs:
       - attach_workspace:
           at: /home/circleci/
       - run:
+          name: Setup python by installing protobuf and enum
+          command: pip install enum34==1.1.10 protobuf==3.13.0
+      - run:
           name: Run e2e navigation test
           command: |
             python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
@@ -170,6 +173,9 @@ jobs:
       - install_chrome
       - attach_workspace:
           at: /home/circleci/
+      - run:
+          name: Setup python by installing protobuf and enum
+          command: pip install enum34==1.1.10 protobuf==3.13.0
       - run:
           name: Run e2e publication test
           command: |
@@ -200,6 +206,9 @@ jobs:
       - install_chrome
       - attach_workspace:
           at: /home/circleci/
+      - run:
+          name: Setup python by installing protobuf and enum
+          command: pip install enum34==1.1.10 protobuf==3.13.0
       - run:
           name: Run e2e users test
           command: |
@@ -234,6 +243,9 @@ jobs:
       - attach_workspace:
           at: /home/circleci/
       - run:
+          name: Setup python by installing protobuf and enum
+          command: pip install enum34==1.1.10 protobuf==3.13.0
+      - run:
           name: Run e2e file upload features test
           command: |
             python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
@@ -259,6 +271,9 @@ jobs:
       - install_chrome
       - attach_workspace:
           at: /home/circleci/
+      - run:
+          name: Setup python by installing protobuf and enum
+          command: pip install enum34==1.1.10 protobuf==3.13.0
       - run:
           name: Run e2e topics and skills dashboard test
           command: |

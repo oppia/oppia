@@ -71,7 +71,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
             return self.Response(task_name)
 
         with self.swap(
-            cloud_taskqueue_services.client, 'create_task', mock_create_task):
+            cloud_taskqueue_services.CLIENT, 'create_task', mock_create_task):
             cloud_taskqueue_services.create_http_task(
                 queue_name, dummy_url, payload=payload, task_name=task_name)
 
@@ -111,7 +111,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
             return self.Response(task_name)
 
         with self.swap(
-            cloud_taskqueue_services.client, 'create_task', mock_create_task):
+            cloud_taskqueue_services.CLIENT, 'create_task', mock_create_task):
             cloud_taskqueue_services.create_http_task(
                 queue_name, dummy_url, payload=payload,
                 scheduled_for=datetime_to_execute_task, task_name=task_name)

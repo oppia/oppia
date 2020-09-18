@@ -187,6 +187,7 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
                 'num_completions': 0,
                 'state_stats_mapping': {}
             })
+        self.process_and_flush_pending_tasks()
 
     def _rate_exploration(self, exp_id, ratings):
         """Create num_ratings ratings for exploration with exp_id,
@@ -195,11 +196,11 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         # Generate unique user ids to rate an exploration. Each user id needs
         # to be unique since each user can only give an exploration one rating.
         user_ids = ['user%d' % i for i in python_utils.RANGE(len(ratings))]
-        self.process_and_flush_tasks()
+        self.process_and_flush_pending_tasks()
         for ind, user_id in enumerate(user_ids):
             rating_services.assign_rating_to_exploration(
                 user_id, exp_id, ratings[ind])
-        self.process_and_flush_pending_mapreduce_tasks()
+        self.process_and_flush_pending_tasks()
 
     def _run_user_stats_aggregator_job(self):
         """Runs the User Stats Aggregator job."""
@@ -211,7 +212,7 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
-        self.process_and_flush_pending_mapreduce_tasks()
+
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""

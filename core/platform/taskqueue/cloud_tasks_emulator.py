@@ -89,10 +89,6 @@ class Emulator(python_utils.OBJECT):
         self.automatic_task_handling = automatic_task_handling
 
         self._queue_threads = {}
-        if self.automatic_task_handling:
-            # Launch threads for loaded queues, if any.
-            for queue_name in self._queues:
-                self._launch_queue_thread(queue_name)
 
     def _process_queue(self, queue_name):
         """The callback function for each individual queue thread. Each queue
@@ -219,7 +215,7 @@ class Emulator(python_utils.OBJECT):
                 self._execute_tasks(task_list)
                 self._queues[queue_name] = []
 
-    def get_tasks(self, queue_name):
+    def get_tasks(self, queue_name=None):
         """Returns a list of the tasks in a single queue if a queue name is
         specified or a list of all of the tasks in the taskqueue if no queue
         name is specified.
@@ -232,9 +228,10 @@ class Emulator(python_utils.OBJECT):
             list(Task). List of tasks in a single queue or in the entire
             taskqueue.
         """
-        if queue_name in self._queues:
+        if queue_name:
             return self._queues[queue_name]
         else:
             tasks_list = []
             for queue_name, task_list in self._queues.items():
                 tasks_list.extend(task_list)
+            return tasks_list

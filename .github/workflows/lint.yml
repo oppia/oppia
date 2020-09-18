@@ -23,7 +23,7 @@ jobs:
           architecture: 'x64'
       - name: Setup python by installing wheel
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: pip install wheel==0.35.0 enum34==1.1.10 protobuf==3.13.0
+        run: pip install wheel==0.35.0
       - name: Install Third Party Dependencies
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_third_party_libs

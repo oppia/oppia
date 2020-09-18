@@ -34,6 +34,8 @@ from core.domain import stats_services
 from core.domain import taskqueue_services
 from core.platform import models
 
+import python_utils
+
 (job_models, email_models) = models.Registry.import_models(
     [models.NAMES.job, models.NAMES.email])
 transaction_services = models.Registry.import_transaction_services()
@@ -77,6 +79,7 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
         transaction_services.run_in_transaction(
             feedback_services.pop_feedback_message_references, user_id,
             len(references))
+        self.render_json({})
 
 
 class SuggestionEmailHandler(base.BaseHandler):
@@ -95,6 +98,7 @@ class SuggestionEmailHandler(base.BaseHandler):
         email_manager.send_suggestion_email(
             exploration.title, exploration.id, suggestion.author_id,
             exploration_rights.owner_ids)
+        self.render_json({})
 
 
 class InstantFeedbackMessageEmailHandler(base.BaseHandler):
@@ -119,6 +123,7 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
             user_id, message.author_id, message.text, subject,
             exploration.title, reference_dict['entity_id'],
             thread.subject, reply_to_id=reply_to_id)
+        self.render_json({})
 
 
 class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
@@ -144,6 +149,7 @@ class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
         email_manager.send_instant_feedback_message_email(
             user_id, message.author_id, text, subject, exploration.title,
             reference_dict['entity_id'], thread.subject)
+        self.render_json({})
 
 
 class FlagExplorationEmailHandler(base.BaseHandler):
@@ -161,6 +167,7 @@ class FlagExplorationEmailHandler(base.BaseHandler):
 
         email_manager.send_flag_exploration_email(
             exploration.title, exploration_id, reporter_id, report_text)
+        self.render_json({})
 
 
 class DeferredTasksHandler(base.BaseHandler):
@@ -179,9 +186,14 @@ class DeferredTasksHandler(base.BaseHandler):
 
     def post(self):
         payload = json.loads(self.request.body.decode())
-        if 'fn_identifier' not in payload: #TODO: add header id
+        if 'fn_identifier' not in payload:
             raise Exception('This request cannot defer.')
+        if payload['fn_identifier'] not in self.DEFERRED_TASK_FUNCTIONS:
+            raise Exception(
+                'The function id, %s, is not valid' %
+                python_utils.convert_to_bytes(payload['fn_identifier']))
 
         deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
             payload['fn_identifier']]
         deferred_task_function(*payload['args'], **payload['kwargs'])
+        self.render_json({})

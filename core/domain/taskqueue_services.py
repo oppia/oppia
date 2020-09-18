@@ -67,8 +67,8 @@ def defer(fn_identifier, queue_name, *args, **kwargs):
             deferred.
         queue_name: str. The name of the queue to place the task into. Should be
             one of the QUEUE_NAME_* constants listed above.
-        *args: list(*). Positional arguments for fn. Positional arguments should
-        be json serializable.
+        *args: tuple(*). Positional arguments for fn. Positional arguments
+            should be json serializable.
         **kwargs: dict(str : *). Keyword arguments for fn.
 
     Raises:
@@ -83,11 +83,10 @@ def defer(fn_identifier, queue_name, *args, **kwargs):
     try:
         json.dumps(payload)
     except Exception:
-        raise Exception(
-            'The arguments, %s, or the keyword arguments, %s, are not JSON '
-            'serializable.' % (
-                python_utils.convert_to_bytes(args),
-                python_utils.convert_to_bytes(kwargs)))
+        raise ValueError(
+            'The args or kwargs passed to deferred call with '
+            'function_identifier, %s, is not json serializable.' %
+            fn_identifier)
     platform_taskqueue_services.create_http_task(
         queue_name=queue_name, url=feconf.TASK_URL_DEFERRED,
         payload=payload)
@@ -102,7 +101,15 @@ def enqueue_task(url, params, countdown):
             to None if no payload is required.
         countdown: int. Amount of time, in seconds, to wait before executing
             task.
+
+    Raises:
+        Exception. The params that are passed in are not JSON serializable.
     '''
+    try:
+        json.dumps(params)
+    except Exception:
+        raise ValueError(
+            'The params added to the email task call cannot be json serialized')
     scheduled_datetime = datetime.datetime.utcnow() + datetime.timedelta(
             seconds=countdown)
     platform_taskqueue_services.create_http_task(

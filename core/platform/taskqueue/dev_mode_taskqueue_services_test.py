@@ -26,7 +26,8 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
 
     def test_creating_dev_mode_task_will_create_the_correct_post_request(self):
         queue_name = 'dummy_queue'
-        dummy_url = 'localhost:8181/dummy_handler'
+        dummy_url = '/dummy_handler'
+        correct_port = dev_mode_taskqueue_services.GOOGLE_APP_ENGINE_PORT
         correct_payload = {
             'fn_identifier': taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS,
             'args': [['1', '2', '3']],
@@ -44,7 +45,8 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
         }
         def mock_post(self, url, json, headers):
             self.assertEqual(
-                url, 'http://localhost:8181%s' % feconf.TASK_URL_DEFERRED)
+                url, 'http://localhost:%s%s' % (
+                    correct_port, dummy_url))
             self.assertEqual(json, correct_payload)
             self.assertEqual(headers, correct_headers)
 

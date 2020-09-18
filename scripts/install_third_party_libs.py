@@ -29,7 +29,7 @@ TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
 PREREQUISITES = [
     ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
-    ('future', '0.18.2  ', os.path.join(
+    ('future', '0.18.2', os.path.join(
         'third_party', 'python_libs')),
 ]
 
@@ -106,12 +106,24 @@ def ensure_pip_library_is_installed(package, version, path):
         install_backend_python_libs.pip_install(
             package, version, exact_lib_path)
 
+def ensure_system_python_libraries_are_installed(package, version):
+    python_utils.PRINT(
+        'Checking if %s is installed.' % (package))
+    install_backend_python_libs.pip_install_to_system(package, version)
 
 def main():
     """Install third-party libraries for Oppia."""
     setup.main(args=[])
     setup_gae.main(args=[])
-    pip_dependencies = [
+    # These system python libraries are REQUIRED to start the development server
+    # and cannot be added to oppia_tools because the dev_appserver python script
+    # looks for them in the default system paths when it is run. Therefore, we
+    # must install these libraries to the developer's computer.
+    system_pip_dependencies = [
+        ('enum34', common.ENUM_VERSION),
+        ('protobuf', common.PROTOBUF_VERSION)
+    ]
+    local_pip_dependencies = [
         ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
         ('pylint', common.PYLINT_VERSION, common.OPPIA_TOOLS_DIR),
         ('Pillow', common.PILLOW_VERSION, common.OPPIA_TOOLS_DIR),
@@ -122,12 +134,15 @@ def main():
         ('esprima', common.ESPRIMA_VERSION, common.OPPIA_TOOLS_DIR),
         ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR)
+        ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR),
+        ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR),
     ]
 
-    for package, version, path in pip_dependencies:
+    for package, version, path in local_pip_dependencies:
         ensure_pip_library_is_installed(package, version, path)
 
+    for package, version in system_pip_dependencies:
+        ensure_system_python_libraries_are_installed(package, version)
     # Do a little surgery on configparser in pylint-1.9.4 to remove dependency
     # on ConverterMapping, which is not implemented in some Python
     # distributions.
@@ -185,12 +200,6 @@ def main():
             os.path.join(
                 common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
             os.path.join(correct_google_path, 'net'))
-
-    if not os.path.isdir(os.path.join(correct_google_path, 'protobuf')):
-        shutil.copytree(
-            os.path.join(
-                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'protobuf'),
-            os.path.join(correct_google_path, 'protobuf'))
 
     if not os.path.isdir(os.path.join(correct_google_path, 'pyglib')):
         shutil.copytree(
