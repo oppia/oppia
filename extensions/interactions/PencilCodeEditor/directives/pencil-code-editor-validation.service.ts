@@ -25,8 +25,7 @@ import { baseInteractionValidationService, Warning } from
   'interactions/base-interaction-validation.service';
 import { PencilCodeEditorCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 
 @Injectable({
   providedIn: 'root'

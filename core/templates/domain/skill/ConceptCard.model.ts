@@ -17,24 +17,19 @@
  * concept card. In the backend, this is referred to as SkillContents.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import {
   RecordedVoiceovers,
-  RecordedVoiceOverBackendDict,
-  RecordedVoiceoversObjectFactory
-} from 'domain/exploration/RecordedVoiceoversObjectFactory';
+  RecordedVoiceOverBackendDict
+} from 'domain/exploration/RecordedVoiceovers.model';
 import {
   SubtitledHtml,
-  SubtitledHtmlBackendDict,
-  SubtitledHtmlObjectFactory
-} from 'domain/exploration/SubtitledHtmlObjectFactory';
+  SubtitledHtmlBackendDict
+} from 'domain/exploration/SubtitledHtml.model';
 import {
   WorkedExample,
-  WorkedExampleBackendDict,
-  WorkedExampleObjectFactory
-} from 'domain/skill/WorkedExampleObjectFactory';
+  WorkedExampleBackendDict
+} from 'domain/skill/WorkedExample.model';
 
 export interface ConceptCardBackendDict {
   'explanation': SubtitledHtmlBackendDict;
@@ -122,54 +117,39 @@ export class ConceptCard {
   getRecordedVoiceovers(): RecordedVoiceovers {
     return this._recordedVoiceovers;
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ConceptCardObjectFactory {
-  constructor(
-      private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
-      private recordedVoiceoversObjectFactory:
-          RecordedVoiceoversObjectFactory,
-      private workedExampleObjectFactory: WorkedExampleObjectFactory) {}
-
-  _generateWorkedExamplesFromBackendDict(
+  static _generateWorkedExamplesFromBackendDict(
       workedExampleDicts: WorkedExampleBackendDict[]): WorkedExample[] {
     return workedExampleDicts.map(workedExampleDict=> {
-      return this.workedExampleObjectFactory.createFromBackendDict(
+      return WorkedExample.createFromBackendDict(
         workedExampleDict);
     });
   }
 
   // Create an interstitial concept card that would be displayed in the
   // editor until the actual skill is fetched from the backend.
-  createInterstitialConceptCard(): ConceptCard {
+  static createInterstitialConceptCard(): ConceptCard {
     let recordedVoiceoversDict = {
       voiceovers_mapping: {
         COMPONENT_NAME_EXPLANATION: {}
       }
     };
     return new ConceptCard(
-      this.subtitledHtmlObjectFactory.createDefault(
+      SubtitledHtml.createDefault(
         'Loading review material', AppConstants.COMPONENT_NAME_EXPLANATION), [],
-      this.recordedVoiceoversObjectFactory.createFromBackendDict(
+      RecordedVoiceovers.createFromBackendDict(
         recordedVoiceoversDict)
     );
   }
 
-  createFromBackendDict(
+  static createFromBackendDict(
       conceptCardBackendDict: ConceptCardBackendDict): ConceptCard {
     return new ConceptCard(
-      this.subtitledHtmlObjectFactory.createFromBackendDict(
+      SubtitledHtml.createFromBackendDict(
         conceptCardBackendDict.explanation),
       this._generateWorkedExamplesFromBackendDict(
         conceptCardBackendDict.worked_examples),
-      this.recordedVoiceoversObjectFactory.createFromBackendDict(
+      RecordedVoiceovers.createFromBackendDict(
         conceptCardBackendDict.recorded_voiceovers));
   }
 }
-
-angular.module('oppia').factory(
-  'ConceptCardObjectFactory',
-  downgradeInjectable(ConceptCardObjectFactory));

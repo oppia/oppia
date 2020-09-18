@@ -31,8 +31,6 @@ import { AnswerGroupsCacheService } from
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solution.service';
@@ -133,8 +131,6 @@ describe('Teach Oppia Modal Controller', function() {
     $provide.value(
       'TextInputRulesService',
       TestBed.get(TextInputRulesService));
-    $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
     $provide.value(
       'StateCustomizationArgsService', stateCustomizationArgsService);
     $provide.value(

@@ -23,8 +23,7 @@ import { AlertsService } from 'services/alerts.service';
 import { StatePropertyService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-property.service';
-import { RecordedVoiceovers } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
 import { UtilsService } from 'services/utils.service';
 
 @Injectable({

@@ -19,12 +19,10 @@
 import { TestBed } from '@angular/core/testing';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 import { Subscription } from 'rxjs';
 
@@ -39,9 +37,7 @@ describe('Display Hint Modal Controller', function() {
   var HintsAndSolutionManagerService = null;
   var interactionObjectFactory = null;
   var playerTranscriptService = null;
-  var recordedVoiceoversObjectFactory = null;
   var stateCardObjectFactory = null;
-  var subtitledHtmlObjectFactory = null;
 
   var card = null;
   var hintContent = null;
@@ -52,10 +48,7 @@ describe('Display Hint Modal Controller', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
-    recordedVoiceoversObjectFactory = TestBed.get(
-      RecordedVoiceoversObjectFactory);
     stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
   });
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -75,7 +68,7 @@ describe('Display Hint Modal Controller', function() {
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
 
-    hintContent = subtitledHtmlObjectFactory.createDefault(
+    hintContent = SubtitledHtml.createDefault(
       'content_1', 'Hint Content');
     spyOn(HintsAndSolutionManagerService, 'displayHint').and.returnValue(
       hintContent);
@@ -87,7 +80,7 @@ describe('Display Hint Modal Controller', function() {
       hints: [],
       id: null
     });
-    var recordedVoiceovers = recordedVoiceoversObjectFactory.createEmpty();
+    var recordedVoiceovers = RecordedVoiceovers.createEmpty();
     card = stateCardObjectFactory.createNewCard(
       'Card 1', 'Content html', 'Interaction text', interaction,
       recordedVoiceovers, 'content_id');

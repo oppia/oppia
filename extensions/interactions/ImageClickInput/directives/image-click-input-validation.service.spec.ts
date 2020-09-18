@@ -26,9 +26,8 @@ import { ImageClickInputCustomizationArgs } from
 import { ImageClickInputValidationService } from
   'interactions/ImageClickInput/directives/image-click-input-validation.service';
 /* eslint-enable max-len*/
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
+import { Rule } from 'domain/exploration/Rule.model';
 
 import { AppConstants } from 'app.constants';
 
@@ -40,8 +39,7 @@ describe('ImageClickInputValidationService', () => {
   let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[];
   let goodDefaultOutcome: Outcome;
   var customizationArguments: ImageClickInputCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
-  let rof: RuleObjectFactory;
+  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -49,13 +47,11 @@ describe('ImageClickInputValidationService', () => {
     });
 
     validatorService = TestBed.get(ImageClickInputValidationService);
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: '',
@@ -67,7 +63,7 @@ describe('ImageClickInputValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    badOutcome = oof.createFromBackendDict({
+    badOutcome = Outcome.createFromBackendDict({
       dest: currentState,
       feedback: {
         html: '',
@@ -102,7 +98,7 @@ describe('ImageClickInputValidationService', () => {
     };
 
     goodAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'IsInRegion',
         inputs: {
           x: 'SecondLabel'

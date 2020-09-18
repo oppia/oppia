@@ -29,8 +29,7 @@ import { RatioObjectFactory, Ratio } from
   'domain/objects/RatioObjectFactory';
 import { RatioExpressionInputRulesService } from
   './ratio-expression-input-rules.service';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 import { AppConstants } from 'app.constants';
 
 @Injectable({

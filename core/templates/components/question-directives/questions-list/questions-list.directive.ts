@@ -15,6 +15,7 @@
 /**
  * @fileoverview Controller for the questions list.
  */
+import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
 
 require('directives/angular-html-bind.directive.ts');
 require(
@@ -49,7 +50,6 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
-require('domain/skill/ShortSkillSummaryObjectFactory.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/SkillDifficultyObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -95,18 +95,17 @@ angular.module('oppia').directive('questionsList', [
         'ImageLocalStorageService', 'MisconceptionObjectFactory',
         'QuestionCreationService', 'QuestionObjectFactory',
         'QuestionUndoRedoService', 'QuestionValidationService',
-        'QuestionsListService', 'ShortSkillSummaryObjectFactory',
-        'SkillBackendApiService', 'SkillDifficultyObjectFactory',
-        'WindowDimensionsService', 'NUM_QUESTIONS_PER_PAGE',
-        function(
+        'QuestionsListService', 'SkillBackendApiService',
+        'SkillDifficultyObjectFactory', 'WindowDimensionsService',
+        'NUM_QUESTIONS_PER_PAGE', function(
             $location, $rootScope, $timeout, $uibModal, AlertsService,
             ContextService, EditableQuestionBackendApiService,
             ImageLocalStorageService, MisconceptionObjectFactory,
             QuestionCreationService, QuestionObjectFactory,
             QuestionUndoRedoService, QuestionValidationService,
-            QuestionsListService, ShortSkillSummaryObjectFactory,
-            SkillBackendApiService, SkillDifficultyObjectFactory,
-            WindowDimensionsService, NUM_QUESTIONS_PER_PAGE) {
+            QuestionsListService, SkillBackendApiService,
+            SkillDifficultyObjectFactory, WindowDimensionsService,
+            NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _reInitializeSelectedSkillIds = function() {
@@ -363,7 +362,7 @@ angular.module('oppia').directive('questionsList', [
                           misconception);
                       });
                     ctrl.associatedSkillSummaries.push(
-                      ShortSkillSummaryObjectFactory.create(
+                      ShortSkillSummary.create(
                         skillDict.id, skillDict.description));
                   });
                 }
@@ -559,7 +558,7 @@ angular.module('oppia').directive('questionsList', [
               }
 
               ctrl.associatedSkillSummaries.push(
-                ShortSkillSummaryObjectFactory.create(
+                ShortSkillSummary.create(
                   summary.id, summary.description));
               ctrl.skillLinkageModificationsArray = [];
               ctrl.skillLinkageModificationsArray.push({

@@ -22,24 +22,21 @@ import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/Hint.model';
 import { InteractionObjectFactory, Interaction } from
   'domain/exploration/InteractionObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory.ts';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 describe('Interaction object factory', () => {
   let iof = null;
-  let oof = null;
   let agof = null;
-  let hof = null;
   let sof = null;
   let answerGroupsDict = null;
   let defaultOutcomeDict = null;
@@ -52,9 +49,7 @@ describe('Interaction object factory', () => {
       providers: [CamelCaseToHyphensPipe]
     });
     iof = TestBed.get(InteractionObjectFactory);
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    hof = TestBed.get(HintObjectFactory);
     sof = TestBed.get(SolutionObjectFactory);
     defaultOutcomeDict = {
       dest: 'dest_default',
@@ -493,9 +488,10 @@ describe('Interaction object factory', () => {
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null
     };
-    const newDefaultOutcome = oof.createFromBackendDict(newDefaultOutcomeDict);
+    const newDefaultOutcome = Outcome.createFromBackendDict(
+      newDefaultOutcomeDict);
     expect(testInteraction.defaultOutcome).toEqual(
-      oof.createFromBackendDict({
+      Outcome.createFromBackendDict({
         dest: 'dest_default',
         feedback: {
           content_id: 'default_outcome',
@@ -563,9 +559,9 @@ describe('Interaction object factory', () => {
         content_id: 'content_id_new'
       }
     };
-    const newHint = hof.createFromBackendDict(newHintDict);
+    const newHint = Hint.createFromBackendDict(newHintDict);
     expect(testInteraction.hints).toEqual(hintsDict.map(function(hintDict) {
-      return hof.createFromBackendDict(hintDict);
+      return Hint.createFromBackendDict(hintDict);
     }));
     testInteraction.setHints([newHint]);
     expect(testInteraction.hints).toEqual([newHint]);

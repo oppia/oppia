@@ -30,7 +30,7 @@ import { ExplorationPlayerConstants } from
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 import { PredictionAlgorithmRegistryService }
   // eslint-disable-next-line max-len
   from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';

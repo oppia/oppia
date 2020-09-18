@@ -18,30 +18,23 @@
 
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 
 describe('Answer classification result object factory', () => {
   let acrof: AnswerClassificationResultObjectFactory;
-  let oof: OutcomeObjectFactory;
   let DEFAULT_OUTCOME_CLASSIFICATION: string;
 
   beforeEach(() => {
     acrof = new AnswerClassificationResultObjectFactory();
-    oof = new OutcomeObjectFactory(
-      new SubtitledHtmlObjectFactory());
     DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
   });
 
   it('should create a new result', () => {
-    var answerClassificationResult = acrof.createNew(
-      oof.createNew('default', '', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
-    );
+    var answerClassificationResult = acrof.createNew(Outcome.createNew(
+      'default', '', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION);
 
     expect(answerClassificationResult.outcome).toEqual(
-      oof.createNew('default', '', '', []));
+      Outcome.createNew('default', '', '', []));
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
     expect(answerClassificationResult.classificationCategorization).toEqual(
       DEFAULT_OUTCOME_CLASSIFICATION);

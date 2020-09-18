@@ -25,7 +25,7 @@ import { AnswerStatsObjectFactory } from
 import { AnswerStatsBackendDict } from
   'domain/exploration/visualization-info-object.factory';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Rule } from 'domain/exploration/Rule.model';
 import { StateTopAnswersStats } from
   'domain/statistics/state-top-answers-stats-object.factory';
 import { StateTopAnswersStatsService } from
@@ -39,7 +39,6 @@ const joC = jasmine.objectContaining;
 
 describe('StateTopAnswersStatsService', () => {
   let answerStatsObjectFactory: AnswerStatsObjectFactory;
-  let ruleObjectFactory: RuleObjectFactory;
   let stateTopAnswersStatsBackendApiService:
     StateTopAnswersStatsBackendApiService;
   let stateTopAnswersStatsService: StateTopAnswersStatsService;
@@ -49,7 +48,6 @@ describe('StateTopAnswersStatsService', () => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
 
     answerStatsObjectFactory = TestBed.get(AnswerStatsObjectFactory);
-    ruleObjectFactory = TestBed.get(RuleObjectFactory);
     stateTopAnswersStatsBackendApiService = (
       TestBed.get(StateTopAnswersStatsBackendApiService));
     stateTopAnswersStatsService = TestBed.get(StateTopAnswersStatsService);
@@ -292,7 +290,7 @@ describe('StateTopAnswersStatsService', () => {
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules.push(
-      ruleObjectFactory.createNew('Contains', {x: 'adios'}));
+      Rule.createNew('Contains', {x: 'adios'}));
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
@@ -313,7 +311,7 @@ describe('StateTopAnswersStatsService', () => {
 
     const updatedState = states.getState('Hola');
     updatedState.interaction.answerGroups[0].rules = [
-      ruleObjectFactory.createNew('Contains', {x: 'bonjour'})
+      Rule.createNew('Contains', {x: 'bonjour'})
     ];
     stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
 

@@ -20,9 +20,6 @@
 // App.ts is upgraded to Angular 8.
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -39,8 +36,6 @@ describe('App', function() {
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-      $provide.value('RuleObjectFactory', new RuleObjectFactory());
-      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());

@@ -63,7 +63,7 @@ import {
 } from 'interactions/customization-args-defs';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 /**
  * These dtslint type tests check that for each interaction, its frontend

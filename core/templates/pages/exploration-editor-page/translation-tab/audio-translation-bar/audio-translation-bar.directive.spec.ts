@@ -23,8 +23,6 @@ import { AnswerGroupsCacheService } from
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solution.service';
@@ -47,8 +45,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { EditabilityService } from 'services/editability.service';
@@ -74,7 +71,6 @@ describe('Audio translation bar directive', function() {
   var contextService = null;
   var editabilityService = null;
   var explorationStatesService = null;
-  var recordedVoiceoversObjectFactory = null;
   var siteAnalyticsService = null;
   var stateEditorService = null;
   var stateRecordedVoiceoversService = null;
@@ -98,8 +94,6 @@ describe('Audio translation bar directive', function() {
   beforeEach(function() {
     alertsService = TestBed.get(AlertsService);
     editabilityService = TestBed.get(EditabilityService);
-    recordedVoiceoversObjectFactory = TestBed.get(
-      RecordedVoiceoversObjectFactory);
     siteAnalyticsService = TestBed.get(SiteAnalyticsService);
     stateRecordedVoiceoversService = TestBed.get(
       StateRecordedVoiceoversService);
@@ -112,8 +106,6 @@ describe('Audio translation bar directive', function() {
     $provide.value(
       'TextInputRulesService',
       TestBed.get(TextInputRulesService));
-    $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
     mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
@@ -180,7 +172,7 @@ describe('Audio translation bar directive', function() {
       mockShowTranslationTabBusyModalEventEmitter);
 
     stateRecordedVoiceoversService.init(
-      stateName, recordedVoiceoversObjectFactory.createFromBackendDict({
+      stateName, RecordedVoiceovers.createFromBackendDict({
         voiceovers_mapping: {
           content: {
             en: {
@@ -738,7 +730,7 @@ describe('Audio translation bar directive', function() {
           canVoiceover: true
         }));
       stateRecordedVoiceoversService.init(
-        stateName, recordedVoiceoversObjectFactory.createFromBackendDict({
+        stateName, RecordedVoiceovers.createFromBackendDict({
           voiceovers_mapping: {
             content: {
               en: {

@@ -15,7 +15,8 @@
 /**
  * @fileoverview Controller for add answer group modal.
  */
-
+import { Rule } from 'domain/exploration/Rule.model';
+import { Outcome } from 'domain/exploration/Outcome.model';
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -23,23 +24,19 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('domain/exploration/OutcomeObjectFactory.ts');
-require('domain/exploration/RuleObjectFactory.ts');
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
 require('services/generate-content-id.service.ts');
 
 angular.module('oppia').controller('AddAnswerGroupModalController', [
   '$controller', '$scope', '$uibModalInstance', 'EditorFirstTimeEventsService',
-  'GenerateContentIdService', 'OutcomeObjectFactory', 'RuleObjectFactory',
-  'StateEditorService', 'addState', 'currentInteractionId',
-  'stateName', 'COMPONENT_NAME_FEEDBACK',
+  'GenerateContentIdService', 'StateEditorService', 'addState',
+  'currentInteractionId', 'stateName', 'COMPONENT_NAME_FEEDBACK',
   'INTERACTION_SPECS',
   function(
       $controller, $scope, $uibModalInstance, EditorFirstTimeEventsService,
-      GenerateContentIdService, OutcomeObjectFactory, RuleObjectFactory,
-      StateEditorService, addState, currentInteractionId,
-      stateName, COMPONENT_NAME_FEEDBACK,
+      GenerateContentIdService, StateEditorService, addState,
+      currentInteractionId, stateName, COMPONENT_NAME_FEEDBACK,
       INTERACTION_SPECS) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
@@ -70,10 +67,10 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
         currentInteractionId &&
         INTERACTION_SPECS[currentInteractionId].is_linear);
     };
-    $scope.tmpRule = RuleObjectFactory.createNew(null, {});
+    $scope.tmpRule = Rule.createNew(null, {});
     var feedbackContentId = GenerateContentIdService.getNextStateId(
       COMPONENT_NAME_FEEDBACK);
-    $scope.tmpOutcome = OutcomeObjectFactory.createNew(
+    $scope.tmpOutcome = Outcome.createNew(
       $scope.questionModeEnabled ? null : stateName,
       feedbackContentId, '', []);
     $scope.tmpTaggedSkillMisconceptionId = null;

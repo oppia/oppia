@@ -16,7 +16,6 @@
  * @fileoverview Directives for the outcome feedback editor.
  */
 
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/context.service.ts');
 

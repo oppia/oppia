@@ -18,7 +18,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
-
+import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model'
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Subtopic editor tab', function() {
@@ -38,7 +38,6 @@ describe('Subtopic editor tab', function() {
   var TopicEditorRoutingService = null;
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
-  var ShortSkillSummaryObjectFactory = null;
   var SubtopicPageObjectFactory = null;
   var MockWindowDimensionsService = {
     isWindowNarrow: () => false
@@ -55,8 +54,6 @@ describe('Subtopic editor tab', function() {
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
-    ShortSkillSummaryObjectFactory = $injector.get(
-      'ShortSkillSummaryObjectFactory');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     $location = $injector.get('$location');
 
@@ -67,8 +64,7 @@ describe('Subtopic editor tab', function() {
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');
     subtopic._skillIds = ['skill_1'];
     subtopic.setUrlFragment('dummy-url');
-    skillSummary = ShortSkillSummaryObjectFactory.create(
-      'skill_1', 'Description 1');
+    skillSummary = ShortSkillSummary.create('skill_1', 'Description 1');
     topic._uncategorizedSkillSummaries = [skillSummary];
     var subtopicPage = SubtopicPageObjectFactory.createDefault('asd2r42', '1');
     topic._id = 'sndsjfn42';
@@ -201,8 +197,7 @@ describe('Subtopic editor tab', function() {
   });
 
   it('should return if skill is deleted', function() {
-    var skillSummary = ShortSkillSummaryObjectFactory.create(
-      '1', 'Skill description');
+    var skillSummary = ShortSkillSummary.create('1', 'Skill description');
     expect(ctrl.isSkillDeleted(skillSummary)).toEqual(false);
   });
 

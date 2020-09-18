@@ -29,7 +29,7 @@ import { StateInteractionStats, StateInteractionStatsService } from
   'services/state-interaction-stats.service';
 import { VisualizationInfoObjectFactory } from
   'domain/exploration/visualization-info-object.factory';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 import { State, StateBackendDict, StateObjectFactory } from
   'domain/state/StateObjectFactory';
 

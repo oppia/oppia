@@ -30,8 +30,7 @@ import { AlgebraicExpressionInputCustomizationArgs } from
 import { AlgebraicExpressionInputRulesService } from
   './algebraic-expression-input-rules.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 import { AppConstants } from 'app.constants';
 
 @Injectable({

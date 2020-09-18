@@ -15,6 +15,8 @@
 /**
  * @fileoverview Component for the training panel in the state editor.
  */
+import { Outcome } from 'domain/exploration/Outcome.model';
+
 require(
   'components/state-directives/outcome-editor/' +
   'outcome-feedback-editor.directive.ts');
@@ -41,13 +43,13 @@ angular.module('oppia').component('trainingPanel', {
   template: require('./training-panel.component.html'),
   controller: [
     '$scope', 'ExplorationHtmlFormatterService', 'ExplorationStatesService',
-    'GenerateContentIdService', 'OutcomeObjectFactory', 'ResponsesService',
+    'GenerateContentIdService', 'ResponsesService',
     'StateCustomizationArgsService', 'StateEditorService',
     'StateInteractionIdService', 'TrainingDataService',
     'COMPONENT_NAME_FEEDBACK',
     function(
         $scope, ExplorationHtmlFormatterService, ExplorationStatesService,
-        GenerateContentIdService, OutcomeObjectFactory, ResponsesService,
+        GenerateContentIdService, ResponsesService,
         StateCustomizationArgsService, StateEditorService,
         StateInteractionIdService, TrainingDataService,
         COMPONENT_NAME_FEEDBACK) {
@@ -66,7 +68,7 @@ angular.module('oppia').component('trainingPanel', {
       $scope.beginAddingNewResponse = function() {
         var contentId = GenerateContentIdService.getNextStateId(
           COMPONENT_NAME_FEEDBACK);
-        ctrl.classification.newOutcome = OutcomeObjectFactory.createNew(
+        ctrl.classification.newOutcome = Outcome.createNew(
           StateEditorService.getActiveStateName(), contentId, '', []);
         ctrl.addingNewResponse = true;
       };

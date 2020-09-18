@@ -23,8 +23,7 @@ import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 
 import { Subscription } from 'rxjs';
 
@@ -33,8 +32,6 @@ describe('Add Answer Group Modal Controller', function() {
   var $uibModalInstance = null;
   var editorFirstTimeEventsService = null;
   var generateContentIdService = null;
-  var outcomeObjectFactory = null;
-  var ruleObjectFactory = null;
   var stateEditorService = null;
 
   var addState = null;
@@ -51,8 +48,6 @@ describe('Add Answer Group Modal Controller', function() {
   beforeEach(function() {
     editorFirstTimeEventsService = TestBed.get(EditorFirstTimeEventsService);
     generateContentIdService = TestBed.get(GenerateContentIdService);
-    outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
-    ruleObjectFactory = TestBed.get(RuleObjectFactory);
     stateEditorService = TestBed.get(StateEditorService);
   });
 
@@ -70,8 +65,6 @@ describe('Add Answer Group Modal Controller', function() {
       $uibModalInstance: $uibModalInstance,
       EditorFirstTimeEventsService: editorFirstTimeEventsService,
       GenerateContentIdService: generateContentIdService,
-      OutcomeObjectFactory: outcomeObjectFactory,
-      RuleObjectFactory: ruleObjectFactory,
       StateEditorService: stateEditorService,
       addState: addState,
       currentInteractionId: currentInteractionId,
@@ -133,11 +126,11 @@ describe('Add Answer Group Modal Controller', function() {
   });
 
   it('should check if outcome has no feedback with self loop', function() {
-    var outcome = outcomeObjectFactory.createNew(
+    var outcome = Outcome.createNew(
       'State Name', '1', '', []);
     expect($scope.isSelfLoopWithNoFeedback(outcome)).toBe(true);
 
-    var outcome2 = outcomeObjectFactory.createNew(
+    var outcome2 = Outcome.createNew(
       'State Name', '1', 'Feedback Text', []);
     expect($scope.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
   });

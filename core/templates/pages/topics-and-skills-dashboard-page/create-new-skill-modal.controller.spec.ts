@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for the Create new skill modal controller.
  */
-
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model'
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Create new skill modal', function() {
@@ -24,7 +24,6 @@ describe('Create new skill modal', function() {
   var skillDifficulties = null;
   var RubricObjectFactory = null;
   var COMPONENT_NAME_EXPLANATION = null;
-  var SubtitledHtmlObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -40,7 +39,6 @@ describe('Create new skill modal', function() {
     skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
     COMPONENT_NAME_EXPLANATION = $injector.get('COMPONENT_NAME_EXPLANATION');
     RubricObjectFactory = $injector.get('RubricObjectFactory');
-    SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
     $scope = $rootScope.$new();
     $controller('CreateNewSkillModalController', {
       $scope: $scope,
@@ -124,7 +122,7 @@ describe('Create new skill modal', function() {
       RubricObjectFactory.create(skillDifficulties[0], []),
       RubricObjectFactory.create(skillDifficulties[1], ['Large addition']),
       RubricObjectFactory.create(skillDifficulties[2], [])];
-    var explanationObject = SubtitledHtmlObjectFactory.createDefault(
+    var explanationObject = SubtitledHtml.createDefault(
       $scope.bindableDict.displayedConceptCardExplanation,
       COMPONENT_NAME_EXPLANATION);
     var newExplanationObject = explanationObject.toBackendDict();

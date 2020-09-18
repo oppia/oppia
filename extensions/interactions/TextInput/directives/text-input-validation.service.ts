@@ -30,8 +30,7 @@ import { NormalizeWhitespacePipe } from
 import { TextInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { TextInputRulesService } from './text-input-rules.service';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { UtilsService } from 'services/utils.service';

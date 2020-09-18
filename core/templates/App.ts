@@ -107,7 +107,7 @@ angular.module('oppia').config([
       'BottomNavbarStatusService', 'BrowserCheckerService',
       'CkEditorCopyContentService', 'ClassroomBackendApiService',
       'CodeReplRulesService', 'CollectionCreationBackendService',
-      'ComputeGraphService', 'ConceptCardObjectFactory', 'ContextService',
+      'ComputeGraphService', 'ContextService',
       'CreatorDashboardBackendApiService', 'CsrfTokenService',
       'CurrentInteractionService', 'DateTimeFormatService',
       'DebouncerService', 'DeviceInfoService',

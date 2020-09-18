@@ -20,16 +20,13 @@ import { TestBed } from '@angular/core/testing';
 
 import { SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtml.model';
 
 describe('Subtopic page contents object factory', () => {
   let subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory =
     null;
-  let recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory = null;
-  let subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory = null;
 
   const expectedDefaultObject = {
     subtitled_html: {
@@ -69,9 +66,6 @@ describe('Subtopic page contents object factory', () => {
 
     subtopicPageContentsObjectFactory = TestBed.get(
       SubtopicPageContentsObjectFactory);
-    recordedVoiceoversObjectFactory = TestBed.get(
-      RecordedVoiceoversObjectFactory);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
   });
 
   it('should be able to create a default object', () => {
@@ -123,16 +117,16 @@ describe('Subtopic page contents object factory', () => {
       subtopicPageContentsObjectFactory.createFromBackendDict(backendDict));
 
     expect(sampleSubtopicPageContents.getSubtitledHtml()).toEqual(
-      subtitledHtmlObjectFactory.createFromBackendDict({
+      SubtitledHtml.createFromBackendDict({
         html: 'test content',
         content_id: 'content'
       }));
 
     sampleSubtopicPageContents.setSubtitledHtml(
-      subtitledHtmlObjectFactory.createDefault('new html content', 'new id'));
+      SubtitledHtml.createDefault('new html content', 'new id'));
 
     expect(sampleSubtopicPageContents.getSubtitledHtml()).toEqual(
-      subtitledHtmlObjectFactory.createFromBackendDict({
+      SubtitledHtml.createFromBackendDict({
         html: 'new html content',
         content_id: 'new id'
       }));
@@ -151,7 +145,7 @@ describe('Subtopic page contents object factory', () => {
     });
 
     sampleSubtopicPageContents.setRecordedVoiceovers(
-      recordedVoiceoversObjectFactory.createFromBackendDict({
+      RecordedVoiceovers.createFromBackendDict({
         voiceovers_mapping: {
           content: {
             en: {

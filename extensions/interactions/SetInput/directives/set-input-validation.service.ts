@@ -26,10 +26,8 @@ import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { SetInputCustomizationArgs } from
   'interactions/customization-args-defs';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
-import { Rule } from
-  'domain/exploration/RuleObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
+import { Rule } from 'domain/exploration/Rule.model';
 
 interface PreviousRule {
   answerGroupIndex: number;

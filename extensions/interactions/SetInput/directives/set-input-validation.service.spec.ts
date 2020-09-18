@@ -22,9 +22,9 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { SetInputValidationService } from
   'interactions/SetInput/directives/set-input-validation.service';
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Outcome } from
+  'domain/exploration/Outcome.model';
+import { Rule } from 'domain/exploration/Rule.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
@@ -38,8 +38,7 @@ describe('SetInputValidationService', () => {
 
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
-    rof: RuleObjectFactory;
+  let agof: AnswerGroupObjectFactory;
 
   let goodCustomizationArgs: SetInputCustomizationArgs;
 
@@ -53,9 +52,7 @@ describe('SetInputValidationService', () => {
     validatorService = TestBed.get(SetInputValidationService);
 
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
 
     goodCustomizationArgs = {
       buttonText: {
@@ -65,7 +62,7 @@ describe('SetInputValidationService', () => {
 
     currentState = 'First State';
 
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: '',
@@ -140,7 +137,7 @@ describe('SetInputValidationService', () => {
     describe('check identical rules', () => {
       describe('Equals', () => {
         it('should generate errors with identical rules', () => {
-          let equalsRule = rof.createFromBackendDict({
+          let equalsRule = Rule.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
               x: ['1', '2', '3']
@@ -165,13 +162,13 @@ describe('SetInputValidationService', () => {
 
         it('should not generate errors with non-redundant rules of the ' +
           'same type', () => {
-          let equalsRule1 = rof.createFromBackendDict({
+          let equalsRule1 = Rule.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
               x: ['1', '2', '3']
             }
           });
-          let equalsRule2 = rof.createFromBackendDict({
+          let equalsRule2 = Rule.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
               x: ['3', '4', '5', '6']
@@ -193,7 +190,7 @@ describe('SetInputValidationService', () => {
 
       describe('IsSubsetOf', () => {
         it('should generate errors with identical rules', () => {
-          let subsetRule = rof.createFromBackendDict({
+          let subsetRule = Rule.createFromBackendDict({
             rule_type: 'IsSubsetOf',
             inputs: {
               x: ['1', '2', '3']
@@ -218,13 +215,13 @@ describe('SetInputValidationService', () => {
 
         it('should not generate errors with non-redundant rules of the ' +
           'same type', () => {
-          let subsetRule1 = rof.createFromBackendDict({
+          let subsetRule1 = Rule.createFromBackendDict({
             rule_type: 'IsSubsetOf',
             inputs: {
               x: ['1', '2', '3']
             }
           });
-          let subsetRule2 = rof.createFromBackendDict({
+          let subsetRule2 = Rule.createFromBackendDict({
             rule_type: 'IsSubsetOf',
             inputs: {
               x: ['3', '4', '5', '6']
@@ -246,7 +243,7 @@ describe('SetInputValidationService', () => {
 
       describe('HasElementsIn', () => {
         it('should generate errors with identical rules', () => {
-          let hasElementsInRule = rof.createFromBackendDict({
+          let hasElementsInRule = Rule.createFromBackendDict({
             rule_type: 'HasElementsIn',
             inputs: {
               x: ['1', '2', '3']
@@ -271,13 +268,13 @@ describe('SetInputValidationService', () => {
 
         it('should not generate errors with non-redundant rules of the ' +
           'same type', () => {
-          let hasElementsInRule1 = rof.createFromBackendDict({
+          let hasElementsInRule1 = Rule.createFromBackendDict({
             rule_type: 'HasElementsIn',
             inputs: {
               x: ['1', '2', '3']
             }
           });
-          let hasElementsInRule2 = rof.createFromBackendDict({
+          let hasElementsInRule2 = Rule.createFromBackendDict({
             rule_type: 'HasElementsIn',
             inputs: {
               x: ['3', '4', '5', '6']
@@ -299,7 +296,7 @@ describe('SetInputValidationService', () => {
 
       describe('IsDisjointFrom', () => {
         it('should generate errors with identical rules', () => {
-          let disjointRule = rof.createFromBackendDict({
+          let disjointRule = Rule.createFromBackendDict({
             rule_type: 'IsDisjointFrom',
             inputs: {
               x: ['1', '2', '3']
@@ -324,13 +321,13 @@ describe('SetInputValidationService', () => {
 
         it('should not generate errors with non-redundant rules of the ' +
           'same type', () => {
-          let disjointRule1 = rof.createFromBackendDict({
+          let disjointRule1 = Rule.createFromBackendDict({
             rule_type: 'IsDisjointFrom',
             inputs: {
               x: ['1', '2', '3']
             }
           });
-          let disjointRule2 = rof.createFromBackendDict({
+          let disjointRule2 = Rule.createFromBackendDict({
             rule_type: 'IsDisjointFrom',
             inputs: {
               x: ['3', '4', '5', '6']
@@ -352,7 +349,7 @@ describe('SetInputValidationService', () => {
 
       describe('IsSupersetOf', () => {
         it('should generate errors with identical rules', () => {
-          let supersetRule = rof.createFromBackendDict({
+          let supersetRule = Rule.createFromBackendDict({
             rule_type: 'IsSupersetOf',
             inputs: {
               x: ['1', '2', '3']
@@ -377,13 +374,13 @@ describe('SetInputValidationService', () => {
 
         it('should not generate errors with non-redundant rules of the ' +
           'same type', () => {
-          let supersetRule1 = rof.createFromBackendDict({
+          let supersetRule1 = Rule.createFromBackendDict({
             rule_type: 'IsSupersetOf',
             inputs: {
               x: ['1', '2', '3']
             }
           });
-          let supersetRule2 = rof.createFromBackendDict({
+          let supersetRule2 = Rule.createFromBackendDict({
             rule_type: 'IsSupersetOf',
             inputs: {
               x: ['3', '4', '5', '6']
@@ -405,7 +402,7 @@ describe('SetInputValidationService', () => {
 
       describe('HasElementsNotIn', () => {
         it('should generate errors with identical rules', () => {
-          let hasElementNotInRule = rof.createFromBackendDict({
+          let hasElementNotInRule = Rule.createFromBackendDict({
             rule_type: 'HasElementsNotIn',
             inputs: {
               x: ['1', '2', '3']
@@ -430,13 +427,13 @@ describe('SetInputValidationService', () => {
 
         it('should not generate errors with non-redundant rules of the ' +
           'same type', () => {
-          let hasElementNotInRule1 = rof.createFromBackendDict({
+          let hasElementNotInRule1 = Rule.createFromBackendDict({
             rule_type: 'HasElementsNotIn',
             inputs: {
               x: ['1', '2', '3']
             }
           });
-          let hasElementNotInRule2 = rof.createFromBackendDict({
+          let hasElementNotInRule2 = Rule.createFromBackendDict({
             rule_type: 'HasElementsNotIn',
             inputs: {
               x: ['3', '4', '5', '6']
@@ -458,7 +455,7 @@ describe('SetInputValidationService', () => {
 
       describe('OmitsElementsIn', () => {
         it('should generate errors with identical rules', () => {
-          let omitElementRule = rof.createFromBackendDict({
+          let omitElementRule = Rule.createFromBackendDict({
             rule_type: 'OmitsElementsIn',
             inputs: {
               x: ['1', '2', '3']
@@ -483,13 +480,13 @@ describe('SetInputValidationService', () => {
 
         it('should not generate errors with non-redundant rules of the ' +
           'same type', () => {
-          let omitElementRule1 = rof.createFromBackendDict({
+          let omitElementRule1 = Rule.createFromBackendDict({
             rule_type: 'OmitsElementsIn',
             inputs: {
               x: ['1', '2', '3']
             }
           });
-          let omitElementRule2 = rof.createFromBackendDict({
+          let omitElementRule2 = Rule.createFromBackendDict({
             rule_type: 'OmitsElementsIn',
             inputs: {
               x: ['3', '4', '5', '6']
@@ -515,13 +512,13 @@ describe('SetInputValidationService', () => {
         let subsetRule1: Rule, subsetRule2: Rule;
 
         beforeEach(() => {
-          subsetRule1 = rof.createFromBackendDict({
+          subsetRule1 = Rule.createFromBackendDict({
             rule_type: 'IsSubsetOf',
             inputs: {
               x: ['1', '2', '3']
             }
           });
-          subsetRule2 = rof.createFromBackendDict({
+          subsetRule2 = Rule.createFromBackendDict({
             rule_type: 'IsSubsetOf',
             inputs: {
               x: ['1', '2', '3', '4']
@@ -566,13 +563,13 @@ describe('SetInputValidationService', () => {
         let hasElementsInRule1: Rule, hasElementsInRule2: Rule;
 
         beforeEach(() => {
-          hasElementsInRule1 = rof.createFromBackendDict({
+          hasElementsInRule1 = Rule.createFromBackendDict({
             rule_type: 'HasElementsIn',
             inputs: {
               x: ['1', '2', '3']
             }
           });
-          hasElementsInRule2 = rof.createFromBackendDict({
+          hasElementsInRule2 = Rule.createFromBackendDict({
             rule_type: 'HasElementsIn',
             inputs: {
               x: ['1', '2', '3', '4']
@@ -617,13 +614,13 @@ describe('SetInputValidationService', () => {
         let disjointRule1: Rule, disjointRule2: Rule;
 
         beforeEach(() => {
-          disjointRule1 = rof.createFromBackendDict({
+          disjointRule1 = Rule.createFromBackendDict({
             rule_type: 'IsDisjointFrom',
             inputs: {
               x: ['1', '2', '3']
             }
           });
-          disjointRule2 = rof.createFromBackendDict({
+          disjointRule2 = Rule.createFromBackendDict({
             rule_type: 'IsDisjointFrom',
             inputs: {
               x: ['1', '2', '3', '4']
@@ -668,13 +665,13 @@ describe('SetInputValidationService', () => {
         let supersetRule1: Rule, supersetRule2: Rule;
 
         beforeEach(() => {
-          supersetRule1 = rof.createFromBackendDict({
+          supersetRule1 = Rule.createFromBackendDict({
             rule_type: 'IsSupersetOf',
             inputs: {
               x: ['1', '2', '3']
             }
           });
-          supersetRule2 = rof.createFromBackendDict({
+          supersetRule2 = Rule.createFromBackendDict({
             rule_type: 'IsSupersetOf',
             inputs: {
               x: ['1', '2', '3', '4']
@@ -719,13 +716,13 @@ describe('SetInputValidationService', () => {
         let hasElementsNotInRule1: Rule, hasElementsNotInRule2: Rule;
 
         beforeEach(() => {
-          hasElementsNotInRule1 = rof.createFromBackendDict({
+          hasElementsNotInRule1 = Rule.createFromBackendDict({
             rule_type: 'HasElementsNotIn',
             inputs: {
               x: ['1', '2', '3']
             }
           });
-          hasElementsNotInRule2 = rof.createFromBackendDict({
+          hasElementsNotInRule2 = Rule.createFromBackendDict({
             rule_type: 'HasElementsNotIn',
             inputs: {
               x: ['1', '2', '3', '4']
@@ -770,13 +767,13 @@ describe('SetInputValidationService', () => {
         let omitsElementsInRule1: Rule, omitsElementsInRule2: Rule;
 
         beforeEach(() => {
-          omitsElementsInRule1 = rof.createFromBackendDict({
+          omitsElementsInRule1 = Rule.createFromBackendDict({
             rule_type: 'OmitsElementsIn',
             inputs: {
               x: ['1', '2', '3']
             }
           });
-          omitsElementsInRule2 = rof.createFromBackendDict({
+          omitsElementsInRule2 = Rule.createFromBackendDict({
             rule_type: 'OmitsElementsIn',
             inputs: {
               x: ['1', '2', '3', '4']

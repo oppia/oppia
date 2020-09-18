@@ -26,12 +26,8 @@ import { QuestionSummaryObjectFactory } from
   'domain/question/QuestionSummaryObjectFactory';
 import { QuestionSummaryForOneSkillObjectFactory } from
   'domain/question/QuestionSummaryForOneSkillObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
 import { SkillRightsObjectFactory } from
   'domain/skill/SkillRightsObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -140,11 +136,7 @@ describe('Skill editor state service', function() {
       'QuestionSummaryForOneSkillObjectFactory',
       new QuestionSummaryForOneSkillObjectFactory(
         new QuestionSummaryObjectFactory));
-    $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
     $provide.value('SkillRightsObjectFactory', new SkillRightsObjectFactory());
-    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
       'SkillBackendApiService',
       [fakeSkillBackendApiService][0]);

@@ -18,7 +18,6 @@
  * across all answer groups.
  */
 
-require('domain/exploration/RuleObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/graph-data.service.ts');
 require(

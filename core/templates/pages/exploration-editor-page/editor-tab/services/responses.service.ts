@@ -17,7 +17,7 @@
  * answer groups.
  */
 
-require('domain/exploration/OutcomeObjectFactory.ts');
+import { Outcome } from 'domain/exploration/Outcome.model';
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'answer-groups-cache.service.ts');
@@ -43,8 +43,7 @@ import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('ResponsesService', [
   'AlertsService', 'AnswerGroupsCacheService',
-  'LoggerService', 'OutcomeObjectFactory',
-  'SolutionValidityService', 'SolutionVerificationService',
+  'LoggerService', 'SolutionValidityService', 'SolutionVerificationService',
   'StateEditorService', 'StateInteractionIdService',
   'StateSolutionService', 'COMPONENT_NAME_DEFAULT_OUTCOME',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
@@ -52,8 +51,7 @@ angular.module('oppia').factory('ResponsesService', [
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INTERACTION_SPECS',
   function(
       AlertsService, AnswerGroupsCacheService,
-      LoggerService, OutcomeObjectFactory,
-      SolutionValidityService, SolutionVerificationService,
+      LoggerService, SolutionValidityService, SolutionVerificationService,
       StateEditorService, StateInteractionIdService,
       StateSolutionService, COMPONENT_NAME_DEFAULT_OUTCOME,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE,
@@ -253,7 +251,7 @@ angular.module('oppia').factory('ResponsesService', [
           if (INTERACTION_SPECS[newInteractionId].is_terminal) {
             _defaultOutcome = null;
           } else if (!_defaultOutcome) {
-            _defaultOutcome = OutcomeObjectFactory.createNew(
+            _defaultOutcome = Outcome.createNew(
               StateEditorService.getActiveStateName(),
               COMPONENT_NAME_DEFAULT_OUTCOME, '', []);
           }

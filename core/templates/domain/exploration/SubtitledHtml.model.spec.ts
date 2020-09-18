@@ -16,16 +16,12 @@
  * @fileoverview Unit tests for the SubtitledHtml object factory.
  */
 
-import { SubtitledHtmlObjectFactory, SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 describe('SubtitledHtml object factory', () => {
-  let shof: SubtitledHtmlObjectFactory, subtitledHtml: SubtitledHtml;
-
+  let subtitledHtml = null;
   beforeEach(() => {
-    shof = new SubtitledHtmlObjectFactory();
-
-    subtitledHtml = shof.createFromBackendDict({
+    subtitledHtml = SubtitledHtml.createFromBackendDict({
       content_id: 'content_id',
       html: '<p>some html</p>'
     });
@@ -61,7 +57,8 @@ describe('SubtitledHtml object factory', () => {
   });
 
   it('should create default object', () => {
-    const defaultSubtitledHtml = shof.createDefault('test html', 'content_id');
+    const defaultSubtitledHtml = SubtitledHtml.createDefault(
+      'test html', 'content_id');
     expect(defaultSubtitledHtml.getHtml()).toEqual('test html');
     expect(defaultSubtitledHtml.getContentId()).toEqual('content_id');
   });

@@ -27,7 +27,6 @@ require(
   'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
   'add-hint-modal.controller.ts');
 
-require('domain/exploration/HintObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +

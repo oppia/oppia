@@ -24,9 +24,8 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { NumericInputValidationService } from
   'interactions/NumericInput/directives/numeric-input-validation.service';
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
+import { Rule } from 'domain/exploration/Rule.model';
 
 import { AppConstants } from 'app.constants';
 
@@ -38,8 +37,7 @@ describe('NumericInputValidationService', () => {
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let betweenNegativeOneAndOneRule: Rule, equalsZeroRule: Rule,
     lessThanOneRule: Rule;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
-    rof: RuleObjectFactory;
+  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -49,12 +47,10 @@ describe('NumericInputValidationService', () => {
     validatorService = TestBed.get(NumericInputValidationService);
 
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         content_id: '',
@@ -65,20 +61,20 @@ describe('NumericInputValidationService', () => {
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null
     });
-    equalsZeroRule = rof.createFromBackendDict({
+    equalsZeroRule = Rule.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: 0
       }
     });
-    betweenNegativeOneAndOneRule = rof.createFromBackendDict({
+    betweenNegativeOneAndOneRule = Rule.createFromBackendDict({
       rule_type: 'IsInclusivelyBetween',
       inputs: {
         a: -1,
         b: 1
       }
     });
-    lessThanOneRule = rof.createFromBackendDict({
+    lessThanOneRule = Rule.createFromBackendDict({
       rule_type: 'IsLessThan',
       inputs: {
         x: 1

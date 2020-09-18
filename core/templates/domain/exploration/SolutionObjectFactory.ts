@@ -29,8 +29,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
-import { SubtitledHtml, SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
 import {
   FractionAnswer,
@@ -59,17 +58,14 @@ interface ShortAnswerResponse {
 
 export class Solution {
   ehfs: ExplorationHtmlFormatterService;
-  shof: SubtitledHtmlObjectFactory;
   answerIsExclusive: boolean;
   correctAnswer: InteractionAnswer;
   explanation: SubtitledHtml;
   constructor(
       ehfs: ExplorationHtmlFormatterService,
-      shof: SubtitledHtmlObjectFactory,
       answerIsExclusive: boolean, correctAnswer: InteractionAnswer,
       explanation: SubtitledHtml) {
     this.ehfs = ehfs;
-    this.shof = shof;
     this.answerIsExclusive = answerIsExclusive;
     this.correctAnswer = correctAnswer;
     this.explanation = explanation;
@@ -141,15 +137,13 @@ export class Solution {
 })
 export class SolutionObjectFactory {
   constructor(
-    private shof: SubtitledHtmlObjectFactory,
     private ehfs: ExplorationHtmlFormatterService) {}
   createFromBackendDict(solutionBackendDict: SolutionBackendDict): Solution {
     return new Solution(
       this.ehfs,
-      this.shof,
       solutionBackendDict.answer_is_exclusive,
       solutionBackendDict.correct_answer,
-      this.shof.createFromBackendDict(
+      SubtitledHtml.createFromBackendDict(
         solutionBackendDict.explanation));
   }
 
@@ -158,10 +152,9 @@ export class SolutionObjectFactory {
       explanationHtml: string, explanationId: string): Solution {
     return new Solution(
       this.ehfs,
-      this.shof,
       answerIsExclusive,
       correctAnswer,
-      this.shof.createDefault(
+      SubtitledHtml.createDefault(
         explanationHtml, explanationId));
   }
 }

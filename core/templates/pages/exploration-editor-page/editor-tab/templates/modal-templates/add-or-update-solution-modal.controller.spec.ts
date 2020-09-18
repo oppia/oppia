@@ -32,8 +32,7 @@ import { StateCustomizationArgsService }
 import { StateInteractionIdService }
   // eslint-disable-next-line max-len
   from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 describe('Add Or Update Solution Modal Controller', function() {
   var $scope = null;
@@ -45,7 +44,6 @@ describe('Add Or Update Solution Modal Controller', function() {
   var stateCustomizationArgsService = null;
   var stateInteractionIdService = null;
   var stateSolutionService = null;
-  var subtitledHtmlObjectFactory = null;
 
   var answerEditorHtml = {};
 
@@ -58,7 +56,6 @@ describe('Add Or Update Solution Modal Controller', function() {
     stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
     stateSolutionService = TestBed.get(StateSolutionService);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
   });
 
   describe('when solution is valid', function() {
@@ -75,7 +72,7 @@ describe('Add Or Update Solution Modal Controller', function() {
 
       answerEditorHtml = {
         answerIsExclusive: true,
-        explanation: subtitledHtmlObjectFactory.createDefault(
+        explanation: SubtitledHtml.createDefault(
           'Explanation html', 'cont_1')
       };
 

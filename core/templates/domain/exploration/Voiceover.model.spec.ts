@@ -16,16 +16,14 @@
  * @fileoverview Unit tests for the Voiceover object factory.
  */
 
-import { VoiceoverObjectFactory, Voiceover } from
+import { Voiceover } from
   'domain/exploration/VoiceoverObjectFactory';
 
 describe('Voiceover object factory', () => {
-  let vof: VoiceoverObjectFactory;
   let voiceover: Voiceover;
 
   beforeEach(() => {
-    vof = new VoiceoverObjectFactory();
-    voiceover = vof.createFromBackendDict({
+    voiceover = Voiceover.createFromBackendDict({
       filename: 'a.mp3',
       file_size_bytes: 200000,
       needs_update: false,
@@ -35,7 +33,7 @@ describe('Voiceover object factory', () => {
 
   it('should correctly mark voiceover as needing update', () => {
     voiceover.markAsNeedingUpdate();
-    expect(voiceover).toEqual(vof.createFromBackendDict({
+    expect(voiceover).toEqual(Voiceover.createFromBackendDict({
       filename: 'a.mp3',
       file_size_bytes: 200000,
       needs_update: true,
@@ -45,7 +43,7 @@ describe('Voiceover object factory', () => {
 
   it('should toggle needs update attribute correctly', () => {
     voiceover.toggleNeedsUpdateAttribute();
-    expect(voiceover).toEqual(vof.createFromBackendDict({
+    expect(voiceover).toEqual(Voiceover.createFromBackendDict({
       filename: 'a.mp3',
       file_size_bytes: 200000,
       needs_update: true,
@@ -53,7 +51,7 @@ describe('Voiceover object factory', () => {
     }));
 
     voiceover.toggleNeedsUpdateAttribute();
-    expect(voiceover).toEqual(vof.createFromBackendDict({
+    expect(voiceover).toEqual(Voiceover.createFromBackendDict({
       filename: 'a.mp3',
       file_size_bytes: 200000,
       needs_update: false,
@@ -71,8 +69,8 @@ describe('Voiceover object factory', () => {
   });
 
   it('should create a new voiceover object', () => {
-    expect(vof.createNew('filename.mp3', 100000, 5.0)).toEqual(
-      vof.createFromBackendDict({
+    expect(Voiceover.createNew('filename.mp3', 100000, 5.0)).toEqual(
+      Voiceover.createFromBackendDict({
         filename: 'filename.mp3',
         file_size_bytes: 100000,
         needs_update: false,

@@ -24,8 +24,8 @@ import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
+import { Voiceover } from
+  'domain/exploration/Voiceover.model';
 
 const constants = require('constants.ts');
 
@@ -38,7 +38,6 @@ describe('States Object Factory', () => {
   let secondState = null;
   let statesWithCyclicOutcomeDict = null;
   let statesWithAudioDict = null;
-  let vof = null;
   const oldNewStateTemplate = constants.NEW_STATE_TEMPLATE;
 
   beforeEach(() => {
@@ -47,7 +46,6 @@ describe('States Object Factory', () => {
     });
     ssof = TestBed.get(StatesObjectFactory);
     sof = TestBed.get(StateObjectFactory);
-    vof = TestBed.get(VoiceoverObjectFactory);
 
     newState = {
       classifier_model_id: null,
@@ -616,18 +614,18 @@ describe('States Object Factory', () => {
     const statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
     expect(statesWithAudio.getAllVoiceovers('hi-en'))
       .toEqual({
-        'first state': [vof.createFromBackendDict({
+        'first state': [Voiceover.createFromBackendDict({
           filename: 'myfile3.mp3',
           file_size_bytes: 0.8,
           needs_update: false,
           duration_secs: 0.8
-        }), vof.createFromBackendDict({
+        }), Voiceover.createFromBackendDict({
           filename: 'myfile8.mp3',
           file_size_bytes: 1.2,
           needs_update: false,
           duration_secs: 1.2
         })],
-        'second state': [vof.createFromBackendDict({
+        'second state': [Voiceover.createFromBackendDict({
           filename: 'myfile2.mp3',
           file_size_bytes: 0.8,
           needs_update: false,

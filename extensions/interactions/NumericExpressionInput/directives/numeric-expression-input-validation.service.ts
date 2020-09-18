@@ -27,8 +27,7 @@ import { NumericExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { NumericExpressionInputRulesService } from
   './numeric-expression-input-rules.service';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 import { AppConstants } from 'app.constants';
 
 @Injectable({

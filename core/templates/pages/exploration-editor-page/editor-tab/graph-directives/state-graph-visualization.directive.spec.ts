@@ -26,8 +26,6 @@ import { AnswerGroupsCacheService } from
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solution.service';
@@ -110,8 +108,6 @@ describe('State Graph Visualization directive', function() {
     $provide.value(
       'TextInputRulesService',
       TestBed.get(TextInputRulesService));
-    $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));

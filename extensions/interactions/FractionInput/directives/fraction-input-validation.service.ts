@@ -29,7 +29,7 @@ import { Warning } from 'services/alerts.service';
 import { FractionInputCustomizationArgs } from
   'interactions/customization-args-defs';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 
 interface FractionWarning {
   type: string;

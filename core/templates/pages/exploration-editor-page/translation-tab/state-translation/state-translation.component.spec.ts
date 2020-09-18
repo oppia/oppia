@@ -27,7 +27,7 @@ import { AnswerGroupsCacheService } from
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
@@ -51,10 +51,8 @@ import { StateEditorRefreshService } from
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { WrapTextWithEllipsisPipe } from
@@ -84,12 +82,9 @@ describe('State translation component', function() {
   var answerGroupObjectFactory = null;
   var ckEditorCopyContentService = null;
   var explorationStatesService = null;
-  var outcomeObjectFactory = null;
-  var recordedVoiceoversObjectFactory = null;
   var routerService = null;
   var stateEditorService = null;
   var stateRecordedVoiceoversService = null;
-  var subtitledHtmlObjectFactory = null;
   var subtitledUnicodeObjectFactory = null;
   var translationLanguageService = null;
   var translationTabActiveContentIdService = null;
@@ -390,8 +385,6 @@ describe('State translation component', function() {
       'TextInputRulesService',
       TestBed.get(TextInputRulesService));
     $provide.value(
-      'OutcomeObjectFactory', outcomeObjectFactory);
-    $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
     $provide.value(
@@ -415,15 +408,11 @@ describe('State translation component', function() {
 
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     ckEditorCopyContentService = TestBed.get(CkEditorCopyContentService);
-    outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
-    recordedVoiceoversObjectFactory = TestBed.get(
-      RecordedVoiceoversObjectFactory);
     stateEditorService = TestBed.get(StateEditorService);
     spyOnProperty(stateEditorService, 'onRefreshStateTranslation').and
       .returnValue(refreshStateTranslationEmitter);
     stateRecordedVoiceoversService = TestBed.get(
       StateRecordedVoiceoversService);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
     subtitledUnicodeObjectFactory = TestBed.get(SubtitledUnicodeObjectFactory);
   });
 
@@ -454,7 +443,7 @@ describe('State translation component', function() {
         'Introduction');
       explorationStatesService.init(explorationState1);
       stateRecordedVoiceoversService.init(
-        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
+        'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
@@ -490,7 +479,7 @@ describe('State translation component', function() {
 
     it('should get customization argument translatable customization' +
       ' arguments', () => {
-      let content = subtitledHtmlObjectFactory.createDefault('', '');
+      let content = SubtitledHtml.createDefault('', '');
       let translatableCa = (
         $scope.getInteractionCustomizationArgTranslatableContents({
           testingCustArgs: {
@@ -679,7 +668,7 @@ describe('State translation component', function() {
       });
 
     it('should get subtitled html data translation', function() {
-      var subtitledObject = subtitledHtmlObjectFactory.createFromBackendDict({
+      var subtitledObject = SubtitledHtml.createFromBackendDict({
         content_id: 'content_1',
         html: 'This is the html'
       });
@@ -698,7 +687,7 @@ describe('State translation component', function() {
     it('should get summary default outcome when outcome is linear',
       function() {
         expect($scope.summarizeDefaultOutcome(
-          outcomeObjectFactory.createNew(
+          Outcome.createNew(
             'unused', '1', 'Feedback Text', []), 'Continue', 0, true))
           .toBe('[When the button is clicked] Feedback Text');
       });
@@ -706,7 +695,7 @@ describe('State translation component', function() {
     it('should get summary default outcome when answer group count' +
       ' is greater than 0', function() {
       expect($scope.summarizeDefaultOutcome(
-        outcomeObjectFactory.createNew(
+        Outcome.createNew(
           'unused', '1', 'Feedback Text', []), 'TextInput', 1, true))
         .toBe('[All other answers] Feedback Text');
     });
@@ -714,7 +703,7 @@ describe('State translation component', function() {
     it('should get summary default outcome when answer group count' +
       ' is equal to 0', function() {
       expect($scope.summarizeDefaultOutcome(
-        outcomeObjectFactory.createNew(
+        Outcome.createNew(
           'unused', '1', 'Feedback Text', []), 'TextInput', 0, true))
         .toBe('[All answers] Feedback Text');
     });
@@ -729,7 +718,7 @@ describe('State translation component', function() {
       expect($scope.summarizeAnswerGroup(
         answerGroupObjectFactory.createNew(
           [],
-          outcomeObjectFactory.createNew('unused', '1', 'Feedback text', []),
+          Outcome.createNew('unused', '1', 'Feedback text', []),
           'Training data text', '0'), '1', {}, true))
         .toBe('[Answer] Feedback text');
     });
@@ -756,7 +745,7 @@ describe('State translation component', function() {
         .returnValue(showTranslationTabBusyModalEmitter);
       explorationStatesService.init(explorationState1);
       stateRecordedVoiceoversService.init(
-        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
+        'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
@@ -860,7 +849,7 @@ describe('State translation component', function() {
     });
 
     it('should get subtitled data', function() {
-      var subtitledObject = subtitledHtmlObjectFactory.createFromBackendDict({
+      var subtitledObject = SubtitledHtml.createFromBackendDict({
         content_id: 'content_1',
         html: 'This is the html'
       });
@@ -900,7 +889,7 @@ describe('State translation component', function() {
         'Introduction');
       explorationStatesService.init(explorationState2);
       stateRecordedVoiceoversService.init(
-        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
+        'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
@@ -943,7 +932,7 @@ describe('State translation component', function() {
         'Introduction');
       explorationStatesService.init(explorationState3);
       stateRecordedVoiceoversService.init(
-        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
+        'Introduction', RecordedVoiceovers.createFromBackendDict(
           recordedVoiceovers));
 
       $scope = $rootScope.$new();
@@ -1008,13 +997,13 @@ describe('State translation component', function() {
         testCa: {
           value: {
             unicode: subtitledUnicodeObjectFactory.createDefault('', 'ca_0'),
-            html: [subtitledHtmlObjectFactory.createDefault('', 'ca_1')]
+            html: [SubtitledHtml.createDefault('', 'ca_1')]
           }
         }
       });
       explorationStatesService.init(explorationState4);
       stateRecordedVoiceoversService.init(
-        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
+        'Introduction', RecordedVoiceovers.createFromBackendDict(
           {
             voiceovers_mapping: {
               content: {},

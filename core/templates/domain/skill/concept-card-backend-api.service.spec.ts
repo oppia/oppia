@@ -22,13 +22,11 @@ import { HttpClientTestingModule, HttpTestingController } from
 
 import { ConceptCardBackendApiService } from
   'domain/skill/concept-card-backend-api.service';
-import { ConceptCardObjectFactory } from
-  'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard } from 'domain/skill/ConceptCard.model';
 
 describe('Concept card backend API service', () => {
   let conceptCardBackendApiService: ConceptCardBackendApiService = null;
   let httpTestingController: HttpTestingController;
-  let conceptCardObjectFactory: ConceptCardObjectFactory;
   let sampleResponse1 = null;
   let sampleResponse2 = null;
   let sampleResponse3 = null;
@@ -44,7 +42,6 @@ describe('Concept card backend API service', () => {
 
     conceptCardBackendApiService = TestBed.get(ConceptCardBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
-    conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
 
     var example1 = {
       question: {
@@ -135,19 +132,19 @@ describe('Concept card backend API service', () => {
     conceptCardSampleResponse1 = [];
     sampleResponse1.concept_card_dicts.forEach((conceptCardDict) => {
       conceptCardSampleResponse1.push(
-        conceptCardObjectFactory.createFromBackendDict(conceptCardDict));
+        ConceptCard.createFromBackendDict(conceptCardDict));
     });
 
     conceptCardSampleResponse2 = [];
     sampleResponse2.concept_card_dicts.forEach((conceptCardDict) => {
       conceptCardSampleResponse2.push(
-        conceptCardObjectFactory.createFromBackendDict(conceptCardDict));
+        ConceptCard.createFromBackendDict(conceptCardDict));
     });
 
     conceptCardSampleResponse3 = [];
     sampleResponse3.concept_card_dicts.forEach((conceptCardDict) => {
       conceptCardSampleResponse3.push(
-        conceptCardObjectFactory.createFromBackendDict(conceptCardDict));
+        ConceptCard.createFromBackendDict(conceptCardDict));
     });
   });
 

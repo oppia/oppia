@@ -13,25 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for WorkedExampleObjectFactory.
+ * @fileoverview Unit tests for WorkedExample model.
  */
 
-import { TestBed } from '@angular/core/testing';
-
-import { SubtitledHtmlObjectFactory} from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { WorkedExampleObjectFactory} from
-  'domain/skill/WorkedExampleObjectFactory';
+import { SubtitledHtml} from 'domain/exploration/SubtitledHtml.model';
+import { WorkedExample } from 'domain/skill/WorkedExample.model';
 
 describe('Worked example object factory', () => {
   let workedExampleDict;
-  let subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory;
-  let workedExampleObjectFactory: WorkedExampleObjectFactory;
 
   beforeEach(() => {
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
-    workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
-
     workedExampleDict = {
       question: {
         html: 'worked example question 1',
@@ -45,19 +36,17 @@ describe('Worked example object factory', () => {
   });
 
   it('should create a new worked example from a backend dictionary', () => {
-    let workedExample =
-          workedExampleObjectFactory.createFromBackendDict(workedExampleDict);
+    let workedExample = WorkedExample.createFromBackendDict(workedExampleDict);
     expect(workedExample.getQuestion()).toEqual(
-      subtitledHtmlObjectFactory.createDefault(
+      SubtitledHtml.createDefault(
         'worked example question 1', 'worked_example_q_1'));
     expect(workedExample.getExplanation()).toEqual(
-      subtitledHtmlObjectFactory.createDefault(
+      SubtitledHtml.createDefault(
         'worked example explanation 1', 'worked_example_e_1'));
   });
 
   it('should convert to a backend dictionary', () => {
-    let workedExample =
-        workedExampleObjectFactory.createFromBackendDict(workedExampleDict);
+    let workedExample = WorkedExample.createFromBackendDict(workedExampleDict);
     expect(workedExample.toBackendDict()).toEqual(workedExampleDict);
   });
 });

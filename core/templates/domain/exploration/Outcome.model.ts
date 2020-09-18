@@ -17,14 +17,10 @@
  * domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 import {
   SubtitledHtmlBackendDict,
-  SubtitledHtml,
-  SubtitledHtmlObjectFactory
-} from 'domain/exploration/SubtitledHtmlObjectFactory';
+  SubtitledHtml
+} from 'domain/exploration/SubtitledHtml.model';
 import { ParamChangeBackendDict } from
   'domain/exploration/ParamChangeObjectFactory';
 
@@ -86,20 +82,13 @@ export class Outcome {
       this.refresherExplorationId === null
     );
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class OutcomeObjectFactory {
-  constructor(private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory) {}
-
-  createNew(
+  static createNew(
       dest: string, feedbackTextId: string, feedbackText: string,
       paramChanges: ParamChangeBackendDict[]): Outcome {
     return new Outcome(
       dest,
-      this.subtitledHtmlObjectFactory.createDefault(
+      SubtitledHtml.createDefault(
         feedbackText, feedbackTextId),
       false,
       paramChanges,
@@ -107,10 +96,10 @@ export class OutcomeObjectFactory {
       null);
   }
 
-  createFromBackendDict(outcomeDict: OutcomeBackendDict): Outcome {
+  static createFromBackendDict(outcomeDict: OutcomeBackendDict): Outcome {
     return new Outcome(
       outcomeDict.dest,
-      this.subtitledHtmlObjectFactory.createFromBackendDict(
+      SubtitledHtml.createFromBackendDict(
         outcomeDict.feedback),
       outcomeDict.labelled_as_correct,
       outcomeDict.param_changes,
@@ -118,6 +107,3 @@ export class OutcomeObjectFactory {
       outcomeDict.missing_prerequisite_skill_id);
   }
 }
-
-angular.module('oppia').factory(
-  'OutcomeObjectFactory', downgradeInjectable(OutcomeObjectFactory));

@@ -24,8 +24,7 @@ import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
-import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 describe('Solution object factory', () => {
   describe('SolutionObjectFactory', () => {

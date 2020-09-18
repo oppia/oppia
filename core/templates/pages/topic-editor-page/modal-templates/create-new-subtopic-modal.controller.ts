@@ -16,9 +16,7 @@
  * @fileoverview Controller for create new subtopic modal controller.
  */
 
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
-
-require(
+ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('domain/topic/topic-update.service.ts');

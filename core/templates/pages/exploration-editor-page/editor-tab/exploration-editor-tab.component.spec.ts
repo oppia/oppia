@@ -33,19 +33,15 @@ import { ExplorationDraftObjectFactory } from
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/Hint.model';
 import { ImprovementsService } from 'services/improvements.service';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 import { ParamMetadataObjectFactory } from
   'domain/exploration/ParamMetadataObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SolutionValidityService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
@@ -54,11 +50,9 @@ import { StateClassifierMappingService } from
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtml.model';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -82,13 +76,10 @@ describe('Exploration editor tab component', function() {
   var explorationInitStateNameService = null;
   var explorationStatesService = null;
   var explorationWarningsService = null;
-  var hintObjectFactory = null;
-  var outcomeObjectFactory = null;
   var routerService = null;
   var stateEditorRefreshService = null;
   var solutionObjectFactory = null;
   var stateEditorService = null;
-  var subtitledHtmlObjectFactory = null;
 
   var mockRefreshStateEditorEventEmitter = null;
 
@@ -102,10 +93,7 @@ describe('Exploration editor tab component', function() {
   beforeEach(function() {
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     explorationFeaturesService = TestBed.get(ExplorationFeaturesService);
-    hintObjectFactory = TestBed.get(HintObjectFactory);
-    outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
     solutionObjectFactory = TestBed.get(SolutionObjectFactory);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -125,10 +113,7 @@ describe('Exploration editor tab component', function() {
     $provide.value(
       'ExplorationFeaturesService', explorationFeaturesService);
     $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));
-    $provide.value('HintObjectFactory', hintObjectFactory);
     $provide.value('ImprovementsService', TestBed.get(ImprovementsService));
-    $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
     $provide.value(
       'ParamChangeObjectFactory', TestBed.get(ParamChangeObjectFactory));
     $provide.value(
@@ -136,21 +121,13 @@ describe('Exploration editor tab component', function() {
     $provide.value(
       'ParamMetadataObjectFactory', TestBed.get(ParamMetadataObjectFactory));
     $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      TestBed.get(RecordedVoiceoversObjectFactory));
-    $provide.value('RuleObjectFactory', TestBed.get(RuleObjectFactory));
-    $provide.value(
       'SolutionValidityService', TestBed.get(SolutionValidityService));
     $provide.value(
       'StateClassifierMappingService',
       TestBed.get(StateClassifierMappingService));
     $provide.value(
       'StateEditorService', TestBed.get(StateEditorService));
-    $provide.value(
-      'SubtitledHtmlObjectFactory', TestBed.get(SubtitledHtmlObjectFactory));
     $provide.value('UnitsObjectFactory', TestBed.get(UnitsObjectFactory));
-    $provide.value(
-      'VoiceoverObjectFactory', TestBed.get(VoiceoverObjectFactory));
     $provide.value(
       'WrittenTranslationObjectFactory',
       TestBed.get(WrittenTranslationObjectFactory));
@@ -376,12 +353,12 @@ describe('Exploration editor tab component', function() {
   it('should save state content', function() {
     stateEditorService.setActiveStateName('First State');
     expect(explorationStatesService.getState('First State').content).toEqual(
-      subtitledHtmlObjectFactory.createFromBackendDict({
+      SubtitledHtml.createFromBackendDict({
         content_id: 'content',
         html: 'First State Content'
       }));
 
-    var displayedValue = subtitledHtmlObjectFactory.createFromBackendDict({
+    var displayedValue = SubtitledHtml.createFromBackendDict({
       content_id: 'content',
       html: 'First State Content Changed'
     });
@@ -463,7 +440,7 @@ describe('Exploration editor tab component', function() {
       explorationStatesService.getState('First State').interaction);
 
     expect(stateEditorService.interaction.defaultOutcome).toEqual(
-      outcomeObjectFactory.createFromBackendDict({
+      Outcome.createFromBackendDict({
         dest: 'default',
         feedback: {
           content_id: 'default_outcome',
@@ -471,10 +448,11 @@ describe('Exploration editor tab component', function() {
         },
         labelled_as_correct: false,
         param_changes: [],
-        refresher_exploration_id: null
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
       }));
 
-    var displayedValue = outcomeObjectFactory.createFromBackendDict({
+    var displayedValue = Outcome.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         content_id: 'default_outcome_changed',
@@ -482,7 +460,8 @@ describe('Exploration editor tab component', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
     });
     ctrl.saveInteractionDefaultOutcome(displayedValue);
 
@@ -550,7 +529,7 @@ describe('Exploration editor tab component', function() {
 
     expect(stateEditorService.interaction.hints).toEqual([]);
 
-    var displayedValue = [hintObjectFactory.createFromBackendDict({
+    var displayedValue = [Hint.createFromBackendDict({
       hint_content: {
         content_id: '',
         html: 'This is a hint'

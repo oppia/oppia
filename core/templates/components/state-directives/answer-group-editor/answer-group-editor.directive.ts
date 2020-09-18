@@ -16,6 +16,8 @@
  * @fileoverview Directive for the answer group editor.
  */
 
+import { Rule } from 'domain/exploration/Rule.model';
+
 require(
   'components/state-directives/outcome-editor/outcome-editor.directive.ts');
 require('components/state-directives/rule-editor/rule-editor.directive.ts');
@@ -29,7 +31,6 @@ require(
   'tag-misconception-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('domain/exploration/RuleObjectFactory.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 require(
@@ -73,12 +74,12 @@ angular.module('oppia').directive('answerGroupEditor', [
       controllerAs: '$ctrl',
       controller: [
         'AlertsService', 'ExternalSaveService', 'ResponsesService',
-        'RuleObjectFactory', 'StateEditorService', 'StateInteractionIdService',
+        'StateEditorService', 'StateInteractionIdService',
         'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
         'INTERACTION_SPECS',
         function(
             AlertsService, ExternalSaveService, ResponsesService,
-            RuleObjectFactory, StateEditorService, StateInteractionIdService,
+            StateEditorService, StateInteractionIdService,
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
             INTERACTION_SPECS) {
           var ctrl = this;
@@ -217,7 +218,7 @@ angular.module('oppia').directive('answerGroupEditor', [
             // TODO(bhenning): Should use functionality in ruleEditor.js, but
             // move it to ResponsesService in StateResponses.js to properly
             // form a new rule.
-            ctrl.rules.push(RuleObjectFactory.createNew(ruleType, inputs));
+            ctrl.rules.push(Rule.createNew(ruleType, inputs));
             ctrl.changeActiveRuleIndex(ctrl.rules.length - 1);
           };
 

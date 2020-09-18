@@ -23,26 +23,17 @@ import { AnswerGroupObjectFactory } from
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 // ^^^ This block is to be removed.
 
 require('App.ts');
@@ -59,7 +50,6 @@ describe('Question update service', function() {
   var QuestionObjectFactory = null;
   var QuestionUndoRedoService = null;
   var StateObjectFactory = null;
-  var subtitledHtmlObjectFactory = null;
   var sampleQuestion = null;
   var sampleStateDict = null;
   var expectedOutputStateDict = null;
@@ -69,29 +59,14 @@ describe('Question update service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
+      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory());
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
     $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
     $provide.value(
       'ParamChangesObjectFactory', new ParamChangesObjectFactory(
         new ParamChangeObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
     $provide.value(
       'WrittenTranslationObjectFactory',
       new WrittenTranslationObjectFactory());
@@ -111,7 +86,6 @@ describe('Question update service', function() {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
     QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
     StateObjectFactory = $injector.get('StateObjectFactory');
-    subtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
 
     sampleStateDict = {
       name: 'question',
@@ -254,7 +228,7 @@ describe('Question update service', function() {
     var oldStateData = angular.copy(sampleQuestion.getStateData());
     var updateFunction = function() {
       var stateData = sampleQuestion.getStateData();
-      stateData.content = subtitledHtmlObjectFactory.createDefault(
+      stateData.content = SubtitledHtml.createDefault(
         'test content', 'content');
     };
     QuestionUpdateService.setQuestionStateData(

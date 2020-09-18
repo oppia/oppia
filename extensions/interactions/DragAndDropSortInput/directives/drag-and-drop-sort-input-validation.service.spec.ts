@@ -24,12 +24,10 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
 import { DragAndDropSortInputValidationService } from
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
 /* eslint-enable max-len */
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from
-  'domain/exploration/RuleObjectFactory';
-import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
+import { Rule } from
+  'domain/exploration/Rule.model';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 import { AppConstants } from 'app.constants';
 import { DragAndDropSortInputCustomizationArgs } from
@@ -47,8 +45,7 @@ describe('DragAndDropSortInputValidationService', () => {
     goodRule1: Rule, goodRule2: Rule, hasXBeforeYRule: Rule,
     hasElementXAtPositionYRule: Rule;
   let customizationArgs: DragAndDropSortInputCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
-    rof: RuleObjectFactory;
+  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -56,14 +53,12 @@ describe('DragAndDropSortInputValidationService', () => {
     });
 
     validatorService = TestBed.get(DragAndDropSortInputValidationService);
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
 
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: '',
@@ -75,7 +70,7 @@ describe('DragAndDropSortInputValidationService', () => {
       refresher_exploration_id: null
     });
 
-    customOutcome = oof.createFromBackendDict({
+    customOutcome = Outcome.createFromBackendDict({
       dest: 'Third State',
       feedback: {
         html: '<p>great job!</p>',
@@ -101,49 +96,49 @@ describe('DragAndDropSortInputValidationService', () => {
       }
     };
 
-    goodRule1 = rof.createFromBackendDict({
+    goodRule1 = Rule.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
         x: [['a'], ['b'], ['c'], ['d']]
       }
     });
 
-    goodRule2 = rof.createFromBackendDict({
+    goodRule2 = Rule.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
         x: [['d'], ['c'], ['b'], ['a']]
       }
     });
 
-    equalsListWithAllowedValuesRule = rof.createFromBackendDict({
+    equalsListWithAllowedValuesRule = Rule.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
         x: [['a', 'b'], ['d'], ['c']]
       }
     });
 
-    equalsListWithValuesRule = rof.createFromBackendDict({
+    equalsListWithValuesRule = Rule.createFromBackendDict({
       rule_type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
       inputs: {
         x: [['a'], ['d'], ['c'], ['b']]
       }
     });
 
-    equalsListWithEmptyValuesRule = rof.createFromBackendDict({
+    equalsListWithEmptyValuesRule = Rule.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
         x: [['a', ''], [], ['c', 'b', 'd']]
       }
     });
 
-    equalsListWithDuplicatesRule = rof.createFromBackendDict({
+    equalsListWithDuplicatesRule = Rule.createFromBackendDict({
       rule_type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
       inputs: {
         x: [['a', 'b'], ['b'], ['c', 'a', 'd']]
       }
     });
 
-    hasXBeforeYRule = rof.createFromBackendDict({
+    hasXBeforeYRule = Rule.createFromBackendDict({
       rule_type: 'HasElementXBeforeElementY',
       inputs: {
         x: 'b',
@@ -151,7 +146,7 @@ describe('DragAndDropSortInputValidationService', () => {
       }
     });
 
-    hasElementXAtPositionYRule = rof.createFromBackendDict({
+    hasElementXAtPositionYRule = Rule.createFromBackendDict({
       rule_type: 'HasElementXAtPositionY',
       inputs: {
         x: 'x',
@@ -182,7 +177,7 @@ describe('DragAndDropSortInputValidationService', () => {
 
   it('should not allow multiple items in same position', () => {
     customizationArgs.allowMultipleItemsInSamePosition.value = false;
-    var rules = [rof.createFromBackendDict({
+    var rules = [Rule.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
         x: [['a', 'b'], ['c', 'd']]

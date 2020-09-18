@@ -18,6 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { Outcome } from 'domain/exploration/Outcome.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 import { TranslatorProviderForTests } from 'tests/test.extras';
@@ -78,7 +79,6 @@ describe('Changes in Human Readable Form Directive', function() {
   var $compile = null;
   var scope = null;
   var LostChangeObjectFactory = null;
-  var OutcomeObjectFactory = null;
 
   beforeEach(angular.mock.module('directiveTemplates'));
   beforeEach(
@@ -93,7 +93,6 @@ describe('Changes in Human Readable Form Directive', function() {
     $compile = _$compile_;
     scope = $rootScope.$new();
     LostChangeObjectFactory = $injector.get('LostChangeObjectFactory');
-    OutcomeObjectFactory = $injector.get('OutcomeObjectFactory');
   }));
 
   it('should make human readable when adding a state', function() {
@@ -428,12 +427,16 @@ describe('Changes in Human Readable Form Directive', function() {
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {
-        outcome: OutcomeObjectFactory.createFromBackendDict({
+        outcome: Outcome.createFromBackendDict({
           dest: 'outcome 2',
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
           },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: '1',
+          missing_prerequisite_skill_id: 'skill1'
         }),
         rules: [{
           type: 'Type1',
@@ -494,12 +497,16 @@ describe('Changes in Human Readable Form Directive', function() {
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {
-        outcome: OutcomeObjectFactory.createFromBackendDict({
+        outcome: Outcome.createFromBackendDict({
           dest: 'outcome 2',
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
           },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: '1',
+          missing_prerequisite_skill_id: 'skill1'
         }),
         rules: [{
           type: 'Type1',
@@ -510,12 +517,16 @@ describe('Changes in Human Readable Form Directive', function() {
         }]
       },
       old_value: {
-        outcome: OutcomeObjectFactory.createFromBackendDict({
+        outcome: Outcome.createFromBackendDict({
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
           },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: '1',
+          missing_prerequisite_skill_id: 'skill1'
         }),
         rules: [{
           type: 'Type1',
@@ -576,12 +587,16 @@ describe('Changes in Human Readable Form Directive', function() {
       state_name: 'Edited state name',
       new_value: {},
       old_value: {
-        outcome: OutcomeObjectFactory.createFromBackendDict({
+        outcome: Outcome.createFromBackendDict({
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
           },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: '1',
+          missing_prerequisite_skill_id: 'skill1'
         }),
         rules: [{
           type: 'Type1',
@@ -623,12 +638,16 @@ describe('Changes in Human Readable Form Directive', function() {
     scope.lostChanges = [LostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
-      new_value: OutcomeObjectFactory.createFromBackendDict({
+      new_value: Outcome.createFromBackendDict({
         dest: 'outcome 2',
         feedback: {
           content_id: 'feedback_2',
           html: 'Html'
         },
+        labelled_as_correct: true,
+        param_changes: [],
+        refresher_exploration_id: '1',
+        missing_prerequisite_skill_id: 'skill1'
       }),
       old_value: {},
       property_name: 'default_outcome'
@@ -670,19 +689,27 @@ describe('Changes in Human Readable Form Directive', function() {
     scope.lostChanges = [LostChangeObjectFactory.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
-      new_value: OutcomeObjectFactory.createFromBackendDict({
+      new_value: Outcome.createFromBackendDict({
         dest: 'outcome 2',
         feedback: {
           content_id: 'feedback_2',
           html: 'Html'
         },
+        labelled_as_correct: true,
+        param_changes: [],
+        refresher_exploration_id: '1',
+        missing_prerequisite_skill_id: 'skill1'
       }),
-      old_value: OutcomeObjectFactory.createFromBackendDict({
+      old_value: Outcome.createFromBackendDict({
         dest: 'outcome 1',
         feedback: {
           content_id: 'feedback_2',
           html: 'Html'
         },
+        labelled_as_correct: true,
+        param_changes: [],
+        refresher_exploration_id: '1',
+        missing_prerequisite_skill_id: 'skill1'
       }),
       property_name: 'default_outcome'
     })];
@@ -725,12 +752,16 @@ describe('Changes in Human Readable Form Directive', function() {
       state_name: 'Edited state name',
       new_value: {},
       old_value: {
-        outcome: OutcomeObjectFactory.createFromBackendDict({
+        outcome: Outcome.createFromBackendDict({
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
           },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: '1',
+          missing_prerequisite_skill_id: 'skill1'
         }),
         rules: [{
           type: 'Type1',

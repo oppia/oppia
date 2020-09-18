@@ -17,23 +17,21 @@
  * @fileoverview Controller for CreateNewSkillModal.
  */
 
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 require('domain/utilities/url-interpolation.service.ts');
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 
 angular.module('oppia').controller('CreateNewSkillModalController', [
   '$scope', '$uibModalInstance', 'ContextService', 'ImageLocalStorageService',
   'RubricObjectFactory', 'SkillCreationService', 'SkillObjectFactory',
-  'SubtitledHtmlObjectFactory', 'COMPONENT_NAME_EXPLANATION',
-  'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
-  'SKILL_DIFFICULTIES',
+  'COMPONENT_NAME_EXPLANATION', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
+  'SKILL_DESCRIPTION_STATUS_VALUES', 'SKILL_DIFFICULTIES',
   function(
       $scope, $uibModalInstance, ContextService, ImageLocalStorageService,
       RubricObjectFactory, SkillCreationService, SkillObjectFactory,
-      SubtitledHtmlObjectFactory, COMPONENT_NAME_EXPLANATION,
-      MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES,
-      SKILL_DIFFICULTIES) {
+      COMPONENT_NAME_EXPLANATION, MAX_CHARS_IN_SKILL_DESCRIPTION,
+      SKILL_DESCRIPTION_STATUS_VALUES, SKILL_DIFFICULTIES) {
     var rubrics = [
       RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
       RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
@@ -72,7 +70,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
     };
 
     $scope.saveConceptCardExplanation = function() {
-      var explanationObject = SubtitledHtmlObjectFactory.createDefault(
+      var explanationObject = SubtitledHtml.createDefault(
         $scope.bindableDict.displayedConceptCardExplanation,
         COMPONENT_NAME_EXPLANATION);
       $scope.newExplanationObject = explanationObject.toBackendDict();

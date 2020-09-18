@@ -23,10 +23,9 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { AnswerGroup, AnswerGroupBackendDict, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { HintBackendDict, Hint, HintObjectFactory } from
-  'domain/exploration/HintObjectFactory';
-import { OutcomeBackendDict, Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+import { HintBackendDict, Hint } from 'domain/exploration/Hint.model';
+import { OutcomeBackendDict, Outcome } from
+  'domain/exploration/Outcome.model';
 import { SolutionBackendDict, Solution, SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { InteractionAnswer } from 'interactions/answer-defs';
@@ -66,9 +65,7 @@ import {
 import {
   SubtitledUnicodeObjectFactory, SubtitledUnicode
 } from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import {
-  SubtitledHtmlObjectFactory, SubtitledHtml
-} from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 
 export interface InteractionBackendDict {
@@ -236,10 +233,7 @@ export class Interaction {
 export class InteractionObjectFactory {
   constructor(
       private answerGroupFactory: AnswerGroupObjectFactory,
-      private hintFactory: HintObjectFactory,
       private solutionFactory: SolutionObjectFactory,
-      private outcomeFactory: OutcomeObjectFactory,
-      private subtitledHtmlFactory: SubtitledHtmlObjectFactory,
       private subtitledUnicodeFactory: SubtitledUnicodeObjectFactory,
   ) {}
 
@@ -264,7 +258,7 @@ export class InteractionObjectFactory {
       choices: {
         value: choices.value.map(
           subtitledHtmlDict =>
-            this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
+            SubtitledHtml.createFromBackendDict(subtitledHtmlDict))
       }
     };
   }
@@ -297,7 +291,7 @@ export class InteractionObjectFactory {
       choices: {
         value: choices.value.map(
           subtitledHtmlDict =>
-            this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
+            SubtitledHtml.createFromBackendDict(subtitledHtmlDict))
       }
     };
   }
@@ -313,7 +307,7 @@ export class InteractionObjectFactory {
       choices: {
         value: choices.value.map(
           subtitledHtmlDict =>
-            this.subtitledHtmlFactory.createFromBackendDict(subtitledHtmlDict))
+            SubtitledHtml.createFromBackendDict(subtitledHtmlDict))
       }
     };
   }
@@ -426,7 +420,7 @@ export class InteractionObjectFactory {
       interactionDict: InteractionBackendDict): Interaction {
     var defaultOutcome;
     if (interactionDict.default_outcome) {
-      defaultOutcome = this.outcomeFactory.createFromBackendDict(
+      defaultOutcome = Outcome.createFromBackendDict(
         interactionDict.default_outcome);
     } else {
       defaultOutcome = null;
@@ -456,7 +450,7 @@ export class InteractionObjectFactory {
 
   generateHintsFromBackend(hintBackendDicts: HintBackendDict[]): Hint[] {
     return hintBackendDicts.map((hintBackendDict) => {
-      return this.hintFactory.createFromBackendDict(hintBackendDict);
+      return Hint.createFromBackendDict(hintBackendDict);
     });
   }
 

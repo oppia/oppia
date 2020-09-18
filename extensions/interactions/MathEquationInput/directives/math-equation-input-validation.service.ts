@@ -30,8 +30,7 @@ import { MathEquationInputCustomizationArgs } from
 import { MathEquationInputRulesService } from
   './math-equation-input-rules.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 import { AppConstants } from 'app.constants';
 
 @Injectable({

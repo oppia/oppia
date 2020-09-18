@@ -20,8 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
-  'domain/skill/ShortSkillSummaryObjectFactory';
+import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
 import { StorySummaryBackendDict, StorySummary } from
   'domain/story/StorySummaryObjectFactory';
 import {
@@ -135,8 +134,7 @@ export class ReadOnlyTopic {
 })
 export class ReadOnlyTopicObjectFactory {
   constructor(
-    private subtopicObjectFactory: SubtopicObjectFactory,
-    private skillSummaryObjectFactory: ShortSkillSummaryObjectFactory) {}
+    private subtopicObjectFactory: SubtopicObjectFactory) {}
 
   createFromBackendDict(
       topicDataDict: ReadOnlyTopicBackendDict): ReadOnlyTopic {
@@ -146,7 +144,7 @@ export class ReadOnlyTopicObjectFactory {
     });
     let uncategorizedSkills =
         topicDataDict.uncategorized_skill_ids.map(skillId => {
-          return this.skillSummaryObjectFactory.create(
+          return ShortSkillSummary.create(
             skillId, topicDataDict.skill_descriptions[skillId]);
         });
     let degreesOfMastery: DegreesOfMastery = topicDataDict.degrees_of_mastery;

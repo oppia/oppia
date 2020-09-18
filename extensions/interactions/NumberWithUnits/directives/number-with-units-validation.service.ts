@@ -29,7 +29,7 @@ import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service.ts';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory.ts';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 import { NumberWithUnitsCustomizationArgs } from
   'interactions/customization-args-defs';
 

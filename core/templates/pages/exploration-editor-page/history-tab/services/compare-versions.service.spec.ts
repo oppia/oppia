@@ -21,23 +21,13 @@
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { ExplorationSnapshot, VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -70,29 +60,14 @@ describe('Compare versions service', function() {
       angular.mock.module('oppia', TranslatorProviderForTests));
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.value(
-        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-          new RuleObjectFactory()));
+        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory());
       $provide.value('FractionObjectFactory', new FractionObjectFactory());
-      $provide.value(
-        'HintObjectFactory', new HintObjectFactory(
-          new SubtitledHtmlObjectFactory()));
-      $provide.value(
-        'OutcomeObjectFactory', new OutcomeObjectFactory(
-          new SubtitledHtmlObjectFactory()));
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value(
         'ParamChangesObjectFactory', new ParamChangesObjectFactory(
           new ParamChangeObjectFactory()));
-      $provide.value(
-        'RecordedVoiceoversObjectFactory',
-        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-      $provide.value('RuleObjectFactory', new RuleObjectFactory());
-      $provide.value(
-        'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
       $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value('VersionTreeService', new VersionTreeService());
       $provide.value(
         'WrittenTranslationObjectFactory',

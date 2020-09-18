@@ -30,7 +30,7 @@ import {
   'interactions/customization-args-defs';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 // Service for assembling extension tags (for interactions).
 @Injectable({

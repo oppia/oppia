@@ -83,7 +83,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'CollectionObjectFactory.ts',
     'CollectionPlaythroughObjectFactory.ts',
     'concept-card.directive.ts',
-    'ConceptCardObjectFactory.ts',
+    'ConceptCard.model.ts',
     'context.service.ts',
     'continue-button.directive.ts',
     'contribution-and-review.service.ts',

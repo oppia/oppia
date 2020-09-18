@@ -28,14 +28,11 @@ import { Injectable } from '@angular/core';
 
 import { MisconceptionBackendDict } from
   'domain/skill/MisconceptionObjectFactory';
-import { RecordedVoiceOverBackendDict } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RecordedVoiceOverBackendDict } from 'domain/exploration/RecordedVoiceovers.model';
 import { StateBackendDict } from
   'domain/state/StateObjectFactory';
-import { SubtitledHtmlBackendDict } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { WorkedExampleBackendDict } from
-  'domain/skill/WorkedExampleObjectFactory';
+import { SubtitledHtmlBackendDict } from 'domain/exploration/SubtitledHtml.model';
+import { WorkedExampleBackendDict } from 'domain/skill/WorkedExample.model';
 
 interface CollectionTitleChange {
   'cmd': 'edit_collection_property';

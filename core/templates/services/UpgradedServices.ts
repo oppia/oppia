@@ -125,8 +125,6 @@ import { CollectionValidationService } from
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ConceptCardBackendApiService } from
   'domain/skill/concept-card-backend-api.service';
-import { ConceptCardObjectFactory } from
-  'domain/skill/ConceptCardObjectFactory';
 import { ContextService } from 'services/context.service';
 import { ContinueRulesService } from
   'interactions/Continue/directives/continue-rules.service';
@@ -259,7 +257,6 @@ import { GuestCollectionProgressService } from
   'domain/collection/guest-collection-progress.service';
 import { HighBounceRateTaskObjectFactory } from
   'domain/improvements/HighBounceRateTaskObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { IdGenerationService } from 'services/id-generation.service';
@@ -380,7 +377,6 @@ import { NumericExpressionInputRulesService } from
 import { NumericExpressionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { PageTitleService } from 'services/page-title.service';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
@@ -460,8 +456,6 @@ import { ReadOnlySubtopicPageObjectFactory } from
   'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 import { ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
 import { ReviewTestBackendApiService } from
   'domain/review_test/review-test-backend-api.service';
 import { ReviewTestEngineService } from
@@ -470,7 +464,6 @@ import { ReviewTestObjectFactory } from
   'domain/review_test/review-test-object.factory';
 import { RubricObjectFactory } from
   'domain/skill/RubricObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SchemaDefaultValueService } from
   'services/schema-default-value.service';
 import { SchemaFormSubmittedService } from
@@ -485,8 +478,6 @@ import { SetInputValidationService } from
   'interactions/SetInput/directives/set-input-validation.service';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
-import { ShortSkillSummaryObjectFactory } from
-  'domain/skill/ShortSkillSummaryObjectFactory';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SkillCreationBackendApiService } from
   'domain/skill/skill-creation-backend-api.service';
@@ -592,8 +583,6 @@ import { StorySummaryObjectFactory } from
   'domain/story/StorySummaryObjectFactory';
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
@@ -660,8 +649,6 @@ import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
 import { VisualizationInfoObjectFactory } from
   'domain/exploration/visualization-info-object.factory';
 import { WindowDimensionsService } from
@@ -669,8 +656,6 @@ import { WindowDimensionsService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { WinnowingPreprocessingService } from
   'classifiers/winnowing-preprocessing.service';
-import { WorkedExampleObjectFactory } from
-  'domain/skill/WorkedExampleObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -871,14 +856,11 @@ export class UpgradedServices {
     upgradedServices['ReviewTestObjectFactory'] = new ReviewTestObjectFactory();
     upgradedServices['RubricObjectFactory'] =
       new RubricObjectFactory();
-    upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
     upgradedServices['SchemaFormSubmittedService'] =
       new SchemaFormSubmittedService();
     upgradedServices['SchemaUndefinedLastElementService'] =
       new SchemaUndefinedLastElementService();
     upgradedServices['SetInputRulesService'] = new SetInputRulesService();
-    upgradedServices['ShortSkillSummaryObjectFactory'] =
-      new ShortSkillSummaryObjectFactory();
     upgradedServices['SkillDifficultyObjectFactory'] =
       new SkillDifficultyObjectFactory();
     upgradedServices['SkillMasteryObjectFactory'] =
@@ -906,8 +888,6 @@ export class UpgradedServices {
       new StoryReferenceObjectFactory();
     upgradedServices['StorySummaryObjectFactory'] =
       new StorySummaryObjectFactory();
-    upgradedServices['SubtitledHtmlObjectFactory'] =
-      new SubtitledHtmlObjectFactory();
     upgradedServices['SubtitledUnicodeObjectFactory'] =
       new SubtitledUnicodeObjectFactory();
     upgradedServices['SuccessiveIncorrectAnswersTaskObjectFactory'] =
@@ -933,7 +913,6 @@ export class UpgradedServices {
     upgradedServices['UserInfoObjectFactory'] = new UserInfoObjectFactory();
     upgradedServices['UtilsService'] = new UtilsService();
     upgradedServices['VersionTreeService'] = new VersionTreeService();
-    upgradedServices['VoiceoverObjectFactory'] = new VoiceoverObjectFactory();
     upgradedServices['VisualizationInfoObjectFactory'] =
       new VisualizationInfoObjectFactory();
     upgradedServices['WindowRef'] = new WindowRef();
@@ -1014,8 +993,6 @@ export class UpgradedServices {
       new GuestCollectionProgressService(
         upgradedServices['GuestCollectionProgressObjectFactory'],
         upgradedServices['WindowRef']);
-    upgradedServices['HintObjectFactory'] = new HintObjectFactory(
-      upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['HtmlEscaperService'] = new HtmlEscaperService(
       upgradedServices['LoggerService']);
     upgradedServices['HttpXhrBackend'] = new HttpXhrBackend(
@@ -1067,8 +1044,6 @@ export class UpgradedServices {
       new NumberWithUnitsRulesService(
         upgradedServices['UnitsObjectFactory'],
         upgradedServices['UtilsService']);
-    upgradedServices['OutcomeObjectFactory'] =
-      new OutcomeObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['PageTitleService'] = new PageTitleService(
       upgradedServices['Meta'], upgradedServices['Title']);
     upgradedServices['ParamChangesObjectFactory'] =
@@ -1100,9 +1075,6 @@ export class UpgradedServices {
           new RatioExpressionInputValidationService(
             upgradedServices['RatioObjectFactory'],
             upgradedServices['baseInteractionValidationService']);
-    upgradedServices['RecordedVoiceoversObjectFactory'] =
-      new RecordedVoiceoversObjectFactory(
-        upgradedServices['VoiceoverObjectFactory']);
     upgradedServices['SetInputValidationService'] =
       new SetInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -1119,7 +1091,6 @@ export class UpgradedServices {
     upgradedServices['SchemaDefaultValueService'] =
       new SchemaDefaultValueService(
         upgradedServices['LoggerService'],
-        upgradedServices['SubtitledHtmlObjectFactory'],
         upgradedServices['SubtitledUnicodeObjectFactory']);
     upgradedServices['SiteAnalyticsService'] = new SiteAnalyticsService(
       upgradedServices['WindowRef']);
@@ -1134,8 +1105,7 @@ export class UpgradedServices {
     upgradedServices['StoryPlaythroughObjectFactory'] =
       new StoryPlaythroughObjectFactory(
         upgradedServices['ReadOnlyStoryNodeObjectFactory']);
-    upgradedServices['SubtopicObjectFactory'] = new SubtopicObjectFactory(
-      upgradedServices['ShortSkillSummaryObjectFactory']);
+    upgradedServices['SubtopicObjectFactory'] = new SubtopicObjectFactory();
     upgradedServices['SuggestionObjectFactory'] = new SuggestionObjectFactory(
       upgradedServices['SuggestionsService']);
     upgradedServices['TextInputValidationService'] =
@@ -1154,17 +1124,13 @@ export class UpgradedServices {
         upgradedServices['LearnerExplorationSummaryObjectFactory']);
     upgradedServices['WindowDimensionsService'] = new WindowDimensionsService(
       upgradedServices['WindowRef']);
-    upgradedServices['WorkedExampleObjectFactory'] =
-      new WorkedExampleObjectFactory(
-        upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['WrittenTranslationsObjectFactory'] =
       new WrittenTranslationsObjectFactory(
         upgradedServices['WrittenTranslationObjectFactory']);
 
     // Topological level: 2.
-    upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
-      upgradedServices['OutcomeObjectFactory'],
-      upgradedServices['RuleObjectFactory']);
+    upgradedServices['AnswerGroupObjectFactory'] = (
+      new AnswerGroupObjectFactory());
     upgradedServices['CkEditorCopyContentService'] =
       new CkEditorCopyContentService(
         upgradedServices['HtmlEscaperService'],);
@@ -1183,10 +1149,6 @@ export class UpgradedServices {
     upgradedServices['CodeReplRulesService'] = new CodeReplRulesService(
       upgradedServices['NormalizeWhitespacePipe'],
       upgradedServices['CodeNormalizerService']);
-    upgradedServices['ConceptCardObjectFactory'] = new ConceptCardObjectFactory(
-      upgradedServices['SubtitledHtmlObjectFactory'],
-      upgradedServices['RecordedVoiceoversObjectFactory'],
-      upgradedServices['WorkedExampleObjectFactory']);
     upgradedServices['ContextService'] = new ContextService(
       upgradedServices['UrlService'],
       upgradedServices['EntityContextObjectFactory']);
@@ -1261,9 +1223,7 @@ export class UpgradedServices {
     upgradedServices['StoryEditorNavigationService'] =
         new StoryEditorNavigationService(upgradedServices['WindowRef']);
     upgradedServices['SubtopicPageContentsObjectFactory'] =
-      new SubtopicPageContentsObjectFactory(
-        upgradedServices['RecordedVoiceoversObjectFactory'],
-        upgradedServices['SubtitledHtmlObjectFactory']);
+      new SubtopicPageContentsObjectFactory();
     upgradedServices['SubtopicPageObjectFactory'] =
       new SubtopicPageObjectFactory(
         upgradedServices['SubtopicPageContentsObjectFactory']);
@@ -1277,8 +1237,7 @@ export class UpgradedServices {
       upgradedServices['NormalizeWhitespacePipe']);
     upgradedServices['TopicObjectFactory'] = new TopicObjectFactory(
       upgradedServices['SubtopicObjectFactory'],
-      upgradedServices['StoryReferenceObjectFactory'],
-      upgradedServices['ShortSkillSummaryObjectFactory']);
+      upgradedServices['StoryReferenceObjectFactory']);
     upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(
       upgradedServices['AlertsService'], upgradedServices['UrlService'],
       upgradedServices['UtilsService']);
@@ -1339,7 +1298,6 @@ export class UpgradedServices {
         upgradedServices['LanguageUtilService']);
     upgradedServices['ConceptCardBackendApiService'] =
       new ConceptCardBackendApiService(
-        upgradedServices['ConceptCardObjectFactory'],
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['ClassroomBackendApiService'] =
@@ -1462,8 +1420,7 @@ export class UpgradedServices {
         upgradedServices['SubtopicObjectFactory']);
     upgradedServices['ReadOnlyTopicObjectFactory'] =
       new ReadOnlyTopicObjectFactory(
-        upgradedServices['SubtopicObjectFactory'],
-        upgradedServices['ShortSkillSummaryObjectFactory']);
+        upgradedServices['SubtopicObjectFactory']);
     upgradedServices['ReviewTestBackendApiService'] =
       new ReviewTestBackendApiService(
         upgradedServices['HttpClient'],
@@ -1483,7 +1440,6 @@ export class UpgradedServices {
         upgradedServices['SkillMasteryObjectFactory']);
     upgradedServices['SkillObjectFactory'] =
       new SkillObjectFactory(
-        upgradedServices['ConceptCardObjectFactory'],
         upgradedServices['MisconceptionObjectFactory'],
         upgradedServices['RubricObjectFactory'],
         upgradedServices['ValidatorsService']);
@@ -1521,9 +1477,7 @@ export class UpgradedServices {
           upgradedServices['StoryPlaythroughObjectFactory'],
           upgradedServices['UrlInterpolationService']);
     upgradedServices['SubtopicPageContentsObjectFactory'] =
-      new SubtopicPageContentsObjectFactory(
-        upgradedServices['RecordedVoiceoversObjectFactory'],
-        upgradedServices['SubtitledHtmlObjectFactory']);
+      new SubtopicPageContentsObjectFactory();
     upgradedServices['TextInputPredictionService'] =
       new TextInputPredictionService(
         upgradedServices['CountVectorizerService'],
@@ -1531,8 +1485,7 @@ export class UpgradedServices {
         upgradedServices['TextInputTokenizer']);
     upgradedServices['TopicObjectFactory'] = new TopicObjectFactory(
       upgradedServices['SubtopicObjectFactory'],
-      upgradedServices['StoryReferenceObjectFactory'],
-      upgradedServices['ShortSkillSummaryObjectFactory']);
+      upgradedServices['StoryReferenceObjectFactory']);
     upgradedServices['TopicCreationBackendApiService'] =
       new TopicCreationBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['TopicsAndSkillsDashboardBackendApiService'] =
@@ -1540,7 +1493,6 @@ export class UpgradedServices {
         upgradedServices['AssignedSkillObjectFactory'],
         upgradedServices['AugmentedSkillSummaryObjectFactory'],
         upgradedServices['HttpClient'],
-        upgradedServices['ShortSkillSummaryObjectFactory'],
         upgradedServices['SkillSummaryObjectFactory'],
         upgradedServices['TopicSummaryObjectFactory'],
         upgradedServices['UrlInterpolationService']);
@@ -1648,7 +1600,6 @@ export class UpgradedServices {
         upgradedServices['PlaythroughObjectFactory'],
         upgradedServices['StopwatchObjectFactory']);
     upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(
-      upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['ExplorationHtmlFormatterService']);
     upgradedServices['StateInteractionStatsService'] =
       new StateInteractionStatsService(
@@ -1672,10 +1623,7 @@ export class UpgradedServices {
     // Topological level: 7.
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
       upgradedServices['AnswerGroupObjectFactory'],
-      upgradedServices['HintObjectFactory'],
       upgradedServices['SolutionObjectFactory'],
-      upgradedServices['OutcomeObjectFactory'],
-      upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['SubtitledUnicodeObjectFactory']);
 
     // Topological level: 8.
@@ -1686,8 +1634,6 @@ export class UpgradedServices {
     upgradedServices['StateObjectFactory'] = new StateObjectFactory(
       upgradedServices['InteractionObjectFactory'],
       upgradedServices['ParamChangesObjectFactory'],
-      upgradedServices['RecordedVoiceoversObjectFactory'],
-      upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['WrittenTranslationsObjectFactory']);
 
     // Topological level: 9.

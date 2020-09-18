@@ -22,9 +22,8 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { InteractiveMapValidationService } from
   'interactions/InteractiveMap/directives/interactive-map-validation.service';
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
+import { Rule } from 'domain/exploration/Rule.model';
 
 import { AppConstants } from 'app.constants';
 import { InteractiveMapCustomizationArgs } from
@@ -37,8 +36,7 @@ describe('InteractiveMapValidationService', () => {
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let customizationArguments: InteractiveMapCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
-    rof: RuleObjectFactory;
+  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -47,11 +45,9 @@ describe('InteractiveMapValidationService', () => {
 
     validatorService = TestBed.get(InteractiveMapValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: '',
@@ -75,12 +71,12 @@ describe('InteractiveMapValidationService', () => {
       }
     };
     goodAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'Within',
         inputs: {
           d: 100
         }
-      }), rof.createFromBackendDict({
+      }), Rule.createFromBackendDict({
         rule_type: 'NotWithin',
         inputs: {
           d: 50

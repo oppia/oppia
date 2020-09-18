@@ -23,11 +23,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
 
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 
 describe('Read only exploration backend API service', function() {
   let ReadOnlyExplorationBackendApiService = null;
@@ -36,10 +32,6 @@ describe('Read only exploration backend API service', function() {
   let $httpBackend = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-  }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     const ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {

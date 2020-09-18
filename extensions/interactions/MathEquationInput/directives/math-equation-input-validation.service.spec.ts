@@ -23,10 +23,8 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
 import { MathEquationInputValidationService } from
 // eslint-disable-next-line max-len
   'interactions/MathEquationInput/directives/math-equation-input-validation.service';
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from
-  'domain/exploration/RuleObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
+import { Rule } from 'domain/exploration/Rule.model';
 import { MathEquationInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 
@@ -40,8 +38,7 @@ describe('MathEquationInputValidationService', () => {
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let matchesExactlyWith: Rule, isEquivalentTo: Rule;
   let customizationArgs: MathEquationInputCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
-    rof: RuleObjectFactory;
+  let agof: AnswerGroupObjectFactory;
   let warnings;
 
   beforeEach(() => {
@@ -50,13 +47,11 @@ describe('MathEquationInputValidationService', () => {
     });
 
     validatorService = TestBed.get(MathEquationInputValidationService);
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: '',
@@ -74,14 +69,14 @@ describe('MathEquationInputValidationService', () => {
       }
     };
 
-    isEquivalentTo = rof.createFromBackendDict({
+    isEquivalentTo = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: 'y = c + m*x'
       }
     });
 
-    matchesExactlyWith = rof.createFromBackendDict({
+    matchesExactlyWith = Rule.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: 'y = m*x + c',
@@ -111,13 +106,13 @@ describe('MathEquationInputValidationService', () => {
     }]);
 
 
-    let isEquivalentTo1 = rof.createFromBackendDict({
+    let isEquivalentTo1 = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: '(a+b)^2 = 0'
       }
     });
-    let isEquivalentTo2 = rof.createFromBackendDict({
+    let isEquivalentTo2 = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: 'a^2 + 2*a*b + b^2 = 0'
@@ -136,14 +131,14 @@ describe('MathEquationInputValidationService', () => {
     }]);
 
 
-    let matchesExactlyWith1 = rof.createFromBackendDict({
+    let matchesExactlyWith1 = Rule.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: 'x ^ 2 = 1',
         y: 'irrelevant'
       }
     });
-    let matchesExactlyWith2 = rof.createFromBackendDict({
+    let matchesExactlyWith2 = Rule.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: '-1 + x*x = 0',
@@ -169,14 +164,14 @@ describe('MathEquationInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
 
-    matchesExactlyWith = rof.createFromBackendDict({
+    matchesExactlyWith = Rule.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: 'x * y = 0',
         y: 'both'
       }
     });
-    isEquivalentTo = rof.createFromBackendDict({
+    isEquivalentTo = Rule.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: 'x + y = 0'
@@ -192,7 +187,7 @@ describe('MathEquationInputValidationService', () => {
 
   it('should warn if there are missing custom variables', function() {
     answerGroups[0].rules = [
-      rof.createFromBackendDict({
+      Rule.createFromBackendDict({
         rule_type: 'IsEquivalentTo',
         inputs: {
           x: 'x^2 = alpha - y/b'
@@ -217,7 +212,7 @@ describe('MathEquationInputValidationService', () => {
 
   it('should warn if there are too many custom variables', function() {
     answerGroups[0].rules = [
-      rof.createFromBackendDict({
+      Rule.createFromBackendDict({
         rule_type: 'IsEquivalentTo',
         inputs: {
           x: 'x=y'

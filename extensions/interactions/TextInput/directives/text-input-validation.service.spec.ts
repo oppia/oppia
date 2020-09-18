@@ -22,10 +22,8 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from
-  'domain/exploration/RuleObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
+import { Rule } from 'domain/exploration/Rule.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { TextInputValidationService } from
@@ -37,15 +35,13 @@ describe('TextInputValidationService', () => {
 
   let currentState, customizationArguments;
   let goodAnswerGroups, goodDefaultOutcome;
-  let oof, agof, rof;
+  let agof;
 
   let createAnswerGroupByRules: (rules: Rule[]) => AnswerGroup;
 
   beforeEach(() => {
     validatorService = TestBed.get(TextInputValidationService);
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     INTERACTION_SPECS = InteractionSpecsConstants.INTERACTION_SPECS;
     customizationArgSpecs = INTERACTION_SPECS.TextInput.customization_arg_specs;
@@ -54,11 +50,11 @@ describe('TextInputValidationService', () => {
     maxRows = rowsSpecs.schema.validators[1].max_value;
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -140,12 +136,12 @@ describe('TextInputValidationService', () => {
 
   it('should catch redundancy of contains rules with matching inputs', () => {
     let answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'Contains',
         inputs: {
           x: 'xyz'
         }
-      }), rof.createFromBackendDict({
+      }), Rule.createFromBackendDict({
         rule_type: 'Contains',
         inputs: {
           x: 'xyza'
@@ -163,13 +159,13 @@ describe('TextInputValidationService', () => {
     }]);
 
     answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'Contains',
         inputs: {
           x: ''
         }
       }),
-      rof.createFromBackendDict({
+      Rule.createFromBackendDict({
         rule_type: 'Contains',
         inputs: {
           x: 'abc'
@@ -187,13 +183,13 @@ describe('TextInputValidationService', () => {
     }]);
 
     answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'Contains',
         inputs: {
           x: 'xyz'
         }
       }),
-      rof.createFromBackendDict({
+      Rule.createFromBackendDict({
         rule_type: 'Contains',
         inputs: {
           x: 'xyz'
@@ -213,13 +209,13 @@ describe('TextInputValidationService', () => {
 
   it('should catch redundancy of startsWith rules with matching inputs', () => {
     let answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'StartsWith',
         inputs: {
           x: 'xyz'
         }
       }),
-      rof.createFromBackendDict({
+      Rule.createFromBackendDict({
         rule_type: 'StartsWith',
         inputs: {
           x: 'xyza'
@@ -237,13 +233,13 @@ describe('TextInputValidationService', () => {
     }]);
 
     answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'StartsWith',
         inputs: {
           x: ''
         }
       }),
-      rof.createFromBackendDict({
+      Rule.createFromBackendDict({
         rule_type: 'StartsWith',
         inputs: {
           x: 'abc'
@@ -261,13 +257,13 @@ describe('TextInputValidationService', () => {
     }]);
 
     answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'Contains',
         inputs: {
           x: 'xyz'
         }
       }),
-      rof.createFromBackendDict({
+      Rule.createFromBackendDict({
         rule_type: 'StartsWith',
         inputs: {
           x: 'xyzy'
@@ -287,13 +283,13 @@ describe('TextInputValidationService', () => {
 
   it('should catch redundancy of equals rules with matching inputs', () => {
     let answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
           x: 'xyz'
         }
       }),
-      rof.createFromBackendDict({
+      Rule.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
           x: 'xyz'
@@ -311,14 +307,14 @@ describe('TextInputValidationService', () => {
     }]);
 
     answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'FuzzyEquals',
         inputs: {
           x: 'xyz'
         }
       })]),
     createAnswerGroupByRules(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
           x: 'xya'
@@ -338,13 +334,13 @@ describe('TextInputValidationService', () => {
 
   it('should catch redundancy of fuzzyEquals rules with matching input', () => {
     let answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'FuzzyEquals',
         inputs: {
           x: 'xyz'
         }
       }),
-      rof.createFromBackendDict({
+      Rule.createFromBackendDict({
         rule_type: 'FuzzyEquals',
         inputs: {
           x: 'xyz'
@@ -362,13 +358,13 @@ describe('TextInputValidationService', () => {
     }]);
 
     answerGroups = [createAnswerGroupByRules(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'FuzzyEquals',
         inputs: {
           x: 'xyz'
         }
       }),
-      rof.createFromBackendDict({
+      Rule.createFromBackendDict({
         rule_type: 'FuzzyEquals',
         inputs: {
           x: 'xya'

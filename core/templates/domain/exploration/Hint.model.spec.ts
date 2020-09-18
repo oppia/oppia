@@ -16,40 +16,29 @@
  * @fileoverview Unit tests for hint object factory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/Hint.model';
 
 describe('Hint object factory', () => {
-  var hof: HintObjectFactory = null;
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [HintObjectFactory]
-    });
-
-    hof = TestBed.get(HintObjectFactory);
-  });
-
   it('should create a Hint from dict and convert a Hint Object to' +
      'backend dict correctly', inject(() => {
-    var testHint = hof.createNew('content_id', '<p>Some Hint</p>');
+    var testHint = Hint.createNew('content_id', '<p>Some Hint</p>');
     expect(testHint.toBackendDict()).toEqual({
       hint_content: {
         html: '<p>Some Hint</p>',
         content_id: 'content_id'
       }
     });
-    expect(hof.createFromBackendDict({
+    expect(Hint.createFromBackendDict({
       hint_content: {
         html: '<p>Some Hint</p>',
         content_id: 'content_id'
       }
-    })).toEqual(hof.createNew('content_id', '<p>Some Hint</p>'));
+    })).toEqual(Hint.createNew('content_id', '<p>Some Hint</p>'));
   }));
 
   it('should be able to create a new hint object', inject(() => {
-    expect(hof.createNew('content_id', '<p>Some Hint</p>')).toEqual(
-      hof.createFromBackendDict({
+    expect(Hint.createNew('content_id', '<p>Some Hint</p>')).toEqual(
+      Hint.createFromBackendDict({
         hint_content: {
           html: '<p>Some Hint</p>',
           content_id: 'content_id'

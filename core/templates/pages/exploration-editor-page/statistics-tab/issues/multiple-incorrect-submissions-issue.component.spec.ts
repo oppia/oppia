@@ -18,8 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { StateEditorRefreshService } from
@@ -29,7 +28,6 @@ describe('Multiple Incorrect Submissions Issue Component', function() {
   var ctrl = null;
   var explorationStatesService = null;
   var learnerActionObjectFactory = null;
-  var subtitledHtmlObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -40,7 +38,6 @@ describe('Multiple Incorrect Submissions Issue Component', function() {
 
   beforeEach(function() {
     learnerActionObjectFactory = TestBed.get(LearnerActionObjectFactory);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
   });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -76,8 +73,7 @@ describe('Multiple Incorrect Submissions Issue Component', function() {
     var action = {
       actionCustomizationArgs: {
         feedback: {
-          value: subtitledHtmlObjectFactory.createDefault(
-            'This is the {{answer}}', '1')
+          value: SubtitledHtml.createDefault('This is the {{answer}}', '1')
         },
         submitted_answer: {
           value: ''

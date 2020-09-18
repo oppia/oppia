@@ -20,32 +20,30 @@ import { TestBed } from '@angular/core/testing';
 
 import { AudioTranslationManagerService } from
   'pages/exploration-player-page/services/audio-translation-manager.service';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
+import { Voiceover } from 'domain/exploration/Voiceover.model';
 
 describe('Audio translation manager service', () => {
-  let atms: AudioTranslationManagerService, vof: VoiceoverObjectFactory;
+  let atms: AudioTranslationManagerService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [AudioTranslationManagerService, VoiceoverObjectFactory]
+      providers: [AudioTranslationManagerService]
     });
 
     atms = TestBed.get(AudioTranslationManagerService);
-    vof = TestBed.get(VoiceoverObjectFactory);
   });
 
   var testAudioTranslations;
   var testAudioTranslations2;
   beforeEach(() => {
     testAudioTranslations = {
-      en: vof.createFromBackendDict({
+      en: Voiceover.createFromBackendDict({
         filename: 'audio-en.mp3',
         file_size_bytes: 0.5,
         needs_update: false,
         duration_secs: 0.5
       }),
-      es: vof.createFromBackendDict({
+      es: Voiceover.createFromBackendDict({
         filename: 'audio-es.mp3',
         file_size_bytes: 0.5,
         needs_update: false,
@@ -54,13 +52,13 @@ describe('Audio translation manager service', () => {
     };
 
     testAudioTranslations2 = {
-      zh: vof.createFromBackendDict({
+      zh: Voiceover.createFromBackendDict({
         filename: 'audio-zh.mp3',
         file_size_bytes: 0.5,
         needs_update: false,
         duration_secs: 0.5
       }),
-      'hi-en': vof.createFromBackendDict({
+      'hi-en': Voiceover.createFromBackendDict({
         filename: 'audio-hi-en.mp3',
         file_size_bytes: 0.5,
         needs_update: false,
@@ -73,13 +71,13 @@ describe('Audio translation manager service', () => {
     () => {
       atms.setContentAudioTranslations(testAudioTranslations, '', '');
       expect(atms.getCurrentAudioTranslations()).toEqual({
-        en: vof.createFromBackendDict({
+        en: Voiceover.createFromBackendDict({
           filename: 'audio-en.mp3',
           file_size_bytes: 0.5,
           needs_update: false,
           duration_secs: 0.5
         }),
-        es: vof.createFromBackendDict({
+        es: Voiceover.createFromBackendDict({
           filename: 'audio-es.mp3',
           file_size_bytes: 0.5,
           needs_update: false,
@@ -88,13 +86,13 @@ describe('Audio translation manager service', () => {
       });
       atms.setSecondaryAudioTranslations(testAudioTranslations2, '', '');
       expect(atms.getCurrentAudioTranslations()).toEqual({
-        zh: vof.createFromBackendDict({
+        zh: Voiceover.createFromBackendDict({
           filename: 'audio-zh.mp3',
           file_size_bytes: 0.5,
           needs_update: false,
           duration_secs: 0.5
         }),
-        'hi-en': vof.createFromBackendDict({
+        'hi-en': Voiceover.createFromBackendDict({
           filename: 'audio-hi-en.mp3',
           file_size_bytes: 0.5,
           needs_update: false,
@@ -103,13 +101,13 @@ describe('Audio translation manager service', () => {
       });
       atms.clearSecondaryAudioTranslations();
       expect(atms.getCurrentAudioTranslations()).toEqual({
-        en: vof.createFromBackendDict({
+        en: Voiceover.createFromBackendDict({
           filename: 'audio-en.mp3',
           file_size_bytes: 0.5,
           needs_update: false,
           duration_secs: 0.5
         }),
-        es: vof.createFromBackendDict({
+        es: Voiceover.createFromBackendDict({
           filename: 'audio-es.mp3',
           file_size_bytes: 0.5,
           needs_update: false,

@@ -22,8 +22,7 @@ import { Injectable } from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
-  'domain/skill/ShortSkillSummaryObjectFactory';
+import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
 import {
   StoryReferenceBackendDict,
   StoryReference,
@@ -74,7 +73,6 @@ export class Topic {
   _urlFragment: string;
   _practiceTabIsDisplayed: boolean;
   _metaTagContent: string;
-  skillSummaryObjectFactory: ShortSkillSummaryObjectFactory;
   subtopicObjectFactory: SubtopicObjectFactory;
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
   constructor(
@@ -87,7 +85,6 @@ export class Topic {
       thumbnailFilename: string,
       thumbnailBgColor: string,
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
-      skillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
       subtopicObjectFactory: SubtopicObjectFactory,
       storyReferenceObjectFactory: StoryReferenceObjectFactory,
       practiceTabIsDisplayed: boolean,
@@ -100,10 +97,9 @@ export class Topic {
     this._languageCode = languageCode;
     this._canonicalStoryReferences = canonicalStoryReferences;
     this._additionalStoryReferences = additionalStoryReferences;
-    this.skillSummaryObjectFactory = skillSummaryObjectFactory;
     this._uncategorizedSkillSummaries = uncategorizedSkillIds.map(
       (skillId: string) => {
-        return this.skillSummaryObjectFactory.create(
+        return ShortSkillSummary.create(
           skillId, skillIdToDescriptionMap[skillId]);
       });
     this._nextSubtopicId = nextSubtopicId;
@@ -349,7 +345,7 @@ export class Topic {
           let skillDescription = skillSummaries[j].getDescription();
           if (!this.hasUncategorizedSkill(skillId)) {
             this._uncategorizedSkillSummaries.push(
-              this.skillSummaryObjectFactory.create(skillId, skillDescription));
+              ShortSkillSummary.create(skillId, skillDescription));
           }
         }
         this._subtopics.splice(i, 1);
@@ -491,7 +487,7 @@ export class Topic {
       throw new Error('Given skillId is already an uncategorized skill.');
     }
     this._uncategorizedSkillSummaries.push(
-      this.skillSummaryObjectFactory.create(skillId, skillDescription));
+      ShortSkillSummary.create(skillId, skillDescription));
   }
 
   removeUncategorizedSkill(skillId: string): void {
@@ -556,8 +552,7 @@ export class Topic {
 export class TopicObjectFactory {
   constructor(
       private subtopicObjectFactory: SubtopicObjectFactory,
-      private storyReferenceObjectFactory: StoryReferenceObjectFactory,
-      private skillSummaryObjectFactory: ShortSkillSummaryObjectFactory) {}
+      private storyReferenceObjectFactory: StoryReferenceObjectFactory) {}
   create(
       topicBackendDict: TopicBackendDict,
       skillIdToDescriptionDict: SkillIdToDescriptionMap): Topic {
@@ -588,8 +583,8 @@ export class TopicObjectFactory {
       topicBackendDict.next_subtopic_id, topicBackendDict.version,
       subtopics, topicBackendDict.thumbnail_filename,
       topicBackendDict.thumbnail_bg_color,
-      skillIdToDescriptionDict, this.skillSummaryObjectFactory,
-      this.subtopicObjectFactory, this.storyReferenceObjectFactory,
+      skillIdToDescriptionDict, this.subtopicObjectFactory,
+      this.storyReferenceObjectFactory,
       topicBackendDict.practice_tab_is_displayed,
       topicBackendDict.meta_tag_content
     );
@@ -602,8 +597,7 @@ export class TopicObjectFactory {
       null, 'Topic name loading', 'Abbrev. name loading',
       'Url Fragment loading', 'Topic description loading', 'en',
       [], [], [], 1, 1, [], '', '', {},
-      this.skillSummaryObjectFactory, this.subtopicObjectFactory,
-      this.storyReferenceObjectFactory, false, ''
+      this.subtopicObjectFactory, this.storyReferenceObjectFactory, false, ''
     );
   }
 }

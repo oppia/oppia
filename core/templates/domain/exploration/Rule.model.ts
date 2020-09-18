@@ -17,9 +17,6 @@
  * domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 
 export interface RuleBackendDict {
@@ -45,20 +42,12 @@ export class Rule {
       inputs: this.inputs
     };
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class RuleObjectFactory {
-  createNew(type: string, inputs: RuleInputs): Rule {
+  static createNew(type: string, inputs: RuleInputs): Rule {
     return new Rule(type, inputs);
   }
 
-  createFromBackendDict(ruleDict: RuleBackendDict): Rule {
+  static createFromBackendDict(ruleDict: RuleBackendDict): Rule {
     return new Rule(ruleDict.rule_type, ruleDict.inputs);
   }
 }
-
-angular.module('oppia').factory('RuleObjectFactory',
-  downgradeInjectable(RuleObjectFactory));

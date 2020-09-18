@@ -33,8 +33,7 @@ export interface SkillBackendDict {
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ConceptCardObjectFactory, ConceptCard, ConceptCardBackendDict } from
-  'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard, ConceptCardBackendDict } from 'domain/skill/ConceptCard.model';
 import { MisconceptionObjectFactory, Misconception, MisconceptionBackendDict }
   from 'domain/skill/MisconceptionObjectFactory';
 import { RubricObjectFactory, Rubric, RubricBackendDict } from
@@ -244,7 +243,6 @@ export class Skill {
 })
 export class SkillObjectFactory {
   constructor(
-    private conceptCardObjectFactory: ConceptCardObjectFactory,
     private misconceptionObjectFactory: MisconceptionObjectFactory,
     private rubricObjectFactory: RubricObjectFactory,
     private validatorService: ValidatorsService) {
@@ -252,7 +250,7 @@ export class SkillObjectFactory {
   createInterstitialSkill(): Skill {
     return new Skill(
       null, 'Skill description loading',
-      [], [], this.conceptCardObjectFactory.createInterstitialConceptCard(),
+      [], [], ConceptCard.createInterstitialConceptCard(),
       'en', 1, 0, null, false, []);
   }
 
@@ -269,7 +267,7 @@ export class SkillObjectFactory {
       this.generateMisconceptionsFromBackendDict(
         skillBackendDict.misconceptions),
       this.generateRubricsFromBackendDict(skillBackendDict.rubrics),
-      this.conceptCardObjectFactory.createFromBackendDict(
+      ConceptCard.createFromBackendDict(
         skillBackendDict.skill_contents),
       skillBackendDict.language_code,
       skillBackendDict.version,

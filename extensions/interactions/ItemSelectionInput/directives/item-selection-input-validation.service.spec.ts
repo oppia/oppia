@@ -24,10 +24,9 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
 import { ItemSelectionInputValidationService } from
   'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
 /* eslint-enable max-len */
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
+import { Rule } from 'domain/exploration/Rule.model';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 import { AppConstants } from 'app.constants';
 import { ItemSelectionInputCustomizationArgs } from
@@ -42,9 +41,7 @@ describe('ItemSelectionInputValidationService', () => {
     goodDefaultOutcome: Outcome = null;
   let customizationArguments: ItemSelectionInputCustomizationArgs = null;
   let IsProperSubsetValidOption: AnswerGroup[] = null;
-  let oof: OutcomeObjectFactory = null,
-    agof: AnswerGroupObjectFactory = null,
-    rof: RuleObjectFactory = null;
+  let agof: AnswerGroupObjectFactory = null;
   let ThreeInputsAnswerGroups: AnswerGroup[] = null,
     OneInputAnswerGroups: AnswerGroup[] = null,
     NoInputAnswerGroups: AnswerGroup[] = null;
@@ -57,13 +54,11 @@ describe('ItemSelectionInputValidationService', () => {
     validatorService = TestBed.get(ItemSelectionInputValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
 
     currentState = 'First State';
 
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: 'Feedback',
@@ -91,7 +86,7 @@ describe('ItemSelectionInputValidationService', () => {
       }
     };
     goodAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
           x: ['Selection 1', 'Selection 2']
@@ -102,7 +97,7 @@ describe('ItemSelectionInputValidationService', () => {
       null)
     ];
     ThreeInputsAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
           x: ['Selection 1', 'Selection 2', 'Selection 3']
@@ -113,7 +108,7 @@ describe('ItemSelectionInputValidationService', () => {
       null)
     ];
     OneInputAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
           x: ['Selection 1']
@@ -124,7 +119,7 @@ describe('ItemSelectionInputValidationService', () => {
       null)
     ];
     NoInputAnswerGroups = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'ContainsAtLeastOneOf',
         inputs: {
           x: []
@@ -135,7 +130,7 @@ describe('ItemSelectionInputValidationService', () => {
       null)
     ];
     IsProperSubsetValidOption = [agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         rule_type: 'IsProperSubsetOf',
         inputs: {
           x: ['Selection 1']

@@ -18,6 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
+import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -38,7 +39,6 @@ describe('Topic editor page', function() {
   var TopicObjectFactory = null;
   var StoryReferenceObjectFactory = null;
   var topic = null;
-  var ShortSkillSummaryObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -58,12 +58,10 @@ describe('Topic editor page', function() {
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
-    ShortSkillSummaryObjectFactory = $injector.get(
-      'ShortSkillSummaryObjectFactory');
 
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'subtopic1');
     subtopic._thumbnailFilename = 'b.svg';
-    var skillSummary = ShortSkillSummaryObjectFactory.create(
+    var skillSummary = ShortSkillSummary.create(
       'skill1', 'Addition');
     subtopic._skillSummaries = [skillSummary];
     topic = TopicObjectFactory.createInterstitialTopic();

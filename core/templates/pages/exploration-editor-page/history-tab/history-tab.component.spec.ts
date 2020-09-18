@@ -24,23 +24,13 @@ import { EditabilityService } from 'services/editability.service';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -104,23 +94,11 @@ describe('History tab component', function() {
       'FractionObjectFactory', TestBed.get(FractionObjectFactory));
     $provide.value('StatesObjectFactory', TestBed.get(StatesObjectFactory));
     $provide.value(
-      'HintObjectFactory', TestBed.get(HintObjectFactory));
-    $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
-    $provide.value(
       'ParamChangeObjectFactory', TestBed.get(ParamChangeObjectFactory));
     $provide.value(
       'ParamChangesObjectFactory', TestBed.get(ParamChangesObjectFactory));
-    $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      TestBed.get(RecordedVoiceoversObjectFactory));
-    $provide.value('RuleObjectFactory', TestBed.get(RuleObjectFactory));
-    $provide.value(
-      'SubtitledHtmlObjectFactory', TestBed.get(SubtitledHtmlObjectFactory));
     $provide.value('UnitsObjectFactory', TestBed.get(UnitsObjectFactory));
     $provide.value('VersionTreeService', TestBed.get(VersionTreeService));
-    $provide.value(
-      'VoiceoverObjectFactory', TestBed.get(VoiceoverObjectFactory));
     $provide.value(
       'WrittenTranslationObjectFactory',
       TestBed.get(WrittenTranslationObjectFactory));

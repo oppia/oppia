@@ -13,21 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview unit test for RuleObjectFactory.
+ * @fileoverview unit test for Rule model.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { RuleBackendDict, RuleInputs, Rule } from
+  'domain/exploration/Rule.model';
 
-import { RuleObjectFactory, RuleBackendDict, RuleInputs, Rule } from
-  'domain/exploration/RuleObjectFactory';
-
-describe('RuleObjectFactory', () => {
-  let ruleObjectFactory: RuleObjectFactory = null;
+describe('Rule.model', () => {
   let ruleBackendDict: RuleBackendDict = null;
   let inputBackend: RuleInputs = null;
 
   beforeEach(() => {
-    ruleObjectFactory = TestBed.get(RuleObjectFactory);
     inputBackend = {
       x: [['<p>list_of_sets_of_html_strings</p>']]
     };
@@ -38,12 +34,12 @@ describe('RuleObjectFactory', () => {
   });
 
   it('should convert to a backend dictionary', () => {
-    let rulesDict = ruleObjectFactory.createFromBackendDict(ruleBackendDict);
+    let rulesDict = Rule.createFromBackendDict(ruleBackendDict);
     expect(rulesDict.toBackendDict()).toEqual(ruleBackendDict);
   });
 
-  it('should creat a new rule from creatNew()', () => {
-    let rulesDict = ruleObjectFactory.createNew('rule_type_1', inputBackend);
+  it('should create a new rule', () => {
+    let rulesDict = Rule.createNew('rule_type_1', inputBackend);
     expect(rulesDict).toEqual(new Rule('rule_type_1', inputBackend));
   });
 });

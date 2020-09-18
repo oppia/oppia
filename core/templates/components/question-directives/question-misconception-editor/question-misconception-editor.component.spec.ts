@@ -23,15 +23,12 @@ import { EventEmitter } from '@angular/core';
 /* eslint-disable max-len */
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
+import { Rule } from 'domain/exploration/Rule.model';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.
 
@@ -82,8 +79,6 @@ describe('Question misconception editor component', function() {
       'onSaveTaggedMisconception');
     var onSaveAnswerGroupFeedbackSpy = jasmine.createSpy(
       'onSaveAnswerGroupFeedback');
-    var outcome = new OutcomeObjectFactory(new SubtitledHtmlObjectFactory());
-    var rules = new RuleObjectFactory();
     mockMisconceptionObject = {
       abc: [
         misconceptionObjectFactory.create(
@@ -100,8 +95,8 @@ describe('Question misconception editor component', function() {
       getOnSaveTaggedMisconception: () => onSaveTaggedMisconceptionSpy,
       getTaggedSkillMisconceptionId: () => null,
       isEditable: true,
-      outcome: outcome,
-      rules: rules
+      outcome: Outcome,
+      rules: Rule
     });
     ctrl.$onInit();
   });

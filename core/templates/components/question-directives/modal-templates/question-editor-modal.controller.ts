@@ -15,6 +15,8 @@
 /**
  * @fileoverview Controller for question editor modal.
  */
+
+import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -24,7 +26,6 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
-require('domain/skill/ShortSkillSummaryObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
@@ -33,16 +34,16 @@ require('services/image-local-storage.service.ts');
 angular.module('oppia').controller('QuestionEditorModalController', [
   '$scope', '$uibModal', '$uibModalInstance', 'AlertsService', 'ContextService',
   'ImageLocalStorageService', 'QuestionUndoRedoService',
-  'QuestionValidationService', 'ShortSkillSummaryObjectFactory',
-  'UrlInterpolationService', 'associatedSkillSummaries', 'canEditQuestion',
+  'QuestionValidationService', 'UrlInterpolationService',
+  'associatedSkillSummaries', 'canEditQuestion',
   'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
   'newQuestionIsBeingCreated', 'question', 'questionId', 'questionStateData',
   'rubrics', 'skillNames', 'untriagedSkillSummaries',
   function(
       $scope, $uibModal, $uibModalInstance, AlertsService, ContextService,
       ImageLocalStorageService, QuestionUndoRedoService,
-      QuestionValidationService, ShortSkillSummaryObjectFactory,
-      UrlInterpolationService, associatedSkillSummaries, canEditQuestion,
+      QuestionValidationService, UrlInterpolationService,
+      associatedSkillSummaries, canEditQuestion,
       categorizedSkills, groupedSkillSummaries, misconceptionsBySkill,
       newQuestionIsBeingCreated, question, questionId, questionStateData,
       rubrics, skillNames, untriagedSkillSummaries) {
@@ -122,8 +123,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
           }
         }
         $scope.associatedSkillSummaries.push(
-          ShortSkillSummaryObjectFactory.create(
-            summary.id, summary.description));
+          ShortSkillSummary.create(summary.id, summary.description));
         returnModalObject.skillLinkageModificationsArray.push({
           id: summary.id,
           task: 'add'

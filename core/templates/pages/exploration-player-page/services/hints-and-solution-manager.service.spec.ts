@@ -21,14 +21,11 @@ import { EventEmitter } from '@angular/core';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // hints-and-solution-manager.service.spec.ts is upgraded to Angular 8.
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { Hint } from 'domain/exploration/Hint.model';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 require(
   'pages/exploration-player-page/services/' +
@@ -37,7 +34,6 @@ require(
 describe('HintsAndSolutionManager service', function() {
   var $timeout;
   var hasms;
-  var hof;
   var sof;
   var firstHint, secondHint, thirdHint;
   var solution;
@@ -48,11 +44,6 @@ describe('HintsAndSolutionManager service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -68,26 +59,25 @@ describe('HintsAndSolutionManager service', function() {
     spyOnProperty(pps, 'onNewCardAvailable').and.returnValue(
       mockNewCardAvailableEmitter);
     hasms = $injector.get('HintsAndSolutionManagerService');
-    hof = $injector.get('HintObjectFactory');
     sof = $injector.get('SolutionObjectFactory');
 
 
-    firstHint = hof.createFromBackendDict({
+    firstHint = Hint.createFromBackendDict({
       hint_content: {
         html: 'one',
-        audio_translations: {}
+        content_id: '1'
       }
     });
-    secondHint = hof.createFromBackendDict({
+    secondHint = Hint.createFromBackendDict({
       hint_content: {
         html: 'two',
-        audio_translations: {}
+        content_id: '2'
       }
     });
-    thirdHint = hof.createFromBackendDict({
+    thirdHint = Hint.createFromBackendDict({
       hint_content: {
         html: 'three',
-        audio_translations: {}
+        content_id: '3'
       }
     });
     solution = sof.createFromBackendDict({

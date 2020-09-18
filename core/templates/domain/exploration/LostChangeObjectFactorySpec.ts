@@ -19,18 +19,16 @@
 import { TestBed } from '@angular/core/testing';
 import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
-import { OutcomeObjectFactory } from './OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 
 describe('Lost Change Object Factory', () => {
   let lcof: LostChangeObjectFactory = null;
-  let oof: OutcomeObjectFactory = null;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [LostChangeObjectFactory]
     });
 
     lcof = TestBed.get(LostChangeObjectFactory);
-    oof = TestBed.get(OutcomeObjectFactory);
   });
 
   it('should evaluate values from a Lost Change', () => {
@@ -163,7 +161,7 @@ describe('Lost Change Object Factory', () => {
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {
-        outcome: oof.createFromBackendDict({
+        outcome: Outcome.createFromBackendDict({
           dest: 'outcome 2',
           feedback: {
             content_id: 'feedback_2',
@@ -183,7 +181,7 @@ describe('Lost Change Object Factory', () => {
         }]
       },
       old_value: {
-        outcome: oof.createFromBackendDict({
+        outcome: Outcome.createFromBackendDict({
           dest: 'outcome 1',
           feedback: {
             content_id: 'feedback_2',
@@ -214,7 +212,7 @@ describe('Lost Change Object Factory', () => {
     const lostChange = lcof.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
-      new_value: oof.createFromBackendDict({
+      new_value: Outcome.createFromBackendDict({
         dest: 'outcome 2',
         feedback: {
           content_id: 'feedback_2',
@@ -225,7 +223,7 @@ describe('Lost Change Object Factory', () => {
         refresher_exploration_id: null,
         missing_prerequisite_skill_id: null
       }),
-      old_value: oof.createFromBackendDict({
+      old_value: Outcome.createFromBackendDict({
         dest: 'outcome 1',
         feedback: {
           content_id: 'feedback_2',

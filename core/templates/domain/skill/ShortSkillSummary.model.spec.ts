@@ -13,21 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for ShortSkillSummaryObjectFactory.
+ * @fileoverview Tests for ShortSkillSummary model.
  */
 
-import { ShortSkillSummaryObjectFactory } from
-  'domain/skill/ShortSkillSummaryObjectFactory';
+import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
 
 describe('Skill summary object factory', () => {
-  let shortSkillSummaryObjectFactory: ShortSkillSummaryObjectFactory;
-
-  beforeEach(() => {
-    shortSkillSummaryObjectFactory = new ShortSkillSummaryObjectFactory();
-  });
-
   it('should be able to create a skill summary object', () => {
-    var shortSkillSummary = shortSkillSummaryObjectFactory.create(
+    var shortSkillSummary = ShortSkillSummary.create(
       'skill_1', 'Description 1');
     expect(shortSkillSummary.getId()).toBe('skill_1');
     expect(shortSkillSummary.getDescription()).toBe('Description 1');
@@ -40,7 +33,7 @@ describe('Skill summary object factory', () => {
     };
 
     var shortSkillSummary = (
-      shortSkillSummaryObjectFactory.createFromBackendDict(backendDict));
+      ShortSkillSummary.createFromBackendDict(backendDict));
 
     expect(shortSkillSummary.id).toBe('skill');
     expect(shortSkillSummary.description).toBe('description');

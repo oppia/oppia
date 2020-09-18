@@ -22,8 +22,7 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { LogicProofValidationService } from
   'interactions/LogicProof/directives/logic-proof-validation.service';
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 
 describe('LogicProofValidationService', () => {
   let validatorService: LogicProofValidationService;
@@ -31,7 +30,7 @@ describe('LogicProofValidationService', () => {
   let currentState: string;
   let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[],
     goodDefaultOutcome: Outcome;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -40,12 +39,11 @@ describe('LogicProofValidationService', () => {
 
     validatorService = TestBed.get(LogicProofValidationService);
 
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
 
     currentState = 'First State';
 
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: '',
@@ -57,7 +55,7 @@ describe('LogicProofValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    badOutcome = oof.createFromBackendDict({
+    badOutcome = Outcome.createFromBackendDict({
       dest: currentState,
       feedback: {
         html: '',

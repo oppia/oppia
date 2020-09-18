@@ -24,9 +24,9 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { GraphInputValidationService } from
   'interactions/GraphInput/directives/graph-input-validation.service';
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Outcome } from
+  'domain/exploration/Outcome.model';
+import { Rule } from 'domain/exploration/Rule.model';
 import { GraphAnswer } from 'interactions/answer-defs';
 
 import { AppConstants } from 'app.constants';
@@ -39,8 +39,7 @@ describe('GraphInputValidationService', () => {
   let currentState: string;
   let customizationArguments: GraphInputCustomizationArgs;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
-  let rof: RuleObjectFactory;
+  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -49,11 +48,9 @@ describe('GraphInputValidationService', () => {
 
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     validatorService = TestBed.get(GraphInputValidationService);
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: '',
@@ -99,14 +96,14 @@ describe('GraphInputValidationService', () => {
     };
 
     var answerGroup = agof.createNew(
-      [rof.createFromBackendDict({
+      [Rule.createFromBackendDict({
         inputs: {
           g: {
             vertices: new Array(10)
           }
         },
         rule_type: 'IsIsomorphicTo'
-      }), rof.createFromBackendDict({
+      }), Rule.createFromBackendDict({
         inputs: {
           g: {
             vertices: new Array(10)

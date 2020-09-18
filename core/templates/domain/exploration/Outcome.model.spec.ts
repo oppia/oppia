@@ -16,29 +16,17 @@
  * @fileoverview unit tests for outcome object factory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 
 describe('Outcome object factory', () => {
-  let oof: OutcomeObjectFactory;
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [OutcomeObjectFactory]
-    });
-
-    oof = TestBed.get(OutcomeObjectFactory);
-  });
-
   it('should correctly determine if an outcome is confusing given a ' +
     'source state', () => {
     const currentState = 'A';
-    const testOutcome1 = oof.createNew('B', 'feedback_1', 'feedback', []);
-    const testOutcome2 = oof.createNew('B', 'feedback_2', '', []);
-    const testOutcome3 = oof.createNew('A', 'feedback_3', 'feedback', []);
-    const testOutcome4 = oof.createNew('A', 'feedback_4', '', []);
-    const testOutcome5 = oof.createNew('A', 'feedback_5', '   ', []);
+    const testOutcome1 = Outcome.createNew('B', 'feedback_1', 'feedback', []);
+    const testOutcome2 = Outcome.createNew('B', 'feedback_2', '', []);
+    const testOutcome3 = Outcome.createNew('A', 'feedback_3', 'feedback', []);
+    const testOutcome4 = Outcome.createNew('A', 'feedback_4', '', []);
+    const testOutcome5 = Outcome.createNew('A', 'feedback_5', '   ', []);
     expect(testOutcome1.isConfusing(currentState)).toBe(false);
     expect(testOutcome2.isConfusing(currentState)).toBe(false);
     expect(testOutcome3.isConfusing(currentState)).toBe(false);
@@ -48,23 +36,23 @@ describe('Outcome object factory', () => {
 
   it('should correctly output whether an outcome has nonempty feedback',
     () => {
-      const testOutcome1 = oof.createNew('A', 'feedback_1', 'feedback', []);
-      const testOutcome2 = oof.createNew('A', 'feedback_2', '', []);
-      const testOutcome3 = oof.createNew('A', 'feedback_3', '   ', []);
+      const testOutcome1 = Outcome.createNew('A', 'feedback_1', 'feedback', []);
+      const testOutcome2 = Outcome.createNew('A', 'feedback_2', '', []);
+      const testOutcome3 = Outcome.createNew('A', 'feedback_3', '   ', []);
       expect(testOutcome1.hasNonemptyFeedback()).toBe(true);
       expect(testOutcome2.hasNonemptyFeedback()).toBe(false);
       expect(testOutcome3.hasNonemptyFeedback()).toBe(false);
     });
 
   it('should correctly set the destination of an outcome', () => {
-    const testOutcome = oof.createNew('A', 'feedback_1', 'feedback', []);
+    const testOutcome = Outcome.createNew('A', 'feedback_1', 'feedback', []);
     testOutcome.setDestination('B');
     expect(testOutcome.dest).toEqual('B');
   });
 
   it('should create an outcome from backend dict and convert it to dict again',
     () => {
-      const testOutcome = oof.createFromBackendDict({
+      const testOutcome = Outcome.createFromBackendDict({
         dest: 'A',
         feedback: {
           html: '<p>Hey</p>',

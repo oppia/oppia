@@ -17,13 +17,12 @@
  */
 
 import { EventEmitter } from '@angular/core';
-
+import { Outcome } from 'domain/exploration/Outcome.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Responses Service', function() {
   var ResponsesService = null;
   var InteractionObjectFactory = null;
-  var OutcomeObjectFactory = null;
   var StateEditorService = null;
   var AlertsService = null;
   var StateInteractionIdService = null;
@@ -50,7 +49,6 @@ describe('Responses Service', function() {
   beforeEach(angular.mock.inject(function($injector) {
     ResponsesService = $injector.get('ResponsesService');
     InteractionObjectFactory = $injector.get('InteractionObjectFactory');
-    OutcomeObjectFactory = $injector.get('OutcomeObjectFactory');
     StateEditorService = $injector.get('StateEditorService');
     AlertsService = $injector.get('AlertsService');
     StateInteractionIdService = $injector.get('StateInteractionIdService');
@@ -163,8 +161,8 @@ describe('Responses Service', function() {
     ResponsesService.init(interactionData);
     StateEditorService.setInteraction(interactionData);
 
-    var updatedDefaultOutcome = OutcomeObjectFactory.createNew(
-      'Hola', 'new_id', 'This is a new feedback text');
+    var updatedDefaultOutcome = Outcome.createNew(
+      'Hola', 'new_id', 'This is a new feedback text', null);
     var callbackSpy = jasmine.createSpy('callback');
     ResponsesService.updateDefaultOutcome(updatedDefaultOutcome, callbackSpy);
 
@@ -596,7 +594,7 @@ describe('Responses Service', function() {
       var callbackSpy = jasmine.createSpy('callback');
       ResponsesService.onInteractionIdChanged(newInteractionId, callbackSpy);
 
-      var expectedDefaultOutcomeCreated = OutcomeObjectFactory.createNew(
+      var expectedDefaultOutcomeCreated = Outcome.createNew(
         'State', 'default_outcome', '', []);
       expect(cacheSpy).toHaveBeenCalledWith(
         newInteractionId, []);
@@ -630,12 +628,12 @@ describe('Responses Service', function() {
 
     var updatedAnswerGroups = [
       AnswerGroupObjectFactory.createNew(
-        [], OutcomeObjectFactory.createNew('Hola', '1', 'Feedback text'),
+        [], Outcome.createNew('Hola', '1', 'Feedback text', []),
         'Training data text', '0'
       )
     ];
-    var updatedDefaultOutcome = OutcomeObjectFactory.createNew(
-      'State', 'new_id', 'This is a new feedback text');
+    var updatedDefaultOutcome = Outcome.createNew(
+      'State', 'new_id', 'This is a new feedback text', []);
 
     var callbackSpy = jasmine.createSpy('callback');
     ResponsesService.save(
@@ -662,19 +660,19 @@ describe('Responses Service', function() {
 
     var updatedAnswerGroups = [
       AnswerGroupObjectFactory.createNew(
-        [], OutcomeObjectFactory.createNew('Hola', '1', 'Feedback text'),
+        [], Outcome.createNew('Hola', '1', 'Feedback text', []),
         'Training data text', '0'
       )
     ];
-    var updatedDefaultOutcome = OutcomeObjectFactory.createNew(
-      'State', 'new_id', 'This is a new feedback text');
+    var updatedDefaultOutcome = Outcome.createNew(
+      'State', 'new_id', 'This is a new feedback text', []);
 
     // Save first time.
     ResponsesService.save(
       updatedAnswerGroups, updatedDefaultOutcome, function() {});
 
-    var updatedDefaultOutcome = OutcomeObjectFactory.createNew(
-      'Hola', 'new_id', 'This is a new feedback text');
+    var updatedDefaultOutcome = Outcome.createNew(
+      'Hola', 'new_id', 'This is a new feedback text', []);
 
     // Save second time.
     var callbackSpy = jasmine.createSpy('callback');

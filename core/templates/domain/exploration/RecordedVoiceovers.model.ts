@@ -32,19 +32,13 @@ export interface BindableVoiceovers {
   [propName: string]: Voiceover;
 }
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { VoiceoverBackendDict, Voiceover } from 'domain/exploration/Voiceover.model';
 
-import { VoiceoverObjectFactory, VoiceoverBackendDict, Voiceover } from
-  'domain/exploration/VoiceoverObjectFactory';
 export class RecordedVoiceovers {
   voiceoversMapping: VoiceoverMapping;
-  _voiceoverObjectFactory: VoiceoverObjectFactory;
   constructor(
-      voiceoversMapping: VoiceoverMapping,
-      voiceoverObjectFactory: VoiceoverObjectFactory) {
+      voiceoversMapping: VoiceoverMapping) {
     this.voiceoversMapping = voiceoversMapping;
-    this._voiceoverObjectFactory = voiceoverObjectFactory;
   }
 
   getAllContentId(): string[] {
@@ -106,7 +100,7 @@ export class RecordedVoiceovers {
       throw new Error('Trying to add duplicate language code.');
     }
     languageCodeToVoiceover[languageCode] =
-      this._voiceoverObjectFactory.createNew(
+      Voiceover.createNew(
         filename, fileSizeBytes, durationSecs);
   }
 
@@ -141,15 +135,8 @@ export class RecordedVoiceovers {
       voiceovers_mapping: voiceoversMappingDict
     };
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class RecordedVoiceoversObjectFactory {
-  constructor(private voiceoverObjectFactory: VoiceoverObjectFactory) {}
-
-  createFromBackendDict(
+  static createFromBackendDict(
       recordedVoiceoversDict: RecordedVoiceOverBackendDict):
         RecordedVoiceovers {
     var voiceoversMapping = {};
@@ -159,21 +146,17 @@ export class RecordedVoiceoversObjectFactory {
       var languageCodeToVoiceover = {};
       Object.keys(languageCodeToVoiceoverDict).forEach((langCode) => {
         languageCodeToVoiceover[langCode] = (
-          this.voiceoverObjectFactory.createFromBackendDict(
+          Voiceover.createFromBackendDict(
             languageCodeToVoiceoverDict[langCode]));
       });
       voiceoversMapping[contentId] = languageCodeToVoiceover;
     });
 
     return new RecordedVoiceovers(
-      voiceoversMapping, this.voiceoverObjectFactory);
+      voiceoversMapping);
   }
 
-  createEmpty(): RecordedVoiceovers {
-    return new RecordedVoiceovers({}, this.voiceoverObjectFactory);
+  static createEmpty(): RecordedVoiceovers {
+    return new RecordedVoiceovers({});
   }
 }
-
-angular.module('oppia').factory(
-  'RecordedVoiceoversObjectFactory',
-  downgradeInjectable(RecordedVoiceoversObjectFactory));

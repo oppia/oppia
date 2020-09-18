@@ -24,7 +24,7 @@ import { CamelCaseToHyphensPipe } from
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/SubtitledHtml.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 

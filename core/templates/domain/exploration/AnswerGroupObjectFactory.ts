@@ -21,10 +21,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { InteractionAnswer } from 'interactions/answer-defs';
-import { Outcome, OutcomeBackendDict, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleBackendDict, RuleObjectFactory } from
-  'domain/exploration/RuleObjectFactory';
+import { Outcome, OutcomeBackendDict } from 'domain/exploration/Outcome.model';
+import { Rule, RuleBackendDict } from 'domain/exploration/Rule.model';
 
 export interface AnswerGroupBackendDict {
   'rule_specs': RuleBackendDict[];
@@ -61,12 +59,8 @@ export class AnswerGroup {
   providedIn: 'root'
 })
 export class AnswerGroupObjectFactory {
-  constructor(
-    private outcomeObjectFactory: OutcomeObjectFactory,
-    private ruleObjectFactory: RuleObjectFactory) {}
-
   generateRulesFromBackend(ruleBackendDicts: RuleBackendDict[]): Rule[] {
-    return ruleBackendDicts.map(this.ruleObjectFactory.createFromBackendDict);
+    return ruleBackendDicts.map(Rule.createFromBackendDict);
   }
 
   createNew(
@@ -80,7 +74,7 @@ export class AnswerGroupObjectFactory {
       answerGroupBackendDict: AnswerGroupBackendDict): AnswerGroup {
     return new AnswerGroup(
       this.generateRulesFromBackend(answerGroupBackendDict.rule_specs),
-      this.outcomeObjectFactory.createFromBackendDict(
+      Outcome.createFromBackendDict(
         answerGroupBackendDict.outcome),
       answerGroupBackendDict.training_data,
       answerGroupBackendDict.tagged_skill_misconception_id);

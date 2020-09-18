@@ -33,9 +33,8 @@ import {
 } from 'domain/skill/augmented-skill-summary-object.factory';
 import {
   ShortSkillSummary,
-  ShortSkillSummaryBackendDict,
-  ShortSkillSummaryObjectFactory
-} from 'domain/skill/ShortSkillSummaryObjectFactory';
+  ShortSkillSummaryBackendDict
+} from 'domain/skill/ShortSkillSummary.model';
 import { SkillSummary, SkillSummaryBackendDict, SkillSummaryObjectFactory } from
   'domain/skill/skill-summary-object.factory';
 import { TopicsAndSkillsDashboardDomainConstants } from
@@ -116,7 +115,6 @@ export class TopicsAndSkillsDashboardBackendApiService {
     private augmentedSkillSummaryObjectFactory:
     AugmentedSkillSummaryObjectFactory,
     private http: HttpClient,
-    private shortSkillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
     private skillSummaryObjectFactory: SkillSummaryObjectFactory,
     private topicSummaryObjectFactory: TopicSummaryObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
@@ -134,8 +132,8 @@ export class TopicsAndSkillsDashboardBackendApiService {
         for (let subtopic in subtopicSkillsDict) {
           subtopicSkills[subtopic] = (
             subtopicSkillsDict[subtopic].map(
-              backendDict => this.shortSkillSummaryObjectFactory
-                .createFromBackendDict(backendDict)));
+              backendDict => ShortSkillSummary.createFromBackendDict(
+                backendDict)));
         }
         categorizedSkills[topic] = subtopicSkills;
       }

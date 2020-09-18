@@ -28,7 +28,7 @@ import { CamelCaseToHyphensPipe } from
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 import { PredictionAlgorithmRegistryService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
@@ -50,7 +50,6 @@ describe('Answer Classification Service', () => {
   let answerClassificationService: AnswerClassificationService;
   let appService: AppService;
   let interactionSpecsService: InteractionSpecsService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
   let stateClassifierMappingService: StateClassifierMappingService;
   let stateObjectFactory: StateObjectFactory;
@@ -63,7 +62,6 @@ describe('Answer Classification Service', () => {
     answerClassificationService = TestBed.get(AnswerClassificationService);
     appService = TestBed.get(AppService);
     interactionSpecsService = TestBed.get(InteractionSpecsService);
-    outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
     predictionAlgorithmRegistryService = TestBed.get(
       PredictionAlgorithmRegistryService);
     stateClassifierMappingService = TestBed.get(StateClassifierMappingService);
@@ -181,7 +179,7 @@ describe('Answer Classification Service', () => {
           state.name, state.interaction, 10, rules)
       ).toEqual(
         answerClassificationResultObjectFactory.createNew(
-          outcomeObjectFactory.createNew('outcome 1', 'feedback_1', '', []),
+          Outcome.createNew('outcome 1', 'feedback_1', '', []),
           0, 0,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
 
@@ -190,7 +188,7 @@ describe('Answer Classification Service', () => {
           state.name, state.interaction, 5, rules)
       ).toEqual(
         answerClassificationResultObjectFactory.createNew(
-          outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []),
+          Outcome.createNew('outcome 2', 'feedback_2', '', []),
           1, 0,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
 
@@ -199,7 +197,7 @@ describe('Answer Classification Service', () => {
           state.name, state.interaction, 6, rules)
       ).toEqual(
         answerClassificationResultObjectFactory.createNew(
-          outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []),
+          Outcome.createNew('outcome 2', 'feedback_2', '', []),
           1, 1,
           ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
     });
@@ -213,7 +211,7 @@ describe('Answer Classification Service', () => {
           state.name, state.interaction, 7, rules)
       ).toEqual(
         answerClassificationResultObjectFactory.createNew(
-          outcomeObjectFactory.createNew('default', 'default_outcome', '', []),
+          Outcome.createNew('default', 'default_outcome', '', []),
           2, 0,
           ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION
         )
@@ -409,7 +407,7 @@ describe('Answer Classification Service', () => {
             state.name, state.interaction, 0, rules)
         ).toEqual(
           answerClassificationResultObjectFactory.createNew(
-            outcomeObjectFactory.createNew(
+            Outcome.createNew(
               'default', 'default_outcome', '', []),
             2, 0,
             ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION

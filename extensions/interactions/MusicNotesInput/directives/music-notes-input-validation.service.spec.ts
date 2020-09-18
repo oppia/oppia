@@ -24,15 +24,14 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
 import { MusicNotesInputValidationService } from
   'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
 /* eslint-enable max-len*/
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 
 describe('MusicNotesInputValidationService', () => {
   let validatorService: MusicNotesInputValidationService;
 
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -41,11 +40,10 @@ describe('MusicNotesInputValidationService', () => {
 
     validatorService = TestBed.get(MusicNotesInputValidationService);
 
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: '',

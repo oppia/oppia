@@ -17,14 +17,10 @@
  * domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 import {
   SubtitledHtml,
-  SubtitledHtmlBackendDict,
-  SubtitledHtmlObjectFactory
-} from 'domain/exploration/SubtitledHtmlObjectFactory';
+  SubtitledHtmlBackendDict
+} from 'domain/exploration/SubtitledHtml.model';
 
 export interface HintBackendDict {
   'hint_content': SubtitledHtmlBackendDict;
@@ -41,26 +37,16 @@ export class Hint {
       hint_content: this.hintContent.toBackendDict()
     };
   }
-}
 
-@Injectable({
-  providedIn: 'root'
-})
-export class HintObjectFactory {
-  constructor(private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory) {}
-
-  createFromBackendDict(hintBackendDict: HintBackendDict): Hint {
+  static createFromBackendDict(hintBackendDict: HintBackendDict): Hint {
     return new Hint(
-      this.subtitledHtmlObjectFactory.createFromBackendDict(
+      SubtitledHtml.createFromBackendDict(
         hintBackendDict.hint_content));
   }
 
-  createNew(hintContentId: string, hintContent: string): Hint {
+  static createNew(hintContentId: string, hintContent: string): Hint {
     return new Hint(
-      this.subtitledHtmlObjectFactory.createDefault(
+      SubtitledHtml.createDefault(
         hintContent, hintContentId));
   }
 }
-
-angular.module('oppia').factory(
-  'HintObjectFactory', downgradeInjectable(HintObjectFactory));

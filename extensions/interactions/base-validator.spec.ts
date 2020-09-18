@@ -30,11 +30,7 @@ import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -43,7 +39,7 @@ describe('Interaction validator', function() {
 
   var currentState, otherState, goodOutcomeDest, goodOutcomeFeedback;
   var badOutcome, goodAnswerGroups;
-  var agof, oof;
+  var agof;
 
   beforeEach(function() {
     angular.mock.module('oppia');
@@ -56,55 +52,46 @@ describe('Interaction validator', function() {
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
+      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory());
     $provide.value(
       'baseInteractionValidationService',
       new baseInteractionValidationService());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector, $rootScope) {
     bivs = $injector.get('baseInteractionValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     agof = $injector.get('AnswerGroupObjectFactory');
-    oof = $injector.get('OutcomeObjectFactory');
 
     currentState = 'First State';
     otherState = 'Second State';
-    goodOutcomeDest = oof.createFromBackendDict({
+    goodOutcomeDest = Outcome.createFromBackendDict({
       dest: otherState,
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null
     });
-    goodOutcomeFeedback = oof.createFromBackendDict({
+    goodOutcomeFeedback = Outcome.createFromBackendDict({
       dest: currentState,
       feedback: {
         html: 'Feedback',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null
     });
-    badOutcome = oof.createFromBackendDict({
+    badOutcome = Outcome.createFromBackendDict({
       dest: currentState,
       feedback: {
         html: '',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],

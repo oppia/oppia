@@ -19,8 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
 
@@ -37,7 +36,6 @@ describe('Display Solution Modal Controller', function() {
   var HintsAndSolutionManagerService = null;
   var interactionObjectFactory = null;
   var playerTranscriptService = null;
-  var recordedVoiceoversObjectFactory = null;
   var SolutionObjectFactory = null;
   var stateCardObjectFactory = null;
 
@@ -50,8 +48,6 @@ describe('Display Solution Modal Controller', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
-    recordedVoiceoversObjectFactory = TestBed.get(
-      RecordedVoiceoversObjectFactory);
     stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
   });
 
@@ -88,7 +84,7 @@ describe('Display Solution Modal Controller', function() {
       hints: [],
       id: 'TextInput'
     });
-    var recordedVoiceovers = recordedVoiceoversObjectFactory.createEmpty();
+    var recordedVoiceovers = RecordedVoiceovers.createEmpty();
     card = stateCardObjectFactory.createNewCard(
       'Card 1', 'Content html', 'Interaction text', interaction,
       recordedVoiceovers, 'content_id');

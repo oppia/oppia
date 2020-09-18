@@ -22,21 +22,18 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
+import { Voiceover } from
+  'domain/exploration/Voiceover.model';
 
 
 describe('State card object factory', () => {
   let stateCardObjectFactory = null;
   let interactionObjectFactory = null;
-  let recordedVoiceoversObjectFactory = null;
-  let voiceoverObjectFactory = null;
   let _sampleCard = null;
 
   beforeEach(() => {
@@ -46,10 +43,6 @@ describe('State card object factory', () => {
 
     stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
-    recordedVoiceoversObjectFactory = (
-      TestBed.get(RecordedVoiceoversObjectFactory));
-    voiceoverObjectFactory =
-      TestBed.get(VoiceoverObjectFactory);
 
     let interactionDict = {
       answer_groups: [],
@@ -79,7 +72,7 @@ describe('State card object factory', () => {
     _sampleCard = stateCardObjectFactory.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       interactionObjectFactory.createFromBackendDict(interactionDict),
-      recordedVoiceoversObjectFactory.createFromBackendDict({
+      RecordedVoiceovers.createFromBackendDict({
         voiceovers_mapping: {
           content: {
             en: {
@@ -111,13 +104,13 @@ describe('State card object factory', () => {
     expect(_sampleCard.getLastOppiaResponse()).toEqual(null);
     expect(_sampleCard.getRecordedVoiceovers().getBindableVoiceovers(
       'content')).toEqual({
-      en: voiceoverObjectFactory.createFromBackendDict({
+      en: Voiceover.createFromBackendDict({
         filename: 'filename1.mp3',
         file_size_bytes: 100000,
         needs_update: false,
         duration_secs: 10.0
       }),
-      hi: voiceoverObjectFactory.createFromBackendDict({
+      hi: Voiceover.createFromBackendDict({
         filename: 'filename2.mp3',
         file_size_bytes: 11000,
         needs_update: false,
@@ -125,13 +118,13 @@ describe('State card object factory', () => {
       })
     });
     expect(_sampleCard.getVoiceovers()).toEqual({
-      en: voiceoverObjectFactory.createFromBackendDict({
+      en: Voiceover.createFromBackendDict({
         filename: 'filename1.mp3',
         file_size_bytes: 100000,
         needs_update: false,
         duration_secs: 10.0
       }),
-      hi: voiceoverObjectFactory.createFromBackendDict({
+      hi: Voiceover.createFromBackendDict({
         filename: 'filename2.mp3',
         file_size_bytes: 11000,
         needs_update: false,

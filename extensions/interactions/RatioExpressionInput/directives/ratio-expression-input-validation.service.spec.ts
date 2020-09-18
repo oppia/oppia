@@ -23,10 +23,8 @@ import { AnswerGroup, AnswerGroupObjectFactory } from
 import { RatioExpressionInputValidationService } from
 // eslint-disable-next-line max-len
   'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { Rule, RuleObjectFactory } from
-  'domain/exploration/RuleObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
+import { Rule } from 'domain/exploration/Rule.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { RatioExpressionInputCustomizationArgs } from
@@ -42,8 +40,7 @@ describe('RatioExpressionInputValidationService', () => {
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let equals: Rule, isEquivalent: Rule, hasNumberOfTermsEqualTo: Rule;
   let customizationArgs: RatioExpressionInputCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
-    rof: RuleObjectFactory;
+  let agof: AnswerGroupObjectFactory;
   let warnings;
 
   beforeEach(() => {
@@ -52,13 +49,11 @@ describe('RatioExpressionInputValidationService', () => {
     });
 
     validatorService = TestBed.get(RatioExpressionInputValidationService);
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: '',
@@ -79,21 +74,21 @@ describe('RatioExpressionInputValidationService', () => {
       }
     };
 
-    isEquivalent = rof.createFromBackendDict({
+    isEquivalent = Rule.createFromBackendDict({
       rule_type: 'IsEquivalent',
       inputs: {
         x: [1, 2, 3]
       }
     });
 
-    equals = rof.createFromBackendDict({
+    equals = Rule.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: [1, 2, 3]
       }
     });
 
-    hasNumberOfTermsEqualTo = rof.createFromBackendDict({
+    hasNumberOfTermsEqualTo = Rule.createFromBackendDict({
       rule_type: 'HasNumberOfTermsEqualTo',
       inputs: {
         y: 3
@@ -121,7 +116,7 @@ describe('RatioExpressionInputValidationService', () => {
       ' it is preceded by a \'Equals\' rule with a matching' +
       ' input.'
     }]);
-    let isEquivalentNonSimplified = rof.createFromBackendDict({
+    let isEquivalentNonSimplified = Rule.createFromBackendDict({
       rule_type: 'IsEquivalent',
       inputs: {
         x: [2, 4, 6]
@@ -145,7 +140,7 @@ describe('RatioExpressionInputValidationService', () => {
     }
     ]);
 
-    let equalFourTerms = rof.createFromBackendDict({
+    let equalFourTerms = Rule.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: [1, 2, 3, 4]
@@ -164,13 +159,13 @@ describe('RatioExpressionInputValidationService', () => {
       ' input.'
     }]);
 
-    let equalsTwoTerms = rof.createFromBackendDict({
+    let equalsTwoTerms = Rule.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: [1, 2]
       }
     });
-    let hasNumberOfTermsEqualToLength2 = rof.createFromBackendDict({
+    let hasNumberOfTermsEqualToLength2 = Rule.createFromBackendDict({
       rule_type: 'HasNumberOfTermsEqualTo',
       inputs: {
         y: 2

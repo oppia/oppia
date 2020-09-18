@@ -20,8 +20,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { LoggerService } from 'services/contextual/logger.service';
-import { SubtitledHtmlObjectFactory, SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 import { SubtitledUnicodeObjectFactory, SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SchemaConstants } from
@@ -104,7 +103,6 @@ type SchemaDefaultValue = (
 export class SchemaDefaultValueService {
   constructor(
       private logger: LoggerService,
-      private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
       private subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory,
   ) {}
 
@@ -122,7 +120,7 @@ export class SchemaDefaultValueService {
     if ('choices' in schema) {
       return schema.choices[0];
     } else if (schemaIsSubtitledHtml) {
-      return this.subtitledHtmlObjectFactory.createFromBackendDict({
+      return SubtitledHtml.createFromBackendDict({
         html: '', content_id: null
       });
     } else if (schemaIsSubtitledUnicode) {

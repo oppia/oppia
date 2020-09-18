@@ -25,11 +25,8 @@ import { AudioFileObjectFactory } from
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
@@ -40,14 +37,7 @@ import { ParamSpecsObjectFactory } from
   'domain/exploration/ParamSpecsObjectFactory';
 import { ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -79,21 +69,13 @@ describe('Image preloader service', function() {
     angular.mock.module('oppia');
     angular.mock.module('oppia', function($provide) {
       $provide.value(
-        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-          new RuleObjectFactory()));
+        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory());
       $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
       $provide.value(
         'FileDownloadRequestObjectFactory',
         new FileDownloadRequestObjectFactory());
       $provide.value('FractionObjectFactory', new FractionObjectFactory());
-      $provide.value(
-        'HintObjectFactory', new HintObjectFactory(
-          new SubtitledHtmlObjectFactory()));
       $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
-      $provide.value(
-        'OutcomeObjectFactory', new OutcomeObjectFactory(
-          new SubtitledHtmlObjectFactory()));
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value(
@@ -107,14 +89,7 @@ describe('Image preloader service', function() {
         new ParamSpecsObjectFactory(
           new ParamSpecObjectFactory(new ParamTypeObjectFactory())));
       $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
-      $provide.value(
-        'RecordedVoiceoversObjectFactory',
-        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-      $provide.value('RuleObjectFactory', new RuleObjectFactory());
-      $provide.value(
-        'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
       $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());

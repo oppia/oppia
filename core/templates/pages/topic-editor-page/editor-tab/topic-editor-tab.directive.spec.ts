@@ -18,6 +18,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -47,7 +48,6 @@ describe('Topic editor tab directive', function() {
   var TopicObjectFactory = null;
   var SkillCreationService = null;
   var EntityCreationService = null;
-  var SkillSummaryObjectFactory = null;
   var TopicUpdateService = null;
   var StoryCreationService = null;
   var SubtopicObjectFactory = null;
@@ -90,7 +90,6 @@ describe('Topic editor tab directive', function() {
     TopicUpdateService = $injector.get('TopicUpdateService');
     StoryCreationService = $injector.get('StoryCreationService');
     UndoRedoService = $injector.get('UndoRedoService');
-    SkillSummaryObjectFactory = $injector.get('ShortSkillSummaryObjectFactory');
     EntityCreationService = $injector.get('EntityCreationService');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
@@ -128,7 +127,7 @@ describe('Topic editor tab directive', function() {
     });
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'subtopic1');
     topic = TopicObjectFactory.createInterstitialTopic();
-    skillSummary = SkillSummaryObjectFactory.create(
+    skillSummary = ShortSkillSummary.create(
       'skill_1', 'Description 1');
     subtopic._skillSummaries = [skillSummary];
     topic._uncategorizedSkillSummaries = [skillSummary];

@@ -23,8 +23,7 @@ import { HttpClient } from '@angular/common/http';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { ConceptCard, ConceptCardBackendDict, ConceptCardObjectFactory} from
-  'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard, ConceptCardBackendDict} from 'domain/skill/ConceptCard.model';
 import { SkillDomainConstants } from
   'domain/skill/skill-domain.constants';
 import { UrlInterpolationService } from
@@ -39,7 +38,6 @@ interface ConceptCardBackendDicts {
 })
 export class ConceptCardBackendApiService {
   constructor(
-    private conceptCardObjectFactory: ConceptCardObjectFactory,
     private http: HttpClient,
     private urlInterpolation: UrlInterpolationService) {}
 
@@ -62,9 +60,8 @@ export class ConceptCardBackendApiService {
         if (successCallback) {
           var conceptCardDicts = response.concept_card_dicts;
           conceptCardDicts.forEach(conceptCardDict => {
-            conceptCardObjects.push(
-              this.conceptCardObjectFactory.createFromBackendDict(
-                conceptCardDict));
+            conceptCardObjects.push(ConceptCard.createFromBackendDict(
+              conceptCardDict));
           });
           successCallback(conceptCardObjects);
         }

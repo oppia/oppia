@@ -34,8 +34,7 @@ import { EndExplorationCustomizationArgs, InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Interaction } from
   'domain/exploration/InteractionObjectFactory';
-import { BindableVoiceovers } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { BindableVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
 import { State } from 'domain/state/StateObjectFactory';
 import {
   StateObjectsBackendDict,
@@ -45,7 +44,7 @@ import {
 } from 'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
+import { Voiceover } from 'domain/exploration/Voiceover.model';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 

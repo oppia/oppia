@@ -16,16 +16,11 @@
  * @fileoverview Unit tests for RecordedVoiceovers object factory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
+import { Voiceover } from
+  'domain/exploration/Voiceover.model';
 
 describe('RecordedVoiceovers object factory', () => {
-  let rvof: RecordedVoiceoversObjectFactory = null;
-  let vof: VoiceoverObjectFactory = null;
   var rv = null;
   var rvDict = {
     voiceovers_mapping: {
@@ -118,13 +113,7 @@ describe('RecordedVoiceovers object factory', () => {
   };
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [RecordedVoiceoversObjectFactory]
-    });
-    rvof = TestBed.get(RecordedVoiceoversObjectFactory);
-    vof = TestBed.get(VoiceoverObjectFactory);
-
-    rv = rvof.createFromBackendDict(rvDict);
+    rv = RecordedVoiceovers.createFromBackendDict(rvDict);
   });
 
   it('should get all content id', () => {
@@ -136,13 +125,13 @@ describe('RecordedVoiceovers object factory', () => {
 
   it('should correctly get all bindable audio voiceovers', () => {
     expect(rv.getBindableVoiceovers('content')).toEqual({
-      en: vof.createFromBackendDict({
+      en: Voiceover.createFromBackendDict({
         filename: 'filename1.mp3',
         file_size_bytes: 100000,
         needs_update: false,
         duration_secs: 10.0
       }),
-      hi: vof.createFromBackendDict({
+      hi: Voiceover.createFromBackendDict({
         filename: 'filename2.mp3',
         file_size_bytes: 11000,
         needs_update: false,
@@ -154,7 +143,7 @@ describe('RecordedVoiceovers object factory', () => {
   it('should return a correct voiceover for a given content ' +
     'id and language', () => {
     expect(rv.getVoiceover('hint_1', 'en')).toEqual(
-      vof.createFromBackendDict({
+      Voiceover.createFromBackendDict({
         filename: 'filename9.mp3',
         file_size_bytes: 104000,
         needs_update: false,
@@ -165,13 +154,13 @@ describe('RecordedVoiceovers object factory', () => {
   it('should make all audio needs update for a give content id', () => {
     rv.markAllVoiceoversAsNeedingUpdate('content');
     expect(rv.getBindableVoiceovers('content')).toEqual({
-      en: vof.createFromBackendDict({
+      en: Voiceover.createFromBackendDict({
         filename: 'filename1.mp3',
         file_size_bytes: 100000,
         needs_update: true,
         duration_secs: 10.0
       }),
-      hi: vof.createFromBackendDict({
+      hi: Voiceover.createFromBackendDict({
         filename: 'filename2.mp3',
         file_size_bytes: 11000,
         needs_update: true,
@@ -218,7 +207,7 @@ describe('RecordedVoiceovers object factory', () => {
   it('should add voiceovers in a given content id', () => {
     rv.addVoiceover('hint_2', 'en', 'filename11.mp3', 1000, 0.1);
     expect(rv.getBindableVoiceovers('hint_2')).toEqual({
-      en: vof.createFromBackendDict({
+      en: Voiceover.createFromBackendDict({
         filename: 'filename11.mp3',
         file_size_bytes: 1000,
         needs_update: false,
@@ -233,7 +222,7 @@ describe('RecordedVoiceovers object factory', () => {
   it('should delete voiceovers in a given content id', () => {
     rv.deleteVoiceover('content', 'hi');
     expect(rv.getBindableVoiceovers('content')).toEqual({
-      en: vof.createFromBackendDict({
+      en: Voiceover.createFromBackendDict({
         filename: 'filename1.mp3',
         file_size_bytes: 100000,
         needs_update: false,
@@ -252,7 +241,7 @@ describe('RecordedVoiceovers object factory', () => {
     'content id', () => {
     rv.toggleNeedsUpdateAttribute('content', 'hi');
     expect(rv.getVoiceover('content', 'hi')).toEqual(
-      vof.createFromBackendDict({
+      Voiceover.createFromBackendDict({
         filename: 'filename2.mp3',
         file_size_bytes: 11000,
         needs_update: true,

@@ -17,7 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { Hint } from 'domain/exploration/Hint.model';
 import { StateHintsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-hints.service';
@@ -28,7 +28,6 @@ describe('Add Hint Modal Controller', function() {
   var $uibModalInstance = null;
   var ContextService = null;
   var generateContentIdService = null;
-  var hintObjectFactory = null;
   var stateHintsService = null;
 
   var existingHintsContentIds = [];
@@ -37,7 +36,6 @@ describe('Add Hint Modal Controller', function() {
 
   beforeEach(function() {
     generateContentIdService = TestBed.get(GenerateContentIdService);
-    hintObjectFactory = TestBed.get(HintObjectFactory);
     stateHintsService = TestBed.get(StateHintsService);
   });
 
@@ -56,7 +54,6 @@ describe('Add Hint Modal Controller', function() {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
       GenerateContentIdService: generateContentIdService,
-      HintObjectFactory: hintObjectFactory,
       StateHintsService: stateHintsService,
       existingHintsContentIds: existingHintsContentIds
     });
@@ -71,7 +68,7 @@ describe('Add Hint Modal Controller', function() {
 
   it('should save hint when closing the modal', function() {
     var contentId = 'cont_1';
-    var hintExpected = hintObjectFactory.createNew(contentId, '');
+    var hintExpected = Hint.createNew(contentId, '');
 
     spyOn(
       generateContentIdService, 'getNextStateId'

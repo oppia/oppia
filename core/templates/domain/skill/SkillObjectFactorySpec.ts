@@ -18,8 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ConceptCardObjectFactory } from
-  'domain/skill/ConceptCardObjectFactory';
+import { ConceptCard } from 'domain/skill/ConceptCard.model';
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
 import { NormalizeWhitespacePipe } from
@@ -27,13 +26,11 @@ import { NormalizeWhitespacePipe } from
 import { RubricObjectFactory } from
   'domain/skill/RubricObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory.ts';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 const constants = require('constants.ts');
 
 describe('Skill object factory', () => {
   let skillObjectFactory: SkillObjectFactory = null;
-  let conceptCardObjectFactory: ConceptCardObjectFactory = null;
   let rubricObjectFactory: RubricObjectFactory = null;
   let misconceptionObjectFactory: MisconceptionObjectFactory = null;
   let example1 = null;
@@ -44,7 +41,6 @@ describe('Skill object factory', () => {
   let skillContentsDict = null;
   let skillDict = null;
   let skillDifficulties = null;
-  let subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -52,12 +48,10 @@ describe('Skill object factory', () => {
         NormalizeWhitespacePipe,
       ]
     });
-    conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
     misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
     rubricObjectFactory = TestBed.get(RubricObjectFactory);
     skillDifficulties = constants.SKILL_DIFFICULTIES;
     skillObjectFactory = TestBed.get(SkillObjectFactory);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
     misconceptionDict1 = {
       id: '2',
       name: 'test name',
@@ -142,7 +136,7 @@ describe('Skill object factory', () => {
     expect(skill.getRubrics()).toEqual([
       rubricObjectFactory.createFromBackendDict(rubricDict)]);
     expect(skill.getConceptCard()).toEqual(
-      conceptCardObjectFactory.createFromBackendDict(skillContentsDict));
+      ConceptCard.createFromBackendDict(skillContentsDict));
     expect(skill.getLanguageCode()).toEqual('en');
     expect(skill.getVersion()).toEqual(3);
     expect(skill.getSupersedingSkillId()).toEqual('2');
@@ -167,7 +161,7 @@ describe('Skill object factory', () => {
   it('should throw validation errors', () => {
     let skill = skillObjectFactory.createFromBackendDict(skillDict);
     skill.getConceptCard().setExplanation(
-      subtitledHtmlObjectFactory.createDefault('', 'review_material'));
+      SubtitledHtml.createDefault('', 'review_material'));
     expect(skill.getValidationIssues()).toEqual([
       'There should be review material in the concept card.',
       'All 3 difficulties (Easy, Medium and Hard) should be addressed ' +
@@ -227,7 +221,7 @@ describe('Skill object factory', () => {
     expect(skill.getMisconceptions()).toEqual([]);
     expect(skill.getRubrics()).toEqual([]);
     expect(skill.getConceptCard()).toEqual(
-      conceptCardObjectFactory.createInterstitialConceptCard());
+      ConceptCard.createInterstitialConceptCard());
     expect(skill.getLanguageCode()).toEqual('en');
     expect(skill.getVersion()).toEqual(1);
     expect(skill.getSupersedingSkillId()).toEqual(null);

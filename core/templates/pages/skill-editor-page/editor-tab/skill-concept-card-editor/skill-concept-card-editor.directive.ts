@@ -15,6 +15,8 @@
 /**
  * @fileoverview Directive for the concept card editor.
  */
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
+import { WorkedExample } from 'domain/skill/WorkedExample.model';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -36,9 +38,7 @@ require(
   'pages/skill-editor-page/modal-templates/' +
   'add-worked-example-modal.controller.ts');
 
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/skill/skill-update.service.ts');
-require('domain/skill/WorkedExampleObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/capitalize.filter.ts');
 require('filters/format-rte-preview.filter.ts');
@@ -52,14 +52,12 @@ import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('skillConceptCardEditor', [
   'GenerateContentIdService', 'PageTitleService', 'SkillEditorStateService',
-  'SkillUpdateService', 'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
-  'WindowDimensionsService', 'WorkedExampleObjectFactory',
-  'COMPONENT_NAME_WORKED_EXAMPLE',
+  'SkillUpdateService', 'UrlInterpolationService',
+  'WindowDimensionsService', 'COMPONENT_NAME_WORKED_EXAMPLE',
   function(
       GenerateContentIdService, PageTitleService, SkillEditorStateService,
-      SkillUpdateService, SubtitledHtmlObjectFactory, UrlInterpolationService,
-      WindowDimensionsService, WorkedExampleObjectFactory,
-      COMPONENT_NAME_WORKED_EXAMPLE) {
+      SkillUpdateService, UrlInterpolationService,
+      WindowDimensionsService, COMPONENT_NAME_WORKED_EXAMPLE) {
     return {
       restrict: 'E',
       scope: {},
@@ -138,14 +136,14 @@ angular.module('oppia').directive('skillConceptCardEditor', [
               backdrop: 'static',
               controller: 'AddWorkedExampleModalController'
             }).result.then(function(result) {
-              var newExample = WorkedExampleObjectFactory.create(
-                SubtitledHtmlObjectFactory.createDefault(
+              var newExample = WorkedExample.create(
+                SubtitledHtml.createDefault(
                   result.workedExampleQuestionHtml,
                   GenerateContentIdService.getNextId(
                     $scope.skill.getConceptCard().getRecordedVoiceovers(
                     ).getAllContentId(),
                     COMPONENT_NAME_WORKED_EXAMPLE.QUESTION)),
-                SubtitledHtmlObjectFactory.createDefault(
+                SubtitledHtml.createDefault(
                   result.workedExampleExplanationHtml,
                   GenerateContentIdService.getNextId(
                     $scope.skill.getConceptCard().getRecordedVoiceovers(

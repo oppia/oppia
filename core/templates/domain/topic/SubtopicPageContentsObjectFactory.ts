@@ -24,15 +24,13 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import {
   RecordedVoiceOverBackendDict,
-  RecordedVoiceovers,
-  RecordedVoiceoversObjectFactory
-} from 'domain/exploration/RecordedVoiceoversObjectFactory';
+  RecordedVoiceovers
+} from 'domain/exploration/RecordedVoiceovers.model';
 
 import {
   SubtitledHtmlBackendDict,
-  SubtitledHtml,
-  SubtitledHtmlObjectFactory
-} from 'domain/exploration/SubtitledHtmlObjectFactory';
+  SubtitledHtml
+} from 'domain/exploration/SubtitledHtml.model';
 
 export interface SubtopicPageContentsBackendDict {
   'subtitled_html': SubtitledHtmlBackendDict;
@@ -84,24 +82,19 @@ export class SubtopicPageContents {
   providedIn: 'root'
 })
 export class SubtopicPageContentsObjectFactory {
-  constructor(
-    private recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory,
-    private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory) {}
-
   createDefault(): SubtopicPageContents {
-    var recordedVoiceovers = this.recordedVoiceoversObjectFactory.createEmpty();
+    var recordedVoiceovers = RecordedVoiceovers.createEmpty();
     recordedVoiceovers.addContentId('content');
     return new SubtopicPageContents(
-      this.subtitledHtmlObjectFactory.createDefault('', 'content'),
+      SubtitledHtml.createDefault('', 'content'),
       recordedVoiceovers);
   }
 
   createFromBackendDict(
       backendDict: SubtopicPageContentsBackendDict): SubtopicPageContents {
     return new SubtopicPageContents(
-      this.subtitledHtmlObjectFactory.createFromBackendDict(
-        backendDict.subtitled_html),
-      this.recordedVoiceoversObjectFactory.createFromBackendDict(
+      SubtitledHtml.createFromBackendDict(backendDict.subtitled_html),
+      RecordedVoiceovers.createFromBackendDict(
         backendDict.recorded_voiceovers));
   }
 }

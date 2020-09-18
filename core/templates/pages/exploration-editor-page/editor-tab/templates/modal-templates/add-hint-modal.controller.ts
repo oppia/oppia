@@ -16,6 +16,7 @@
  * @fileoverview Controller for add hint modal.
  */
 
+import { Hint } from 'domain/exploration/Hint.model';
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -23,17 +24,16 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-hints.service.ts');
-require('domain/exploration/HintObjectFactory.ts');
 require('services/generate-content-id.service.ts');
 require('services/context.service.ts');
 
 angular.module('oppia').controller('AddHintModalController', [
   '$controller', '$scope', '$uibModalInstance', 'ContextService',
-  'GenerateContentIdService', 'HintObjectFactory', 'StateHintsService',
+  'GenerateContentIdService', 'StateHintsService',
   'COMPONENT_NAME_HINT',
   function(
       $controller, $scope, $uibModalInstance, ContextService,
-      GenerateContentIdService, HintObjectFactory, StateHintsService,
+      GenerateContentIdService, StateHintsService,
       COMPONENT_NAME_HINT) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
@@ -56,8 +56,7 @@ angular.module('oppia').controller('AddHintModalController', [
         COMPONENT_NAME_HINT);
       // Close the modal and save it afterwards.
       $uibModalInstance.close({
-        hint: angular.copy(
-          HintObjectFactory.createNew(contentId, $scope.tmpHint)),
+        hint: angular.copy(Hint.createNew(contentId, $scope.tmpHint)),
         contentId: contentId
       });
     };

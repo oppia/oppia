@@ -24,8 +24,7 @@ import { EndExplorationCustomizationArgs } from
   'interactions/customization-args-defs';
 import { EndExplorationValidationService } from
   'interactions/EndExploration/directives/end-exploration-validation.service';
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 
 import { AppConstants } from 'app.constants';
 
@@ -36,7 +35,7 @@ describe('EndExplorationValidationService', () => {
   let currentState: string;
   let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[];
   let customizationArguments: EndExplorationCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -45,12 +44,11 @@ describe('EndExplorationValidationService', () => {
 
     validatorService = TestBed.get(EndExplorationValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
 
     currentState = 'First State';
 
-    badOutcome = oof.createFromBackendDict({
+    badOutcome = Outcome.createFromBackendDict({
       dest: currentState,
       feedback: {
         html: '',
@@ -70,7 +68,7 @@ describe('EndExplorationValidationService', () => {
 
     goodAnswerGroups = [agof.createNew(
       [],
-      oof.createFromBackendDict({
+      Outcome.createFromBackendDict({
         dest: 'Second State',
         feedback: {
           html: '',

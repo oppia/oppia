@@ -24,7 +24,7 @@ import {
   StateObjectFactory,
   State
 } from 'domain/state/StateObjectFactory';
-import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
+import { Voiceover } from 'domain/exploration/Voiceover.model';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 

@@ -33,16 +33,11 @@ import { ClassifierObjectFactory } from
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
@@ -53,11 +48,7 @@ import { StateClassifierMappingService } from
 import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
 /* eslint-enable max-len */
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -82,7 +73,7 @@ require(
   'state-interaction-id.service.ts');
 
 describe('TrainingDataService', function() {
-  var siis, ecs, rs, tds, ess, oof;
+  var siis, ecs, rs, tds, ess;
   var mockExplorationData;
 
   beforeEach(
@@ -106,28 +97,16 @@ describe('TrainingDataService', function() {
       $provide.value(
         'AnswerGroupsCacheService', new AnswerGroupsCacheService());
       $provide.value(
-        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-          new RuleObjectFactory()));
+        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
       $provide.value('FractionObjectFactory', new FractionObjectFactory());
       $provide.value(
-        'HintObjectFactory', new HintObjectFactory(
-          new SubtitledHtmlObjectFactory()));
-      $provide.value(
-        'OutcomeObjectFactory', new OutcomeObjectFactory(
-          new SubtitledHtmlObjectFactory()));
-      $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
       $provide.value(
         'ParamChangesObjectFactory', new ParamChangesObjectFactory(
           new ParamChangeObjectFactory()));
-      $provide.value('RuleObjectFactory', new RuleObjectFactory());
-      $provide.value(
-        'RecordedVoiceoversObjectFactory',
-        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('SolutionValidityService', new SolutionValidityService());
       $provide.value(
         'StateClassifierMappingService', new StateClassifierMappingService(
@@ -135,10 +114,7 @@ describe('TrainingDataService', function() {
       $provide.value(
         'StateEditorService', new StateEditorService(
           new SolutionValidityService()));
-      $provide.value(
-        'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
       $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory());
@@ -163,7 +139,6 @@ describe('TrainingDataService', function() {
     ess = $injector.get('ExplorationStatesService');
     rs = $injector.get('ResponsesService');
     tds = $injector.get('TrainingDataService');
-    oof = $injector.get('OutcomeObjectFactory');
 
     // Set the currently loaded interaction ID.
     siis.savedMemento = 'TextInput';
@@ -357,8 +332,8 @@ describe('TrainingDataService', function() {
   it('should get all potential outcomes of an interaction', function() {
     // First the answer group's outcome is listed, then the default.
     expect(tds.getAllPotentialOutcomes(ess.getState('State'))).toEqual([
-      oof.createNew('State', 'feedback_1', 'Feedback', []),
-      oof.createNew('State', 'default_outcome', 'Default', [])]);
+      Outcome.createNew('State', 'feedback_1', 'Feedback', []),
+      Outcome.createNew('State', 'default_outcome', 'Default', [])]);
   });
 
   it('should remove answer from training data associated with given answer ' +

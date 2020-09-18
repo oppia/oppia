@@ -22,10 +22,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { UtilsService } from 'services/utils.service';
 import isEqual from 'lodash/isEqual';
 
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
-import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { Outcome } from 'domain/exploration/Outcome.model';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 interface LostChangeValues {
   'outcome'?: Outcome;

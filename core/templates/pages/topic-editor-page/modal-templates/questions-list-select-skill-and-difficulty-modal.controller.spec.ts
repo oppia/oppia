@@ -18,8 +18,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { ShortSkillSummaryObjectFactory } from
-  'domain/skill/ShortSkillSummaryObjectFactory';
+import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
 import { SkillDifficultyObjectFactory } from
   'domain/skill/SkillDifficultyObjectFactory';
 
@@ -28,7 +27,6 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
     var $scope = null;
     var $uibModalInstance = null;
     var skillDifficultyObjectFactory = null;
-    var skillSummaryObjectFactory = null;
 
     var allSkillSummaries = [{
       id: '1',
@@ -50,13 +48,11 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
     beforeEach(function() {
       TestBed.configureTestingModule({
         providers: [
-          SkillDifficultyObjectFactory,
-          ShortSkillSummaryObjectFactory
+          SkillDifficultyObjectFactory
         ]
       });
 
       skillDifficultyObjectFactory = TestBed.get(SkillDifficultyObjectFactory);
-      skillSummaryObjectFactory = TestBed.get(ShortSkillSummaryObjectFactory);
     });
 
     beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -65,8 +61,8 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
-      allSkillSummaries.map(summary => (
-        skillSummaryObjectFactory.create(summary.id, summary.description)));
+      allSkillSummaries.map(summary => (ShortSkillSummary.create(
+        summary.id, summary.description)));
 
       $scope = $rootScope.$new();
       $controller('QuestionsListSelectSkillAndDifficultyModalController', {
