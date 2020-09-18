@@ -530,7 +530,7 @@ class StateStats(python_utils.OBJECT):
 
 
 class SessionStateStats(python_utils.OBJECT):
-    """Domain object representing analytic data for a specifc state of an
+    """Domain object representing analytics data for a specific state of an
     exploration, aggregated during a continuous learner session.
     """
 
