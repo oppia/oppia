@@ -398,10 +398,24 @@ angular.module('oppia').directive('conversationSkin', [
             REVIEW_TESTS_URL_TEMPLATE, STORY_VIEWER_URL_TEMPLATE,
             SUPPORTED_SITE_LANGUAGES, TWO_CARD_THRESHOLD_PX,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
-          var ctrl = this;
-          ctrl.directiveSubscriptions = new Subscription();
+          // Due to the migration path we've taken to upgrade AngularJS to
+          // Angular 8, the instances of Angular 8 services are bifurcated; the
+          // instance provided to AngularJS services is different than the one
+          // provided to Angular 8 services.
+          //
+          // StatsReportingService is stateful, however, so it is cruicial for
+          // its instance to stay consistent across all services. To patch the
+          // issue described in the preceding paragraph, we import it directly
+          // from a central Angular 8 service, OppiaAngularRootComponent, to
+          // ensure that only the Angular 8 instances get referenced.
+          //
+          // TODO(#7222): Stop doing this once we've upgraded everything to
+          // Angular 8.
           StatsReportingService = (
             OppiaAngularRootComponent.statsReportingService);
+
+          var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
           var TIME_PADDING_MSEC = 250;
