@@ -41,7 +41,7 @@
  *   - Then we assign the serivce to the static varible in ngAfterViewInit
  *     ngAfterViewInit() {
  *       ...
- *       OppiaAngularRootComponent.myService = (this.myService
+ *       OppiaAngularRootComponent.myService = this.myService
  *       ...
  *     }
  *
