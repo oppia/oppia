@@ -9383,12 +9383,12 @@ class GeneralVoiceoverApplicationModelValidatorTests(
 class ReviewerAndSuggestionCountsModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
-    translation_reviewer_counts_by_lang = {
+    translation_reviewer_counts_by_lang_code = {
         'hi': 0,
         'en': 1
     }
 
-    translation_suggestion_counts_by_lang = {
+    translation_suggestion_counts_by_lang_code = {
         'fr': 6,
         'en': 5
     }
@@ -9417,10 +9417,10 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
     def test_model_validation_success_when_model_has_non_zero_counts(self):
         suggestion_models.ReviewerAndSuggestionCountsModel(
             id=suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID,
-            translation_reviewer_counts_by_lang=(
-                self.translation_reviewer_counts_by_lang),
-            translation_suggestion_counts_by_lang=(
-                self.translation_suggestion_counts_by_lang),
+            translation_reviewer_counts_by_lang_code=(
+                self.translation_reviewer_counts_by_lang_code),
+            translation_suggestion_counts_by_lang_code=(
+                self.translation_suggestion_counts_by_lang_code),
             question_reviewer_count=self.question_reviewer_count,
             question_suggestion_count=self.question_suggestion_count
         ).put()
@@ -9433,8 +9433,8 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
     def test_model_validation_success_when_model_has_default_values(self):
         suggestion_models.ReviewerAndSuggestionCountsModel(
             id=suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID,
-            translation_reviewer_counts_by_lang={},
-            translation_suggestion_counts_by_lang={},
+            translation_reviewer_counts_by_lang_code={},
+            translation_suggestion_counts_by_lang_code={},
             question_reviewer_count=0,
             question_suggestion_count=0
         ).put()
@@ -9448,10 +9448,10 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
     def test_model_validation_fails_with_invalid_model_id(self):
         suggestion_models.ReviewerAndSuggestionCountsModel(
             id='invalid_id',
-            translation_reviewer_counts_by_lang=(
-                self.translation_reviewer_counts_by_lang),
-            translation_suggestion_counts_by_lang=(
-                self.translation_suggestion_counts_by_lang),
+            translation_reviewer_counts_by_lang_code=(
+                self.translation_reviewer_counts_by_lang_code),
+            translation_suggestion_counts_by_lang_code=(
+                self.translation_suggestion_counts_by_lang_code),
             question_reviewer_count=self.question_reviewer_count,
             question_suggestion_count=self.question_suggestion_count
         ).put()
@@ -9469,7 +9469,7 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
     def test_model_validation_fails_for_negative_translation_reviewer_counts(
             self):
         counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
-        counts_model.translation_reviewer_counts_by_lang = {
+        counts_model.translation_reviewer_counts_by_lang_code = {
             self.sample_language_code: self.negative_count}
         counts_model.put()
         expected_output = [
@@ -9479,7 +9479,7 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
             'translation reviewer count to be non-negative, recieved: %s. '
             'The language code for the translation was %s.\']]' % (
                 counts_model.id,
-                counts_model.translation_reviewer_counts_by_lang[
+                counts_model.translation_reviewer_counts_by_lang_code[
                     self.sample_language_code],
                 self.sample_language_code)
         ]
@@ -9490,7 +9490,7 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
     def test_model_validation_fails_for_negative_translation_suggestion_counts(
             self):
         counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
-        counts_model.translation_suggestion_counts_by_lang = {
+        counts_model.translation_suggestion_counts_by_lang_code = {
             self.sample_language_code: self.negative_count}
         counts_model.put()
         expected_output = [
@@ -9500,7 +9500,7 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
             'translation suggestion count to be non-negative, recieved: %s. '
             'The language code for the translation was %s.\']]' % (
                 counts_model.id,
-                counts_model.translation_suggestion_counts_by_lang[
+                counts_model.translation_suggestion_counts_by_lang_code[
                     self.sample_language_code],
                 self.sample_language_code)
         ]
@@ -9544,7 +9544,7 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
     def test_model_validation_fails_for_invalid_lang_code_in_reviewers_dict(
             self):
         counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
-        counts_model.translation_reviewer_counts_by_lang = {
+        counts_model.translation_reviewer_counts_by_lang_code = {
             self.invalid_language_code: 1}
         counts_model.put()
         expected_output = [
@@ -9561,7 +9561,7 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
     def test_model_validation_fails_for_invalid_lang_code_in_suggestions_dict(
             self):
         counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
-        counts_model.translation_suggestion_counts_by_lang = {
+        counts_model.translation_suggestion_counts_by_lang_code = {
             self.invalid_language_code: 1}
         counts_model.put()
         expected_output = [

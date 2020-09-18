@@ -622,15 +622,15 @@ class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
     REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID.
     """
 
-    # A dictionary where the keys represent the languages that translation
+    # A dictionary where the keys represent the language codes that translation
     # suggestions are offered in and the values correspond to the total number
     # of reviewers who have permission to review translation suggestions in
     # that language.
-    translation_reviewer_counts_by_lang = ndb.JsonProperty(required=True)
-    # A dictionary where the keys represent the languages that translation
+    translation_reviewer_counts_by_lang_code = ndb.JsonProperty(required=True)
+    # A dictionary where the keys represent the language codes that translation
     # suggestions are offered in and the values correspond to the total number
     # of translation suggestions that are currently in review in that language.
-    translation_suggestion_counts_by_lang = ndb.JsonProperty(required=True)
+    translation_suggestion_counts_by_lang_code = ndb.JsonProperty(required=True)
     # The total number of reviewers who have permission to review question
     # suggestions.
     question_reviewer_count = ndb.IntegerProperty(required=True)
@@ -654,17 +654,18 @@ class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
         if reviewer_and_suggestion_counts_model is None:
             reviewer_and_suggestion_counts_model = cls(
                 id=REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID,
-                translation_reviewer_counts_by_lang={},
-                translation_suggestion_counts_by_lang={},
+                translation_reviewer_counts_by_lang_code_code={},
+                translation_suggestion_counts_by_lang_code={},
                 question_reviewer_count=0,
                 question_suggestion_count=0
             )
             reviewer_and_suggestion_counts_model.put()
             return reviewer_and_suggestion_counts_model
 
-        return super(
-            ReviewerAndSuggestionCountsModel, cls).get(
-                REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID)
+        else:
+            return super(
+                ReviewerAndSuggestionCountsModel, cls).get(
+                    REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID)
 
     @classmethod
     def get_deletion_policy(cls):
@@ -679,9 +680,9 @@ class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
         information because the data is aggregated.
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'translation_reviewer_counts_by_lang':
+            'translation_reviewer_counts_by_lang_code':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'translation_suggestion_counts_by_lang':
+            'translation_suggestion_counts_by_lang_code':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'question_reviewer_count':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
