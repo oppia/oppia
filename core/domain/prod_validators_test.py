@@ -9396,6 +9396,9 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
     question_reviewer_count = 1
     question_suggestion_count = 4
 
+    negative_count = -1
+    sample_language_code = 'en'
+
     def setUp(self):
         super(ReviewerAndSuggestionCountsModelValidatorTests, self).setUp()
 
@@ -9459,16 +9462,19 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
     def test_model_validation_fails_for_negative_translation_reviewer_counts(
             self):
         counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
-        counts_model.translation_reviewer_counts_per_lang = {'en': -1}
+        counts_model.translation_reviewer_counts_per_lang = {
+            self.sample_language_code: self.negative_count}
         counts_model.put()
         expected_output = [
             u'[u\'failed validation check for domain object check of '
             'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the '
             'translation reviewer count to be positive, recieved: %s. The '
-            'language code for the translation was en.\']]' % (
+            'language code for the translation was %s.\']]' % (
                 counts_model.id,
-                counts_model.translation_reviewer_counts_per_lang['en'])
+                counts_model.translation_reviewer_counts_per_lang[
+                    self.sample_language_code],
+                self.sample_language_code)
         ]
 
         self.run_job_and_check_output(
@@ -9477,16 +9483,19 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
     def test_model_validation_fails_for_negative_translation_suggestion_counts(
             self):
         counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
-        counts_model.translation_suggestion_counts_per_lang = {'en': -1}
+        counts_model.translation_suggestion_counts_per_lang = {
+            self.sample_language_code: self.negative_count}
         counts_model.put()
         expected_output = [
             u'[u\'failed validation check for domain object check of '
             'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the '
             'translation suggestion count to be positive, recieved: %s. The'
-            ' language code for the translation was en.\']]' % (
+            ' language code for the translation was %s.\']]' % (
                 counts_model.id,
-                counts_model.translation_suggestion_counts_per_lang['en'])
+                counts_model.translation_suggestion_counts_per_lang[
+                    self.sample_language_code],
+                self.sample_language_code)
         ]
 
         self.run_job_and_check_output(
@@ -9495,7 +9504,7 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
     def test_model_validation_fails_for_negative_question_reviewer_count(
             self):
         counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
-        counts_model.question_reviewer_count = -1
+        counts_model.question_reviewer_count = self.negative_count
         counts_model.put()
         expected_output = [
             u'[u\'failed validation check for domain object check of '
@@ -9511,7 +9520,7 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
     def test_model_validation_fails_for_negative_question_suggestion_count(
             self):
         counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
-        counts_model.question_suggestion_count = -1
+        counts_model.question_suggestion_count = self.negative_count
         counts_model.put()
         expected_output = [
             u'[u\'failed validation check for domain object check of '

@@ -1101,18 +1101,16 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
     """Domain object for the ReviewerAndSuggestionCountsModel.
 
     Attributes:
-        translation_reviewer_counts_per_lang: dict. A dictionary where the keys
-            are the languages that translation suggestions are offered in and
-            the values are the number of reviewers who have permission to
-            review translation suggestions for each language.
-        translation_suggestion_counts_per_lang: dict. A dictionary where the
-            keys are the languages that translation suggestions are offered in
-            and the values are the number of translation suggestions that are
-            currently in review for each language.
-        question_reviewer_count: int. The number of reviewers who have
+        translation_reviewer_counts_per_lang: dict. A dictionary that contains
+            the total number of translation reviewers for each language that
+            translation suggestions are offered in.
+        translation_suggestion_counts_per_lang: dict. A dictionary that
+            contains the total total number of translation suggestions that are
+            currently in review per language.
+        question_reviewer_count: int. The total number of reviewers who have
             permission to review question suggestions.
-        question_suggestion_count: int. The number of question suggestions that
-            are currently in review.
+        question_suggestion_count: int. The total number of question
+            suggestions that are currently in review.
     """
 
     def __init__(

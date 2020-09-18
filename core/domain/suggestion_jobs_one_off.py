@@ -28,8 +28,7 @@ from core.domain import suggestion_services
 from core.platform import models
 import feconf
 
-(suggestion_models, user_models) = models.Registry.import_models(
-    [models.NAMES.suggestion, models.NAMES.user])
+(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
 class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):

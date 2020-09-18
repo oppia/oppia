@@ -622,26 +622,24 @@ class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
     REVIEWER_AND_SUGGESTION_COUNTS_ID.
 
     Fields:
-        translation_reviewer_counts_per_lang: dict. A dictionary where the keys
-            are the languages that translation suggestions are offered in and
-            the values are the number of reviewers who have permission to
-            review translation suggestions for each language.
-        translation_suggestion_counts_per_lang: dict. A dictionary where the
-            keys are the languages that translation suggestions are offered in
-            and the values are the number of translation suggestions that are
-            currently in review for each language.
-        question_reviewer_count: int. The number of reviewers who have
+        translation_reviewer_counts_per_lang: dict. A dictionary that contains
+            the total number of translation reviewers for each language that
+            translation suggestions are offered in.
+        translation_suggestion_counts_per_lang: dict. A dictionary that
+            contains the total total number of translation suggestions that are
+            currently in review per language.
+        question_reviewer_count: int. The total number of reviewers who have
             permission to review question suggestions.
-        question_suggestion_count: int. The number of question suggestions that
-            are currently in review.
+        question_suggestion_count: int. The total number of question
+            suggestions that are currently in review.
     """
 
     # A dictionary that contains the total number of translation reviewers for
-    # each language.
+    # each language that translation suggestions are offered in.
     translation_reviewer_counts_per_lang = ndb.JsonProperty(
         required=True, indexed=True)
     # A dictionary that contains the total total number of translation
-    # suggestions in review per language.
+    # suggestions that are in review per language.
     translation_suggestion_counts_per_lang = ndb.JsonProperty(
         required=True, indexed=True)
     # The total number of question reviewers.
@@ -655,7 +653,7 @@ class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
     def get(cls, strict=True):
         """Gets the ReviewerAndSuggestionCountsModel instance. If the
         ReviewerAndSuggestionCountsModel does not exist yet, it is created.
-        This method is enforcing that there should only ever be one instance
+        This method helps enforce that there should only ever be one instance
         of this model.
 
         Returns:
