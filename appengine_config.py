@@ -56,12 +56,3 @@ pkg_resources.working_set.add_entry(
 # https://github.com/googleapis/python-ndb/issues/249.
 import six
 reload(six)
-
-import logging
-import google
-logging.info("Google File Position")
-logging.info(google.__file__)
-from google import protobuf
-logging.info("Google Protobuf File Position")
-logging.info(protobuf.__file__)
-
