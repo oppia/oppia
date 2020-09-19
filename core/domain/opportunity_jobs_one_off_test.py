@@ -23,8 +23,6 @@ import ast
 
 from constants import constants
 from core.domain import caching_services
-from core.domain import exp_domain
-from core.domain import exp_services
 from core.domain import opportunity_jobs_one_off
 from core.domain import opportunity_services
 from core.domain import skill_services
