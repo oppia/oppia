@@ -696,8 +696,8 @@ def stop_redis_server():
 
 
 def fix_third_party_imports():
-    """Setups up the environment variables and corrects the system paths so that
-    the backend tests work correctly.
+    """Sets up up the environment variables and corrects the system paths so
+    that the backend tests and imports work correctly.
     """
     # These environmental variables are required to allow Google Cloud Tasks to
     # operate in a local development environment without connecting to the

@@ -180,6 +180,9 @@ class TaskqueueServicesStub(python_utils.OBJECT):
     def __init__(self, test_base):
         """Initializes a taskqueue services stub that replaces the API
         functionality of core.platform.taskqueue.
+
+        Args:
+            test_base: AppEngineTestBase. The current test base.
         """
         self.test_base = test_base
         self.client = cloud_tasks_emulator.Emulator(

@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""An emulator for that mocks the core.platform.taskqueue API. This emulator
-models the third party library Google Cloud Tasks.
+"""An emulator that mocks the core.platform.taskqueue API. This emulator
+models the third party library, Google Cloud Tasks.
 
 This emulator is an extension of the emulator from this github page:
 https://github.com/doitintl/Cloud-Tasks-In-Process-Emulator

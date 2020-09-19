@@ -465,7 +465,6 @@ def main(args=None):
     # File extension to be linted.
     file_extension_types = _get_file_extensions(
         parsed_args.only_check_file_extensions)
-
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)

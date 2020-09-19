@@ -39,8 +39,8 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         arg1 = NonSerializableArgs()
         serialization_exception = self.assertRaisesRegexp(
             ValueError,
-            'The args or kwargs passed to deferred call with '
-            'function_identifier, %s, is not json serializable.' %
+            'The args or kwargs passed to the deferred call with '
+            'function_identifier, %s, are not json serializable.' %
             taskqueue_services.FUNCTION_ID_DISPATCH_EVENT)
         with serialization_exception:
             taskqueue_services.defer(

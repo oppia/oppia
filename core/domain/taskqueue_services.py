@@ -84,8 +84,8 @@ def defer(fn_identifier, queue_name, *args, **kwargs):
         json.dumps(payload)
     except Exception:
         raise ValueError(
-            'The args or kwargs passed to deferred call with '
-            'function_identifier, %s, is not json serializable.' %
+            'The args or kwargs passed to the deferred call with '
+            'function_identifier, %s, are not json serializable.' %
             fn_identifier)
     platform_taskqueue_services.create_http_task(
         queue_name=queue_name, url=feconf.TASK_URL_DEFERRED,

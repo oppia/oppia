@@ -14,16 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides cloud tasks api in DEV_MODE."""
+"""Provides a taskqueue API for the platform layer in DEV_MODE."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 
-# Special app engine import fix for requests that causes the request.post
-# function to to use URLFetch which is required to make correct requests to the
-# Google App Engine development environment. More details can be found here:
+# This is a special app engine import fix for requests that causes the
+# request.post function to to use URLFetch which is required to make correct
+# requests to the Google App Engine development environment. More details can be
+# found here:
 # https://cloud.google.com/appengine/docs/standard/python/issue-requests#issuing_an_http_request
 from core.platform.taskqueue import cloud_tasks_emulator
 import requests_toolbelt.adapters.appengine

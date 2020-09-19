@@ -849,11 +849,12 @@ def is_appengine_simulated_environment():
 
     This is necessary because the DEV_MODE constant only differentiates between
     local development and operations on the production server. However,
-    we also run certain tests and the development server with the '--prod_env'
-    flag which runs in a simulated production environment; this use case
-    still falls under local development mode and requires usage of stubs instead
-    of the production APIs. For this reason, we need this function to check if
-    we are actually in the production server.
+    the e2e tests and the development server can operate with the flag
+    '--prod_env' flag which creates a simulated production environment; this use
+    case still falls under local development mode and requires the usage of
+    stubs to mock out important functionality of certain production APIs. For
+    this reason, we need this function to check if we are actually in the
+    production server.
 
     Returns:
         bool. Whether the current instance is running locally on a developer's
@@ -874,11 +875,12 @@ def is_appengine_cloud_environment():
 
     This is necessary because the DEV_MODE constant only differentiates between
     local development and operations on the production server. However,
-    we also run certain tests and the development server with the '--prod_env'
-    flag which runs in a simulated production environment; this use case
-    still falls under local development mode and requires usage of stubs instead
-    of the production APIs. For this reason, we need this function to check if
-    we are actually in the production server.
+    the e2e tests and the development server can operate with the flag
+    '--prod_env' flag which creates a simulated production environment; this use
+    case still falls under local development mode and requires the usage of
+    stubs to mock out important functionality of certain production APIs. For
+    this reason, we need this function to check if we are actually in the
+    production server.
 
     Returns:
         bool. Whether the current instance is running in production.

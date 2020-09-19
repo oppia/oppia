@@ -343,7 +343,7 @@ class TasksTests(test_utils.EmailTestBase):
 
         raises_incorrect_function_id_exception = self.assertRaisesRegexp(
             Exception,
-            'The function id, %s, is not valid' %
+            'The function id, %s, is not valid.' %
             incorrect_function_identifier)
 
         with raises_incorrect_function_id_exception:

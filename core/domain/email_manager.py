@@ -338,6 +338,7 @@ def _send_email(
     def _send_email_in_transaction():
         """Sends the email to a single recipient."""
         sender_name_email = '%s <%s>' % (sender_name, sender_email)
+
         email_services.send_mail(
             sender_name_email, recipient_email, email_subject,
             cleaned_plaintext_body, cleaned_html_body, bcc_admin=bcc_admin,
