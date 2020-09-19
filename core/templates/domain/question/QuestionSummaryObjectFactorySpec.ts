@@ -29,7 +29,7 @@ describe('Question summary object factory', () => {
       id: 'question_id',
       question_content: 'Question 1',
       interaction_id: 'TextInput',
-      misconception_ids: 'skillid-0'
+      misconception_ids: ['skillid-0']
     };
   });
 
