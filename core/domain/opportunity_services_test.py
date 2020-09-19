@@ -85,7 +85,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title %d' % i,
             category='category%d' % i,
-            end_state_name='End State'
+            end_state_name='End State',
+            correctness_feedback_enabled=True
         ) for i in python_utils.RANGE(5)]
 
         for exp in explorations:
@@ -752,7 +753,8 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title %d' % i,
             category='category%d' % i,
-            end_state_name='End State'
+            end_state_name='End State',
+            correctness_feedback_enabled=True
         ) for i in python_utils.RANGE(5)]
 
         for exp in explorations:
