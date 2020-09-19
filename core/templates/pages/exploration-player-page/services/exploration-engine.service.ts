@@ -18,9 +18,6 @@
 
 import { EventEmitter } from '@angular/core';
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-
 require('domain/collection/guest-collection-progress.service.ts');
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/ExplorationObjectFactory.ts');

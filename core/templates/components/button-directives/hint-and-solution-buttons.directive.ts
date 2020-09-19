@@ -16,9 +16,6 @@
  * @fileoverview Directive for hint and solution buttons.
  */
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
 require(
