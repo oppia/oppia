@@ -18,25 +18,14 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // translation-status.service.ts is upgraded to Angular 8.
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
+import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
+import { AnswerClassificationResultObjectFactory } from 'domain/classifier/AnswerClassificationResultObjectFactory';
+import { ClassifierObjectFactory } from 'domain/classifier/ClassifierObjectFactory';
+import { ExplorationDraftObjectFactory } from 'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-/* eslint-disable max-len */
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-/* eslint-enable max-len */
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-/* eslint-disable max-len */
-import { StateEditorService } from
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-/* eslint-enable max-len */
+import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.

@@ -40,9 +40,7 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-import { CkEditorCopyToolbarComponent } from
-  /* eslint-disable max-len */
-  'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
+import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
 
