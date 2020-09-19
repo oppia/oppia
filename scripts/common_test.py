@@ -908,6 +908,5 @@ class CommonTests(test_utils.GenericTestBase):
     def test_fix_third_party_imports_correctly_sets_up_imports(self):
         common.fix_third_party_imports()
         # Asserts that imports from problematic modules do not error.
-        from google.cloud import tasks_v2
-        from google.appengine.api import app_identity
-
+        from google.cloud import tasks_v2 # pylint: disable=unused-variable
+        from google.appengine.api import app_identity # pylint: disable=unused-variable

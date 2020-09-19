@@ -17,8 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import time
-
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -360,33 +358,27 @@ class TasksTests(test_utils.EmailTestBase):
         csrf_token = self.get_new_csrf_token()
 
         self.post_task(
-            url=feconf.TASK_URL_DEFERRED,
-            payload={},
-            headers=headers,
-            csrf_token=csrf_token,
-            expect_errors=True,
-            expected_status_int=500)
+            feconf.TASK_URL_DEFERRED, {}, headers,
+            csrf_token=csrf_token, expect_errors=True, expected_status_int=500)
 
     def test_deferred_tasks_handler_handles_tasks_correctly(self):
-        self.exp_id = '15'
-
+        exp_id = '15'
         self.login(self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        exp_services.load_demo(self.exp_id)
-        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
+        exp_services.load_demo(exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
-        self.exp_version = exploration.version
-        self.state_name = 'Home'
-        self.session_id = 'session_id1'
+        exp_version = exploration.version
+        state_name = 'Home'
         state_stats_mapping = {
-            self.state_name: stats_domain.StateStats.create_default()
+            state_name: stats_domain.StateStats.create_default()
         }
         exploration_stats = stats_domain.ExplorationStats(
-            self.exp_id, self.exp_version, 0, 0, 0, 0, 0, 0,
+            exp_id, exp_version, 0, 0, 0, 0, 0, 0,
             state_stats_mapping)
         stats_services.create_stats_model(exploration_stats)
 
-        self.aggregated_stats = {
+        aggregated_stats = {
             'num_starts': 1,
             'num_actual_starts': 1,
             'num_completions': 1,
@@ -401,19 +393,19 @@ class TasksTests(test_utils.EmailTestBase):
                 }
             }
         }
-        self.post_json('/explorehandler/stats_events/%s' % (self.exp_id), {
-            'aggregated_stats': self.aggregated_stats,
-            'exp_version': self.exp_version})
+        self.post_json('/explorehandler/stats_events/%s' % (exp_id), {
+            'aggregated_stats': aggregated_stats,
+            'exp_version': exp_version})
         self.assertEqual(self.count_jobs_in_taskqueue(
             queue_name=taskqueue_services.QUEUE_NAME_STATS), 1)
         self.process_and_flush_pending_tasks()
 
         # Check that the models are updated.
         exploration_stats = stats_services.get_exploration_stats_by_id(
-            self.exp_id, self.exp_version)
+            exp_id, exp_version)
         self.assertEqual(exploration_stats.num_starts_v2, 1)
         self.assertEqual(exploration_stats.num_actual_starts_v2, 1)
         self.assertEqual(exploration_stats.num_completions_v2, 1)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                self.state_name].total_hit_count_v2, 1)
+                state_name].total_hit_count_v2, 1)
