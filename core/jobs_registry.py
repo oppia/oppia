@@ -153,7 +153,6 @@ AUDIT_JOB_MANAGERS = [
         .ExplorationOpportunitySummaryModelAuditOneOffJob
     ),
     prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationRightsModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
