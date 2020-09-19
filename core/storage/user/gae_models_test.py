@@ -88,7 +88,6 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_3_ID,
             gae_id=self.USER_3_GAE_ID,
-            gae_user_id=self.USER_3_GAE_ID,
             email=self.USER_3_EMAIL,
             role=self.USER_3_ROLE,
             username=self.GENERIC_USERNAME,

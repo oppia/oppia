@@ -715,9 +715,6 @@ class ExpSummaryModel(base_models.BaseModel):
     # for commits to an exploration (as opposed to its rights, etc.).
     version = ndb.IntegerProperty()
 
-    # DEPRECATED in v2.8.3. Do not use.
-    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
-
     @staticmethod
     def get_deletion_policy():
         """Exploration summary is deleted only if the corresponding exploration
@@ -866,6 +863,5 @@ class ExpSummaryModel(base_models.BaseModel):
             'viewer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'contributor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'contributors_summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
