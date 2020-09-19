@@ -16,8 +16,6 @@
  * @fileoverview Controller for the conversation skin.
  */
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { Subscription } from 'rxjs';
 
 require(
