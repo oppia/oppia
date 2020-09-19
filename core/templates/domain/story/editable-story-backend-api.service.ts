@@ -30,7 +30,7 @@ interface FetchStoryResponse {
   'story_is_published':boolean;
   'skill_summaries':object;
   'topic_url_fragment':string;
-  'classroomUrlFragment':string;
+  'classroom_url_fragment':string;
 }
 @Injectable({
   providedIn: 'root'
@@ -39,7 +39,7 @@ export class EditableStoryBackendApiService {
   constructor(
     private http: HttpClient,
     private urlInterpolation: UrlInterpolationService) {}
-  private storyDataDict = null;
+  // Private storyDataDict = null;
   private _fetchStory(
       storyId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
@@ -57,7 +57,7 @@ export class EditableStoryBackendApiService {
         var storyIsPublished = response.story_is_published;
         var skillSummaries = angular.copy(response.skill_summaries);
         var topicUrlFragment = response.topic_url_fragment;
-        var classroomUrlFragment = response.classroomUrlFragment;
+        var classroomUrlFragment = response.classroom_url_fragment;
         if (successCallback) {
           successCallback({
             story: story,
@@ -65,7 +65,7 @@ export class EditableStoryBackendApiService {
             storyIsPublished: storyIsPublished,
             skillSummaries: skillSummaries,
             topicUrlFragment: topicUrlFragment,
-            classroomUrlFragment: classroomUrlFragment 
+            classroomUrlFragment: classroomUrlFragment
           });
           // SuccessCallback(this.storyDataDict);
         }
