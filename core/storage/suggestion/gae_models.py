@@ -62,6 +62,13 @@ SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
+# Daily emails are sent to reviewers to notify them of suggestions on the
+# Contributor Dashboard to review. The constants below define the number of
+# question and translation suggestions to fetch to come up with these daily
+# suggestion recommendations.
+MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS = 30
+MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS = 30
+
 # Defines what is the minimum role required to review suggestions
 # of a particular type.
 SUGGESTION_MINIMUM_ROLE_FOR_REVIEW = {
@@ -84,7 +91,7 @@ SCORE_CATEGORY_DELIMITER = '.'
 
 ALLOWED_QUERY_FIELDS = ['suggestion_type', 'target_type', 'target_id',
                         'status', 'author_id', 'final_reviewer_id',
-                        'score_category']
+                        'score_category', 'language_code']
 
 # Threshold number of days after which suggestion will be accepted.
 THRESHOLD_DAYS_BEFORE_ACCEPT = 7
@@ -153,6 +160,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # separated by a ., the first will be a value from SCORE_TYPE_CHOICES and
     # the second will be the subcategory of the suggestion.
     score_category = ndb.StringProperty(required=True, indexed=True)
+    # The ISO 639-1 code used to query suggestions by language, or None if the
+    # suggestion type is not queryable by language.
+    language_code = ndb.StringProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -172,7 +182,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             'author_id': base_models.EXPORT_POLICY.EXPORTED,
             'final_reviewer_id': base_models.EXPORT_POLICY.EXPORTED,
             'change_cmd': base_models.EXPORT_POLICY.EXPORTED,
-            'score_category': base_models.EXPORT_POLICY.EXPORTED
+            'score_category': base_models.EXPORT_POLICY.EXPORTED,
+            'language_code': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -192,9 +203,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, suggestion_type, target_type, target_id,
-            target_version_at_submission, status, author_id,
-            final_reviewer_id, change_cmd, score_category,
-            thread_id):
+            target_version_at_submission, status, author_id, final_reviewer_id,
+            change_cmd, score_category, thread_id, language_code):
         """Creates a new SuggestionModel entry.
 
         Args:
@@ -211,6 +221,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
             score_category: str. The scoring category for the suggestion.
             thread_id: str. The ID of the feedback thread linked to the
                 suggestion.
+            language_code: str|None. The ISO 639-1 code used to query
+                suggestions by language, or None if the suggestion type is not
+                queryable by language.
 
         Raises:
             Exception. There is already a suggestion with the given id.
@@ -228,7 +241,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             target_version_at_submission=target_version_at_submission,
             status=status, author_id=author_id,
             final_reviewer_id=final_reviewer_id, change_cmd=change_cmd,
-            score_category=score_category).put()
+            score_category=score_category, language_code=language_code).put()
 
     @classmethod
     def query_suggestions(cls, query_fields_and_values):
@@ -341,6 +354,50 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 cls.author_id != user_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
+    def get_question_suggestions_waiting_longest_for_review(cls):
+        """Returns MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS number
+        of question suggestions, sorted in descending order by review wait
+        time.
+
+        Returns:
+            list(GeneralSuggestionModel). A list of question suggestions,
+            sorted in descending order based on how long the suggestions have
+            been waiting for review.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.suggestion_type == SUGGESTION_TYPE_ADD_QUESTION)
+            .order(cls.last_updated)
+            .fetch(MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
+        )
+
+    @classmethod
+    def get_translation_suggestions_waiting_longest_for_review_per_lang(
+            cls, language_code):
+        """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
+        number of translation suggestions in the specified language code,
+        sorted in descending order by review wait time.
+
+        Args:
+            language_code: str. The ISO 639-1 language code of the translation
+                suggestions.
+
+        Returns:
+            list(GeneralSuggestionModel). A list of translation suggestions,
+            sorted in descending order based on how long the suggestions have
+            been waiting for review.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            .filter(cls.language_code == language_code)
+            .order(cls.last_updated)
+            .fetch(MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
+        )
+
+    @classmethod
     def get_user_created_suggestions_of_suggestion_type(
             cls, suggestion_type, user_id):
         """Gets all suggestions of suggestion_type which the user has created.
@@ -395,7 +452,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     suggestion_model
                     .target_version_at_submission),
                 'status': suggestion_model.status,
-                'change_cmd': suggestion_model.change_cmd,
+                'change_cmd': suggestion_model.change_cmd
             }
 
         return user_data

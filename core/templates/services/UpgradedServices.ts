@@ -18,7 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { Title } from '@angular/platform-browser';
+import { Meta, Title } from '@angular/platform-browser';
 import {
   HttpClient,
   HttpXhrBackend,
@@ -212,6 +212,8 @@ import { ExplorationStatsObjectFactory } from
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ExplorationTaskObjectFactory } from
   'domain/improvements/ExplorationTaskObjectFactory';
+import { ExpressionEvaluatorService } from
+  'expressions/expression-evaluator.service';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExplorationRecommendationsService } from
   // eslint-disable-next-line max-len
@@ -236,6 +238,7 @@ import { FeedbackThreadSummaryObjectFactory } from
   'domain/feedback_thread/FeedbackThreadSummaryObjectFactory';
 import { FileDownloadRequestObjectFactory } from
   'domain/utilities/FileDownloadRequestObjectFactory';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { FractionInputValidationService } from
@@ -683,6 +686,12 @@ interface UpgradedServicesDict {
 export class UpgradedServices {
   getUpgradedServices(): UpgradedServicesDict {
     var upgradedServices = {};
+    // We are using eslint disable here for multilines because we have not used
+    // dot notation at a lot of places so it does not seem practical to use
+    // "eslint disable next line" for each of them. Also, we can't use dot
+    // notation either because then "Property 'AdminRouterService' does not
+    // exist on type '{}'" lint error will be raised by the linter.
+    /* eslint-disable-next-line oppia/no-multiline-disable */
     /* eslint-disable dot-notation */
 
     // Topological level: 0.
@@ -824,6 +833,7 @@ export class UpgradedServices {
       new UtilsService);
     upgradedServices['MathEquationInputRulesService'] =
       new MathEquationInputRulesService();
+    upgradedServices['Meta'] = new Meta({});
     upgradedServices['MisconceptionObjectFactory'] =
       new MisconceptionObjectFactory();
     upgradedServices['MultipleChoiceInputRulesService'] =
@@ -1066,7 +1076,7 @@ export class UpgradedServices {
     upgradedServices['OutcomeObjectFactory'] =
       new OutcomeObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['PageTitleService'] = new PageTitleService(
-      upgradedServices['Title']);
+      upgradedServices['Meta'], upgradedServices['Title']);
     upgradedServices['ParamChangesObjectFactory'] =
       new ParamChangesObjectFactory(
         upgradedServices['ParamChangeObjectFactory']);
@@ -1192,6 +1202,10 @@ export class UpgradedServices {
     upgradedServices['ExplorationImprovementsTaskRegistryService'] =
       new ExplorationImprovementsTaskRegistryService(
         upgradedServices['ExplorationTaskObjectFactory']);
+    upgradedServices['ExpressionEvaluatorService'] =
+      new ExpressionEvaluatorService(
+        upgradedServices['ExpressionParserService'],
+        upgradedServices['ExpressionSyntaxTreeService']);
     upgradedServices['ExtensionTagAssemblerService'] =
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
@@ -1199,6 +1213,9 @@ export class UpgradedServices {
     upgradedServices['ExtractImageFilenamesFromStateService'] =
       new ExtractImageFilenamesFromStateService(
         upgradedServices['HtmlEscaperService']);
+    upgradedServices['FocusManagerService'] = new FocusManagerService(
+      upgradedServices['DeviceInfoService'],
+      upgradedServices['IdGenerationService']);
     upgradedServices['HttpClient'] = new HttpClient(
       upgradedServices['HttpXhrBackend']);
     upgradedServices['LanguageUtilService'] = new LanguageUtilService(
