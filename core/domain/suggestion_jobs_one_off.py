@@ -28,7 +28,8 @@ from core.domain import suggestion_services
 from core.platform import models
 import feconf
 
-(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+(suggestion_models, user_models,) = models.Registry.import_models(
+    [models.NAMES.suggestion, models.NAMES.user])
 
 
 class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -235,4 +236,102 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
 
     @staticmethod
     def reduce(key, values):
+        yield (key, len(values))
+
+
+class PopulateReviewerAndSuggestionCountsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """A reusable one-time job that may be used to initialize, or regenerate,
+    the reviewer and suggestion counts of the ReviewerAndSuggestionCountsModel.
+    """
+
+    _VALIDATION_ERROR_KEY = 'reviewer_and_suggestion_counts_validation_error'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            suggestion_models.GeneralSuggestionModel,
+            user_models.UserContributionRightsModel
+        ]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        if isinstance(item, suggestion_models.GeneralSuggestionModel):
+            # Exit early if the suggestion type is not a part of the
+            # Contributor Dashboard or if the suggestion is not currently in
+            # review.
+            if item.suggestion_type == (
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT) or (
+                        item.status != suggestion_models.STATUS_IN_REVIEW):
+                return
+            suggestion = suggestion_services.get_suggestion_from_model(item)
+            yield ('suggestion_%s_%s' % (
+                suggestion.suggestion_type, suggestion.language_code), item.id)
+
+        else:
+            # The ContributionRightsModel case is used to count the number of
+            # reviewers for each of the reviewing rights categories.
+            if item.can_review_translation_for_language_codes:
+                for language_code in (
+                        item.can_review_translation_for_language_codes):
+                    yield ('reviewer_translation_%s' % language_code, item.id)
+            if item.can_review_questions:
+                yield ('reviewer_question', item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        reviewer_and_suggestion_counts = (
+            suggestion_services.get_reviewer_and_suggestion_counts()
+        )
+        keys = key.split('_')
+
+        # Update the reviewer counts.
+        if keys[0] == 'reviewer':
+            if keys[1] == 'question':
+                reviewer_and_suggestion_counts.question_reviewer_count = len(
+                    values)
+            elif keys[1] == 'translation':
+                (
+                    reviewer_and_suggestion_counts
+                    .set_translation_reviewer_count_for_language_code(
+                        key[:-1], len(values))
+                )
+        # Update the suggestion counts.
+        else:
+            # Get the expected key for each suggestion type.
+            question_suggestion_key = (
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT.split('_')
+            )
+            translation_suggestion_key = (
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION.split('_')
+            )
+            if keys[1] == question_suggestion_key[0]:
+                reviewer_and_suggestion_counts.question_suggestion_count = len(
+                    values)
+            elif keys[1] == translation_suggestion_key[0]:
+                (
+                    reviewer_and_suggestion_counts
+                    .set_translation_suggestion_count_for_language_code(
+                        key[:-1], len(values))
+                )
+        # Make sure the counts that have been updated are valid.
+        try:
+            reviewer_and_suggestion_counts.validate()
+        except Exception as e:
+            logging.error(
+                'Reviewer and suggestion counts failed validation: %s' % e
+            )
+            yield (
+                PopulateReviewerAndSuggestionCountsOneOffJob
+                ._VALIDATION_ERROR_KEY,
+                'Reviewer and suggestion counts failed validation: %s' % e
+            )
+            return
+
+        suggestion_services.update_reviewer_and_suggestion_counts(
+            reviewer_and_suggestion_counts
+        )
         yield (key, len(values))
