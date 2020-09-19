@@ -35,7 +35,8 @@ describe('Story viewer backend API service', () => {
     story_title: 'Story title',
     story_description: 'Story description',
     story_nodes: [],
-    topic_name: 'Topic name'
+    topic_name: 'Topic name',
+    meta_tag_content: 'Story meta tag content'
   };
 
   beforeEach(() => {

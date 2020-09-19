@@ -92,6 +92,7 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.StatisticsCustomizationArgsAudit,
     story_jobs_one_off.RegenerateStorySummaryOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
+    suggestion_jobs_one_off.PopulateSuggestionLanguageCodeMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,
     takeout_domain_jobs_one_off.SnapshotMetadataCommitMsgMigrationOneOffJob,
@@ -151,7 +152,6 @@ AUDIT_JOB_MANAGERS = [
         prod_validation_jobs_one_off
         .ExplorationOpportunitySummaryModelAuditOneOffJob
     ),
-    prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationRightsModelAuditOneOffJob,
     (

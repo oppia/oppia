@@ -114,8 +114,10 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
           };
 
           $scope.togglePrerequisiteSkills = function() {
-            $scope.prerequisiteSkillsAreShown = (
-              !$scope.prerequisiteSkillsAreShown);
+            if (WindowDimensionsService.isWindowNarrow()) {
+              $scope.prerequisiteSkillsAreShown = (
+                !$scope.prerequisiteSkillsAreShown);
+            }
           };
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();

@@ -81,6 +81,12 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             r'derived class. It should be implemented in the derived class.'):
             base_models.BaseModel.export_data('user_id')
 
+    def test_get_lowest_supported_role_is_exploration_editor(self):
+        self.assertEqual(
+            base_models.BaseModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_EXPLORATION_EDITOR
+        )
+
     def test_generic_query_put_get_and_delete_operations(self):
         model = base_models.BaseModel()
 

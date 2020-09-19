@@ -1,17 +1,21 @@
-<div class="topic-card" ng-click="$ctrl.openTopicPage()" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
-  <div class="topic-thumbnail">
-    <picture>
-      <img ng-src="<[$ctrl.thumbnailUrl]>" alt="" class="img-thumbnail" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
-    </picture>
-  </div>
-  <div class="topic-details" ng-style="{background: $ctrl.getDarkerThumbnailBgColor()}">
-    <span class="topic-name"> <[$ctrl.getTopicSummary().getName()]> </span>
-    <span class="topic-story-count">
-      <[$ctrl.getTopicSummary().getCanonicalStoryCount()]>
-      <span ng-if="$ctrl.getTopicSummary().getCanonicalStoryCount() === 1" translate="I18N_TOPIC_VIEWER_STORY"></span>
-      <span ng-if="$ctrl.getTopicSummary().getCanonicalStoryCount() !== 1" translate="I18N_TOPIC_VIEWER_STORIES"></span>
-    </span>
-  </div>
+
+
+<div class="topic-card"  ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
+  <a ng-href="<[$ctrl.getTopicPageUrl()]>">
+    <div class="topic-thumbnail">
+      <picture>
+        <img ng-src="<[$ctrl.thumbnailUrl]>" alt="" class="img-thumbnail" ng-style="{background: $ctrl.getTopicSummary().getThumbnailBgColor()}">
+      </picture>
+    </div>
+    <div class="topic-details" ng-style="{background: $ctrl.getDarkerThumbnailBgColor()}">
+      <span class="topic-name"> <[$ctrl.getTopicSummary().getName()]> </span>
+      <span class="topic-story-count">
+        <[$ctrl.getTopicSummary().getCanonicalStoryCount()]>
+        <span ng-if="$ctrl.getTopicSummary().getCanonicalStoryCount() === 1" translate="I18N_TOPIC_VIEWER_STORY"></span>
+        <span ng-if="$ctrl.getTopicSummary().getCanonicalStoryCount() !== 1" translate="I18N_TOPIC_VIEWER_STORIES"></span>
+      </span>
+    </div>
+  </a>
 </div>
 <style>
   .topic-card {
@@ -19,6 +23,10 @@
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
     cursor: pointer;
     width: 100%;
+  }
+
+  .topic-card a:hover {
+    text-decoration: none;
   }
 
   .topic-card .topic-name {
