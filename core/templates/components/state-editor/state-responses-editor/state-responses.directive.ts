@@ -97,6 +97,7 @@ angular.module('oppia').directive('stateResponses', [
       scope: {
         addState: '=',
         onResponsesInitialized: '=',
+        onSaveInapplicableSkillMisconceptionIds: '=',
         onSaveInteractionAnswerGroups: '=',
         onSaveInteractionDefaultOutcome: '=',
         onSaveNextContentIdIndex: '=',
@@ -371,6 +372,32 @@ angular.module('oppia').directive('stateResponses', [
             });
           };
 
+          var verifyAndUpdateInapplicableSkillMisconceptionIds = function() {
+            var answerGroups = ResponsesService.getAnswerGroups();
+            var taggedSkillMisconceptionIds = [];
+            for (var i = 0; i < answerGroups.length; i++) {
+              if (!answerGroups[i].outcome.labelledAsCorrect &&
+                  answerGroups[i].taggedSkillMisconceptionId !== null) {
+                taggedSkillMisconceptionIds.push(
+                  answerGroups[i].taggedSkillMisconceptionId);
+              }
+            }
+            var commonSkillMisconceptionIds = (
+              taggedSkillMisconceptionIds.filter(
+                skillMisconceptionId => (
+                  $scope.inapplicableSkillMisconceptionIds.includes(
+                    skillMisconceptionId))));
+            if (commonSkillMisconceptionIds.length) {
+              commonSkillMisconceptionIds.forEach((skillMisconceptionId => {
+                $scope.inapplicableSkillMisconceptionIds = (
+                  $scope.inapplicableSkillMisconceptionIds.filter(
+                    item => item !== skillMisconceptionId));
+              }));
+              $scope.onSaveInapplicableSkillMisconceptionIds(
+                $scope.inapplicableSkillMisconceptionIds);
+            }
+          }
+
           $scope.saveTaggedMisconception = function(misconceptionId, skillId) {
             ResponsesService.updateActiveAnswerGroup({
               taggedSkillMisconceptionId: skillId + '-' + misconceptionId
@@ -522,6 +549,78 @@ angular.module('oppia').directive('stateResponses', [
             $scope.responseCardIsShown = !$scope.responseCardIsShown;
           };
 
+          $scope.getUnaddressedMisconceptionNames = function() {
+            var answerGroups = ResponsesService.getAnswerGroups();
+            var taggedSkillMisconceptionIds = {};
+            for (var i = 0; i < answerGroups.length; i++) {
+              if (!answerGroups[i].outcome.labelledAsCorrect &&
+                  answerGroups[i].taggedSkillMisconceptionId !== null) {
+                taggedSkillMisconceptionIds[
+                  answerGroups[i].taggedSkillMisconceptionId] = true;
+              }
+            }
+            var unaddressedMisconceptionNames = [];
+            Object.keys($scope.misconceptionsBySkill).forEach(function(skillId) {
+              var misconceptions = $scope.misconceptionsBySkill[skillId];
+              for (var i = 0; i < misconceptions.length; i++) {
+                if (!misconceptions[i].isMandatory()) {
+                  continue;
+                }
+                var skillMisconceptionId = (
+                  skillId + '-' + misconceptions[i].getId());
+                if (!taggedSkillMisconceptionIds.hasOwnProperty(
+                  skillMisconceptionId)) {
+                  unaddressedMisconceptionNames.push(
+                    misconceptions[i].getName());
+                }
+              }
+            });
+            return unaddressedMisconceptionNames;
+          };
+
+          $scope.getOptionalSkillMisconceptionStatus = function(
+            optionalSkillMisconceptionId) {
+            var answerGroups = ResponsesService.getAnswerGroups();
+            var taggedSkillMisconceptionIds = [];
+            for (var i = 0; i < answerGroups.length; i++) {
+              if (!answerGroups[i].outcome.labelledAsCorrect &&
+                  answerGroups[i].taggedSkillMisconceptionId !== null) {
+                taggedSkillMisconceptionIds.push(
+                  answerGroups[i].taggedSkillMisconceptionId);
+              }
+            }
+            if (taggedSkillMisconceptionIds.includes(optionalSkillMisconceptionId)) {
+              return 'Assigned';
+            }
+            return $scope.inapplicableSkillMisconceptionIds.includes(
+              optionalSkillMisconceptionId) ? 'Not Applicable' : '';
+          };
+
+          $scope.updateOptionalMisconceptionIdStatus = function(
+            skillMisconceptionId, isApplicable) {
+            if (isApplicable) {
+              $scope.inapplicableSkillMisconceptionIds = (
+                $scope.inapplicableSkillMisconceptionIds.filter(
+                  item => item !== skillMisconceptionId));
+            } else {
+              $scope.inapplicableSkillMisconceptionIds.push(
+                skillMisconceptionId);
+            }
+            $scope.onSaveInapplicableSkillMisconceptionIds(
+              $scope.inapplicableSkillMisconceptionIds);
+            $scope.setActiveEditOption(null);
+          };
+
+          $scope.setActiveEditOption = function(activeEditOption) {
+            $scope.activeEditOption = activeEditOption;
+          };
+
+          $scope.isNoActionExpected = function(skillMisconceptionId) {
+            return ['Assigned', 'Not Applicable'].includes(
+              $scope.getOptionalSkillMisconceptionStatus(
+                skillMisconceptionId));
+          };
+
           ctrl.$onInit = function() {
             $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
               SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
@@ -600,6 +699,7 @@ angular.module('oppia').directive('stateResponses', [
                   $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
                   $scope.activeAnswerGroupIndex =
                   ResponsesService.getActiveAnswerGroupIndex();
+                  verifyAndUpdateInapplicableSkillMisconceptionIds();
                 }
               ));
             ctrl.directiveSubscriptions.add(
@@ -651,6 +751,11 @@ angular.module('oppia').directive('stateResponses', [
               $scope.onResponsesInitialized();
             }
             StateEditorService.updateStateResponsesInitialised();
+            $scope.misconceptionsBySkill = (
+              StateEditorService.getMisconceptionsBySkill());
+            $scope.inapplicableSkillMisconceptionIds = (
+              StateEditorService.getInapplicableSkillMisconceptionIds());
+            $scope.activeEditOption = null;
           };
           ctrl.$onDestroy = function() {
             ctrl.directiveSubscriptions.unsubscribe();
