@@ -21,7 +21,7 @@ import { HttpService } from 'services/http.service';
 import { HttpTestingController, HttpClientTestingModule } from
   '@angular/common/http/testing';
 
-describe('HTML escaper service', () => {
+fdescribe('HTML escaper service', () => {
   let httpTestingController: HttpTestingController;
   let service: HttpService;
   const arbitraryTestUrl = 'abcdfg.com';
