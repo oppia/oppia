@@ -64,22 +64,6 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
       StatsReportingService, UrlService,
       EXPLORATION_MODE) {
-    // Due to the migration path we've taken to upgrade AngularJS to Angular 8,
-    // the instances of Angular 8 services are bifurcated; the instance provided
-    // to AngularJS services is different than the one provided to Angular 8
-    // services.
-    //
-    // PlaythroughService and StatsReportingService are both stateful, however,
-    // so it is cruicial for their instances to stay consistent across all
-    // services. To patch the issue described in the preceding paragraph, we
-    // import them directly from a central Angular 8 service,
-    // OppiaAngularRootComponent, to ensure that only the Angular 8 instances
-    // get referenced.
-    //
-    // TODO(#7222): Stop doing this once we've upgraded everything to Angular 8.
-    PlaythroughService = OppiaAngularRootComponent.playthroughService;
-    StatsReportingService = OppiaAngularRootComponent.statsReportingService;
-
     var _totalQuestionsReceivedEventEmitter = new EventEmitter();
     var _oppiaFeedbackAvailableEventEmitter = new EventEmitter();
     var currentEngineService = null;
