@@ -135,7 +135,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         # name in taskqueue_services.
         for attribute in attributes:
             value = getattr(taskqueue_services, attribute)
-            if isinstance(value, (str, unicode)) and value in queue_name_dict:
+            if python_utils.convert_to_bytes(value) in queue_name_dict:
                 queue_name_dict[value] = True
 
         for queue_name, in_taskqueue_services in queue_name_dict.items():

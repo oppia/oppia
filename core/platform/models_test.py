@@ -293,7 +293,6 @@ class RegistryUnitTest(test_utils.GenericTestBase):
             self.registry_instance.import_taskqueue_services(),
             dev_mode_taskqueue_services)
 
-
     def test_import_search_services(self):
         """Tests import search services function."""
         from core.platform.search import gae_search_services

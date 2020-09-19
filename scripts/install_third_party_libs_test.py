@@ -170,7 +170,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_tweak_yarn_executable():
             check_function_calls['tweak_yarn_executable_is_called'] = True
 
-
         correct_google_path = os.path.join(
             common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
         def mock_is_dir(path):
