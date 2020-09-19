@@ -2115,21 +2115,18 @@ class PopulateReviewerAndSuggestionCountsOneOffJobTests(
             }
         }
 
+
         with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id',
-            self.mock_generate_new_exploration_thread_id):
-            with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                edit_state_content_suggestion = (
-                    suggestion_services.create_suggestion(
-                        suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                        suggestion_models.TARGET_TYPE_EXPLORATION,
-                        self.target_id, self.target_version_at_submission,
-                        self.author_id, edit_state_content_change_dict,
-                        'test description')
-                )
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            edit_state_content_suggestion = (
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, edit_state_content_change_dict,
+                    'test description')
+            )
 
         return edit_state_content_suggestion
 
@@ -2145,23 +2142,19 @@ class PopulateReviewerAndSuggestionCountsOneOffJobTests(
         }
 
         with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
-            'generate_new_thread_id',
-            self.mock_generate_new_exploration_thread_id):
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
             with self.swap(
-                exp_fetchers, 'get_exploration_by_id',
-                self.mock_get_exploration_by_id):
-                with self.swap(
-                    exp_domain.Exploration, 'get_content_html',
-                    self.MockExploration.get_content_html):
-                    translation_suggestion = (
-                        suggestion_services.create_suggestion(
-                            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                            suggestion_models.TARGET_TYPE_EXPLORATION,
-                            self.target_id, self.target_version_at_submission,
-                            self.author_id, add_translation_change_dict,
-                            'test description')
-                    )
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                translation_suggestion = (
+                    suggestion_services.create_suggestion(
+                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                        suggestion_models.TARGET_TYPE_EXPLORATION,
+                        self.target_id, self.target_version_at_submission,
+                        self.author_id, add_translation_change_dict,
+                        'test description')
+                )
 
         return translation_suggestion
 
@@ -2331,16 +2324,25 @@ class PopulateReviewerAndSuggestionCountsOneOffJobTests(
 
         self._run_job_and_verify_output(expected_output)
 
-    def test_no_action_is_performed_for_accepted_suggestions(self):
+    def test_job_updates_counts_for_translation_suggestions_in_same_lang_code(
+            self):
+        translation_suggestion_1 = (
+            self._create_translation_suggestion_with_language_code('hi')
+        )
+        translation_suggestion_2 = (
+            self._create_translation_suggestion_with_language_code('hi')
+        )
+        expected_output = ['[u\'suggestion_translate_content_hi\', 2]']
 
+        self._run_job_and_verify_output(expected_output)
+"""
 - add translation suggestions and see count increase
 - add question suggestions and see count increase
 - add question reviewers and see count increase
 - add translation reviewer with multiple languages and see count increase
 - add an invalid language code
-- add a negative count?
 
-    """
+
     def test_success(self):
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         user_services.allow_user_to_review_translation_in_language(

@@ -654,7 +654,7 @@ class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
         if reviewer_and_suggestion_counts_model is None:
             reviewer_and_suggestion_counts_model = cls(
                 id=REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID,
-                translation_reviewer_counts_by_lang_code_code={},
+                translation_reviewer_counts_by_lang_code={},
                 translation_suggestion_counts_by_lang_code={},
                 question_reviewer_count=0,
                 question_suggestion_count=0

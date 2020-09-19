@@ -854,3 +854,34 @@ def get_reviewer_and_suggestion_counts():
 
     return create_reviewer_and_suggestion_counts_from_model(
         reviewer_and_suggestion_counts_model)
+
+
+def update_reviewer_and_suggestion_counts(reviewer_and_suggestion_counts):
+    """Updates the ReviewerAndSuggestionCountsModel using
+    reviewer_and_suggestion_counts.
+
+    Args:
+        reviewer_and_suggestion_counts: ReviewerAndSuggestionCounts. The
+            domain object that will be used to update the
+            ReviewerAndSuggestionCountsModel.
+    """
+
+    reviewer_and_suggestion_counts.validate()
+
+    counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
+
+    counts_model.translation_reviewer_counts_by_lang_code = (
+        reviewer_and_suggestion_counts.translation_reviewer_counts_by_lang_code
+    )
+    counts_model.translation_suggestion_counts_by_lang_code = (
+        reviewer_and_suggestion_counts
+        .translation_suggestion_counts_by_lang_code
+    )
+    counts_model.question_reviewer_count = (
+        reviewer_and_suggestion_counts.question_reviewer_count
+    )
+    counts_model.question_suggestion_count = (
+        reviewer_and_suggestion_counts.question_suggestion_count
+    )
+
+    counts_model.put()
