@@ -472,3 +472,9 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             dt,
             datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))
+
+    def test_get_current_appengine_environment(self):
+        os.environ['APPENGINE_RUNTIME'] = 'True'
+        self.assertTrue(utils.is_appengine_simulated_environment())
+        os.environ['SERVER_SOFTWARE'] = 'Google App Engine/'
+        self.assertTrue(utils.is_appengine_cloud_environment())

@@ -16,6 +16,9 @@
 
 """An emulator for that mocks the core.platform.taskqueue API. This emulator
 models the third party library Google Cloud Tasks.
+
+This emulator is an extension of the emulator from this github page:
+https://github.com/doitintl/Cloud-Tasks-In-Process-Emulator
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules

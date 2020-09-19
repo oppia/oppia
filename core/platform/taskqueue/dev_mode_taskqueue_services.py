@@ -22,13 +22,15 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import os
 
 from core.platform.taskqueue import cloud_tasks_emulator
+# Special app engine import fix for requests that causes the request.post
+# function to to use URLFetch which is required to make correct requests to the
+# Google App Engine development environment. More details can be found here:
+# https://cloud.google.com/appengine/docs/standard/python/issue-requests#issuing_an_http_request
 import requests_toolbelt.adapters.appengine
 
 import requests
 
 
-# Special app engine monkey patch. More details can be found here:
-# https://cloud.google.com/appengine/docs/standard/python/issue-requests#issuing_an_http_request
 requests_toolbelt.adapters.appengine.monkeypatch()
 GOOGLE_APP_ENGINE_PORT = (
     os.environ['SERVER_PORT']

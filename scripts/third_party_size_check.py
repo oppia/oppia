@@ -59,6 +59,7 @@ def _get_skip_files_list():
             skip_files_list = [os.getcwd() + '/' + skip_files_dir
                                for skip_files_dir in skip_files_list]
         return skip_files_list
+
     except IOError as io_error:
         python_utils.PRINT(io_error)
         sys.exit(1)

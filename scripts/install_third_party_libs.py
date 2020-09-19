@@ -188,10 +188,11 @@ def main():
 
     # The following steps solves the problem of multiple google paths confusing
     # the python interpreter. Namely, there are two modules named google/, one
-    # that is installed with google-cloud libraries and another that comes with
-    # the google cloud sdk. We solve this by copying the required Google Cloud
-    # SDK libraries into the correct google module directory in the
-    # 'third_party/python_libs' directory.
+    # that is installed with google cloud libraries and another that comes with
+    # the Google Cloud SDK. Python cannot import from both paths simultaneously
+    # so we must combine the two modules into one. We solve this by copying the
+    # Google Cloud SDK libraries that we need into the correct google
+    # module directory in the 'third_party/python_libs' directory.
     python_utils.PRINT(
         'Copying Google Cloud SDK modules to third_party/python_libs...')
     correct_google_path = os.path.join(
@@ -219,8 +220,9 @@ def main():
 
     # The following for loop populates all of the google modules with
     # the correct __init__.py files if they do not exist. This solves the bug
-    # mentioned here where namespace packages sometimes install modules without
-    # __init__.py files:
+    # mentioned below where namespace packages sometimes install modules without
+    # __init__.py files (python requires modules to have __init__.py files in
+    # in order to recognize them as modules and import them):
     # https://github.com/googleapis/python-ndb/issues/518
     python_utils.PRINT(
         'Checking that all google library modules contain __init__.py files...')

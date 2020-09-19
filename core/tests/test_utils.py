@@ -401,7 +401,7 @@ class TestBase(unittest.TestCase):
 
     # This is the value that gets returned by default when
     # app_identity.get_application_id() is called during tests.
-    EXPECTED_TEST_APP_ID = 'oppia-dev'
+    EXPECTED_TEST_APP_ID = 'dummy-cloudsdk-project-id'
 
     # A test unicode string.
     UNICODE_TEST_STRING = u'unicode ¡马!'

@@ -466,26 +466,13 @@ def main(args=None):
     file_extension_types = _get_file_extensions(
         parsed_args.only_check_file_extensions)
 
-    # These environmental variables are required to allow Google Cloud Tasks to
-    # operate in a local development environment without connecting to the
-    # internet. These environment variables allow Cloud APIs to be instantiated.
-    os.environ['CLOUDSDK_CORE_PROJECT'] = 'oppia-dev'
-    os.environ['APPLICATION_ID'] = 'oppia-dev'
-
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
 
     install_third_party_libs.main()
-    import dev_appserver
-    dev_appserver.fix_sys_path()
-
-    if 'google' in sys.modules:
-        google_path = os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
-        google_module = sys.modules['google']
-        google_module.__path__ = [google_path]
-        google_module.__file__ = os.path.join(google_path, '__init__.py')
+    common.fix_third_party_imports()
 
     python_utils.PRINT('Starting Linter....')
 

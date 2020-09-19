@@ -53,7 +53,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         def mock_create_task(parent, task):
             self.assertEqual(
                 parent,
-                u'projects/my-project-id/locations/us-central1/queues/queue')
+                u'projects/dev-project-id/locations/us-central1/queues/queue')
             self.assertEqual(
                 task,
                 {
@@ -92,7 +92,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         def mock_create_task(parent, task):
             self.assertEqual(
                 parent,
-                u'projects/my-project-id/locations/us-central1/queues/queue')
+                u'projects/dev-project-id/locations/us-central1/queues/queue')
             self.assertEqual(
                 task,
                 {

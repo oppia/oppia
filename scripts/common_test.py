@@ -904,3 +904,10 @@ class CommonTests(test_utils.GenericTestBase):
             common.start_redis_server()
 
         self.assertTrue(check_function_calls['os_remove_is_called'])
+
+    def test_fix_third_party_imports_correctly_sets_up_imports(self):
+        common.fix_third_party_imports()
+        # Asserts that imports from problematic modules do not error.
+        from google.cloud import tasks_v2
+        from google.appengine.api import app_identity
+

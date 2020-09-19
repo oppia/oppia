@@ -77,8 +77,7 @@ DIRS_TO_ADD_TO_SYS_PATH = [
         common.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common.PYGITHUB_VERSION),
     os.path.join(
         common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
-    common.CURR_DIR,
-    common.THIRD_PARTY_PYTHON_LIBS_DIR
+    common.CURR_DIR
 ]
 
 COVERAGE_DIR = os.path.join(
@@ -231,14 +230,6 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
 def main(args=None):
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
-    # These environmental variables are required to allow Google Cloud Tasks to
-    # operate in a local development environment without connecting to the
-    # internet. These environment variables allow Cloud APIs to be instantiated.
-    os.environ['CLOUDSDK_CORE_PROJECT'] = 'oppia-dev'
-    os.environ['APPLICATION_ID'] = 'oppia-dev'
-
-    import dev_appserver
-    dev_appserver.fix_sys_path()
 
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
@@ -249,11 +240,7 @@ def main(args=None):
         # https://stackoverflow.com/q/10095037 for more details.
         sys.path.insert(1, directory)
 
-    if 'google' in sys.modules:
-        google_path = os.path.join(common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
-        google_module = sys.modules['google']
-        google_module.__path__ = [google_path]
-        google_module.__file__ = os.path.join(google_path, '__init__.py')
+    common.fix_third_party_imports()
 
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(

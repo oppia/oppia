@@ -277,16 +277,22 @@ class RegistryUnitTest(test_utils.GenericTestBase):
 
     def test_import_taskqueue_services(self):
         """Tests import taskqueue services function."""
-        def mock_is_appengine_development_environment():
+        def mock_is_appengine_simulated_environment():
             return False
         swap_to_prod = self.swap(
-            utils, 'is_appengine_development_environment',
-            mock_is_appengine_development_environment)
+            utils, 'is_appengine_simulated_environment',
+            mock_is_appengine_simulated_environment)
         with self.swap(constants, 'DEV_MODE', False), swap_to_prod:
             from core.platform.taskqueue import cloud_taskqueue_services
             self.assertEqual(
                 self.registry_instance.import_taskqueue_services(),
                 cloud_taskqueue_services)
+
+        from core.platform.taskqueue import dev_mode_taskqueue_services
+        self.assertEqual(
+            self.registry_instance.import_taskqueue_services(),
+            dev_mode_taskqueue_services)
+
 
     def test_import_search_services(self):
         """Tests import search services function."""

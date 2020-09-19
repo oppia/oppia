@@ -114,3 +114,31 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         with swap_create_http_task:
             taskqueue_services.enqueue_task(
                 correct_url, correct_payload, 0)
+
+    def test_that_queue_names_are_in_sync_with_queue_yaml_file(self):
+        """Checks that all of the queues that are instantiated in the queue.yaml
+        file has a corresponding QUEUE_NAME_* constant instantiated in
+        taskqueue_services.
+        """
+        queue_name_dict = {}
+        # Parse the queue.yaml file for the correct queue names.
+        with python_utils.open_file('queue.yaml', 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                if 'name' in line:
+                    queue_name = line.split(':')[1]
+                    queue_name_dict[queue_name.strip()] = False
+
+        # Get all attributes of taskqueue_services using the dir function.
+        attributes = dir(taskqueue_services)
+        # Check if the queue names in the queue.yaml file exist in as a queue
+        # name in taskqueue_services.
+        for attribute in attributes:
+            value = getattr(taskqueue_services, attribute)
+            if (
+                (isinstance(value, str) or isinstance(value, unicode)) and
+                value in queue_name_dict):
+                queue_name_dict[value] = True
+
+        for queue_name, in_taskqueue_services in queue_name_dict.items():
+            self.assertTrue(in_taskqueue_services)

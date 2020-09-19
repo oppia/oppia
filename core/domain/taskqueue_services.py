@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides a seam for taskqueue-related operations."""
+"""Provides a shim for taskqueue-related operations."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -44,9 +44,9 @@ QUEUE_NAME_ONE_OFF_JOBS = 'one-off-jobs'
 # Taskqueue for updating stats models.
 QUEUE_NAME_STATS = 'stats'
 
-# Function identifiers informs the deferred task handler of what deferred
+# Function identifiers inform the deferred task handler of which deferred
 # function should be run for the relevant task.
-# NOTE for developers: If you want to defer a function, visit the file,
+# NOTE for developers: If you want to defer a function, visit the file
 # core/controllers/tasks.py, and check the DeferredTasksHandler.
 # 1. If the function you want to defer already exists in the handler, choose the
 #    correct FUNCTION_ID and defer the function using that FUNCTION_ID.

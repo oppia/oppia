@@ -168,7 +168,17 @@ class FlagExplorationEmailHandler(base.BaseHandler):
 
 
 class DeferredTasksHandler(base.BaseHandler):
-    """Handles special singular function tasks."""
+    """Handles special singular function tasks. This task handler is required
+    to handle single asynchronous function calls. For more complex tasks that
+    require a large number of function calls, the correct approach is to
+    create a special url handler that handles that task. However, it doesn't
+    make sense to create a url handler for a single function call. Therefore,
+    we add deferred tasks functionality which handles tasks that make a single
+    function call.
+
+    The convention of function ids and an explanation of the different queue
+    names exists in core/domain/taskqueue_services.py.
+    """
 
     DEFERRED_TASK_FUNCTIONS = {
         taskqueue_services.FUNCTION_ID_DISPATCH_EVENT: (
@@ -184,7 +194,10 @@ class DeferredTasksHandler(base.BaseHandler):
     def post(self):
         payload = json.loads(self.request.body.decode())
         if 'fn_identifier' not in payload:
-            raise Exception('This request cannot defer.')
+            raise Exception(
+                'This request cannot defer tasks because it does not contain a '
+                'function identifier attribute (fn_identifier). Deferred tasks '
+                'must contain a function_identifier in the payload.')
         if payload['fn_identifier'] not in self.DEFERRED_TASK_FUNCTIONS:
             raise Exception(
                 'The function id, %s, is not valid' %
