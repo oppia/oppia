@@ -18,16 +18,11 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { NumericExpressionInputValidationService } from
-// eslint-disable-next-line max-len
-  'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { NumericExpressionInputValidationService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
-import { Rule } from
-  'domain/exploration/Rule.model';
-import { NumericExpressionInputCustomizationArgs } from
-  'extensions/interactions/customization-args-defs';
+import { Rule } from 'domain/exploration/Rule.model';
+import { NumericExpressionInputCustomizationArgs } from 'extensions/interactions/customization-args-defs';
 
 import { AppConstants } from 'app.constants';
 
@@ -39,7 +34,6 @@ describe('NumericExpressionInputValidationService', () => {
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let matchesExactlyWith: Rule, isEquivalentTo: Rule;
   let customizationArgs: NumericExpressionInputCustomizationArgs;
-  let agof: AnswerGroupObjectFactory;
   let warnings;
 
   beforeEach(() => {
@@ -48,7 +42,6 @@ describe('NumericExpressionInputValidationService', () => {
     });
 
     validatorService = TestBed.get(NumericExpressionInputValidationService);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -80,7 +73,7 @@ describe('NumericExpressionInputValidationService', () => {
       }
     });
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    answerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, null, null)];
   });
 
   it('should be able to perform basic validation', () => {

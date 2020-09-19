@@ -17,6 +17,7 @@
  */
 
 import { Subscription } from 'rxjs';
+import { WrittenTranslation } from 'domain/exploration/WrittenTranslation.model';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -31,14 +32,12 @@ angular.module('oppia').component('stateTranslationEditor', {
     'StateEditorService', 'StateWrittenTranslationsService',
     'TranslationLanguageService', 'TranslationStatusService',
     'TranslationTabActiveContentIdService', 'UrlInterpolationService',
-    'WrittenTranslationObjectFactory',
     function(
         $scope, $uibModal, EditabilityService,
         ExplorationStatesService, ExternalSaveService,
         StateEditorService, StateWrittenTranslationsService,
         TranslationLanguageService, TranslationStatusService,
-        TranslationTabActiveContentIdService, UrlInterpolationService,
-        WrittenTranslationObjectFactory) {
+        TranslationTabActiveContentIdService, UrlInterpolationService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var showMarkAudioAsNeedingUpdateModalIfRequired = function(
@@ -132,8 +131,7 @@ angular.module('oppia').component('stateTranslationEditor', {
           $scope.translationEditorIsOpen = true;
           if (!$scope.activeWrittenTranslation) {
             $scope.activeWrittenTranslation = (
-              WrittenTranslationObjectFactory
-                .createNew($scope.dataFormat, ''));
+              WrittenTranslation.createNew($scope.dataFormat, ''));
           }
         }
       };

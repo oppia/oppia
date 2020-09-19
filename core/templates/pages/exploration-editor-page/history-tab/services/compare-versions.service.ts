@@ -16,9 +16,9 @@
  * @fileoverview Service to compare versions of explorations.
  */
 
+ import { States } from 'domain/exploration/States.model';
+
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
-require('domain/state/StateObjectFactory.ts');
-require('domain/exploration/StatesObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('pages/exploration-editor-page/services/exploration-diff.service.ts');
 require(
@@ -26,12 +26,10 @@ require(
 
 angular.module('oppia').factory('CompareVersionsService', [
   '$q', 'ExplorationDataService', 'ExplorationDiffService',
-  'ReadOnlyExplorationBackendApiService',
-  'StatesObjectFactory', 'VersionTreeService',
+  'ReadOnlyExplorationBackendApiService', 'VersionTreeService',
   function(
       $q, ExplorationDataService, ExplorationDiffService,
-      ReadOnlyExplorationBackendApiService,
-      StatesObjectFactory, VersionTreeService) {
+      ReadOnlyExplorationBackendApiService, VersionTreeService) {
     /**
      * Constructs the combined list of changes needed to get from v1 to v2.
      *
@@ -105,9 +103,9 @@ angular.module('oppia').factory('CompareVersionsService', [
           // Track changes from v1 to LCA, and then from LCA to v2.
           var lca = VersionTreeService.findLCA(v1, v2);
 
-          var v1States = StatesObjectFactory.createFromBackendDict(
+          var v1States = States.createFromBackendDict(
             v1StatesDict).getStateObjects();
-          var v2States = StatesObjectFactory.createFromBackendDict(
+          var v2States = States.createFromBackendDict(
             v2StatesDict).getStateObjects();
 
           var diffGraphData = ExplorationDiffService.getDiffGraphData(

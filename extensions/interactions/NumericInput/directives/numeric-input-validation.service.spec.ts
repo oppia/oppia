@@ -20,10 +20,8 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { NumericInputValidationService } from
-  'interactions/NumericInput/directives/numeric-input-validation.service';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { NumericInputValidationService } from 'interactions/NumericInput/directives/numeric-input-validation.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
 import { Rule } from 'domain/exploration/Rule.model';
 
@@ -37,7 +35,6 @@ describe('NumericInputValidationService', () => {
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let betweenNegativeOneAndOneRule: Rule, equalsZeroRule: Rule,
     lessThanOneRule: Rule;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -47,7 +44,6 @@ describe('NumericInputValidationService', () => {
     validatorService = TestBed.get(NumericInputValidationService);
 
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    agof = TestBed.get(AnswerGroupObjectFactory);
 
     currentState = 'First State';
     goodDefaultOutcome = Outcome.createFromBackendDict({
@@ -80,7 +76,7 @@ describe('NumericInputValidationService', () => {
         x: 1
       }
     });
-    answerGroups = [agof.createNew(
+    answerGroups = [AnswerGroup.createNew(
       [equalsZeroRule, betweenNegativeOneAndOneRule],
       goodDefaultOutcome,
       null,

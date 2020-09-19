@@ -20,8 +20,7 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
 import { GraphInputValidationService } from
   'interactions/GraphInput/directives/graph-input-validation.service';
 import { Outcome } from
@@ -39,7 +38,6 @@ describe('GraphInputValidationService', () => {
   let currentState: string;
   let customizationArguments: GraphInputCustomizationArgs;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -48,7 +46,6 @@ describe('GraphInputValidationService', () => {
 
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     validatorService = TestBed.get(GraphInputValidationService);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     currentState = 'First State';
     goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
@@ -95,7 +92,7 @@ describe('GraphInputValidationService', () => {
       }
     };
 
-    var answerGroup = agof.createNew(
+    var answerGroup = AnswerGroup.createNew(
       [Rule.createFromBackendDict({
         inputs: {
           g: {

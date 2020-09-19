@@ -22,8 +22,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
 import { Hint } from 'domain/exploration/Hint.model';
 import {
   DragAndDropSortInputCustomizationArgs,
@@ -32,12 +31,11 @@ import {
   ItemSelectionInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgs
 } from 'extensions/interactions/customization-args-defs';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { Interaction } from 'domain/exploration/Interaction.model';
 import { Outcome } from 'domain/exploration/Outcome.model';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { State } from 'domain/state/StateObjectFactory';
+import { Solution } from 'domain/exploration/Solution.model';
+import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { State } from 'domain/state/State.model';
 
 interface AnswerChoice {
   val: string | number;

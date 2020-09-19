@@ -19,6 +19,9 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
 import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
+import { StoryReference } from 'domain/topic/StoryReference.model';
+import { Subtopic } from 'domain/topic/Subtopic.model';
+import { Topic } from 'domain/topic/Topic.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -35,9 +38,6 @@ describe('Topic editor page', function() {
   var UndoRedoService = null;
   var TopicEditorStateService = null;
   var UrlService = null;
-  var SubtopicObjectFactory = null;
-  var TopicObjectFactory = null;
-  var StoryReferenceObjectFactory = null;
   var topic = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -55,21 +55,18 @@ describe('Topic editor page', function() {
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     UrlService = $injector.get('UrlService');
-    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
-    TopicObjectFactory = $injector.get('TopicObjectFactory');
-    StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
 
-    var subtopic = SubtopicObjectFactory.createFromTitle(1, 'subtopic1');
+    var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     subtopic._thumbnailFilename = 'b.svg';
     var skillSummary = ShortSkillSummary.create(
       'skill1', 'Addition');
     subtopic._skillSummaries = [skillSummary];
-    topic = TopicObjectFactory.createInterstitialTopic();
+    topic = Topic.createInterstitialTopic();
     topic._subtopics = [subtopic];
     topic._thumbnailFilename = 'a.svg';
     topic._metaTagContent = 'topic';
-    var story1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
-    var story2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
+    var story1 = StoryReference.createFromStoryId('storyId1');
+    var story2 = StoryReference.createFromStoryId('storyId2');
     topic._canonicalStoryReferences = [story1, story2];
     topic.setName('New Name');
     topic.setUrlFragment('topic-url-fragment');

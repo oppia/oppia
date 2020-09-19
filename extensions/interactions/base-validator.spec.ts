@@ -26,20 +26,17 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // interaction validators is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { baseInteractionValidationService } from 'interactions/base-interaction-validation.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 describe('Interaction validator', function() {
-  var bivs, WARNING_TYPES, agof;
+  var bivs, WARNING_TYPES;
 
   var currentState, otherState, goodOutcomeDest, goodOutcomeFeedback;
   var badOutcome, goodAnswerGroups;
-  var agof;
 
   beforeEach(function() {
     angular.mock.module('oppia');
@@ -52,8 +49,6 @@ describe('Interaction validator', function() {
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory());
-    $provide.value(
       'baseInteractionValidationService',
       new baseInteractionValidationService());
   }));
@@ -61,7 +56,6 @@ describe('Interaction validator', function() {
   beforeEach(angular.mock.inject(function($injector, $rootScope) {
     bivs = $injector.get('baseInteractionValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
-    agof = $injector.get('AnswerGroupObjectFactory');
 
     currentState = 'First State';
     otherState = 'Second State';
@@ -100,8 +94,8 @@ describe('Interaction validator', function() {
     });
 
     goodAnswerGroups = [
-      agof.createNew([], goodOutcomeDest, false, null),
-      agof.createNew([], goodOutcomeFeedback, false, null)
+      AnswerGroup.createNew([], goodOutcomeDest, null, null),
+      AnswerGroup.createNew([], goodOutcomeFeedback, null, null)
     ];
   }));
 
@@ -116,9 +110,9 @@ describe('Interaction validator', function() {
     it('should have a warning for an answer group with a confusing outcome',
       function() {
         var answerGroups = [
-          agof.createNew([], goodOutcomeDest, false, null),
-          agof.createNew([], badOutcome, false, null),
-          agof.createNew([], goodOutcomeFeedback, false, null)
+          AnswerGroup.createNew([], goodOutcomeDest, null, null),
+          AnswerGroup.createNew([], badOutcome, null, null),
+          AnswerGroup.createNew([], goodOutcomeFeedback, null, null)
         ];
         var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
         expect(warnings).toEqual([{
@@ -158,9 +152,9 @@ describe('Interaction validator', function() {
     it('should be able to concatenate warnings for both answer groups and ' +
         'the default outcome', function() {
       var badAnswerGroups = [
-        agof.createNew([], goodOutcomeDest, false, null),
-        agof.createNew([], badOutcome, false, null),
-        agof.createNew([], badOutcome, false, null)
+        AnswerGroup.createNew([], goodOutcomeDest, null, null),
+        AnswerGroup.createNew([], badOutcome, null, null),
+        AnswerGroup.createNew([], badOutcome, null, null)
       ];
       var warnings = bivs.getAllOutcomeWarnings(
         badAnswerGroups, badOutcome, currentState);

@@ -18,13 +18,13 @@
  */
 
 import { Subscription } from 'rxjs';
+import { States } from 'domain/exploration/States.model';
 
 require(
   'pages/exploration-editor-page/statistics-tab/templates/' +
   'state-stats-modal.controller.ts');
 
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
-require('domain/exploration/StatesObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/alerts.service.ts');
@@ -42,14 +42,12 @@ angular.module('oppia').component('statisticsTab', {
     '$q', '$scope', '$uibModal', 'AlertsService', 'ComputeGraphService',
     'ExplorationDataService', 'ExplorationStatsService',
     'ReadOnlyExplorationBackendApiService', 'RouterService',
-    'StateInteractionStatsService', 'StatesObjectFactory',
-    'UrlInterpolationService',
+    'StateInteractionStatsService', 'UrlInterpolationService',
     function(
         $q, $scope, $uibModal, AlertsService, ComputeGraphService,
         ExplorationDataService, ExplorationStatsService,
         ReadOnlyExplorationBackendApiService, RouterService,
-        StateInteractionStatsService, StatesObjectFactory,
-        UrlInterpolationService) {
+        StateInteractionStatsService, UrlInterpolationService) {
       this.directiveSubscriptions = new Subscription();
       const expId = ExplorationDataService.explorationId;
       const refreshExplorationStatistics = () => {
@@ -62,7 +60,7 @@ angular.module('oppia').component('statisticsTab', {
           const numNonCompletions = (
             expStats.numActualStarts - expStats.numCompletions);
 
-          this.states = StatesObjectFactory.createFromBackendDict(
+          this.states = States.createFromBackendDict(
             expResponse.exploration.states);
           this.expStats = expStats;
 

@@ -18,14 +18,9 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { MultipleChoiceInputCustomizationArgs } from
-  'interactions/customization-args-defs';
-/* eslint-disable max-len */
-import { MultipleChoiceInputValidationService } from
-  'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
-/* eslint-enable max-len */
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { MultipleChoiceInputCustomizationArgs } from 'interactions/customization-args-defs';
+import { MultipleChoiceInputValidationService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
 import { Rule } from 'domain/exploration/Rule.model';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
@@ -40,7 +35,6 @@ describe('MultipleChoiceInputValidationService', () => {
     goodDefaultOutcome: Outcome;
   let validatorService: MultipleChoiceInputValidationService,
     customizationArguments: MultipleChoiceInputCustomizationArgs;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -49,7 +43,6 @@ describe('MultipleChoiceInputValidationService', () => {
 
     validatorService = TestBed.get(MultipleChoiceInputValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    agof = TestBed.get(AnswerGroupObjectFactory);
     currentState = 'First State';
 
     goodDefaultOutcome = Outcome.createFromBackendDict({
@@ -88,7 +81,7 @@ describe('MultipleChoiceInputValidationService', () => {
       }
     };
 
-    goodAnswerGroups = [agof.createNew(
+    goodAnswerGroups = [AnswerGroup.createNew(
       [{
         rule_type: 'Equals',
         inputs: {

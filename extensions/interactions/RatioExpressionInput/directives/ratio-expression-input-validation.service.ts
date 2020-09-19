@@ -19,16 +19,11 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { Warning, baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
-import { RatioExpressionInputCustomizationArgs } from
-  'extensions/interactions/customization-args-defs';
-import { RatioObjectFactory, Ratio } from
-  'domain/objects/RatioObjectFactory';
-import { RatioExpressionInputRulesService } from
-  './ratio-expression-input-rules.service';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { Warning, baseInteractionValidationService } from 'interactions/base-interaction-validation.service';
+import { RatioExpressionInputCustomizationArgs } from 'extensions/interactions/customization-args-defs';
+import { RatioObjectFactory, Ratio } from 'domain/objects/RatioObjectFactory';
+import { RatioExpressionInputRulesService } from './ratio-expression-input-rules.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
 import { AppConstants } from 'app.constants';
 

@@ -19,13 +19,10 @@
 
 import { merge } from 'd3-array';
 
-import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
-import { HighBounceRateTask } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
-import { NeedsGuidingResponsesTask } from
-  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
-import { State } from 'domain/state/StateObjectFactory';
+import { ExplorationImprovementsConfig } from 'domain/improvements/exploration-improvements-config-object.factory';
+import { HighBounceRateTask } from 'domain/improvements/HighBounceRateTaskObjectFactory';
+import { NeedsGuidingResponsesTask } from 'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
+import { State } from 'domain/state/State.model';
 
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');

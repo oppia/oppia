@@ -18,22 +18,16 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { InteractionObjectFactory } from
-  'domain/exploration/InteractionObjectFactory';
+import { CamelCaseToHyphensPipe } from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { Interaction } from 'domain/exploration/Interaction.model';
 import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
-import { StateCardObjectFactory } from
-  'domain/state_card/StateCardObjectFactory';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
-import { Voiceover } from
-  'domain/exploration/Voiceover.model';
+import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
+import { Voiceover } from 'domain/exploration/Voiceover.model';
 
 
 describe('State card object factory', () => {
   let stateCardObjectFactory = null;
-  let interactionObjectFactory = null;
   let _sampleCard = null;
 
   beforeEach(() => {
@@ -42,7 +36,6 @@ describe('State card object factory', () => {
     });
 
     stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
-    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
 
     let interactionDict = {
       answer_groups: [],
@@ -64,14 +57,18 @@ describe('State card object factory', () => {
           content_id: 'default_outcome',
           html: ''
         },
-        param_changes: []
+        param_changes: [],
+        labelled_as_correct: true,
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
       },
       hints: [],
+      solution: null,
       id: 'TextInput'
     };
     _sampleCard = stateCardObjectFactory.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict(interactionDict),
+      Interaction.createFromBackendDict(interactionDict),
       RecordedVoiceovers.createFromBackendDict({
         voiceovers_mapping: {
           content: {

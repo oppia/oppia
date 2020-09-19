@@ -21,14 +21,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import nerdamer from 'nerdamer';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { Warning, baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
-import { MathEquationInputCustomizationArgs } from
-  'extensions/interactions/customization-args-defs';
-import { MathEquationInputRulesService } from
-  './math-equation-input-rules.service';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { Warning, baseInteractionValidationService } from 'interactions/base-interaction-validation.service';
+import { MathEquationInputCustomizationArgs } from 'extensions/interactions/customization-args-defs';
+import { MathEquationInputRulesService } from './math-equation-input-rules.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
 import { AppConstants } from 'app.constants';

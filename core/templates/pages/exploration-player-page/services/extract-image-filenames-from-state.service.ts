@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { State } from 'domain/state/StateObjectFactory';
+import { State } from 'domain/state/State.model';
 import {
   DragAndDropSortInputCustomizationArgs,
   ImageClickInputCustomizationArgs,

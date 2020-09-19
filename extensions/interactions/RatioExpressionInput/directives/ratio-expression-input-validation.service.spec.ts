@@ -18,17 +18,12 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { RatioExpressionInputValidationService } from
-// eslint-disable-next-line max-len
-  'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { RatioExpressionInputValidationService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
 import { Rule } from 'domain/exploration/Rule.model';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
-import { RatioExpressionInputCustomizationArgs } from
-  'extensions/interactions/customization-args-defs';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
+import { RatioExpressionInputCustomizationArgs } from 'extensions/interactions/customization-args-defs';
 
 import { AppConstants } from 'app.constants';
 
@@ -40,7 +35,6 @@ describe('RatioExpressionInputValidationService', () => {
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let equals: Rule, isEquivalent: Rule, hasNumberOfTermsEqualTo: Rule;
   let customizationArgs: RatioExpressionInputCustomizationArgs;
-  let agof: AnswerGroupObjectFactory;
   let warnings;
 
   beforeEach(() => {
@@ -49,7 +43,6 @@ describe('RatioExpressionInputValidationService', () => {
     });
 
     validatorService = TestBed.get(RatioExpressionInputValidationService);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -95,7 +88,7 @@ describe('RatioExpressionInputValidationService', () => {
       }
     });
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    answerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, null, null)];
   });
 
   it('should be able to perform basic validation', () => {

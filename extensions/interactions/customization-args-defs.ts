@@ -19,8 +19,7 @@
 import { GraphAnswer } from 'interactions/answer-defs';
 
 import { SubtitledHtmlBackendDict, SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
-import { SubtitledUnicodeBackendDict, SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledUnicodeBackendDict, SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
 
 
 interface LabeledRegion {

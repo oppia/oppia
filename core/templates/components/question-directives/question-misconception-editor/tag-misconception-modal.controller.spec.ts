@@ -19,8 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // question-misconception-editor.component.ts is upgraded to Angular 8.
 /* eslint-disable max-len */
-import { MisconceptionObjectFactory } from
-  'domain/skill/MisconceptionObjectFactory';
+import { Misconception } from 'domain/skill/Misconception.model';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateEditorService } from
@@ -40,14 +39,11 @@ describe('Tag misconception modal controller', function() {
   var $uibModalInstance = null;
   var $rootScope = null;
   var $scope = null;
-  var misconceptionObjectFactory = null;
   var mockMisconceptionObject = null;
   var ses = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'MisconceptionObjectFactory', new MisconceptionObjectFactory());
     $provide.value(
       'StateEditorService', new StateEditorService(
         new SolutionValidityService()));
@@ -56,7 +52,6 @@ describe('Tag misconception modal controller', function() {
   beforeEach(angular.mock.inject(
     function(_$controller_, _$q_, _$rootScope_, $injector) {
       $rootScope = _$rootScope_;
-      misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
       ses = $injector.get('StateEditorService');
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -64,8 +59,7 @@ describe('Tag misconception modal controller', function() {
       $controller = _$controller_;
       mockMisconceptionObject = {
         abc: [
-          misconceptionObjectFactory.create(
-            '1', 'misc1', 'notes1', 'feedback1', true)
+          Misconception.create('1', 'misc1', 'notes1', 'feedback1', true)
         ]
       };
       spyOn(ses, 'getMisconceptionsBySkill').and.callFake(function() {

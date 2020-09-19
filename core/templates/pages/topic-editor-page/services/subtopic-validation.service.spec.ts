@@ -18,6 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // topic-editor-state.service.ts is upgraded to Angular 8.
+import { Subtopic } from 'domain/topic/Subtopic.model';
+import { Topic } from 'domain/topic/Topic.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -32,23 +34,19 @@ describe('Subtopic validation service', function() {
     }
   }));
 
-  var TopicObjectFactory = null;
   var TopicEditorStateService = null;
   var SubtopicValidationService = null;
-  var SubtopicObjectFactory = null;
 
   beforeEach(angular.mock.inject(function($injector) {
     TopicEditorStateService = $injector.get('TopicEditorStateService');
-    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
-    TopicObjectFactory = $injector.get('TopicObjectFactory');
     SubtopicValidationService = $injector.get('SubtopicValidationService');
 
-    var topic = TopicObjectFactory.createInterstitialTopic();
-    var subtopic1 = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');
+    var topic = Topic.createInterstitialTopic();
+    var subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
     subtopic1.setUrlFragment('subtopic-one');
-    var subtopic2 = SubtopicObjectFactory.createFromTitle(1, 'Subtopic2');
+    var subtopic2 = Subtopic.createFromTitle(1, 'Subtopic2');
     subtopic2.setUrlFragment('subtopic-two');
-    var subtopic3 = SubtopicObjectFactory.createFromTitle(1, 'Subtopic3');
+    var subtopic3 = Subtopic.createFromTitle(1, 'Subtopic3');
     subtopic3.setUrlFragment('subtopic-three');
     topic.getSubtopics = function() {
       return [subtopic1, subtopic2, subtopic3];

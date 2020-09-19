@@ -20,8 +20,6 @@
 require(
   'pages/exploration-editor-page/editor-tab/training-panel/' +
   'training-panel.component.ts');
-
-require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/angular-name.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');

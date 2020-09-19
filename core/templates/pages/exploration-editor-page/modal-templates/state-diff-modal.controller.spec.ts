@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for StateDiffModalController.
  */
 
+import { State } from 'domain/state/State.model';
+
 describe('State Diff Modal Controller', function() {
   var $flushPendingTasks = null;
   var $httpBackend = null;
@@ -25,7 +27,6 @@ describe('State Diff Modal Controller', function() {
   var $uibModalInstance = null;
   var ContextService = null;
   var CsrfTokenService = null;
-  var StateObjectFactory = null;
 
   var explorationId = 'exp1';
   var headers = null;
@@ -44,13 +45,12 @@ describe('State Diff Modal Controller', function() {
       ContextService = $injector.get('ContextService');
       spyOn(ContextService, 'getExplorationId').and.returnValue(explorationId);
       CsrfTokenService = $injector.get('CsrfTokenService');
-      StateObjectFactory = $injector.get('StateObjectFactory');
 
       spyOn(CsrfTokenService, 'getTokenAsync')
         .and.returnValue($q.resolve('sample-csrf-token'));
 
-      newState = StateObjectFactory.createDefaultState(newState);
-      oldState = StateObjectFactory.createDefaultState(oldState);
+      newState = State.createDefaultState(newState);
+      oldState = State.createDefaultState(oldState);
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);

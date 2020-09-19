@@ -19,19 +19,13 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AnswerClassificationService } from
-  'pages/exploration-player-page/services/answer-classification.service';
-import { FractionObjectFactory } from
-  'domain/objects/FractionObjectFactory';
-import { InteractionAnswer, FractionAnswer, MultipleChoiceAnswer } from
-  'interactions/answer-defs';
-import { MultipleChoiceInputCustomizationArgs } from
-  'extensions/interactions/customization-args-defs';
-import { InteractionRulesRegistryService } from
-  'services/interaction-rules-registry.service';
-import { State } from 'domain/state/StateObjectFactory';
-import { StateInteractionStatsBackendApiService } from
-  'domain/exploration/state-interaction-stats-backend-api.service';
+import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { InteractionAnswer, FractionAnswer, MultipleChoiceAnswer } from 'interactions/answer-defs';
+import { MultipleChoiceInputCustomizationArgs } from 'extensions/interactions/customization-args-defs';
+import { InteractionRulesRegistryService } from 'services/interaction-rules-registry.service';
+import { State } from 'domain/state/State.model';
+import { StateInteractionStatsBackendApiService } from 'domain/exploration/state-interaction-stats-backend-api.service';
 
 type Option = string | string[];
 

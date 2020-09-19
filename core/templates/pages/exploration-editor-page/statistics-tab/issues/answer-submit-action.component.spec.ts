@@ -18,10 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ExplorationHtmlFormatterService } from
-  'services/exploration-html-formatter.service';
-import { InteractionObjectFactory } from
-  'domain/exploration/InteractionObjectFactory';
+import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
@@ -32,13 +29,11 @@ describe('Answer Submit Action directive', function() {
   var $scope = null;
   var explorationHtmlFormatterService = null;
   var htmlEscaperService = null;
-  var interactionObjectFactory = null;
 
   beforeEach(function() {
     explorationHtmlFormatterService = TestBed.get(
       ExplorationHtmlFormatterService);
     htmlEscaperService = TestBed.get(HtmlEscaperService);
-    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -70,8 +65,7 @@ describe('Answer Submit Action directive', function() {
     ctrl = $componentController('answerSubmitAction', {
       $scope: $scope,
       ExplorationHtmlFormatterService: explorationHtmlFormatterService,
-      HtmlEscaperService: htmlEscaperService,
-      InteractionObjectFactory: interactionObjectFactory
+      HtmlEscaperService: htmlEscaperService
     });
     ctrl.$onInit();
   }));

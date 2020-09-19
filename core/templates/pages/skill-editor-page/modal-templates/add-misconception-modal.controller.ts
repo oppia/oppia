@@ -16,18 +16,18 @@
  * @fileoverview Controller for add misconception modal.
  */
 
+import { Misconception } from 'domain/skill/Misconception.model';
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
-require('domain/skill/MisconceptionObjectFactory.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 angular.module('oppia').controller('AddMisconceptionModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'MisconceptionObjectFactory',
+  '$controller', '$scope', '$uibModalInstance',
   'SkillEditorStateService', 'MAX_CHARS_IN_MISCONCEPTION_NAME',
   function(
-      $controller, $scope, $uibModalInstance, MisconceptionObjectFactory,
+      $controller, $scope, $uibModalInstance,
       SkillEditorStateService, MAX_CHARS_IN_MISCONCEPTION_NAME) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
@@ -59,7 +59,7 @@ angular.module('oppia').controller('AddMisconceptionModalController', [
     $scope.saveMisconception = function() {
       var newMisconceptionId = $scope.skill.getNextMisconceptionId();
       $uibModalInstance.close({
-        misconception: MisconceptionObjectFactory.create(
+        misconception: Misconception.create(
           newMisconceptionId,
           $scope.misconceptionName,
           $scope.misconceptionNotes,

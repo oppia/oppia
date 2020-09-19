@@ -16,33 +16,23 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
-import { StateObjectsBackendDict } from
-  'domain/exploration/StatesObjectFactory';
-import { ExplorationPermissions } from
-  'domain/exploration/exploration-permissions-object.factory';
-import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
-import { HighBounceRateTaskObjectFactory } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
-import { StateBackendDict } from 'domain/state/StateObjectFactory';
-import { ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
-import { PlaythroughObjectFactory } from
-  'domain/statistics/PlaythroughObjectFactory';
+import { StateObjectsBackendDict } from 'domain/exploration/States.model';
+import { ExplorationPermissions } from 'domain/exploration/exploration-permissions-object.factory';
+import { ExplorationImprovementsConfig } from 'domain/improvements/exploration-improvements-config-object.factory';
+import { HighBounceRateTaskObjectFactory } from 'domain/improvements/HighBounceRateTaskObjectFactory';
+import { StateBackendDict } from 'domain/state/State.model';
+import { ExplorationStats } from 'domain/statistics/ExplorationStatsObjectFactory';
+import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFactory';
 import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
-import { UserExplorationPermissionsService } from
-  'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { ContextService } from 'services/context.service';
 import {
   ExplorationImprovementsBackendApiService, ExplorationImprovementsResponse
 } from 'services/exploration-improvements-backend-api.service';
-import { ExplorationImprovementsTaskRegistryService } from
-  'services/exploration-improvements-task-registry.service';
+import { ExplorationImprovementsTaskRegistryService } from 'services/exploration-improvements-task-registry.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
-import { PlaythroughIssuesBackendApiService } from
-  'services/playthrough-issues-backend-api.service';
-import { StateTopAnswersStatsService } from
-  'services/state-top-answers-stats.service';
+import { PlaythroughIssuesBackendApiService } from 'services/playthrough-issues-backend-api.service';
+import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
 
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';

@@ -18,13 +18,14 @@
  * retrieving the topic, saving it, and listening for changes.
  */
 
+import { Rubric } from 'domain/skill/Rubric.model';
+import { SubtopicPage } from 'domain/topic/SubtopicPage.model';
+import { Topic } from 'domain/topic/Topic.model';
+
 require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/skill/RubricObjectFactory.ts');
 require('domain/story/editable-story-backend-api.service.ts');
 require('domain/story/StorySummaryObjectFactory.ts');
 require('domain/topic/editable-topic-backend-api.service.ts');
-require('domain/topic/SubtopicPageObjectFactory.ts');
-require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/topic-rights-backend-api.service.ts');
 require('domain/topic/TopicRightsObjectFactory.ts');
 require('services/alerts.service.ts');
@@ -35,18 +36,14 @@ require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('TopicEditorStateService', [
-  'AlertsService',
-  'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
-  'RubricObjectFactory', 'StorySummaryObjectFactory',
-  'SubtopicPageObjectFactory', 'TopicObjectFactory',
+  'AlertsService', 'EditableStoryBackendApiService',
+  'EditableTopicBackendApiService', 'StorySummaryObjectFactory',
   'TopicRightsBackendApiService', 'TopicRightsObjectFactory', 'UndoRedoService',
   function(
-      AlertsService,
-      EditableStoryBackendApiService, EditableTopicBackendApiService,
-      RubricObjectFactory, StorySummaryObjectFactory,
-      SubtopicPageObjectFactory, TopicObjectFactory,
+      AlertsService, EditableStoryBackendApiService,
+      EditableTopicBackendApiService, StorySummaryObjectFactory,
       TopicRightsBackendApiService, TopicRightsObjectFactory, UndoRedoService) {
-    var _topic = TopicObjectFactory.createInterstitialTopic();
+    var _topic = Topic.createInterstitialTopic();
     var _topicRights = TopicRightsObjectFactory.createInterstitialRights();
     // The array that caches all the subtopic pages loaded by the user.
     var _cachedSubtopicPages = [];
@@ -54,8 +51,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
     // loaded from the backend i.e those that correspond to newly created
     // subtopics (and not loaded from the backend).
     var _newSubtopicPageIds = [];
-    var _subtopicPage =
-      SubtopicPageObjectFactory.createInterstitialSubtopicPage();
+    var _subtopicPage = SubtopicPage.createInterstitialSubtopicPage();
     var _topicIsInitialized = false;
     var _topicIsLoading = false;
     var _topicIsBeingSaved = false;
@@ -126,14 +122,12 @@ angular.module('oppia').factory('TopicEditorStateService', [
       _classroomUrlFragment = classroomUrlFragment;
     };
     var _updateTopic = function(newBackendTopicDict, skillIdToDescriptionDict) {
-      _setTopic(
-        TopicObjectFactory.create(
-          newBackendTopicDict, skillIdToDescriptionDict));
+      _setTopic(Topic.create(newBackendTopicDict, skillIdToDescriptionDict));
     };
     var _updateSkillIdToRubricsObject = function(skillIdToRubricsObject) {
       for (var skillId in skillIdToRubricsObject) {
         var rubrics = skillIdToRubricsObject[skillId].map(function(rubric) {
-          return RubricObjectFactory.createFromBackendDict(rubric);
+          return Rubric.createFromBackendDict(rubric);
         });
         _skillIdToRubricsObject[skillId] = rubrics;
       }
@@ -144,7 +138,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
       _subtopicPageLoadedEventEmitter.emit();
     };
     var _updateSubtopicPage = function(newBackendSubtopicPageObject) {
-      _setSubtopicPage(SubtopicPageObjectFactory.createFromBackendDict(
+      _setSubtopicPage(SubtopicPage.createFromBackendDict(
         newBackendSubtopicPageObject));
     };
     var _setTopicRights = function(topicRights) {

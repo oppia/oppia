@@ -26,11 +26,9 @@ import cloneDeep from 'lodash/cloneDeep';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { MisconceptionBackendDict } from
-  'domain/skill/MisconceptionObjectFactory';
+import { MisconceptionBackendDict } from 'domain/skill/Misconception.model';
 import { RecordedVoiceOverBackendDict } from 'domain/exploration/RecordedVoiceovers.model';
-import { StateBackendDict } from
-  'domain/state/StateObjectFactory';
+import { StateBackendDict } from 'domain/state/State.model';
 import { SubtitledHtmlBackendDict } from 'domain/exploration/SubtitledHtml.model';
 import { WorkedExampleBackendDict } from 'domain/skill/WorkedExample.model';
 

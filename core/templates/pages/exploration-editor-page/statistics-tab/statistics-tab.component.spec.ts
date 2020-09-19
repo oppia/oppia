@@ -20,7 +20,6 @@ import { TestBed } from '@angular/core/testing';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { StateInteractionStatsService } from
   'services/state-interaction-stats.service';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -47,7 +46,6 @@ describe('Statistics Tab Component', function() {
   var explorationStatsService = null;
   var readOnlyExplorationBackendApiService = null;
   var stateInteractionStatsService = null;
-  var statesObjectFactory = null;
   var routerService = null;
 
   var explorationId = 'exp1';
@@ -126,7 +124,6 @@ describe('Statistics Tab Component', function() {
     computeGraphService = TestBed.get(ComputeGraphService);
     explorationStatsService = TestBed.get(ExplorationStatsService);
     stateInteractionStatsService = TestBed.get(StateInteractionStatsService);
-    statesObjectFactory = TestBed.get(StatesObjectFactory);
     routerService = new MockRouterService();
   });
 
@@ -171,8 +168,7 @@ describe('Statistics Tab Component', function() {
       ComputeGraphService: computeGraphService,
       ExplorationStatsService: explorationStatsService,
       RouterService: routerService,
-      StateInteractionStatsService: stateInteractionStatsService,
-      StatesObjectFactory: statesObjectFactory
+      StateInteractionStatsService: stateInteractionStatsService
     });
     ctrl.$onInit();
   }));

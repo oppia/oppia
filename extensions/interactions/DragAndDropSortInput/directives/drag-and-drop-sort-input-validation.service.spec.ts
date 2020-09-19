@@ -18,15 +18,10 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-/* eslint-disable max-len */
-import { DragAndDropSortInputValidationService } from
-  'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
-/* eslint-enable max-len */
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { DragAndDropSortInputValidationService } from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
-import { Rule } from
-  'domain/exploration/Rule.model';
+import { Rule } from 'domain/exploration/Rule.model';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 import { AppConstants } from 'app.constants';
@@ -45,7 +40,6 @@ describe('DragAndDropSortInputValidationService', () => {
     goodRule1: Rule, goodRule2: Rule, hasXBeforeYRule: Rule,
     hasElementXAtPositionYRule: Rule;
   let customizationArgs: DragAndDropSortInputCustomizationArgs;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -53,7 +47,6 @@ describe('DragAndDropSortInputValidationService', () => {
     });
 
     validatorService = TestBed.get(DragAndDropSortInputValidationService);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -155,12 +148,12 @@ describe('DragAndDropSortInputValidationService', () => {
     });
 
     answerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [equalsListWithAllowedValuesRule],
         goodDefaultOutcome,
         null,
         null
-      ), agof.createNew(
+      ), AnswerGroup.createNew(
         [goodRule1, goodRule2],
         customOutcome,
         null,
@@ -184,8 +177,8 @@ describe('DragAndDropSortInputValidationService', () => {
       }
     })];
     answerGroups = [
-      agof.createNew(rules, customOutcome, null, null),
-      agof.createNew(rules, customOutcome, null, null)
+      AnswerGroup.createNew(rules, customOutcome, null, null),
+      AnswerGroup.createNew(rules, customOutcome, null, null)
     ];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);

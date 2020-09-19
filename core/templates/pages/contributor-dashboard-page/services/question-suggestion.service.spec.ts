@@ -16,6 +16,7 @@
 /**
  * @fileoverview Unit tests for QuestionSuggestionService.
  */
+import { Skill } from 'domain/skill/Skill.model';
 
 describe('Question Suggestion Service', function() {
   let $httpBackend = null;
@@ -23,7 +24,6 @@ describe('Question Suggestion Service', function() {
   let CsrfTokenService = null;
   let QuestionObjectFactory = null;
   let QuestionSuggestionService = null;
-  let SkillObjectFactory = null;
 
   let question = null;
   let skill = null;
@@ -38,7 +38,6 @@ describe('Question Suggestion Service', function() {
       CsrfTokenService = $injector.get('CsrfTokenService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionSuggestionService = $injector.get('QuestionSuggestionService');
-      SkillObjectFactory = $injector.get('SkillObjectFactory');
 
       spyOn(CsrfTokenService, 'getTokenAsync')
         .and.returnValue($q.resolve('sample-csrf-token'));
@@ -68,8 +67,12 @@ describe('Question Suggestion Service', function() {
         skill_contents: skillContentsDict,
         language_code: 'en',
         version: 3,
+        prerequisite_skill_ids: ['skill_1'],
+        all_questions_merged: true,
+        next_misconception_id: null,
+        superseding_skill_id: null
       };
-      skill = SkillObjectFactory.createFromBackendDict(skillDict);
+      skill = Skill.createFromBackendDict(skillDict);
       question = QuestionObjectFactory.createFromBackendDict({
         id: skill.getId(),
         question_state_data: {

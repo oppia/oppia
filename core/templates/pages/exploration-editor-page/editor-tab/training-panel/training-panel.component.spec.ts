@@ -36,7 +36,7 @@ import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { State } from 'domain/state/State.model';
 
 describe('Training Panel Component', function() {
   var ctrl = null;
@@ -47,7 +47,6 @@ describe('Training Panel Component', function() {
   var stateEditorService = null;
   var stateInteractionIdService = null;
   var stateCustomizationArgsService = null;
-  var stateObjectFactory = null;
 
   var stateName = 'State1';
   var state = {
@@ -66,10 +65,12 @@ describe('Training Panel Component', function() {
           },
           labelled_as_correct: true,
           param_changes: [],
-          refresher_exploration_id: null
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: ''
         },
         rule_specs: [],
-        tagged_skill_misconception_id: ''
+        tagged_skill_misconception_id: '',
+        training_data: null
       }, {
         outcome: {
           dest: 'outcome 2',
@@ -79,11 +80,14 @@ describe('Training Panel Component', function() {
           },
           labelled_as_correct: true,
           param_changes: [],
-          refresher_exploration_id: null
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: ''
         },
         rule_specs: [],
-        tagged_skill_misconception_id: ''
+        tagged_skill_misconception_id: '',
+        training_data: null
       }],
+      default_outcome: null,
       confirmed_unclassified_answers: null,
       customization_args: {},
       hints: [],
@@ -105,7 +109,7 @@ describe('Training Panel Component', function() {
     solicit_answer_details: true,
     written_translations: {
       translations_mapping: {}
-    },
+    }
   };
 
   beforeEach(angular.mock.module('oppia'));
@@ -114,7 +118,6 @@ describe('Training Panel Component', function() {
     generateContentIdService = TestBed.get(GenerateContentIdService);
     stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
-    stateObjectFactory = TestBed.get(StateObjectFactory);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -141,7 +144,7 @@ describe('Training Panel Component', function() {
 
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(stateName);
     spyOn(explorationStatesService, 'getState').and.returnValue(
-      stateObjectFactory.createFromBackendDict(stateName, state));
+      State.createFromBackendDict(stateName, state));
     spyOn(generateContentIdService, 'getNextStateId').and.returnValue(
       'feedback_1');
 

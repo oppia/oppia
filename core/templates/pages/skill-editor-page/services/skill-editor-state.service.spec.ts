@@ -26,8 +26,8 @@ import { QuestionSummaryObjectFactory } from
   'domain/question/QuestionSummaryObjectFactory';
 import { QuestionSummaryForOneSkillObjectFactory } from
   'domain/question/QuestionSummaryForOneSkillObjectFactory';
-import { SkillRightsObjectFactory } from
-  'domain/skill/SkillRightsObjectFactory';
+import { Skill } from 'domain/skill/Skill.model';
+import { SkillRightsObjectFactory } from 'domain/skill/SkillRightsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -36,8 +36,7 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 describe('Skill editor state service', function() {
   var SkillEditorStateService = null, $q, $rootScope,
-    SkillObjectFactory = null, SkillUpdateService = null,
-    skillRightsObjectFactory = null;
+    SkillUpdateService = null, skillRightsObjectFactory = null;
   var fakeSkillBackendApiService = null;
   var fakeSkillRightsBackendApiService = null;
   var skillRightsObject = null;
@@ -151,7 +150,6 @@ describe('Skill editor state service', function() {
   beforeEach(angular.mock.inject(function($injector) {
     SkillEditorStateService = $injector.get(
       'SkillEditorStateService');
-    SkillObjectFactory = $injector.get('SkillObjectFactory');
     // The injector is required because this service is directly used in this
     // spec, therefore even though SkillRightsObjectFactory is upgraded to
     // Angular, it cannot be used just by instantiating it by its class but
@@ -183,7 +181,7 @@ describe('Skill editor state service', function() {
 
     var rubricDict = {
       difficulty: skillDifficulties[0],
-      explanation: ['explanation']
+      explanations: ['explanation']
     };
 
     var example1 = {
@@ -231,7 +229,10 @@ describe('Skill editor state service', function() {
       skill_contents: skillContentsDict,
       language_code: 'en',
       version: 3,
-      prerequisite_skill_ids: []
+      prerequisite_skill_ids: [],
+      all_questions_merged: true,
+      next_misconception_id: null,
+      superseding_skill_id: null
     };
 
     skillRightsObject = {
@@ -242,8 +243,8 @@ describe('Skill editor state service', function() {
       skillRightsObject);
 
     fakeSkillBackendApiService.newBackendSkillObject = skillDict;
-    fakeSkillBackendApiService.skillObject = SkillObjectFactory
-      .createFromBackendDict(skillDict);
+    fakeSkillBackendApiService.skillObject = Skill.createFromBackendDict(
+      skillDict);
   }));
 
   it('should request to load the skill from the backend', function() {
@@ -288,7 +289,7 @@ describe('Skill editor state service', function() {
 
   it('should return the last skill loaded as the same object', function() {
     var previousSkill = SkillEditorStateService.getSkill();
-    var expectedSkill = SkillObjectFactory.createFromBackendDict(
+    var expectedSkill = Skill.createFromBackendDict(
       fakeSkillBackendApiService.newBackendSkillObject);
     expect(previousSkill).not.toEqual(expectedSkill);
     SkillEditorStateService.loadSkill('skill_id_1');

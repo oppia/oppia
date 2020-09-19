@@ -18,12 +18,8 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-/* eslint-disable max-len */
-import { ItemSelectionInputValidationService } from
-  'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
-/* eslint-enable max-len */
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { ItemSelectionInputValidationService } from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
 import { Rule } from 'domain/exploration/Rule.model';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
@@ -41,7 +37,6 @@ describe('ItemSelectionInputValidationService', () => {
     goodDefaultOutcome: Outcome = null;
   let customizationArguments: ItemSelectionInputCustomizationArgs = null;
   let IsProperSubsetValidOption: AnswerGroup[] = null;
-  let agof: AnswerGroupObjectFactory = null;
   let ThreeInputsAnswerGroups: AnswerGroup[] = null,
     OneInputAnswerGroups: AnswerGroup[] = null,
     NoInputAnswerGroups: AnswerGroup[] = null;
@@ -53,8 +48,6 @@ describe('ItemSelectionInputValidationService', () => {
 
     validatorService = TestBed.get(ItemSelectionInputValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-
-    agof = TestBed.get(AnswerGroupObjectFactory);
 
     currentState = 'First State';
 
@@ -96,7 +89,7 @@ describe('ItemSelectionInputValidationService', () => {
       null,
       null)
     ];
-    ThreeInputsAnswerGroups = [agof.createNew(
+    ThreeInputsAnswerGroups = [AnswerGroup.createNew(
       [Rule.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
@@ -107,7 +100,7 @@ describe('ItemSelectionInputValidationService', () => {
       null,
       null)
     ];
-    OneInputAnswerGroups = [agof.createNew(
+    OneInputAnswerGroups = [AnswerGroup.createNew(
       [Rule.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
@@ -118,7 +111,7 @@ describe('ItemSelectionInputValidationService', () => {
       null,
       null)
     ];
-    NoInputAnswerGroups = [agof.createNew(
+    NoInputAnswerGroups = [AnswerGroup.createNew(
       [Rule.createFromBackendDict({
         rule_type: 'ContainsAtLeastOneOf',
         inputs: {
@@ -129,7 +122,7 @@ describe('ItemSelectionInputValidationService', () => {
       null,
       null)
     ];
-    IsProperSubsetValidOption = [agof.createNew(
+    IsProperSubsetValidOption = [AnswerGroup.createNew(
       [Rule.createFromBackendDict({
         rule_type: 'IsProperSubsetOf',
         inputs: {

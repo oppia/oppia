@@ -438,14 +438,14 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             interaction_ids_with_ca_frontend_interfaces)
 
     def test_frontend_customization_args_constructor_coverage(self):
-        """Test to ensure that InteractionObjectFactory.ts covers constructing
+        """Test to ensure that Interaction.model.ts covers constructing
         customization arguments for each interaction. Uses regex to confirm
         that the CustomizationArgs or CustomizationArgsBackendDict
         interface is used in the file to typecast customization arguments.
         """
         filepath = os.path.join(
             'core', 'templates', 'domain', 'exploration',
-            'InteractionObjectFactory.ts')
+            'Interaction.model.ts')
         with python_utils.open_file(filepath, 'r', newline='') as f:
             lines = f.readlines()
 

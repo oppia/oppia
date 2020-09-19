@@ -23,8 +23,7 @@ import { StatePropertyService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-property.service';
 import { UtilsService } from 'services/utils.service';
-import { WrittenTranslations } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
+import { WrittenTranslations } from 'domain/exploration/WrittenTranslations.model';
 
 @Injectable({
   providedIn: 'root'

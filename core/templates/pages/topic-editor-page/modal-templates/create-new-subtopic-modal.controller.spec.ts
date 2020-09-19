@@ -18,6 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { Topic } from 'domain/topic/Topic.model';s
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -34,7 +35,6 @@ describe('Create new subtopic modal', function() {
   var $scope = null;
   var ctrl = null;
   var $uibModalInstance = null;
-  var TopicObjectFactory = null;
   var SubtopicValidationService = null;
   var topic = null;
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -42,11 +42,9 @@ describe('Create new subtopic modal', function() {
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
-    TopicObjectFactory =
-            $injector.get('TopicObjectFactory');
     SubtopicValidationService = $injector.get('SubtopicValidationService');
     $scope = $rootScope.$new();
-    topic = TopicObjectFactory.createInterstitialTopic();
+    topic = Topic.createInterstitialTopic();
     ctrl = $controller('CreateNewSubtopicModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,

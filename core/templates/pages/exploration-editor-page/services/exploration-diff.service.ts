@@ -30,7 +30,7 @@ import {
   RenameStateChangeList,
   EditStatePropertyChangeList
 } from 'domain/exploration/ExplorationDraftObjectFactory';
-import { StateObjectsDict } from 'domain/exploration/StatesObjectFactory';
+import { StateObjectsDict } from 'domain/exploration/States.model';
 
 interface ExplorationGraphChangeList {
   changeList: ExplorationChangeList[];

@@ -25,7 +25,7 @@ import { ContributionOpportunitiesBackendApiService } from
 import { SkillOpportunityObjectFactory } from
   'domain/opportunity/SkillOpportunityObjectFactory';
 import { AlertsService } from 'services/alerts.service';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { Skill } from 'domain/skill/Skill.model';
 
 describe('Question opportunities component', function() {
   var ctrl = null;
@@ -35,7 +35,6 @@ describe('Question opportunities component', function() {
   var alertsService = null;
   var contributionOpportunitiesService = null;
   var questionUndoRedoService = null;
-  var skillObjectFactory = null;
   var skillOpportunityObjectFactory = null;
   var userService = null;
 
@@ -47,7 +46,6 @@ describe('Question opportunities component', function() {
     });
 
     alertsService = TestBed.get(AlertsService);
-    skillObjectFactory = TestBed.get(SkillObjectFactory);
     skillOpportunityObjectFactory = TestBed.get(
       SkillOpportunityObjectFactory);
   });
@@ -171,7 +169,7 @@ describe('Question opportunities component', function() {
   it('should open create question modal when creating a question', function() {
     spyOn($uibModal, 'open').and.callThrough();
     ctrl.createQuestion(
-      skillObjectFactory.createFromBackendDict({
+      Skill.createFromBackendDict({
         id: '1',
         description: 'test description',
         misconceptions: [],
@@ -188,6 +186,10 @@ describe('Question opportunities component', function() {
         },
         language_code: 'en',
         version: 3,
+        prerequisite_skill_ids: [],
+        all_questions_merged: true,
+        next_misconception_id: null,
+        superseding_skill_id: null
       }), 1);
     $rootScope.$apply();
 
@@ -206,7 +208,7 @@ describe('Question opportunities component', function() {
 
       openSpy.and.returnValue({
         result: $q.resolve({
-          skill: skillObjectFactory.createFromBackendDict({
+          skill: Skill.createFromBackendDict({
             id: '1',
             description: 'test description',
             misconceptions: [],
@@ -223,6 +225,10 @@ describe('Question opportunities component', function() {
             },
             language_code: 'en',
             version: 3,
+            prerequisite_skill_ids: [],
+            all_questions_merged: true,
+            next_misconception_id: null,
+            superseding_skill_id: null
           }),
           skillDifficulty: 1
         })
@@ -252,7 +258,7 @@ describe('Question opportunities component', function() {
 
       openSpy.and.returnValue({
         result: $q.resolve({
-          skill: skillObjectFactory.createFromBackendDict({
+          skill: Skill.createFromBackendDict({
             id: '1',
             description: 'test description',
             misconceptions: [],
@@ -269,6 +275,10 @@ describe('Question opportunities component', function() {
             },
             language_code: 'en',
             version: 3,
+            prerequisite_skill_ids: [],
+            all_questions_merged: true,
+            next_misconception_id: null,
+            superseding_skill_id: null
           }),
           skillDifficulty: 1
         })

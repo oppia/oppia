@@ -18,26 +18,15 @@
 
 import { EventEmitter } from '@angular/core';
 
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
 import { TestBed } from '@angular/core/testing';
 import { ExplorationDiffService } from '../services/exploration-diff.service';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -81,8 +70,6 @@ describe('History tab component', function() {
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', TestBed.get(AnswerGroupObjectFactory));
     $provide.value('CsrfTokenService', TestBed.get(CsrfTokenService));
     $provide.value('EditabilityService', TestBed.get(EditabilityService));
     $provide.value(
@@ -92,19 +79,8 @@ describe('History tab component', function() {
       'ExplorationDiffService', TestBed.get(ExplorationDiffService));
     $provide.value(
       'FractionObjectFactory', TestBed.get(FractionObjectFactory));
-    $provide.value('StatesObjectFactory', TestBed.get(StatesObjectFactory));
-    $provide.value(
-      'ParamChangeObjectFactory', TestBed.get(ParamChangeObjectFactory));
-    $provide.value(
-      'ParamChangesObjectFactory', TestBed.get(ParamChangesObjectFactory));
     $provide.value('UnitsObjectFactory', TestBed.get(UnitsObjectFactory));
     $provide.value('VersionTreeService', TestBed.get(VersionTreeService));
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      TestBed.get(WrittenTranslationObjectFactory));
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      TestBed.get(WrittenTranslationsObjectFactory));
     $provide.value('ExplorationDataService', {
       explorationId: explorationId,
       data: {

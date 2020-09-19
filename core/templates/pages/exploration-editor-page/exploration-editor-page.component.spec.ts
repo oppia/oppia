@@ -19,25 +19,14 @@
 import { EventEmitter } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { StateEditorService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { ParamSpecsObjectFactory } from
-  'domain/exploration/ParamSpecsObjectFactory';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { UserExplorationPermissionsService } from
-  'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
-import { ExplorationFeaturesBackendApiService } from
-  'services/exploration-features-backend-api.service';
-import { ExplorationFeaturesService } from
-  'services/exploration-features.service';
+import { ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
+import { ExplorationFeaturesService } from 'services/exploration-features.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -190,8 +179,6 @@ describe('Exploration editor page component', function() {
         ExplorationFeaturesService,
         PageTitleService,
         LoaderService,
-        ParamChangesObjectFactory,
-        ParamSpecsObjectFactory,
         SiteAnalyticsService,
         StateClassifierMappingService,
         StateEditorService,

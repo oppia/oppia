@@ -22,7 +22,6 @@ require(
 require('directives/angular-html-bind.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('domain/exploration/SolutionObjectFactory.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'solution-verification.service.ts');

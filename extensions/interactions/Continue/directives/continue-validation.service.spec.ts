@@ -18,17 +18,13 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { ContinueValidationService } from
-  'interactions/Continue/directives/continue-validation.service';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { ContinueValidationService } from 'interactions/Continue/directives/continue-validation.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
 
 import { AppConstants } from 'app.constants';
-import { ContinueCustomizationArgs } from
-  'interactions/customization-args-defs';
+import { ContinueCustomizationArgs } from 'interactions/customization-args-defs';
 
 describe('ContinueValidationService', () => {
   let validatorService: ContinueValidationService;
@@ -37,7 +33,6 @@ describe('ContinueValidationService', () => {
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let customizationArguments: ContinueCustomizationArgs;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -46,7 +41,6 @@ describe('ContinueValidationService', () => {
 
     validatorService = TestBed.get(ContinueValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    agof = TestBed.get(AnswerGroupObjectFactory);
     currentState = 'First State';
     goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
@@ -60,7 +54,8 @@ describe('ContinueValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    goodAnswerGroups = (
+      [AnswerGroup.createNew([], goodDefaultOutcome, null, null)]);
     customizationArguments = {
       buttonText: {
         value: new SubtitledUnicode('Some Button Text', 'ca_buttonText')

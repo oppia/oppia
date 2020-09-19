@@ -18,15 +18,15 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { Misconception } from 'domain/skill/Misconception.model';
+import { Skill } from 'domain/skill/Skill.model';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 describe('Add Misconception Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
-  var MisconceptionObjectFactory = null;
   var SkillEditorStateService = null;
-  var SkillObjectFactory = null;
 
   var skillObject = null;
 
@@ -34,9 +34,7 @@ describe('Add Misconception Modal Controller', function() {
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
-    MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
     SkillEditorStateService = $injector.get('SkillEditorStateService');
-    SkillObjectFactory = $injector.get('SkillObjectFactory');
     var skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -69,7 +67,7 @@ describe('Add Misconception Modal Controller', function() {
         voiceovers_mapping: {}
       }
     };
-    skillObject = SkillObjectFactory.createFromBackendDict({
+    skillObject = Skill.createFromBackendDict({
       id: 'skill1',
       description: 'test description 1',
       misconceptions: [misconceptionDict1, misconceptionDict2],
@@ -77,8 +75,10 @@ describe('Add Misconception Modal Controller', function() {
       skill_contents: skillContentsDict,
       language_code: 'en',
       version: 3,
-      next_misconception_id: '3',
-      prerequisite_skill_ids: ['skill_1']
+      next_misconception_id: 3,
+      prerequisite_skill_ids: ['skill_1'],
+      all_questions_merged: true,
+      superseding_skill_id: null
     });
 
     spyOn(SkillEditorStateService, 'getSkill').and.returnValue(skillObject);
@@ -102,8 +102,7 @@ describe('Add Misconception Modal Controller', function() {
   it('should save misconception when closing the modal', function() {
     $scope.saveMisconception();
     expect($uibModalInstance.close).toHaveBeenCalledWith({
-      misconception: MisconceptionObjectFactory.create(
-        '3', '', '', '', true)
+      misconception: Misconception.create('3', '', '', '', true)
     });
   });
 });

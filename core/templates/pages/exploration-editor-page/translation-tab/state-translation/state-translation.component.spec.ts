@@ -18,74 +18,44 @@
 
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { CkEditorCopyContentService } from
-  'components/ck-editor-helpers/ck-editor-copy-content-service';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
+import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
+import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
+import { AnswerGroupsCacheService } from 'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
 import { Outcome } from 'domain/exploration/Outcome.model';
-import { StateCustomizationArgsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { StateInteractionIdService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { StateSolutionService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-solution.service';
-import { StateEditorService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateRecordedVoiceoversService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import { StateWrittenTranslationsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-written-translations.service';
-import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service.ts';
+import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import { StateWrittenTranslationsService } from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
+import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service.ts';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
-import { ExplorationImprovementsTaskRegistryService } from
-  'services/exploration-improvements-task-registry.service';
+import { ExplorationImprovementsTaskRegistryService } from 'services/exploration-improvements-task-registry.service';
 import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { WrapTextWithEllipsisPipe } from
-  'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-import { ConvertToPlainTextPipe } from
-  'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { FractionObjectFactory } from
-  'domain/objects/FractionObjectFactory';
-import { NumberWithUnitsObjectFactory } from
-  'domain/objects/NumberWithUnitsObjectFactory';
-import { ContinueValidationService } from
-  'interactions/Continue/directives/continue-validation.service';
-import { ContinueRulesService } from
-  'interactions/Continue/directives/continue-rules.service';
+import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
+import { ContinueValidationService } from 'interactions/Continue/directives/continue-validation.service';
+import { ContinueRulesService } from 'interactions/Continue/directives/continue-rules.service';
 import { EventEmitter } from '@angular/core';
 import { ExternalSaveService } from 'services/external-save.service';
-import { RatioObjectFactory } from
-  'domain/objects/RatioObjectFactory';
-import { SubtitledUnicodeObjectFactory } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { RatioObjectFactory } from 'domain/objects/RatioObjectFactory';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
 
 
 describe('State translation component', function() {
   var ctrl = null;
   var $rootScope = null;
   var $scope = null;
-  var answerGroupObjectFactory = null;
   var ckEditorCopyContentService = null;
   var explorationStatesService = null;
   var routerService = null;
   var stateEditorService = null;
   var stateRecordedVoiceoversService = null;
-  var subtitledUnicodeObjectFactory = null;
   var translationLanguageService = null;
   var translationTabActiveContentIdService = null;
   var translationTabActiveModeService = null;
@@ -406,14 +376,12 @@ describe('State translation component', function() {
       providers: [WrapTextWithEllipsisPipe, ConvertToPlainTextPipe]
     });
 
-    answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     ckEditorCopyContentService = TestBed.get(CkEditorCopyContentService);
     stateEditorService = TestBed.get(StateEditorService);
     spyOnProperty(stateEditorService, 'onRefreshStateTranslation').and
       .returnValue(refreshStateTranslationEmitter);
     stateRecordedVoiceoversService = TestBed.get(
       StateRecordedVoiceoversService);
-    subtitledUnicodeObjectFactory = TestBed.get(SubtitledUnicodeObjectFactory);
   });
 
   afterEach(function() {
@@ -715,11 +683,9 @@ describe('State translation component', function() {
       });
 
     it('should get summary answer group', function() {
-      expect($scope.summarizeAnswerGroup(
-        answerGroupObjectFactory.createNew(
-          [],
-          Outcome.createNew('unused', '1', 'Feedback text', []),
-          'Training data text', '0'), '1', {}, true))
+      expect($scope.summarizeAnswerGroup(AnswerGroup.createNew(
+        [], Outcome.createNew('unused', '1', 'Feedback text', []),
+        'Training data text', '0'), '1', {}, true))
         .toBe('[Answer] Feedback text');
     });
   });
@@ -857,12 +823,12 @@ describe('State translation component', function() {
       expect($scope.getSubtitledContentSummary(subtitledObject)).toBe(
         'This is the html');
 
-      subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict(
+      var subtitledObject2 = SubtitledUnicode.createFromBackendDict(
         {
           content_id: 'content_1',
           unicode_str: 'This is the unicode'
         });
-      expect($scope.getSubtitledContentSummary(subtitledObject)).toBe(
+      expect($scope.getSubtitledContentSummary(subtitledObject2)).toBe(
         'This is the unicode');
     });
 
@@ -996,7 +962,7 @@ describe('State translation component', function() {
       ).and.returnValue({
         testCa: {
           value: {
-            unicode: subtitledUnicodeObjectFactory.createDefault('', 'ca_0'),
+            unicode: SubtitledUnicode.createDefault('', 'ca_0'),
             html: [SubtitledHtml.createDefault('', 'ca_1')]
           }
         }

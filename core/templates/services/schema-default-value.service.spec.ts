@@ -19,11 +19,9 @@
 import { TestBed } from '@angular/core/testing';
 
 import { LoggerService } from 'services/contextual/logger.service';
-import { SchemaDefaultValueService } from
-  'services/schema-default-value.service';
+import { SchemaDefaultValueService } from 'services/schema-default-value.service';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
 
 describe('Schema Default Value Service', () => {
   let sdvs, ls;

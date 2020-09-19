@@ -17,7 +17,6 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { AlertsService } from 'services/alerts.service';
 import { SuggestionThreadObjectFactory } from
@@ -52,7 +51,6 @@ describe('Feedback Tab Component', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
-    $provide.value('StateObjectFactory', TestBed.get(StateObjectFactory));
     $provide.value(
       'SuggestionModalService', TestBed.get(SuggestionModalService));
     $provide.value('RouterService', {});

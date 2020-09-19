@@ -18,6 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
+import { ReadOnlySubtopicPageData } from 'domain/subtopic_viewer/ReadOnlySubtopicPage.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 import { TestBed } from '@angular/core/testing';
@@ -33,7 +34,6 @@ describe('Subtopic viewer page', function() {
   var $q = null;
   var $scope = null;
   var AlertsService = null;
-  var ReadOnlySubtopicPageObjectFactory = null;
   var SubtopicViewerBackendApiService = null;
   var UrlService = null;
   var WindowDimensionsService = null;
@@ -62,8 +62,6 @@ describe('Subtopic viewer page', function() {
     var $rootScope = $injector.get('$rootScope');
     AlertsService = $injector.get('AlertsService');
     ContextService = $injector.get('ContextService');
-    ReadOnlySubtopicPageObjectFactory = $injector.get(
-      'ReadOnlySubtopicPageObjectFactory');
     SubtopicViewerBackendApiService = $injector.get(
       'SubtopicViewerBackendApiService');
     UrlService = $injector.get('UrlService');
@@ -83,7 +81,7 @@ describe('Subtopic viewer page', function() {
     spyOn(UrlService, 'getSubtopicUrlFragmentFromLearnerUrl').and.returnValue(
       subtopicUrlFragment);
     var subtopicDataObject = (
-      ReadOnlySubtopicPageObjectFactory.createFromBackendDict({
+      ReadOnlySubtopicPageData.createFromBackendDict({
         topic_id: topicId,
         topic_name: topicName,
         subtopic_title: subtopicTitle,
@@ -97,7 +95,7 @@ describe('Subtopic viewer page', function() {
           }
         },
         next_subtopic_dict: {
-          id: '1',
+          id: 1,
           title: '',
           skill_ids: [],
           thumbnail_filename: '',

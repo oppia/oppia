@@ -15,14 +15,14 @@
 /**
  * @fileoverview Unit tests for the Create new skill modal controller.
  */
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model'
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
+import { Rubric } from 'domain/skill/Rubric.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Create new skill modal', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var skillDifficulties = null;
-  var RubricObjectFactory = null;
   var COMPONENT_NAME_EXPLANATION = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -38,7 +38,6 @@ describe('Create new skill modal', function() {
       '$uibModalInstance', ['close', 'dismiss']);
     skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
     COMPONENT_NAME_EXPLANATION = $injector.get('COMPONENT_NAME_EXPLANATION');
-    RubricObjectFactory = $injector.get('RubricObjectFactory');
     $scope = $rootScope.$new();
     $controller('CreateNewSkillModalController', {
       $scope: $scope,
@@ -49,9 +48,9 @@ describe('Create new skill modal', function() {
   it('should initialize $scope properties after controller is initialized',
     function() {
       var rubrics = [
-        RubricObjectFactory.create(skillDifficulties[0], []),
-        RubricObjectFactory.create(skillDifficulties[1], ['']),
-        RubricObjectFactory.create(skillDifficulties[2], [])];
+        Rubric.create(skillDifficulties[0], []),
+        Rubric.create(skillDifficulties[1], ['']),
+        Rubric.create(skillDifficulties[2], [])];
 
       expect($scope.newSkillDescription).toEqual('');
       expect($scope.errorMsg).toEqual('');
@@ -119,9 +118,9 @@ describe('Create new skill modal', function() {
 
   it('should close the modal with skill input values', function() {
     var rubrics = [
-      RubricObjectFactory.create(skillDifficulties[0], []),
-      RubricObjectFactory.create(skillDifficulties[1], ['Large addition']),
-      RubricObjectFactory.create(skillDifficulties[2], [])];
+      Rubric.create(skillDifficulties[0], []),
+      Rubric.create(skillDifficulties[1], ['Large addition']),
+      Rubric.create(skillDifficulties[2], [])];
     var explanationObject = SubtitledHtml.createDefault(
       $scope.bindableDict.displayedConceptCardExplanation,
       COMPONENT_NAME_EXPLANATION);

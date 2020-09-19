@@ -17,13 +17,12 @@
  */
 
 import { EventEmitter } from '@angular/core';
-
+import { Exploration } from 'domain/exploration/Exploration.model';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
 require('domain/collection/guest-collection-progress.service.ts');
 require('domain/exploration/editable-exploration-backend-api.service.ts');
-require('domain/exploration/ExplorationObjectFactory.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
 require('domain/utilities/language-util.service.ts');
@@ -63,7 +62,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
   'AlertsService', 'AnswerClassificationService',
   'AudioPreloaderService', 'AudioTranslationLanguageService', 'ContextService',
   'ExplorationFeaturesBackendApiService', 'ExplorationHtmlFormatterService',
-  'ExplorationObjectFactory', 'ExpressionInterpolationService',
+  'ExpressionInterpolationService',
   'FocusManagerService', 'ImagePreloaderService', 'LearnerParamsService',
   'PlayerTranscriptService', 'ReadOnlyExplorationBackendApiService',
   'StateCardObjectFactory', 'StatsReportingService', 'UrlService',
@@ -71,7 +70,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
       AlertsService, AnswerClassificationService,
       AudioPreloaderService, AudioTranslationLanguageService, ContextService,
       ExplorationFeaturesBackendApiService, ExplorationHtmlFormatterService,
-      ExplorationObjectFactory, ExpressionInterpolationService,
+      ExpressionInterpolationService,
       FocusManagerService, ImagePreloaderService, LearnerParamsService,
       PlayerTranscriptService, ReadOnlyExplorationBackendApiService,
       StateCardObjectFactory, StatsReportingService, UrlService) {
@@ -279,7 +278,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
           autoTtsEnabled, successCallback) {
         answerIsBeingProcessed = false;
         if (_editorPreviewMode) {
-          exploration = ExplorationObjectFactory.createFromBackendDict(
+          exploration = Exploration.createFromBackendDict(
             explorationDict);
           exploration.setInitialStateName(initStateName);
           visitedStateNames = [exploration.getInitialState().name];
@@ -293,7 +292,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
           AudioPreloaderService.kickOffAudioPreloader(initStateName);
           _loadInitialState(successCallback);
         } else {
-          exploration = ExplorationObjectFactory.createFromBackendDict(
+          exploration = Exploration.createFromBackendDict(
             explorationDict);
           visitedStateNames.push(exploration.getInitialState().name);
           version = explorationVersion;

@@ -15,11 +15,11 @@
 /**
  * @fileoverview Controller for TrainingModal.
  */
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+
 require(
   'pages/exploration-editor-page/editor-tab/training-panel/' +
   'training-panel.component.ts');
-
-require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/angular-name.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -59,13 +59,13 @@ require(
 
 angular.module('oppia').controller('TrainingModalController', [
   '$injector', '$scope', '$uibModalInstance', 'AngularNameService',
-  'AnswerClassificationService', 'AnswerGroupObjectFactory',
+  'AnswerClassificationService',
   'ExplorationStatesService', 'ExplorationWarningsService', 'GraphDataService',
   'ResponsesService', 'StateEditorService', 'StateInteractionIdService',
   'TrainingDataService', 'finishTrainingCallback', 'unhandledAnswer',
   function(
       $injector, $scope, $uibModalInstance, AngularNameService,
-      AnswerClassificationService, AnswerGroupObjectFactory,
+      AnswerClassificationService,
       ExplorationStatesService, ExplorationWarningsService, GraphDataService,
       ResponsesService, StateEditorService, StateInteractionIdService,
       TrainingDataService, finishTrainingCallback, unhandledAnswer) {
@@ -106,7 +106,7 @@ angular.module('oppia').controller('TrainingModalController', [
       var index = $scope.classification.answerGroupIndex;
       if (index > ResponsesService.getAnswerGroupCount()) {
         var newOutcome = $scope.classification.newOutcome;
-        var newAnswerGroup = AnswerGroupObjectFactory.createNew(
+        var newAnswerGroup = AnswerGroup.createNew(
           [], angular.copy(newOutcome), [unhandledAnswer], null);
         _saveNewAnswerGroup(newAnswerGroup);
         TrainingDataService.associateWithAnswerGroup(

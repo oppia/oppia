@@ -18,20 +18,10 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // question-update.service.ts is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
+import { ChangeObjectFactory } from 'domain/editor/undo_redo/ChangeObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
+import { State } from 'domain/state/State.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 // ^^^ This block is to be removed.
@@ -40,7 +30,6 @@ require('App.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/question/question-update.service.ts');
-require('domain/state/StateObjectFactory.ts');
 require(
   'components/question-directives/question-editor/' +
   'question-editor.directive.ts');
@@ -49,7 +38,6 @@ describe('Question update service', function() {
   var QuestionUpdateService = null;
   var QuestionObjectFactory = null;
   var QuestionUndoRedoService = null;
-  var StateObjectFactory = null;
   var sampleQuestion = null;
   var sampleStateDict = null;
   var expectedOutputStateDict = null;
@@ -58,22 +46,9 @@ describe('Question update service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory());
     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
-      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-        new ParamChangeObjectFactory()));
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -85,7 +60,6 @@ describe('Question update service', function() {
     QuestionUpdateService = $injector.get('QuestionUpdateService');
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
     QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
-    StateObjectFactory = $injector.get('StateObjectFactory');
 
     sampleStateDict = {
       name: 'question',
@@ -203,7 +177,7 @@ describe('Question update service', function() {
       }
     };
 
-    expectedOutputState = StateObjectFactory.createFromBackendDict(
+    expectedOutputState = State.createFromBackendDict(
       'question', expectedOutputStateDict);
 
     sampleQuestionBackendObject = {

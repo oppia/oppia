@@ -22,33 +22,26 @@ import { Injectable } from '@angular/core';
 import { group } from 'd3-array';
 
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
-import { States } from 'domain/exploration/StatesObjectFactory';
-import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
+import { States } from 'domain/exploration/States.model';
+import { ExplorationImprovementsConfig } from 'domain/improvements/exploration-improvements-config-object.factory';
 import {
   ExplorationTask,
   ExplorationTaskObjectFactory,
   ExplorationTaskType,
 } from 'domain/improvements/ExplorationTaskObjectFactory';
-import { HighBounceRateTask } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
-import { ImprovementsConstants } from
-  'domain/improvements/improvements.constants';
-import { IneffectiveFeedbackLoopTask } from
-  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
-import { NeedsGuidingResponsesTask } from
-  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
-import { SuccessiveIncorrectAnswersTask } from
-  'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
-import { State } from 'domain/state/StateObjectFactory';
+import { HighBounceRateTask } from 'domain/improvements/HighBounceRateTaskObjectFactory';
+import { ImprovementsConstants } from 'domain/improvements/improvements.constants';
+import { IneffectiveFeedbackLoopTask } from 'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
+import { NeedsGuidingResponsesTask } from 'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
+import { SuccessiveIncorrectAnswersTask } from 'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
+import { State } from 'domain/state/State.model';
 import {
   CyclicStateTransitionsPlaythroughIssue,
   EarlyQuitPlaythroughIssue,
   MultipleIncorrectSubmissionsPlaythroughIssue,
   PlaythroughIssue
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
-import { ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
+import { ExplorationStats } from 'domain/statistics/ExplorationStatsObjectFactory';
 import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
 
 type HbrTask = HighBounceRateTask;

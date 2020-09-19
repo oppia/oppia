@@ -19,11 +19,9 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { CamelCaseToHyphensPipe } from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ContextService } from 'services/context.service';
-import { ExplorationObjectFactory } from
-  'domain/exploration/ExplorationObjectFactory';
+import { Exploration } from 'domain/exploration/Exploration.model';
 import { ExtractImageFilenamesFromStateService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
@@ -31,7 +29,6 @@ import { ExtractImageFilenamesFromStateService } from
 
 describe('Extracting Image file names in the state service', () => {
   let eifss: ExtractImageFilenamesFromStateService;
-  let eof: ExplorationObjectFactory;
   let ecs: ContextService;
   let explorationDict;
   let ImageFilenamesInExploration;
@@ -39,7 +36,6 @@ describe('Extracting Image file names in the state service', () => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
     });
-    eof = TestBed.get(ExplorationObjectFactory);
     ecs = TestBed.get(ContextService);
     eifss = TestBed.get(ExtractImageFilenamesFromStateService);
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
@@ -665,7 +661,7 @@ describe('Extracting Image file names in the state service', () => {
 
   it('should get all the filenames of the images in a state',
     () => {
-      let exploration = eof.createFromBackendDict(explorationDict);
+      let exploration = Exploration.createFromBackendDict(explorationDict);
       let states = exploration.getStates();
       let stateNames = states.getStateNames();
       stateNames.forEach((statename) => {

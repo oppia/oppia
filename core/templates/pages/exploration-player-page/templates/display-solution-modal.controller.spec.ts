@@ -17,11 +17,10 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { InteractionObjectFactory } from
-  'domain/exploration/InteractionObjectFactory';
+import { Interaction } from 'domain/exploration/Interaction.model';
 import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
-import { StateCardObjectFactory } from
-  'domain/state_card/StateCardObjectFactory';
+import { Solution } from 'domain/exploration/Solution.model';
+import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
 
 import { Subscription } from 'rxjs';
 
@@ -34,9 +33,7 @@ describe('Display Solution Modal Controller', function() {
   var AudioTranslationManagerService = null;
   var ContextService = null;
   var HintsAndSolutionManagerService = null;
-  var interactionObjectFactory = null;
   var playerTranscriptService = null;
-  var SolutionObjectFactory = null;
   var stateCardObjectFactory = null;
 
   var card = null;
@@ -47,7 +44,6 @@ describe('Display Solution Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
-    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
   });
 
@@ -64,17 +60,16 @@ describe('Display Solution Modal Controller', function() {
     HintsAndSolutionManagerService = $injector.get(
       'HintsAndSolutionManagerService');
     playerTranscriptService = $injector.get('PlayerTranscriptService');
-    SolutionObjectFactory = $injector.get('SolutionObjectFactory');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
 
-    solution = SolutionObjectFactory.createNew(
+    solution = Solution.createNew(
       true, 'Correct answer', 'Explanation html', 'exp1');
     spyOn(HintsAndSolutionManagerService, 'displaySolution').and.returnValue(
       solution);
 
-    var interaction = interactionObjectFactory.createFromBackendDict({
+    var interaction = Interaction.createFromBackendDict({
       answer_groups: [],
       confirmed_unclassified_answers: [],
       customization_args: {
@@ -82,7 +77,9 @@ describe('Display Solution Modal Controller', function() {
         rows: {value: 1}
       },
       hints: [],
-      id: 'TextInput'
+      id: 'TextInput',
+      default_outcome: null,
+      solution: null
     });
     var recordedVoiceovers = RecordedVoiceovers.createEmpty();
     card = stateCardObjectFactory.createNewCard(

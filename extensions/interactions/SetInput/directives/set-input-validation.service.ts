@@ -19,13 +19,10 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
 import { AppConstants } from 'app.constants';
-import { Warning, baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
-import { SetInputCustomizationArgs } from
-  'interactions/customization-args-defs';
+import { Warning, baseInteractionValidationService } from 'interactions/base-interaction-validation.service';
+import { SetInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { Outcome } from 'domain/exploration/Outcome.model';
 import { Rule } from 'domain/exploration/Rule.model';
 

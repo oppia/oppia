@@ -18,34 +18,15 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // image-preloader.service.ts is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { AudioFileObjectFactory } from
-  'domain/utilities/AudioFileObjectFactory';
-import { FileDownloadRequestObjectFactory } from
-  'domain/utilities/FileDownloadRequestObjectFactory';
+import { Exploration } from 'domain/exploration/Exploration.model';
+import { AudioFileObjectFactory } from 'domain/utilities/AudioFileObjectFactory';
+import { FileDownloadRequestObjectFactory } from 'domain/utilities/FileDownloadRequestObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { ImageFileObjectFactory } from
-  'domain/utilities/ImageFileObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { ParamSpecObjectFactory } from
-  'domain/exploration/ParamSpecObjectFactory';
-import { ParamSpecsObjectFactory } from
-  'domain/exploration/ParamSpecsObjectFactory';
-import { ParamTypeObjectFactory } from
-  'domain/exploration/ParamTypeObjectFactory';
+import { ImageFileObjectFactory } from 'domain/utilities/ImageFileObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/exploration/ExplorationObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('services/assets-backend-api.service.ts');
@@ -54,7 +35,6 @@ require('services/context.service.ts');
 describe('Image preloader service', function() {
   var abas = null;
   var ips = null;
-  var eof = null;
   var ecs = null;
   var $httpBackend = null;
   var UrlInterpolationService = null;
@@ -68,35 +48,13 @@ describe('Image preloader service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module('oppia', function($provide) {
-      $provide.value(
-        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory());
       $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());
       $provide.value(
         'FileDownloadRequestObjectFactory',
         new FileDownloadRequestObjectFactory());
       $provide.value('FractionObjectFactory', new FractionObjectFactory());
       $provide.value('ImageFileObjectFactory', new ImageFileObjectFactory());
-      $provide.value(
-        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-      $provide.value(
-        'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-          new ParamChangeObjectFactory()));
-      $provide.value(
-        'ParamSpecObjectFactory',
-        new ParamSpecObjectFactory(new ParamTypeObjectFactory()));
-      $provide.value(
-        'ParamSpecsObjectFactory',
-        new ParamSpecsObjectFactory(
-          new ParamSpecObjectFactory(new ParamTypeObjectFactory())));
-      $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
       $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-      $provide.value(
-        'WrittenTranslationObjectFactory',
-        new WrittenTranslationObjectFactory());
-      $provide.value(
-        'WrittenTranslationsObjectFactory',
-        new WrittenTranslationsObjectFactory(
-          new WrittenTranslationObjectFactory()));
     });
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
@@ -131,7 +89,6 @@ describe('Image preloader service', function() {
     $httpBackend = $injector.get('$httpBackend');
     UrlInterpolationService = $injector.get('UrlInterpolationService');
     ips = $injector.get('ImagePreloaderService');
-    eof = $injector.get('ExplorationObjectFactory');
     ecs = $injector.get('ContextService');
     abas = $injector.get('AssetsBackendApiService');
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
@@ -446,7 +403,7 @@ describe('Image preloader service', function() {
         filename: 's6Hint1_height_60_width_60.png'
       });
 
-    exploration = eof.createFromBackendDict(explorationDict);
+    exploration = Exploration.createFromBackendDict(explorationDict);
   }));
 
   it('should be in exploration player after init is called', function() {

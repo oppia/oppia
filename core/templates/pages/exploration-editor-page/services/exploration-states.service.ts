@@ -18,12 +18,12 @@
  * keeps no mementos.
  */
 
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { Interaction } from 'domain/exploration/Interaction.model';
+import { States } from 'domain/exploration/States.model';
 
 require(
   'pages/exploration-editor-page/editor-tab/templates/' +
   'modal-templates/confirm-delete-state-modal.controller.ts');
-require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('pages/exploration-editor-page/services/angular-name.service.ts');
@@ -52,13 +52,13 @@ angular.module('oppia').factory('ExplorationStatesService', [
   'AlertsService', 'AngularNameService', 'AnswerClassificationService',
   'ChangeListService', 'ContextService', 'ExplorationInitStateNameService',
   'SolutionValidityService', 'StateEditorRefreshService', 'StateEditorService',
-  'StatesObjectFactory', 'UrlInterpolationService', 'ValidatorsService',
+  'UrlInterpolationService', 'ValidatorsService',
   function(
       $filter, $injector, $location, $q, $uibModal,
       AlertsService, AngularNameService, AnswerClassificationService,
       ChangeListService, ContextService, ExplorationInitStateNameService,
       SolutionValidityService, StateEditorRefreshService, StateEditorService,
-      StatesObjectFactory, UrlInterpolationService, ValidatorsService) {
+      UrlInterpolationService, ValidatorsService) {
     var _states = null;
 
     var stateAddedCallbacks = [];
@@ -267,7 +267,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
     // TODO(sll): Add unit tests for all get/save methods.
     return {
       init: function(statesBackendDict) {
-        _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
+        _states = States.createFromBackendDict(statesBackendDict);
         // Initialize the solutionValidityService.
         SolutionValidityService.init(_states.getStateNames());
         _states.getStateNames().forEach(function(stateName) {

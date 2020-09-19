@@ -16,14 +16,13 @@
  * @fileoverview Directive for the parameter changes editor (which is shown in
  * both the exploration settings tab and the state editor page).
  */
-
+import { ParamChange } from 'domain/exploration/ParamChange.model';
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
   'pages/exploration-editor-page/param-changes-editor/' +
   'value-generator-editor.directive.ts');
 
-require('domain/exploration/ParamChangeObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
@@ -47,13 +46,11 @@ angular.module('oppia').component('paramChangesEditor', {
   controller: [
     '$scope', 'AlertsService', 'EditabilityService',
     'ExplorationParamSpecsService', 'ExplorationStatesService',
-    'ExternalSaveService', 'ParamChangeObjectFactory',
-    'UrlInterpolationService', 'INVALID_PARAMETER_NAMES',
+    'ExternalSaveService', 'UrlInterpolationService', 'INVALID_PARAMETER_NAMES',
     function(
         $scope, AlertsService, EditabilityService,
         ExplorationParamSpecsService, ExplorationStatesService,
-        ExternalSaveService, ParamChangeObjectFactory,
-        UrlInterpolationService, INVALID_PARAMETER_NAMES) {
+        ExternalSaveService, UrlInterpolationService, INVALID_PARAMETER_NAMES) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var generateParamNameChoices = function() {
@@ -70,8 +67,7 @@ angular.module('oppia').component('paramChangesEditor', {
         var newParamName = (
           $scope.paramNameChoices.length > 0 ?
             $scope.paramNameChoices[0].id : 'x');
-        var newParamChange = ParamChangeObjectFactory.createDefault(
-          newParamName);
+        var newParamChange = ParamChange.createDefault(newParamName);
         // Add the new param name to $scope.paramNameChoices, if necessary,
         // so that it shows up in the dropdown.
         if (ExplorationParamSpecsService.displayed.addParamIfNew(

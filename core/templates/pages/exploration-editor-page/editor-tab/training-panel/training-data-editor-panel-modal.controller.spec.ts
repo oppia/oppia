@@ -18,6 +18,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { Interaction } from 'domain/exploration/Interaction.model';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 describe('TrainingDataEditorPanelServiceModalController', function() {
@@ -25,7 +26,6 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
   var $uibModalInstance = null;
   var ExplorationStatesService = null;
   var ResponsesService = null;
-  var InteractionObjectFactory = null;
   var StateInteractionIdService = null;
   var StateCustomizationArgsService = null;
   var TrainingModalService = null;
@@ -53,7 +53,6 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       ExplorationStatesService = $injector.get('ExplorationStatesService');
       ResponsesService = $injector.get('ResponsesService');
-      InteractionObjectFactory = $injector.get('InteractionObjectFactory');
       StateInteractionIdService = $injector.get('StateInteractionIdService');
       StateCustomizationArgsService = $injector.get(
         'StateCustomizationArgsService');
@@ -112,7 +111,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           },
         },
       });
-      ResponsesService.init(InteractionObjectFactory.createFromBackendDict({
+      ResponsesService.init(Interaction.createFromBackendDict({
         id: 'TextInput',
         answer_groups: [{
           outcome: {
@@ -121,6 +120,10 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               content_id: 'feedback_2',
               html: ''
             },
+            labelled_as_correct: true,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
           rule_specs: [{
             rule_type: '',
@@ -129,7 +132,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               y: ['a', 'b', 'c']
             }
           }],
-          training_data: ['Answer1', 'Answer2']
+          training_data: ['Answer1', 'Answer2'],
+          tagged_skill_misconception_id: null
         }],
         default_outcome: {
           dest: 'Hola',
@@ -137,6 +141,10 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
             content_id: 'feedback_1',
             html: '',
           },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
         },
         confirmed_unclassified_answers: [],
         customization_args: {
@@ -149,6 +157,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           rows: { value: 1 }
         },
         hints: [],
+        solution: null
       }));
       ResponsesService.changeActiveAnswerGroupIndex(0);
       StateInteractionIdService.init('Hola', 'TextInput');
@@ -254,7 +263,6 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       ExplorationStatesService = $injector.get('ExplorationStatesService');
       ResponsesService = $injector.get('ResponsesService');
-      InteractionObjectFactory = $injector.get('InteractionObjectFactory');
       StateInteractionIdService = $injector.get('StateInteractionIdService');
       StateCustomizationArgsService = $injector.get(
         'StateCustomizationArgsService');
@@ -313,7 +321,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           },
         },
       });
-      ResponsesService.init(InteractionObjectFactory.createFromBackendDict({
+      ResponsesService.init(Interaction.createFromBackendDict({
         id: 'TextInput',
         answer_groups: [{
           outcome: {
@@ -322,9 +330,14 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               content_id: 'feedback_2',
               html: ''
             },
+            labelled_as_correct: true,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
           rule_specs: [],
-          training_data: ['Answer1', 'Answer2']
+          training_data: ['Answer1', 'Answer2'],
+          tagged_skill_misconception_id: null
         }],
         default_outcome: {
           dest: 'Hola',
@@ -332,6 +345,10 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
             content_id: 'feedback_1',
             html: '',
           },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
         },
         confirmed_unclassified_answers: [],
         customization_args: {
@@ -346,6 +363,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           }
         },
         hints: [],
+        solution: null
       }));
       ResponsesService.changeActiveAnswerGroupIndex(0);
       StateInteractionIdService.init('Hola', 'TextInput');
@@ -383,7 +401,6 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       ExplorationStatesService = $injector.get('ExplorationStatesService');
       ResponsesService = $injector.get('ResponsesService');
-      InteractionObjectFactory = $injector.get('InteractionObjectFactory');
       StateInteractionIdService = $injector.get('StateInteractionIdService');
       StateCustomizationArgsService = $injector.get(
         'StateCustomizationArgsService');
@@ -442,7 +459,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           },
         },
       });
-      ResponsesService.init(InteractionObjectFactory.createFromBackendDict({
+      ResponsesService.init(Interaction.createFromBackendDict({
         id: 'TextInput',
         answer_groups: [{
           outcome: {
@@ -451,9 +468,14 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
               content_id: 'feedback_2',
               html: ''
             },
+            labelled_as_correct: true,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
           rule_specs: [],
-          training_data: ['Answer1']
+          training_data: ['Answer1'],
+          tagged_skill_misconception_id: null
         }],
         default_outcome: {
           dest: 'Hola',
@@ -461,6 +483,10 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
             content_id: 'feedback_1',
             html: '',
           },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
         },
         confirmed_unclassified_answers: [],
         customization_args: {
@@ -473,6 +499,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
           rows: { value: 1 }
         },
         hints: [],
+        solution: null
       }));
       ResponsesService.changeActiveAnswerGroupIndex(0);
       StateInteractionIdService.init('Hola', 'TextInput');

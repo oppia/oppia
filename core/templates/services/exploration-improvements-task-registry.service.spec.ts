@@ -18,29 +18,21 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerStatsObjectFactory, AnswerStatsBackendDict } from
-  'domain/exploration/AnswerStatsObjectFactory';
+import { AnswerStatsObjectFactory, AnswerStatsBackendDict } from 'domain/exploration/AnswerStatsObjectFactory';
 import {
   ExplorationTask,
   ExplorationTaskType,
   ExplorationTaskBackendDict,
   ExplorationTaskObjectFactory
 } from 'domain/improvements/ExplorationTaskObjectFactory';
-import { HighBounceRateTask } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
-import { StateStatsBackendDict } from
-  'domain/statistics/StateStatsObjectFactory';
-import { IneffectiveFeedbackLoopTask } from
-  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
-import { NeedsGuidingResponsesTask } from
-  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
-import { SuccessiveIncorrectAnswersTask } from
-  'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
-import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
-import { StateBackendDict } from 'domain/state/StateObjectFactory';
-import { ExplorationStatsObjectFactory, ExplorationStatsBackendDict } from
-  'domain/statistics/ExplorationStatsObjectFactory';
+import { HighBounceRateTask } from 'domain/improvements/HighBounceRateTaskObjectFactory';
+import { StateStatsBackendDict } from  'domain/statistics/StateStatsObjectFactory';
+import { IneffectiveFeedbackLoopTask } from 'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
+import { NeedsGuidingResponsesTask } from 'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
+import { SuccessiveIncorrectAnswersTask } from 'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
+import { ExplorationImprovementsConfig } from 'domain/improvements/exploration-improvements-config-object.factory';
+import { StateBackendDict } from 'domain/state/State.model';
+import { ExplorationStatsObjectFactory, ExplorationStatsBackendDict } from 'domain/statistics/ExplorationStatsObjectFactory';
 import {
   CyclicStateTransitionsPlaythroughIssue,
   EarlyQuitPlaythroughIssue,
@@ -50,9 +42,8 @@ import {
   MultipleIncorrectSubmissionsPlaythroughIssue,
   PlaythroughIssueObjectFactory,
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { ExplorationImprovementsTaskRegistryService } from
-  'services/exploration-improvements-task-registry.service';
+import { States } from 'domain/exploration/States.model';
+import { ExplorationImprovementsTaskRegistryService } from 'services/exploration-improvements-task-registry.service';
 
 
 describe('Exploration improvements task registrar service', () => {
@@ -62,7 +53,6 @@ describe('Exploration improvements task registrar service', () => {
   let explorationStatsObjectFactory: ExplorationStatsObjectFactory;
   let explorationTaskObjectFactory: ExplorationTaskObjectFactory;
   let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory;
-  let statesObjectFactory: StatesObjectFactory;
 
   let answerStatsBackendDict: AnswerStatsBackendDict;
   let cstPlaythroughIssueBackendDict:
@@ -89,7 +79,6 @@ describe('Exploration improvements task registrar service', () => {
     explorationStatsObjectFactory = TestBed.get(ExplorationStatsObjectFactory);
     explorationTaskObjectFactory = TestBed.get(ExplorationTaskObjectFactory);
     playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
-    statesObjectFactory = TestBed.get(StatesObjectFactory);
 
     config = new ExplorationImprovementsConfig(
       expId, expVersion, true, 0.25, 0.20, 100);
@@ -242,7 +231,7 @@ describe('Exploration improvements task registrar service', () => {
       return <T> explorationTaskObjectFactory.createFromBackendDict(dict);
     });
   const makeStates = (map = statesBackendDict) => {
-    return statesObjectFactory.createFromBackendDict(map);
+    return States.createFromBackendDict(map);
   };
   const makeExpStats = (dict = expStatsBackendDict) => {
     return explorationStatsObjectFactory.createFromBackendDict(dict);

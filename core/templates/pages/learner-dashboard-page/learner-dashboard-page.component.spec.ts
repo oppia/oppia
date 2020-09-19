@@ -18,6 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { Exploration } from 'domain/exploration/Exploration.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -37,7 +38,6 @@ describe('Learner dashboard page', function() {
   var collectionSummaryObjectFactory = null;
   var CsrfTokenService = null;
   var DateTimeFormatService = null;
-  var ExplorationObjectFactory = null;
   var feedbackThreadSummaryObjectFactory = null;
   var LearnerDashboardBackendApiService = null;
   var learnerExplorationSummaryObjectFactory = null;
@@ -71,7 +71,6 @@ describe('Learner dashboard page', function() {
         'CollectionSummaryObjectFactory');
       CsrfTokenService = $injector.get('CsrfTokenService');
       DateTimeFormatService = $injector.get('DateTimeFormatService');
-      ExplorationObjectFactory = $injector.get('ExplorationObjectFactory');
       feedbackThreadSummaryObjectFactory = $injector.get(
         'FeedbackThreadSummaryObjectFactory');
       LearnerDashboardBackendApiService = $injector.get(
@@ -97,7 +96,7 @@ describe('Learner dashboard page', function() {
             param_changes: [],
             content: {
               html: '',
-              audio_translations: {}
+              content_id: null
             },
             recorded_voiceovers: {
               voiceovers_mapping: {}
@@ -114,13 +113,20 @@ describe('Learner dashboard page', function() {
                 dest: 'Introduction',
                 feedback: {
                   html: '',
-                  audio_translations: {}
-                }
+                  content_id: null
+                },
+                labelled_as_correct: null,
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
               },
               hints: [],
               confirmed_unclassified_answers: [],
-              id: null
-            }
+              id: null,
+              solution: null
+            },
+            classifier_model_id: null,
+            solicit_answer_details: null,
+            next_content_id_index: null
           }
         },
         param_changes: [],
@@ -182,7 +188,7 @@ describe('Learner dashboard page', function() {
       // Generate completed explorations and exploration playlist.
       for (let i = 0; i < 10; i++) {
         learnerDashboardData.completed_explorations_list[i] = (
-          ExplorationObjectFactory.createFromBackendDict(
+          Exploration.createFromBackendDict(
             Object.assign(explorationDict, {
               exploration_id: i + 1,
               title: 'Exploration Title ' + (i + 1),
@@ -197,7 +203,7 @@ describe('Learner dashboard page', function() {
       // Generate incomplete explorations.
       for (let i = 0; i < 12; i++) {
         learnerDashboardData.incomplete_explorations_list[i] = (
-          ExplorationObjectFactory.createFromBackendDict(
+          Exploration.createFromBackendDict(
             Object.assign(explorationDict, {
               // Create ids from 10 to 22.
               // (1 to 10 is the complete explorations).

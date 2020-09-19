@@ -19,7 +19,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { Subtopic } from 'domain/topic/SubtopicObjectFactory';
+import { Subtopic } from 'domain/topic/Subtopic.model';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
 import { UrlInterpolationService } from

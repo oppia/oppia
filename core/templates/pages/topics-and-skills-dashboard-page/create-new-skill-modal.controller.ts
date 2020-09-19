@@ -18,24 +18,28 @@
  */
 
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
+import { Rubric } from 'domain/skill/Rubric.model';
+import { Skill } from 'domain/skill/Skill.model';
+
+
 require('domain/utilities/url-interpolation.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 
 angular.module('oppia').controller('CreateNewSkillModalController', [
   '$scope', '$uibModalInstance', 'ContextService', 'ImageLocalStorageService',
-  'RubricObjectFactory', 'SkillCreationService', 'SkillObjectFactory',
+  'SkillCreationService',
   'COMPONENT_NAME_EXPLANATION', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
   'SKILL_DESCRIPTION_STATUS_VALUES', 'SKILL_DIFFICULTIES',
   function(
       $scope, $uibModalInstance, ContextService, ImageLocalStorageService,
-      RubricObjectFactory, SkillCreationService, SkillObjectFactory,
+      SkillCreationService,
       COMPONENT_NAME_EXPLANATION, MAX_CHARS_IN_SKILL_DESCRIPTION,
       SKILL_DESCRIPTION_STATUS_VALUES, SKILL_DIFFICULTIES) {
     var rubrics = [
-      RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
-      RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
-      RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
+      Rubric.create(SKILL_DIFFICULTIES[0], []),
+      Rubric.create(SKILL_DIFFICULTIES[1], ['']),
+      Rubric.create(SKILL_DIFFICULTIES[2], [])];
     ContextService.setImageSaveDestinationToLocalStorage();
     $scope.newSkillDescription = '';
     $scope.rubrics = rubrics;
@@ -79,9 +83,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
     };
 
     $scope.isSkillDescriptionValid = function() {
-      if (
-        !SkillObjectFactory.hasValidDescription(
-          $scope.newSkillDescription)) {
+      if (!Skill.hasValidDescription($scope.newSkillDescription)) {
         $scope.errorMsg = (
           'Please use a non-empty description consisting of ' +
             'alphanumeric characters, spaces and/or hyphens.');
@@ -91,9 +93,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
     };
 
     $scope.createNewSkill = function() {
-      if (
-        !SkillObjectFactory.hasValidDescription(
-          $scope.newSkillDescription)) {
+      if (Skill.hasValidDescription($scope.newSkillDescription)) {
         $scope.errorMsg = (
           'Please use a non-empty description consisting of ' +
           'alphanumeric characters, spaces and/or hyphens.');

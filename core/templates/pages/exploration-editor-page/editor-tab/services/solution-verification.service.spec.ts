@@ -21,11 +21,10 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
+import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
+import { Solution } from 'domain/exploration/Solution.model';
 
 require('App.ts');
-require('domain/exploration/SolutionObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
@@ -41,7 +40,7 @@ require(
   'state-interaction-id.service.ts');
 
 describe('Solution Verification Service', function() {
-  var ess, siis, scas, sof, svs, see;
+  var ess, siis, scas, svs, see;
   var mockExplorationData;
 
   beforeEach(angular.mock.module('oppia'));
@@ -79,7 +78,6 @@ describe('Solution Verification Service', function() {
     ess = $injector.get('ExplorationStatesService');
     siis = $injector.get('StateInteractionIdService');
     scas = $injector.get('StateCustomizationArgsService');
-    sof = $injector.get('SolutionObjectFactory');
     see = $injector.get('StateEditorService');
     svs = $injector.get('SolutionVerificationService');
 
@@ -227,7 +225,8 @@ describe('Solution Verification Service', function() {
       state.interaction, 'widget_customization_args');
 
     siis.savedMemento = 'TextInput';
-    ess.saveSolution('First State', sof.createNew(false, 'abc', 'nothing'));
+    ess.saveSolution(
+      'First State', Solution.createNew(false, 'abc', 'nothing', null));
 
     expect(svs.verifySolution(
       'First State', state.interaction,
@@ -252,7 +251,8 @@ describe('Solution Verification Service', function() {
       state.interaction, 'widget_customization_args');
 
     siis.savedMemento = 'TextInput';
-    ess.saveSolution('First State', sof.createNew(false, 'xyz', 'nothing'));
+    ess.saveSolution(
+      'First State', Solution.createNew(false, 'xyz', 'nothing', null));
 
     expect(svs.verifySolution(
       'First State', state.interaction,

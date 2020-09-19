@@ -29,7 +29,6 @@ require(
   'pages/skill-editor-page/modal-templates/' +
   'delete-misconception-modal.controller.ts');
 
-require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/skill-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');

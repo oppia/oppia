@@ -19,13 +19,13 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
+import { Skill } from 'domain/skill/Skill.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 describe('Question Player Concept Card Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
-  var SkillObjectFactory = null;
 
   var skillIds = ['skill1', 'skill2'];
   var skills = null;
@@ -50,7 +50,6 @@ describe('Question Player Concept Card Modal Controller', function() {
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
-    SkillObjectFactory = $injector.get('SkillObjectFactory');
     var skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -97,8 +96,7 @@ describe('Question Player Concept Card Modal Controller', function() {
       prerequisite_skill_ids: ['skill_1']
     }];
 
-    skillsObject = skills.map(skill => (
-      SkillObjectFactory.createFromBackendDict(skill)));
+    skillsObject = skills.map(skill => (Skill.createFromBackendDict(skill)));
 
     $scope = $rootScope.$new();
     $controller('QuestionPlayerConceptCardModalController', {

@@ -18,6 +18,8 @@
 
 import { EventEmitter } from '@angular/core';
 import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
+import { Subtopic } from 'domain/topic/Subtopic.model';
+import { Topic } from 'domain/topic/Topic.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Rearrange Skills In Subtopic Modal Controller', function() {
@@ -27,8 +29,6 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
   var $uibModalInstance = null;
   var TopicEditorStateService = null;
   var TopicUpdateService;
-  var SubtopicObjectFactory;
-  var TopicObjectFactory;
   var topicInitializedEventEmitter = null;
   var topicReinitializedEventEmitter = null;
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -40,13 +40,11 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
-    TopicObjectFactory = $injector.get('TopicObjectFactory');
     TopicUpdateService = $injector.get('TopicUpdateService');
-    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     $uibModalInstance = $injector.get('$uibModal');
     $scope = $rootScope.$new();
-    var subtopic = SubtopicObjectFactory.createFromTitle(1, 'subtopic1');
-    topic = TopicObjectFactory.createInterstitialTopic();
+    var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
+    topic = Topic.createInterstitialTopic();
     topic._subtopics = [subtopic];
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
     ctrl = $controller('RearrangeSkillsInSubtopicsModalController', {

@@ -16,7 +16,7 @@
  * @fileoverview Service to handle the updating of a question.
  */
 
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { Interaction } from 'domain/exploration/Interaction.model';
 
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/question-undo-redo.service.ts');

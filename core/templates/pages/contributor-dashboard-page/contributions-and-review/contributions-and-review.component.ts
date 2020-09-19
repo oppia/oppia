@@ -24,7 +24,6 @@ require(
   'question-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('interactions/interactionsQuestionsRequires.ts');

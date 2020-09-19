@@ -19,8 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // question-misconception-editor.component.ts is upgraded to Angular 8.
 /* eslint-disable max-len */
-import { MisconceptionObjectFactory } from
-  'domain/skill/MisconceptionObjectFactory';
+import { Misconception } from 'domain/skill/Misconception.model';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateEditorService } from
@@ -32,7 +31,6 @@ require('domain/question/QuestionObjectFactory.ts');
 require('services/question-validation.service.ts');
 
 describe('Question Validation Service', function() {
-  var misconceptionObjectFactory = null;
   var mockMisconceptionObject = null;
   var mockQuestionDict = null;
   var QuestionObjectFactory = null;
@@ -42,15 +40,12 @@ describe('Question Validation Service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'MisconceptionObjectFactory', new MisconceptionObjectFactory());
-    $provide.value(
       'StateEditorService', new StateEditorService(
         new SolutionValidityService()));
   }));
 
   beforeEach(angular.mock.inject(
     function($injector) {
-      misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
       qvs = $injector.get('QuestionValidationService');
       ses = $injector.get('StateEditorService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
@@ -163,10 +158,8 @@ describe('Question Validation Service', function() {
     };
     mockMisconceptionObject = {
       abc: [
-        misconceptionObjectFactory.create(
-          '1', 'misc1', 'notes1', 'feedback1', true),
-        misconceptionObjectFactory.create(
-          '2', 'misc2', 'notes2', 'feedback1', false)
+        Misconception.create('1', 'misc1', 'notes1', 'feedback1', true),
+        Misconception.create('2', 'misc2', 'notes2', 'feedback1', false)
       ]
     };
   });

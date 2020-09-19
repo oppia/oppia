@@ -28,9 +28,8 @@ import { StateWrittenTranslationsService } from
 import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { WrittenTranslation } from 'domain/exploration/WrittenTranslation.model';
+import { State } from 'domain/state/State.model';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 
@@ -43,11 +42,9 @@ describe('State Translation Editor Component', function() {
   var editabilityService = null;
   var explorationStatesService = null;
   var stateEditorService = null;
-  var stateObjectFactory = null;
   var stateWrittenTranslationsService = null;
   var translationLanguageService = null;
   var translationTabActiveContentIdService = null;
-  var writtenTranslationObjectFactory = null;
 
   var mockExternalSaveEventEmitter = null;
 
@@ -71,10 +68,12 @@ describe('State Translation Editor Component', function() {
           },
           labelled_as_correct: true,
           param_changes: [],
-          refresher_exploration_id: null
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
         },
         rule_specs: [],
-        tagged_skill_misconception_id: ''
+        tagged_skill_misconception_id: '',
+        training_data: null
       }, {
         outcome: {
           dest: 'outcome 2',
@@ -84,10 +83,12 @@ describe('State Translation Editor Component', function() {
           },
           labelled_as_correct: true,
           param_changes: [],
-          refresher_exploration_id: null
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
         },
         rule_specs: [],
-        tagged_skill_misconception_id: ''
+        tagged_skill_misconception_id: '',
+        training_data: null
       }],
       confirmed_unclassified_answers: null,
       customization_args: {},
@@ -100,7 +101,8 @@ describe('State Translation Editor Component', function() {
           content_id: 'content1',
           html: 'This is a html text'
         }
-      }
+      },
+      default_outcome: null
     },
     param_changes: [],
     recorded_voiceovers: {
@@ -108,9 +110,15 @@ describe('State Translation Editor Component', function() {
         content_1: {
           en: {
             needs_update: false,
+            duration_secs: null,
+            filename: null,
+            file_size_bytes: null
           },
           es: {
             needs_update: true,
+            duration_secs: null,
+            filename: null,
+            file_size_bytes: null
           }
         }
       }
@@ -119,6 +127,7 @@ describe('State Translation Editor Component', function() {
     written_translations: {
       translations_mapping: {}
     },
+    next_content_id_index: null
   };
   var stateObj = null;
   var ctrl = null;
@@ -127,11 +136,8 @@ describe('State Translation Editor Component', function() {
 
   beforeEach(function() {
     stateEditorService = TestBed.get(StateEditorService);
-    stateObjectFactory = TestBed.get(StateObjectFactory);
     stateWrittenTranslationsService = TestBed.get(
       StateWrittenTranslationsService);
-    writtenTranslationObjectFactory = TestBed.get(
-      WrittenTranslationObjectFactory);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -161,7 +167,7 @@ describe('State Translation Editor Component', function() {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         stateName);
       spyOn(editabilityService, 'isEditable').and.returnValue(true);
-      stateObj = stateObjectFactory.createFromBackendDict(stateName, state);
+      stateObj = State.createFromBackendDict(stateName, state);
       spyOn(explorationStatesService, 'getState').and.returnValue(stateObj);
       spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
         () => {});
@@ -177,7 +183,7 @@ describe('State Translation Editor Component', function() {
       stateWrittenTranslationsService.init(stateName, {
         hasWrittenTranslation: () => true,
         getWrittenTranslation: () => (
-          writtenTranslationObjectFactory.createFromBackendDict({
+          WrittenTranslation.createFromBackendDict({
             data_format: 'html',
             translation: 'This is a html',
             needs_update: true
@@ -190,8 +196,7 @@ describe('State Translation Editor Component', function() {
       ctrl = $componentController('stateTranslationEditor', {
         $scope: $scope,
         StateEditorService: stateEditorService,
-        StateWrittenTranslationsService: stateWrittenTranslationsService,
-        WrittenTranslationObjectFactory: writtenTranslationObjectFactory
+        StateWrittenTranslationsService: stateWrittenTranslationsService
       });
       ctrl.$onInit();
     }));
@@ -204,7 +209,7 @@ describe('State Translation Editor Component', function() {
       function() {
         expect($scope.translationEditorIsOpen).toBe(false);
         expect($scope.activeWrittenTranslation).toEqual(
-          writtenTranslationObjectFactory.createFromBackendDict({
+          WrittenTranslation.createFromBackendDict({
             data_format: 'html',
             translation: 'This is a html',
             needs_update: true
@@ -219,7 +224,7 @@ describe('State Translation Editor Component', function() {
       stateWrittenTranslationsService.displayed = {
         hasWrittenTranslation: () => true,
         getWrittenTranslation: () => (
-          writtenTranslationObjectFactory.createFromBackendDict({
+          WrittenTranslation.createFromBackendDict({
             data_format: 'html',
             translation: 'This is a second html',
             needs_update: true
@@ -244,7 +249,7 @@ describe('State Translation Editor Component', function() {
       stateWrittenTranslationsService.displayed = {
         hasWrittenTranslation: () => true,
         getWrittenTranslation: () => (
-          writtenTranslationObjectFactory.createFromBackendDict({
+          WrittenTranslation.createFromBackendDict({
             data_format: 'html',
             translation: 'This is a second html',
             needs_update: true
@@ -278,7 +283,7 @@ describe('State Translation Editor Component', function() {
       stateWrittenTranslationsService.displayed = {
         hasWrittenTranslation: () => true,
         getWrittenTranslation: () => (
-          writtenTranslationObjectFactory.createFromBackendDict({
+          WrittenTranslation.createFromBackendDict({
             data_format: 'html',
             translation: 'This is a second html',
             needs_update: true
@@ -321,7 +326,7 @@ describe('State Translation Editor Component', function() {
       stateWrittenTranslationsService.displayed = {
         hasWrittenTranslation: () => true,
         getWrittenTranslation: () => (
-          writtenTranslationObjectFactory.createFromBackendDict({
+          WrittenTranslation.createFromBackendDict({
             data_format: 'html',
             translation: 'This is a second html',
             needs_update: true
@@ -341,7 +346,7 @@ describe('State Translation Editor Component', function() {
         mockActiveContentIdChangedEventEmitter.emit('html');
         expect($scope.translationEditorIsOpen).toBe(false);
         expect($scope.activeWrittenTranslation).toEqual(
-          writtenTranslationObjectFactory.createFromBackendDict({
+          WrittenTranslation.createFromBackendDict({
             data_format: 'html',
             translation: 'This is a html',
             needs_update: true
@@ -352,7 +357,7 @@ describe('State Translation Editor Component', function() {
       mockActiveLanguageChangedEventEmitter.emit();
       expect($scope.translationEditorIsOpen).toBe(false);
       expect($scope.activeWrittenTranslation).toEqual(
-        writtenTranslationObjectFactory.createFromBackendDict({
+        WrittenTranslation.createFromBackendDict({
           data_format: 'html',
           translation: 'This is a html',
           needs_update: true
@@ -374,7 +379,7 @@ describe('State Translation Editor Component', function() {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         stateName);
       spyOn(editabilityService, 'isEditable').and.returnValue(true);
-      stateObj = stateObjectFactory.createFromBackendDict(stateName, state);
+      stateObj = State.createFromBackendDict(stateName, state);
       spyOn(explorationStatesService, 'getState').and.returnValue(stateObj);
       spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
         () => {});
@@ -385,7 +390,7 @@ describe('State Translation Editor Component', function() {
       stateWrittenTranslationsService.init(stateName, {
         hasWrittenTranslation: () => false,
         getWrittenTranslation: () => (
-          writtenTranslationObjectFactory.createFromBackendDict({
+          WrittenTranslation.createFromBackendDict({
             data_format: 'html',
             translation: 'This is a html',
             needs_update: true
@@ -398,8 +403,7 @@ describe('State Translation Editor Component', function() {
       ctrl = $componentController('stateTranslationEditor', {
         $scope: $scope,
         StateEditorService: stateEditorService,
-        StateWrittenTranslationsService: stateWrittenTranslationsService,
-        WrittenTranslationObjectFactory: writtenTranslationObjectFactory
+        StateWrittenTranslationsService: stateWrittenTranslationsService
       });
       ctrl.$onInit();
     }));
@@ -418,7 +422,7 @@ describe('State Translation Editor Component', function() {
       $scope.openTranslationEditor();
       expect($scope.translationEditorIsOpen).toBe(true);
       expect($scope.activeWrittenTranslation).toEqual(
-        writtenTranslationObjectFactory.createNew('html', ''));
+        WrittenTranslation.createNew('html', ''));
     });
 
     it('should add written translation html when clicking on save' +

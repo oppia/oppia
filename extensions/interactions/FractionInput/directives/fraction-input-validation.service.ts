@@ -20,15 +20,12 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { FractionAnswer } from 'interactions/answer-defs';
-import { Fraction, FractionObjectFactory } from
-  'domain/objects/FractionObjectFactory';
-import { baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
+import { Fraction, FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { baseInteractionValidationService } from 'interactions/base-interaction-validation.service';
 import { AppConstants } from 'app.constants';
 import { Warning } from 'services/alerts.service';
-import { FractionInputCustomizationArgs } from
-  'interactions/customization-args-defs';
-import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { FractionInputCustomizationArgs } from 'interactions/customization-args-defs';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
 import { Outcome } from 'domain/exploration/Outcome.model';
 
 interface FractionWarning {

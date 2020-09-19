@@ -18,14 +18,12 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
 import { AppConstants } from 'app.constants';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { Outcome } from 'domain/exploration/Outcome.model';
 import { Rule } from 'domain/exploration/Rule.model';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
 import { TextInputValidationService } from
   'interactions/TextInput/directives/text-input-validation.service';
 
@@ -35,13 +33,11 @@ describe('TextInputValidationService', () => {
 
   let currentState, customizationArguments;
   let goodAnswerGroups, goodDefaultOutcome;
-  let agof;
 
   let createAnswerGroupByRules: (rules: Rule[]) => AnswerGroup;
 
   beforeEach(() => {
     validatorService = TestBed.get(TextInputValidationService);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     INTERACTION_SPECS = InteractionSpecsConstants.INTERACTION_SPECS;
     customizationArgSpecs = INTERACTION_SPECS.TextInput.customization_arg_specs;
@@ -71,8 +67,9 @@ describe('TextInputValidationService', () => {
       }
     };
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
-    createAnswerGroupByRules = (rules) => agof.createNew(
+    goodAnswerGroups = (
+      [AnswerGroup.createNew([], goodDefaultOutcome, null, null)]);
+    createAnswerGroupByRules = (rules) => AnswerGroup.createNew(
       rules,
       goodDefaultOutcome,
       null,

@@ -18,15 +18,11 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { MathEquationInputValidationService } from
-// eslint-disable-next-line max-len
-  'interactions/MathEquationInput/directives/math-equation-input-validation.service';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { MathEquationInputValidationService } from 'interactions/MathEquationInput/directives/math-equation-input-validation.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
 import { Rule } from 'domain/exploration/Rule.model';
-import { MathEquationInputCustomizationArgs } from
-  'extensions/interactions/customization-args-defs';
+import { MathEquationInputCustomizationArgs } from 'extensions/interactions/customization-args-defs';
 
 import { AppConstants } from 'app.constants';
 
@@ -38,7 +34,6 @@ describe('MathEquationInputValidationService', () => {
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let matchesExactlyWith: Rule, isEquivalentTo: Rule;
   let customizationArgs: MathEquationInputCustomizationArgs;
-  let agof: AnswerGroupObjectFactory;
   let warnings;
 
   beforeEach(() => {
@@ -47,7 +42,6 @@ describe('MathEquationInputValidationService', () => {
     });
 
     validatorService = TestBed.get(MathEquationInputValidationService);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -84,7 +78,7 @@ describe('MathEquationInputValidationService', () => {
       }
     });
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    answerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, null, null)];
   });
 
   it('should be able to perform basic validation', () => {

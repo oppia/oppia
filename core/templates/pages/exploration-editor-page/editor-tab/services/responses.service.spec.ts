@@ -17,17 +17,17 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { Interaction } from 'domain/exploration/Interaction.model';
 import { Outcome } from 'domain/exploration/Outcome.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Responses Service', function() {
   var ResponsesService = null;
-  var InteractionObjectFactory = null;
   var StateEditorService = null;
   var AlertsService = null;
   var StateInteractionIdService = null;
   var AnswerGroupsCacheService = null;
-  var AnswerGroupObjectFactory = null;
   var interactionData = null;
   var interactionDataWithRules = null;
   var LoggerService = null;
@@ -48,15 +48,13 @@ describe('Responses Service', function() {
   }));
   beforeEach(angular.mock.inject(function($injector) {
     ResponsesService = $injector.get('ResponsesService');
-    InteractionObjectFactory = $injector.get('InteractionObjectFactory');
     StateEditorService = $injector.get('StateEditorService');
     AlertsService = $injector.get('AlertsService');
     StateInteractionIdService = $injector.get('StateInteractionIdService');
     AnswerGroupsCacheService = $injector.get('AnswerGroupsCacheService');
-    AnswerGroupObjectFactory = $injector.get('AnswerGroupObjectFactory');
     LoggerService = $injector.get('LoggerService');
 
-    interactionData = InteractionObjectFactory.createFromBackendDict({
+    interactionData = Interaction.createFromBackendDict({
       id: 'TextInput',
       answer_groups: [{
         outcome: {
@@ -65,8 +63,14 @@ describe('Responses Service', function() {
             content_id: 'feedback_1',
             html: ''
           },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
         },
         rule_specs: [],
+        training_data: null,
+        tagged_skill_misconception_id: null
       }],
       default_outcome: {
         dest: 'Hola',
@@ -74,6 +78,10 @@ describe('Responses Service', function() {
           content_id: '',
           html: '',
         },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
       },
       confirmed_unclassified_answers: [],
       customization_args: {
@@ -85,8 +93,9 @@ describe('Responses Service', function() {
         }
       },
       hints: [],
+      solution: null
     });
-    interactionDataWithRules = InteractionObjectFactory.createFromBackendDict({
+    interactionDataWithRules = Interaction.createFromBackendDict({
       id: 'TextInput',
       answer_groups: [{
         outcome: {
@@ -95,14 +104,20 @@ describe('Responses Service', function() {
             content_id: 'feedback_1',
             html: ''
           },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
         },
         rule_specs: [{
-          type: '',
+          rule_type: '',
           inputs: {
             x: ['c', 'd', 'e'],
             y: ['a', 'b', 'c']
           }
         }],
+        training_data: null,
+        tagged_skill_misconception_id: null
       }],
       default_outcome: {
         dest: 'Hola',
@@ -110,6 +125,10 @@ describe('Responses Service', function() {
           content_id: '',
           html: '',
         },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
       },
       confirmed_unclassified_answers: [],
       customization_args: {
@@ -121,6 +140,7 @@ describe('Responses Service', function() {
         }
       },
       hints: [],
+      solution: null
     });
   }));
 
@@ -627,7 +647,7 @@ describe('Responses Service', function() {
     StateInteractionIdService.init('stateName', 'TextInput');
 
     var updatedAnswerGroups = [
-      AnswerGroupObjectFactory.createNew(
+      AnswerGroup.createNew(
         [], Outcome.createNew('Hola', '1', 'Feedback text', []),
         'Training data text', '0'
       )
@@ -659,7 +679,7 @@ describe('Responses Service', function() {
     StateInteractionIdService.init('stateName', 'TextInput');
 
     var updatedAnswerGroups = [
-      AnswerGroupObjectFactory.createNew(
+      AnswerGroup.createNew(
         [], Outcome.createNew('Hola', '1', 'Feedback text', []),
         'Training data text', '0'
       )

@@ -20,16 +20,10 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { CamelCaseToHyphensPipe } from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import {
-  InteractionCustomizationArgs,
-  InteractionCustomizationArgsBackendDict
-} from
-  'interactions/customization-args-defs';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { InteractionCustomizationArgs, InteractionCustomizationArgsBackendDict } from 'interactions/customization-args-defs';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 // Service for assembling extension tags (for interactions).
@@ -44,7 +38,7 @@ export class ExtensionTagAssemblerService {
       customizationArgs: InteractionCustomizationArgs
   ): InteractionCustomizationArgsBackendDict {
     // Because of issues with circular dependencies, we cannot import
-    // Interaction from InteractionObjectFactory in this file.
+    // Interaction from Interaction.model in this file.
     // The convertCustomizationArgsToBackendDict function is repeated
     // here to avoid the circular dependency.
 

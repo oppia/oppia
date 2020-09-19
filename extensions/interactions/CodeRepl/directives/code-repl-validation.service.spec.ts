@@ -18,22 +18,18 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { CodeReplValidationService } from
-  'interactions/CodeRepl/directives/code-repl-validation.service';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { CodeReplValidationService } from 'interactions/CodeRepl/directives/code-repl-validation.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
 
 import { AppConstants } from 'app.constants';
-import { CodeReplCustomizationArgs } from
-  'interactions/customization-args-defs';
+import { CodeReplCustomizationArgs } from 'interactions/customization-args-defs';
 
 describe('CodeReplValidationService', () => {
   let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
   let validatorService: CodeReplValidationService;
   let currentState: string, customizationArguments: CodeReplCustomizationArgs;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -42,7 +38,6 @@ describe('CodeReplValidationService', () => {
 
     validatorService = TestBed.get(CodeReplValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    agof = TestBed.get(AnswerGroupObjectFactory);
 
     currentState = 'First State';
     goodDefaultOutcome = Outcome.createFromBackendDict({
@@ -72,7 +67,8 @@ describe('CodeReplValidationService', () => {
       }
     };
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    goodAnswerGroups = (
+      [AnswerGroup.createNew([], goodDefaultOutcome, null, null)]);
   });
 
   it('should be able to perform basic validation', () => {

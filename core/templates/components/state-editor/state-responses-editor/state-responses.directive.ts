@@ -16,6 +16,8 @@
  * @fileoverview Directive for managing the state responses in the state editor.
  */
 
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -36,7 +38,6 @@ require(
   'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
   'add-answer-group-modal.controller.ts');
 
-require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
@@ -106,7 +107,6 @@ angular.module('oppia').directive('stateResponses', [
         'state-responses.directive.html'),
       controller: [
         '$filter', '$scope', '$uibModal', 'AlertsService',
-        'AnswerGroupObjectFactory',
         'EditabilityService', 'ExternalSaveService', 'ResponsesService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
@@ -118,7 +118,6 @@ angular.module('oppia').directive('stateResponses', [
         'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
         function(
             $filter, $scope, $uibModal, AlertsService,
-            AnswerGroupObjectFactory,
             EditabilityService, ExternalSaveService, ResponsesService,
             StateCustomizationArgsService, StateEditorService,
             StateInteractionIdService, StateNextContentIdIndexService,
@@ -317,7 +316,7 @@ angular.module('oppia').directive('stateResponses', [
               controller: 'AddAnswerGroupModalController'
             }).result.then(function(result) {
               // Create a new answer group.
-              $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
+              $scope.answerGroups.push(AnswerGroup.createNew(
                 [result.tmpRule], result.tmpOutcome, [],
                 result.tmpTaggedSkillMisconceptionId));
               ResponsesService.save(

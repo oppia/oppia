@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for QuestionSuggestionEditorModalController.
  */
+import { Skill } from 'domain/skill/Skill.model';
 
 describe('Question Suggestion Editor Modal Controller', function() {
   let $httpBackend = null;
@@ -26,7 +27,6 @@ describe('Question Suggestion Editor Modal Controller', function() {
   let QuestionObjectFactory = null;
   let QuestionSuggestionService = null;
   let QuestionUndoRedoService = null;
-  let SkillObjectFactory = null;
   let StateEditorService = null;
 
   let question = null;
@@ -47,7 +47,6 @@ describe('Question Suggestion Editor Modal Controller', function() {
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionSuggestionService = $injector.get('QuestionSuggestionService');
       QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
-      SkillObjectFactory = $injector.get('SkillObjectFactory');
       StateEditorService = $injector.get('StateEditorService');
 
       $uibModalInstance = jasmine.createSpyObj(
@@ -81,8 +80,12 @@ describe('Question Suggestion Editor Modal Controller', function() {
         skill_contents: skillContentsDict,
         language_code: 'en',
         version: 3,
+        prerequisite_skill_ids: null,
+        all_questions_merged: true,
+        next_misconception_id: null,
+        superseding_skill_id: null
       };
-      skill = SkillObjectFactory.createFromBackendDict(skillDict);
+      skill = Skill.createFromBackendDict(skillDict);
       question = QuestionObjectFactory.createFromBackendDict({
         id: skill.getId(),
         question_state_data: {
@@ -228,7 +231,6 @@ describe('Question Suggestion Editor Modal Controller', function() {
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionSuggestionService = $injector.get('QuestionSuggestionService');
       QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
-      SkillObjectFactory = $injector.get('SkillObjectFactory');
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -252,8 +254,12 @@ describe('Question Suggestion Editor Modal Controller', function() {
         skill_contents: skillContentsDict,
         language_code: 'en',
         version: 3,
+        prerequisite_skill_ids: null,
+        all_questions_merged: true,
+        next_misconception_id: null,
+        superseding_skill_id: null
       };
-      skill = SkillObjectFactory.createFromBackendDict(skillDict);
+      skill = Skill.createFromBackendDict(skillDict);
       question = QuestionObjectFactory.createDefaultQuestion([skill.getId()]);
       questionId = question.getId();
       questionStateData = question.getStateData();

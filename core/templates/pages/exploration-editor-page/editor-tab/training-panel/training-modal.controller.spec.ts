@@ -19,6 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { Interaction } from 'domain/exploration/Interaction.model';
 // ^^^ This block is to be removed.
 
 describe('Training Modal Controller', function() {
@@ -30,7 +31,6 @@ describe('Training Modal Controller', function() {
   var ExplorationStatesService = null;
   var StateInteractionIdService = null;
   var ResponsesService = null;
-  var InteractionObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(function($provide) {
@@ -52,7 +52,6 @@ describe('Training Modal Controller', function() {
     ExplorationStatesService = $injector.get('ExplorationStatesService');
     StateInteractionIdService = $injector.get('StateInteractionIdService');
     ResponsesService = $injector.get('ResponsesService');
-    InteractionObjectFactory = $injector.get('InteractionObjectFactory');
   }));
 
   describe('when answer group index is equal to response answer groups count',
@@ -118,7 +117,7 @@ describe('Training Modal Controller', function() {
         });
         StateEditorService.activeStateName = 'Init';
         StateInteractionIdService.init('Init', 'TextInput');
-        ResponsesService.init(InteractionObjectFactory.createFromBackendDict({
+        ResponsesService.init(Interaction.createFromBackendDict({
           id: 'TextInput',
           answer_groups: [{
             outcome: {
@@ -127,9 +126,14 @@ describe('Training Modal Controller', function() {
                 content_id: '',
                 html: ''
               },
+              labelled_as_correct: true,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             training_data: ['This is the answer'],
             rule_specs: [],
+            tagged_skill_misconception_id: null
           }],
           customization_args: {
             placeholder: {
@@ -145,10 +149,15 @@ describe('Training Modal Controller', function() {
             feedback: {
               content_id: '',
               html: '',
-            }
+            },
+            labelled_as_correct: true,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
           hints: [],
-          confirmed_unclassified_answers: []
+          confirmed_unclassified_answers: [],
+          solution: null
         }));
 
         $scope = $rootScope.$new();
@@ -206,7 +215,6 @@ describe('Training Modal Controller', function() {
     var ExplorationStatesService = null;
     var StateInteractionIdService = null;
     var ResponsesService = null;
-    var InteractionObjectFactory = null;
 
     beforeEach(angular.mock.inject(function($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
@@ -214,7 +222,6 @@ describe('Training Modal Controller', function() {
       ExplorationStatesService = $injector.get('ExplorationStatesService');
       StateInteractionIdService = $injector.get('StateInteractionIdService');
       ResponsesService = $injector.get('ResponsesService');
-      InteractionObjectFactory = $injector.get('InteractionObjectFactory');
 
       $uibModalInstance = jasmine.createSpyObj(['close', 'dismiss']);
       ExplorationStatesService.init({
@@ -285,7 +292,7 @@ describe('Training Modal Controller', function() {
       });
       StateEditorService.activeStateName = 'Init';
       StateInteractionIdService.init('Init', 'TextInput');
-      ResponsesService.init(InteractionObjectFactory.createFromBackendDict({
+      ResponsesService.init(Interaction.createFromBackendDict({
         id: 'TextInput',
         answer_groups: [{
           outcome: {
@@ -294,9 +301,14 @@ describe('Training Modal Controller', function() {
               content_id: '',
               html: ''
             },
+            labelled_as_correct: true,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
           training_data: ['This is the answer'],
           rule_specs: [],
+          tagged_skill_misconception_id: null
         }],
         customization_args: {
           placeholder: {
@@ -312,10 +324,15 @@ describe('Training Modal Controller', function() {
           feedback: {
             content_id: '',
             html: '',
-          }
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
         },
         hints: [],
-        confirmed_unclassified_answers: []
+        confirmed_unclassified_answers: [],
+        solution: null
       }));
       $scope = $rootScope.$new();
       $controller('TrainingModalController', {
@@ -359,7 +376,6 @@ describe('Training Modal Controller', function() {
         ExplorationStatesService = $injector.get('ExplorationStatesService');
         StateInteractionIdService = $injector.get('StateInteractionIdService');
         ResponsesService = $injector.get('ResponsesService');
-        InteractionObjectFactory = $injector.get('InteractionObjectFactory');
 
         $uibModalInstance = jasmine.createSpyObj(['close', 'dismiss']);
         ExplorationStatesService.init({
@@ -410,7 +426,7 @@ describe('Training Modal Controller', function() {
         });
         StateEditorService.activeStateName = 'Init';
         StateInteractionIdService.init('Init', 'TextInput');
-        ResponsesService.init(InteractionObjectFactory.createFromBackendDict({
+        ResponsesService.init(Interaction.createFromBackendDict({
           id: 'TextInput',
           answer_groups: [{
             outcome: {
@@ -419,9 +435,14 @@ describe('Training Modal Controller', function() {
                 content_id: '',
                 html: ''
               },
+              labelled_as_correct: true,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             rule_specs: [],
-            training_data: []
+            training_data: [],
+            tagged_skill_misconception_id: null
           }, {
             outcome: {
               dest: 'Hola',
@@ -429,9 +450,14 @@ describe('Training Modal Controller', function() {
                 content_id: '',
                 html: ''
               },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             rule_specs: [],
-            training_data: []
+            training_data: [],
+            tagged_skill_misconception_id: null
           }],
           default_outcome: {
             dest: 'Hola',
@@ -439,6 +465,10 @@ describe('Training Modal Controller', function() {
               content_id: '',
               html: '',
             },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
           confirmed_unclassified_answers: [],
           customization_args: {
@@ -453,6 +483,7 @@ describe('Training Modal Controller', function() {
             }
           },
           hints: [],
+          solution: null
         }));
         $scope = $rootScope.$new();
         $controller('TrainingModalController', {

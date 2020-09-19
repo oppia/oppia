@@ -16,11 +16,11 @@
  * @fileoverview Service to display suggestion modal in editor view.
  */
 
+import { State } from 'domain/state/State.model';
+
 require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
   'exploration-editor-suggestion-modal.controller.ts');
-
-require('domain/state/StateObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require(
@@ -35,12 +35,12 @@ require('pages/exploration-editor-page/services/router.service.ts');
 angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
   '$log', '$uibModal', 'ExplorationDataService',
   'ExplorationStatesService', 'RouterService',
-  'StateEditorRefreshService', 'StateObjectFactory',
+  'StateEditorRefreshService',
   'SuggestionModalService', 'ThreadDataService', 'UrlInterpolationService',
   function(
       $log, $uibModal, ExplorationDataService,
       ExplorationStatesService, RouterService,
-      StateEditorRefreshService, StateObjectFactory,
+      StateEditorRefreshService,
       SuggestionModalService, ThreadDataService, UrlInterpolationService) {
     let showEditStateContentSuggestionModal = function(
         activeThread, isSuggestionHandled, hasUnsavedChanges, isSuggestionValid,
@@ -77,8 +77,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
               let suggestion = activeThread.getSuggestion();
               let stateName = suggestion.stateName;
               let stateDict = ExplorationDataService.data.states[stateName];
-              let state = StateObjectFactory.createFromBackendDict(
-                stateName, stateDict);
+              let state = State.createFromBackendDict(stateName, stateDict);
               state.content.setHtml(
                 activeThread.getReplacementHtmlFromSuggestion());
               if (result.audioUpdateRequired) {

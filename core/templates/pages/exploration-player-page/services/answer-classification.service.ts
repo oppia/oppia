@@ -20,23 +20,17 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
-import {
-  AnswerClassificationResult, AnswerClassificationResultObjectFactory
-} from 'domain/classifier/AnswerClassificationResultObjectFactory';
-import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { AnswerClassificationResult, AnswerClassificationResultObjectFactory } from 'domain/classifier/AnswerClassificationResultObjectFactory';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
 import { AppService } from 'services/app.service';
-import { ExplorationPlayerConstants } from
-  'pages/exploration-player-page/exploration-player-page.constants';
+import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
 import { InteractionAnswer } from 'interactions/answer-defs';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { Interaction } from 'domain/exploration/Interaction.model';
 import { InteractionSpecsService } from 'services/interaction-specs.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
-import { PredictionAlgorithmRegistryService }
-  // eslint-disable-next-line max-len
-  from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
-import { State } from 'domain/state/StateObjectFactory';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
+import { State } from 'domain/state/State.model';
+import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 
 interface InteractionRulesService {

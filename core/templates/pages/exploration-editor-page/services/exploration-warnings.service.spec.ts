@@ -28,8 +28,6 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { ClassifierObjectFactory } from
@@ -40,10 +38,6 @@ import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { ImprovementsService } from 'services/improvements.service';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
 import { ParamMetadataObjectFactory } from
   'domain/exploration/ParamMetadataObjectFactory';
 /* eslint-disable max-len */
@@ -57,10 +51,6 @@ import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
 /* eslint-enable max-len */
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -83,8 +73,6 @@ describe('Exploration Warnings Service', function() {
       'AnswerClassificationResultObjectFactory',
       new AnswerClassificationResultObjectFactory());
     $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory());
-    $provide.value(
       'AnswerStatsObjectFactory', new AnswerStatsObjectFactory());
     $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
     $provide.value(
@@ -93,11 +81,6 @@ describe('Exploration Warnings Service', function() {
       'ExplorationFeaturesService', new ExplorationFeaturesService());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value('ImprovementsService', new ImprovementsService());
-    $provide.value(
-      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
-      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-        new ParamChangeObjectFactory()));
     $provide.value(
       'ParamMetadataObjectFactory', new ParamMetadataObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
@@ -108,13 +91,6 @@ describe('Exploration Warnings Service', function() {
       'StateEditorService', new StateEditorService(
         new SolutionValidityService()));
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();

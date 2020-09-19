@@ -23,28 +23,15 @@ import { StateInteractionIdService } from
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { TestBed } from '@angular/core/testing';
 
-import { InteractionDetailsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service.ts';
-import { StateCustomizationArgsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { StateEditorService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateNextContentIdIndexService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
-import { EditorFirstTimeEventsService } from
-  'pages/exploration-editor-page/services/editor-first-time-events.service';
-import { ImageClickInputValidationService } from
-  // eslint-disable-next-line max-len
-  'interactions/ImageClickInput/directives/image-click-input-validation.service';
-import { InteractionObjectFactory } from
-  'domain/exploration/InteractionObjectFactory';
+import { InteractionDetailsCacheService } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service.ts';
+import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateNextContentIdIndexService } from 'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
+import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
+import { ImageClickInputValidationService } from 'interactions/ImageClickInput/directives/image-click-input-validation.service';
+import { Interaction } from 'domain/exploration/Interaction.model';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
 
 describe('Customize Interaction Modal Controller', function() {
   var $injector = null;
@@ -53,7 +40,6 @@ describe('Customize Interaction Modal Controller', function() {
   var imageClickInputValidationService = null;
   var editorFirstTimeEventsService = null;
   var interactionDetailsCacheService = null;
-  var interactionObjectFactory = null;
   var stateCustomizationArgsService = null;
   var stateEditorService = null;
   var stateInteractionIdService = null;
@@ -72,7 +58,6 @@ describe('Customize Interaction Modal Controller', function() {
       ImageClickInputValidationService);
     interactionDetailsCacheService = TestBed.get(
       InteractionDetailsCacheService);
-    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
     stateEditorService = TestBed.get(StateEditorService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
@@ -118,7 +103,6 @@ describe('Customize Interaction Modal Controller', function() {
         EditorFirstTimeEventsService: editorFirstTimeEventsService,
         imageClickInputValidationService: imageClickInputValidationService,
         InteractionDetailsCacheService: interactionDetailsCacheService,
-        InteractionObjectFactory: interactionObjectFactory,
         StateCustomizationArgsService: stateCustomizationArgsService,
         StateEditorService: stateEditorService,
         StateInteractionIdService: stateInteractionIdService,
@@ -339,7 +323,6 @@ describe('Customize Interaction Modal Controller', function() {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
         InteractionDetailsCacheService: interactionDetailsCacheService,
-        InteractionObjectFactory: interactionObjectFactory,
         StateCustomizationArgsService: stateCustomizationArgsService,
         StateEditorService: stateEditorService,
         StateInteractionIdService: stateInteractionIdService,
@@ -430,7 +413,6 @@ describe('Customize Interaction Modal Controller', function() {
           $scope: $scope,
           $uibModalInstance: $uibModalInstance,
           InteractionDetailsCacheService: interactionDetailsCacheService,
-          InteractionObjectFactory: interactionObjectFactory,
           StateCustomizationArgsService: stateCustomizationArgsService,
           StateEditorService: stateEditorService,
           StateInteractionIdService: stateInteractionIdService,
@@ -504,7 +486,6 @@ describe('Customize Interaction Modal Controller', function() {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
         InteractionDetailsCacheService: interactionDetailsCacheService,
-        InteractionObjectFactory: interactionObjectFactory,
         StateCustomizationArgsService: stateCustomizationArgsService,
         StateEditorService: stateEditorService,
         StateInteractionIdService: stateInteractionIdService,
@@ -561,7 +542,6 @@ describe('Customize Interaction Modal Controller', function() {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
         InteractionDetailsCacheService: interactionDetailsCacheService,
-        InteractionObjectFactory: interactionObjectFactory,
         StateCustomizationArgsService: stateCustomizationArgsService,
         StateEditorService: stateEditorService,
         StateInteractionIdService: stateInteractionIdService,

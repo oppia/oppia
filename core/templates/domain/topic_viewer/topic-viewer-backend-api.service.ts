@@ -22,10 +22,8 @@ import { Injectable } from '@angular/core';
 
 import {
   ReadOnlyTopic,
-  ReadOnlyTopicBackendDict,
-  ReadOnlyTopicObjectFactory
-} from 'domain/topic_viewer/read-only-topic-object.factory';
-import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
+  ReadOnlyTopicBackendDict
+} from 'domain/topic_viewer/ReadOnlyTopic.model';
 import { TopicViewerDomainConstants } from
   'domain/topic_viewer/topic-viewer-domain.constants';
 import { UrlInterpolationService } from
@@ -50,12 +48,9 @@ export class TopicViewerBackendApiService {
         topic_url_fragment: topicUrlFragment,
         classroom_url_fragment: classroomUrlFragment,
       });
-    var readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory(
-      new SubtopicObjectFactory());
     this.http.get<ReadOnlyTopicBackendDict>(topicDataUrl).toPromise().then(
       (response) => {
-        let readOnlyTopic = readOnlyTopicObjectFactory.createFromBackendDict(
-          response);
+        let readOnlyTopic = ReadOnlyTopic.createFromBackendDict(response);
         if (successCallback) {
           successCallback(readOnlyTopic);
         }

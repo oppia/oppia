@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for ParameterMetadataService.
  */
 
+import { States } from 'domain/exploration/States.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/exploration-editor-page/services/parameter-metadata.service');
@@ -32,7 +33,6 @@ require(
 
 describe('Parameter Metadata Service', function() {
   var ParameterMetadataService = null;
-  var StatesObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -67,7 +67,7 @@ describe('Parameter Metadata Service', function() {
     });
     $provide.value('ExplorationStatesService', {
       getStates: function() {
-        return StatesObjectFactory.createFromBackendDict({
+        return States.createFromBackendDict({
           Hola: {
             content: {
               content_id: 'content',
@@ -90,7 +90,13 @@ describe('Parameter Metadata Service', function() {
                     content_id: 'feedback_1',
                     html: '{{FeedbackValue}}'
                   },
+                  labelled_as_correct: false,
+                  param_changes: null,
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null
                 },
+                training_data: null,
+                tagged_skill_misconception_id: null
               }],
               default_outcome: {
                 dest: 'Hola',
@@ -98,8 +104,15 @@ describe('Parameter Metadata Service', function() {
                   content_id: '',
                   html: '',
                 },
+                labelled_as_correct: false,
+                param_changes: null,
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
               },
               hints: [],
+              confirmed_unclassified_answers: null,
+              customization_args: null,
+              solution: null
             },
             written_translations: {
               translations_mapping: {
@@ -107,6 +120,9 @@ describe('Parameter Metadata Service', function() {
                 default_outcome: {},
               },
             },
+            classifier_model_id: null,
+            solicit_answer_details: null,
+            next_content_id_index: null
           },
           State: {
             content: {
@@ -130,7 +146,13 @@ describe('Parameter Metadata Service', function() {
                     content_id: 'feedback_1',
                     html: '{{StateFeedbackValue}}'
                   },
+                  labelled_as_correct: false,
+                  param_changes: null,
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null
                 },
+                training_data: null,
+                tagged_skill_misconception_id: null
               }],
               default_outcome: {
                 dest: 'State',
@@ -138,15 +160,25 @@ describe('Parameter Metadata Service', function() {
                   content_id: 'default_outcome',
                   html: ''
                 },
+                labelled_as_correct: false,
+                param_changes: null,
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
               },
-              hints: []
+              hints: [],
+              confirmed_unclassified_answers: null,
+              customization_args: null,
+              solution: null
             },
             written_translations: {
               translations_mapping: {
                 content: {},
                 default_outcome: {},
               }
-            }
+            },
+            classifier_model_id: null,
+            solicit_answer_details: null,
+            next_content_id_index: null
           },
           State2: {
             content: {
@@ -169,8 +201,14 @@ describe('Parameter Metadata Service', function() {
                   feedback: {
                     content_id: '',
                     html: ''
-                  }
-                }
+                  },
+                  labelled_as_correct: false,
+                  param_changes: null,
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null
+                },
+                training_data: null,
+                tagged_skill_misconception_id: null
               }],
               default_outcome: {
                 dest: 'State2',
@@ -178,15 +216,25 @@ describe('Parameter Metadata Service', function() {
                   content_id: 'default_outcome',
                   html: ''
                 },
+                labelled_as_correct: false,
+                param_changes: null,
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
               },
-              hints: []
+              hints: [],
+              confirmed_unclassified_answers: null,
+              customization_args: null,
+              solution: null
             },
             written_translations: {
               translations_mapping: {
                 content: {},
                 default_outcome: {},
               }
-            }
+            },
+            classifier_model_id: null,
+            solicit_answer_details: null,
+            next_content_id_index: null
           },
           State3: {
             content: {
@@ -209,8 +257,14 @@ describe('Parameter Metadata Service', function() {
                   feedback: {
                     content_id: '',
                     html: ''
-                  }
-                }
+                  },
+                  labelled_as_correct: false,
+                  param_changes: null,
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null
+                },
+                training_data: null,
+                tagged_skill_misconception_id: null
               }],
               default_outcome: {
                 dest: 'State2',
@@ -218,15 +272,25 @@ describe('Parameter Metadata Service', function() {
                   content_id: '',
                   html: ''
                 },
+                labelled_as_correct: false,
+                param_changes: null,
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
               },
-              hints: []
+              hints: [],
+              confirmed_unclassified_answers: null,
+              customization_args: null,
+              solution: null
             },
             written_translations: {
               translations_mapping: {
                 content: {},
                 default_outcome: {},
               }
-            }
+            },
+            classifier_model_id: null,
+            solicit_answer_details: null,
+            next_content_id_index: null
           }
         });
       }
@@ -254,7 +318,6 @@ describe('Parameter Metadata Service', function() {
   beforeEach(angular.mock.inject(function($injector) {
     ParameterMetadataService = $injector.get(
       'ParameterMetadataService');
-    StatesObjectFactory = $injector.get('StatesObjectFactory');
   }));
 
   it('should get unset parameters info', function() {

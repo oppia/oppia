@@ -15,6 +15,7 @@
 /**
  * @fileoverview Controller for the questions list.
  */
+import { Misconception } from 'domain/skill/Misconception.model';
 import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
 
 require('directives/angular-html-bind.directive.ts');
@@ -49,7 +50,6 @@ require(
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/SkillDifficultyObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -92,20 +92,18 @@ angular.module('oppia').directive('questionsList', [
       controller: [
         '$location', '$rootScope', '$timeout', '$uibModal', 'AlertsService',
         'ContextService', 'EditableQuestionBackendApiService',
-        'ImageLocalStorageService', 'MisconceptionObjectFactory',
-        'QuestionCreationService', 'QuestionObjectFactory',
-        'QuestionUndoRedoService', 'QuestionValidationService',
-        'QuestionsListService', 'SkillBackendApiService',
-        'SkillDifficultyObjectFactory', 'WindowDimensionsService',
-        'NUM_QUESTIONS_PER_PAGE', function(
+        'ImageLocalStorageService', 'QuestionCreationService',
+        'QuestionObjectFactory', 'QuestionUndoRedoService',
+        'QuestionValidationService', 'QuestionsListService',
+        'SkillBackendApiService', 'SkillDifficultyObjectFactory',
+        'WindowDimensionsService', 'NUM_QUESTIONS_PER_PAGE', function(
             $location, $rootScope, $timeout, $uibModal, AlertsService,
             ContextService, EditableQuestionBackendApiService,
-            ImageLocalStorageService, MisconceptionObjectFactory,
-            QuestionCreationService, QuestionObjectFactory,
-            QuestionUndoRedoService, QuestionValidationService,
-            QuestionsListService, SkillBackendApiService,
-            SkillDifficultyObjectFactory, WindowDimensionsService,
-            NUM_QUESTIONS_PER_PAGE) {
+            ImageLocalStorageService, QuestionCreationService,
+            QuestionObjectFactory, QuestionUndoRedoService,
+            QuestionValidationService, QuestionsListService,
+            SkillBackendApiService, SkillDifficultyObjectFactory,
+            WindowDimensionsService, NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _reInitializeSelectedSkillIds = function() {
@@ -358,7 +356,7 @@ angular.module('oppia').directive('questionsList', [
                   response.associated_skill_dicts.forEach(function(skillDict) {
                     ctrl.misconceptionsBySkill[skillDict.id] =
                       skillDict.misconceptions.map(function(misconception) {
-                        return MisconceptionObjectFactory.createFromBackendDict(
+                        return Misconception.createFromBackendDict(
                           misconception);
                       });
                     ctrl.associatedSkillSummaries.push(

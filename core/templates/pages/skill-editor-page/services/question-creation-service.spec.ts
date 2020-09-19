@@ -18,6 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { Skill } from 'domain/skill/Skill.model';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
@@ -32,7 +33,6 @@ describe('Question Creation Service', function() {
   var SkillBackendApiService = null;
   var $uibModal = null;
 
-  var SkillObjectFactory = null;
   var skillSummaryDict = {
     id: 'skillId1',
     description: 'description1',
@@ -52,7 +52,6 @@ describe('Question Creation Service', function() {
     beforeEach(angular.mock.inject(function($injector) {
       qcs = $injector.get('QuestionCreationService');
       SkillEditorStateService = $injector.get('SkillEditorStateService');
-      SkillObjectFactory = $injector.get('SkillObjectFactory');
       $q = $injector.get('$q');
       SkillDifficultyObjectFactory = $injector.get(
         'SkillDifficultyObjectFactory');
@@ -244,7 +243,6 @@ describe('Question Creation Service', function() {
       qcs = $injector.get('QuestionCreationService');
       SkillEditorStateService = $injector.get('SkillEditorStateService');
       AlertsService = $injector.get('AlertsService');
-      SkillObjectFactory = $injector.get('SkillObjectFactory');
       SkillDifficultyObjectFactory = $injector.get(
         'SkillDifficultyObjectFactory');
       SkillBackendApiService = $injector.get('SkillBackendApiService');
@@ -279,7 +277,7 @@ describe('Question Creation Service', function() {
         id: 'skillId1',
         language_code: 'en',
         misconceptions: [misconceptionDict],
-        next_misconception_id: '2',
+        next_misconception_id: 2,
         prerequisite_skill_ids: [],
         rubrics: [rubricDict],
         skill_contents: conceptCardDict,
@@ -299,7 +297,7 @@ describe('Question Creation Service', function() {
         current: [],
         others: [skillSummaryDict]
       });
-      var skillObject = SkillObjectFactory.createFromBackendDict(
+      var skillObject = Skill.createFromBackendDict(
         skillBackendDict);
       spyOn(
         SkillEditorStateService, 'getSkill').and.returnValue(skillObject);
@@ -407,7 +405,6 @@ describe('Question Creation Service', function() {
       qcs = $injector.get('QuestionCreationService');
       $q = $injector.get('$q');
       SkillEditorStateService = $injector.get('SkillEditorStateService');
-      SkillObjectFactory = $injector.get('SkillObjectFactory');
       SkillDifficultyObjectFactory = $injector.get(
         'SkillDifficultyObjectFactory');
       SkillBackendApiService = $injector.get('SkillBackendApiService');
@@ -442,7 +439,7 @@ describe('Question Creation Service', function() {
         id: 'skillId1',
         language_code: 'en',
         misconceptions: [misconceptionDict],
-        next_misconception_id: '2',
+        next_misconception_id: 2,
         prerequisite_skill_ids: [],
         rubrics: [rubricDict],
         skill_contents: conceptCardDict,
@@ -451,13 +448,13 @@ describe('Question Creation Service', function() {
       };
 
       spyOn(SkillBackendApiService, 'fetchSkill').and.returnValue({
-        skill: SkillObjectFactory.createFromBackendDict(skillBackendDict),
+        skill: Skill.createFromBackendDict(skillBackendDict),
         topicName: 'topic1',
         subtopicName: 'subtopic2',
       });
       var deferred = $q.defer();
       deferred.resolve(
-        [SkillObjectFactory.createFromBackendDict(skillBackendDict)]
+        [Skill.createFromBackendDict(skillBackendDict)]
       );
       spyOn(SkillBackendApiService, 'fetchMultiSkills').and.returnValue(
         deferred.promise);
@@ -466,7 +463,7 @@ describe('Question Creation Service', function() {
         current: [],
         others: [skillSummaryDict]
       });
-      var skillObject = SkillObjectFactory.createFromBackendDict(
+      var skillObject = Skill.createFromBackendDict(
         skillBackendDict);
       spyOn(
         SkillEditorStateService, 'getSkill').and.returnValue(skillObject);

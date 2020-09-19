@@ -19,6 +19,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { Skill } from 'domain/skill/Skill.model';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
@@ -31,7 +32,6 @@ describe(
     var alertsService = null;
     var SkillBackendApiService = null;
     var skillDifficultyObjectFactory = null;
-    var skillObjectFactory = null;
 
     var skillId = 'skill_1';
     var skill = null;
@@ -48,7 +48,6 @@ describe(
         alertsService = $injector.get('AlertsService');
         skillDifficultyObjectFactory = $injector.get(
           'SkillDifficultyObjectFactory');
-        skillObjectFactory = $injector.get('SkillObjectFactory');
         var skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
 
         $uibModalInstance = jasmine.createSpyObj(
@@ -84,12 +83,14 @@ describe(
           language_code: 'en',
           version: 1,
           next_misconception_id: 3,
-          prerequisite_skill_ids: []
+          prerequisite_skill_ids: [],
+          all_questions_merged: true,
+          superseding_skill_id: null
         };
 
         spyOn(SkillBackendApiService, 'fetchSkill').and.returnValue(
           $q.resolve({
-            skill: skillObjectFactory.createFromBackendDict(skill)
+            skill: Skill.createFromBackendDict(skill)
           }));
 
         $scope = $rootScope.$new();
@@ -98,7 +99,6 @@ describe(
             $scope: $scope,
             AlertsService: alertsService,
             SkillDifficultyObjectFactory: skillDifficultyObjectFactory,
-            SkillObjectFactory: skillObjectFactory,
             $uibModalInstance: $uibModalInstance,
             skillId: skillId,
           });
@@ -107,7 +107,7 @@ describe(
 
       it('should initialize $scope properties after controller is' +
         ' initialized', function() {
-        expect($scope.skill).toEqual(skillObjectFactory.createFromBackendDict(
+        expect($scope.skill).toEqual(Skill.createFromBackendDict(
           skill));
         expect($scope.linkedSkillsWithDifficulty).toEqual(
           [skillDifficultyObjectFactory.create(
@@ -120,7 +120,7 @@ describe(
         $scope.startQuestionCreation();
 
         expect($uibModalInstance.close).toHaveBeenCalledWith({
-          skill: skillObjectFactory.createFromBackendDict(skill),
+          skill: Skill.createFromBackendDict(skill),
           skillDifficulty: 0.3
         });
       });
@@ -145,7 +145,6 @@ describe(
             $scope: $scope,
             AlertsService: alertsService,
             SkillDifficultyObjectFactory: skillDifficultyObjectFactory,
-            SkillObjectFactory: skillObjectFactory,
             $uibModalInstance: $uibModalInstance,
             skillId: skillId,
           });

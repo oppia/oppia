@@ -16,20 +16,17 @@
  * @fileoverview Unit tests for ExplorationPropertyService.
  */
 
+import { ParamChanges } from 'domain/exploration/ParamChanges.model';
+import { ParamSpec } from 'domain/exploration/ParamSpec.model';
+import { ParamSpecs } from 'domain/exploration/ParamSpecs.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/exploration-editor-page/services/exploration-property.service');
 require('pages/exploration-editor-page/services/change-list.service');
-require('domain/exploration/ParamChangesObjectFactory');
-require('domain/exploration/ParamSpecsObjectFactory');
-require('domain/exploration/ParamSpecObjectFactory');
 
 
 describe('Exploration Property Service', function() {
   var ExplorationPropertyService;
-  var ParamChangesObjectFactory;
-  var ParamSpecsObjectFactory;
-  var ParamSpecObjectFactory;
   var ChangeListService;
   var editExplorationPropertySpy;
 
@@ -49,9 +46,6 @@ describe('Exploration Property Service', function() {
   }));
   beforeEach(angular.mock.inject(function($injector) {
     ExplorationPropertyService = $injector.get('ExplorationPropertyService');
-    ParamChangesObjectFactory = $injector.get('ParamChangesObjectFactory');
-    ParamSpecsObjectFactory = $injector.get('ParamSpecsObjectFactory');
-    ParamSpecObjectFactory = $injector.get('ParamSpecObjectFactory');
     ChangeListService = $injector.get('ChangeListService');
 
     editExplorationPropertySpy = spyOn(
@@ -139,7 +133,7 @@ describe('Exploration Property Service', function() {
     var normalizeSpy = spyOn(child, '_normalize').and
       .callThrough();
 
-    child.init(ParamChangesObjectFactory.createFromBackendList([{
+    child.init(ParamChanges.createFromBackendList([{
       customization_args: {
         parse_with_jinja: true,
         value: ''
@@ -166,7 +160,7 @@ describe('Exploration Property Service', function() {
     child.propertyName = 'param_specs';
     child._normalize = function(paramSpecs) {
       // Changing paramSpecs so hasChanged() turns to be true on line 87.
-      var paramSpec = ParamSpecObjectFactory.createDefault();
+      var paramSpec = ParamSpec.createDefault();
       paramSpecs.addParamIfNew('z', paramSpec);
       return paramSpecs;
     };
@@ -174,7 +168,7 @@ describe('Exploration Property Service', function() {
     var normalizeSpy = spyOn(child, '_normalize').and
       .callThrough();
 
-    child.init(ParamSpecsObjectFactory.createFromBackendDict({
+    child.init(ParamSpecs.createFromBackendDict({
       x: {
         obj_type: 'UnicodeString'
       },

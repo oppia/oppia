@@ -17,6 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { States } from 'domain/exploration/States.model';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -40,7 +41,6 @@ require(
   'pages/exploration-editor-page/modal-templates/' +
   'post-publish-modal.controller.ts');
 
-require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/autosave-info-modals.service.ts');
@@ -80,8 +80,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
   'ExplorationTagsService', 'ExplorationTitleService',
   'ExplorationWarningsService', 'ExternalSaveService',
   'FocusManagerService', 'RouterService',
-  'SiteAnalyticsService', 'StatesObjectFactory', 'UrlInterpolationService',
-  'DEFAULT_LANGUAGE_CODE',
+  'SiteAnalyticsService', 'UrlInterpolationService', 'DEFAULT_LANGUAGE_CODE',
   function(
       $log, $q, $timeout, $uibModal, $window,
       AlertsService, AutosaveInfoModalsService, ChangeListService,
@@ -92,8 +91,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
       ExplorationTagsService, ExplorationTitleService,
       ExplorationWarningsService, ExternalSaveService,
       FocusManagerService, RouterService,
-      SiteAnalyticsService, StatesObjectFactory, UrlInterpolationService,
-      DEFAULT_LANGUAGE_CODE) {
+      SiteAnalyticsService, UrlInterpolationService, DEFAULT_LANGUAGE_CODE) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet).
     var saveIsInProgress = false;
@@ -354,7 +352,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
         }
 
         ExplorationDataService.getLastSavedData().then(function(data) {
-          var oldStates = StatesObjectFactory.createFromBackendDict(
+          var oldStates = States.createFromBackendDict(
             data.states).getStateObjects();
           var newStates = ExplorationStatesService.getStates()
             .getStateObjects();

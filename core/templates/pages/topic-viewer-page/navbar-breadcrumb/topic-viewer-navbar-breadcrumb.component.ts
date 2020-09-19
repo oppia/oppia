@@ -19,8 +19,7 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { ReadOnlyTopic } from
-  'domain/topic_viewer/read-only-topic-object.factory';
+import { ReadOnlyTopic } from 'domain/topic_viewer/ReadOnlyTopic.model';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';

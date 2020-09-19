@@ -20,24 +20,17 @@ import { TestBed, flushMicrotasks, fakeAsync } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 
-import { NormalizeWhitespacePipe } from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
-import { NormalizeWhitespacePunctuationAndCasePipe } from
-  // eslint-disable-next-line max-len
-  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
-import { StateInteractionStats, StateInteractionStatsService } from
-  'services/state-interaction-stats.service';
-import { VisualizationInfoObjectFactory } from
-  'domain/exploration/visualization-info-object.factory';
+import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import { NormalizeWhitespacePunctuationAndCasePipe } from 'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
+import { StateInteractionStats, StateInteractionStatsService } from 'services/state-interaction-stats.service';
+import { VisualizationInfoObjectFactory } from 'domain/exploration/visualization-info-object.factory';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
-import { State, StateBackendDict, StateObjectFactory } from
-  'domain/state/StateObjectFactory';
+import { State, StateBackendDict } from 'domain/state/State.model';
 
 const joC = jasmine.objectContaining;
 
 describe('State Interaction Stats Service', () => {
   let httpTestingController: HttpTestingController;
-  let stateObjectFactory: StateObjectFactory;
   let stateInteractionStatsService: StateInteractionStatsService;
 
   beforeEach(() => {
@@ -52,7 +45,6 @@ describe('State Interaction Stats Service', () => {
       ],
     });
 
-    stateObjectFactory = TestBed.get(StateObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
     stateInteractionStatsService = (
       TestBed.get(StateInteractionStatsService));
@@ -161,7 +153,7 @@ describe('State Interaction Stats Service', () => {
       next_content_id_index: 0
     };
 
-    mockState = stateObjectFactory.createFromBackendDict('Hola', stateDict);
+    mockState = State.createFromBackendDict('Hola', stateDict);
   });
 
   it('should support improvements overview for states with text-input', () => {

@@ -19,8 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // question-misconception-selector.component.ts is upgraded to Angular 8.
 /* eslint-disable max-len */
-import { MisconceptionObjectFactory } from
-  'domain/skill/MisconceptionObjectFactory';
+import { Misconception } from 'domain/skill/Misconception.model';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateEditorService } from
@@ -37,14 +36,11 @@ require(
 describe('Question misconception selector component', function() {
   var $componentController = null;
   var ctrl = null;
-  var misconceptionObjectFactory = null;
   var mockMisconceptionObject = null;
   var ses = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'MisconceptionObjectFactory', new MisconceptionObjectFactory());
     $provide.value(
       'StateEditorService', new StateEditorService(
         new SolutionValidityService()));
@@ -53,19 +49,16 @@ describe('Question misconception selector component', function() {
   beforeEach(angular.mock.inject(
     function(_$componentController_, _$q_, _$rootScope_, $injector) {
       $componentController = _$componentController_;
-      misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
       ses = $injector.get('StateEditorService');
     }));
 
   beforeEach(function() {
     mockMisconceptionObject = {
       abc: [
-        misconceptionObjectFactory.create(
-          '1', 'misc1', 'notes1', 'feedback1', true)
+        Misconception.create('1', 'misc1', 'notes1', 'feedback1', true)
       ],
       def: [
-        misconceptionObjectFactory.create(
-          '2', 'misc2', 'notes2', 'feedback1', true)
+        Misconception.create('2', 'misc2', 'notes2', 'feedback1', true)
       ]
     };
     spyOn(ses, 'getMisconceptionsBySkill').and.callFake(function() {

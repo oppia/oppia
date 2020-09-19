@@ -18,19 +18,14 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { SetInputValidationService } from
-  'interactions/SetInput/directives/set-input-validation.service';
-import { Outcome } from
-  'domain/exploration/Outcome.model';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { SetInputValidationService } from 'interactions/SetInput/directives/set-input-validation.service';
+import { Outcome } from 'domain/exploration/Outcome.model';
 import { Rule } from 'domain/exploration/Rule.model';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
 
 import { AppConstants } from 'app.constants';
-import { SetInputCustomizationArgs } from
-  'interactions/customization-args-defs';
+import { SetInputCustomizationArgs } from 'interactions/customization-args-defs';
 
 describe('SetInputValidationService', () => {
   let validatorService: SetInputValidationService;
@@ -38,7 +33,6 @@ describe('SetInputValidationService', () => {
 
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let agof: AnswerGroupObjectFactory;
 
   let goodCustomizationArgs: SetInputCustomizationArgs;
 
@@ -52,7 +46,6 @@ describe('SetInputValidationService', () => {
     validatorService = TestBed.get(SetInputValidationService);
 
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    agof = TestBed.get(AnswerGroupObjectFactory);
 
     goodCustomizationArgs = {
       buttonText: {
@@ -74,9 +67,10 @@ describe('SetInputValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    goodAnswerGroups = (
+      [AnswerGroup.createNew([], goodDefaultOutcome, null, null)]);
 
-    createAnswerGroupByRules = (rules) => agof.createNew(
+    createAnswerGroupByRules = (rules) => AnswerGroup.createNew(
       rules,
       goodDefaultOutcome,
       null,

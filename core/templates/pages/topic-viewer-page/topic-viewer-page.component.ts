@@ -20,13 +20,9 @@ import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
-import { ReadOnlyTopic } from
-  'domain/topic_viewer/read-only-topic-object.factory';
+import { ReadOnlyTopic, DegreesOfMastery } from 'domain/topic_viewer/ReadOnlyTopic.model';
 import { StorySummary } from 'domain/story/StorySummaryObjectFactory';
-import { Subtopic, SkillIdToDescriptionMap } from
-  'domain/topic/SubtopicObjectFactory';
-import { DegreesOfMastery } from
-  'domain/topic_viewer/read-only-topic-object.factory';
+import { Subtopic, SkillIdToDescriptionMap } from 'domain/topic/Subtopic.model';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UrlInterpolationService } from

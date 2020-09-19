@@ -23,10 +23,10 @@ import { EventEmitter } from '@angular/core';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { Hint } from 'domain/exploration/Hint.model';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { Solution } from 'domain/exploration/Solution.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/exploration/SolutionObjectFactory.ts');
 require(
   'pages/exploration-player-page/services/' +
   'hints-and-solution-manager.service.ts');
@@ -34,7 +34,6 @@ require(
 describe('HintsAndSolutionManager service', function() {
   var $timeout;
   var hasms;
-  var sof;
   var firstHint, secondHint, thirdHint;
   var solution;
   var pps;
@@ -59,7 +58,6 @@ describe('HintsAndSolutionManager service', function() {
     spyOnProperty(pps, 'onNewCardAvailable').and.returnValue(
       mockNewCardAvailableEmitter);
     hasms = $injector.get('HintsAndSolutionManagerService');
-    sof = $injector.get('SolutionObjectFactory');
 
 
     firstHint = Hint.createFromBackendDict({
@@ -80,12 +78,12 @@ describe('HintsAndSolutionManager service', function() {
         content_id: '3'
       }
     });
-    solution = sof.createFromBackendDict({
+    solution = Solution.createFromBackendDict({
       answer_is_exclusive: false,
       correct_answer: 'This is a correct answer!',
       explanation: {
         html: 'This is the explanation to the answer',
-        audio_translations: {}
+        content_id: '4'
       }
     });
 

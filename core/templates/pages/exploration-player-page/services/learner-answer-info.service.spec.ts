@@ -20,13 +20,12 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 import { Outcome } from 'domain/exploration/Outcome.model';
+import { State } from 'domain/state/State.model';
 
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
-require('domain/state/StateObjectFactory.ts');
 
 describe('Learner answer info service', function() {
-  var sof = null;
   var acrof = null;
   var stateDict = null;
   var firstState = null;
@@ -130,7 +129,6 @@ describe('Learner answer info service', function() {
       }
     };
 
-    sof = $injector.get('StateObjectFactory');
     acrof = $injector.get('AnswerClassificationResultObjectFactory');
     LearnerAnswerInfoService = $injector.get('LearnerAnswerInfoService');
     AnswerClassificationService = $injector.get('AnswerClassificationService');
@@ -138,9 +136,9 @@ describe('Learner answer info service', function() {
       'LearnerAnswerDetailsBackendApiService');
     DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
       'DEFAULT_OUTCOME_CLASSIFICATION');
-    firstState = sof.createFromBackendDict('new state', stateDict);
-    secondState = sof.createFromBackendDict('fake state', stateDict);
-    thirdState = sof.createFromBackendDict('demo state', stateDict);
+    firstState = State.createFromBackendDict('new state', stateDict);
+    secondState = State.createFromBackendDict('fake state', stateDict);
+    thirdState = State.createFromBackendDict('demo state', stateDict);
     spyOn(AnswerClassificationService, 'getMatchingClassificationResult')
       .and.returnValue(acrof.createNew(
         Outcome.createNew('default', 'default_outcome', '', []), 2,

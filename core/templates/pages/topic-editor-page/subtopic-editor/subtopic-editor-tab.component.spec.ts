@@ -18,7 +18,10 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model'
+import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
+import { Subtopic } from 'domain/topic/Subtopic.model';
+import { SubtopicPage } from 'domain/topic/SubtopicPage.model';
+import { Topic } from 'domain/topic/Topic.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Subtopic editor tab', function() {
@@ -36,9 +39,6 @@ describe('Subtopic editor tab', function() {
   var TopicUpdateService = null;
   var SubtopicValidationService = null;
   var TopicEditorRoutingService = null;
-  var TopicObjectFactory = null;
-  var SubtopicObjectFactory = null;
-  var SubtopicPageObjectFactory = null;
   var MockWindowDimensionsService = {
     isWindowNarrow: () => false
   };
@@ -52,21 +52,18 @@ describe('Subtopic editor tab', function() {
     TopicUpdateService = $injector.get('TopicUpdateService');
     SubtopicValidationService = $injector.get('SubtopicValidationService');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
-    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
-    SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
-    TopicObjectFactory = $injector.get('TopicObjectFactory');
     $location = $injector.get('$location');
 
     var MockQuestionBackendApiService = {
       fetchTotalQuestionCountForSkillIds: () => Promise.resolve(2)
     };
-    var topic = TopicObjectFactory.createInterstitialTopic();
-    var subtopic = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');
+    var topic = Topic.createInterstitialTopic();
+    var subtopic = Subtopic.createFromTitle(1, 'Subtopic1');
     subtopic._skillIds = ['skill_1'];
     subtopic.setUrlFragment('dummy-url');
     skillSummary = ShortSkillSummary.create('skill_1', 'Description 1');
     topic._uncategorizedSkillSummaries = [skillSummary];
-    var subtopicPage = SubtopicPageObjectFactory.createDefault('asd2r42', '1');
+    var subtopicPage = SubtopicPage.createDefault('asd2r42', 1);
     topic._id = 'sndsjfn42';
 
     topicInitializedEventEmitter = new EventEmitter();

@@ -16,7 +16,8 @@
  * @fileoverview Directive for the skill description editor.
  */
 
-require('domain/skill/SkillObjectFactory.ts');
+import { Skill } from 'domain/skill/Skill.model';
+
 require('domain/skill/skill-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
@@ -26,10 +27,10 @@ require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('skillDescriptionEditor', [
-  'SkillEditorStateService', 'SkillObjectFactory', 'SkillUpdateService',
+  'SkillEditorStateService', 'SkillUpdateService',
   'UrlInterpolationService', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
   function(
-      SkillEditorStateService, SkillObjectFactory, SkillUpdateService,
+      SkillEditorStateService, SkillUpdateService,
       UrlInterpolationService, MAX_CHARS_IN_SKILL_DESCRIPTION) {
     return {
       restrict: 'E',
@@ -56,8 +57,7 @@ angular.module('oppia').directive('skillDescriptionEditor', [
             if (newSkillDescription === $scope.skill.getDescription()) {
               return;
             }
-            if (SkillObjectFactory.hasValidDescription(
-              newSkillDescription)) {
+            if (Skill.hasValidDescription(newSkillDescription)) {
               $scope.skillDescriptionEditorIsShown = false;
               SkillUpdateService.setSkillDescription(
                 $scope.skill,

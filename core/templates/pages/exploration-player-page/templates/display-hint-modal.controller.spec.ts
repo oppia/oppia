@@ -17,11 +17,9 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { InteractionObjectFactory } from
-  'domain/exploration/InteractionObjectFactory';
+import { Interaction } from 'domain/exploration/Interaction.model';
 import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
-import { StateCardObjectFactory } from
-  'domain/state_card/StateCardObjectFactory';
+import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 import { Subscription } from 'rxjs';
@@ -35,7 +33,6 @@ describe('Display Hint Modal Controller', function() {
   var AudioTranslationManagerService = null;
   var ContextService = null;
   var HintsAndSolutionManagerService = null;
-  var interactionObjectFactory = null;
   var playerTranscriptService = null;
   var stateCardObjectFactory = null;
 
@@ -47,7 +44,6 @@ describe('Display Hint Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
-    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
   });
 
@@ -73,12 +69,14 @@ describe('Display Hint Modal Controller', function() {
     spyOn(HintsAndSolutionManagerService, 'displayHint').and.returnValue(
       hintContent);
 
-    var interaction = interactionObjectFactory.createFromBackendDict({
+    var interaction = Interaction.createFromBackendDict({
       answer_groups: [],
       confirmed_unclassified_answers: [],
       customization_args: {},
       hints: [],
-      id: null
+      id: null,
+      default_outcome: null,
+      solution: null
     });
     var recordedVoiceovers = RecordedVoiceovers.createEmpty();
     card = stateCardObjectFactory.createNewCard(

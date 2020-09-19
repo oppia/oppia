@@ -26,18 +26,12 @@ import { AnswerClassificationResultObjectFactory } from
 import { AnswerGroupsCacheService } from
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 /* eslint-enable max-len */
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { Outcome } from 'domain/exploration/Outcome.model';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
@@ -49,10 +43,6 @@ import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
 /* eslint-enable max-len */
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -96,17 +86,10 @@ describe('TrainingDataService', function() {
         new AnswerClassificationResultObjectFactory());
       $provide.value(
         'AnswerGroupsCacheService', new AnswerGroupsCacheService());
-      $provide.value(
-        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
       $provide.value('FractionObjectFactory', new FractionObjectFactory());
-      $provide.value(
-        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-      $provide.value(
-        'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-          new ParamChangeObjectFactory()));
       $provide.value('SolutionValidityService', new SolutionValidityService());
       $provide.value(
         'StateClassifierMappingService', new StateClassifierMappingService(
@@ -115,13 +98,6 @@ describe('TrainingDataService', function() {
         'StateEditorService', new StateEditorService(
           new SolutionValidityService()));
       $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-      $provide.value(
-        'WrittenTranslationObjectFactory',
-        new WrittenTranslationObjectFactory());
-      $provide.value(
-        'WrittenTranslationsObjectFactory',
-        new WrittenTranslationsObjectFactory(
-          new WrittenTranslationObjectFactory()));
     });
     mockExplorationData = {
       explorationId: 0,

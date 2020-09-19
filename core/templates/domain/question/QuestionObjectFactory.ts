@@ -17,9 +17,7 @@
  * question domain objects.
  */
 
-require('domain/state/StateObjectFactory.ts');
-
-import { StateBackendDict } from 'domain/state/StateObjectFactory';
+import { StateBackendDict, State } from 'domain/state/State.model';
 
 export interface QuestionBackendDict {
   'id': string;
@@ -32,8 +30,8 @@ export interface QuestionBackendDict {
 }
 
 angular.module('oppia').factory('QuestionObjectFactory', [
-  'StateObjectFactory', 'DEFAULT_LANGUAGE_CODE', 'INTERACTION_SPECS',
-  function(StateObjectFactory, DEFAULT_LANGUAGE_CODE, INTERACTION_SPECS) {
+  'DEFAULT_LANGUAGE_CODE', 'INTERACTION_SPECS',
+  function(DEFAULT_LANGUAGE_CODE, INTERACTION_SPECS) {
     var Question = function(
         id, stateData, languageCode, version, linkedSkillIds,
         inApplicableSkillMisconceptionIds) {
@@ -95,7 +93,7 @@ angular.module('oppia').factory('QuestionObjectFactory', [
     Question['createDefaultQuestion'] = function(skillIds) {
     /* eslint-enable dot-notation */
       return new Question(
-        null, StateObjectFactory.createDefaultState(null),
+        null, State.createDefaultState(null),
         DEFAULT_LANGUAGE_CODE, 1, skillIds, []);
     };
 
@@ -161,7 +159,7 @@ angular.module('oppia').factory('QuestionObjectFactory', [
     /* eslint-enable dot-notation */
       return new Question(
         questionBackendDict.id,
-        StateObjectFactory.createFromBackendDict(
+        State.createFromBackendDict(
           'question', questionBackendDict.question_state_data),
         questionBackendDict.language_code, questionBackendDict.version,
         questionBackendDict.linked_skill_ids,

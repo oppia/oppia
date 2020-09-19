@@ -18,6 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { Skill } from 'domain/skill/Skill.model'
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
@@ -25,7 +26,6 @@ describe('Delete Misconception Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var SkillEditorStateService = null;
-  var SkillObjectFactory = null;
 
   var skillObject = null;
   var index = 0;
@@ -35,7 +35,6 @@ describe('Delete Misconception Modal Controller', function() {
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     SkillEditorStateService = $injector.get('SkillEditorStateService');
-    SkillObjectFactory = $injector.get('SkillObjectFactory');
     var skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
 
     $uibModalInstance = jasmine.createSpyObj(
@@ -61,7 +60,7 @@ describe('Delete Misconception Modal Controller', function() {
         voiceovers_mapping: {}
       }
     };
-    skillObject = SkillObjectFactory.createFromBackendDict({
+    skillObject = Skill.createFromBackendDict({
       id: 'skill1',
       description: 'test description 1',
       misconceptions: [misconceptionDict1],
@@ -69,8 +68,10 @@ describe('Delete Misconception Modal Controller', function() {
       skill_contents: skillContentsDict,
       language_code: 'en',
       version: 3,
-      next_misconception_id: '3',
-      prerequisite_skill_ids: ['skill_1']
+      prerequisite_skill_ids: ['skill_1'],
+      all_questions_merged: true,
+      next_misconception_id: 3,
+      superseding_skill_id: null
     });
 
     spyOn(SkillEditorStateService, 'getSkill').and.returnValue(skillObject);

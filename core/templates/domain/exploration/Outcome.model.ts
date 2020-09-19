@@ -21,8 +21,7 @@ import {
   SubtitledHtmlBackendDict,
   SubtitledHtml
 } from 'domain/exploration/SubtitledHtml.model';
-import { ParamChangeBackendDict } from
-  'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangeBackendDict } from 'domain/exploration/ParamChange.model';
 
 export interface OutcomeBackendDict {
   'dest': string;

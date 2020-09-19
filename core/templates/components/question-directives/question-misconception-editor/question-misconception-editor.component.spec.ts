@@ -21,10 +21,9 @@ import { EventEmitter } from '@angular/core';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // question-misconception-editor.component.ts is upgraded to Angular 8.
 /* eslint-disable max-len */
-import { MisconceptionObjectFactory } from
-  'domain/skill/MisconceptionObjectFactory';
 import { Outcome } from 'domain/exploration/Outcome.model';
 import { Rule } from 'domain/exploration/Rule.model';
+import { Misconception } from 'domain/skill/Misconception.model';
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateEditorService } from
@@ -45,7 +44,6 @@ describe('Question misconception editor component', function() {
   var $q = null;
   var $rootScope = null;
   var ctrl = null;
-  var misconceptionObjectFactory = null;
   var mockMisconceptionObject = null;
   var ses = null;
 
@@ -53,8 +51,6 @@ describe('Question misconception editor component', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'MisconceptionObjectFactory', new MisconceptionObjectFactory());
     $provide.value(
       'StateEditorService', new StateEditorService(
         new SolutionValidityService()));
@@ -70,7 +66,6 @@ describe('Question misconception editor component', function() {
       $uibModal = $injector.get('$uibModal');
       $q = _$q_;
       $rootScope = _$rootScope_;
-      misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
       ses = $injector.get('StateEditorService');
     }));
 
@@ -81,10 +76,8 @@ describe('Question misconception editor component', function() {
       'onSaveAnswerGroupFeedback');
     mockMisconceptionObject = {
       abc: [
-        misconceptionObjectFactory.create(
-          '1', 'misc1', 'notes1', 'feedback1', true),
-        misconceptionObjectFactory.create(
-          '2', 'misc2', 'notes2', 'feedback1', true)
+        Misconception.create('1', 'misc1', 'notes1', 'feedback1', true),
+        Misconception.create('2', 'misc2', 'notes2', 'feedback1', true)
       ]
     };
     spyOn(ses, 'getMisconceptionsBySkill').and.callFake(function() {

@@ -45,7 +45,6 @@ import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
@@ -97,7 +96,6 @@ describe('Exploration save and publish buttons component', function() {
       'TextInputRulesService',
       TestBed.get(TextInputRulesService));
     $provide.value('SiteAnalyticsService', TestBed.get(SiteAnalyticsService));
-    $provide.value('StatesObjectFactory', TestBed.get(StatesObjectFactory));
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));

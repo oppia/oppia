@@ -19,10 +19,8 @@
 import { TestBed } from '@angular/core/testing';
 
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { InteractionAttributesExtractorService } from
-  'interactions/interaction-attributes-extractor.service';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
 
 describe('Interaction attributes extractor service', () => {
   let iaes: InteractionAttributesExtractorService = null;

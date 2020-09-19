@@ -18,8 +18,7 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
+import { ParamChange } from 'domain/exploration/ParamChange.model';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerGroupsCacheService } from
@@ -39,8 +38,7 @@ import { StateParamChangesService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-param-changes.service';
 import { AlertsService } from 'services/alerts.service';
-import { ParamSpecsObjectFactory } from
-  'domain/exploration/ParamSpecsObjectFactory';
+import { ParamSpecs } from 'domain/exploration/ParamSpecs.model';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
@@ -53,8 +51,6 @@ describe('Param Changes Editor Component', function() {
   var editabilityService = null;
   var explorationParamSpecsService = null;
   var explorationStatesService = null;
-  var paramChangeObjectFactory = null;
-  var paramSpecsObjectFactory = null;
   var externalSaveService = null;
   var stateParamChangesService = null;
 
@@ -66,8 +62,6 @@ describe('Param Changes Editor Component', function() {
 
   beforeEach(function() {
     alertsService = TestBed.get(AlertsService);
-    paramChangeObjectFactory = TestBed.get(ParamChangeObjectFactory);
-    paramSpecsObjectFactory = TestBed.get(ParamSpecsObjectFactory);
     stateParamChangesService = TestBed.get(StateParamChangesService);
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -104,7 +98,7 @@ describe('Param Changes Editor Component', function() {
     externalSaveService = $injector.get('ExternalSaveService');
 
     explorationParamSpecsService.init(
-      paramSpecsObjectFactory.createFromBackendDict({
+      ParamSpecs.createFromBackendDict({
         y: {
           obj_type: 'UnicodeString'
         },
@@ -118,7 +112,6 @@ describe('Param Changes Editor Component', function() {
     ctrl = $componentController('paramChangesEditor', {
       $scope: $scope,
       AlertsService: alertsService,
-      ParamChangeObjectFactory: paramChangeObjectFactory,
       ExternalSaveService: externalSaveService
     }, {
       paramChangesService: stateParamChangesService,
@@ -141,7 +134,7 @@ describe('Param Changes Editor Component', function() {
 
   it('should reset customization args from param change when changing' +
     ' generator type', function() {
-    var paramChange = paramChangeObjectFactory.createFromBackendDict({
+    var paramChange = ParamChange.createFromBackendDict({
       customization_args: {
         list_of_values: ['first value', 'second value']
       },
@@ -245,8 +238,7 @@ describe('Param Changes Editor Component', function() {
 
   it('should check param changes as invalid when it has an empty parameter' +
     ' name', function() {
-    ctrl.paramChangesService.displayed = [
-      paramChangeObjectFactory.createDefault('')];
+    ctrl.paramChangesService.displayed = [ParamChange.createDefault('')];
 
     expect($scope.areDisplayedParamChangesValid()).toBe(false);
     expect($scope.warningText).toBe('Please pick a non-empty parameter name.');
@@ -254,8 +246,7 @@ describe('Param Changes Editor Component', function() {
 
   it('should check param changes as invalid when it has a reserved parameter' +
     ' name', function() {
-    ctrl.paramChangesService.displayed = [
-      paramChangeObjectFactory.createDefault('answer')];
+    ctrl.paramChangesService.displayed = [ParamChange.createDefault('answer')];
 
     expect($scope.areDisplayedParamChangesValid()).toBe(false);
     expect($scope.warningText).toBe(
@@ -264,8 +255,7 @@ describe('Param Changes Editor Component', function() {
 
   it('should check param changes as invalid when it has non alphabetic' +
     ' characters in parameter name', function() {
-    ctrl.paramChangesService.displayed = [
-      paramChangeObjectFactory.createDefault('123')];
+    ctrl.paramChangesService.displayed = [ParamChange.createDefault('123')];
 
     expect($scope.areDisplayedParamChangesValid()).toBe(false);
     expect($scope.warningText).toBe(
@@ -274,12 +264,13 @@ describe('Param Changes Editor Component', function() {
 
   it('should check param changes as invalid when it has no default' +
     ' generator id', function() {
-    ctrl.paramChangesService.displayed = [
-      paramChangeObjectFactory.createFromBackendDict({
-        customization_args: {},
-        generator_id: '',
-        name: 'a'
-      })];
+    ctrl.paramChangesService.displayed = [ParamChange.createFromBackendDict({
+      customization_args: {
+        list_of_values: []
+      },
+      generator_id: '',
+      name: 'a'
+    })];
 
     $scope.areDisplayedParamChangesValid();
     expect($scope.areDisplayedParamChangesValid()).toBe(false);
@@ -289,14 +280,13 @@ describe('Param Changes Editor Component', function() {
 
   it('should check param changes as invalid when it has no values and its' +
     ' generator id is RandomSelector', function() {
-    ctrl.paramChangesService.displayed = [
-      paramChangeObjectFactory.createFromBackendDict({
-        customization_args: {
-          list_of_values: []
-        },
-        generator_id: 'RandomSelector',
-        name: 'a'
-      })];
+    ctrl.paramChangesService.displayed = [ParamChange.createFromBackendDict({
+      customization_args: {
+        list_of_values: []
+      },
+      generator_id: 'RandomSelector',
+      name: 'a'
+    })];
 
     $scope.areDisplayedParamChangesValid();
     expect($scope.areDisplayedParamChangesValid()).toBe(false);
@@ -306,8 +296,7 @@ describe('Param Changes Editor Component', function() {
 
   it('should not save param changes when it is invalid', function() {
     spyOn(alertsService, 'addWarning');
-    ctrl.paramChangesService.displayed = [
-      paramChangeObjectFactory.createDefault('123')];
+    ctrl.paramChangesService.displayed = [ParamChange.createDefault('123')];
     $scope.saveParamChanges();
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(

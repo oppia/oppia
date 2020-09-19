@@ -24,8 +24,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { AnswerGroupBackendDict } from
-  'domain/exploration/AnswerGroupObjectFactory';
+import { AnswerGroupBackendDict } from 'domain/exploration/AnswerGroup.model';
 
 @Injectable({
   providedIn: 'root'

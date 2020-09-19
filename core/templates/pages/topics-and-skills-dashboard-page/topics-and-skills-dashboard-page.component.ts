@@ -26,11 +26,9 @@ require('components/entity-creation-services/skill-creation.service.ts');
 require('components/entity-creation-services/topic-creation.service.ts');
 require('components/rubrics-editor/rubrics-editor.directive.ts');
 
-require('domain/skill/RubricObjectFactory.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
   'TopicsAndSkillsDashboardFilterObjectFactory.ts');
-require('domain/skill/SkillObjectFactory.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
     'topics-and-skills-dashboard-backend-api.service.ts');

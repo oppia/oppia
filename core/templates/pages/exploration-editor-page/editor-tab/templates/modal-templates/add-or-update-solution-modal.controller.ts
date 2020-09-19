@@ -16,6 +16,7 @@
  * @fileoverview Controller for add or update solution modal.
  */
 
+import { Solution } from 'domain/exploration/Solution.model';
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -26,7 +27,6 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-interaction-id.service.ts');
-require('domain/exploration/SolutionObjectFactory.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
@@ -38,13 +38,13 @@ require('services/exploration-html-formatter.service.ts');
 angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
   '$controller', '$scope', '$uibModalInstance', 'ContextService',
   'CurrentInteractionService', 'ExplorationHtmlFormatterService',
-  'SolutionObjectFactory', 'StateCustomizationArgsService',
-  'StateInteractionIdService', 'StateSolutionService',
+  'StateCustomizationArgsService',
+'StateInteractionIdService', 'StateSolutionService',
   'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
   function(
       $controller, $scope, $uibModalInstance, ContextService,
       CurrentInteractionService, ExplorationHtmlFormatterService,
-      SolutionObjectFactory, StateCustomizationArgsService,
+      StateCustomizationArgsService,
       StateInteractionIdService, StateSolutionService,
       COMPONENT_NAME_SOLUTION, INTERACTION_SPECS) {
     $controller('ConfirmOrCancelModalController', {
@@ -108,7 +108,7 @@ angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
           $scope.data.correctAnswer !== null &&
           $scope.data.explanation !== '') {
         $uibModalInstance.close({
-          solution: SolutionObjectFactory.createNew(
+          solution: Solution.createNew(
             $scope.data.answerIsExclusive,
             $scope.data.correctAnswer,
             $scope.data.explanationHtml,

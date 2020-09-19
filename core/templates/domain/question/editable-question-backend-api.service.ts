@@ -18,10 +18,7 @@
  */
 
 require('domain/collection/guest-collection-progress.service.ts');
-require('domain/exploration/AnswerGroupObjectFactory.ts');
-require('domain/exploration/ParamSpecObjectFactory.ts');
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/exploration/WrittenTranslationObjectFactory.ts');
 require('domain/objects/FractionObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 

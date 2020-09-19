@@ -22,8 +22,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SkillChange } from 'domain/editor/undo_redo/ChangeObjectFactory';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
-import { Skill, SkillBackendDict, SkillObjectFactory } from
-  'domain/skill/SkillObjectFactory';
+import { Skill, SkillBackendDict } from 'domain/skill/Skill.model';
 import { SkillSummaryBackendDict } from
   'domain/skill/skill-summary-object.factory';
 import { UrlInterpolationService } from
@@ -63,7 +62,6 @@ interface UpdateSkillBackendResponse {
 export class SkillBackendApiService {
   constructor(
     private http: HttpClient,
-    private skillObjectFactory: SkillObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
 
   fetchSkill(skillId: string): Promise<FetchSkillResponse> {
@@ -76,8 +74,7 @@ export class SkillBackendApiService {
       this.http.get<FetchSkillBackendResponse>(skillDataUrl).toPromise()
         .then(response => {
           resolve({
-            skill: this.skillObjectFactory.createFromBackendDict(
-              response.skill),
+            skill: Skill.createFromBackendDict(response.skill),
             assignedSkillTopicData: response.assigned_skill_topic_data_dict,
             // TODO(nishantwrp): Refactor this property to return SkillSummary
             // domain objects instead of backend dicts.
@@ -100,7 +97,7 @@ export class SkillBackendApiService {
       this.http.get<FetchMultiSkillsBackendResponse>(
         skillDataUrl).toPromise().then(response => {
         resolve(response.skills.map(backendDict => {
-          return this.skillObjectFactory.createFromBackendDict(backendDict);
+          return Skill.createFromBackendDict(backendDict);
         }));
       }, errorResponse => {
         reject(errorResponse.error.error);
@@ -141,7 +138,7 @@ export class SkillBackendApiService {
 
       this.http.put<UpdateSkillBackendResponse>(
         editableSkillDataUrl, putData).toPromise().then(response => {
-        resolve(this.skillObjectFactory.createFromBackendDict(response.skill));
+        resolve(Skill.createFromBackendDict(response.skill));
       }, errorResponse => {
         reject(errorResponse.error.error);
       });

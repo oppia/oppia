@@ -18,6 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { Skill } from 'domain/skill/Skill.model';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
@@ -30,9 +31,7 @@ describe('Contributions and review component', function() {
   var contextService = null;
   var contributionAndReviewService = null;
   var csrfTokenService = null;
-  var misconceptionObjectFactory = null;
   var skillBackendApiService = null;
-  var skillObjectFactory = null;
   var userService = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -50,7 +49,6 @@ describe('Contributions and review component', function() {
       contextService = $injector.get('ContextService');
       skillBackendApiService = $injector.get('SkillBackendApiService');
       spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
-      misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
       spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
         isLoggedIn: () => true
@@ -164,8 +162,7 @@ describe('Contributions and review component', function() {
       $scope = $rootScope.$new();
       ctrl = $componentController('contributionsAndReview', {
         $scope: $scope,
-        ContextService: contextService,
-        MisconceptionObjectFactory: misconceptionObjectFactory
+        ContextService: contextService
       });
       ctrl.$onInit();
       $scope.$apply();
@@ -253,9 +250,7 @@ describe('Contributions and review component', function() {
       userService = $injector.get('UserService');
       contextService = $injector.get('ContextService');
       skillBackendApiService = $injector.get('SkillBackendApiService');
-      skillObjectFactory = $injector.get('SkillObjectFactory');
       spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
-      misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
@@ -351,7 +346,7 @@ describe('Contributions and review component', function() {
         }));
       spyOn(skillBackendApiService, 'fetchSkill').and.returnValue(
         $q.resolve({
-          skill: skillObjectFactory.createFromBackendDict({
+          skill: Skill.createFromBackendDict({
             id: 'skill1',
             description: 'test description 1',
             misconceptions: [{
@@ -377,15 +372,17 @@ describe('Contributions and review component', function() {
             },
             language_code: 'en',
             version: 3,
-            prerequisite_skill_ids: ['skill_1']
+            prerequisite_skill_ids: ['skill_1'],
+            all_questions_merged: true,
+            next_misconception_id: null,
+            superseding_skill_id: null
           })
         }));
 
       $scope = $rootScope.$new();
       ctrl = $componentController('contributionsAndReview', {
         $scope: $scope,
-        ContextService: contextService,
-        MisconceptionObjectFactory: misconceptionObjectFactory
+        ContextService: contextService
       });
       ctrl.$onInit();
       $scope.$apply();

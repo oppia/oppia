@@ -23,7 +23,6 @@ require(
 
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/SkillDifficultyObjectFactory.ts');
-require('domain/skill/SkillObjectFactory.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').controller(

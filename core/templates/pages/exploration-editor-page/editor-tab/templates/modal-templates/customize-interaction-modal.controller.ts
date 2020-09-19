@@ -16,13 +16,11 @@
  * @fileoverview Controller for customize interaction modal.
  */
 
-import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtml.model';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { Interaction } from 'domain/exploration/Interaction.model';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
 import { Schema } from 'services/schema-default-value.service';
-import { SchemaConstants } from
-  'components/forms/schema-based-editors/schema-constants';
+import { SchemaConstants } from 'components/forms/schema-based-editors/schema-constants';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -39,7 +37,6 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-next-content-id-index.service');
-require('domain/exploration/InteractionObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
@@ -49,8 +46,7 @@ require(
 
 angular.module('oppia').controller('CustomizeInteractionModalController', [
   '$controller', '$injector', '$scope', '$uibModalInstance',
-  'EditorFirstTimeEventsService',
-  'InteractionDetailsCacheService', 'InteractionObjectFactory',
+  'EditorFirstTimeEventsService', 'InteractionDetailsCacheService',
   'StateCustomizationArgsService', 'StateEditorService',
   'StateInteractionIdService', 'StateNextContentIdIndexService',
   'UrlInterpolationService',
@@ -61,8 +57,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
   'INTERACTION_SPECS',
   function(
       $controller, $injector, $scope, $uibModalInstance,
-      EditorFirstTimeEventsService,
-      InteractionDetailsCacheService, InteractionObjectFactory,
+      EditorFirstTimeEventsService, InteractionDetailsCacheService,
       StateCustomizationArgsService, StateEditorService,
       StateInteractionIdService, StateNextContentIdIndexService,
       UrlInterpolationService,
@@ -174,10 +169,8 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         });
 
         StateCustomizationArgsService.displayed = (
-          InteractionObjectFactory.convertFromCustomizationArgsBackendDict(
-            newInteractionId,
-            customizationArgsBackendDict
-          )
+          Interaction.convertFromCustomizationArgsBackendDict(
+            newInteractionId, customizationArgsBackendDict)
         );
       }
 

@@ -18,10 +18,8 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { LogicProofValidationService } from
-  'interactions/LogicProof/directives/logic-proof-validation.service';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { LogicProofValidationService } from 'interactions/LogicProof/directives/logic-proof-validation.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
 
 describe('LogicProofValidationService', () => {
@@ -30,7 +28,6 @@ describe('LogicProofValidationService', () => {
   let currentState: string;
   let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[],
     goodDefaultOutcome: Outcome;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -39,10 +36,7 @@ describe('LogicProofValidationService', () => {
 
     validatorService = TestBed.get(LogicProofValidationService);
 
-    agof = TestBed.get(AnswerGroupObjectFactory);
-
     currentState = 'First State';
-
     goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       feedback: {
@@ -67,7 +61,8 @@ describe('LogicProofValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    goodAnswerGroups = (
+      [AnswerGroup.createNew([], goodDefaultOutcome, null, null)]);
   });
 
   it('should be able to perform basic validation', () => {

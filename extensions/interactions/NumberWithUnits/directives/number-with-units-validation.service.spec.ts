@@ -18,13 +18,9 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
 import { AppConstants } from 'app.constants';
-/* eslint-disable max-len */
-import { NumberWithUnitsValidationService } from
-  'interactions/NumberWithUnits/directives/number-with-units-validation.service.ts';
-/* eslint-enable max-len */
+import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/directives/number-with-units-validation.service.ts';
 import { Outcome } from 'domain/exploration/Outcome.model';
 import { Rule } from 'domain/exploration/Rule.model';
 
@@ -35,11 +31,9 @@ describe('NumberWithUnitsValidationService', () => {
   var answerGroups, goodDefaultOutcome;
   var equalsTwoRule, equalsTwoByThreeRule, equivalentToTwoThousandRule,
     equivalentToTwoByThreeRule, equivalentToTwoRule;
-  var agof;
 
   beforeEach(() => {
     validatorService = TestBed.get(NumberWithUnitsValidationService);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     var createFractionDict = (
@@ -120,10 +114,10 @@ describe('NumberWithUnitsValidationService', () => {
       }
     });
 
-    answerGroups = [agof.createNew(
+    answerGroups = [AnswerGroup.createNew(
       [equalsTwoRule, equalsTwoByThreeRule],
       goodDefaultOutcome,
-      false
+      null, null
     )];
   });
 

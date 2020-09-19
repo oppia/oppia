@@ -36,7 +36,6 @@ require('directives/angular-html-bind.directive.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/skill-creation-backend-api.service.ts');
 require('domain/skill/SkillDifficultyObjectFactory.ts');

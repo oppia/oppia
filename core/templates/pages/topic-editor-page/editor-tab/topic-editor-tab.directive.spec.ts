@@ -19,6 +19,9 @@
 
 import { EventEmitter } from '@angular/core';
 import { ShortSkillSummary } from 'domain/skill/ShortSkillSummary.model';
+import { StoryReference } from 'domain/topic/StoryReference.model';
+import { Subtopic } from 'domain/topic/Subtopic.model';
+import { Topic } from 'domain/topic/Topic.model';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -45,13 +48,10 @@ describe('Topic editor tab directive', function() {
   var story2 = null;
   var directive = null;
   var TopicEditorStateService = null;
-  var TopicObjectFactory = null;
   var SkillCreationService = null;
   var EntityCreationService = null;
   var TopicUpdateService = null;
   var StoryCreationService = null;
-  var SubtopicObjectFactory = null;
-  var StoryReferenceObjectFactory = null;
   var UndoRedoService = null;
   var TopicEditorRoutingService = null;
   var mockStorySummariesInitializedEventEmitter = new EventEmitter();
@@ -76,7 +76,6 @@ describe('Topic editor tab directive', function() {
     $q = $injector.get('$q');
     directive = $injector.get('topicEditorTabDirective')[0];
     TopicEditorStateService = $injector.get('TopicEditorStateService');
-    TopicObjectFactory = $injector.get('TopicObjectFactory');
     var MockContextSerivce = {
       getEntityType: () => 'topic',
       getEntityId: () => 'dkfn32sxssasd'
@@ -91,8 +90,6 @@ describe('Topic editor tab directive', function() {
     StoryCreationService = $injector.get('StoryCreationService');
     UndoRedoService = $injector.get('UndoRedoService');
     EntityCreationService = $injector.get('EntityCreationService');
-    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
-    StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     mockTasdReinitializedEventEmitter = new EventEmitter();
 
@@ -125,15 +122,15 @@ describe('Topic editor tab directive', function() {
       TopicsAndSkillsDashboardBackendApiService:
         MockTopicsAndSkillsDashboardBackendApiService
     });
-    var subtopic = SubtopicObjectFactory.createFromTitle(1, 'subtopic1');
-    topic = TopicObjectFactory.createInterstitialTopic();
+    var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
+    topic = Topic.createInterstitialTopic();
     skillSummary = ShortSkillSummary.create(
       'skill_1', 'Description 1');
     subtopic._skillSummaries = [skillSummary];
     topic._uncategorizedSkillSummaries = [skillSummary];
     topic._subtopics = [subtopic];
-    story1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
-    story2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
+    story1 = StoryReference.createFromStoryId('storyId1');
+    story2 = StoryReference.createFromStoryId('storyId2');
     topic._canonicalStoryReferences = [story1, story2];
     topic.setName('New Name');
     topic.setUrlFragment('topic-url-fragment');

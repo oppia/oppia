@@ -19,20 +19,15 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
 import { AppConstants } from 'app.constants';
-import { baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
+import { baseInteractionValidationService } from 'interactions/base-interaction-validation.service';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
-import { NormalizeWhitespacePipe } from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
-import { TextInputCustomizationArgs } from
-  'interactions/customization-args-defs';
+import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import { TextInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { TextInputRulesService } from './text-input-rules.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
 import { UtilsService } from 'services/utils.service';
 
 interface Warning {

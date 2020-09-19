@@ -20,9 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { ReadOnlyTopicObjectFactory } from
-  'domain/topic_viewer/read-only-topic-object.factory';
-import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
+import { ReadOnlyTopic } from 'domain/topic_viewer/ReadOnlyTopic.model';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -33,16 +31,8 @@ describe('Topic viewer backend API service', () => {
   let httpTestingController: HttpTestingController;
   let sampleDataResults = null;
   let sampleDataResultsObjects = null;
-  let readOnlyTopicObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'ReadOnlyObjectFactory', new ReadOnlyTopicObjectFactory(
-        new SubtopicObjectFactory());
-  }));
-
   beforeEach(angular.mock.module('oppia', function($provide) {
     let ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -56,7 +46,6 @@ describe('Topic viewer backend API service', () => {
     });
     httpTestingController = TestBed.get(HttpTestingController);
     topicViewerBackendApiService = TestBed.get(TopicViewerBackendApiService);
-    readOnlyTopicObjectFactory = TestBed.get(ReadOnlyTopicObjectFactory);
 
     // Sample topic object returnable from the backend.
     sampleDataResults = {
@@ -99,7 +88,7 @@ describe('Topic viewer backend API service', () => {
       practice_tab_is_displayed: false
     };
 
-    sampleDataResultsObjects = readOnlyTopicObjectFactory.createFromBackendDict(
+    sampleDataResultsObjects = ReadOnlyTopic.createFromBackendDict(
       sampleDataResults);
   });
 

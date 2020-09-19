@@ -17,9 +17,9 @@
  * in the skill editor.
  */
 
+import { Skill } from 'domain/skill/Skill.model';
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/question-backend-api.service.ts');
-require('domain/skill/SkillObjectFactory.ts');
 require('domain/skill/SkillRightsObjectFactory.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/skill-rights-backend-api.service.ts');
@@ -30,13 +30,13 @@ import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('SkillEditorStateService', [
   '$rootScope', 'AlertsService', 'QuestionsListService',
-  'SkillBackendApiService', 'SkillObjectFactory',
-  'SkillRightsBackendApiService', 'SkillRightsObjectFactory', 'UndoRedoService',
+  'SkillBackendApiService', 'SkillRightsBackendApiService',
+  'SkillRightsObjectFactory', 'UndoRedoService',
   function(
       $rootScope, AlertsService, QuestionsListService,
-      SkillBackendApiService, SkillObjectFactory,
-      SkillRightsBackendApiService, SkillRightsObjectFactory, UndoRedoService) {
-    var _skill = SkillObjectFactory.createInterstitialSkill();
+      SkillBackendApiService, SkillRightsBackendApiService,
+      SkillRightsObjectFactory, UndoRedoService) {
+    var _skill = Skill.createInterstitialSkill();
     var _skillRights = (
       SkillRightsObjectFactory.createInterstitialSkillRights());
     var _skillIsInitialized = false;

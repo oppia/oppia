@@ -34,7 +34,7 @@ import { PredictionAlgorithmRegistryService } from
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { State } from 'domain/state/State.model';
 
 describe('Answer Classification Service', () => {
   const stateName = 'Test State';
@@ -52,7 +52,6 @@ describe('Answer Classification Service', () => {
   let interactionSpecsService: InteractionSpecsService;
   let predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
   let stateClassifierMappingService: StateClassifierMappingService;
-  let stateObjectFactory: StateObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
@@ -65,7 +64,6 @@ describe('Answer Classification Service', () => {
     predictionAlgorithmRegistryService = TestBed.get(
       PredictionAlgorithmRegistryService);
     stateClassifierMappingService = TestBed.get(StateClassifierMappingService);
-    stateObjectFactory = TestBed.get(StateObjectFactory);
   });
 
   describe('with string classifier disabled', () => {
@@ -159,8 +157,7 @@ describe('Answer Classification Service', () => {
     });
 
     it('should fail if no frontend rules are provided', () => {
-      const state = (
-        stateObjectFactory.createFromBackendDict(stateName, stateDict));
+      const state = State.createFromBackendDict(stateName, stateDict);
 
       expect(
         () => answerClassificationService.getMatchingClassificationResult(
@@ -171,8 +168,7 @@ describe('Answer Classification Service', () => {
 
     it('should return the first matching answer group and first matching ' +
         'rule spec', () => {
-      const state = (
-        stateObjectFactory.createFromBackendDict(stateName, stateDict));
+      const state = State.createFromBackendDict(stateName, stateDict);
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
@@ -203,8 +199,7 @@ describe('Answer Classification Service', () => {
     });
 
     it('should return the default rule if no answer group matches', () => {
-      const state = (
-        stateObjectFactory.createFromBackendDict(stateName, stateDict));
+      const state = State.createFromBackendDict(stateName, stateDict);
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
@@ -240,8 +235,7 @@ describe('Answer Classification Service', () => {
           }],
         }];
 
-        const state = (
-          stateObjectFactory.createFromBackendDict(stateName, stateDict));
+        const state = State.createFromBackendDict(stateName, stateDict);
 
         expect(
           () => answerClassificationService.getMatchingClassificationResult(
@@ -379,8 +373,7 @@ describe('Answer Classification Service', () => {
           interactionSpecsService, 'isInteractionTrainable'
         ).and.returnValue(true);
 
-        const state = (
-          stateObjectFactory.createFromBackendDict(stateName, stateDict));
+        const state = State.createFromBackendDict(stateName, stateDict);
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
@@ -399,8 +392,7 @@ describe('Answer Classification Service', () => {
           interactionSpecsService, 'isInteractionTrainable'
         ).and.returnValue(false);
 
-        const state = (
-          stateObjectFactory.createFromBackendDict(stateName, stateDict));
+        const state = State.createFromBackendDict(stateName, stateDict);
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
@@ -506,8 +498,7 @@ describe('Answer Classification Service', () => {
       'should use training data classification if no answer group matches ' +
         'and interaction is trainable',
       () => {
-        const state = (
-          stateObjectFactory.createFromBackendDict(stateName, stateDict));
+        const state = State.createFromBackendDict(stateName, stateDict);
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
@@ -530,8 +521,7 @@ describe('Answer Classification Service', () => {
       'should perform explicit classification before doing training data ' +
         'classification',
       () => {
-        const state = (
-          stateObjectFactory.createFromBackendDict(stateName, stateDict));
+        const state = State.createFromBackendDict(stateName, stateDict);
 
         expect(
           answerClassificationService.getMatchingClassificationResult(

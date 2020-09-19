@@ -16,9 +16,7 @@
  * @fileoverview Unit tests for previewTab.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
+import { ParamChange } from 'domain/exploration/ParamChange.model';
 import { EventEmitter } from '@angular/core';
 
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
@@ -41,7 +39,6 @@ describe('Preview Tab Component', function() {
   var numberAttemptsService = null;
   var routerService = null;
   var stateEditorService = null;
-  var paramChangeObjectFactory = null;
   var parameterMetadataService = null;
   var mockUpdateActiveStateIfInEditorEventEmitter = new EventEmitter();
   var mockPlayerStateChangeEventEmitter = new EventEmitter();
@@ -69,10 +66,6 @@ describe('Preview Tab Component', function() {
       $provide.value(key, value);
     }
   }));
-
-  beforeEach(function() {
-    paramChangeObjectFactory = TestBed.get(ParamChangeObjectFactory);
-  });
 
   beforeEach(angular.mock.module(function($provide) {
     $provide.value('ExplorationDataService', {
@@ -115,8 +108,7 @@ describe('Preview Tab Component', function() {
         mockPlayerStateChangeEventEmitter);
       $scope = $rootScope.$new();
       ctrl = $componentController('previewTab', {
-        $scope: $scope,
-        ParamChangeObjectFactory: paramChangeObjectFactory
+        $scope: $scope
       });
       ctrl.$onInit();
     }));
@@ -188,7 +180,7 @@ describe('Preview Tab Component', function() {
       $scope.$apply();
 
       var expectedParamChanges = parameters.map(parameter => (
-        paramChangeObjectFactory.createEmpty(parameter.paramName)));
+        ParamChange.createEmpty(parameter.paramName)));
       expect(
         explorationEngineService.initSettingsFromEditor).toHaveBeenCalledWith(
         stateName, expectedParamChanges);
@@ -245,8 +237,7 @@ describe('Preview Tab Component', function() {
 
       $scope = $rootScope.$new();
       ctrl = $componentController('previewTab', {
-        $scope: $scope,
-        ParamChangeObjectFactory: paramChangeObjectFactory
+        $scope: $scope
       });
       ctrl.$onInit();
     }));

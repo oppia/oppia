@@ -18,10 +18,8 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import { AppConstants } from 'app.constants';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { FractionInputValidationService } from
-  'interactions/FractionInput/directives/fraction-input-validation.service';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { FractionInputValidationService } from 'interactions/FractionInput/directives/fraction-input-validation.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
 import { Rule } from 'domain/exploration/Rule.model';
 import { TestBed } from '@angular/core/testing';
@@ -42,11 +40,9 @@ describe('FractionInputValidationService', () => {
     integerPartEqualsZero, lessThanTwoRule, nonIntegerRule,
     numeratorEqualsFiveRule, zeroDenominatorRule;
   var createFractionDict;
-  var agof;
 
   beforeEach(() => {
     validatorService = TestBed.get(FractionInputValidationService);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     createFractionDict = function(
@@ -213,10 +209,10 @@ describe('FractionInputValidationService', () => {
       }
     });
 
-    answerGroups = [agof.createNew(
+    answerGroups = [AnswerGroup.createNew(
       [equalsOneRule, lessThanTwoRule],
       goodDefaultOutcome,
-      false,
+      null,
       null
     )];
   });

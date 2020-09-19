@@ -17,7 +17,10 @@
  *               help tab in the navbar.
  */
 
-import { State } from 'domain/state/StateObjectFactory';
+
+import { ParamChanges } from 'domain/exploration/ParamChanges.model';
+import { ParamSpecs } from 'domain/exploration/ParamSpecs.model';
+import { State } from 'domain/state/State.model';
 
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
@@ -83,8 +86,6 @@ require('value_generators/valueGeneratorsRequires.ts');
 require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
-require('domain/exploration/ParamChangesObjectFactory.ts');
-require('domain/exploration/ParamSpecsObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/autosave-info-modals.service.ts');
@@ -172,10 +173,9 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
-    'LoaderService', 'PageTitleService', 'ParamChangesObjectFactory',
-    'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
-    'StateClassifierMappingService', 'StateEditorRefreshService',
-    'StateEditorService',
+    'LoaderService', 'PageTitleService', 'RouterService',
+    'SiteAnalyticsService', 'StateClassifierMappingService',
+    'StateEditorRefreshService', 'StateEditorService',
     'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
     'ThreadDataService', 'UrlInterpolationService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
@@ -194,10 +194,9 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationRightsService, ExplorationSaveService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService, GraphDataService,
-        LoaderService, PageTitleService, ParamChangesObjectFactory,
-        ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
-        StateClassifierMappingService, StateEditorRefreshService,
-        StateEditorService,
+        LoaderService, PageTitleService, RouterService,
+        SiteAnalyticsService, StateClassifierMappingService,
+        StateEditorRefreshService, StateEditorService,
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
         ThreadDataService, UrlInterpolationService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
@@ -272,11 +271,9 @@ angular.module('oppia').component('explorationEditorPage', {
             explorationData.init_state_name);
           ExplorationTagsService.init(explorationData.tags);
           ExplorationParamSpecsService.init(
-            ParamSpecsObjectFactory.createFromBackendDict(
-              explorationData.param_specs));
+            ParamSpecs.createFromBackendDict(explorationData.param_specs));
           ExplorationParamChangesService.init(
-            ParamChangesObjectFactory.createFromBackendList(
-              explorationData.param_changes));
+            ParamChanges.createFromBackendList(explorationData.param_changes));
           ExplorationAutomaticTextToSpeechService.init(
             explorationData.auto_tts_enabled);
           ExplorationCorrectnessFeedbackService.init(

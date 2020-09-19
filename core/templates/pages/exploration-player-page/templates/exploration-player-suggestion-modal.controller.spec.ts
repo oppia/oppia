@@ -17,13 +17,11 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { InteractionObjectFactory } from
-  'domain/exploration/InteractionObjectFactory';
+import { Interaction } from 'domain/exploration/Interaction.model';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { RecordedVoiceovers } from 'domain/exploration/RecordedVoiceovers.model';
-import { StateCardObjectFactory } from
-  'domain/state_card/StateCardObjectFactory';
+import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 
 describe('Exploration Player Suggestion Modal Controller', function() {
@@ -32,7 +30,6 @@ describe('Exploration Player Suggestion Modal Controller', function() {
   var $uibModalInstance = null;
   var ContextService = null;
   var ExplorationEngineService = null;
-  var interactionObjectFactory = null;
   var playerPositionService = null;
   var playerTranscriptService = null;
   var stateCardObjectFactory = null;
@@ -43,7 +40,6 @@ describe('Exploration Player Suggestion Modal Controller', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(function() {
-    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     playerPositionService = TestBed.get(PlayerPositionService);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
     stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
@@ -61,12 +57,14 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
 
-    var interaction = interactionObjectFactory.createFromBackendDict({
+    var interaction = Interaction.createFromBackendDict({
       answer_groups: [],
       confirmed_unclassified_answers: [],
       customization_args: {},
       hints: [],
-      id: null
+      id: null,
+      default_outcome: null,
+      solution: null
     });
 
     var recordedVoiceovers = RecordedVoiceovers.createEmpty();

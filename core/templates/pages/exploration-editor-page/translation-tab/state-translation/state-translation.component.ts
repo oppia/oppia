@@ -57,12 +57,9 @@ require(
 import { Subscription } from 'rxjs';
 
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
-import { WRITTEN_TRANSLATION_TYPE_HTML, WRITTEN_TRANSLATION_TYPE_UNICODE } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { InteractionCustomizationArgs } from
-  'interactions/customization-args-defs';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
+import { WRITTEN_TRANSLATION_TYPE_HTML, WRITTEN_TRANSLATION_TYPE_UNICODE } from 'domain/exploration/WrittenTranslation.model';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 
 angular.module('oppia').component('stateTranslation', {
   bindings: {

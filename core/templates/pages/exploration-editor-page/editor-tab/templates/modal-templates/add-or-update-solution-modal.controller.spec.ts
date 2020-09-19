@@ -24,8 +24,7 @@ import { StateSolutionService } from
   'components/state-editor/state-editor-properties-services/state-solution.service';
 import { CurrentInteractionService } from
   'pages/exploration-player-page/services/current-interaction.service';
-import { SolutionObjectFactory } from
-  'domain/exploration/SolutionObjectFactory';
+import { Solution } from 'domain/exploration/Solution.model';
 import { StateCustomizationArgsService }
   // eslint-disable-next-line max-len
   from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
@@ -40,7 +39,6 @@ describe('Add Or Update Solution Modal Controller', function() {
   var ContextService = null;
   var currentInteractionService = null;
   var explorationHtmlFormatterService = null;
-  var solutionObjectFactory = null;
   var stateCustomizationArgsService = null;
   var stateInteractionIdService = null;
   var stateSolutionService = null;
@@ -52,7 +50,6 @@ describe('Add Or Update Solution Modal Controller', function() {
     currentInteractionService = TestBed.get(CurrentInteractionService);
     explorationHtmlFormatterService = TestBed.get(
       ExplorationHtmlFormatterService);
-    solutionObjectFactory = TestBed.get(SolutionObjectFactory);
     stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
     stateSolutionService = TestBed.get(StateSolutionService);
@@ -84,7 +81,6 @@ describe('Add Or Update Solution Modal Controller', function() {
         $uibModalInstance: $uibModalInstance,
         CurrentInteractionService: currentInteractionService,
         ExplorationHtmlFormatterService: explorationHtmlFormatterService,
-        SolutionObjectFactory: solutionObjectFactory,
         StateCustomizationArgsService: stateCustomizationArgsService,
         StateInteractionIdService: stateInteractionIdService,
         StateSolutionService: stateSolutionService
@@ -133,7 +129,7 @@ describe('Add Or Update Solution Modal Controller', function() {
       $scope.saveSolution();
 
       expect($uibModalInstance.close).toHaveBeenCalledWith({
-        solution: solutionObjectFactory.createNew(
+        solution: Solution.createNew(
           true, 'answer', 'Explanation html', 'cont_1')
       });
     });
@@ -159,7 +155,6 @@ describe('Add Or Update Solution Modal Controller', function() {
         $uibModalInstance: $uibModalInstance,
         CurrentInteractionService: currentInteractionService,
         ExplorationHtmlFormatterService: explorationHtmlFormatterService,
-        SolutionObjectFactory: solutionObjectFactory,
         StateCustomizationArgsService: stateCustomizationArgsService,
         StateInteractionIdService: stateInteractionIdService,
         StateSolutionService: stateSolutionService

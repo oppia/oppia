@@ -26,7 +26,7 @@
  * learner actions and then returns a giant HTML string.
  */
 
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { Interaction } from 'domain/exploration/Interaction.model';
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(

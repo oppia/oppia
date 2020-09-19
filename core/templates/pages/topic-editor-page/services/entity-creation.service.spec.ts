@@ -18,6 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // topic-editor-state.service.ts is upgraded to Angular 8.
+import { Subtopic } from 'domain/topic/Subtopic.model';
+import { Topic } from 'domain/topic/Topic.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -35,11 +37,9 @@ describe('Entity creation service', function() {
   var $uibModal = null;
   var $q = null;
   var $location = null;
-  var TopicObjectFactory = null;
   var TopicEditorStateService = null;
   var TopicEditorRoutingService = null;
   var EntityCreationService = null;
-  var SubtopicObjectFactory = null;
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
@@ -47,15 +47,13 @@ describe('Entity creation service', function() {
     $q = $injector.get('$q');
     $uibModal = $injector.get('$uibModal');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
-    TopicObjectFactory = $injector.get('TopicObjectFactory');
-    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     EntityCreationService = $injector.get('EntityCreationService');
 
-    var topic = TopicObjectFactory.createInterstitialTopic();
-    var subtopic1 = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');
-    var subtopic2 = SubtopicObjectFactory.createFromTitle(1, 'Subtopic2');
-    var subtopic3 = SubtopicObjectFactory.createFromTitle(1, 'Subtopic3');
+    var topic = Topic.createInterstitialTopic();
+    var subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
+    var subtopic2 = Subtopic.createFromTitle(1, 'Subtopic2');
+    var subtopic3 = Subtopic.createFromTitle(1, 'Subtopic3');
     topic.getSubtopics = function() {
       return [subtopic1, subtopic2, subtopic3];
     };

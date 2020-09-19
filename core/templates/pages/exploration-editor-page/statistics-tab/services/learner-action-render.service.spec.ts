@@ -24,10 +24,8 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { LearnerActionObjectFactory } from 'domain/statistics/LearnerActionObjectFactory';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 
 require('pages/exploration-editor-page/services/exploration-states.service');

@@ -16,20 +16,20 @@
  * @fileoverview Component for the Answer Submit Learner Action.
  */
 
+import { Interaction } from 'domain/exploration/Interaction.model';
+
 require('services/exploration-html-formatter.service.ts');
 require('services/html-escaper.service.ts');
-require('domain/exploration/InteractionObjectFactory.ts');
 
 angular.module('oppia').component('answerSubmitAction', {
   template: require('./answer-submit-action.component.html'),
   controller: ['$attrs', 'ExplorationHtmlFormatterService',
-    'HtmlEscaperService', 'InteractionObjectFactory',
-    function(
+    'HtmlEscaperService', function(
         $attrs, ExplorationHtmlFormatterService,
-        HtmlEscaperService, InteractionObjectFactory) {
+        HtmlEscaperService) {
       var ctrl = this;
       var _customizationArgs = (
-        InteractionObjectFactory.convertFromCustomizationArgsBackendDict(
+        Interaction.convertFromCustomizationArgsBackendDict(
           $attrs.interactionId,
           HtmlEscaperService.escapedJsonToObj(
             $attrs.interactionCustomizationArgs)

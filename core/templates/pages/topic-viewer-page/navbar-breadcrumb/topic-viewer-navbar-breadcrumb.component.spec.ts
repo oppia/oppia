@@ -21,8 +21,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UrlService } from 'services/contextual/url.service';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
-import { ReadOnlyTopicObjectFactory } from
-  'domain/topic_viewer/read-only-topic-object.factory';
+import { ReadOnlyTopic } from
+  'domain/topic_viewer/ReadOnlyTopic.model';
 import { TopicViewerNavbarBreadcrumbComponent } from
   // eslint-disable-next-line max-len
   'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
@@ -30,7 +30,6 @@ import { TopicViewerNavbarBreadcrumbComponent } from
 describe('Topic viewer navbar breadcrumb component', () => {
   let component: TopicViewerNavbarBreadcrumbComponent;
   let fixture: ComponentFixture<TopicViewerNavbarBreadcrumbComponent>;
-  let readOnlyTopicObjectFactory = null;
   let topicViewerBackendApiService = null;
   let urlService = null;
 
@@ -40,7 +39,6 @@ describe('Topic viewer navbar breadcrumb component', () => {
       declarations: [TopicViewerNavbarBreadcrumbComponent],
     }).compileComponents();
 
-    readOnlyTopicObjectFactory = TestBed.get(ReadOnlyTopicObjectFactory);
     topicViewerBackendApiService = TestBed.get(TopicViewerBackendApiService);
     urlService = TestBed.get(UrlService);
 
@@ -50,7 +48,7 @@ describe('Topic viewer navbar breadcrumb component', () => {
       'classroom1');
 
     spyOn(topicViewerBackendApiService, 'fetchTopicData').and.resolveTo(
-      readOnlyTopicObjectFactory.createFromBackendDict({
+      ReadOnlyTopic.createFromBackendDict({
         subtopics: [],
         skill_descriptions: {},
         uncategorized_skill_ids: [],
@@ -60,7 +58,8 @@ describe('Topic viewer navbar breadcrumb component', () => {
         topic_name: 'Topic Name 1',
         topic_id: 'topic1',
         topic_description: 'Description',
-        practice_tab_is_displayed: false
+        practice_tab_is_displayed: false,
+        meta_tag_content: ''
       }));
   }));
 

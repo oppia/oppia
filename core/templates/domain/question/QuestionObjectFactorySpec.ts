@@ -18,52 +18,24 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // QuestionObjectFactory.ts is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { MisconceptionObjectFactory } from
-  'domain/skill/MisconceptionObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
+import { Misconception } from 'domain/skill/Misconception.model';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
+import { State } from 'domain/state/State.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/state/StateObjectFactory.ts');
 
 describe('Question object factory', function() {
   var QuestionObjectFactory = null;
-  var StateObjectFactory = null;
   var sampleQuestion = null;
   var sampleQuestionBackendDict = null;
-  var misconceptionObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'MisconceptionObjectFactory', new MisconceptionObjectFactory());
-    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
-      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-        new ParamChangeObjectFactory()));
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -84,15 +56,6 @@ describe('Question object factory', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-    StateObjectFactory = $injector.get('StateObjectFactory');
-    // The injector is required because this service is directly used in this
-    // spec, therefore even though MisconceptionObjectFactory is upgraded to
-    // Angular, it cannot be used just by instantiating it by its class but
-    // instead needs to be injected. Note that 'misconceptionObjectFactory' is
-    // the injected service instance whereas 'MisconceptionObjectFactory' is the
-    // service class itself. Therefore, use the instance instead of the class in
-    // the specs.
-    misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
     sampleQuestionBackendDict = {
       id: 'question_id',
@@ -225,11 +188,11 @@ describe('Question object factory', function() {
 
   it('should correctly report unaddressed misconceptions', function() {
     var interaction = sampleQuestion.getStateData().interaction;
-    var misconception1 = misconceptionObjectFactory.create(
+    var misconception1 = Misconception.create(
       'id', 'name', 'notes', 'feedback', true);
-    var misconception2 = misconceptionObjectFactory.create(
+    var misconception2 = Misconception.create(
       'id_2', 'name_2', 'notes', 'feedback', true);
-    var misconception3 = misconceptionObjectFactory.create(
+    var misconception3 = Misconception.create(
       'id_3', 'name_3', 'notes', 'feedback', false);
     var misconceptionsDict = {
       skillId1: [misconception1],
@@ -266,7 +229,7 @@ describe('Question object factory', function() {
   it('should correctly create a Default Question', function() {
     var sampleQuestion1 = QuestionObjectFactory.createDefaultQuestion(
       ['skill_id3', 'skill_id4']);
-    var state = StateObjectFactory.createDefaultState(null);
+    var state = State.createDefaultState(null);
 
     expect(sampleQuestion1.getId()).toEqual(null);
     expect(sampleQuestion1.getLanguageCode()).toEqual('en');

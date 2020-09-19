@@ -16,13 +16,12 @@
  * @fileoverview Component for the exploration preview in the
  * editor page.
  */
-
+import { ParamChange } from 'domain/exploration/ParamChange.model';
 require(
   'pages/exploration-editor-page/preview-tab/templates/' +
   'preview-set-parameters-modal.controller.ts');
 
 require('domain/exploration/editable-exploration-backend-api.service.ts');
-require('domain/exploration/ParamChangeObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-category.service.ts');
@@ -63,8 +62,7 @@ angular.module('oppia').component('previewTab', {
     'ExplorationDataService', 'ExplorationEngineService',
     'ExplorationFeaturesService', 'ExplorationInitStateNameService',
     'ExplorationPlayerStateService',
-    'LearnerParamsService', 'NumberAttemptsService',
-    'ParamChangeObjectFactory', 'ParameterMetadataService',
+    'LearnerParamsService', 'NumberAttemptsService', 'ParameterMetadataService',
     'PlayerCorrectnessFeedbackEnabledService', 'RouterService',
     'StateEditorService', 'UrlInterpolationService',
     function(
@@ -73,8 +71,7 @@ angular.module('oppia').component('previewTab', {
         ExplorationDataService, ExplorationEngineService,
         ExplorationFeaturesService, ExplorationInitStateNameService,
         ExplorationPlayerStateService,
-        LearnerParamsService, NumberAttemptsService,
-        ParamChangeObjectFactory, ParameterMetadataService,
+        LearnerParamsService, NumberAttemptsService, ParameterMetadataService,
         PlayerCorrectnessFeedbackEnabledService, RouterService,
         StateEditorService, UrlInterpolationService) {
       var ctrl = this;
@@ -88,7 +85,7 @@ angular.module('oppia').component('previewTab', {
         // Construct array to hold required parameter changes.
         var manualParamChanges = [];
         for (var i = 0; i < unsetParametersInfo.length; i++) {
-          var newParamChange = ParamChangeObjectFactory.createEmpty(
+          var newParamChange = ParamChange.createEmpty(
             unsetParametersInfo[i].paramName);
           manualParamChanges.push(newParamChange);
         }

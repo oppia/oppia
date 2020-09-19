@@ -34,7 +34,7 @@ import { StateEditorRefreshService } from
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solution.service';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { State } from 'domain/state/State.model';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 
@@ -50,7 +50,6 @@ describe('Teach Oppia Modal Controller', function() {
   var stateCustomizationArgsService = null;
   var stateEditorService = null;
   var stateInteractionIdService = null;
-  var stateObjectFactory = null;
   var explorationStatesService = null;
   var responsesService = null;
   var trainingDataService = null;
@@ -87,7 +86,8 @@ describe('Teach Oppia Modal Controller', function() {
           },
           labelled_as_correct: true,
           param_changes: [],
-          refresher_exploration_id: null
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
         },
         training_data: [],
         tagged_skill_misconception_id: null
@@ -114,14 +114,14 @@ describe('Teach Oppia Modal Controller', function() {
     solicit_answer_details: false,
     written_translations: {
       translations_mapping: {}
-    }
+    },
+    next_content_id_index: null
   };
 
   beforeEach(function() {
     angularNameService = TestBed.get(AngularNameService);
     stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
-    stateObjectFactory = TestBed.get(StateObjectFactory);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -166,7 +166,7 @@ describe('Teach Oppia Modal Controller', function() {
         stateName);
 
       spyOn(explorationStatesService, 'getState').and.returnValue(
-        stateObjectFactory.createFromBackendDict(stateName, state));
+        State.createFromBackendDict(stateName, state));
 
       stateInteractionIdService.init(stateName, 'TextInput');
 
@@ -284,7 +284,7 @@ describe('Teach Oppia Modal Controller', function() {
         stateName);
 
       spyOn(explorationStatesService, 'getState').and.returnValue(
-        stateObjectFactory.createFromBackendDict(stateName, state));
+        State.createFromBackendDict(stateName, state));
 
       stateInteractionIdService.init(stateName, 'TextInput');
 

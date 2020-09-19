@@ -18,49 +18,25 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { AnswerStatsObjectFactory } from
-  'domain/exploration/AnswerStatsObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
-import { ExplorationFeaturesService } from
-  'services/exploration-features.service';
+import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
+import { AnswerClassificationResultObjectFactory } from 'domain/classifier/AnswerClassificationResultObjectFactory';
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { AnswerStatsObjectFactory } from 'domain/exploration/AnswerStatsObjectFactory';
+import { ClassifierObjectFactory } from 'domain/classifier/ClassifierObjectFactory';
+import { ExplorationDraftObjectFactory } from 'domain/exploration/ExplorationDraftObjectFactory';
+import { ExplorationFeaturesService } from 'services/exploration-features.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { Hint } from 'domain/exploration/Hint.model';
 import { ImprovementsService } from 'services/improvements.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { ParamMetadataObjectFactory } from
-  'domain/exploration/ParamMetadataObjectFactory';
-import { SolutionValidityService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { StateEditorService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtml.model';
+import { ParamMetadataObjectFactory } from 'domain/exploration/ParamMetadataObjectFactory';
+import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-import { SolutionObjectFactory } from
-  'domain/exploration/SolutionObjectFactory';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { Solution } from 'domain/exploration/Solution.model';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicode.model';
 
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -71,14 +47,12 @@ describe('Exploration editor tab component', function() {
   var $scope = null;
   var $rootScope = null;
   var $uibModal = null;
-  var answerGroupObjectFactory = null;
   var explorationFeaturesService = null;
   var explorationInitStateNameService = null;
   var explorationStatesService = null;
   var explorationWarningsService = null;
   var routerService = null;
   var stateEditorRefreshService = null;
-  var solutionObjectFactory = null;
   var stateEditorService = null;
 
   var mockRefreshStateEditorEventEmitter = null;
@@ -91,9 +65,7 @@ describe('Exploration editor tab component', function() {
   }));
 
   beforeEach(function() {
-    answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     explorationFeaturesService = TestBed.get(ExplorationFeaturesService);
-    solutionObjectFactory = TestBed.get(SolutionObjectFactory);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -101,8 +73,6 @@ describe('Exploration editor tab component', function() {
     $provide.value(
       'AnswerClassificationResultObjectFactory',
       TestBed.get(AnswerClassificationResultObjectFactory));
-    $provide.value(
-      'AnswerGroupObjectFactory', answerGroupObjectFactory);
     $provide.value(
       'AnswerStatsObjectFactory', TestBed.get(AnswerStatsObjectFactory));
     $provide.value(
@@ -115,10 +85,6 @@ describe('Exploration editor tab component', function() {
     $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));
     $provide.value('ImprovementsService', TestBed.get(ImprovementsService));
     $provide.value(
-      'ParamChangeObjectFactory', TestBed.get(ParamChangeObjectFactory));
-    $provide.value(
-      'ParamChangesObjectFactory', TestBed.get(ParamChangesObjectFactory));
-    $provide.value(
       'ParamMetadataObjectFactory', TestBed.get(ParamMetadataObjectFactory));
     $provide.value(
       'SolutionValidityService', TestBed.get(SolutionValidityService));
@@ -128,12 +94,6 @@ describe('Exploration editor tab component', function() {
     $provide.value(
       'StateEditorService', TestBed.get(StateEditorService));
     $provide.value('UnitsObjectFactory', TestBed.get(UnitsObjectFactory));
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      TestBed.get(WrittenTranslationObjectFactory));
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      TestBed.get(WrittenTranslationsObjectFactory));
     $provide.value('ExplorationDataService', {
       autosaveChangeList: function() {}
     });
@@ -400,7 +360,7 @@ describe('Exploration editor tab component', function() {
       explorationStatesService.getState('First State').interaction);
 
     expect(stateEditorService.interaction.answerGroups).toEqual([
-      answerGroupObjectFactory.createFromBackendDict({
+      AnswerGroup.createFromBackendDict({
         rule_specs: [],
         outcome: {
           dest: 'unused',
@@ -410,11 +370,14 @@ describe('Exploration editor tab component', function() {
           },
           labelled_as_correct: false,
           param_changes: [],
-          refresher_exploration_id: null
-        }
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        training_data: null,
+        tagged_skill_misconception_id: null
       })]);
 
-    var displayedValue = [answerGroupObjectFactory.createFromBackendDict({
+    var displayedValue = [AnswerGroup.createFromBackendDict({
       rule_specs: [],
       outcome: {
         dest: 'Second State',
@@ -424,9 +387,10 @@ describe('Exploration editor tab component', function() {
         },
         labelled_as_correct: false,
         param_changes: [],
-        refresher_exploration_id: null
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
       },
-      training_data: {},
+      training_data: null,
       tagged_skill_misconception_id: ''
     })];
     ctrl.saveInteractionAnswerGroups(displayedValue);
@@ -499,7 +463,7 @@ describe('Exploration editor tab component', function() {
       explorationStatesService.getState('First State').interaction);
 
     expect(stateEditorService.interaction.solution).toEqual(
-      solutionObjectFactory.createFromBackendDict({
+      Solution.createFromBackendDict({
         correct_answer: 'This is the correct answer',
         answer_is_exclusive: false,
         explanation: {
@@ -508,7 +472,7 @@ describe('Exploration editor tab component', function() {
         }
       }));
 
-    var displayedValue = solutionObjectFactory.createFromBackendDict({
+    var displayedValue = Solution.createFromBackendDict({
       correct_answer: 'This is the second correct answer',
       answer_is_exclusive: true,
       explanation: {

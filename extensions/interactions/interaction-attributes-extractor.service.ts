@@ -23,8 +23,7 @@ import { Injectable } from '@angular/core';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { InteractionCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
-import { InteractionObjectFactory } from
-  'domain/exploration/InteractionObjectFactory';
+import { Interaction } from 'domain/exploration/Interaction.model';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -33,8 +32,7 @@ const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 })
 export class InteractionAttributesExtractorService {
   constructor(
-    private htmlEscaperService: HtmlEscaperService,
-    private interactionFactory: InteractionObjectFactory,
+    private htmlEscaperService: HtmlEscaperService
   ) {}
 
   getValuesFromAttributes(
@@ -53,7 +51,7 @@ export class InteractionAttributesExtractorService {
       };
     });
 
-    const ca = this.interactionFactory.convertFromCustomizationArgsBackendDict(
+    const ca = Interaction.convertFromCustomizationArgsBackendDict(
       interactionId, caBackendDict);
 
     const caValues = {};

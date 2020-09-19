@@ -1,0 +1,220 @@
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for Skill model.
+ */
+
+import { TestBed } from '@angular/core/testing';
+
+import { ConceptCard } from 'domain/skill/ConceptCard.model';
+import { Misconception } from 'domain/skill/Misconception.model';
+import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import { Rubric } from 'domain/skill/Rubric.model';
+import { Skill } from 'domain/skill/Skill.model';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtml.model';
+const constants = require('constants.ts');
+
+describe('Skill object factory', () => {
+  let example1 = null;
+  let example2 = null;
+  let misconceptionDict1 = null;
+  let misconceptionDict2 = null;
+  let rubricDict = null;
+  let skillContentsDict = null;
+  let skillDict = null;
+  let skillDifficulties = null;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        NormalizeWhitespacePipe,
+      ]
+    });
+    skillDifficulties = constants.SKILL_DIFFICULTIES;
+    misconceptionDict1 = {
+      id: '2',
+      name: 'test name',
+      notes: 'test notes',
+      feedback: 'test feedback',
+      must_be_addressed: true
+    };
+
+    misconceptionDict2 = {
+      id: '4',
+      name: 'test name',
+      notes: 'test notes',
+      feedback: 'test feedback',
+      must_be_addressed: false
+    };
+
+    rubricDict = {
+      difficulty: skillDifficulties[0],
+      explanations: ['explanation']
+    };
+
+    example1 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1'
+      },
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
+      }
+    };
+    example2 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1'
+      },
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
+      }
+    };
+
+
+    skillContentsDict = {
+      explanation: {
+        html: 'test explanation',
+        content_id: 'explanation',
+      },
+      worked_examples: [example1, example2],
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          explanation: {},
+          worked_example_1: {},
+          worked_example_2: {}
+        }
+      }
+    };
+    skillDict = {
+      id: '1',
+      description: 'test description',
+      misconceptions: [misconceptionDict1, misconceptionDict2],
+      rubrics: [rubricDict],
+      skill_contents: skillContentsDict,
+      language_code: 'en',
+      version: 3,
+      next_misconception_id: 6,
+      superseding_skill_id: '2',
+      all_questions_merged: false,
+      prerequisite_skill_ids: ['skill_1']
+    };
+  });
+
+  it('should create a new skill from a backend dictionary', () => {
+    let skill = Skill.createFromBackendDict(skillDict);
+    expect(skill.getId()).toEqual('1');
+    expect(skill.getDescription()).toEqual('test description');
+    expect(skill.getMisconceptions()).toEqual(
+      [
+        Misconception.createFromBackendDict(misconceptionDict1),
+        Misconception.createFromBackendDict(misconceptionDict2)]);
+    expect(skill.getRubrics()).toEqual([
+      Rubric.createFromBackendDict(rubricDict)]);
+    expect(skill.getConceptCard()).toEqual(
+      ConceptCard.createFromBackendDict(skillContentsDict));
+    expect(skill.getLanguageCode()).toEqual('en');
+    expect(skill.getVersion()).toEqual(3);
+    expect(skill.getSupersedingSkillId()).toEqual('2');
+    expect(skill.getAllQuestionsMerged()).toEqual(false);
+    expect(skill.getPrerequisiteSkillIds()).toEqual(['skill_1']);
+  });
+
+  it('should find misconception by id', () => {
+    let skill = Skill.createFromBackendDict(skillDict);
+    expect(skill.findMisconceptionById('4')).toEqual(
+      Misconception.createFromBackendDict(misconceptionDict2));
+  });
+
+  it('should delete a misconception given its id', () => {
+    let skill = Skill.createFromBackendDict(skillDict);
+    skill.deleteMisconception('2');
+    expect(skill.getMisconceptions()).toEqual(
+      [Misconception.createFromBackendDict(misconceptionDict2)]);
+  });
+
+  it('should throw validation errors', () => {
+    let skill = Skill.createFromBackendDict(skillDict);
+    skill.getConceptCard().setExplanation(
+      SubtitledHtml.createDefault('', 'review_material'));
+    expect(skill.getValidationIssues()).toEqual([
+      'There should be review material in the concept card.',
+      'All 3 difficulties (Easy, Medium and Hard) should be addressed ' +
+      'in rubrics.'
+    ]);
+  });
+
+  it('should add/update a rubric given difficulty', () => {
+    let skill = Skill.createFromBackendDict(skillDict);
+    expect(skill.getRubrics()[0].getExplanations()).toEqual(['explanation']);
+    expect(skill.getRubrics().length).toEqual(1);
+
+    skill.updateRubricForDifficulty(
+      skillDifficulties[0], ['new explanation 1', 'new explanation 2']);
+    expect(skill.getRubrics()[0].getExplanations()).toEqual([
+      'new explanation 1', 'new explanation 2']);
+
+    skill.updateRubricForDifficulty(skillDifficulties[1], ['explanation 2']);
+    expect(skill.getRubrics().length).toEqual(2);
+    expect(skill.getRubrics()[1].getExplanations()).toEqual(['explanation 2']);
+
+    expect(() => {
+      skill.updateRubricForDifficulty('invalid difficulty', ['explanation 2']);
+    }).toThrowError('Invalid difficulty value passed');
+  });
+
+  it('should get the correct next misconception id', () => {
+    let skill = Skill.createFromBackendDict(skillDict);
+    expect(skill.getNextMisconceptionId()).toEqual(6);
+    skill.deleteMisconception('4');
+    expect(skill.getNextMisconceptionId()).toEqual(6);
+
+    var misconceptionToAdd1 = Misconception.createFromBackendDict(
+      {
+        id: JSON.stringify(skill.getNextMisconceptionId()),
+        name: 'test name',
+        notes: 'test notes',
+        feedback: 'test feedback',
+        must_be_addressed: true
+      });
+
+    skill.appendMisconception(misconceptionToAdd1);
+    expect(skill.getNextMisconceptionId()).toEqual(7);
+    skill.deleteMisconception('6');
+    expect(skill.getNextMisconceptionId()).toEqual(7);
+  });
+
+  it('should convert to a backend dictionary', () => {
+    let skill = Skill.createFromBackendDict(skillDict);
+    expect(skill.toBackendDict()).toEqual(skillDict);
+  });
+
+  it('should be able to create an interstitial skill', () => {
+    let skill = Skill.createInterstitialSkill();
+    expect(skill.getId()).toEqual(null);
+    expect(skill.getDescription()).toEqual('Skill description loading');
+    expect(skill.getMisconceptions()).toEqual([]);
+    expect(skill.getRubrics()).toEqual([]);
+    expect(skill.getConceptCard()).toEqual(
+      ConceptCard.createInterstitialConceptCard());
+    expect(skill.getLanguageCode()).toEqual('en');
+    expect(skill.getVersion()).toEqual(1);
+    expect(skill.getSupersedingSkillId()).toEqual(null);
+    expect(skill.getAllQuestionsMerged()).toEqual(false);
+    expect(skill.getPrerequisiteSkillIds()).toEqual([]);
+  });
+});

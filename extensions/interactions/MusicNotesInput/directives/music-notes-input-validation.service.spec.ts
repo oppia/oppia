@@ -18,12 +18,8 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-/* eslint-disable max-len*/
-import { MusicNotesInputValidationService } from
-  'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
-/* eslint-enable max-len*/
+import { AnswerGroup } from 'domain/exploration/AnswerGroup.model';
+import { MusicNotesInputValidationService } from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
 import { Outcome } from 'domain/exploration/Outcome.model';
 
 describe('MusicNotesInputValidationService', () => {
@@ -31,7 +27,6 @@ describe('MusicNotesInputValidationService', () => {
 
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -39,8 +34,6 @@ describe('MusicNotesInputValidationService', () => {
     });
 
     validatorService = TestBed.get(MusicNotesInputValidationService);
-
-    agof = TestBed.get(AnswerGroupObjectFactory);
 
     currentState = 'First State';
     goodDefaultOutcome = Outcome.createFromBackendDict({
@@ -54,7 +47,8 @@ describe('MusicNotesInputValidationService', () => {
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null
     });
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    goodAnswerGroups = (
+      [AnswerGroup.createNew([], goodDefaultOutcome, null, null)]);
   });
 
   it('should be able to perform basic validation', () => {
