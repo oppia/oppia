@@ -74,9 +74,11 @@
 # Answer classification team.
 /core/controllers/classifier*.py @prasanna08
 /core/domain/classifier*.py @prasanna08
+/core/domain/proto/ @prasanna08
 /core/storage/classifier/ @prasanna08
 /core/templates/domain/classifier/ @prasanna08
 /extensions/classifiers/ @prasanna08
+/prototool.yaml @prasanna08
 
 
 # Audio and Translation team.

@@ -1,5 +1,14 @@
 {
   "dependencies": {
+    "proto": {
+      "oppiaMlProto": {
+        "version": "0.0.0",
+        "downloadFormat": "zip",
+        "url": "https://github.com/oppia/oppia-ml-proto/archive/0.0.0.zip",
+        "rootDirPrefix": "oppia-ml-proto-",
+        "targetDirPrefix": "oppia-ml-proto-"
+      }
+    },
     "frontend": {
       "angular": {
         "version": "1.7.9",
