@@ -119,14 +119,14 @@ angular.module('oppia').directive('learnerLocalNav', [
                 ctrl.canEdit = exploration.can_edit;
               });
             ctrl.username = '';
-            ctrl.showFeedbackOption = true;
+            ctrl.feedbackOptionIsShown = true;
             LoaderService.showLoadingScreen('Loading');
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.username = userInfo.getUsername();
               if (
                 ctrl.username === null &&
                 !ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS) {
-                ctrl.showFeedbackOption = false;
+                ctrl.feedbackOptionIsShown = false;
               }
               LoaderService.hideLoadingScreen();
             });
