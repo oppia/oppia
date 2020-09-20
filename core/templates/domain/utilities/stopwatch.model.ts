@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Object factory for creating stopwatches.
+ * @fileoverview Model class for creating stopwatches.
  */
 
 // A simple service that provides stopwatch instances. Each stopwatch can be

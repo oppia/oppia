@@ -19,7 +19,7 @@
 import { BackendChangeObject, Change } from
   'domain/editor/undo_redo/change.model';
 
-describe('Factory for Change domain objects', () => {
+describe('Change domain objects model', () => {
   it('should invoke no callbacks after creation', () => {
     const applyFunc = jasmine.createSpy('applyChange');
     const reverseFunc = jasmine.createSpy('reverseChange');

@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for topic preview tab.
  */
 
-import { StorySummary } from
-  'domain/story/story-summary.model';
+import { StorySummary } from 'domain/story/story-summary.model';
 
 describe('Topic preview tab', function() {
   var ctrl = null;

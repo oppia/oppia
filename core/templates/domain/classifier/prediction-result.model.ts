@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of Prediction
+ * @fileoverview Model Class for creating new frontend instances of Prediction
  *     result domain objects.
  */
 

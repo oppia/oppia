@@ -16,10 +16,9 @@
  * @fileoverview Unit tests for AudioLanguage.
  */
 
-import { AudioLanguage } from
-  'domain/utilities/audio-language.model';
+import { AudioLanguage } from 'domain/utilities/audio-language.model';
 
-describe('AudioLanguage object factory', () => {
+describe('AudioLanguage model', () => {
   let audioLanguage: AudioLanguage;
   beforeEach(() => {
     audioLanguage = AudioLanguage.createFromDict({

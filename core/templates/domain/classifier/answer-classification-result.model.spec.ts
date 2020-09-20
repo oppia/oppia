@@ -20,10 +20,9 @@ import { AnswerClassificationResult } from
   'domain/classifier/answer-classification-result.model';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 
-describe('Answer classification result object factory', () => {
+describe('Answer classification result model', () => {
   let oof: OutcomeObjectFactory;
   let DEFAULT_OUTCOME_CLASSIFICATION: string;
 

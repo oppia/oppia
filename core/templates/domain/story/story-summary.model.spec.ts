@@ -16,10 +16,9 @@
  * @fileoverview Tests for StorySummary.
  */
 
-import { StorySummary } from
-  'domain/story/story-summary.model';
+import { StorySummary } from 'domain/story/story-summary.model';
 
-describe('Story summary object factory', () => {
+describe('Story summary model', () => {
   let _sampleStorySummary: StorySummary;
 
   beforeEach(() => {

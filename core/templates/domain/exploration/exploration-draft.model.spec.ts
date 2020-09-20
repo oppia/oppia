@@ -16,11 +16,10 @@
  * @fileoverview unit tests for the local save services.
  */
 
-import { ExplorationDraft } from
-  'domain/exploration/exploration-draft.model';
+import { ExplorationDraft } from 'domain/exploration/exploration-draft.model';
 
-describe('ExplorationDraftObjectFactory', () => {
-  describe('exploration draft object factory', () => {
+describe('ExplorationDraft model', () => {
+  describe('exploration draft model', () => {
     var draftChangeListId = 2;
     var changeList = [];
     var draftDict = {
@@ -30,16 +29,12 @@ describe('ExplorationDraftObjectFactory', () => {
     let draft: ExplorationDraft;
 
     beforeEach(() => {
-      draft = (
-        ExplorationDraft.createFromLocalStorageDict(
-          draftDict));
+      draft = (ExplorationDraft.createFromLocalStorageDict(draftDict));
     });
 
     it('should determine if the draft is valid', () => {
-      expect(draft.isValid(
-        draftChangeListId)).toBeTruthy();
-      expect(draft.isValid(
-        draftChangeListId + 1)).toBeFalsy();
+      expect(draft.isValid(draftChangeListId)).toBeTruthy();
+      expect(draft.isValid(draftChangeListId + 1)).toBeFalsy();
     });
 
     it('should return the correct changeList', () => {

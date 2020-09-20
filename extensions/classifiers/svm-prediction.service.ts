@@ -29,8 +29,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { PredictionResult } from
-  'domain/classifier/prediction-result.model';
+import { PredictionResult } from 'domain/classifier/prediction-result.model';
 
 @Injectable({
   providedIn: 'root'

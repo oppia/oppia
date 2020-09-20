@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating domain object for frontend topics
+ * @fileoverview Model class for creating domain object for frontend topics
  * that are used in topics dashboard.
  */
 

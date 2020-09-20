@@ -21,8 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
-import { EntityContext } from
-  'domain/utilities/entity-context.model';
+import { EntityContext } from 'domain/utilities/entity-context.model';
 import { ServicesConstants } from 'services/services.constants';
 import { UrlService } from 'services/contextual/url.service';
 

@@ -15,17 +15,15 @@
 /**
  * @fileoverview Unit tests for the PredictionResult.
  */
-import { PredictionResult } from
-  'domain/classifier/prediction-result.model';
+import { PredictionResult } from 'domain/classifier/prediction-result.model';
 
-describe('Prediction Result Object Factory', () => {
+describe('Prediction Result model', () => {
   it('should create a new result object', () => {
     const label = 1;
     const confidence = 1;
-    const predictionResultObject = PredictionResult.createNew(
-      label, confidence);
+    const predictionResult = PredictionResult.createNew(label, confidence);
 
-    expect(predictionResultObject.getLabel()).toBe(label);
-    expect(predictionResultObject.getConfidence()).toBe(confidence);
+    expect(predictionResult.getLabel()).toBe(label);
+    expect(predictionResult.getConfidence()).toBe(confidence);
   });
 });

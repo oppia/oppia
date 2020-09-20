@@ -16,10 +16,9 @@
  * @fileoverview Unit tests for the Classifier.
  */
 
-import { Classifier } from
-  'domain/classifier/classifier.model';
+import { Classifier } from 'domain/classifier/classifier.model';
 
-describe('Classifier', () => {
+describe('Classifier model', () => {
   let sampleClassifierData = {
     KNN: {
       occurrence: 0,

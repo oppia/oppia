@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating instances of frontend
+ * @fileoverview Model class for creating instances of frontend
  * exploration metadata domain objects.
  */
 

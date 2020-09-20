@@ -19,13 +19,12 @@
  * undo/redo service.
  */
 
+import { Change } from 'domain/editor/undo_redo/change.model';
+
 require('domain/collection/collection-node-object.factory.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 
 require('domain/collection/collection-domain.constants.ajs.ts');
-
-import { Change } from
-  'domain/editor/undo_redo/change.model';
 
 angular.module('oppia').factory('CollectionUpdateService', [
   'CollectionNodeObjectFactory', 'UndoRedoService',

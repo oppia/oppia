@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating instances of ExplorationDraft
+ * @fileoverview Model Class for creating instances of ExplorationDraft
  * domain objects.
  */
 

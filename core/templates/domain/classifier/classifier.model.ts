@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of Classifier
+ * @fileoverview Model class for creating new frontend instances of Classifier
  *     domain objects.
  */
 

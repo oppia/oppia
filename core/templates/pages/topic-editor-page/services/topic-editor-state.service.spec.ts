@@ -32,8 +32,7 @@ import { SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory';
 import { SubtopicPageObjectFactory } from
   'domain/topic/SubtopicPageObjectFactory';
-import { TopicRights } from
-  'domain/topic/topic-rights.model';
+import { TopicRights } from 'domain/topic/topic-rights.model';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';

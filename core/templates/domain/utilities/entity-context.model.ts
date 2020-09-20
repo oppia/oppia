@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Object factory for creating and mutating entity context
+ * @fileoverview Model class for creating and mutating entity context
  * objects.
  */
 

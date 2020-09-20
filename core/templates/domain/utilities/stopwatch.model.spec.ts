@@ -16,10 +16,9 @@
  * @fileoverview Unit tests for Stopwatch.
  */
 
-import { Stopwatch } from
-  'domain/utilities/stopwatch.model';
+import { Stopwatch } from 'domain/utilities/stopwatch.model';
 
-describe('Stopwatch object factory', () => {
+describe('Stopwatch model', () => {
   let nowSpy = null;
 
   beforeEach(() => {

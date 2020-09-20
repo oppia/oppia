@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating filters of frontend topics
+ * @fileoverview Model class for creating filters of frontend topics
  * and skill dashboard.
  */
 

@@ -25,8 +25,7 @@ import { PlaythroughService } from 'services/playthrough.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { AggregatedStats, StatsReportingBackendApiService } from
   'domain/exploration/stats-reporting-backend-api.service';
-import { Stopwatch } from
-  'domain/utilities/stopwatch.model';
+import { Stopwatch } from 'domain/utilities/stopwatch.model';
 
 @Injectable({
   providedIn: 'root'

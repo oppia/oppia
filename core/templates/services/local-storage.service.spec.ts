@@ -18,8 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ExplorationDraft } from
-  'domain/exploration/exploration-draft.model';
+import { ExplorationDraft } from 'domain/exploration/exploration-draft.model';
 import { LocalStorageService } from 'services/local-storage.service';
 
 describe('LocalStorageService', () => {
@@ -44,10 +43,8 @@ describe('LocalStorageService', () => {
     beforeEach(() => {
       localStorageService = TestBed.get(LocalStorageService);
 
-      draftOne = ExplorationDraft.createFromLocalStorageDict(
-        draftDictOne);
-      draftTwo = ExplorationDraft.createFromLocalStorageDict(
-        draftDictTwo);
+      draftOne = ExplorationDraft.createFromLocalStorageDict(draftDictOne);
+      draftTwo = ExplorationDraft.createFromLocalStorageDict(draftDictTwo);
     });
 
     it('should verify that storage is available', () => {

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend change
+ * @fileoverview Model class for creating and mutating instances of frontend change
  * domain objects. This frontend object represents both CollectionChange and
  * ExplorationChange backend domain objects.
  */

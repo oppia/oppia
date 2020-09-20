@@ -18,10 +18,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // AssetsBackendApiService.ts is upgraded to Angular 8.
-import { AudioFile } from
-  'domain/utilities/audio-file.model';
-import { ImageFile } from
-  'domain/utilities/image-file.model';
+import { AudioFile } from 'domain/utilities/audio-file.model';
+import { ImageFile } from 'domain/utilities/image-file.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 // Jquery is needed in this file because some tests will spyOn Jquery methods.

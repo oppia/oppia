@@ -19,8 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { Classifier } from
-  'domain/classifier/classifier.model';
+import { Classifier } from 'domain/classifier/classifier.model';
 
 interface StateClassifierMappingBackendDict {
   [state: string]: {
@@ -54,8 +53,7 @@ export class StateClassifierMappingService {
         dataSchemaVersion = backendStateClassifierMapping[
           stateName].data_schema_version;
         this.stateClassifierMapping[stateName] =
-          Classifier.create(
-            algorithmId, classifierData, dataSchemaVersion);
+          Classifier.create(algorithmId, classifierData, dataSchemaVersion);
       }
     }
   }

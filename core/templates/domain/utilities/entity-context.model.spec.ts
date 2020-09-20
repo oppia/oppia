@@ -16,10 +16,9 @@
  * @fileoverview Unit tests for EntityContext.
  */
 
-import { EntityContext } from
-  'domain/utilities/entity-context.model';
+import { EntityContext } from 'domain/utilities/entity-context.model';
 
-describe('Entity context object factory', () => {
+describe('Entity context model', () => {
   describe('EntityContext', () => {
     it('should create a new entity context object', () => {
       var entityContext = EntityContext.create(

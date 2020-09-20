@@ -27,8 +27,7 @@ import { Playthrough } from 'domain/statistics/PlaythroughObjectFactory';
 import { PlaythroughService } from 'services/playthrough.service';
 import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
-import { Stopwatch } from
-  'domain/utilities/stopwatch.model';
+import { Stopwatch } from 'domain/utilities/stopwatch.model';
 
 describe('PlaythroughService', () => {
   let explorationFeaturesService: ExplorationFeaturesService = null;

@@ -22,8 +22,7 @@
  * story would always be linked to a topic.
  */
 
-import { Change } from
-  'domain/editor/undo_redo/change.model';
+import { Change } from 'domain/editor/undo_redo/change.model';
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-domain.constants.ajs.ts');

@@ -19,7 +19,7 @@
 import { FeedbackThreadSummary } from
   'domain/feedback_thread/feedback-thread-summary.model';
 
-describe('Feedback thread object factory', () => {
+describe('Feedback thread model', () => {
   it('should update the summary of the thread on addition of a ' +
      'message', () => {
     var feedbackThreadSummary = FeedbackThreadSummary.create(

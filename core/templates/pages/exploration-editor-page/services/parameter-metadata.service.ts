@@ -16,6 +16,8 @@
  * @fileoverview Service for computing parameter metadata.
  */
 
+import { ParamMetadata } from 'domain/exploration/param-metadata.model';
+
 require('expressions/expression-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
@@ -25,9 +27,6 @@ require('pages/exploration-editor-page/services/graph-data.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
-
-import { ParamMetadata } from
-  'domain/exploration/param-metadata.model';
 
 angular.module('oppia').factory('ParameterMetadataService', [
   'ExplorationParamChangesService', 'ExplorationStatesService',

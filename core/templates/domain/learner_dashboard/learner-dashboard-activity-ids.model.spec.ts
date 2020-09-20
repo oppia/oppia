@@ -21,7 +21,7 @@ import {
   LearnerDashboardActivityIdsDict
 } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 
-describe('Learner dashboard activity ids object factory', () => {
+describe('Learner dashboard activity ids model', () => {
   let learnerDashboardActivityIdsDict: LearnerDashboardActivityIdsDict;
 
   beforeEach(() => {

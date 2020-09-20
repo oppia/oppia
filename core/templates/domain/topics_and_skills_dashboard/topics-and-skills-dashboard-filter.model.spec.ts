@@ -24,7 +24,7 @@ import { TopicsAndSkillsDashboardFilter } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
 
-describe('Topics And Skills Dashboard Filter Object', () => {
+describe('Topics And Skills Dashboard Filter Model', () => {
   let filter: TopicsAndSkillsDashboardFilter = null;
 
   beforeEach(() => {

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Object factory for creating audio languages.
+ * @fileoverview Model class for creating audio languages.
  */
 
 export interface AudioLanguageBackendDict {

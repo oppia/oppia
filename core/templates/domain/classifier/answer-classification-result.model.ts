@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of answer
+ * @fileoverview Model class for creating new frontend instances of answer
  *     Classification Result domain objects.
  */
 

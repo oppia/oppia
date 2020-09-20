@@ -16,10 +16,9 @@
  * @fileoverview Unit tests for ParamMetadata.
  */
 
-import { ParamMetadata } from
-  'domain/exploration/param-metadata.model';
+import { ParamMetadata } from 'domain/exploration/param-metadata.model';
 
-describe('ParameterMetadata object factory', () => {
+describe('ParameterMetadata model', () => {
   let parameterMetadata: ParamMetadata = null;
 
   it('should have correct metadata for SET action', () => {

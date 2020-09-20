@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Object factory for creating audio files.
+ * @fileoverview Model class for creating audio files.
  */
 
 export class FileDownloadRequest {

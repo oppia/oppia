@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Object factory for creating image files.
+ * @fileoverview Model class for creating image files.
  */
 
 export class ImageFile {

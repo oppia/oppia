@@ -98,8 +98,7 @@ export class LocalStorageService {
       let draftDict = JSON.parse(
         this.storage.getItem(this._createExplorationDraftKey(explorationId)));
       if (draftDict) {
-        return ExplorationDraft.createFromLocalStorageDict(
-          draftDict);
+        return ExplorationDraft.createFromLocalStorageDict(draftDict);
       }
     }
     return null;

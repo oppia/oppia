@@ -16,10 +16,9 @@
  * @fileoverview Tests for TopicRights.
  */
 
-import { TopicRights } from
-  'domain/topic/topic-rights.model';
+import { TopicRights } from 'domain/topic/topic-rights.model';
 
-describe('Topic rights object factory', () => {
+describe('Topic rights model', () => {
   let sampleTopicRights: TopicRights = null;
 
   beforeEach(() => {

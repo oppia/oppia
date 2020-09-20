@@ -20,7 +20,7 @@
 import { NewlyCreatedTopic } from
   'domain/topics_and_skills_dashboard/newly-created-topic.model';
 
-describe('Newly Created Topic Object Factory', () => {
+describe('Newly Created Topic Model', () => {
   let topic: NewlyCreatedTopic = null;
 
   beforeEach(() => {
