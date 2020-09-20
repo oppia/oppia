@@ -549,7 +549,7 @@ def _pseudonymize_config_models(pending_deletion_request):
         ndb.put_multi(metadata_models)
 
     config_ids_to_pids = (
-        pending_deletion_request.entity_mappings[models.NAMES.config])
+        pending_deletion_request.activity_mappings[models.NAMES.config])
     for config_id, pseudonymized_id in config_ids_to_pids.items():
         config_related_models = [
             model for model in snapshot_metadata_models
@@ -739,7 +739,7 @@ def _pseudonymize_col_or_exp_models(
                 snapshot_metadata_model.commit_message = (
                     rights_domain.DEASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
                         pseudonymized_username,
-                        assign_commit_message_match.group(2),
+                        deassign_commit_message_match.group(2),
                     )
                 )
 
@@ -811,6 +811,7 @@ def _pseudonymize_col_or_exp_models(
                 0,
                 len(col_or_exp_related_models),
                 MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+            print(pseudonymized_id)
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
                 col_or_exp_related_models[
@@ -858,7 +859,7 @@ def _pseudonymize_topic_models(pending_deletion_request):
         for subtopic_model in subtopic_models
     }
     subtopic_topic_model_ids = set(subtopic_id_to_topic_id.values())
-    _save_entity_mappings(
+    _save_activity_mappings(
         pending_deletion_request,
         models.NAMES.topic,
         list(topic_model_ids | subtopic_topic_model_ids))
@@ -948,7 +949,7 @@ def _pseudonymize_topic_models(pending_deletion_request):
             commit_log_models)
 
     topic_ids_to_pids = (
-        pending_deletion_request.entity_mappings[models.NAMES.topic])
+        pending_deletion_request.activity_mappings[models.NAMES.topic])
     for topic_id, pseudonymized_id in topic_ids_to_pids.items():
         topic_related_snapshot_metadata_models = [
             model for model in topic_snapshot_metadata_models
