@@ -900,7 +900,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         test_data = {
             'creator_usernames': [],
             'collection_ids': [],
-            'entity_ids': [],
+            'activity_ids': [],
             'general_feedback_thread_ids': [],
             'last_checked': None
         }
@@ -913,7 +913,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         test_data = {
             'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
-            'entity_ids': self.ACTIVITY_IDS,
+            'activity_ids': self.ACTIVITY_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
             'last_checked': utils.get_time_in_millisecs(self.GENERIC_DATETIME)
         }

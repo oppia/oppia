@@ -46,14 +46,14 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
         self.assertEqual(default_pending_deletion.deletion_complete, False)
         self.assertEqual(default_pending_deletion.exploration_ids, [])
         self.assertEqual(default_pending_deletion.collection_ids, [])
-        self.assertEqual(default_pending_deletion.entity_mappings, {})
+        self.assertEqual(default_pending_deletion.activity_mappings, {})
 
     def test_validate_fails_for_wrong_key_in_activity_mappings(self):
         """Tests the create_default_topic() function."""
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
                 self.user_id_a, 'a@example.com', self.role, [], []))
-        pending_deletion_request.entity_mappings = {'wrong_key': {}}
+        pending_deletion_request.activity_mappings = {'wrong_key': {}}
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'entity_mappings contain wrong key'):
+            utils.ValidationError, 'activity_mappings contain wrong key'):
             pending_deletion_request.validate()
