@@ -124,6 +124,36 @@
     </form>
   </div>
 </md-card>
+
+<md-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Delete account</h3>
+  <div class="oppia-query-form">
+    <p>(the user needs to request the deletion (through preferences page) before this can be run)</p>
+    <form class="form" ng-submit="$ctrl.deleteAccount()">
+      <div class="form-group row">
+        <label>Email:</label>
+        <input type="text" ng-model="$ctrl.email" required="true">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Delete account">
+      </div>
+    </form>
+  </div>
+  <h3>Verify account deleted</h3>
+  <div class="oppia-query-form">
+    <p>(the user needs to be deleted)</p>
+    <form class="form" ng-submit="$ctrl.verifyAccountDeleted()">
+      <div class="form-group row">
+        <label>Email:</label>
+        <input type="text" ng-model="$ctrl.email" required="true">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Verify account deleted">
+      </div>
+    </form>
+  </div>
+</md-card>
+
 <style>
   admin-misc-tab .oppia-admin-page-card {
     max-width: 700px

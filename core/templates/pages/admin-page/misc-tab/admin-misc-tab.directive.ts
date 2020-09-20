@@ -41,14 +41,17 @@ angular.module('oppia').directive('adminMiscTab', [
         '/pages/admin-page/misc-tab/admin-misc-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
-        var ctrl = this;
-        var DATA_EXTRACTION_QUERY_HANDLER_URL = (
+        const ctrl = this;
+        const DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
-        var SEND_DUMMY_MAIL_HANDLER_URL = (
+        const SEND_DUMMY_MAIL_HANDLER_URL = (
           '/senddummymailtoadminhandler');
-        var MEMORY_CACHE_HANDLER_URL = '/memorycacheadminhandler';
-        var UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
-        var irreversibleActionMessage = (
+        const MEMORY_CACHE_HANDLER_URL = '/memorycacheadminhandler';
+        const UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
+        const DELETE_ACCOUNT_HANDLER_URL = '/deleteaccounthandler';
+        const VERIFY_ACCOUNT_DELETED_HANDLER_URL = (
+          '/verifyaccountdeletedhandler');
+        const irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
 
         ctrl.MAX_USERNAME_LENGTH = MAX_USERNAME_LENGTH;
@@ -151,7 +154,6 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.dataExtractionQueryStatusMessage = message;
         };
 
-
         ctrl.sendDummyMailToAdmin = function() {
           $http.post(SEND_DUMMY_MAIL_HANDLER_URL)
             .then(function(response) {
@@ -199,6 +201,33 @@ angular.module('oppia').directive('adminMiscTab', [
               ctrl.setStatusMessage(
                 'Successfully renamed ' + ctrl.oldUsername + ' to ' +
                   ctrl.newUsername + '!');
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            }
+          );
+        };
+
+        ctrl.deleteAccount = function() {
+          ctrl.setStatusMessage('Running the deletion...');
+          $http.delete(DELETE_ACCOUNT_HANDLER_URL, {email: ctrl.email}).then(
+            function(response) {
+              ctrl.setStatusMessage(
+                'Deletion run with result:' + response.data.result);
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            }
+          );
+        };
+
+        ctrl.verifyAccountDeleted = function() {
+          ctrl.setStatusMessage('Running the verification...');
+          $http.post(
+              VERIFY_ACCOUNT_DELETED_HANDLER_URL, {email: ctrl.email}).then(
+            function(response) {
+              ctrl.setStatusMessage(
+                'Verification run with result:' + response.data.result);
             }, function(errorResponse) {
               ctrl.setStatusMessage(
                 'Server error: ' + errorResponse.data.error);

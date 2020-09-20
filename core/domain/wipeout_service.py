@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 
 from core.domain import collection_services
+from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -61,6 +62,34 @@ def get_pending_deletion_request(user_id):
     """
     pending_deletion_request_model = (
         user_models.PendingDeletionRequestModel.get_by_id(user_id))
+    return wipeout_domain.PendingDeletionRequest(
+        pending_deletion_request_model.id,
+        pending_deletion_request_model.email,
+        pending_deletion_request_model.role,
+        pending_deletion_request_model.deletion_complete,
+        pending_deletion_request_model.exploration_ids,
+        pending_deletion_request_model.collection_ids,
+        pending_deletion_request_model.activity_mappings
+    )
+
+
+def get_pending_deletion_request_by_email(email):
+    """Return the pending deletion request.
+
+    Args:
+        email: str. The email of the user being deleted.
+
+    Returns:
+        PendingDeletionRequest|None. The pending deletion request domain object.
+    """
+    pending_deletion_request_model = (
+        user_models.PendingDeletionRequestModel.query(
+            user_models.PendingDeletionRequestModel.email == email
+        ).get()
+    )
+    if pending_deletion_request_model is None:
+        return None
+
     return wipeout_domain.PendingDeletionRequest(
         pending_deletion_request_model.id,
         pending_deletion_request_model.email,
@@ -240,6 +269,30 @@ def pre_delete_user(user_id):
     )
 
     save_pending_deletion_requests(pending_deletion_requests)
+
+
+def run_user_deletion(pending_deletion_request):
+    if pending_deletion_request.deletion_complete:
+        return 'ALREADY DONE'
+    else:
+        delete_user(pending_deletion_request)
+        pending_deletion_request.deletion_complete = True
+        save_pending_deletion_requests([pending_deletion_request])
+        return 'SUCCESS'
+
+
+def run_user_verification(pending_deletion_request):
+    if not pending_deletion_request.deletion_complete:
+        return 'NOT DELETED'
+    elif verify_user_deleted(pending_deletion_request):
+        delete_pending_deletion_request(pending_deletion_request.user_id)
+        email_manager.send_account_deleted_email(
+            pending_deletion_request.user_id, pending_deletion_request.email)
+        return 'SUCCESS'
+    else:
+        pending_deletion_request.deletion_complete = False
+        save_pending_deletion_requests([pending_deletion_request])
+        return 'FAILURE'
 
 
 def delete_user(pending_deletion_request):

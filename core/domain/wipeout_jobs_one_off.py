@@ -39,14 +39,10 @@ class UserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function for this job."""
         pending_deletion_request = wipeout_service.get_pending_deletion_request(
             pending_deletion_request_model.id)
-        if pending_deletion_request.deletion_complete:
-            yield ('ALREADY DONE', pending_deletion_request.user_id)
-        else:
-            wipeout_service.delete_user(pending_deletion_request)
-            pending_deletion_request.deletion_complete = True
-            wipeout_service.save_pending_deletion_requests(
-                [pending_deletion_request])
-            yield ('SUCCESS', pending_deletion_request.user_id)
+        yield (
+            wipeout_service.run_user_deletion(pending_deletion_request),
+            pending_deletion_request.user_id
+        )
 
     @staticmethod
     def reduce(key, values):
@@ -76,21 +72,13 @@ class FullyCompleteUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # FullyCompleteUserDeletionOneOffJob.
         pending_deletion_request = wipeout_service.get_pending_deletion_request(
             pending_deletion_request_model.id)
-        if not pending_deletion_request.deletion_complete:
-            yield ('NOT DELETED', pending_deletion_request.user_id)
-        elif wipeout_service.verify_user_deleted(pending_deletion_request):
-            wipeout_service.delete_pending_deletion_request(
-                pending_deletion_request.user_id)
-            email_manager.send_account_deleted_email(
-                pending_deletion_request.user_id,
-                pending_deletion_request.email)
-            yield ('SUCCESS', pending_deletion_request.user_id)
-        else:
-            pending_deletion_request.deletion_complete = False
-            wipeout_service.save_pending_deletion_requests(
-                [pending_deletion_request])
-            yield ('FAILURE', pending_deletion_request.user_id)
+        yield (
+            wipeout_service.run_user_verification(pending_deletion_request),
+            pending_deletion_request.user_id
+        )
 
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+
+
