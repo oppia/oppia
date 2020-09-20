@@ -28,10 +28,6 @@ from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
-# Available choices of algorithms for classification.
-ALGORITHM_CHOICES = [classifier_details['algorithm_id'] for (
-    classifier_details) in feconf.INTERACTION_CLASSIFIER_MAPPING.values()]
-
 
 class ClassifierTrainingJobModel(base_models.BaseModel):
     """Model for storing classifier training jobs.
@@ -41,8 +37,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     """
 
     # The ID of the algorithm used to create the model.
-    algorithm_id = ndb.StringProperty(
-        required=True, choices=ALGORITHM_CHOICES, indexed=True)
+    algorithm_id = ndb.StringProperty(required=True, indexed=True)
     # The ID of the interaction to which the algorithm belongs.
     interaction_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration_id of the exploration to whose state the model belongs.
@@ -63,8 +58,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # It is incremented by TTL when a job with status NEW is picked up by VM.
     next_scheduled_check_time = ndb.DateTimeProperty(
         required=True, indexed=True)
-    # The schema version for the data that is being classified.
-    data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
+    # The algorithm version for the classifier. Algorithm version identifies
+    # the format of the classifier_data as well as the prediction API to be
+    # used.
+    algorithm_version = ndb.IntegerProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -84,7 +81,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             'training_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'next_scheduled_check_time':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'data_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'algorithm_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -121,7 +118,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     def create(
             cls, algorithm_id, interaction_id, exp_id, exp_version,
             next_scheduled_check_time, training_data, state_name, status,
-            data_schema_version):
+            algorithm_version):
         """Creates a new ClassifierTrainingJobModel entry.
 
         Args:
@@ -137,7 +134,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             state_name: str. The name of the state to which the classifier
                 belongs.
             status: str. The status of the training job.
-            data_schema_version: int. The schema version for the data.
+            algorithm_version: int. The version of the classifier model to be
+                trained.
 
         Returns:
             str. ID of the new ClassifierModel entry.
@@ -155,8 +153,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             next_scheduled_check_time=next_scheduled_check_time,
             state_name=state_name, status=status,
             training_data=training_data,
-            data_schema_version=data_schema_version
-            )
+            algorithm_version=algorithm_version
+        )
 
         training_job_instance.put()
         return instance_id
@@ -207,7 +205,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 next_scheduled_check_time=job_dict['next_scheduled_check_time'],
                 state_name=job_dict['state_name'], status=job_dict['status'],
                 training_data=job_dict['training_data'],
-                data_schema_version=job_dict['data_schema_version'])
+                algorithm_version=job_dict['algorithm_version'])
 
             job_models.append(training_job_instance)
             job_ids.append(instance_id)
@@ -215,7 +213,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         return job_ids
 
 
-class TrainingJobExplorationMappingModel(base_models.BaseModel):
+class StateTrainingJobsMappingModel(base_models.BaseModel):
     """Model for mapping exploration attributes to a ClassifierTrainingJob.
 
     The ID of instances of this class has the form
@@ -229,12 +227,15 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
     exp_version = ndb.IntegerProperty(required=True, indexed=True)
     # The name of the state to which the model belongs.
     state_name = ndb.StringProperty(required=True, indexed=True)
-    # The ID of the training job corresponding to the exploration attributes.
-    job_id = ndb.StringProperty(required=True, indexed=True)
+    # The IDs of the training jobs corresponding to the exploration state. Each
+    # algorithm_id corresponding to the interaction of the exploration state is
+    # mapped to its unique job_id.
+    algorithm_ids_to_job_ids = ndb.JsonProperty(
+        required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
-        """TrainingJobExplorationMappingModel is not related to users."""
+        """StateTrainingJobsMappingModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -244,7 +245,7 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'job_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'algorithm_ids_to_job_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -289,8 +290,29 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
         return mapping_instances
 
     @classmethod
+    def get_model(cls, exp_id, exp_version, state_name):
+        """Retrieves the Classifier Exploration Mapping model for given
+        exploration.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. The exploration version at the time
+                this training job was created.
+            state_name: unicode. The state name for which we retrieve
+                the mapping model.
+
+        Returns:
+            ClassifierExplorationMappingModel|None. The model instance
+            for the classifier exploration mapping. It returns None if the no
+            entry for given <exp_id, exp_version, state_name> is found.
+        """
+        mapping_id = cls._generate_id(exp_id, exp_version, state_name)
+        model = cls.get_by_id(mapping_id)
+        return model
+
+    @classmethod
     def create(
-            cls, exp_id, exp_version, state_name, job_id):
+            cls, exp_id, exp_version, state_name, algorithm_ids_to_job_ids):
         """Creates a new ClassifierExplorationMappingModel entry.
 
         Args:
@@ -299,8 +321,9 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
                 this training job was created.
             state_name: unicode. The name of the state to which the classifier
                 belongs.
-            job_id: str. The ID of the training job corresponding to this
-                combination of <exp_id, exp_version, state_name>.
+            algorithm_ids_to_job_ids: dict(str, str). The mapping from
+                algorithm IDs to the IDs of their corresponding classifier
+                training jobs.
 
         Returns:
             str. ID of the new ClassifierExplorationMappingModel entry.
@@ -313,35 +336,38 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
         if not cls.get_by_id(instance_id):
             mapping_instance = cls(
                 id=instance_id, exp_id=exp_id, exp_version=exp_version,
-                state_name=state_name, job_id=job_id)
+                state_name=state_name,
+                algorithm_ids_to_job_ids=algorithm_ids_to_job_ids)
 
             mapping_instance.put()
             return instance_id
         raise Exception('A model with the same ID already exists.')
 
     @classmethod
-    def create_multi(cls, job_exploration_mappings):
-        """Creates multiple new TrainingJobExplorationMappingModel entries.
+    def create_multi(cls, state_training_jobs_mappings):
+        """Creates multiple new StateTrainingJobsMappingModel entries.
 
         Args:
-            job_exploration_mappings: list(TrainingJobExplorationMapping). The
-                list of TrainingJobExplorationMapping Domain objects.
+            state_training_jobs_mappings: list(StateTrainingJobsMapping). The
+                list of StateTrainingJobsMapping domain objects.
 
         Returns:
             list(int). The list of mapping IDs.
         """
         mapping_models = []
         mapping_ids = []
-        for job_exploration_mapping in job_exploration_mappings:
+        for state_training_job_mapping in state_training_jobs_mappings:
             instance_id = cls._generate_id(
-                job_exploration_mapping.exp_id,
-                job_exploration_mapping.exp_version,
-                job_exploration_mapping.state_name)
+                state_training_job_mapping.exp_id,
+                state_training_job_mapping.exp_version,
+                state_training_job_mapping.state_name)
             mapping_instance = cls(
-                id=instance_id, exp_id=job_exploration_mapping.exp_id,
-                exp_version=job_exploration_mapping.exp_version,
-                state_name=job_exploration_mapping.state_name,
-                job_id=job_exploration_mapping.job_id)
+                id=instance_id, exp_id=state_training_job_mapping.exp_id,
+                exp_version=state_training_job_mapping.exp_version,
+                state_name=state_training_job_mapping.state_name,
+                algorithm_ids_to_job_ids=(
+                    state_training_job_mapping.algorithm_ids_to_job_ids
+                ))
 
             mapping_models.append(mapping_instance)
             mapping_ids.append(instance_id)

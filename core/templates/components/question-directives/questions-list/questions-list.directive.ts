@@ -97,7 +97,8 @@ angular.module('oppia').directive('questionsList', [
         'QuestionUndoRedoService', 'QuestionValidationService',
         'QuestionsListService', 'ShortSkillSummaryObjectFactory',
         'SkillBackendApiService', 'SkillDifficultyObjectFactory',
-        'UtilsService', 'WindowDimensionsService', 'NUM_QUESTIONS_PER_PAGE',
+        'UtilsService', 'WindowDimensionsService', 'INTERACTION_SPECS',
+        'NUM_QUESTIONS_PER_PAGE',
         function(
             $location, $rootScope, $timeout, $uibModal, AlertsService,
             ContextService, EditableQuestionBackendApiService,
@@ -106,7 +107,8 @@ angular.module('oppia').directive('questionsList', [
             QuestionUndoRedoService, QuestionValidationService,
             QuestionsListService, ShortSkillSummaryObjectFactory,
             SkillBackendApiService, SkillDifficultyObjectFactory,
-            UtilsService, WindowDimensionsService, NUM_QUESTIONS_PER_PAGE) {
+            UtilsService, WindowDimensionsService, INTERACTION_SPECS,
+            NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var _reInitializeSelectedSkillIds = function() {
@@ -550,6 +552,14 @@ angular.module('oppia').directive('questionsList', [
               ctrl.question, ctrl.misconceptionsBySkill) &&
                 ctrl.newQuestionSkillDifficulties.length);
           };
+
+          ctrl.showSolutionCheckpoint = function() {
+            const interactionId = ctrl.question.getStateData().interaction.id;
+            return (
+              interactionId && INTERACTION_SPECS[
+                interactionId].can_have_solution);
+          };
+
           ctrl.addSkill = function() {
             var skillsInSameTopicCount =
                 ctrl.getGroupedSkillSummaries().current.length;
