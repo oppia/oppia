@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for managing the state responses in the state editor.
+ * @fileoverview Directive for managing the state responses in the state
+ * editor.
  */
 
 require(
@@ -48,7 +49,8 @@ require('filters/parameterize-rule-description.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
 require(
-  'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
+  'pages/exploration-editor-page/services/' +
+  'editor-first-time-events.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'interaction-details-cache.service.ts');
@@ -468,7 +470,8 @@ angular.module('oppia').directive('stateResponses', [
             });
           };
 
-          $scope.saveDefaultOutcomeCorrectnessLabel = function(updatedOutcome) {
+          $scope.saveDefaultOutcomeCorrectnessLabel = function(
+              updatedOutcome) {
             ResponsesService.updateDefaultOutcome({
               labelledAsCorrect: updatedOutcome.labelledAsCorrect
             }, function(newDefaultOutcome) {
@@ -646,7 +649,8 @@ angular.module('oppia').directive('stateResponses', [
 
                 // If the creator selects an interaction which has only one
                 // possible answer, automatically expand the default response.
-                // Otherwise, default to having no responses initially selected.
+                // Otherwise, default to having no responses initially
+                // selected.
                 if ($scope.isCurrentInteractionLinear()) {
                   ResponsesService.changeActiveAnswerGroupIndex(0);
                 }
@@ -671,7 +675,8 @@ angular.module('oppia').directive('stateResponses', [
                   ResponsesService.onInteractionIdChanged(
                     newInteractionId,
                     function(newAnswerGroups, newDefaultOutcome) {
-                      $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+                      $scope.onSaveInteractionDefaultOutcome(
+                        newDefaultOutcome);
                       $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
                       $scope.refreshWarnings()();
                       $scope.answerGroups = ResponsesService.getAnswerGroups();
