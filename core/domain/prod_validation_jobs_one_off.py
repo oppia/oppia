@@ -732,7 +732,9 @@ class UserNormalizedNameAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if len(values) > 1:
+        # If normalized name is not set, we do not comapare it with normalized
+        # names for other users.
+        if key != 'None' and len(values) > 1:
             yield (
                 'failed validation check for normalized username check of '
                 'UserSettingsModel',
