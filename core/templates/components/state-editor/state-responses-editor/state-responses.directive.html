@@ -123,7 +123,7 @@
             <label for="label-target-solicit-answer-details-checkbox">Solicit Answer Details</label>
           </span>
         </div>
-        <div ng-if="containsOptionalMisconceptions || getUnaddressedMisconceptionNames(misconceptionsBySkill).length" class="misconception-parent-card">
+        <div ng-if="isInQuestionMode() && (containsOptionalMisconceptions || getUnaddressedMisconceptionNames(misconceptionsBySkill).length)" class="misconception-parent-card">
           <h3>Misconceptions</h3>
           <small class="text-muted">The following must be addressed by tagging to an incorrect answer. If a misconception is not relevant to this question, mark it as "Not Applicable".</small>
           <div class="pt-4" ng-if="getUnaddressedMisconceptionNames(misconceptionsBySkill).length">
