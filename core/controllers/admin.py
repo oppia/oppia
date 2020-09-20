@@ -388,34 +388,6 @@ class AdminHandler(base.BaseHandler):
         skill = skill_domain.Skill.create_default_skill(
             skill_id, skill_description, rubrics)
         skill.update_explanation(state_domain.SubtitledHtml('1', explanation))
-        misconception_dict_1 = {
-            'id': 0, 'name': 'misc 1', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>',
-            'must_be_addressed': True}
-        misconception_dict_2 = {
-            'id': 1, 'name': 'misc 2', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>',
-            'must_be_addressed': True}
-        misconception_dict_3 = {
-            'id': 2, 'name': 'misc 3', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>',
-            'must_be_addressed': False}
-        misconception_dict_4 = {
-            'id': 3, 'name': 'misc 4', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>',
-            'must_be_addressed': False}
-        misconception_1 = skill_domain.Misconception.from_dict(
-            misconception_dict_1)
-        misconception_2 = skill_domain.Misconception.from_dict(
-            misconception_dict_2)
-        misconception_3 = skill_domain.Misconception.from_dict(
-            misconception_dict_3)
-        misconception_4 = skill_domain.Misconception.from_dict(
-            misconception_dict_4)
-        skill.add_misconception(misconception_1)
-        skill.add_misconception(misconception_2)
-        skill.add_misconception(misconception_3)
-        skill.add_misconception(misconception_4)
         return skill
 
     def _load_dummy_new_structures_data(self):
