@@ -175,7 +175,7 @@ angular.module('oppia').directive('questionEditor', [
           };
 
           ctrl.saveInapplicableSkillMisconceptionIds = function(
-            displayedValue) {
+              displayedValue) {
             StateEditorService.setInapplicableSkillMisconceptionIds(
               angular.copy(displayedValue));
             QuestionUpdateService.setQuestionInapplicableSkillMisconceptionIds(

@@ -255,8 +255,9 @@ export class StateEditorService {
   }
 
   setInapplicableSkillMisconceptionIds(
-    newInapplicableSkillMisconceptionIds: string[]): void {
-    this.inapplicableSkillMisconceptionIds = newInapplicableSkillMisconceptionIds;
+      newInapplicableSkillMisconceptionIds: string[]): void {
+    this.inapplicableSkillMisconceptionIds = (
+      newInapplicableSkillMisconceptionIds);
   }
 
   getInapplicableSkillMisconceptionIds(): string[] {

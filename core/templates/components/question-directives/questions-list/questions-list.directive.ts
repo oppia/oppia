@@ -165,7 +165,7 @@ angular.module('oppia').directive('questionsList', [
           };
 
           ctrl.showUnaddressedSkillMisconceptionWarning = function(
-            skillMisconceptionIds) {
+              skillMisconceptionIds) {
             var skillId = ctrl.getSelectedSkillId();
             var expectedMisconceptionIds = (
               ctrl.misconceptionIdsForSelectedSkill);
@@ -174,7 +174,7 @@ angular.module('oppia').directive('questionsList', [
                 if (skillMisconceptionId.startsWith(skillId)) {
                   return parseInt(skillMisconceptionId.split('-')[1]);
                 }
-              }))
+              }));
             return UtilsService.isEquivalent(
               actualMisconceptionIds.sort(), expectedMisconceptionIds.sort());
           };

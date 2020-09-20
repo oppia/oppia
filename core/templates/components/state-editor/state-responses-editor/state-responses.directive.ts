@@ -87,6 +87,7 @@ require('services/html-escaper.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/external-save.service.ts');
 
+import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 import { Subscription } from 'rxjs';
 
 
@@ -396,7 +397,7 @@ angular.module('oppia').directive('stateResponses', [
               $scope.onSaveInapplicableSkillMisconceptionIds(
                 $scope.inapplicableSkillMisconceptionIds);
             }
-          }
+          };
 
           $scope.saveTaggedMisconception = function(misconceptionId, skillId) {
             ResponsesService.updateActiveAnswerGroup({
@@ -560,26 +561,27 @@ angular.module('oppia').directive('stateResponses', [
               }
             }
             var unaddressedMisconceptionNames = [];
-            Object.keys($scope.misconceptionsBySkill).forEach(function(skillId) {
-              var misconceptions = $scope.misconceptionsBySkill[skillId];
-              for (var i = 0; i < misconceptions.length; i++) {
-                if (!misconceptions[i].isMandatory()) {
-                  continue;
+            Object.keys($scope.misconceptionsBySkill).forEach(
+              function(skillId) {
+                var misconceptions = $scope.misconceptionsBySkill[skillId];
+                for (var i = 0; i < misconceptions.length; i++) {
+                  if (!misconceptions[i].isMandatory()) {
+                    continue;
+                  }
+                  var skillMisconceptionId = (
+                    skillId + '-' + misconceptions[i].getId());
+                  if (!taggedSkillMisconceptionIds.hasOwnProperty(
+                    skillMisconceptionId)) {
+                    unaddressedMisconceptionNames.push(
+                      misconceptions[i].getName());
+                  }
                 }
-                var skillMisconceptionId = (
-                  skillId + '-' + misconceptions[i].getId());
-                if (!taggedSkillMisconceptionIds.hasOwnProperty(
-                  skillMisconceptionId)) {
-                  unaddressedMisconceptionNames.push(
-                    misconceptions[i].getName());
-                }
-              }
-            });
+              });
             return unaddressedMisconceptionNames;
           };
 
           $scope.getOptionalSkillMisconceptionStatus = function(
-            optionalSkillMisconceptionId) {
+              optionalSkillMisconceptionId) {
             var answerGroups = ResponsesService.getAnswerGroups();
             var taggedSkillMisconceptionIds = [];
             for (var i = 0; i < answerGroups.length; i++) {
@@ -589,7 +591,10 @@ angular.module('oppia').directive('stateResponses', [
                   answerGroups[i].taggedSkillMisconceptionId);
               }
             }
-            if (taggedSkillMisconceptionIds.includes(optionalSkillMisconceptionId)) {
+            var skillMisconceptionIdIsAssigned = (
+              taggedSkillMisconceptionIds.includes(
+                optionalSkillMisconceptionId));
+            if (skillMisconceptionIdIsAssigned) {
               return 'Assigned';
             }
             return $scope.inapplicableSkillMisconceptionIds.includes(
@@ -597,7 +602,7 @@ angular.module('oppia').directive('stateResponses', [
           };
 
           $scope.updateOptionalMisconceptionIdStatus = function(
-            skillMisconceptionId, isApplicable) {
+              skillMisconceptionId, isApplicable) {
             if (isApplicable) {
               $scope.inapplicableSkillMisconceptionIds = (
                 $scope.inapplicableSkillMisconceptionIds.filter(
@@ -756,6 +761,10 @@ angular.module('oppia').directive('stateResponses', [
             $scope.inapplicableSkillMisconceptionIds = (
               StateEditorService.getInapplicableSkillMisconceptionIds());
             $scope.activeEditOption = null;
+            $scope.containsOptionalMisconceptions = (
+              Object.values($scope.misconceptionsBySkill).some(
+                (misconceptions: Misconception[]) => misconceptions.some(
+                  misconception => !misconception.isMandatory())));
           };
           ctrl.$onDestroy = function() {
             ctrl.directiveSubscriptions.unsubscribe();

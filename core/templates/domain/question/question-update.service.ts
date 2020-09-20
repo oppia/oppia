@@ -27,14 +27,14 @@ require('domain/question/question-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('QuestionUpdateService', [
   'ChangeObjectFactory', 'QuestionUndoRedoService',
-  'CMD_UPDATE_QUESTION_PROPERTY', 'QUESTION_PROPERTY_LANGUAGE_CODE',
-  'QUESTION_PROPERTY_QUESTION_STATE_DATA',
+  'CMD_UPDATE_QUESTION_PROPERTY',
   'QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS',
+  'QUESTION_PROPERTY_LANGUAGE_CODE', 'QUESTION_PROPERTY_QUESTION_STATE_DATA',
   function(
       ChangeObjectFactory, QuestionUndoRedoService,
-      CMD_UPDATE_QUESTION_PROPERTY, QUESTION_PROPERTY_LANGUAGE_CODE,
-      QUESTION_PROPERTY_QUESTION_STATE_DATA,
-      QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS) {
+      CMD_UPDATE_QUESTION_PROPERTY,
+      QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
+      QUESTION_PROPERTY_LANGUAGE_CODE, QUESTION_PROPERTY_QUESTION_STATE_DATA) {
     var _applyChange = function(question, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
@@ -120,7 +120,7 @@ angular.module('oppia').factory('QuestionUpdateService', [
           });
       },
       setQuestionInapplicableSkillMisconceptionIds: function(
-        question, newInapplicableSkillMisconceptionIds) {
+          question, newInapplicableSkillMisconceptionIds) {
         var oldInapplicableSkillMisconceptionIds = angular.copy(
           question.getInapplicableSkillMisconceptionIds());
         _applyPropertyChange(
