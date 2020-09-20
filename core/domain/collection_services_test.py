@@ -1954,14 +1954,14 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
                 'new_value': 'Collection Bob title'
             }],
             'Changed title.')
-        collection_services.update_collection_summary(
+        collection_services.regenerate_collection_summary(
             self.COLLECTION_0_ID, None)
 
         self._check_contributors_summary(
             self.COLLECTION_0_ID, {self.albert_id: 1, self.bob_id: 1})
 
         user_services.mark_user_for_deletion(self.bob_id)
-        collection_services.update_collection_summary(
+        collection_services.regenerate_collection_summary(
             self.COLLECTION_0_ID, None)
 
         self._check_contributors_summary(
