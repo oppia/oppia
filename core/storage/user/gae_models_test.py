@@ -255,6 +255,18 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
                 id=new_id, gae_id='gae_id', email='some@email.com').put()
             ids.add(new_id)
 
+    def test_get_new_id_with_deleted_user_model(self):
+        # Swap dependent method get_by_id to simulate collision every time.
+        get_by_id_swap = self.swap(
+            user_models.DeletedUserModel, 'get_by_id', types.MethodType(
+                lambda _, __: True, user_models.DeletedUserModel))
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'New id generator is producing too many collisions.')
+
+        with assert_raises_regexp_context_manager, get_by_id_swap:
+            user_models.UserSettingsModel.get_new_id('exploration')
+
     def test_get_new_id_for_too_many_collisions_raises_error(self):
         # Swap dependent method get_by_id to simulate collision every time.
         get_by_id_swap = self.swap(
@@ -2329,6 +2341,15 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
+
+
+class DeletedUserModelTests(test_utils.GenericTestBase):
+    """Tests for DeletedUserModelTests."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.DeletedUserModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
 
 
 class PseudonymizedUserModelTests(test_utils.GenericTestBase):

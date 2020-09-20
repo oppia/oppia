@@ -2374,12 +2374,12 @@ class DeletedUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """PseudonymizedUserModel contains only pseudonymous ids."""
+        """DeletedUserModel contains only IDs that were deleted."""
         return base_models.DELETION_POLICY.KEEP
 
     @classmethod
     def get_export_policy(cls):
-        """PseudonymizedUserModel contains only pseudonymous ids."""
+        """DeletedUserModel contains only IDs that were deleted."""
         return dict(super(cls, cls).get_export_policy(), **{})
 
 
