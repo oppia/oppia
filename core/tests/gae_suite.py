@@ -43,6 +43,7 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(OPPIA_TOOLS_DIR, 'webtest-2.0.35'),
     os.path.join(GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webob_0_9'),
     os.path.join(OPPIA_TOOLS_DIR, 'Pillow-6.2.2'),
+    os.path.join(OPPIA_TOOLS_DIR, 'protobuf-3.12.0'),
     os.path.join(OPPIA_TOOLS_DIR, 'psutil-5.7.0'),
     os.path.join(OPPIA_TOOLS_DIR, 'PyGithub-1.45'),
     CURR_DIR,
