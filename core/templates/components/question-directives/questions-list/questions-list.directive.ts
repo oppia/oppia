@@ -550,6 +550,7 @@ angular.module('oppia').directive('questionsList', [
           ctrl.isQuestionValid = function() {
             return Boolean(QuestionValidationService.isQuestionValid(
               ctrl.question, ctrl.misconceptionsBySkill) &&
+                ctrl.newQuestionSkillDifficulties &&
                 ctrl.newQuestionSkillDifficulties.length);
           };
 
