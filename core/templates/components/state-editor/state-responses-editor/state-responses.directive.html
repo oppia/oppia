@@ -158,7 +158,8 @@
                         NOT APPLICABLE
                     </div>
                   </div>
-                  <div ng-click="setActiveEditOption(skillId + '-' + misconception.getId())"
+                  <div ng-if="EditabilityService.isEditable()"
+                       ng-click="setActiveEditOption(skillId + '-' + misconception.getId())"
                        class="fas fa-ellipsis-v optional-misconception-options-button"
                        ng-class="{'d-none': getOptionalSkillMisconceptionStatus(skillId + '-' + misconception.getId()) === 'Assigned'}">
                   </div>
