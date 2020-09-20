@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for EditableStoryBackendApiService.
  */
 
-import { EditableStoryBackendApiService } from
-  'domain/story/editable-story-backend-api.service';
+import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 import { HttpClientTestingModule, HttpTestingController } from
@@ -25,11 +24,6 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from
   '@angular/core/testing';
 export {};
-/* Class MockEditableStory extends EditableStoryBackendApiService {
-  isAuthenticated() {
-    return 'Mocked';
-  }
-}*/
 describe('Editable story backend API service', () => {
   let editableStoryBackendApiService: EditableStoryBackendApiService = null;
   let sampleDataResults = null;
@@ -106,8 +100,8 @@ describe('Editable story backend API service', () => {
         topic_name: sampleDataResults.topic_name,
         story_is_published: true,
         skill_summaries: sampleDataResults.skill_summaries,
-        topic_url_fragement: undefined,
-        classroom_url_fragement: undefined
+        topic_url_fragment: undefined,
+        classroom_url_fragment: undefined
       });
       expect(failHandler).not.toHaveBeenCalled();
     }

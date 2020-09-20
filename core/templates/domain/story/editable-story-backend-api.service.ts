@@ -22,7 +22,6 @@ import { HttpClient } from '@angular/common/http';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants';
-// Import cloneDeep from 'lodash/cloneDeep';
 
 interface FetchStoryResponse {
   'story':object;
@@ -39,7 +38,6 @@ export class EditableStoryBackendApiService {
   constructor(
     private http: HttpClient,
     private urlInterpolation: UrlInterpolationService) {}
-  // Private storyDataDict = null;
   private _fetchStory(
       storyId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
@@ -51,7 +49,6 @@ export class EditableStoryBackendApiService {
     this.http.get<FetchStoryResponse>(
       editableStoryDataUrl).toPromise().then(
       (response) => {
-        // This.storyDataDict = cloneDeep(response);
         var story = angular.copy(response.story);
         var topicName = angular.copy(response.topic_name);
         var storyIsPublished = response.story_is_published;
@@ -67,7 +64,6 @@ export class EditableStoryBackendApiService {
             topicUrlFragment: topicUrlFragment,
             classroomUrlFragment: classroomUrlFragment
           });
-          // SuccessCallback(this.storyDataDict);
         }
       }, (errorResponse) => {
         if (errorCallback) {
