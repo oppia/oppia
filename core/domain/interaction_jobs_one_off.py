@@ -193,13 +193,14 @@ class InteractionCustomizationArgsValidationOneOffJob(
                     fail_on_validation_errors=True
                 )
             except Exception as e:
-                error_messages.append(
-                    '%s: %s' % (state.interaction.id, python_utils.UNICODE(e)))
+                error_messages.append(u'%s: %s' % (state.interaction.id, e))
 
         if error_messages:
+            error_msg = u', '.join(error_messages)
             yield (
-                'Failed customization args validation for exp '
-                'id %s' % item.id, ', '.join(error_messages))
+                u'Failed customization args validation for exp '
+                'id %s' % item.id, python_utils.convert_to_bytes(
+                    error_msg))
 
     @staticmethod
     def reduce(key, values):
