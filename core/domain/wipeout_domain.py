@@ -41,7 +41,7 @@ class PendingDeletionRequest(python_utils.OBJECT):
                 deleted and need to be hard-deleted.
             collection_ids: list(str). Private collections that are marked as
                 deleted and need to be hard-deleted.
-            entity_mappings: dict(str, str). Mapping between the entity IDs
+            activity_mappings: dict(str, str). Mapping between the activity IDs
                 and pseudonymized user IDs.
         """
         self.user_id = user_id
@@ -81,7 +81,7 @@ class PendingDeletionRequest(python_utils.OBJECT):
         Raises:
             ValidationError. The field activity_mappings contains wrong key.
         """
-        for key in self.entity_mappings.keys():
+        for key in self.activity_mappings.keys():
             if key not in [name for name in models.NAMES.__dict__]:
                 raise utils.ValidationError(
                     'activity_mappings contain wrong key')

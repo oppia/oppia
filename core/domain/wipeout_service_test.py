@@ -113,7 +113,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
                 deletion_complete=False,
                 exploration_ids=['exp1', 'exp2'],
                 collection_ids=['col1'],
-                entity_mappings={}
+                activity_mappings={}
             )
         )
         pending_deletion_request_model_old.put()
