@@ -69,6 +69,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'Title', 'Description', self.TOPIC_ID,
             self.STORY_URL_FRAGMENT)
+        story.meta_tag_content = 'story meta content'
 
         exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
@@ -219,7 +220,8 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             'story_title': 'Title',
             'story_description': 'Description',
             'story_nodes': [self.node_2, self.node_1, self.node_3],
-            'topic_name': 'Topic'
+            'topic_name': 'Topic',
+            'meta_tag_content': 'story meta content'
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
