@@ -88,9 +88,13 @@ AUDIO_PATH_REGEX = (
         ASSETS_PATH_REGEX, ('|').join(ALLOWED_AUDIO_EXTENSIONS)))
 USER_ID_REGEX = 'uid_[a-z]{32}'
 ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES = [
+    'DashboardRecentUpdatesAggregator',
+    'ExplorationRecommendationsAggregator',
     'FeedbackAnalyticsAggregator',
     'InteractionAnswerSummariesAggregator',
-    'DashboardRecentUpdatesAggregator',
+    'SearchRanker',
+    'StatisticsAggregator',
+    'UserImpactAggregator',
     'UserStatsAggregator']
 TARGET_TYPE_TO_TARGET_MODEL = {
     suggestion_models.TARGET_TYPE_EXPLORATION: (
