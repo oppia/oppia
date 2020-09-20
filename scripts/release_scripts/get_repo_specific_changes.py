@@ -35,7 +35,7 @@ FECONF_VAR_NAMES = ['CURRENT_STATE_SCHEMA_VERSION',
 FECONF_FILEPATH = os.path.join('', 'feconf.py')
 
 
-def check_versions(current_release):
+def get_changes_in_versions(current_release):
     """Checks if the versions for the exploration or collection schemas have
     changed.
 
@@ -74,7 +74,7 @@ def _git_diff_names_only(left, right='HEAD'):
     return common.run_cmd(diff_cmd.split(' ')).splitlines()
 
 
-def check_setup_scripts(base_release_tag, changed_only=True):
+def get_changes_in_setup_scripts(base_release_tag, changed_only=True):
     """Check if setup scripts have changed.
 
     Args:
@@ -83,8 +83,9 @@ def check_setup_scripts(base_release_tag, changed_only=True):
             instead of just the changed ones.
 
     Returns:
-        dict. Dict consisting of script or boolean indicating whether or not it
-        has changed (filtered by default to those that are modified).
+        dict. Dict consisting of key as script name and value as boolean
+        indicating whether or not it has changed
+        (filtered by default to those that are modified).
     """
     setup_scripts = ['scripts/%s' % item for item in
                      ['setup.py', 'setup_gae.py', 'install_third_party_libs.py',
@@ -99,32 +100,35 @@ def check_setup_scripts(base_release_tag, changed_only=True):
         return changes_dict
 
 
-def check_storage_models(current_release):
-    """Check if files in core/storage have changed and returns them.
+def get_changes_in_storage_models(current_release):
+    """Returns a list of filepaths in core/storage whose contents have
+    changed since the last release.
 
     Args:
         current_release: str. The current release version.
 
     Returns:
-        list(str). The changed files (if any).
+        list(str). The changed files in core/storage (if any).
     """
     diff_list = _git_diff_names_only(current_release)
     return [item for item in diff_list if item.startswith('core/storage')]
 
 
 def get_changes(current_release):
-    """Collects necessary info and dumps it to disk.
+    """Collects changes in storage models, setup scripts and feconf
+    since the previous release.
 
     Args:
         current_release: str. The current release version.
 
     Returns:
-        list(str). The list of repo specific changes to write to release
-        summary file.
+        list(str). The list of repo specific changes in storage models,
+        setup scripts and feconf since the previous release to be
+        written to release summary file.
     """
     changes = []
 
-    feconf_version_changes = check_versions(current_release)
+    feconf_version_changes = get_changes_in_versions(current_release)
     if feconf_version_changes:
         changes.append(
             '\n### Feconf version changes:\nThis indicates that a '
@@ -132,13 +136,13 @@ def get_changes(current_release):
         for var in feconf_version_changes:
             changes.append('* %s\n' % var)
 
-    setup_changes = check_setup_scripts(current_release)
+    setup_changes = get_changes_in_setup_scripts(current_release)
     if setup_changes:
         changes.append('\n### Changed setup scripts:\n')
         for var in setup_changes.keys():
             changes.append('* %s\n' % var)
 
-    storage_changes = check_setup_scripts(current_release)
+    storage_changes = get_changes_in_setup_scripts(current_release)
     if storage_changes:
         changes.append('\n### Changed storage models:\n')
         for item in storage_changes:

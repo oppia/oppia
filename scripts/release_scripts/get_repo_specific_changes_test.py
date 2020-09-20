@@ -32,7 +32,7 @@ MOCK_FECONF_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'feconf.txt')
 class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
     """Test the methods for obtaining repo specific changes."""
 
-    def test_check_versions_with_no_diff(self):
+    def test_get_changes_in_versions_with_no_diff(self):
         def mock_run_cmd(unused_cmd):
             return (
                 'CURRENT_STATE_SCHEMA_VERSION = 3'
@@ -41,11 +41,12 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
         feconf_swap = self.swap(
             get_repo_specific_changes, 'FECONF_FILEPATH', MOCK_FECONF_FILEPATH)
         with run_cmd_swap, feconf_swap:
-            actual_version_changes = get_repo_specific_changes.check_versions(
-                'current_release')
+            actual_version_changes = (
+                get_repo_specific_changes.get_changes_in_versions(
+                    'current_release'))
         self.assertEqual(actual_version_changes, [])
 
-    def test_check_versions_with_diff(self):
+    def test_get_changes_in_versions_with_diff(self):
         def mock_run_cmd(unused_cmd):
             return (
                 'CURRENT_STATE_SCHEMA_VERSION = 8'
@@ -54,29 +55,32 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
         feconf_swap = self.swap(
             get_repo_specific_changes, 'FECONF_FILEPATH', MOCK_FECONF_FILEPATH)
         with run_cmd_swap, feconf_swap:
-            actual_version_changes = get_repo_specific_changes.check_versions(
-                'current_release')
+            actual_version_changes = (
+                get_repo_specific_changes.get_changes_in_versions(
+                    'current_release'))
         self.assertEqual(
             actual_version_changes, ['CURRENT_STATE_SCHEMA_VERSION'])
 
-    def test_check_setup_scripts_to_get_changed_scripts_status(self):
+    def test_get_changes_in_setup_scripts_to_get_changed_scripts_status(self):
         def mock_run_cmd(unused_cmd):
             return 'scripts/setup.py\nscripts/setup_gae.py'
         with self.swap(common, 'run_cmd', mock_run_cmd):
-            actual_scripts = get_repo_specific_changes.check_setup_scripts(
-                'release_tag')
+            actual_scripts = (
+                get_repo_specific_changes.get_changes_in_setup_scripts(
+                    'release_tag'))
         expected_scripts = {
             'scripts/setup.py': True,
             'scripts/setup_gae.py': True
         }
         self.assertEqual(actual_scripts, expected_scripts)
 
-    def test_check_setup_scripts_to_get_all_scripts_status(self):
+    def test_get_changes_in_setup_scripts_to_get_all_scripts_status(self):
         def mock_run_cmd(unused_cmd):
             return 'scripts/setup.py\nscripts/setup_gae.py'
         with self.swap(common, 'run_cmd', mock_run_cmd):
-            actual_scripts = get_repo_specific_changes.check_setup_scripts(
-                'release_tag', changed_only=False)
+            actual_scripts = (
+                get_repo_specific_changes.get_changes_in_setup_scripts(
+                    'release_tag', changed_only=False))
         expected_scripts = {
             'scripts/setup.py': True,
             'scripts/setup_gae.py': True,
@@ -85,7 +89,7 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
         }
         self.assertEqual(actual_scripts, expected_scripts)
 
-    def test_check_storage_models(self):
+    def test_get_changes_in_storage_models(self):
         def mock_run_cmd(unused_cmd):
             return (
                 'scripts/setup.py\nextensions/test.ts\n'
@@ -93,7 +97,7 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
                 'core/storage/user/gae_models.py')
         with self.swap(common, 'run_cmd', mock_run_cmd):
             actual_storgae_models = (
-                get_repo_specific_changes.check_storage_models(
+                get_repo_specific_changes.get_changes_in_storage_models(
                     'current_release'))
         expected_storage_models = [
             'core/storage/activity/gae_models.py',
@@ -101,28 +105,29 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
         self.assertEqual(actual_storgae_models, expected_storage_models)
 
     def test_get_changes(self):
-        def mock_check_versions(unused_current_release):
+        def mock_get_changes_in_versions(unused_current_release):
             return ['version_change']
-        def mock_check_setup_scripts(unused_base_release_tag):
+        def mock_get_changes_in_setup_scripts(unused_base_release_tag):
             return {'setup_changes': True}
-        def mock_check_storage_models(unused_current_release):
+        def mock_get_changes_in_storage_models(unused_current_release):
             return ['storage_changes']
 
-        check_versions_swap = self.swap(
-            get_repo_specific_changes, 'check_versions', mock_check_versions)
+        versions_swap = self.swap(
+            get_repo_specific_changes, 'get_changes_in_versions',
+            mock_get_changes_in_versions)
         setup_scripts_swap = self.swap(
-            get_repo_specific_changes, 'check_setup_scripts',
-            mock_check_setup_scripts)
+            get_repo_specific_changes, 'get_changes_in_setup_scripts',
+            mock_get_changes_in_setup_scripts)
         storage_models_swap = self.swap(
-            get_repo_specific_changes, 'check_storage_models',
-            mock_check_storage_models)
+            get_repo_specific_changes, 'get_changes_in_storage_models',
+            mock_get_changes_in_storage_models)
 
         expected_changes = [
             '\n### Feconf version changes:\nThis indicates '
             'that a migration may be needed\n\n', '* version_change\n',
             '\n### Changed setup scripts:\n', '* setup_changes\n',
             '\n### Changed storage models:\n', '* setup_changes\n']
-        with check_versions_swap, setup_scripts_swap, storage_models_swap:
+        with versions_swap, setup_scripts_swap, storage_models_swap:
             self.assertEqual(
                 get_repo_specific_changes.get_changes('rel-tag'),
                 expected_changes)
