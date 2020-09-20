@@ -637,6 +637,7 @@ angular.module('oppia').directive('stateResponses', [
               ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE);
             $scope.stateSolicitAnswerDetailsService = (
               StateSolicitAnswerDetailsService);
+            $scope.misconceptionsBySkill = {};
             ctrl.directiveSubscriptions.add(
               ResponsesService.onInitializeAnswerGroups.subscribe((data) => {
                 ResponsesService.init(data);
@@ -726,6 +727,18 @@ angular.module('oppia').directive('stateResponses', [
               )
             );
 
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onStateEditorInitialized.subscribe(
+                () => {
+                  $scope.misconceptionsBySkill = (
+                    StateEditorService.getMisconceptionsBySkill());
+                  $scope.containsOptionalMisconceptions = (
+                    Object.values($scope.misconceptionsBySkill).some(
+                      (misconceptions: Misconception[]) => misconceptions.some(
+                        misconception => !misconception.isMandatory())));
+                })
+            );
+
             // When the page is scrolled so that the top of the page is above
             // the browser viewport, there are some bugs in the positioning of
             // the helper. This is a bug in jQueryUI that has not been fixed
@@ -756,15 +769,9 @@ angular.module('oppia').directive('stateResponses', [
               $scope.onResponsesInitialized();
             }
             StateEditorService.updateStateResponsesInitialised();
-            $scope.misconceptionsBySkill = (
-              StateEditorService.getMisconceptionsBySkill());
             $scope.inapplicableSkillMisconceptionIds = (
               StateEditorService.getInapplicableSkillMisconceptionIds());
             $scope.activeEditOption = null;
-            $scope.containsOptionalMisconceptions = (
-              Object.values($scope.misconceptionsBySkill).some(
-                (misconceptions: Misconception[]) => misconceptions.some(
-                  misconception => !misconception.isMandatory())));
           };
           ctrl.$onDestroy = function() {
             ctrl.directiveSubscriptions.unsubscribe();
