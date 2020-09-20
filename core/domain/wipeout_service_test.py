@@ -103,7 +103,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         self.assertEqual(
             pending_deletion_request.exploration_ids, ['exp1', 'exp2'])
         self.assertEqual(pending_deletion_request.collection_ids, ['col1'])
-        self.assertEqual(pending_deletion_request.entity_mappings, {})
+        self.assertEqual(pending_deletion_request.activity_mappings, {})
 
     def test_saves_pending_deletion_request_when_new(self):
         pending_deletion_request = (
@@ -122,7 +122,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
             pending_deletion_request_model.deletion_complete, False)
         self.assertEqual(pending_deletion_request_model.exploration_ids, [])
         self.assertEqual(pending_deletion_request_model.collection_ids, [])
-        self.assertEqual(pending_deletion_request_model.entity_mappings, {})
+        self.assertEqual(pending_deletion_request_model.activity_mappings, {})
 
     def test_saves_pending_deletion_request_when_already_existing(self):
         pending_deletion_request_model_old = (
@@ -133,7 +133,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
                 deletion_complete=False,
                 exploration_ids=['exp1', 'exp2'],
                 collection_ids=['col1'],
-                entity_mappings={}
+                activity_mappings={}
             )
         )
         pending_deletion_request_model_old.put()
@@ -145,7 +145,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
             )
         )
         pending_deletion_request.deletion_complete = True
-        pending_deletion_request.entity_mappings = {
+        pending_deletion_request.activity_mappings = {
             'story': {'story_id': 'user_id'}
         }
         wipeout_service.save_pending_deletion_requests(
@@ -165,7 +165,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         self.assertEqual(
             pending_deletion_request_model_new.collection_ids, ['col1'])
         self.assertEqual(
-            pending_deletion_request_model_new.entity_mappings,
+            pending_deletion_request_model_new.activity_mappings,
             {'story': {'story_id': 'user_id'}})
         self.assertEqual(
             pending_deletion_request_model_old.created_on,
@@ -731,7 +731,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model_1
-            .entity_mappings[models.NAMES.collection][self.COL_1_ID])
+            .activity_mappings[models.NAMES.collection][self.COL_1_ID])
         rights_metadata_model_1 = (
             collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.COL_1_ID)
@@ -739,11 +739,11 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             rights_metadata_model_1.committer_id,
             pending_deletion_model_1
-            .entity_mappings[models.NAMES.collection][self.COL_1_ID])
+            .activity_mappings[models.NAMES.collection][self.COL_1_ID])
         self.assertEqual(
             rights_metadata_model_1.content_user_ids,
             [pending_deletion_model_1
-             .entity_mappings[models.NAMES.collection][self.COL_1_ID]])
+             .activity_mappings[models.NAMES.collection][self.COL_1_ID]])
         self.assertEqual(rights_metadata_model_1.commit_cmds_user_ids, [])
         rights_metadata_model_2 = (
             collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
@@ -752,11 +752,11 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             rights_metadata_model_2.committer_id,
             pending_deletion_model_1
-            .entity_mappings[models.NAMES.collection][self.COL_1_ID])
+            .activity_mappings[models.NAMES.collection][self.COL_1_ID])
         self.assertEqual(
             rights_metadata_model_2.content_user_ids,
             [pending_deletion_model_1
-             .entity_mappings[models.NAMES.collection][self.COL_1_ID]])
+             .activity_mappings[models.NAMES.collection][self.COL_1_ID]])
         self.assertEqual(rights_metadata_model_2.commit_cmds_user_ids, [])
 
     def test_one_collection_snapshot_content_is_pseudonymized(self):
@@ -774,7 +774,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             rights_content_model_1.content['owner_ids'],
             [pending_deletion_model_1
-             .entity_mappings[models.NAMES.collection][self.COL_1_ID]])
+             .activity_mappings[models.NAMES.collection][self.COL_1_ID]])
         rights_content_model_2 = (
             collection_models.CollectionRightsSnapshotContentModel.get_by_id(
                 '%s-3' % self.COL_1_ID)
@@ -783,7 +783,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
             rights_content_model_2.content['owner_ids'],
             [
                 pending_deletion_model_1
-                .entity_mappings[models.NAMES.collection][self.COL_1_ID],
+                .activity_mappings[models.NAMES.collection][self.COL_1_ID],
                 self.user_2_id
             ])
 
@@ -802,7 +802,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model_1.user_id,
             pending_deletion_model_1
-            .entity_mappings[models.NAMES.collection][self.COL_1_ID])
+            .activity_mappings[models.NAMES.collection][self.COL_1_ID])
         commit_log_model_2 = (
             collection_models.CollectionCommitLogEntryModel.get_by_id(
                 'rights-%s-3' % self.COL_1_ID)
@@ -810,7 +810,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model_2.user_id,
             pending_deletion_model_1
-            .entity_mappings[models.NAMES.collection][self.COL_1_ID])
+            .activity_mappings[models.NAMES.collection][self.COL_1_ID])
 
     def test_one_collection_with_missing_snapshot_is_pseudonymized(self):
         observed_log_messages = []
@@ -863,7 +863,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.collection][self.COL_1_ID])
+            .activity_mappings[models.NAMES.collection][self.COL_1_ID])
         commit_log_model_1 = (
             collection_models.CollectionCommitLogEntryModel.get_by_id(
                 'collection-%s-1' % self.COL_1_ID
@@ -872,7 +872,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model_1.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.collection][self.COL_1_ID])
+            .activity_mappings[models.NAMES.collection][self.COL_1_ID])
         commit_log_model_2 = (
             collection_models.CollectionCommitLogEntryModel.get_by_id(
                 'collection-%s-1' % self.COL_2_ID
@@ -881,7 +881,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model_2.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.collection][self.COL_2_ID])
+            .activity_mappings[models.NAMES.collection][self.COL_2_ID])
 
     def test_one_collection_when_the_deletion_is_repeated_is_pseudonymized(
             self):
@@ -914,7 +914,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.collection][self.COL_1_ID])
+            .activity_mappings[models.NAMES.collection][self.COL_1_ID])
         commit_log_model = (
             collection_models.CollectionCommitLogEntryModel.get_by_id(
                 'collection-%s-1' % self.COL_1_ID)
@@ -922,7 +922,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.collection][self.COL_1_ID])
+            .activity_mappings[models.NAMES.collection][self.COL_1_ID])
 
     def test_multiple_collections_are_pseudonymized(self):
         self.save_new_valid_collection(self.COL_2_ID, self.user_1_id)
@@ -942,7 +942,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.collection][self.COL_1_ID])
+            .activity_mappings[models.NAMES.collection][self.COL_1_ID])
         commit_log_model = (
             collection_models.CollectionCommitLogEntryModel.get_by_id(
                 'collection-%s-1' % self.COL_1_ID
@@ -951,7 +951,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.collection][self.COL_1_ID])
+            .activity_mappings[models.NAMES.collection][self.COL_1_ID])
         metadata_model = (
             collection_models.CollectionSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.COL_2_ID
@@ -960,7 +960,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.collection][self.COL_2_ID])
+            .activity_mappings[models.NAMES.collection][self.COL_2_ID])
         commit_log_model = (
             collection_models.CollectionCommitLogEntryModel.get_by_id(
                 'collection-%s-1' % self.COL_2_ID
@@ -969,7 +969,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.collection][self.COL_2_ID])
+            .activity_mappings[models.NAMES.collection][self.COL_2_ID])
 
 
 class WipeoutServiceVerifyDeleteCollectionModelsTests(
@@ -1056,7 +1056,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model_1
-            .entity_mappings[models.NAMES.exploration][self.EXP_1_ID])
+            .activity_mappings[models.NAMES.exploration][self.EXP_1_ID])
         rights_metadata_model_1 = (
             exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.EXP_1_ID)
@@ -1064,11 +1064,11 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             rights_metadata_model_1.committer_id,
             pending_deletion_model_1
-            .entity_mappings[models.NAMES.exploration][self.EXP_1_ID])
+            .activity_mappings[models.NAMES.exploration][self.EXP_1_ID])
         self.assertEqual(
             rights_metadata_model_1.content_user_ids,
             [pending_deletion_model_1
-             .entity_mappings[models.NAMES.exploration][self.EXP_1_ID]])
+             .activity_mappings[models.NAMES.exploration][self.EXP_1_ID]])
         self.assertEqual(rights_metadata_model_1.commit_cmds_user_ids, [])
         rights_metadata_model_2 = (
             exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
@@ -1077,11 +1077,11 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             rights_metadata_model_2.committer_id,
             pending_deletion_model_1
-            .entity_mappings[models.NAMES.exploration][self.EXP_1_ID])
+            .activity_mappings[models.NAMES.exploration][self.EXP_1_ID])
         self.assertEqual(
             rights_metadata_model_2.content_user_ids,
             [pending_deletion_model_1
-             .entity_mappings[models.NAMES.exploration][self.EXP_1_ID]])
+             .activity_mappings[models.NAMES.exploration][self.EXP_1_ID]])
         self.assertEqual(rights_metadata_model_2.commit_cmds_user_ids, [])
 
     def test_one_exploration_snapshot_content_is_pseudonymized(self):
@@ -1099,7 +1099,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             rights_content_model_1.content['owner_ids'],
             [pending_deletion_model_1
-             .entity_mappings[models.NAMES.exploration][self.EXP_1_ID]])
+             .activity_mappings[models.NAMES.exploration][self.EXP_1_ID]])
         rights_content_model_2 = (
             exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
                 '%s-3' % self.EXP_1_ID)
@@ -1108,7 +1108,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
             rights_content_model_2.content['owner_ids'],
             [
                 pending_deletion_model_1
-                .entity_mappings[models.NAMES.exploration][self.EXP_1_ID],
+                .activity_mappings[models.NAMES.exploration][self.EXP_1_ID],
                 self.user_2_id
             ])
 
@@ -1127,7 +1127,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model_1.user_id,
             pending_deletion_model_1
-            .entity_mappings[models.NAMES.exploration][self.EXP_1_ID])
+            .activity_mappings[models.NAMES.exploration][self.EXP_1_ID])
         commit_log_model_2 = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'rights-%s-3' % self.EXP_1_ID)
@@ -1135,7 +1135,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model_2.user_id,
             pending_deletion_model_1
-            .entity_mappings[models.NAMES.exploration][self.EXP_1_ID])
+            .activity_mappings[models.NAMES.exploration][self.EXP_1_ID])
 
     def test_one_exploration_with_missing_snapshot_is_pseudonymized(self):
         observed_log_messages = []
@@ -1183,7 +1183,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.exploration][self.EXP_1_ID])
+            .activity_mappings[models.NAMES.exploration][self.EXP_1_ID])
         commit_log_model_1 = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'exploration-%s-1' % self.EXP_1_ID
@@ -1192,7 +1192,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model_1.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.exploration][self.EXP_1_ID])
+            .activity_mappings[models.NAMES.exploration][self.EXP_1_ID])
         commit_log_model_2 = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'exploration-%s-1' % self.EXP_2_ID
@@ -1201,7 +1201,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model_2.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.exploration][self.EXP_2_ID])
+            .activity_mappings[models.NAMES.exploration][self.EXP_2_ID])
 
     def test_one_exploration_when_the_deletion_is_repeated_is_pseudonymized(
             self):
@@ -1234,7 +1234,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.exploration][self.EXP_1_ID])
+            .activity_mappings[models.NAMES.exploration][self.EXP_1_ID])
         commit_log_model = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'exploration-%s-1' % self.EXP_1_ID)
@@ -1242,7 +1242,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.exploration][self.EXP_1_ID])
+            .activity_mappings[models.NAMES.exploration][self.EXP_1_ID])
 
     def test_multiple_explorations_are_pseudonymized(self):
         self.save_new_valid_exploration(self.EXP_2_ID, self.user_1_id)
@@ -1262,7 +1262,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.exploration][self.EXP_1_ID])
+            .activity_mappings[models.NAMES.exploration][self.EXP_1_ID])
         commit_log_model = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'exploration-%s-1' % self.EXP_1_ID
@@ -1271,7 +1271,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.exploration][self.EXP_1_ID])
+            .activity_mappings[models.NAMES.exploration][self.EXP_1_ID])
         metadata_model = (
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.EXP_2_ID
@@ -1280,7 +1280,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.exploration][self.EXP_2_ID])
+            .activity_mappings[models.NAMES.exploration][self.EXP_2_ID])
         commit_log_model = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'exploration-%s-1' % self.EXP_2_ID
@@ -1289,7 +1289,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.exploration][self.EXP_2_ID])
+            .activity_mappings[models.NAMES.exploration][self.EXP_2_ID])
 
 
 class WipeoutServiceVerifyDeleteExplorationModelsTests(
@@ -1535,7 +1535,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             feedback_thread_model.original_author_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.feedback][self.FEEDBACK_1_ID]
+            .activity_mappings[models.NAMES.feedback][self.FEEDBACK_1_ID]
         )
         suggestion_model_model = (
             suggestion_models.GeneralSuggestionModel.get_by_id(
@@ -1544,7 +1544,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion_model_model.author_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.feedback][self.FEEDBACK_1_ID]
+            .activity_mappings[models.NAMES.feedback][self.FEEDBACK_1_ID]
         )
 
     def test_one_feedback_when_the_deletion_is_repeated_is_pseudonymized(self):
@@ -1574,7 +1574,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             new_feedback_thread_model.original_author_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.feedback][self.FEEDBACK_1_ID]
+            .activity_mappings[models.NAMES.feedback][self.FEEDBACK_1_ID]
         )
 
     def test_multiple_feedbacks_are_pseudonymized(self):
@@ -1610,7 +1610,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
         feedback_mappings = (
-            pending_deletion_model.entity_mappings[models.NAMES.feedback])
+            pending_deletion_model.activity_mappings[models.NAMES.feedback])
 
         pseudonymized_feedback_thread_models = (
             feedback_models.GeneralFeedbackThreadModel.get_multi(
@@ -1649,7 +1649,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             feedback_thread_model.original_author_id,
             pending_deletion_model_user_1
-            .entity_mappings[models.NAMES.feedback][self.FEEDBACK_1_ID]
+            .activity_mappings[models.NAMES.feedback][self.FEEDBACK_1_ID]
         )
 
         # Verify second user is not yet pseudonymized.
@@ -1668,7 +1668,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             feedback_thread_model.last_nonempty_message_author_id,
             pending_deletion_model_user_2
-            .entity_mappings[models.NAMES.feedback][self.FEEDBACK_1_ID]
+            .activity_mappings[models.NAMES.feedback][self.FEEDBACK_1_ID]
         )
 
 
@@ -1925,7 +1925,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_1_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
         commit_log_model = (
             question_models.QuestionCommitLogEntryModel.get_by_id(
                 'question-%s-1' % self.QUESTION_1_ID)
@@ -1933,7 +1933,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_1_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
 
     def test_one_question_with_missing_snapshot_is_pseudonymized(self):
         observed_log_messages = []
@@ -1976,7 +1976,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_1_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
         commit_log_model_1 = (
             question_models.QuestionCommitLogEntryModel.get_by_id(
                 'question-%s-1' % self.QUESTION_1_ID
@@ -1985,7 +1985,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model_1.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_1_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
         commit_log_model_2 = (
             question_models.QuestionCommitLogEntryModel.get_by_id(
                 'question-%s-1' % self.QUESTION_2_ID
@@ -1994,7 +1994,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model_2.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_2_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_2_ID])
 
     def test_one_question_when_the_deletion_is_repeated_is_pseudonymized(self):
         wipeout_service.delete_user(
@@ -2025,7 +2025,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_1_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
         commit_log_model = (
             question_models.QuestionCommitLogEntryModel.get_by_id(
                 'question-%s-1' % self.QUESTION_1_ID
@@ -2034,7 +2034,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_1_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
 
     def test_multiple_questions_are_pseudonymized(self):
         self.save_new_question(
@@ -2057,7 +2057,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_1_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
         commit_log_model = (
             question_models.QuestionCommitLogEntryModel.get_by_id(
                 'question-%s-1' % self.QUESTION_1_ID
@@ -2066,7 +2066,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_1_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
         metadata_model = (
             question_models.QuestionSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.QUESTION_2_ID
@@ -2075,7 +2075,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_2_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_2_ID])
         commit_log_model = (
             question_models.QuestionCommitLogEntryModel.get_by_id(
                 'question-%s-1' % self.QUESTION_2_ID
@@ -2084,7 +2084,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_2_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_2_ID])
 
     def test_multiple_questions_with_multiple_users_are_pseudonymized(self):
         self.save_new_question(
@@ -2108,7 +2108,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_1_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
         commit_log_model = (
             question_models.QuestionCommitLogEntryModel.get_by_id(
                 'question-%s-1' % self.QUESTION_1_ID
@@ -2117,7 +2117,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_1_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
 
         # Verify second user is not yet deleted.
         metadata_model = (
@@ -2147,7 +2147,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_2_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_2_ID])
         commit_log_model = (
             question_models.QuestionCommitLogEntryModel.get_by_id(
                 'question-%s-1' % self.QUESTION_2_ID
@@ -2156,7 +2156,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_2_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_2_ID])
 
     def test_one_question_with_multiple_users_is_pseudonymized(self):
         question_services.update_question(
@@ -2186,7 +2186,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_1_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
         commit_log_model = (
             question_models.QuestionCommitLogEntryModel.get_by_id(
                 'question-%s-1' % self.QUESTION_1_ID
@@ -2195,7 +2195,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_1_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
 
         # Verify second user is not yet deleted.
         metadata_model = (
@@ -2225,7 +2225,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_1_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
         commit_log_model = (
             question_models.QuestionCommitLogEntryModel.get_by_id(
                 'question-%s-2' % self.QUESTION_1_ID
@@ -2234,7 +2234,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.question][self.QUESTION_1_ID])
+            .activity_mappings[models.NAMES.question][self.QUESTION_1_ID])
 
 
 class WipeoutServiceVerifyDeleteQuestionModelsTests(test_utils.GenericTestBase):
@@ -2330,13 +2330,13 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_1_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_1_ID])
         commit_log_model = skill_models.SkillCommitLogEntryModel.get_by_id(
             'skill-%s-1' % self.SKILL_1_ID)
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_1_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_1_ID])
 
     def test_one_skill_with_missing_snapshot_is_pseudonymized(self):
         observed_log_messages = []
@@ -2376,19 +2376,19 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_1_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_1_ID])
         commit_log_model_1 = skill_models.SkillCommitLogEntryModel.get_by_id(
             'skill-%s-1' % self.SKILL_1_ID)
         self.assertEqual(
             commit_log_model_1.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_1_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_1_ID])
         commit_log_model_2 = skill_models.SkillCommitLogEntryModel.get_by_id(
             'skill-%s-1' % self.SKILL_2_ID)
         self.assertEqual(
             commit_log_model_2.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_2_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_2_ID])
 
     def test_one_skill_when_the_deletion_is_repeated_is_pseudonymized(self):
         wipeout_service.delete_user(
@@ -2413,13 +2413,13 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_1_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_1_ID])
         commit_log_model = skill_models.SkillCommitLogEntryModel.get_by_id(
             'skill-%s-1' % self.SKILL_1_ID)
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_1_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_1_ID])
 
     def test_multiple_skills_are_pseudonymized(self):
         self.save_new_skill(self.SKILL_2_ID, self.user_1_id)
@@ -2434,25 +2434,25 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_1_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_1_ID])
         commit_log_model = skill_models.SkillCommitLogEntryModel.get_by_id(
             'skill-%s-1' % self.SKILL_1_ID)
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_1_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_1_ID])
         metadata_model = skill_models.SkillSnapshotMetadataModel.get_by_id(
             '%s-1' % self.SKILL_2_ID)
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_2_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_2_ID])
         commit_log_model = skill_models.SkillCommitLogEntryModel.get_by_id(
             'skill-%s-1' % self.SKILL_2_ID)
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_2_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_2_ID])
 
     def test_multiple_skills_with_multiple_users_are_pseudonymized(self):
         self.save_new_skill(self.SKILL_2_ID, self.user_2_id)
@@ -2468,13 +2468,13 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_1_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_1_ID])
         commit_log_model = skill_models.SkillCommitLogEntryModel.get_by_id(
             'skill-%s-1' % self.SKILL_1_ID)
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_1_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_1_ID])
 
         # Verify second user is not yet deleted.
         metadata_model = skill_models.SkillSnapshotMetadataModel.get_by_id(
@@ -2495,13 +2495,13 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_2_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_2_ID])
         commit_log_model = skill_models.SkillCommitLogEntryModel.get_by_id(
             'skill-%s-1' % self.SKILL_2_ID)
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_2_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_2_ID])
 
     def test_one_skill_with_multiple_users_is_pseudonymized(self):
         skill_services.update_skill(
@@ -2527,13 +2527,13 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_1_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_1_ID])
         commit_log_model = skill_models.SkillCommitLogEntryModel.get_by_id(
             'skill-%s-1' % self.SKILL_1_ID)
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_1_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_1_ID])
 
         # Verify second user is not yet deleted.
         metadata_model = skill_models.SkillSnapshotMetadataModel.get_by_id(
@@ -2554,13 +2554,13 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_1_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_1_ID])
         commit_log_model = skill_models.SkillCommitLogEntryModel.get_by_id(
             'skill-%s-2' % self.SKILL_1_ID)
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.skill][self.SKILL_1_ID])
+            .activity_mappings[models.NAMES.skill][self.SKILL_1_ID])
 
 
 class WipeoutServiceVerifyDeleteSkillModelsTests(test_utils.GenericTestBase):
@@ -2657,13 +2657,13 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_1_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_1_ID])
         commit_log_model = story_models.StoryCommitLogEntryModel.get_by_id(
             'story-%s-1' % self.STORY_1_ID)
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_1_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_1_ID])
 
     def test_one_story_with_missing_snapshot_is_pseudonymized(self):
         observed_log_messages = []
@@ -2703,19 +2703,19 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_1_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_1_ID])
         commit_log_model_1 = story_models.StoryCommitLogEntryModel.get_by_id(
             'story-%s-1' % self.STORY_1_ID)
         self.assertEqual(
             commit_log_model_1.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_1_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_1_ID])
         commit_log_model_2 = story_models.StoryCommitLogEntryModel.get_by_id(
             'story-%s-1' % self.STORY_2_ID)
         self.assertEqual(
             commit_log_model_2.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_2_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_2_ID])
 
     def test_one_story_when_the_deletion_is_repeated_is_pseudonymized(self):
         wipeout_service.delete_user(
@@ -2740,13 +2740,13 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_1_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_1_ID])
         commit_log_model = story_models.StoryCommitLogEntryModel.get_by_id(
             'story-%s-1' % self.STORY_1_ID)
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_1_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_1_ID])
 
     def test_multiple_stories_are_pseudonymized(self):
         self.save_new_topic(
@@ -2764,25 +2764,25 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_1_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_1_ID])
         commit_log_model = story_models.StoryCommitLogEntryModel.get_by_id(
             'story-%s-1' % self.STORY_1_ID)
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_1_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_1_ID])
         metadata_model = story_models.StorySnapshotMetadataModel.get_by_id(
             '%s-1' % self.STORY_2_ID)
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_2_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_2_ID])
         commit_log_model = story_models.StoryCommitLogEntryModel.get_by_id(
             'story-%s-1' % self.STORY_2_ID)
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_2_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_2_ID])
 
     def test_multiple_stories_with_multiple_users_are_pseudonymized(self):
         self.save_new_topic(
@@ -2801,13 +2801,13 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_1_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_1_ID])
         commit_log_model = story_models.StoryCommitLogEntryModel.get_by_id(
             'story-%s-1' % self.STORY_1_ID)
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_1_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_1_ID])
 
         # Verify second user is not yet deleted.
         metadata_model = story_models.StorySnapshotMetadataModel.get_by_id(
@@ -2828,13 +2828,13 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_2_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_2_ID])
         commit_log_model = story_models.StoryCommitLogEntryModel.get_by_id(
             'story-%s-1' % self.STORY_2_ID)
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_2_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_2_ID])
 
     def test_one_story_with_multiple_users_is_pseudonymized(self):
         story_services.update_story(
@@ -2859,13 +2859,13 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_1_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_1_ID])
         commit_log_model = story_models.StoryCommitLogEntryModel.get_by_id(
             'story-%s-1' % self.STORY_1_ID)
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_1_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_1_ID])
 
         # Verify second user is not yet deleted.
         metadata_model = story_models.StorySnapshotMetadataModel.get_by_id(
@@ -2886,13 +2886,13 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             metadata_model.committer_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_1_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_1_ID])
         commit_log_model = story_models.StoryCommitLogEntryModel.get_by_id(
             'story-%s-2' % self.STORY_1_ID)
         self.assertEqual(
             commit_log_model.user_id,
             pending_deletion_model
-            .entity_mappings[models.NAMES.story][self.STORY_1_ID])
+            .activity_mappings[models.NAMES.story][self.STORY_1_ID])
 
 
 class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
@@ -3009,7 +3009,7 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id)
         )
         suggestion_mappings = (
-            pending_deletion_model.entity_mappings[models.NAMES.suggestion])
+            pending_deletion_model.activity_mappings[models.NAMES.suggestion])
 
         # Verify user is pseudonymized.
         voiceover_application_model_1 = (
