@@ -760,7 +760,7 @@ def _assign_role(
     else:
         raise Exception('Invalid role: %s' % new_role)
 
-    commit_message = 'Changed role of %s from %s to %s' % (
+    commit_message = rights_domain.ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
         assignee_username, old_role, new_role)
     commit_cmds = [{
         'cmd': rights_domain.CMD_CHANGE_ROLE,
@@ -821,8 +821,8 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
             % (activity_type, activity_id))
 
     assignee_username = user_services.get_username(removed_user_id)
-    commit_message = 'Remove %s from role %s for %s' % (
-        assignee_username, old_role, activity_type)
+    commit_message = rights_domain.DEASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
+        assignee_username, old_role)
     commit_cmds = [{
         'cmd': rights_domain.CMD_REMOVE_ROLE,
         'removed_user_id': removed_user_id,

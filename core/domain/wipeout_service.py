@@ -18,12 +18,15 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
+import re
 
 from core.domain import collection_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_domain
@@ -696,6 +699,9 @@ def _pseudonymize_col_or_exp_models(
             pseudonymized_id: str. New pseudonymized user ID to be used for
                 the models.
         """
+        pseudonymized_username = user_services.get_pseudonymous_username(
+            pseudonymized_id)
+
         snapshot_metadata_models = [
             model for model in col_or_exp_related_models
             if isinstance(model, metadata_model_classes)]
@@ -714,13 +720,37 @@ def _pseudonymize_col_or_exp_models(
                 for user_id_attribute_name in user_id_attribute_names:
                     if commit_cmd[user_id_attribute_name] == user_id:
                         commit_cmd[user_id_attribute_name] = pseudonymized_id
+
+            assign_commit_message_match = re.match(
+                    rights_domain.ASSIGN_ROLE_COMMIT_MESSAGE_REGEX,
+                    snapshot_metadata_model.commit_message)
+            if assign_commit_message_match:
+                snapshot_metadata_model.commit_message = (
+                    rights_domain.ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
+                        pseudonymized_username,
+                        assign_commit_message_match.group(2),
+                        assign_commit_message_match.group(3),
+                    )
+                )
+            deassign_commit_message_match = re.match(
+                rights_domain.DEASSIGN_ROLE_COMMIT_MESSAGE_REGEX,
+                snapshot_metadata_model.commit_message)
+            if deassign_commit_message_match:
+                snapshot_metadata_model.commit_message = (
+                    rights_domain.DEASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
+                        pseudonymized_username,
+                        assign_commit_message_match.group(2),
+                    )
+                )
+
             snapshot_metadata_model.content_user_ids = [
                 pseudonymized_id if model_user_id == user_id else model_user_id
                 for model_user_id in snapshot_metadata_model.content_user_ids
             ]
             snapshot_metadata_model.commit_cmds_user_ids = [
                 pseudonymized_id if model_user_id == user_id else model_user_id
-                for model_user_id in snapshot_metadata_model.commit_cmds_user_ids
+                for model_user_id
+                in snapshot_metadata_model.commit_cmds_user_ids
             ]
             if user_id == snapshot_metadata_model.committer_id:
                 snapshot_metadata_model.committer_id = pseudonymized_id
@@ -845,6 +875,9 @@ def _pseudonymize_topic_models(pending_deletion_request):
             pseudonymized_id: str. New pseudonymized user ID to be used for
                 the models.
         """
+        pseudonymized_username = user_services.get_pseudonymous_username(
+            pseudonymized_id)
+
         metadata_model_classes = (
             topic_metadata_model_classes +
             (topic_models.SubtopicPageSnapshotMetadataModel,))
@@ -862,6 +895,19 @@ def _pseudonymize_topic_models(pending_deletion_request):
                 for user_id_attribute_name in user_id_attribute_names:
                     if commit_cmd[user_id_attribute_name] == user_id:
                         commit_cmd[user_id_attribute_name] = pseudonymized_id
+
+            assign_commit_message_match = re.match(
+                    topic_domain.ASSIGN_ROLE_COMMIT_MESSAGE_REGEX,
+                    snapshot_metadata_model.commit_message)
+            if assign_commit_message_match:
+                snapshot_metadata_model.commit_message = (
+                    topic_domain.ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
+                        pseudonymized_username,
+                        assign_commit_message_match.group(2),
+                        assign_commit_message_match.group(3),
+                    )
+                )
+
             snapshot_metadata_model.content_user_ids = [
                 pseudonymized_id if model_user_id == user_id else model_user_id
                 for model_user_id in snapshot_metadata_model.content_user_ids]

@@ -40,6 +40,9 @@ CMD_UNPUBLISH_TOPIC = feconf.CMD_UNPUBLISH_TOPIC
 ROLE_MANAGER = feconf.ROLE_MANAGER
 ROLE_NONE = feconf.ROLE_NONE
 
+ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE = 'Changed role of %s from %s to %s'
+ASSIGN_ROLE_COMMIT_MESSAGE_REGEX = '^Changed role of (.*) from (.*) to (.*)$'
+
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
 TOPIC_PROPERTY_NAME = 'name'

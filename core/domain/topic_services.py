@@ -1221,7 +1221,7 @@ def assign_role(committer, assignee, new_role, topic_id):
     else:
         raise Exception('Invalid role: %s' % new_role)
 
-    commit_message = 'Changed role of %s from %s to %s' % (
+    commit_message = topic_domain.ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
         assignee_username, old_role, new_role)
     commit_cmds = [topic_domain.TopicRightsChange({
         'cmd': topic_domain.CMD_CHANGE_ROLE,

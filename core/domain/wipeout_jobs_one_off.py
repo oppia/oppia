@@ -81,6 +81,9 @@ class FullyCompleteUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         elif wipeout_service.verify_user_deleted(pending_deletion_request):
             wipeout_service.delete_pending_deletion_request(
                 pending_deletion_request.user_id)
+            user_models.DeletedUserModel(
+                id=pending_deletion_request.user_id
+            ).put()
             email_manager.send_account_deleted_email(
                 pending_deletion_request.user_id,
                 pending_deletion_request.email)

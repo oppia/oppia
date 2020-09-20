@@ -273,7 +273,10 @@ class UserSettingsModel(base_models.BaseModel):
             new_id = 'uid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
                 for _ in python_utils.RANGE(feconf.USER_ID_RANDOM_PART_LENGTH))
-            if not cls.get_by_id(new_id):
+            if (
+                    not cls.get_by_id(new_id) and
+                    not DeletedUserModel.get_by_id(new_id)
+            ):
                 return new_id
 
         raise Exception('New id generator is producing too many collisions.')
@@ -2364,6 +2367,20 @@ class PendingDeletionRequestModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+
+class DeletedUserModel(base_models.BaseModel):
+    """Model for storing deleted user IDs."""
+
+    @staticmethod
+    def get_deletion_policy():
+        """PseudonymizedUserModel contains only pseudonymous ids."""
+        return base_models.DELETION_POLICY.KEEP
+
+    @classmethod
+    def get_export_policy(cls):
+        """PseudonymizedUserModel contains only pseudonymous ids."""
+        return dict(super(cls, cls).get_export_policy(), **{})
 
 
 class PseudonymizedUserModel(base_models.BaseModel):
