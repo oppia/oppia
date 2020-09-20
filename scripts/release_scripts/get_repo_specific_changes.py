@@ -122,8 +122,8 @@ def get_changes(current_release):
         current_release: str. The current release version.
 
     Returns:
-        list(str). The list of repo specific changes in storage models,
-        setup scripts and feconf since the previous release to be
+        list(str). The list of changed storage models, setup scripts and
+        feconf schema versions since the previous release to be
         written to release summary file.
     """
     changes = []
