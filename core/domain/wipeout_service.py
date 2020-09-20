@@ -373,7 +373,7 @@ def _save_entity_mappings(
             request object to which to save the entity mappings.
         entity_category: models.NAMES. The category of the models that
             contain the entity IDs.
-        entity_ids: list(str). The IDs for which to genetrate the mappings.
+        entity_ids: list(str). The IDs for which to generate the mappings.
     """
     # The entity_mappings field might have only been partially generated, so
     # we fill in the missing part for this entity category.
