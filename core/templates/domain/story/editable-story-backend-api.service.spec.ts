@@ -16,7 +16,8 @@
  * @fileoverview Unit tests for EditableStoryBackendApiService.
  */
 
-import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
+import { EditableStoryBackendApiService } from
+  'domain/story/editable-story-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 import { HttpClientTestingModule, HttpTestingController } from
