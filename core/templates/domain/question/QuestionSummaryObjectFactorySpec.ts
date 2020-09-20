@@ -39,7 +39,7 @@ describe('Question summary object factory', () => {
     expect(questionSummary.getQuestionId()).toEqual('question_id');
     expect(questionSummary.getQuestionContent()).toEqual('Question 1');
     expect(questionSummary.getInteractionId()).toEqual('TextInput');
-    expect(questionSummary.getMisconceptionIds()).toEqual('skillid-0');
+    expect(questionSummary.getMisconceptionIds()).toEqual(['skillid-0']);
   });
 
   it('should change question content in a question summary', () => {
