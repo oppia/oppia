@@ -5163,8 +5163,9 @@ class PendingDeletionRequestModelValidator(
         if incorrect_keys:
             cls._add_error(
                 'correct pseudonymizable_entity_mappings check',
-                'Entity id %s: pseudonymizable_entity_mappings contains keys %s that are not '
-                'allowed' % (item.id, incorrect_keys))
+                'Entity id %s: pseudonymizable_entity_mappings '
+                'contains keys %s that are not allowed' % (
+                    item.id, incorrect_keys))
 
     @classmethod
     def _get_custom_validation_functions(cls):

@@ -80,7 +80,7 @@ class PendingDeletionRequest(python_utils.OBJECT):
 
         Raises:
             ValidationError. The field pseudonymizable_entity_mappings
-            contains wrong key.
+                contains wrong key.
         """
         for key in self.pseudonymizable_entity_mappings.keys():
             if key not in [name for name in models.NAMES.__dict__]:

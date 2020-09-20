@@ -2350,7 +2350,8 @@ class PendingDeletionRequestModel(base_models.BaseModel):
             'deletion_complete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'collection_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'pseudonymizable_entity_mappings': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'pseudonymizable_entity_mappings': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'role': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
