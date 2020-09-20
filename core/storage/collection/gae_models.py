@@ -329,12 +329,23 @@ class CollectionRightsModel(base_models.VersionedModel):
 
         # We need to remove pseudonymous IDs from all the fields that contain
         # user IDs.
-        for field_name in (
-                'owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids'):
-            model_dict[field_name] = [
-                user_id for user_id in model_dict[field_name]
-                if not utils.is_pseudonymous_id(user_id)
-            ]
+        model_dict['owner_ids'] = [
+            owner_id for owner_id in model_dict['owner_ids']
+            if not utils.is_pseudonymous_id(owner_id)
+        ]
+        model_dict['editor_ids'] = [
+            editor_id for editor_id in model_dict['editor_ids']
+            if not utils.is_pseudonymous_id(editor_id)
+        ]
+        model_dict['voice_artist_ids'] = [
+            voice_artist_id for voice_artist_id
+            in model_dict['voice_artist_ids']
+            if not utils.is_pseudonymous_id(voice_artist_id)
+        ]
+        model_dict['viewer_ids'] = [
+            viewer_id for viewer_id in model_dict['viewer_ids']
+            if not utils.is_pseudonymous_id(viewer_id)
+        ]
 
         return model_dict
 

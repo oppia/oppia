@@ -785,7 +785,7 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
     )
     model.commit(committer_id, commit_message, commit_cmds)
     collection.version += 1
-    regenerate_collection_summary(collection.id, committer_id)
+    create_collection_summary(collection.id, committer_id)
 
 
 def save_new_collection(committer_id, collection):
@@ -928,7 +928,7 @@ def update_collection(
     collection = apply_change_list(collection_id, change_list)
 
     _save_collection(committer_id, collection, commit_message, change_list)
-    regenerate_collection_summary(collection.id, committer_id)
+    update_collection_summary(collection.id, committer_id)
 
     if (not rights_manager.is_collection_private(collection.id) and
             committer_id != feconf.MIGRATION_BOT_USER_ID):
@@ -936,7 +936,7 @@ def update_collection(
             committer_id, utils.get_current_time_in_millisecs())
 
 
-def regenerate_collection_summary(collection_id, contributor_id_to_add):
+def create_collection_summary(collection_id, contributor_id_to_add):
     """Creates and stores a summary of the given collection.
 
     Args:
@@ -948,6 +948,18 @@ def regenerate_collection_summary(collection_id, contributor_id_to_add):
     collection_summary = compute_summary_of_collection(
         collection, contributor_id_to_add)
     save_collection_summary(collection_summary)
+
+
+def update_collection_summary(
+        collection_id, contributor_id_to_add):
+    """Update the summary of an collection.
+
+    Args:
+        collection_id: str. ID of the collection.
+        contributor_id_to_add: str|None. ID of the contributor to be added to
+            the collection summary.
+    """
+    create_collection_summary(collection_id, contributor_id_to_add)
 
 
 def compute_summary_of_collection(collection, contributor_id_to_add):
@@ -1027,13 +1039,13 @@ def compute_collection_contributors_summary(collection_id):
 
         current_version -= 1
 
-    contributor_ids = list(contributors_summary)
-    # Remove IDs that are deleted or do not exist.
-    users_settings = user_services.get_users_settings(contributor_ids)
-    for contributor_id, user_settings in python_utils.ZIP(
-            contributor_ids, users_settings):
+    # Remove IDs that are deleted or do not exists.
+    users_settings = user_services.get_users_settings(
+        list(contributors_summary))
+    for key, user_settings in python_utils.ZIP(
+            list(contributors_summary), users_settings):
         if user_settings is None:
-            del contributors_summary[contributor_id]
+            del contributors_summary[key]
 
     return contributors_summary
 
