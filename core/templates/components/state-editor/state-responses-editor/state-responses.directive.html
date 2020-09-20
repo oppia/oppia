@@ -150,12 +150,12 @@
                     <div ng-if="inapplicableSkillMisconceptionIds.includes(skillId + '-' + misconception.getId())"
                          ng-click="updateOptionalMisconceptionIdStatus(skillId + '-' + misconception.getId(), true)"
                          ng-mouseleave="setActiveEditOption(null)">
-                        APPLICABLE
+                        MARK AS "APPLICABLE"
                     </div>
                     <div ng-if="!inapplicableSkillMisconceptionIds.includes(skillId + '-' + misconception.getId())"
                          ng-click="updateOptionalMisconceptionIdStatus(skillId + '-' + misconception.getId(), false)"
                          ng-mouseleave="setActiveEditOption(null)">
-                        NOT APPLICABLE
+                        MARK AS "NOT APPLICABLE"
                     </div>
                   </div>
                   <div ng-if="EditabilityService.isEditable()"
@@ -242,7 +242,7 @@
     right: 15px;
     text-align: center;
     top: calc(50% - 0.75em);
-    width: 10em;
+    width: 15em;
     z-index: 1;
   }
   state-responses .optional-misconception-list-no-action {
