@@ -19,9 +19,8 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/exploration-editor-page/services/graph-data.service');
 require('pages/exploration-editor-page/services/exploration-property.service');
-/* eslint-disable max-len */
+/* eslint-disable-next-line max-len */
 require('pages/exploration-editor-page/services/exploration-init-state-name.service');
-/* eslint-enable max-len */
 
 describe('Graph Data Service', function() {
   var GraphDataService;

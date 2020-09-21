@@ -123,9 +123,6 @@ class UserSettingsModel(base_models.BaseModel):
     # May be None.
     first_contribution_msec = ndb.FloatProperty(default=None)
 
-    # DEPRECATED in 2.8.7. Do not use.
-    gae_user_id = ndb.StringProperty(required=False, indexed=False)
-
     @staticmethod
     def get_lowest_supported_role():
         """The lowest supported role here should be Learner."""
@@ -173,7 +170,6 @@ class UserSettingsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_msec':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'gae_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
