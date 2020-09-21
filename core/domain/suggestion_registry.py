@@ -1142,10 +1142,11 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
             if reviewer_count < 0:
                 raise utils.ValidationError(
                     'Expected the translation reviewer count to be '
-                    'non-negative, recieved: %s. The language code for the '
-                    'translation was %s.' % (reviewer_count, language_code)
+                    'non-negative for %s language code, recieved: %s.' % (
+                        language_code, reviewer_count)
                 )
-            if not utils.is_valid_language_code(language_code):
+            # Translation languages are a part of audio languages.
+            if not utils.is_supported_audio_language_code(language_code):
                 raise utils.ValidationError(
                     'Invalid language code for the translation reviewer '
                     'counts: %s.' % language_code)
@@ -1155,10 +1156,11 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
             if suggestion_count < 0:
                 raise utils.ValidationError(
                     'Expected the translation suggestion count to be '
-                    'non-negative, recieved: %s. The language code for the '
-                    'translation was %s.' % (suggestion_count, language_code)
+                    'non-negative for %s language code, recieved: %s.' % (
+                        language_code, suggestion_count)
                 )
-            if not utils.is_valid_language_code(language_code):
+            # Translation languages are a part of audio languages.
+            if not utils.is_supported_audio_language_code(language_code):
                 raise utils.ValidationError(
                     'Invalid language code for the translation suggestion '
                     'counts: %s.' % language_code)

@@ -2598,9 +2598,9 @@ class ReviewerAndSuggestionCountsUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception,
-            'Expected the translation reviewer count to be non-negative, '
-            'recieved: %s. The language code for the translation was %s.' % (
-                self.negative_count, self.sample_language_code)):
+            'Expected the translation reviewer count to be non-negative for '
+            '%s language code, recieved: %s.' % (
+                self.sample_language_code, self.negative_count)):
             reviewer_and_suggestion_counts.validate()
 
     def test_validate_translation_suggestion_counts_fails_for_negative_counts(
@@ -2616,9 +2616,9 @@ class ReviewerAndSuggestionCountsUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception,
-            'Expected the translation suggestion count to be non-negative, '
-            'recieved: %s. The language code for the translation was %s.' % (
-                self.negative_count, self.sample_language_code)):
+            'Expected the translation suggestion count to be non-negative for '
+            '%s language code, recieved: %s.' % (
+                self.sample_language_code, self.negative_count)):
             reviewer_and_suggestion_counts.validate()
 
     def test_validate_question_reviewer_count_fails_for_negative_counts(self):

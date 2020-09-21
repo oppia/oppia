@@ -9475,13 +9475,13 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
         expected_output = [
             u'[u\'failed validation check for domain object check of '
             'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
-            'fails domain validation with the error Expected the '
-            'translation reviewer count to be non-negative, recieved: %s. '
-            'The language code for the translation was %s.\']]' % (
+            'fails domain validation with the error Expected the translation '
+            'reviewer count to be non-negative for %s language code, '
+            'recieved: %s.\']]' % (
                 counts_model.id,
+                self.sample_language_code,
                 counts_model.translation_reviewer_counts_by_lang_code[
-                    self.sample_language_code],
-                self.sample_language_code)
+                    self.sample_language_code])
         ]
 
         self.run_job_and_check_output(
@@ -9496,13 +9496,13 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
         expected_output = [
             u'[u\'failed validation check for domain object check of '
             'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
-            'fails domain validation with the error Expected the '
-            'translation suggestion count to be non-negative, recieved: %s. '
-            'The language code for the translation was %s.\']]' % (
+            'fails domain validation with the error Expected the translation '
+            'suggestion count to be non-negative for %s language code, '
+            'recieved: %s.\']]' % (
                 counts_model.id,
+                self.sample_language_code,
                 counts_model.translation_suggestion_counts_by_lang_code[
-                    self.sample_language_code],
-                self.sample_language_code)
+                    self.sample_language_code])
         ]
 
         self.run_job_and_check_output(
