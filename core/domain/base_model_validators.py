@@ -110,6 +110,13 @@ class BaseModelValidator(python_utils.OBJECT):
     # model for which the external model is being fetched. Each value consists
     # of a list of ExternalModelReference objects.
     field_name_to_external_model_references = collections.defaultdict(list)
+    # Domain validation for some models provides an option of strict vs non
+    # strict check. Currently the models which provide this feature are
+    # collection model and exploration model.
+    # In cases when models are not published, domain validation should be
+    # non strict. The subclasses should override this var whenever the
+    # validation should be non strict.
+    use_non_strict_domain_validation = False
 
     @classmethod
     def _add_error(cls, error_category, error_message):
@@ -181,7 +188,10 @@ class BaseModelValidator(python_utils.OBJECT):
             if model_domain_object_instance is None:
                 # No domain object exists for this storage model class.
                 return
-            model_domain_object_instance.validate()
+            if cls.use_non_strict_domain_validation:
+                model_domain_object_instance.validate(strict=False)
+            else:
+                model_domain_object_instance.validate()
         except Exception as e:
             cls._add_error(
                 ERROR_CATEGORY_DOMAIN_OBJECT_CHECK,

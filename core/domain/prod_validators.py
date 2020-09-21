@@ -390,6 +390,12 @@ class CollectionModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
+        collection_rights_exist = rights_manager.get_collection_rights(
+            item.id, strict=False) is not None
+
+        if collection_rights_exist and (
+                rights_manager.is_collection_private(item.id)):
+            cls.use_non_strict_domain_validation = True
         return collection_services.get_collection_from_model(item)
 
     @classmethod
@@ -1334,6 +1340,11 @@ class ExplorationModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
+        exp_rights_exist = rights_manager.get_exploration_rights(
+            item.id, strict=False) is not None
+
+        if exp_rights_exist and rights_manager.is_exploration_private(item.id):
+            cls.use_non_strict_domain_validation = True
         return exp_fetchers.get_exploration_from_model(item)
 
     @classmethod
