@@ -29,7 +29,7 @@
     "RELEASE_ROTA_URL": "https://github.com/oppia/oppia/wiki/Release-Schedule#release-coordinators-and-qa-coordinators-for-upcoming-releases",
     "RELEASE_SUMMARY_FILEPATH": "../release_summary.md",
     "REMOTE_URL": "git@github.com:oppia/oppia.git",
-    "REPO_SPECIFIC_CHANGE_MODULE_PATH": "scripts.release_scripts.get_repo_specific_changes",
+    "REPO_SPECIFIC_CHANGE_MODULE_PATH": "scripts.release_scripts.repo_specific_changes_fetcher",
     "SCHEMA_CONFIG_PATH": "feconf.py",
     "SCHEMA_VERSIONS_TO_JOBS_MAPPING": {
         "CURRENT_COLLECTION_SCHEMA_VERSION": "CollectionMigrationOneOffJob",
