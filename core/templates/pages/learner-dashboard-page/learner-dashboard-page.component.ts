@@ -49,23 +49,25 @@ angular.module('oppia').component('learnerDashboardPage', {
   template: require('./learner-dashboard-page.component.html'),
   controller: [
     '$http', '$q', '$scope', '$uibModal', '$window', 'AlertsService',
-    'DateTimeFormatService', 'FeedbackMessageSummaryObjectFactory',
-    'LearnerDashboardBackendApiService', 'LoaderService',
-    'SuggestionModalForLearnerDashboardService', 'ThreadStatusDisplayService',
-    'UrlInterpolationService', 'UserService', 'ACTIVITY_TYPE_COLLECTION',
-    'ACTIVITY_TYPE_EXPLORATION', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
-    'FATAL_ERROR_CODES', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
+    'DateTimeFormatService', 'DeviceInfoService',
+    'FeedbackMessageSummaryObjectFactory', 'LearnerDashboardBackendApiService',
+    'LoaderService', 'SuggestionModalForLearnerDashboardService',
+    'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
+    'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
+    'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
+    'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
     'LEARNER_DASHBOARD_SECTION_I18N_IDS',
     'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS',
     'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS',
     function(
         $http, $q, $scope, $uibModal, $window, AlertsService,
-        DateTimeFormatService, FeedbackMessageSummaryObjectFactory,
-        LearnerDashboardBackendApiService, LoaderService,
-        SuggestionModalForLearnerDashboardService, ThreadStatusDisplayService,
-        UrlInterpolationService, UserService, ACTIVITY_TYPE_COLLECTION,
-        ACTIVITY_TYPE_EXPLORATION, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
-        FATAL_ERROR_CODES, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
+        DateTimeFormatService, DeviceInfoService,
+        FeedbackMessageSummaryObjectFactory, LearnerDashboardBackendApiService,
+        LoaderService, SuggestionModalForLearnerDashboardService,
+        ThreadStatusDisplayService, UrlInterpolationService, UserService,
+        ACTIVITY_TYPE_COLLECTION, ACTIVITY_TYPE_EXPLORATION,
+        EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
+        FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
         LEARNER_DASHBOARD_SECTION_I18N_IDS,
         LEARNER_DASHBOARD_SUBSECTION_I18N_IDS,
         SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS) {
@@ -94,7 +96,7 @@ angular.module('oppia').component('learnerDashboardPage', {
       };
 
       ctrl.checkMobileView = function() {
-        return ($window.innerWidth < 500);
+        return DeviceInfoService.isMobileDevice();
       };
 
       ctrl.getVisibleExplorationList = function(startCompletedExpIndex) {
@@ -351,7 +353,7 @@ angular.module('oppia').component('learnerDashboardPage', {
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/learner-dashboard-page/modal-templates/' +
             'remove-activity-from-learner-dashboard-modal.template.html'),
-          backdrop: true,
+          backdrop: 'static',
           resolve: {
             sectionNameI18nId: function() {
               return sectionNameI18nId;
