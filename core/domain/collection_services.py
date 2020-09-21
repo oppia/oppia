@@ -937,7 +937,8 @@ def update_collection(
 
 
 def regenerate_collection_summary(collection_id, contributor_id_to_add):
-    """Creates and stores a summary of the given collection.
+    """Regenerate a summary of the given collection, if the summary does not
+    exist generates a new one.
 
     Args:
         collection_id: str. ID of the collection.

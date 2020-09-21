@@ -957,8 +957,8 @@ def update_exploration(
 
 
 def regenerate_exploration_summary(exploration_id, contributor_id_to_add):
-    """Create the summary model for an exploration, and store it in the
-    datastore.
+    """Regenerate a summary of the given exploration, if the summary does not
+    exist generates a new one.
 
     Args:
         exploration_id: str. The id of the exploration.
