@@ -43,7 +43,7 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
         with run_cmd_swap, feconf_swap:
             actual_version_changes = (
                 get_repo_specific_changes.get_changes_in_versions(
-                    'current_release'))
+                    'release_tag'))
         self.assertEqual(actual_version_changes, [])
 
     def test_get_changes_in_versions_with_diff(self):
@@ -57,7 +57,7 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
         with run_cmd_swap, feconf_swap:
             actual_version_changes = (
                 get_repo_specific_changes.get_changes_in_versions(
-                    'current_release'))
+                    'release_tag'))
         self.assertEqual(
             actual_version_changes, ['CURRENT_STATE_SCHEMA_VERSION'])
 
@@ -80,7 +80,7 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
         with self.swap(common, 'run_cmd', mock_run_cmd):
             actual_scripts = (
                 get_repo_specific_changes.get_changes_in_setup_scripts(
-                    'release_tag', changed_only=False))
+                    'release_tag', only_include_changed_scripts=False))
         expected_scripts = {
             'scripts/setup.py': True,
             'scripts/setup_gae.py': True,
@@ -98,18 +98,20 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
         with self.swap(common, 'run_cmd', mock_run_cmd):
             actual_storgae_models = (
                 get_repo_specific_changes.get_changes_in_storage_models(
-                    'current_release'))
+                    'release_tag'))
         expected_storage_models = [
             'core/storage/activity/gae_models.py',
             'core/storage/user/gae_models.py']
         self.assertEqual(actual_storgae_models, expected_storage_models)
 
     def test_get_changes(self):
-        def mock_get_changes_in_versions(unused_current_release):
+        def mock_get_changes_in_versions(unused_release_tag_to_diff_against):
             return ['version_change']
-        def mock_get_changes_in_setup_scripts(unused_base_release_tag):
+        def mock_get_changes_in_setup_scripts(
+                unused_release_tag_to_diff_against):
             return {'setup_changes': True}
-        def mock_get_changes_in_storage_models(unused_current_release):
+        def mock_get_changes_in_storage_models(
+                unused_release_tag_to_diff_against):
             return ['storage_changes']
 
         versions_swap = self.swap(
@@ -129,5 +131,5 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
             '\n### Changed storage models:\n', '* setup_changes\n']
         with versions_swap, setup_scripts_swap, storage_models_swap:
             self.assertEqual(
-                get_repo_specific_changes.get_changes('rel-tag'),
+                get_repo_specific_changes.get_changes('release_tag'),
                 expected_changes)
