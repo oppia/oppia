@@ -260,25 +260,25 @@ def delete_user(pending_deletion_request):
         _hard_delete_explorations_and_collections(pending_deletion_request)
         _pseudonymize_feedback_models(pending_deletion_request)
         _pseudonymize_suggestion_models(pending_deletion_request)
-        _pseudonymize_activity_models(
+        _pseudonymize_activity_models_without_associated_rights_models(
             pending_deletion_request,
             models.NAMES.question,
             question_models.QuestionSnapshotMetadataModel,
             question_models.QuestionCommitLogEntryModel,
             'question_id')
-        _pseudonymize_activity_models(
+        _pseudonymize_activity_models_without_associated_rights_models(
             pending_deletion_request,
             models.NAMES.skill,
             skill_models.SkillSnapshotMetadataModel,
             skill_models.SkillCommitLogEntryModel,
             'skill_id')
-        _pseudonymize_activity_models(
+        _pseudonymize_activity_models_without_associated_rights_models(
             pending_deletion_request,
             models.NAMES.story,
             story_models.StorySnapshotMetadataModel,
             story_models.StoryCommitLogEntryModel,
             'story_id')
-        _pseudonymize_col_or_exp_models(
+        _pseudonymize_activity_models_with_associated_rights_models(
             pending_deletion_request,
             models.NAMES.exploration,
             exp_models.ExplorationSnapshotMetadataModel,
@@ -286,7 +286,7 @@ def delete_user(pending_deletion_request):
             exp_models.ExplorationRightsSnapshotContentModel,
             exp_models.ExplorationCommitLogEntryModel,
             'exploration_id')
-        _pseudonymize_col_or_exp_models(
+        _pseudonymize_activity_models_with_associated_rights_models(
             pending_deletion_request,
             models.NAMES.collection,
             collection_models.CollectionSnapshotMetadataModel,
@@ -479,7 +479,7 @@ def _collect_activity_ids_from_snapshots_and_commit(
     return (snapshot_metadata_models, commit_log_models)
 
 
-def _pseudonymize_activity_models(
+def _pseudonymize_activity_models_without_associated_rights_models(
         pending_deletion_request,
         activity_category,
         snapshot_model_class,
@@ -490,8 +490,9 @@ def _pseudonymize_activity_models(
     Activity models are models that have a main VersionedModel,
     CommitLogEntryModel, and other additional models that mostly use the same ID
     as the main model (e.g. collection, exploration, question, skill, story,
-    topic). Collection, exploration, and topic should not be handled by this
-    function since they have their own functions.
+    topic). Activity models with associated rights models, e.g. models in
+    collections, explorations, and topics, should not be handled by this method
+    but with _pseudonymize_activity_models_with_associated_rights_models.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
@@ -561,7 +562,7 @@ def _pseudonymize_activity_models(
                 pseudonymized_id)
 
 
-def _pseudonymize_col_or_exp_models(
+def _pseudonymize_activity_models_with_associated_rights_models(
         pending_deletion_request,
         activity_category,
         snapshot_metadata_model_class,
@@ -569,8 +570,8 @@ def _pseudonymize_col_or_exp_models(
         rights_snapshot_content_model_class,
         commit_log_model_class,
         commit_log_model_field_name):
-    """Pseudonymize the collection or exploration models for the user with
-    user_id.
+    """Pseudonymize the activity models with associated rights models for the
+    user with user_id.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion

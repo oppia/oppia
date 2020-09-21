@@ -15039,7 +15039,7 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_incorrect_keys_in_activity_mappings(self):
         self.model_instance.pseudonymizable_entity_mappings = {
-            'wrong_key': {'some_id': 'id'}
+            models.NAMES.audit: {'some_id': 'id'}
         }
         self.model_instance.put()
         expected_output = [
@@ -15048,7 +15048,7 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
                 'pseudonymizable_entity_mappings check of '
                 'PendingDeletionRequestModel\', [u"Entity id %s: '
                 'pseudonymizable_entity_mappings contains keys '
-                '[u\'wrong_key\'] that are not allowed"]]') % self.user_id]
+                '[u\'audit\'] that are not allowed"]]') % self.user_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 

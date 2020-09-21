@@ -788,15 +788,14 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
 def delete_explorations_from_subscribed_users(exploration_ids):
     """Remove explorations from all subscribers' activity_ids.
 
-    Note: activity_ids in UserSubscriptionsModel are ought be renamed to
-    explorations_id.
-
     Args:
         exploration_ids: list(str). The ids of the explorations to delete.
     """
     if not exploration_ids:
         return
 
+    # TODO(#10727): activity_ids in UserSubscriptionsModel should be renamed
+    # to explorations_id.
     subscription_models = user_models.UserSubscriptionsModel.query(
         user_models.UserSubscriptionsModel.activity_ids.IN(exploration_ids)
     ).fetch()
@@ -957,8 +956,8 @@ def update_exploration(
 
 
 def regenerate_exploration_summary(exploration_id, contributor_id_to_add):
-    """Regenerate a summary of the given exploration, if the summary does not
-    exist generates a new one.
+    """Regenerate a summary of the given exploration. If the summary does not
+    exist, this function generates a new one.
 
     Args:
         exploration_id: str. The id of the exploration.

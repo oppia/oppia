@@ -33,6 +33,10 @@ NAMES = utils.create_enum(
     'question', 'recommendations', 'skill', 'statistics', 'story', 'suggestion',
     'topic', 'user')
 
+NAMES_THAT_CAN_BE_PSEUDONYMIZED = utils.create_enum(  # pylint: disable=invalid-name
+    NAMES.collection, NAMES.config, NAMES.exploration, NAMES.feedback,
+    NAMES.question, NAMES.skill, NAMES.story, NAMES.suggestion, NAMES.topic)
+
 GAE_PLATFORM = 'gae'
 
 

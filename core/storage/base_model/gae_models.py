@@ -1231,10 +1231,12 @@ class BaseSnapshotContentModel(BaseModel):
 
         The pseudonymization of these models is handled in the wipeout service
         (in the relevant psudonymization function, e.g. in the
-        _pseudonymize_col_or_exp_models for ExplorationRightsModel), based on
-        the content_user_ids field of the relevant metadata model, e.g. for
-        the ExplorationRightsSnapshotContentModel by the content_user_ids in
-        ExplorationRightsSnapshotMetadataModel.
+        _pseudonymize_activity_models_with_associated_rights_models for
+        CollectionRightsModel or ExplorationRightsModel), based on
+        the content_user_ids field of the relevant metadata model.
+        E.g. the content_user_ids in ExplorationRightsSnapshotMetadataModel are
+        used to pseudonymize the relevant fields in the corresponding
+        ExplorationRightsSnapshotContentModel.
         """
         return DELETION_POLICY.NOT_APPLICABLE
 
