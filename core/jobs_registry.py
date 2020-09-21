@@ -176,7 +176,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.GeneralFeedbackThreadUserModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralSuggestionModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralVoiceoverApplicationModelAuditOneOffJob,
-    prod_validation_jobs_one_off.ReviewerAndSuggestionCountsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CommunityContributionStatsModelAuditOneOffJob,
     prod_validation_jobs_one_off.IncompleteActivitiesModelAuditOneOffJob,
     prod_validation_jobs_one_off.JobModelAuditOneOffJob,
     prod_validation_jobs_one_off.LearnerPlaylistModelAuditOneOffJob,

@@ -808,49 +808,48 @@ def get_voiceover_application(voiceover_application_id):
         voiceover_application_model.rejection_message)
 
 
-def create_reviewer_and_suggestion_counts_from_model(
-        reviewer_and_suggestion_counts_model):
-    """Creates a ReviewerAndSuggestionCounts domain object from the model. The
-    domain object contains the counts of reviewers and suggestions in review.
-    Note that each call to this function returns a new domain object, but the
-    data copied into the domain object comes from a single, shared source.
+def create_community_contribution_stats_from_model(
+        community_contribution_stats_model):
+    """Creates a domain object that represents the community contribution
+    stats from the model given. Note that each call to this function returns
+    a new domain object, but the data copied into the domain object comes from
+    a single, shared source.
 
     Args:
-        reviewer_and_suggestion_counts_model: ReviewerAndSuggestionCountsModel.
+        community_contribution_stats_model: CommunityContributionStatsModel.
             The model to convert to a domain object.
 
     Returns:
-        ReviewerAndSuggestionCounts. The corresponding
-        ReviewerAndSuggestionCounts domain object.
+        CommunityContributionStats. The corresponding
+        CommunityContributionStats domain object.
     """
-    return suggestion_registry.ReviewerAndSuggestionCounts(
+    return suggestion_registry.CommunityContributionStats(
         (
-            reviewer_and_suggestion_counts_model
+            community_contribution_stats_model
             .translation_reviewer_counts_by_lang_code
         ),
         (
-            reviewer_and_suggestion_counts_model
+            community_contribution_stats_model
             .translation_suggestion_counts_by_lang_code
         ),
-        reviewer_and_suggestion_counts_model.question_reviewer_count,
-        reviewer_and_suggestion_counts_model.question_suggestion_count
+        community_contribution_stats_model.question_reviewer_count,
+        community_contribution_stats_model.question_suggestion_count
     )
 
 
-def get_reviewer_and_suggestion_counts():
-    """Retrieves the ReviewerAndSuggestionCountsModel and converts it to a
-    ReviewerAndSuggestionCounts domain object. The object contains the counts
-    of reviewers and suggestions in review. Note that there is only ever one
-    instance of this model and if the model doesn't exist yet, it will be
-    created.
+def get_community_contribution_stats():
+    """Gets the CommunityContributionStatsModel and converts it into the
+    corresponding domain object that represents the community contribution
+    stats. Note that there is only ever one instance of this model and if the
+    model doesn't exist yet, it will be created.
 
     Returns:
-        ReviewerAndSuggestionCounts. The corresponding
-        ReviewerAndSuggestionCounts domain object.
+        CommunityContributionStats. The corresponding
+        CommunityContributionStats domain object.
     """
-    reviewer_and_suggestion_counts_model = (
-        suggestion_models.ReviewerAndSuggestionCountsModel.get()
+    community_contribution_stats_model = (
+        suggestion_models.CommunityContributionStatsModel.get()
     )
 
-    return create_reviewer_and_suggestion_counts_from_model(
-        reviewer_and_suggestion_counts_model)
+    return create_community_contribution_stats_from_model(
+        community_contribution_stats_model)

@@ -126,8 +126,8 @@ INCREMENT_SCORE_OF_AUTHOR_BY = 1
 ACTION_TYPE_ACCEPT = 'accept'
 ACTION_TYPE_REJECT = 'reject'
 
-# The unique ID for the ReviewerAndSuggestionCountsModel.
-REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID = 'reviewer_and_suggestion_counts'
+# The unique ID for the CommunityContributionStatsModel.
+COMMUNITY_CONTRIBUTION_STATS_MODEL_ID = 'community_contribution_stats'
 
 
 class GeneralSuggestionModel(base_models.BaseModel):
@@ -615,11 +615,11 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         return user_data
 
 
-class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
+class CommunityContributionStatsModel(base_models.BaseModel):
     """Records the total number of reviewers for each suggestion type and the
     total number of suggestions in review for each suggestion type. There is
     only ever one instance of this model with ID
-    REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID.
+    COMMUNITY_CONTRIBUTION_STATS_MODEL_ID.
     """
 
     # A dictionary where the keys represent the language codes that translation
@@ -639,33 +639,33 @@ class ReviewerAndSuggestionCountsModel(base_models.BaseModel):
 
     @classmethod
     def get(cls):
-        """Gets the ReviewerAndSuggestionCountsModel instance. If the
-        ReviewerAndSuggestionCountsModel does not exist yet, it is created.
+        """Gets the CommunityContributionStatsModel instance. If the
+        CommunityContributionStatsModel does not exist yet, it is created.
         This method helps enforce that there should only ever be one instance
         of this model.
 
         Returns:
-            ReviewerAndSuggestionCountsModel. The single model instance.
+            CommunityContributionStatsModel. The single model instance.
         """
-        reviewer_and_suggestion_counts_model = cls.get_by_id(
-            REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID
+        community_contribution_stats_model = cls.get_by_id(
+            COMMUNITY_CONTRIBUTION_STATS_MODEL_ID
         )
 
-        if reviewer_and_suggestion_counts_model is None:
-            reviewer_and_suggestion_counts_model = cls(
-                id=REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID,
+        if community_contribution_stats_model is None:
+            community_contribution_stats_model = cls(
+                id=COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
                 translation_reviewer_counts_by_lang_code={},
                 translation_suggestion_counts_by_lang_code={},
                 question_reviewer_count=0,
                 question_suggestion_count=0
             )
-            reviewer_and_suggestion_counts_model.put()
-            return reviewer_and_suggestion_counts_model
+            community_contribution_stats_model.put()
+            return community_contribution_stats_model
 
         else:
             return super(
-                ReviewerAndSuggestionCountsModel, cls).get(
-                    REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID)
+                CommunityContributionStatsModel, cls).get(
+                    COMMUNITY_CONTRIBUTION_STATS_MODEL_ID)
 
     @classmethod
     def get_deletion_policy(cls):

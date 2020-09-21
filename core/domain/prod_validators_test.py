@@ -9387,7 +9387,7 @@ class GeneralVoiceoverApplicationModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
 
-class ReviewerAndSuggestionCountsModelValidatorTests(
+class CommunityContributionStatsModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
     translation_reviewer_counts_by_lang_code = {
@@ -9408,11 +9408,11 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
     invalid_language_code = 'invalid'
 
     def setUp(self):
-        super(ReviewerAndSuggestionCountsModelValidatorTests, self).setUp()
+        super(CommunityContributionStatsModelValidatorTests, self).setUp()
 
         self.job_class = (
             prod_validation_jobs_one_off
-            .ReviewerAndSuggestionCountsModelAuditOneOffJob
+            .CommunityContributionStatsModelAuditOneOffJob
         )
 
     def test_model_validation_success_when_no_model_has_been_created(self):
@@ -9422,8 +9422,8 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_validation_success_when_model_has_non_zero_counts(self):
-        suggestion_models.ReviewerAndSuggestionCountsModel(
-            id=suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID,
+        suggestion_models.CommunityContributionStatsModel(
+            id=suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
             translation_reviewer_counts_by_lang_code=(
                 self.translation_reviewer_counts_by_lang_code),
             translation_suggestion_counts_by_lang_code=(
@@ -9432,28 +9432,28 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
             question_suggestion_count=self.question_suggestion_count
         ).put()
         expected_output = [(
-            u'[u\'fully-validated ReviewerAndSuggestionCountsModel\', 1]')]
+            u'[u\'fully-validated CommunityContributionStatsModel\', 1]')]
 
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_validation_success_when_model_has_default_values(self):
-        suggestion_models.ReviewerAndSuggestionCountsModel(
-            id=suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID,
+        suggestion_models.CommunityContributionStatsModel(
+            id=suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
             translation_reviewer_counts_by_lang_code={},
             translation_suggestion_counts_by_lang_code={},
             question_reviewer_count=0,
             question_suggestion_count=0
         ).put()
         expected_output = [
-            u'[u\'fully-validated ReviewerAndSuggestionCountsModel\', 1]'
+            u'[u\'fully-validated CommunityContributionStatsModel\', 1]'
         ]
 
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_validation_fails_with_invalid_model_id(self):
-        suggestion_models.ReviewerAndSuggestionCountsModel(
+        suggestion_models.CommunityContributionStatsModel(
             id='invalid_id',
             translation_reviewer_counts_by_lang_code=(
                 self.translation_reviewer_counts_by_lang_code),
@@ -9465,7 +9465,7 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
 
         expected_output = [
             u'[u\'failed validation check for model id check of '
-            'ReviewerAndSuggestionCountsModel\', '
+            'CommunityContributionStatsModel\', '
             '[u\'Entity id invalid_id: Entity id does not match regex '
             'pattern\']]'
         ]
@@ -9475,19 +9475,19 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
 
     def test_model_validation_fails_for_negative_translation_reviewer_counts(
             self):
-        counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
-        counts_model.translation_reviewer_counts_by_lang_code = {
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_reviewer_counts_by_lang_code = {
             self.sample_language_code: self.negative_count}
-        counts_model.put()
+        stats_model.put()
         expected_output = [
             u'[u\'failed validation check for domain object check of '
-            'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the translation '
             'reviewer count to be non-negative for %s language code, '
             'recieved: %s.\']]' % (
-                counts_model.id,
+                stats_model.id,
                 self.sample_language_code,
-                counts_model.translation_reviewer_counts_by_lang_code[
+                stats_model.translation_reviewer_counts_by_lang_code[
                     self.sample_language_code])
         ]
 
@@ -9496,19 +9496,19 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
 
     def test_model_validation_fails_for_negative_translation_suggestion_counts(
             self):
-        counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
-        counts_model.translation_suggestion_counts_by_lang_code = {
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_suggestion_counts_by_lang_code = {
             self.sample_language_code: self.negative_count}
-        counts_model.put()
+        stats_model.put()
         expected_output = [
             u'[u\'failed validation check for domain object check of '
-            'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the translation '
             'suggestion count to be non-negative for %s language code, '
             'recieved: %s.\']]' % (
-                counts_model.id,
+                stats_model.id,
                 self.sample_language_code,
-                counts_model.translation_suggestion_counts_by_lang_code[
+                stats_model.translation_suggestion_counts_by_lang_code[
                     self.sample_language_code])
         ]
 
@@ -9517,15 +9517,15 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
 
     def test_model_validation_fails_for_negative_question_reviewer_count(
             self):
-        counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
-        counts_model.question_reviewer_count = self.negative_count
-        counts_model.put()
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.question_reviewer_count = self.negative_count
+        stats_model.put()
         expected_output = [
             u'[u\'failed validation check for domain object check of '
-            'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the '
             'question reviewer count to be non-negative, recieved: %s.\']]' % (
-                counts_model.id, counts_model.question_reviewer_count)
+                stats_model.id, stats_model.question_reviewer_count)
         ]
 
         self.run_job_and_check_output(
@@ -9533,16 +9533,16 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
 
     def test_model_validation_fails_for_negative_question_suggestion_count(
             self):
-        counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
-        counts_model.question_suggestion_count = self.negative_count
-        counts_model.put()
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.question_suggestion_count = self.negative_count
+        stats_model.put()
         expected_output = [
             u'[u\'failed validation check for domain object check of '
-            'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the '
             'question suggestion count to be non-negative, recieved: '
             '%s.\']]' % (
-                counts_model.id, counts_model.question_suggestion_count)
+                stats_model.id, stats_model.question_suggestion_count)
         ]
 
         self.run_job_and_check_output(
@@ -9550,16 +9550,16 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
 
     def test_model_validation_fails_for_invalid_lang_code_in_reviewer_counts(
             self):
-        counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
-        counts_model.translation_reviewer_counts_by_lang_code = {
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_reviewer_counts_by_lang_code = {
             self.invalid_language_code: 1}
-        counts_model.put()
+        stats_model.put()
         expected_output = [
             u'[u\'failed validation check for domain object check of '
-            'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Invalid language code for '
             'the translation reviewer counts: %s.\']]' % (
-                counts_model.id, self.invalid_language_code)
+                stats_model.id, self.invalid_language_code)
         ]
 
         self.run_job_and_check_output(
@@ -9567,16 +9567,16 @@ class ReviewerAndSuggestionCountsModelValidatorTests(
 
     def test_model_validation_fails_for_invalid_lang_code_in_suggestion_counts(
             self):
-        counts_model = suggestion_models.ReviewerAndSuggestionCountsModel.get()
-        counts_model.translation_suggestion_counts_by_lang_code = {
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_suggestion_counts_by_lang_code = {
             self.invalid_language_code: 1}
-        counts_model.put()
+        stats_model.put()
         expected_output = [
             u'[u\'failed validation check for domain object check of '
-            'ReviewerAndSuggestionCountsModel\', [u\'Entity id %s: Entity '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Invalid language code for '
             'the translation suggestion counts: %s.\']]' % (
-                counts_model.id, self.invalid_language_code)
+                stats_model.id, self.invalid_language_code)
         ]
 
         self.run_job_and_check_output(

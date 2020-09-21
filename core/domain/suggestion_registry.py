@@ -1097,8 +1097,8 @@ SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
 }
 
 
-class ReviewerAndSuggestionCounts(python_utils.OBJECT):
-    """Domain object for the ReviewerAndSuggestionCountsModel.
+class CommunityContributionStats(python_utils.OBJECT):
+    """Domain object for the CommunityContributionStatsModel.
 
     Attributes:
         translation_reviewer_counts_by_lang_code: dict. A dictionary where the
@@ -1131,11 +1131,11 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
         self.question_suggestion_count = question_suggestion_count
 
     def validate(self):
-        """Validates the ReviewerAndSuggestionCounts object.
+        """Validates the CommunityContributionStats object.
 
         Raises:
             ValidationError. One or more attributes of the
-                ReviewerAndSuggestionCounts object is invalid.
+                CommunityContributionStats object is invalid.
         """
         for language_code, reviewer_count in (
                 self.translation_reviewer_counts_by_lang_code.items()):
