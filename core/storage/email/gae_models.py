@@ -49,7 +49,8 @@ class SentEmailModel(base_models.BaseModel):
     # The user ID of the email sender. For site-generated emails this is equal
     # to SYSTEM_COMMITTER_ID.
     sender_id = ndb.StringProperty(required=True, indexed=True)
-    # The email address used to send the notification.
+    # The email address used to send the notification. This should be either
+    # noreply address or the system address.
     sender_email = ndb.StringProperty(required=True)
     # The intent of the email.
     intent = ndb.StringProperty(required=True, indexed=True, choices=[

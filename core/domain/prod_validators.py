@@ -109,6 +109,7 @@ TARGET_TYPE_TO_TARGET_MODEL = {
 VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION = [
     '%s\\.[A-Za-z0-9-_]{1,%s}' % (
         suggestion_models.SCORE_TYPE_QUESTION, base_models.ID_LENGTH)]
+ALLOWED_SENDER_EMAIL_ADDRESSES = ['noreply@oppia.org', 'admin@oppia.org']
 
 
 class RoleQueryAuditModelValidator(base_model_validators.BaseModelValidator):
@@ -1126,50 +1127,19 @@ class SentEmailModelValidator(base_model_validators.BaseModelValidator):
                     item.id, item.sent_datetime))
 
     @classmethod
-    def _validate_sender_email(
-            cls, item, field_name_to_external_model_references):
-        """Validate that sender email corresponds to email of user obtained
-        by using the sender_id.
+    def _validate_sender_email(cls, item):
+        """Validate that sender email is in the ALLOWED_SENDER_EMAIL_ADDRESSES
+        list.
 
         Args:
             item: ndb.Model. SentEmailModel to validate.
-            field_name_to_external_model_references:
-                dict(str, (list(base_model_validators.ExternalModelReference))).
-                A dict keyed by field name. The field name represents
-                a unique identifier provided by the storage
-                model to which the external model is associated. Each value
-                contains a list of ExternalModelReference objects corresponding
-                to the field_name. For examples, all the external Exploration
-                Models corresponding to a storage model can be associated
-                with the field name 'exp_ids'. This dict is used for
-                validation of External Model properties linked to the
-                storage model.
         """
-        sender_model_references = (
-            field_name_to_external_model_references['sender_id'])
-
-        for sender_model_reference in sender_model_references:
-            sender_model = sender_model_reference.model_instance
-            if sender_model is None or sender_model.deleted:
-                model_class = sender_model_reference.model_class
-                model_id = sender_model_reference.model_id
-                cls._add_error(
-                    'sender_id %s' % (
-                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
-                    'Entity id %s: based on field sender_id having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
-                    ' exist' % (
-                        item.id, model_id, model_class.__name__, model_id))
-                continue
-            if sender_model.email != item.sender_email:
-                cls._add_error(
-                    'sender %s' % (
-                        base_model_validators.ERROR_CATEGORY_EMAIL_CHECK),
-                    'Entity id %s: Sender email %s in entity does not '
-                    'match with email %s of user obtained through '
-                    'sender id %s' % (
-                        item.id, item.sender_email, sender_model.email,
-                        item.sender_id))
+        if item.sender_email not in ALLOWED_SENDER_EMAIL_ADDRESSES:
+            cls._add_error(
+                'sender %s' % (
+                    base_model_validators.ERROR_CATEGORY_EMAIL_CHECK),
+                'Entity id %s: Sender email %s in entity is not allowed.' % (
+                    item.id, item.sender_email))
 
     @classmethod
     def _validate_recipient_email(
@@ -1219,13 +1189,11 @@ class SentEmailModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _get_custom_validation_functions(cls):
-        return [cls._validate_sent_datetime]
+        return [cls._validate_sent_datetime, cls._validate_sender_email]
 
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
-        return [
-            cls._validate_sender_email,
-            cls._validate_recipient_email]
+        return [cls._validate_recipient_email]
 
 
 class BulkEmailModelValidator(base_model_validators.BaseModelValidator):

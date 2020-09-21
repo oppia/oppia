@@ -2845,7 +2845,7 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
                 unused_email_body):
             return 'Email Hash'
 
-        self.sender_email = 'sender@email.com'
+        self.sender_email = 'noreply@oppia.org'
         self.sender_id = 'sender'
         self.sender_model = user_models.UserSettingsModel(
             id=self.sender_id,
@@ -2940,15 +2940,14 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_model_with_invalid_sender_email(self):
-        self.sender_model.email = 'invalid@email.com'
-        self.sender_model.put()
+        self.model_instance.sender_email = 'invalid@email.com'
+        self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for sender email check of '
             'SentEmailModel\', '
-            '[u\'Entity id %s: Sender email %s in entity does not match with '
-            'email %s of user obtained through sender id %s\']]') % (
-                self.model_instance.id, self.model_instance.sender_email,
-                self.sender_model.email, self.model_instance.sender_id)]
+            '[u\'Entity id %s: Sender email %s in entity is not '
+            'allowed.\']]') % (
+                self.model_instance.id, self.model_instance.sender_email)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -2982,7 +2981,7 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
         model_instance_with_invalid_id = email_models.SentEmailModel(
             id='invalid', recipient_id=self.recipient_id,
             recipient_email=self.recipient_email, sender_id=self.sender_id,
-            sender_email=self.sender_email, intent=feconf.EMAIL_INTENT_SIGNUP,
+            sender_email='noreply@oppia.org', intent=feconf.EMAIL_INTENT_SIGNUP,
             subject='Email Subject', html_body='Email Body',
             sent_datetime=datetime.datetime.utcnow())
         model_instance_with_invalid_id.put()
