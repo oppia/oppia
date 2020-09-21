@@ -18,6 +18,7 @@
     "baseUrl": ".",
     "paths": {
       "app.constants": ["core/templates/app.constants"],
+      "app-type.constants": ["core/templates/app-type.constants"],
       "components/*": ["core/templates/components/*"],
       "domain/*": ["core/templates/domain/*"],
       "expressions/*": ["core/templates/expressions/*"],
@@ -33,6 +34,8 @@
   "files": [
     "core/templates/pages/admin-page/services/admin-router.service.ts",
     "core/templates/pages/admin-page/services/admin-router.service.spec.ts",
+    "core/templates/domain/utilities/AudioLanguageObjectFactory.ts",
+    "core/templates/domain/utilities/AudioLanguageObjectFactorySpec.ts",
     "core/templates/pages/admin-page/services/admin-task-manager.service.ts",
     "core/templates/pages/admin-page/services/admin-task-manager.service.spec.ts",
     "core/templates/pages/exploration-editor-page/services/angular-name.service.ts",
