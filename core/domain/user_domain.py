@@ -383,7 +383,7 @@ class ModifiableUserData(python_utils.OBJECT):
     def __init__(
             self, display_alias, pin, preferred_language_codes,
             preferred_site_language_code, preferred_audio_language_code,
-            version, user_id=None):
+            user_id=None):
         """Constructs a ModifiableUserData domain object.
 
         Args:
@@ -396,7 +396,6 @@ class ModifiableUserData(python_utils.OBJECT):
                 preference.
             preferred_audio_language_code: str or None. Audio language
                 preference.
-            version: int. The version of modifiable user data schema.
             user_id: str or None. User ID of the user whose data is being
                 updated. None if request did not have a user_id for the user
                 yet and expects the backend to create a new user entry for it.
@@ -409,7 +408,6 @@ class ModifiableUserData(python_utils.OBJECT):
         # The user_id is not intended to be a modifiable attribute, it is just
         # needed to identify the object.
         self.user_id = user_id
-        self.version = version
 
     @classmethod
     def from_dict(cls, modifiable_user_data_dict):
@@ -429,7 +427,6 @@ class ModifiableUserData(python_utils.OBJECT):
             modifiable_user_data_dict['preferred_language_codes'],
             modifiable_user_data_dict['preferred_site_language_code'],
             modifiable_user_data_dict['preferred_audio_language_code'],
-            modifiable_user_data_dict['schema_version'],
             modifiable_user_data_dict['user_id'],
         )
 
@@ -448,4 +445,18 @@ class ModifiableUserData(python_utils.OBJECT):
             ModifiableUserData. The domain object representing the user data
             dict transformed according to the latest schema version.
         """
-        return ModifiableUserData.from_dict(raw_user_data_dict)
+        data_schema_version = raw_user_data_dict.get('schema_version')
+
+        if data_schema_version is None:
+            raise Exception(
+                'Invalid modifiable user data: no schema version specified.')
+        if (data_schema_version < 1) or (
+                data_schema_version > cls.CURRENT_SCHEMA_VERSION):
+            raise Exception(
+                'Invalid version %s received. At present we can only process v1'
+                ' to v%s modifiable user data.' % (
+                    data_schema_version, cls.CURRENT_SCHEMA_VERSION)
+            )
+
+        return (
+            cls.from_dict(raw_user_data_dict), data_schema_version)

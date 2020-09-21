@@ -179,15 +179,28 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
-        schema_version = 1
-        self.modifiable_user_data = user_domain.ModifiableUserData(
-            'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version, self.user_1_id
-        )
-        self.modifiable_new_user_data = user_domain.ModifiableUserData(
-            'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version
-        )
+        user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias',
+            'pin': '12345',
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': self.user_1_id,
+        }
+        new_user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias3',
+            'pin': '12345',
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': None,
+        }
+        self.modifiable_user_data = (
+            user_domain.ModifiableUserData.from_raw_dict(user_data_dict)[0])
+        self.modifiable_new_user_data = (
+            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict)[0])
 
         user_services.update_multiple_users_data(
             [self.modifiable_user_data])
@@ -2013,16 +2026,29 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         user_models.LearnerPlaylistModel(
             id=self.user_2_id, exploration_ids=[], collection_ids=[]
         ).put()
-        schema_version = 1
         self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
-        self.modifiable_user_data = user_domain.ModifiableUserData(
-            'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version, self.user_1_id
-        )
-        self.modifiable_new_user_data = user_domain.ModifiableUserData(
-            'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version
-        )
+        user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias',
+            'pin': '12345',
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': self.user_1_id,
+        }
+        new_user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias3',
+            'pin': '12345',
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': None,
+        }
+        self.modifiable_user_data = (
+            user_domain.ModifiableUserData.from_raw_dict(user_data_dict)[0])
+        self.modifiable_new_user_data = (
+            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict)[0])
 
         user_services.update_multiple_users_data(
             [self.modifiable_user_data])
@@ -2295,15 +2321,28 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
-        schema_version = 1
-        self.modifiable_user_data = user_domain.ModifiableUserData(
-            'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version, self.user_1_id
-        )
-        self.modifiable_new_user_data = user_domain.ModifiableUserData(
-            'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
-            None, None, schema_version
-        )
+        user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias',
+            'pin': '12345',
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': self.user_1_id,
+        }
+        new_user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias3',
+            'pin': '12345',
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': None,
+        }
+        self.modifiable_user_data = (
+            user_domain.ModifiableUserData.from_raw_dict(user_data_dict)[0])
+        self.modifiable_new_user_data = (
+            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict)[0])
 
         user_services.update_multiple_users_data(
             [self.modifiable_user_data])
