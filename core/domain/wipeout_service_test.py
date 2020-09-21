@@ -3105,6 +3105,11 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
         self.save_new_topic(self.TOP_1_ID, self.user_1_id)
         topic_services.assign_role(
             self.user_1_actions,
+            self.user_1_actions,
+            topic_domain.ROLE_MANAGER,
+            self.TOP_1_ID)
+        topic_services.assign_role(
+            self.user_1_actions,
             self.user_2_actions,
             topic_domain.ROLE_MANAGER,
             self.TOP_1_ID)
@@ -3133,8 +3138,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             rights_metadata_model_1.committer_id, topic_mappings[self.TOP_1_ID])
         self.assertEqual(
-            rights_metadata_model_1.content_user_ids,
-            [topic_mappings[self.TOP_1_ID]])
+            rights_metadata_model_1.content_user_ids, [])
         self.assertEqual(rights_metadata_model_1.commit_cmds_user_ids, [])
         rights_metadata_model_2 = (
             topic_models.TopicRightsSnapshotMetadataModel.get_by_id(
@@ -3145,7 +3149,9 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             rights_metadata_model_2.content_user_ids,
             [topic_mappings[self.TOP_1_ID]])
-        self.assertEqual(rights_metadata_model_2.commit_cmds_user_ids, [])
+        self.assertEqual(
+            rights_metadata_model_2.commit_cmds_user_ids,
+            [topic_mappings[self.TOP_1_ID]])
 
     def test_one_topic_snapshot_content_is_pseudonymized(self):
         wipeout_service.pre_delete_user(self.user_1_id)
@@ -3163,8 +3169,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
                 '%s-1' % self.TOP_1_ID)
         )
         self.assertEqual(
-            rights_content_model_1.content['manager_ids'],
-            [topic_mappings[self.TOP_1_ID]])
+            rights_content_model_1.content['manager_ids'], [])
         rights_content_model_2 = (
             topic_models.TopicRightsSnapshotContentModel.get_by_id(
                 '%s-3' % self.TOP_1_ID)

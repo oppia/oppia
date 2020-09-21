@@ -324,10 +324,13 @@ def verify_user_deleted(pending_deletion_request):
         bool. True if all the models were correctly deleted, False otherwise.
     """
     for model_class in models.Registry.get_all_storage_model_classes():
-        if model_class.get_deletion_policy() not in [
-            base_models.DELETION_POLICY.KEEP,
-            base_models.DELETION_POLICY.NOT_APPLICABLE,
-        ] and model_class.has_reference_to_user_id(pending_deletion_request.user_id):
+        if (
+                model_class.get_deletion_policy() not in [
+                    base_models.DELETION_POLICY.KEEP,
+                    base_models.DELETION_POLICY.NOT_APPLICABLE
+                ] and model_class.has_reference_to_user_id(
+                    pending_deletion_request.user_id)
+        ):
             return False
     return True
 
