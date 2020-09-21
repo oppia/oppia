@@ -48,6 +48,8 @@ angular.module('oppia').directive('adminMiscTab', [
           '/senddummymailtoadminhandler');
         const MEMORY_CACHE_HANDLER_URL = '/memorycacheadminhandler';
         const UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
+        const NUMBER_OF_DELETION_REQUEST_HANDLER_URL = (
+          '/numberofpendingdeletionrequests');
         const DELETE_ACCOUNT_HANDLER_URL = '/deleteaccounthandler';
         const VERIFY_ACCOUNT_DELETED_HANDLER_URL = (
           '/verifyaccountdeletedhandler');
@@ -206,6 +208,22 @@ angular.module('oppia').directive('adminMiscTab', [
                 'Server error: ' + errorResponse.data.error);
             }
           );
+        };
+
+        ctrl.getNumberOfPendingDeletionRequestModels = function() {
+          ctrl.setStatusMessage(
+            'Getting the number of PendingDeletionRequestModels...');
+          $http.get(
+            NUMBER_OF_DELETION_REQUEST_HANDLER_URL, {email: ctrl.email}).then(
+              function(response) {
+                ctrl.setStatusMessage(
+                  'The number of PendingDeletionRequestModels is:'
+                  + response.data.number_of_deletion_models);
+              }, function(errorResponse) {
+                ctrl.setStatusMessage(
+                  'Server error: ' + errorResponse.data.error);
+              }
+            );
         };
 
         ctrl.deleteAccount = function() {

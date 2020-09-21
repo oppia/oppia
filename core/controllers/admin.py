@@ -1011,6 +1011,15 @@ class UpdateUsernameHandler(base.BaseHandler):
         self.render_json({})
 
 
+class NumberOfDeletionRequestsHandler(base.BaseHandler):
+    """Handler for deleting account via admin page."""
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+
+        self.render_json({'result': result})
+
+
 class DeleteAccountHandler(base.BaseHandler):
     """Handler for deleting account via admin page."""
 
