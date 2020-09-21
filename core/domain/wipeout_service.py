@@ -553,7 +553,8 @@ def _pseudonymize_config_models(pending_deletion_request):
         ndb.put_multi(metadata_models)
 
     config_ids_to_pids = (
-        pending_deletion_request.activity_mappings[models.NAMES.config])
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            models.NAMES.config])
     for config_id, pseudonymized_id in config_ids_to_pids.items():
         config_related_models = [
             model for model in snapshot_metadata_models
@@ -871,7 +872,7 @@ def _pseudonymize_topic_models(pending_deletion_request):
         for subtopic_model in subtopic_models
     }
     subtopic_topic_model_ids = set(subtopic_id_to_topic_id.values())
-    _save_activity_mappings(
+    _save_pseudonymizable_entity_mappings(
         pending_deletion_request,
         models.NAMES.topic,
         list(topic_model_ids | subtopic_topic_model_ids))
@@ -961,7 +962,8 @@ def _pseudonymize_topic_models(pending_deletion_request):
             commit_log_models)
 
     topic_ids_to_pids = (
-        pending_deletion_request.activity_mappings[models.NAMES.topic])
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            models.NAMES.topic])
     for topic_id, pseudonymized_id in topic_ids_to_pids.items():
         topic_related_snapshot_metadata_models = [
             model for model in topic_snapshot_metadata_models
