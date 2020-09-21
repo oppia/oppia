@@ -33,6 +33,9 @@ NAMES = utils.create_enum(
     'question', 'recommendations', 'skill', 'statistics', 'story', 'suggestion',
     'topic', 'user')
 
+# Types of deletion policies. The pragma comment is needed because Enums are
+# evaluated as classes in Python and they should use PascalCase, but using
+# UPPER_CASE seems more appropriate here.
 NAMES_THAT_CAN_BE_PSEUDONYMIZED = utils.create_enum(  # pylint: disable=invalid-name
     NAMES.collection, NAMES.config, NAMES.exploration, NAMES.feedback,
     NAMES.question, NAMES.skill, NAMES.story, NAMES.suggestion, NAMES.topic)
