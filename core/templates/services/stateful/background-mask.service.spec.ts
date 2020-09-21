@@ -20,7 +20,7 @@ import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
 
 describe('Background Mask Service', () => {
-  let backgroundMaskService;
+  let backgroundMaskService: BackgroundMaskService;
 
   beforeEach(() => {
     backgroundMaskService = new BackgroundMaskService();
