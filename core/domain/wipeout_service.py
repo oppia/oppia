@@ -469,13 +469,12 @@ def _collect_entity_ids_from_snapshots_and_commit(
     )
 
 
-def _collect_and_save_activity_ids_from_snapshots_and_commit(
+def _collect_and_save_entity_ids_from_snapshots_and_commit(
     pending_deletion_request,
     activity_category,
     snapshot_metadata_model_classes,
     commit_log_model_class,
-    commit_log_model_field_name,
-):
+    commit_log_model_field_name):
     """Collect the activity IDs that for the user with user_id. Verify that each
     snapshot has corresponding commit log.
 
@@ -524,7 +523,7 @@ def _pseudonymize_config_models(pending_deletion_request):
         config_models.PlatformParameterSnapshotMetadataModel)
 
     snapshot_metadata_models, _ = (
-        _collect_and_save_activity_ids_from_snapshots_and_commit(
+        _collect_and_save_entity_ids_from_snapshots_and_commit(
             pending_deletion_request,
             models.NAMES.config,
             snapshot_model_classes,
@@ -597,7 +596,7 @@ def _pseudonymize_activity_models(
             activity id in the corresponding commit log model.
     """
     snapshot_metadata_models, commit_log_models = (
-        _collect_and_save_activity_ids_from_snapshots_and_commit(
+        _collect_and_save_entity_ids_from_snapshots_and_commit(
             pending_deletion_request,
             activity_category,
             [snapshot_model_class],
@@ -687,7 +686,7 @@ def _pseudonymize_col_or_exp_models(
         rights_snapshot_metadata_model_class)
 
     snapshot_metadata_models, commit_log_models = (
-        _collect_and_save_activity_ids_from_snapshots_and_commit(
+        _collect_and_save_entity_ids_from_snapshots_and_commit(
             pending_deletion_request,
             activity_category,
             [
