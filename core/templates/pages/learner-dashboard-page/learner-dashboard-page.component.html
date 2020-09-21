@@ -572,10 +572,10 @@
             <tr ng-repeat="thread in $ctrl.threadSummaries | orderBy:sortFeedbackFunction:$ctrl.isCurrentFeedbackSortDescending"
                 ng-click="$ctrl.onClickThread(thread.status, thread.explorationId, thread.threadId, thread.explorationTitle)"
                 class="oppia-feedback-tab-row protractor-test-feedback-thread">
-              <td class="col-lg-1 col-md-1 col-sm-1">
+              <td width="10%">
                 <span ng-class="$ctrl.getLabelClass(thread.status)"><[$ctrl.getHumanReadableStatus(thread.status)]></span>
               </td>
-              <td class="col-lg-3 col-md-3 col-sm-3">
+              <td width="20%">
                 <span ng-if="thread.totalMessageCount > 1">
                   <span ng-if="thread.authorSecondLastMessage">
                     <span ng-if="thread.secondLastMessageIsRead"><[thread.authorSecondLastMessage | truncate:7]>, </span>
@@ -600,7 +600,7 @@
                 </span>
                 <span class="feedback-thread-message-count">(<[thread.totalMessageCount]>)</span>
               </td>
-              <td class="col-lg-6 col-md-6 col-sm-6 oppia-exploration-title-text">
+              <td width="50%">
                 <span ng-if="thread.totalMessageCount > 1 && thread.secondLastMessageIsRead && thread.lastMessageIsRead"><[thread.explorationTitle]> -</span>
                 <span class="protractor-test-feedback-exploration" ng-if="thread.totalMessageCount === 1 && thread.lastMessageIsRead"><[thread.explorationTitle]> -</span>
                 <span ng-if="thread.totalMessageCount === 1 && !thread.lastMessageIsRead">
@@ -617,7 +617,7 @@
                 </span>
                 <span ng-if="!thread.lastMessageText && thread.totalMessageCount === 1"><i translate="I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT"></i></span>
               </td>
-              <td class="col-lg-2 col-md-2 col-sm-2">
+              <td width="20%">
                 <span><[$ctrl.getLocaleAbbreviatedDatetimeString(thread.lastUpdatedMsecs)]></span>
               </td>
             </tr>
@@ -1037,9 +1037,6 @@
   }
   learner-dashboard-page .oppia-message-count-container {
     width: 21%;
-  }
-  learner-dashboard-page .oppia-exploration-title-text {
-    width: 58%;
   }
   learner-dashboard-page .oppia-btn-secondary {
     padding: 0 3px;
