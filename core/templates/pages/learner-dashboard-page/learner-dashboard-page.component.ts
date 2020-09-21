@@ -48,7 +48,7 @@ require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 angular.module('oppia').component('learnerDashboardPage', {
   template: require('./learner-dashboard-page.component.html'),
   controller: [
-    '$http', '$q', '$scope', '$uibModal', '$window', 'AlertsService',
+    '$http', '$q', '$scope', '$uibModal', 'AlertsService',
     'DateTimeFormatService', 'DeviceInfoService',
     'FeedbackMessageSummaryObjectFactory', 'LearnerDashboardBackendApiService',
     'LoaderService', 'SuggestionModalForLearnerDashboardService',
@@ -60,7 +60,7 @@ angular.module('oppia').component('learnerDashboardPage', {
     'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS',
     'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS',
     function(
-        $http, $q, $scope, $uibModal, $window, AlertsService,
+        $http, $q, $scope, $uibModal, AlertsService,
         DateTimeFormatService, DeviceInfoService,
         FeedbackMessageSummaryObjectFactory, LearnerDashboardBackendApiService,
         LoaderService, SuggestionModalForLearnerDashboardService,
