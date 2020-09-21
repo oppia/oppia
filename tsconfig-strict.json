@@ -31,7 +31,6 @@
     }
   },
   "files": [
-
     "core/templates/domain/skill/assigned-skill-object.factory.ts",
     "core/templates/domain/skill/assigned-skill-object.factory.spec.ts",
     "core/templates/domain/utilities/AudioFileObjectFactory.ts",
