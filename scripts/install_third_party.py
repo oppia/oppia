@@ -29,6 +29,7 @@ import zipfile
 import python_utils
 
 from . import common
+from . import install_backend_python_libs
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
@@ -43,8 +44,8 @@ TMP_UNZIP_PATH = os.path.join('.', 'tmp_unzip.zip')
 common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
 TARGET_DOWNLOAD_DIRS = {
+    'proto': THIRD_PARTY_DIR,
     'frontend': THIRD_PARTY_STATIC_DIR,
-    'backend': THIRD_PARTY_DIR,
     'oppiaTools': TOOLS_DIR
 }
 
@@ -331,7 +332,9 @@ def download_manifest_files(filepath):
 
             elif download_format == _DOWNLOAD_FORMAT_TAR:
                 dependency_tar_root_name = (
-                    dependency_contents['tarRootDirPrefix'] + dependency_rev)
+                    dependency_contents['tarRootDirPrefix'] +
+                    dependency_rev)
+
                 dependency_target_root_name = (
                     dependency_contents['targetDirPrefix'] + dependency_rev)
                 download_and_untar_files(
@@ -409,8 +412,8 @@ def main(args=None):
             'The redis command line interface will not be installed because '
             'your machine is on the Windows operating system.')
     unused_parsed_args = _PARSER.parse_args(args=args)
+    install_backend_python_libs.main()
     download_manifest_files(MANIFEST_FILE_PATH)
-
     install_redis_cli()
 
 

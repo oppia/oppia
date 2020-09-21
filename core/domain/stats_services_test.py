@@ -71,7 +71,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
         exploration_stats.state_stats_mapping = {
-            'Home': stats_domain.StateStats.create_default()
+            'Home': stats_domain.StateStats.create_default(),
+            '🙂': stats_domain.StateStats.create_default(),
         }
         stats_services.save_stats_model_transactional(exploration_stats)
 
@@ -89,12 +90,19 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                     'useful_feedback_count': 1,
                     'num_times_solution_viewed': 1,
                     'num_completions': 1
-                }
+                },
+                '🙂': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
             }
         }
 
-        stats_services.update_stats(
-            'exp_id1', 1, aggregated_stats)
+        stats_services.update_stats('exp_id1', 1, aggregated_stats)
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
         self.assertEqual(exploration_stats.num_starts_v2, 1)
@@ -118,6 +126,118 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 'Home'].num_times_solution_viewed_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].total_hit_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].first_hit_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].total_answers_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].useful_feedback_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].num_completions_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].num_times_solution_viewed_v2, 1)
+
+    def test_update_stats_throws_if_model_is_missing_entirely(self):
+        """Test the update_stats method."""
+        aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+
+        with self.assertRaisesRegexp(Exception, 'id="nullid.1" does not exist'):
+            stats_services.update_stats('nullid', 1, aggregated_stats)
+
+    def test_update_stats_throws_if_model_is_missing_state_stats(self):
+        """Test the update_stats method."""
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        exploration_stats.state_stats_mapping = {
+            'Home': stats_domain.StateStats.create_default()
+        }
+        stats_services.save_stats_model_transactional(exploration_stats)
+
+        aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+                'Away from Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+
+        with self.assertRaisesRegexp(Exception, 'does not exist'):
+            stats_services.update_stats('exp_id1', 1, aggregated_stats)
+
+    def test_update_stats_throws_if_model_is_using_unicode_state_name(self):
+        """Test the update_stats method."""
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        exploration_stats.state_stats_mapping = {
+            'Home': stats_domain.StateStats.create_default(),
+            # No stats for '🙂'.
+        }
+        stats_services.save_stats_model_transactional(exploration_stats)
+
+        aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+                '🙂': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+
+        with self.assertRaisesRegexp(Exception, 'does not exist'):
+            stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
     def test_calls_to_stats_methods(self):
         """Test that calls are being made to the

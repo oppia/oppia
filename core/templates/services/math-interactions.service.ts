@@ -28,10 +28,7 @@ import { AppConstants } from 'app.constants';
 })
 export class MathInteractionsService {
   private warningText = '';
-  // TODO(#7434): Use dot notation after we find a way to get
-  // rid of the TS2339 error on AppConstants.
-  // eslint-disable-next-line dot-notation
-  private mathFunctionNames = AppConstants['MATH_FUNCTION_NAMES'];
+  private mathFunctionNames = AppConstants.MATH_FUNCTION_NAMES;
 
   private cleanErrorMessage(
       errorMessage: string, expressionString: string): string {
@@ -143,12 +140,13 @@ export class MathInteractionsService {
     if (expressionString.match(/(^|[^a-zA-Z])pi($|[^a-zA-Z])/g)) {
       variablesList.push('pi');
     }
+    const greekNameToSymbolMap: { [greekName: string]: string } = (
+      AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+
     // Replacing greek names with symbols.
     for (let i = 0; i < variablesList.length; i++) {
       if (variablesList[i].length > 1) {
-        // eslint-disable-next-line dot-notation
-        variablesList[i] = AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS'][
-          variablesList[i]];
+        variablesList[i] = greekNameToSymbolMap[variablesList[i]];
       }
     }
     if (variablesList.length === 0) {
@@ -247,13 +245,10 @@ export class MathInteractionsService {
   }
 
   insertMultiplicationSigns(expressionString: string): string {
-    // TODO(#7434): Use dot notation after we find a way to get
-    // rid of the TS2339 error on AppConstants.
-    /* eslint-disable dot-notation */
     let greekLetters = Object.keys(
-      AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS']);
+      AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
     let greekSymbols = Object.values(
-      AppConstants['GREEK_LETTER_NAMES_TO_SYMBOLS']);
+      AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
     /* eslint-enable dot-notation */
     let greekLettersAndSymbols = [];
     for (let i = 0; i < greekLetters.length; i++) {
@@ -264,8 +259,8 @@ export class MathInteractionsService {
     // ['alpha', 'beta'] and not ['alpha', 'b', 'eta'].
     greekLettersAndSymbols.sort((a, b) => b[0].length - a[0].length);
 
-    let greekLetterToSymbol = {};
-    let greekSymbolToLetter = {};
+    let greekLetterToSymbol: { [letter: string]: string } = {};
+    let greekSymbolToLetter: { [symbol: string]: string } = {};
     for (let letterAndSymbol of greekLettersAndSymbols) {
       greekLetterToSymbol[letterAndSymbol[0]] = letterAndSymbol[1];
       greekSymbolToLetter[letterAndSymbol[1]] = letterAndSymbol[0];

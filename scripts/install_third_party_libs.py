@@ -22,14 +22,14 @@ import os
 import subprocess
 import sys
 
-
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
 # These libraries need to be installed before running or importing any script.
 
 PREREQUISITES = [
     ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
-    ('future', '0.17.1', os.path.join('third_party', 'future-0.17.1')),
+    ('future', '0.17.1', os.path.join(
+        'third_party', 'python_libs')),
 ]
 
 for package_name, version_number, target_path in PREREQUISITES:
@@ -48,6 +48,7 @@ for package_name, version_number, target_path in PREREQUISITES:
 import python_utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import install_backend_python_libs  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import install_third_party  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import pre_commit_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import pre_push_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -65,6 +66,24 @@ PYLINT_CONFIGPARSER_FILEPATH = os.path.join(
 PQ_CONFIGPARSER_FILEPATH = os.path.join(
     common.OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % common.PYLINT_QUOTES_VERSION,
     'configparser.py')
+
+# Download locations for prototool binary.
+PROTOTOOL_LINUX_BIN_URL = (
+    'https://github.com/uber/prototool/releases/download/v1.10.0/'
+    'prototool-Linux-x86_64')
+
+PROTOTOOL_DARWIN_BIN_URL = (
+    'https://github.com/uber/prototool/releases/download/v1.10.0/'
+    'prototool-Darwin-x86_64')
+
+# Path of the prototool executable.
+PROTOTOOL_DIR = os.path.join(
+    common.OPPIA_TOOLS_DIR, 'prototool-%s' % common.PROTOTOOL_VERSION)
+PROTOTOOL_BIN_PATH = os.path.join(PROTOTOOL_DIR, 'prototool')
+# Path of files which needs to be compiled by protobuf.
+PROTO_FILES_PATHS = [
+    os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0'),
+    os.path.join('core', 'domain', 'proto')]
 
 
 def tweak_yarn_executable():
@@ -87,60 +106,37 @@ def get_yarn_command():
     return 'yarn'
 
 
-def pip_install(package, version, install_path):
-    """Installs third party libraries with pip.
+def install_prototool():
+    """Installs prototool for Linux or Darwin, depending upon the platform."""
+    if os.path.exists(PROTOTOOL_BIN_PATH):
+        return
 
-    Args:
-        package: str. The package name.
-        version: str. The package version.
-        install_path: str. The installation path for the package.
+    prototool_url = PROTOTOOL_LINUX_BIN_URL
+    if common.is_mac_os():
+        prototool_url = PROTOTOOL_DARWIN_BIN_URL
+
+    common.ensure_directory_exists(PROTOTOOL_DIR)
+    python_utils.url_retrieve(prototool_url, filename=PROTOTOOL_BIN_PATH)
+    common.recursive_chmod(PROTOTOOL_BIN_PATH, 0o744)
+
+
+def compile_protobuf_files(proto_files_paths):
+    """Compiles protobuf files using prototool.
+
+    Raises:
+        Exception. If there is any error in compiling the proto files.
     """
-    try:
-        python_utils.PRINT('Checking if pip is installed on the local machine')
-        # Importing pip just to check if its installed.
-        import pip  #pylint: disable=unused-variable
-    except ImportError as e:
-        common.print_each_string_after_two_new_lines([
-            'Pip is required to install Oppia dependencies, but pip wasn\'t '
-            'found on your local machine.',
-            'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
-            'page:'])
-
-        if common.is_mac_os():
-            python_utils.PRINT(
-                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
-                'OS%29')
-        elif common.is_linux_os():
-            python_utils.PRINT(
-                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
-                '%29')
+    for path in proto_files_paths:
+        command = [
+            PROTOTOOL_BIN_PATH, 'generate', path]
+        process = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        if process.returncode == 0:
+            python_utils.PRINT(stdout)
         else:
-            python_utils.PRINT(
-                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
-                'Windows%29')
-        raise ImportError('Error importing pip: %s' % e)
-
-    # The call to python -m is used to ensure that Python and Pip versions are
-    # compatible.
-    command = [
-        sys.executable, '-m', 'pip', 'install', '%s==%s'
-        % (package, version), '--target', install_path]
-    process = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
-        python_utils.PRINT(stdout)
-    elif 'can\'t combine user with prefix' in stderr:
-        python_utils.PRINT('Trying by setting --user and --prefix flags.')
-        subprocess.check_call([
-            sys.executable, '-m', 'pip', 'install',
-            '%s==%s' % (package, version), '--target', install_path,
-            '--user', '--prefix=', '--system'])
-    else:
-        python_utils.PRINT(stderr)
-        python_utils.PRINT(
-            'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
-        raise Exception('Error installing package')
+            python_utils.PRINT(stderr)
+            raise Exception('Error compiling proto files at %s' % path)
 
 
 def ensure_pip_library_is_installed(package, version, path):
@@ -157,7 +153,8 @@ def ensure_pip_library_is_installed(package, version, path):
     exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
     if not os.path.exists(exact_lib_path):
         python_utils.PRINT('Installing %s' % package)
-        pip_install(package, version, exact_lib_path)
+        install_backend_python_libs.pip_install(
+            package, version, exact_lib_path)
 
 
 def main():
@@ -174,7 +171,9 @@ def main():
         ('pycodestyle', common.PYCODESTYLE_VERSION, common.OPPIA_TOOLS_DIR),
         ('esprima', common.ESPRIMA_VERSION, common.OPPIA_TOOLS_DIR),
         ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
+        ('protobuf', common.PROTOBUF_VERSION, common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
+        ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR)
     ]
 
     for package, version, path in pip_dependencies:
@@ -212,6 +211,12 @@ def main():
     # Download and install required JS and zip files.
     python_utils.PRINT('Installing third-party JS libraries and zip files.')
     install_third_party.main(args=[])
+
+    # Compile protobuf files.
+    python_utils.PRINT('Installing Prototool.')
+    install_prototool()
+    python_utils.PRINT('Compiling protobuf files.')
+    compile_protobuf_files(PROTO_FILES_PATHS)
 
     if common.is_windows_os():
         tweak_yarn_executable()

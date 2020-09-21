@@ -199,10 +199,13 @@ angular.module('oppia').directive('topicEditorNavbar', [
               controller: 'TopicEditorSaveModalController'
             }).result.then(function(commitMessage) {
               TopicEditorStateService.saveTopic(commitMessage);
-            }, function() {}).then(function() {
               var successToast = 'Changes saved.';
               AlertsService.addSuccessMessage(
                 successToast, 1000);
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -316,7 +319,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
             $scope.prepublishValidationIssues = [];
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             ctrl.directiveSubscriptions.add(
-              UndoRedoService.onUndoRedoChangeApplied().subscribe(
+              UndoRedoService.onUndoRedoChangeApplied$().subscribe(
                 () => _validateTopic()
               )
             );

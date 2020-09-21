@@ -24,7 +24,6 @@ import re
 
 import python_utils
 
-from . import ignored_style_tag_files
 from . import js_ts_linter
 from . import warranted_angular_security_bypasses
 from .. import common
@@ -34,10 +33,11 @@ EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif', '*.png',
     '*.webp', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
-    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
-    'webpack_bundles/*', 'core/tests/services_sources/*',
-    'core/tests/release_sources/tmp_unzip.zip', 'scripts/linters/test_files/*',
+    'assets/scripts/*', 'core/domain/proto/*.py', 'core/tests/data/*',
+    'core/tests/build_sources/*', '*.mp3', '*.mp4', 'node_modules/*',
+    'typings/*', 'local_compiled_js/*', 'webpack_bundles/*',
+    'core/tests/services_sources/*', 'core/tests/release_sources/tmp_unzip.zip',
+    'scripts/linters/test_files/*',
     'core/tests/release_sources/tmp_unzip.tar.gz',
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
@@ -232,7 +232,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/Polyfills.ts',
             'core/templates/filters/translate.pipe.spec.ts',
             'core/templates/components/ck-editor-helpers/' +
-            'ck-editor-copy-content-service.spec.ts'),
+            'ck-editor-copy-content-service.spec.ts',
+            'core/templates/tests/unit-test-utils.ts'),
         'excluded_dirs': ('core/tests/',)
     },
     {
@@ -332,7 +333,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
         'regexp': re.compile(r'\s+style\s*=\s*'),
         'message': 'Please do not use inline styling.',
-        'excluded_files': ignored_style_tag_files.EXCLUDED_FILES,
+        'excluded_files': (),
         'excluded_dirs': ()
     }
 ]

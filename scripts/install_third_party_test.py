@@ -30,6 +30,7 @@ from core.tests import test_utils
 import python_utils
 
 from . import common
+from . import install_backend_python_libs
 from . import install_third_party
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
@@ -303,13 +304,15 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'validate_manifest_is_called': False,
             'download_files_is_called': False,
             'download_and_unzip_files_is_called': False,
-            'download_and_untar_files_is_called': False
+            'download_and_untar_files_is_called': False,
+            'install_backend_python_libs_is_called': False
         }
         expected_check_function_calls = {
             'validate_manifest_is_called': True,
             'download_files_is_called': True,
             'download_and_unzip_files_is_called': True,
-            'download_and_untar_files_is_called': True
+            'download_and_untar_files_is_called': True,
+            'install_backend_python_libs_is_called': True
         }
         def mock_return_json(unused_filepath):
             return {
@@ -343,6 +346,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                             'url': 'https://bootstrap/bootstrap-4.3.1-dist.zip',
                             'rootDir': 'bootstrap-4.3.1-dist',
                             'targetDir': 'bootstrap'}}}}
+
         def mock_validate_manifest(unused_filepath):
             check_function_calls['validate_manifest_is_called'] = True
         def mock_download_files(
@@ -357,6 +361,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 unused_source_url, unused_target_parent_dir,
                 unused_tar_root_name, unused_target_root_name):
             check_function_calls['download_and_untar_files_is_called'] = True
+        def mock_install_backend_python_libs():
+            check_function_calls['install_backend_python_libs_is_called'] = True
         return_json_swap = self.swap(
             install_third_party, 'return_json', mock_return_json)
         validate_swap = self.swap(
@@ -369,8 +375,12 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         untar_files_swap = self.swap(
             install_third_party, 'download_and_untar_files',
             mock_download_and_untar_files)
+        mock_install_backend_python_libs_swap = self.swap(
+            install_backend_python_libs, 'main',
+            mock_install_backend_python_libs)
 
-        with validate_swap, return_json_swap, download_files_swap:
+        with validate_swap, return_json_swap, download_files_swap, (
+            mock_install_backend_python_libs_swap):
             with unzip_files_swap, untar_files_swap:
                 install_third_party.main(args=[])
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -409,7 +419,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 def __init__(self):
                     self.returncode = 0
                 def communicate(self):
-                    """Return required meathod."""
+                    """Return required method."""
                     return '', ''
 
             # The first subprocess.call() in install_redis_cli needs to throw an

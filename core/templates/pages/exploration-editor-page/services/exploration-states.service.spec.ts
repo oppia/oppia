@@ -39,16 +39,11 @@ import { ParamChangesObjectFactory } from
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-/* eslint-disable max-len */
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-/* eslint-enable max-len */
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
-/* eslint-disable max-len */
-import { StateEditorService } from
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-/* eslint-enable max-len */
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -205,7 +200,7 @@ describe('ExplorationStatesService', function() {
 
   describe('Callback Registration', function() {
     describe('.registerOnStateAddedCallback', function() {
-      it('callsback when a new state is added', function() {
+      it('should callback when a new state is added', function() {
         var spy = jasmine.createSpy('callback');
         spyOn(ChangeListService, 'addState');
 
@@ -217,7 +212,7 @@ describe('ExplorationStatesService', function() {
     });
 
     describe('.registerOnStateDeletedCallback', function() {
-      it('callsback when a state is deleted', function(done) {
+      it('should callback when a state is deleted', function(done) {
         spyOn($uibModal, 'open').and.callFake(function() {
           return {result: $q.resolve()};
         });
@@ -234,7 +229,7 @@ describe('ExplorationStatesService', function() {
     });
 
     describe('.registerOnStateRenamedCallback', function() {
-      it('callsback when a state is renamed', function() {
+      it('should callback when a state is renamed', function() {
         var spy = jasmine.createSpy('callback');
         spyOn(ChangeListService, 'renameState');
 
@@ -246,16 +241,17 @@ describe('ExplorationStatesService', function() {
     });
 
     describe('.registerOnStateInteractionSaved', function() {
-      it('callsback when answer groups of a state are saved', function() {
-        var spy = jasmine.createSpy('callback');
-        spyOn(ChangeListService, 'editStateProperty');
+      it('should callback when answer groups of a state are saved',
+        function() {
+          var spy = jasmine.createSpy('callback');
+          spyOn(ChangeListService, 'editStateProperty');
 
-        ExplorationStatesService.registerOnStateInteractionSavedCallback(spy);
-        ExplorationStatesService.saveInteractionAnswerGroups('Hola', []);
+          ExplorationStatesService.registerOnStateInteractionSavedCallback(spy);
+          ExplorationStatesService.saveInteractionAnswerGroups('Hola', []);
 
-        expect(spy)
-          .toHaveBeenCalledWith(ExplorationStatesService.getState('Hola'));
-      });
+          expect(spy)
+            .toHaveBeenCalledWith(ExplorationStatesService.getState('Hola'));
+        });
     });
   });
 

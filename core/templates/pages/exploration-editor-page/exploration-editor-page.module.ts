@@ -36,7 +36,7 @@ angular.module('oppia', [
   'ui.sortable', 'ui.tree', uiValidate,
 ]);
 
-import { NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
@@ -45,28 +45,10 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { platformFeatureInitFactory, PlatformFeatureService } from
+  'services/platform-feature.service';
 
-import { AppConstants } from 'app.constants';
-import { CkEditorCopyToolbarComponent } from
-  /* eslint-disable max-len */
-  'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
-import { ClassifiersExtensionConstants } from
-  'classifiers/classifiers-extension.constants';
-import { CollectionSummaryTileConstants } from
-  'components/summary-tile/collection-summary-tile.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { QuestionDomainConstants } from
-  'domain/question/question-domain.constants';
-import { ServicesConstants } from 'services/services.constants';
-import { StateEditorConstants } from
-  'components/state-editor/state-editor.constants';
-import { StatisticsDomainConstants } from
-  'domain/statistics/statistics-domain.constants';
-import { ExplorationEditorPageConstants } from
-  'pages/exploration-editor-page/exploration-editor-page.constants';
+import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 
 @NgModule({
   imports: [
@@ -83,19 +65,15 @@ import { ExplorationEditorPageConstants } from
     OppiaAngularRootComponent
   ],
   providers: [
-    AppConstants,
-    ClassifiersExtensionConstants,
-    CollectionSummaryTileConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    QuestionDomainConstants,
-    ServicesConstants,
-    StateEditorConstants,
-    StatisticsDomainConstants,
-    ExplorationEditorPageConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: platformFeatureInitFactory,
+      deps: [PlatformFeatureService],
       multi: true
     }
   ]

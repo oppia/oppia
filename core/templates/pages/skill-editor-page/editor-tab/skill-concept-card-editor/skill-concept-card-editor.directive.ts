@@ -185,12 +185,16 @@ angular.module('oppia').directive('skillConceptCardEditor', [
           };
 
           $scope.toggleWorkedExampleList = function() {
-            $scope.workedExamplesListIsShown = (
-              !$scope.workedExamplesListIsShown);
+            if (WindowDimensionsService.isWindowNarrow()) {
+              $scope.workedExamplesListIsShown = (
+                !$scope.workedExamplesListIsShown);
+            }
           };
 
           $scope.toggleSkillEditorCard = function() {
-            $scope.skillEditorCardIsShown = !$scope.skillEditorCardIsShown;
+            if (WindowDimensionsService.isWindowNarrow()) {
+              $scope.skillEditorCardIsShown = !$scope.skillEditorCardIsShown;
+            }
           };
 
           ctrl.$onInit = function() {

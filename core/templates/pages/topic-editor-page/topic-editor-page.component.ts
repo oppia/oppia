@@ -41,6 +41,8 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 require('pages/topic-editor-page/preview-tab/topic-preview-tab.component.ts');
+require('services/contextual/window-ref.service');
+require('services/loader.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -55,13 +57,15 @@ angular.module('oppia').directive('topicEditorPage', [
         '/pages/topic-editor-page/topic-editor-page.component.html'),
       controllerAs: '$ctrl',
       controller: [
-        'BottomNavbarStatusService', 'ContextService', 'PageTitleService',
+        'BottomNavbarStatusService', 'ContextService', 'LoaderService',
+        'PageTitleService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
-        'UndoRedoService', 'UrlService',
+        'UndoRedoService', 'UrlService', 'WindowRef',
         function(
-            BottomNavbarStatusService, ContextService, PageTitleService,
+            BottomNavbarStatusService, ContextService, LoaderService,
+            PageTitleService,
             TopicEditorRoutingService, TopicEditorStateService,
-            UndoRedoService, UrlService) {
+            UndoRedoService, UrlService, WindowRef) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.getActiveTabName = function() {
@@ -174,11 +178,28 @@ angular.module('oppia').directive('topicEditorPage', [
             return validationIssuesCount + prepublishValidationIssuesCount;
           };
 
+          ctrl.setUpBeforeUnload = function() {
+            WindowRef.nativeWindow.addEventListener(
+              'beforeunload', ctrl.confirmBeforeLeaving);
+          };
+
+          ctrl.confirmBeforeLeaving = function(e) {
+            if (UndoRedoService.getChangeCount()) {
+              // This message is irrelevant, but is needed to trigger the
+              // confirmation before leaving.
+              e.returnValue = 'Sure?';
+              return false;
+            }
+          };
 
           ctrl.$onInit = function() {
+            LoaderService.showLoadingScreen('Loading Topic');
             ctrl.directiveSubscriptions.add(
               TopicEditorStateService.onTopicInitialized.subscribe(
-                () => setPageTitle()
+                () => {
+                  LoaderService.hideLoadingScreen();
+                  setPageTitle();
+                }
               ));
             ctrl.directiveSubscriptions.add(
               TopicEditorStateService.onTopicReinitialized.subscribe(
@@ -186,12 +207,13 @@ angular.module('oppia').directive('topicEditorPage', [
               ));
             TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
             PageTitleService.setPageTitleForMobileView('Topic Editor');
+            ctrl.setUpBeforeUnload();
             ctrl.validationIssues = [];
             ctrl.prepublishValidationIssues = [];
             ctrl.warningsAreShown = false;
             BottomNavbarStatusService.markBottomNavbarStatus(true);
             ctrl.directiveSubscriptions.add(
-              UndoRedoService.onUndoRedoChangeApplied().subscribe(
+              UndoRedoService.onUndoRedoChangeApplied$().subscribe(
                 () => setPageTitle()
               )
             );

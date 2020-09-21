@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import subprocess
-import sys
 import tempfile
 
 from core.tests import test_utils
@@ -29,6 +28,7 @@ from core.tests import test_utils
 import python_utils
 
 from . import common
+from . import install_backend_python_libs
 from . import install_third_party
 from . import install_third_party_libs
 from . import pre_commit_hook
@@ -81,6 +81,12 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_popen_error_call)
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
+        def mock_ensure_directory_exists(unused_path):
+            pass
+
+        self.dir_exists_swap = self.swap(
+            common, 'ensure_directory_exists', mock_ensure_directory_exists)
+
     def test_tweak_yarn_executable(self):
         def mock_is_file(unused_filename):
             return True
@@ -113,75 +119,109 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             command = install_third_party_libs.get_yarn_command()
             self.assertEqual(command, 'yarn')
 
-    def test_pip_install_without_import_error(self):
-        with self.Popen_swap:
-            install_third_party_libs.pip_install('package', 'version', 'path')
-        self.assertTrue(self.check_function_calls['check_call_is_called'])
+    def test_prototool_installation_on_linux(self):
+        check_mock_function_calls = {
+            'url_retrieve_is_called': False,
+            'recursive_chmod_is_called': False,
+        }
 
-    def test_pip_install_with_user_prefix_error(self):
-        with self.Popen_error_swap:
-            with self.check_call_swap:
-                install_third_party_libs.pip_install('pkg', 'ver', 'path')
-        self.assertTrue(self.check_function_calls['check_call_is_called'])
+        def mock_url_retrieve(url, filename): # pylint: disable=unused-argument
+            self.assertEqual(url.split('/')[-1], 'prototool-Linux-x86_64')
+            check_mock_function_calls['url_retrieve_is_called'] = True
+        def mock_recursive_chmod(unused_fname, mode): # pylint: disable=unused-argument
+            self.assertEqual(mode, 0o744)
+            check_mock_function_calls['recursive_chmod_is_called'] = True
+        def mock_exists(unused_fname):
+            return False
 
-    def test_pip_install_exception_handling(self):
-        with self.assertRaisesRegexp(
-            Exception, 'Error installing package') as context:
-            install_third_party_libs.pip_install('package', 'version', 'path')
-        self.assertTrue('Error installing package' in context.exception)
-
-    def test_pip_install_with_import_error_and_darwin_os(self):
-        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
-
-        import pip
-        try:
-            sys.modules['pip'] = None
-            with os_name_swap, self.print_swap, self.check_call_swap:
-                with self.assertRaisesRegexp(
-                    ImportError, 'Error importing pip: No module named pip'):
-                    install_third_party_libs.pip_install(
-                        'package', 'version', 'path')
-        finally:
-            sys.modules['pip'] = pip
-        self.assertTrue(
-            'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
-            'OS%29' in self.print_arr)
-        self.assertFalse(self.check_function_calls['check_call_is_called'])
-
-    def test_pip_install_with_import_error_and_linux_os(self):
+        url_retrieve_swap = self.swap(
+            python_utils, 'url_retrieve', mock_url_retrieve)
+        recursive_chmod_swap = self.swap(
+            common, 'recursive_chmod', mock_recursive_chmod)
         os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
 
-        import pip
-        try:
-            sys.modules['pip'] = None
-            with os_name_swap, self.print_swap, self.check_call_swap:
-                with self.assertRaisesRegexp(
-                    Exception, 'Error importing pip: No module named pip'):
-                    install_third_party_libs.pip_install(
-                        'package', 'version', 'path')
-        finally:
-            sys.modules['pip'] = pip
-        self.assertTrue(
-            'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
-            '%29' in self.print_arr)
-        self.assertFalse(self.check_function_calls['check_call_is_called'])
+        with os_name_swap, url_retrieve_swap, recursive_chmod_swap:
+            with self.dir_exists_swap, exists_swap:
+                install_third_party_libs.install_prototool()
 
-    def test_pip_install_with_import_error_and_windows_os(self):
-        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
-        import pip
-        try:
-            sys.modules['pip'] = None
-            with os_name_swap, self.print_swap, self.check_call_swap:
-                with self.assertRaisesRegexp(
-                    Exception, 'Error importing pip: No module named pip'):
-                    install_third_party_libs.pip_install(
-                        'package', 'version', 'path')
-        finally:
-            sys.modules['pip'] = pip
         self.assertTrue(
-            'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
-            'Windows%29' in self.print_arr)
-        self.assertFalse(self.check_function_calls['check_call_is_called'])
+            check_mock_function_calls['url_retrieve_is_called'])
+        self.assertTrue(
+            check_mock_function_calls['recursive_chmod_is_called'])
+
+    def test_prototool_installation_on_mac(self):
+        check_mock_function_calls = {
+            'url_retrieve_is_called': False,
+            'recursive_chmod_is_called': False,
+        }
+
+        def mock_url_retrieve(url, filename): # pylint: disable=unused-argument
+            self.assertEqual(url.split('/')[-1], 'prototool-Darwin-x86_64')
+            check_mock_function_calls['url_retrieve_is_called'] = True
+        def mock_recursive_chmod(unused_fname, mode): # pylint: disable=unused-argument
+            self.assertEqual(mode, 0o744)
+            check_mock_function_calls['recursive_chmod_is_called'] = True
+        def mock_exists(unused_fname):
+            return False
+
+        url_retrieve_swap = self.swap(
+            python_utils, 'url_retrieve', mock_url_retrieve)
+        recursive_chmod_swap = self.swap(
+            common, 'recursive_chmod', mock_recursive_chmod)
+        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+
+        with os_name_swap, url_retrieve_swap, recursive_chmod_swap:
+            with self.dir_exists_swap, exists_swap:
+                install_third_party_libs.install_prototool()
+
+        self.assertTrue(
+            check_mock_function_calls['url_retrieve_is_called'])
+        self.assertTrue(
+            check_mock_function_calls['recursive_chmod_is_called'])
+
+    def test_prototool_is_not_reinstalled(self):
+        check_mock_functions_are_not_called = {
+            'url_retrieve_is_not_called': True,
+            'recursive_chmod_is_not_called': True,
+        }
+
+        def mock_url_retrieve(url, filename): # pylint: disable=unused-argument
+            check_mock_functions_are_not_called[
+                'url_retrieve_is_not_called'] = False
+        def mock_recursive_chmod(unused_fname, mode): # pylint: disable=unused-argument
+            check_mock_functions_are_not_called[
+                'recursive_chmod_is_not_called'] = False
+        def mock_exists(unused_fname):
+            return True
+
+        url_retrieve_swap = self.swap(
+            python_utils, 'url_retrieve', mock_url_retrieve)
+        recursive_chmod_swap = self.swap(
+            common, 'recursive_chmod', mock_recursive_chmod)
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+
+        with url_retrieve_swap, recursive_chmod_swap:
+            with self.dir_exists_swap, exists_swap:
+                install_third_party_libs.install_prototool()
+
+        self.assertTrue(
+            check_mock_functions_are_not_called['url_retrieve_is_not_called'])
+        self.assertTrue(
+            check_mock_functions_are_not_called[
+                'recursive_chmod_is_not_called'])
+
+    def test_proto_file_compilation(self):
+        with self.Popen_swap:
+            install_third_party_libs.compile_protobuf_files(['mock_path'])
+        self.assertTrue(self.check_function_calls['check_call_is_called'])
+
+    def test_proto_file_compilation_raises_exception_on_compile_errors(self):
+        with self.Popen_error_swap:
+            with self.assertRaisesRegexp(
+                Exception, 'Error compiling proto files at mock_path'):
+                install_third_party_libs.compile_protobuf_files(['mock_path'])
 
     def test_ensure_pip_library_is_installed(self):
         check_function_calls = {
@@ -194,7 +234,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         pip_install_swap = self.swap(
-            install_third_party_libs, 'pip_install', mock_pip_install)
+            install_backend_python_libs, 'pip_install', mock_pip_install)
 
         with exists_swap, pip_install_swap:
             install_third_party_libs.ensure_pip_library_is_installed(

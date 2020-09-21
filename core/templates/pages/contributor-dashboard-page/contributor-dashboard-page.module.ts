@@ -30,7 +30,7 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
 ]);
 
-import { NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
@@ -40,14 +40,11 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-import { AppConstants } from 'app.constants';
-import { CkEditorCopyToolbarComponent } from
-  /* eslint-disable max-len */
-  'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
-import { ContributorDashboardConstants } from
-  'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
+import { platformFeatureInitFactory, PlatformFeatureService } from
+  'services/platform-feature.service';
 
 @NgModule({
   imports: [
@@ -66,11 +63,15 @@ import { TranslationLanguageSelectorComponent } from
     TranslationLanguageSelectorComponent
   ],
   providers: [
-    AppConstants,
-    ContributorDashboardConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: platformFeatureInitFactory,
+      deps: [PlatformFeatureService],
       multi: true
     }
   ]
