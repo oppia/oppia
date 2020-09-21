@@ -35,7 +35,7 @@ FECONF_SCHEMA_VERSION_CONSTANT_NAMES = [
 FECONF_FILEPATH = os.path.join('', 'feconf.py')
 
 
-def get_changes_in_version_numbers(release_tag_to_diff_against):
+def get_changed_schema_version_constant_names(release_tag_to_diff_against):
     """Returns a list of schema version constant names in feconf that have
     changed since the release against which diff is being checked.
 
@@ -76,7 +76,7 @@ def _get_changed_filenames_since_tag(release_tag_to_diff_against):
     return common.run_cmd(diff_cmd.split(' ')).splitlines()
 
 
-def get_changes_in_setup_scripts(release_tag_to_diff_against):
+def get_setup_scripts_changes_status(release_tag_to_diff_against):
     """Returns a dict of setup script filepaths with a status of whether
     they have changed or not since the release against which diff is
     being checked.
@@ -101,7 +101,7 @@ def get_changes_in_setup_scripts(release_tag_to_diff_against):
     return changes_dict
 
 
-def get_changes_in_storage_models(release_tag_to_diff_against):
+def get_changed_storage_models_filenames(release_tag_to_diff_against):
     """Returns a list of filepaths in core/storage whose contents have
     changed since the release against which diff is being checked.
 
@@ -133,7 +133,7 @@ def get_changes(release_tag_to_diff_against):
     """
     changes = []
 
-    feconf_version_changes = get_changes_in_version_numbers(
+    feconf_version_changes = get_changed_schema_version_constant_names(
         release_tag_to_diff_against)
     if feconf_version_changes:
         changes.append(
@@ -142,13 +142,15 @@ def get_changes(release_tag_to_diff_against):
         for var in feconf_version_changes:
             changes.append('* %s\n' % var)
 
-    setup_changes = get_changes_in_setup_scripts(release_tag_to_diff_against)
+    setup_changes = get_setup_scripts_changes_status(
+        release_tag_to_diff_against)
     if setup_changes:
         changes.append('\n### Changed setup scripts:\n')
         for var in setup_changes.keys():
             changes.append('* %s\n' % var)
 
-    storage_changes = get_changes_in_setup_scripts(release_tag_to_diff_against)
+    storage_changes = get_setup_scripts_changes_status(
+        release_tag_to_diff_against)
     if storage_changes:
         changes.append('\n### Changed storage models:\n')
         for item in storage_changes:
