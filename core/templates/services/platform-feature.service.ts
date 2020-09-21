@@ -70,17 +70,12 @@ export class PlatformFeatureService {
   private static COOKIE_NAME_FOR_SESSION_ID = 'SACSID';
   private static COOKIE_NAME_FOR_SESSION_ID_IN_DEV = 'dev_appserver_login';
 
-  // TODO(#9154): Remove static when migration is complete.
+  // The following attributes are made static to avoid potential inconsistencies
+  // caused by multi-instantiation of the service.
   static featureStatusSummary: FeatureStatusSummary = null;
-
-  // TODO(#9154): Remove static when migration is complete.
-  static _isInitializedWithError = false;
-
-  // TODO(#9154): Remove static when migration is complete.
-  static _isSkipped = false;
-
-  // TODO(#9154): Remove static when migration is complete.
   static initializationPromise: Promise<void> = null;
+  static _isInitializedWithError = false;
+  static _isSkipped = false;
 
   constructor(
       private clientContextObjectFactory: ClientContextObjectFactory,
@@ -245,8 +240,8 @@ export class PlatformFeatureService {
    * all following conditions hold:
    *   - it hasn't expired.
    *   - its session id matches the current session id.
-   *   - there are new features defined in the code base while the cached
-   *     summary is out-of-date.
+   *   - there isn't any new feature defined in the code base that is not
+   *     presented in the cached result.
    *
    * @param {FeatureFlagsCacheItem} item - The result item loaded from
    * sessionStorage.
@@ -322,6 +317,10 @@ export class PlatformFeatureService {
     return Date.now();
   }
 }
+
+export const platformFeatureInitFactory = (service: PlatformFeatureService) => {
+  return (): Promise<void> => service.initialize();
+};
 
 angular.module('oppia').factory(
   'PlatformFeatureService', downgradeInjectable(PlatformFeatureService));
