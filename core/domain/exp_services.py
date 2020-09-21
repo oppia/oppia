@@ -786,7 +786,10 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
 
 
 def delete_explorations_from_subscribed_users(exploration_ids):
-    """Remove explorations from all subscribers' entity_ids.
+    """Remove explorations from all subscribers' activity_ids.
+
+    Note: activity_ids in UserSubscriptionsModel are ought be renamed to
+    explorations_id.
 
     Args:
         exploration_ids: list(str). The ids of the explorations to delete.

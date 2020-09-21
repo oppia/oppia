@@ -499,21 +499,6 @@ def is_user_id_valid(user_id):
         len(user_id) == feconf.USER_ID_LENGTH))
 
 
-def is_pseudonymous_id(user_id):
-    """Check that the ID is a pseudonymous one.
-
-    Args:
-        user_id: str. The ID to be checked.
-
-    Returns:
-        bool. Whether the ID represents a pseudonymous user.
-    """
-    return all((
-        user_id.islower(),
-        user_id.startswith('pid_'),
-        len(user_id) == feconf.USER_ID_LENGTH))
-
-
 def is_username_taken(username):
     """Returns whether the given username has already been taken.
 
@@ -1454,7 +1439,7 @@ def get_usernames(user_ids, strict=False):
     for index, user_id in enumerate(user_ids):
         if user_id in feconf.SYSTEM_USERS:
             usernames[index] = feconf.SYSTEM_USERS[user_id]
-        elif is_pseudonymous_id(user_id):
+        elif utils.is_pseudonymous_id(user_id):
             usernames[index] = _get_pseudonymous_username(user_id)
         else:
             non_system_user_indices.append(index)

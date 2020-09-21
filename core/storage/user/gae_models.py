@@ -855,7 +855,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'entity_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'activity_ids': base_models.EXPORT_POLICY.EXPORTED,
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'general_feedback_thread_ids':
                 base_models.EXPORT_POLICY.EXPORTED,
@@ -912,7 +912,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
             creator.username for creator in creator_user_models]
 
         user_data = {
-            'entity_ids': user_model.activity_ids,
+            'activity_ids': user_model.activity_ids,
             'collection_ids': user_model.collection_ids,
             'general_feedback_thread_ids': (
                 user_model.general_feedback_thread_ids),
@@ -2310,7 +2310,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
     # A dict mapping model IDs to pseudonymous user IDs. Each type of entity
-    # is grouped under different key (i.e. config, feedback, story, skill,
+    # is grouped under different key (e.g. config, feedback, story, skill,
     # question), the keys need to be from the core.platform.models.NAMES enum.
     # For each entity, we use a different pseudonymous user ID. Note that all
     # these pseudonymous user IDs originate from the same about-to-be-deleted

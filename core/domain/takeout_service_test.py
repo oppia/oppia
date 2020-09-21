@@ -793,7 +793,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         stats_data = {}
         story_progress_data = {}
         subscriptions_data = {
-            'entity_ids': [],
+            'activity_ids': [],
             'collection_ids': [],
             'creator_usernames': [],
             'general_feedback_thread_ids': [],
@@ -1074,7 +1074,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_subscriptions_data = {
             'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
-            'entity_ids': self.ACTIVITY_IDS + self.EXPLORATION_IDS,
+            'activity_ids': self.ACTIVITY_IDS + self.EXPLORATION_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS +
                                            [thread_id],
             'last_checked': self.GENERIC_EPOCH

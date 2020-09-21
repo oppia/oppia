@@ -354,7 +354,8 @@ def _generate_entity_to_pseudonymized_ids_mapping(entity_ids):
 
     Args:
         entity_ids: list(str). List of entity IDs for which to generate new
-            pseudonymous user IDs. The IDs are of activities that were modified
+            pseudonymous user IDs. The IDs are of entities (e.g. models in
+            config, collection, skill, or suggestion) that were modified
             in some way by the user who is currently being deleted.
 
     Returns:
@@ -485,6 +486,12 @@ def _pseudonymize_activity_models(
         commit_log_model_class,
         commit_log_model_field_name):
     """Pseudonymize the activity models for the user with user_id.
+
+    Activity models are models that have a main VersionedModel,
+    CommitLogEntryModel, and other additional models that mostly use the same ID
+    as the main model (e.g. collection, exploration, question, skill, story,
+    topic). Collection, exploration, and topic should not be handled by this
+    function since they have their own functions.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
