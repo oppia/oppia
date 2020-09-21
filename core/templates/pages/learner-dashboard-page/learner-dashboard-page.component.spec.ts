@@ -427,22 +427,10 @@ describe('Learner dashboard page', function() {
     });
 
     it('should detect when application is being used on a mobile', function() {
-      // This approach was choosen because spyOn() doesn't work on properties
-      // that doesn't have a get access type.
-      // Without this approach the test will fail because it'll throw
-      // 'Property innerWidth does not have access type get' error.
-      // eslint-disable-next-line max-len
-      // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
-      // ref: https://github.com/jasmine/jasmine/issues/1415
-      Object.defineProperty($window, 'innerWidth', {
-        get: () => undefined
-      });
-      var innerWidthSpy = spyOnProperty($window, 'innerWidth');
-      innerWidthSpy.and.returnValue(400);
-      expect(ctrl.checkMobileView()).toBe(true);
-
-      innerWidthSpy.and.returnValue(700);
       expect(ctrl.checkMobileView()).toBe(false);
+
+      spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
+      expect(ctrl.checkMobileView()).toBe(true);
     });
 
     it('should show username popover based on its length', function() {
