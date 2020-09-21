@@ -1225,8 +1225,16 @@ class BaseSnapshotContentModel(BaseModel):
     def get_deletion_policy():
         """The content models do not contain any user ID fields directly,
         the user ID fields might be hidden inside the content field (because
-        content field contains all the fields from the parent model) but this is
-        handled in the wipeout service.
+        content field contains all the fields from the parent model), e.g. the
+        owner_ids or viewer_ids in the ExplorationRightsModel that are then in
+        the content field of ExplorationRightsSnapshotContentModel.
+
+        The pseudonymization of these models is handled in the wipeout service
+        (in the relevant psudonymization function, e.g. in the
+        _pseudonymize_col_or_exp_models for ExplorationRightsModel), based on
+        the content_user_ids field of the relevant metadata model, e.g. for
+        the ExplorationRightsSnapshotContentModel by the content_user_ids in
+        ExplorationRightsSnapshotMetadataModel.
         """
         return DELETION_POLICY.NOT_APPLICABLE
 

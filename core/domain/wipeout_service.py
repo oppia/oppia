@@ -85,7 +85,7 @@ def get_pending_deletion_request(user_id):
         pending_deletion_request_model.deletion_complete,
         pending_deletion_request_model.exploration_ids,
         pending_deletion_request_model.collection_ids,
-        pending_deletion_request_model.activity_mappings
+        pending_deletion_request_model.pseudonymizable_entity_mappings
     )
 
 
@@ -111,7 +111,8 @@ def save_pending_deletion_requests(pending_deletion_requests):
             'deletion_complete': deletion_request.deletion_complete,
             'exploration_ids': deletion_request.exploration_ids,
             'collection_ids': deletion_request.collection_ids,
-            'activity_mappings': deletion_request.activity_mappings
+            'pseudonymizable_entity_mappings': (
+                deletion_request.pseudonymizable_entity_mappings)
         }
         if deletion_request_model is not None:
             deletion_request_model.populate(**deletion_request_dict)
@@ -353,42 +354,46 @@ def _hard_delete_explorations_and_collections(pending_deletion_request):
     save_pending_deletion_requests([pending_deletion_request])
 
 
-def _generate_activity_to_pseudonymized_ids_mapping(activity_ids):
-    """Generate mapping from activity IDs to pseudonymous user IDs.
+def _generate_entity_to_pseudonymized_ids_mapping(entity_ids):
+    """Generate mapping from entity IDs to pseudonymous user IDs.
 
     Args:
-        activity_ids: list(str). List of activity IDs for which to generate
-            new pseudonymous user IDs. The IDs are of activities that were
-            modified in some way by the user who is currently being deleted.
+        entity_ids: list(str). List of entity IDs for which to generate new
+            pseudonymous user IDs. The IDs are of entities (e.g. models in
+            config, collection, skill, or suggestion) that were modified
+            in some way by the user who is currently being deleted.
 
     Returns:
-        dict(str, str). Mapping between the activity IDs and pseudonymous
-        user IDs. For each activity (with distinct ID) we generate a new
-        pseudonymous user ID.
+        dict(str, str). Mapping between the entity IDs and pseudonymous user
+        IDs. For each entity (with distinct ID) we generate a new pseudonymous
+        user ID.
     """
     return {
-        activity_id: user_models.PseudonymizedUserModel.get_new_id('')
-        for activity_id in activity_ids
+        entity_id: user_models.PseudonymizedUserModel.get_new_id('')
+        for entity_id in entity_ids
     }
 
 
-def _save_activity_mappings(
-        pending_deletion_request, activity_category, activity_ids):
-    """Save the activity mappings for some activity category into the pending
+def _save_pseudonymizable_entity_mappings(
+        pending_deletion_request, entity_category, entity_ids):
+    """Save the entity mappings for some entity category into the pending
     deletion request.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
-            request object to which to save the activity mappings.
-        activity_category: models.NAMES. The category of the models that
-            contain the activity IDs.
-        activity_ids: list(str). The IDs for which to generate the mappings.
+            request object to which to save the entity mappings.
+        entity_category: models.NAMES. The category of the models that
+            contain the entity IDs.
+        entity_ids: list(str). The IDs for which to generate the mappings.
     """
-    # The activity_mappings field might have only been partially generated, so
-    # we fill in the missing part for this activity category.
-    if activity_category not in pending_deletion_request.activity_mappings:
-        pending_deletion_request.activity_mappings[activity_category] = (
-            _generate_activity_to_pseudonymized_ids_mapping(activity_ids))
+    # The pseudonymizable_entity_mappings field might have only been partially
+    # generated, so we fill in the missing part for this entity category.
+    if (
+            entity_category not in
+            pending_deletion_request.pseudonymizable_entity_mappings):
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            entity_category] = (
+                _generate_entity_to_pseudonymized_ids_mapping(entity_ids))
         save_pending_deletion_requests([pending_deletion_request])
 
 
@@ -501,7 +506,7 @@ def _collect_and_save_activity_ids_from_snapshots_and_commit(
         commit_log_model_field_name
     )
 
-    _save_activity_mappings(
+    _save_pseudonymizable_entity_mappings(
         pending_deletion_request, activity_category, list(model_ids))
 
     return (snapshot_metadata_models, commit_log_models)
@@ -573,6 +578,12 @@ def _pseudonymize_activity_models(
         commit_log_model_field_name):
     """Pseudonymize the activity models for the user with user_id.
 
+    Activity models are models that have a main VersionedModel,
+    CommitLogEntryModel, and other additional models that mostly use the same ID
+    as the main model (e.g. collection, exploration, question, skill, story,
+    topic). Collection, exploration, and topic should not be handled by this
+    function since they have their own functions.
+
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object for which to pseudonymize the models.
@@ -621,7 +632,8 @@ def _pseudonymize_activity_models(
         ndb.put_multi(metadata_models + commit_log_models)
 
     activity_ids_to_pids = (
-        pending_deletion_request.activity_mappings[activity_category])
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            activity_category])
     for activity_id, pseudonymized_id in activity_ids_to_pids.items():
         activity_related_models = [
             model for model in snapshot_metadata_models
@@ -783,7 +795,8 @@ def _pseudonymize_col_or_exp_models(
         )
 
     col_or_exp_ids_to_pids = (
-        pending_deletion_request.activity_mappings[activity_category])
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            activity_category])
     for col_or_exp_id, pseudonymized_id in col_or_exp_ids_to_pids.items():
         col_or_exp_related_snapshot_metadata_models = [
             model for model in snapshot_metadata_models
@@ -991,7 +1004,7 @@ def _pseudonymize_topic_models(pending_deletion_request):
 
 
 def _pseudonymize_feedback_models(pending_deletion_request):
-    """Pseudonymize the activity models for the user with user_id.
+    """Pseudonymize the feedback models for the user with user_id.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
@@ -1029,7 +1042,7 @@ def _pseudonymize_feedback_models(pending_deletion_request):
     ).fetch()
     feedback_ids |= set([model.id for model in general_suggestion_models])
 
-    _save_activity_mappings(
+    _save_pseudonymizable_entity_mappings(
         pending_deletion_request, models.NAMES.feedback, feedback_ids)
 
     def _pseudonymize_models(feedback_related_models, pseudonymized_id):
@@ -1075,7 +1088,8 @@ def _pseudonymize_feedback_models(pending_deletion_request):
             general_suggestion_models)
 
     feedback_ids_to_pids = (
-        pending_deletion_request.activity_mappings[models.NAMES.feedback])
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            models.NAMES.feedback])
     for feedback_id, pseudonymized_id in feedback_ids_to_pids.items():
         feedback_related_models = [
             model for model in feedback_thread_models
@@ -1098,7 +1112,7 @@ def _pseudonymize_feedback_models(pending_deletion_request):
 
 
 def _pseudonymize_suggestion_models(pending_deletion_request):
-    """Pseudonymize the activity models for the user with user_id.
+    """Pseudonymize the suggestion models for the user with user_id.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
@@ -1116,7 +1130,7 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
     ).fetch()
     suggestion_ids = set([model.id for model in voiceover_application_models])
 
-    _save_activity_mappings(
+    _save_pseudonymizable_entity_mappings(
         pending_deletion_request, models.NAMES.suggestion, suggestion_ids)
 
     def _pseudonymize_models(voiceover_application_models):
@@ -1140,7 +1154,8 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
         voiceover_application_class.put_multi(voiceover_application_models)
 
     suggestion_ids_to_pids = (
-        pending_deletion_request.activity_mappings[models.NAMES.suggestion])
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            models.NAMES.suggestion])
     for i in python_utils.RANGE(
             0,
             len(voiceover_application_models),
