@@ -3242,8 +3242,7 @@ class CommunityContributionStatsModelValidator(
                     item.id, item.question_suggestion_count,
                     expected_question_suggestion_count)
             )
-        
-                      
+                  
     @classmethod
     def _get_custom_validation_functions(cls):
         return [
