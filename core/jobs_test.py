@@ -35,6 +35,7 @@ import feconf
 import python_utils
 
 from google.appengine.ext import ndb
+from mapreduce import input_readers
 
 (base_models, exp_models, stats_models, job_models) = (
     models.Registry.import_models([
@@ -66,8 +67,75 @@ class MockJobManagerOne(jobs.BaseMapReduceJobManager):
         yield (key, sum([int(value) for value in values]))
 
 
+class MockJobManagerTwo(jobs.BaseMapReduceJobManager):
+    """Test job that counts the total number of explorations."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        current_class = MockJobManagerOne
+        if current_class.entity_created_before_job_queued(item):
+            yield ('sum', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, sum([int(value) for value in values]))
+
+
 class JobManagerUnitTests(test_utils.GenericTestBase):
     """Test basic job manager operations."""
+
+    def test_create_new(self):
+        """Test the creation of a new job."""
+        job_id = MockJobManagerOne.create_new()
+        self.assertTrue(job_id.startswith('MockJobManagerOne'))
+        self.assertEqual(
+            MockJobManagerOne.get_status_code(job_id), jobs.STATUS_CODE_NEW)
+        self.assertIsNone(MockJobManagerOne.get_time_queued_msec(job_id))
+        self.assertIsNone(MockJobManagerOne.get_time_started_msec(job_id))
+        self.assertIsNone(MockJobManagerOne.get_time_finished_msec(job_id))
+        self.assertIsNone(MockJobManagerOne.get_metadata(job_id))
+        self.assertIsNone(MockJobManagerOne.get_output(job_id))
+        self.assertIsNone(MockJobManagerOne.get_error(job_id))
+
+        self.assertFalse(MockJobManagerOne.is_active(job_id))
+        self.assertFalse(MockJobManagerOne.has_finished(job_id))
+
+    def test_failing_jobs(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+
+        # Mocks GoogleCloudStorageInputReader() to fail a job.
+        _mock_input_reader = lambda _, __: python_utils.divide(1, 0)
+
+        input_reader_swap = self.swap(
+            input_readers, 'GoogleCloudStorageInputReader', _mock_input_reader)
+        assert_raises_context_manager = self.assertRaisesRegexp(
+            Exception,
+            r'Invalid status code change for job '
+            r'MockJobManagerOne-\w+-\w+: from new to failed')
+
+        job_id = MockJobManagerOne.create_new()
+        store_map_reduce_results = jobs.StoreMapReduceResults()
+
+        with input_reader_swap, assert_raises_context_manager, logging_swap:
+            store_map_reduce_results.run(
+                job_id, 'core.jobs_test.MockJobManagerOne', 'output')
+
+        expected_log_message = 'Job %s failed at' % job_id
+
+        # The first log message is ignored as it is the traceback.
+        self.assertEqual(len(observed_log_messages), 2)
+        self.assertTrue(
+            observed_log_messages[1].startswith(expected_log_message))
 
     def test_base_job_manager_enqueue_raises_error(self):
         with self.assertRaisesRegexp(
@@ -93,32 +161,37 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         actual_output = MockJobManagerOne.get_output(job_id)
         self.assertEqual(actual_output, expected_output)
 
-    def test_cancelling_multiple_unfinished_jobs(self):
-        job1_id = MockJobManagerOne.create_new()
-        MockJobManagerOne.enqueue(
-            job1_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        job2_id = MockJobManagerOne.create_new()
-        MockJobManagerOne.enqueue(
-            job2_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+    def test_failure_for_job_enqueued_using_wrong_manager(self):
+        job_id = MockJobManagerOne.create_new()
+        with self.assertRaisesRegexp(Exception, 'Invalid job type'):
+            MockJobManagerTwo.enqueue(
+                job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+    # def test_cancelling_multiple_unfinished_jobs(self):
+    #     job1_id = MockJobManagerOne.create_new()
+    #     MockJobManagerOne.enqueue(
+    #         job1_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+    #     job2_id = MockJobManagerOne.create_new()
+    #     MockJobManagerOne.enqueue(
+    #         job2_id, taskqueue_services.QUEUE_NAME_DEFAULT)
 
-        MockJobManagerOne.register_start(job1_id)
-        MockJobManagerOne.register_start(job2_id)
-        MockJobManagerOne.cancel_all_unfinished_jobs('admin_user_id')
+    #     MockJobManagerOne.register_start(job1_id)
+    #     MockJobManagerOne.register_start(job2_id)
+    #     MockJobManagerOne.cancel_all_unfinished_jobs('admin_user_id')
 
-        self.assertFalse(MockJobManagerOne.is_active(job1_id))
-        self.assertFalse(MockJobManagerOne.is_active(job2_id))
-        self.assertEqual(
-            MockJobManagerOne.get_status_code(job1_id),
-            jobs.STATUS_CODE_CANCELED)
-        self.assertEqual(
-            MockJobManagerOne.get_status_code(job2_id),
-            jobs.STATUS_CODE_CANCELED)
-        self.assertIsNone(MockJobManagerOne.get_output(job1_id))
-        self.assertIsNone(MockJobManagerOne.get_output(job2_id))
-        self.assertEqual(
-            'Canceled by admin_user_id', MockJobManagerOne.get_error(job1_id))
-        self.assertEqual(
-            'Canceled by admin_user_id', MockJobManagerOne.get_error(job2_id))
+    #     self.assertFalse(MockJobManagerOne.is_active(job1_id))
+    #     self.assertFalse(MockJobManagerOne.is_active(job2_id))
+    #     self.assertEqual(
+    #         MockJobManagerOne.get_status_code(job1_id),
+    #         jobs.STATUS_CODE_CANCELED)
+    #     self.assertEqual(
+    #         MockJobManagerOne.get_status_code(job2_id),
+    #         jobs.STATUS_CODE_CANCELED)
+    #     self.assertIsNone(MockJobManagerOne.get_output(job1_id))
+    #     self.assertIsNone(MockJobManagerOne.get_output(job2_id))
+    #     self.assertEqual(
+    #         'Canceled by admin_user_id', MockJobManagerOne.get_error(job1_id))
+    #     self.assertEqual(
+    #         'Canceled by admin_user_id', MockJobManagerOne.get_error(job2_id))
 
 
 SUM_MODEL_ID = 'all_data_id'
@@ -131,6 +204,23 @@ class MockNumbersModel(ndb.Model):
 class MockSumModel(ndb.Model):
     total = ndb.IntegerProperty(default=0)
     failed = ndb.BooleanProperty(default=False)
+
+
+class FailingAdditionJobManager(jobs.BaseMapReduceJobManager):
+    """Test job that stores stuff in MockSumModel and then fails."""
+
+    @classmethod
+    def _run(cls, additional_job_params):
+        total = sum([
+            numbers_model.number for numbers_model in MockNumbersModel.query()])
+        MockSumModel(id=SUM_MODEL_ID, total=total).put()
+        raise Exception('Oops, I failed.')
+
+    @classmethod
+    def _post_failure_hook(cls, job_id):
+        model = MockSumModel.get_by_id(SUM_MODEL_ID)
+        model.failed = True
+        model.put()
 
 
 class DatastoreJobIntegrationTests(test_utils.GenericTestBase):
@@ -154,6 +244,24 @@ class DatastoreJobIntegrationTests(test_utils.GenericTestBase):
         MockNumbersModel(number=2).put()
         MockNumbersModel(number=1).put()
         MockNumbersModel(number=2).put()
+
+
+class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
+    """Test job that counts the total number of explorations."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        current_class = SampleMapReduceJobManager
+        if current_class.entity_created_before_job_queued(item):
+            yield ('sum', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, sum([int(value) for value in values]))
 
 
 class MapReduceJobForCheckingParamNames(jobs.BaseMapReduceOneOffJobManager):
