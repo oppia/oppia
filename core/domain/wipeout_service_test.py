@@ -485,7 +485,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         config_models.ConfigPropertyModel(
             id=self.CONFIG_1_ID, value='a'
-        ).commit(self.user_1_id,  [{'cmd': 'command'}])
+        ).commit(self.user_1_id, [{'cmd': 'command'}])
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
 
@@ -536,7 +536,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
     def test_multiple_config_properties_are_pseudonymized(self):
         config_models.ConfigPropertyModel(
             id=self.CONFIG_2_ID, value='b'
-        ).commit(self.user_1_id,   [{'cmd': 'command'}])
+        ).commit(self.user_1_id, [{'cmd': 'command'}])
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
@@ -565,7 +565,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
             self):
         config_models.ConfigPropertyModel(
             id=self.CONFIG_2_ID, value='b'
-        ).commit(self.user_2_id,   [{'cmd': 'command'}])
+        ).commit(self.user_2_id, [{'cmd': 'command'}])
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
@@ -610,7 +610,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
     def test_one_config_property_with_multiple_users_is_pseudonymized(self):
         config_models.ConfigPropertyModel.get_by_id(
             self.CONFIG_1_ID
-        ).commit(self.user_2_id,  [{'cmd': 'command'}])
+        ).commit(self.user_2_id, [{'cmd': 'command'}])
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
@@ -671,7 +671,7 @@ class WipeoutServiceVerifyDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_model.commit(self.user_1_id, [{'cmd': 'command_2'}])
         config_models.ConfigPropertyModel(
             id=self.CONFIG_2_ID, value='a'
-        ).commit(self.user_1_id,  [{'cmd': 'command'}])
+        ).commit(self.user_1_id, [{'cmd': 'command'}])
         wipeout_service.pre_delete_user(self.user_1_id)
 
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
@@ -688,7 +688,7 @@ class WipeoutServiceVerifyDeleteConfigModelsTests(test_utils.GenericTestBase):
 
         config_models.ConfigPropertyModel(
             id=self.CONFIG_2_ID, value='a'
-        ).commit(self.user_1_id,  [{'cmd': 'command'}])
+        ).commit(self.user_1_id, [{'cmd': 'command'}])
 
         self.assertFalse(wipeout_service.verify_user_deleted(
             wipeout_service.get_pending_deletion_request(self.user_1_id)))

@@ -117,7 +117,7 @@ def save_pending_deletion_requests(pending_deletion_requests):
         if deletion_request_model is not None:
             deletion_request_model.populate(**deletion_request_dict)
         else:
-            deletion_request_dict["id"] = deletion_request.user_id
+            deletion_request_dict['id'] = deletion_request.user_id
             deletion_request_model = user_models.PendingDeletionRequestModel(
                 **deletion_request_dict
             )
@@ -291,7 +291,7 @@ def delete_user(pending_deletion_request):
             models.NAMES.story,
             story_models.StorySnapshotMetadataModel,
             story_models.StoryCommitLogEntryModel,
-             'story_id')
+            'story_id')
         _pseudonymize_col_or_exp_models(
             pending_deletion_request,
             models.NAMES.exploration,
@@ -299,7 +299,7 @@ def delete_user(pending_deletion_request):
             exp_models.ExplorationRightsSnapshotMetadataModel,
             exp_models.ExplorationRightsSnapshotContentModel,
             exp_models.ExplorationCommitLogEntryModel,
-             'exploration_id')
+            'exploration_id')
         _pseudonymize_col_or_exp_models(
             pending_deletion_request,
             models.NAMES.collection,
@@ -307,7 +307,7 @@ def delete_user(pending_deletion_request):
             collection_models.CollectionRightsSnapshotMetadataModel,
             collection_models.CollectionRightsSnapshotContentModel,
             collection_models.CollectionCommitLogEntryModel,
-             'collection_id')
+            'collection_id')
         _pseudonymize_topic_models(pending_deletion_request)
     _delete_models(user_id, user_role, models.NAMES.email)
 
@@ -453,9 +453,9 @@ def _collect_entity_ids_from_snapshots_and_commit(
             for model in commit_log_models)
         if snapshot_metadata_ids != commit_log_ids:
             logging.error(
-                "The commit log model \'%s\' and snapshot models %s IDs "
-                "differ. Snapshots without commit logs: %s, "
-                "commit logs without snapshots: %s.",
+                'The commit log model \'%s\' and snapshot models %s IDs '
+                'differ. Snapshots without commit logs: %s, '
+                'commit logs without snapshots: %s.',
                 commit_log_model_class.__name__,
                 [
                     snapshot_metadata_model_class.__name__
@@ -473,11 +473,11 @@ def _collect_entity_ids_from_snapshots_and_commit(
 
 
 def _collect_and_save_entity_ids_from_snapshots_and_commit(
-    pending_deletion_request,
-    activity_category,
-    snapshot_metadata_model_classes,
-    commit_log_model_class,
-    commit_log_model_field_name):
+        pending_deletion_request,
+        activity_category,
+        snapshot_metadata_model_classes,
+        commit_log_model_class,
+        commit_log_model_field_name):
     """Collect the activity IDs that for the user with user_id. Verify that each
     snapshot has corresponding commit log.
 
@@ -709,8 +709,8 @@ def _pseudonymize_col_or_exp_models(
         activity_related_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
 
         Args:
-            col_related_models: list(BaseModel). Models whose user IDs should be
-                pseudonymized.
+            col_or_exp_related_models: list(BaseModel). Models whose user IDs
+                should be pseudonymized.
             pseudonymized_id: str. New pseudonymized user ID to be used for
                 the models.
         """
@@ -737,8 +737,8 @@ def _pseudonymize_col_or_exp_models(
                         commit_cmd[user_id_attribute_name] = pseudonymized_id
 
             assign_commit_message_match = re.match(
-                    rights_domain.ASSIGN_ROLE_COMMIT_MESSAGE_REGEX,
-                    snapshot_metadata_model.commit_message)
+                rights_domain.ASSIGN_ROLE_COMMIT_MESSAGE_REGEX,
+                snapshot_metadata_model.commit_message)
             if assign_commit_message_match:
                 snapshot_metadata_model.commit_message = (
                     rights_domain.ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
@@ -827,7 +827,6 @@ def _pseudonymize_col_or_exp_models(
                 0,
                 len(col_or_exp_related_models),
                 MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-            print(pseudonymized_id)
             transaction_services.run_in_transaction(
                 _pseudonymize_models,
                 col_or_exp_related_models[
@@ -887,8 +886,8 @@ def _pseudonymize_topic_models(pending_deletion_request):
         activity_related_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
 
         Args:
-            topic_related_models: list(BaseModel). Models whose user IDs should be
-                pseudonymized.
+            topic_related_models: list(BaseModel). Models whose user IDs should
+                be pseudonymized.
             pseudonymized_id: str. New pseudonymized user ID to be used for
                 the models.
         """
@@ -914,8 +913,8 @@ def _pseudonymize_topic_models(pending_deletion_request):
                         commit_cmd[user_id_attribute_name] = pseudonymized_id
 
             assign_commit_message_match = re.match(
-                    topic_domain.ASSIGN_ROLE_COMMIT_MESSAGE_REGEX,
-                    snapshot_metadata_model.commit_message)
+                topic_domain.ASSIGN_ROLE_COMMIT_MESSAGE_REGEX,
+                snapshot_metadata_model.commit_message)
             if assign_commit_message_match:
                 snapshot_metadata_model.commit_message = (
                     topic_domain.ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
@@ -987,14 +986,14 @@ def _pseudonymize_topic_models(pending_deletion_request):
             [
                 model for model in subtopic_snapshot_metadata_models
                 if subtopic_id_to_topic_id[
-                       model.get_unversioned_instance_id()] == topic_id
+                    model.get_unversioned_instance_id()] == topic_id
             ] + [
                 model for model in topic_commit_log_models
                 if getattr(model, 'topic_id') == topic_id
             ] + [
                 model for model in subtopic_commit_log_models
                 if subtopic_id_to_topic_id[
-                       getattr(model, 'subtopic_page_id')] == topic_id
+                    getattr(model, 'subtopic_page_id')] == topic_id
             ]
         )
 
@@ -1063,7 +1062,8 @@ def _pseudonymize_feedback_models(pending_deletion_request):
         """
         feedback_thread_models = [
             model for model in feedback_related_models
-            if isinstance(model, feedback_thread_model_class) ]
+            if isinstance(model, feedback_thread_model_class)
+        ]
         for feedback_thread_model in feedback_thread_models:
             if feedback_thread_model.original_author_id == user_id:
                 feedback_thread_model.original_author_id = pseudonymized_id
@@ -1163,7 +1163,7 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
     for i in python_utils.RANGE(
             0,
             len(voiceover_application_models),
-            MAX_NUMBER_OF_OPS_IN_TRANSACTION ):
+            MAX_NUMBER_OF_OPS_IN_TRANSACTION):
         transaction_services.run_in_transaction(
             _pseudonymize_models,
             voiceover_application_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION]
