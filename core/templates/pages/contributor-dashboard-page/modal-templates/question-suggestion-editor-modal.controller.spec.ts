@@ -147,6 +147,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
             translations_mapping: {}
           },
         },
+        inapplicable_skill_misconception_ids: ['1-2']
       });
       questionId = question.getId();
       questionStateData = question.getStateData();
