@@ -275,9 +275,8 @@ describe('Assets Backend API Service', function() {
           // )]}' string. That's why double quotes is being used here. It's not
           // possible to use \' instead of ' so the XSSI Prefix won't be
           // evaluated correctly.
-          /* eslint-disable quotes */
+          /* eslint-disable-next-line quotes */
           responseText: ")]}'\n{ \"message\": \"" + errorMessage + "\" }"
-          /* eslint-enable quotes */
         });
         return d.promise();
       });
@@ -309,9 +308,8 @@ describe('Assets Backend API Service', function() {
           // )]}' string. That's why double quotes is being used here. It's not
           // possible to use \' instead of ' so the XSSI Prefix won't be
           // evaluated correctly.
-          /* eslint-disable quotes */
+          /* eslint-disable-next-line quotes */
           responseText: ")]}'\n{ \"message\": \"" + errorMessage + "\" }"
-          /* eslint-enable quotes */
         });
         return d.promise();
       });
