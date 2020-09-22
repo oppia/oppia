@@ -114,7 +114,9 @@ angular.module('oppia').factory('ImageUploadHelperService', [
             // We are removing this attribute, because currently it is not in
             // the white list of valid attributes.
             node.removeAttribute('aria-hidden');
-            node.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            node.setAttributeNS(
+              'http://www.w3.org/2000/svg', 'xmlns',
+              'http://www.w3.org/2000/svg');
           }
           // Remove the custom data attributes added by MathJax.
           // These custom attributes don't affect the rendering of the SVGs,
