@@ -167,46 +167,6 @@ describe('Assets Backend API Service', () => {
       expect(onFailure).not.toHaveBeenCalled();
     }));
 
-<<<<<<< HEAD
-    it('should successfully save a math SVG', fakeAsync(() => {
-      const successMessage = 'Math SVG was successfully saved.';
-      const onSuccess = jasmine.createSpy('onSuccess');
-      const onFailure = jasmine.createSpy('onFailure');
-||||||| d4bd61d19
-    it('should handle rejection when saving a math SVG fails', function(done) {
-      var errorMessage = 'Math SVG was not successfully saved.';
-      // This throws "Argument of type '() => Promise<any, any, any>' is not
-      // assignable to parameter of type '{ (url: string, ...):
-      // jqXHR<any>; ...}'.". We need to suppress this error because we need
-      // to mock $.ajax to this function for testing purposes.
-      // @ts-expect-error
-      spyOn($, 'ajax').and.callFake(function() {
-        var d = $.Deferred();
-        d.reject({
-          // The responseText contains a XSSI Prefix, which is represented by
-          // )]}' string. That's why double quotes is being used here. It's not
-          // possible to use \' instead of ' so the XSSI Prefix won't be
-          // evaluated correctly.
-          /* eslint-disable quotes */
-          responseText: ")]}'\n{ \"message\": \"" + errorMessage + "\" }"
-          /* eslint-enable quotes */
-        });
-        return d.promise();
-      });
-      var imageFile = new Blob();
-      AssetsBackendApiService.saveMathExpresionImage(
-        imageFile, 'new.svg', 'exploration', 'expid12345')
-        .then(done, function(response) {
-          expect(response).toEqual({
-            message: errorMessage
-          });
-          done();
-        });
-      // $q Promises need to be forcibly resolved through a JavaScript digest,
-      // which is what $apply helps kick-start.
-      $rootScope.$apply();
-    });
-=======
     it('should handle rejection when saving a math SVG fails', function(done) {
       var errorMessage = 'Math SVG was not successfully saved.';
       // This throws "Argument of type '() => Promise<any, any, any>' is not
@@ -239,35 +199,7 @@ describe('Assets Backend API Service', () => {
       // which is what $apply helps kick-start.
       $rootScope.$apply();
     });
->>>>>>> upstream/develop
 
-<<<<<<< HEAD
-      assetsBackendApiService.saveMathExpresionImage(
-        imageBlob, 'newMathExpression.svg', 'exploration', 'expid12345')
-        .then(onSuccess, onFailure);
-      flushMicrotasks();
-||||||| d4bd61d19
-    it('should handle rejection when saving a file fails', function(done) {
-      var errorMessage = 'Error on saving audio';
-      // This throws "Argument of type '() => Promise<any, any, any>' is not
-      // assignable to parameter of type '{ (url: string, ...):
-      // jqXHR<any>; ...}'.". We need to suppress this error because we need
-      // to mock $.ajax to this function for testing purposes.
-      // @ts-expect-error
-      spyOn($, 'ajax').and.callFake(function() {
-        var d = $.Deferred();
-        d.reject({
-          // The responseText contains a XSSI Prefix, which is represented by
-          // )]}' string. That's why double quotes is being used here. It's not
-          // possible to use \' instead of ' so the XSSI Prefix won't be
-          // evaluated correctly.
-          /* eslint-disable quotes */
-          responseText: ")]}'\n{ \"message\": \"" + errorMessage + "\" }"
-          /* eslint-enable quotes */
-        });
-        return d.promise();
-      });
-=======
     it('should handle rejection when saving a file fails', function(done) {
       var errorMessage = 'Error on saving audio';
       // This throws "Argument of type '() => Promise<any, any, any>' is not
@@ -287,7 +219,6 @@ describe('Assets Backend API Service', () => {
         });
         return d.promise();
       });
->>>>>>> upstream/develop
 
       httpTestingController.expectOne(
         '/createhandler/imageupload/exploration/expid12345'
