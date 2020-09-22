@@ -79,7 +79,7 @@ angular.module('oppia').component('contributionsAndReview', {
         Object.keys(ctrl.contributions).forEach(function(key) {
           var suggestion = ctrl.contributions[key].suggestion;
           var details = ctrl.contributions[key].details;
-          if(details != null) {
+          if (typeof details !== 'undefined') {
             var change = suggestion.change;
             var requiredData = {
               id: suggestion.suggestion_id,
@@ -105,7 +105,7 @@ angular.module('oppia').component('contributionsAndReview', {
         Object.keys(ctrl.contributions).forEach(function(key) {
           var suggestion = ctrl.contributions[key].suggestion;
           var details = ctrl.contributions[key].details;
-          if(details != null) {
+          if (typeof details !== 'undefined') {
             var change = suggestion.change;
             var requiredData = {
               id: suggestion.suggestion_id,
