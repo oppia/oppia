@@ -24,6 +24,7 @@ import { ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
+import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
@@ -44,6 +45,7 @@ describe('Topic viewer backend API service', () => {
       'ShortSkillSummaryObjectFactory', new ShortSkillSummaryObjectFactory());
     $provide.value(
       'ReadOnlyObjectFactory', new ReadOnlyTopicObjectFactory(
+        new StoryNodeObjectFactory(),
         new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
         new ShortSkillSummaryObjectFactory()));
   }));

@@ -908,7 +908,8 @@ export class UpgradedServices {
     upgradedServices['StoryReferenceObjectFactory'] =
       new StoryReferenceObjectFactory();
     upgradedServices['StorySummaryObjectFactory'] =
-      new StorySummaryObjectFactory();
+      new StorySummaryObjectFactory(
+        upgradedServices['StoryNodeObjectFactory']);
     upgradedServices['SubtitledHtmlObjectFactory'] =
       new SubtitledHtmlObjectFactory();
     upgradedServices['SubtitledUnicodeObjectFactory'] =
