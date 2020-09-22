@@ -467,7 +467,8 @@ describe('Contributions and review component', function() {
       ctrl.switchToReviewTab('translate_content');
       $scope.$apply();
 
-      expect(Object.keys(ctrl.contributions)).toContain('suggestion_undefined_1');
+      expect(Object.keys(ctrl.contributions)).toContain(
+        'suggestion_undefined_1');
     });
 
     it('should handle undefined question opportunities' +
@@ -488,7 +489,8 @@ describe('Contributions and review component', function() {
         }));
       ctrl.switchToReviewTab('add_question')
 
-      expect(Object.keys(ctrl.contributions)).toContain('suggestion_undefined_2');
+      expect(Object.keys(ctrl.contributions)).toContain(
+        'suggestion_undefined_2');
     });
 
     it('should open show view question modal when clicking on' +
