@@ -218,7 +218,7 @@
                class="oppia-exploration-summary-tile-container"
                ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
             <i class="remove-icon fa fa-times"
-               ng-show="showRemoveIcon"
+               ng-show="showRemoveIcon || $ctrl.checkMobileView()"
                aria-hidden="true"
                ng-click="$ctrl.openRemoveActivityModal($ctrl.activeSection, $ctrl.activeSubsection, tile)"
                uib-tooltip="Remove"
@@ -327,7 +327,7 @@
                  ng-repeat="tile in $ctrl.explorationPlaylist track by $index"
                  ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
               <i class="remove-icon fa fa-times text-dark"
-                 ng-show="showRemoveIcon"
+                 ng-show="showRemoveIcon || $ctrl.checkMobileView()"
                  aria-hidden="true"
                  ng-click="$ctrl.openRemoveActivityModal($ctrl.activeSection, $ctrl.activeSubsection, tile)"
                  uib-tooltip="Remove"
@@ -378,7 +378,7 @@
                class="oppia-exploration-summary-tile-container"
                ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
             <i class="remove-icon fa fa-times"
-               ng-show="showRemoveIcon"
+               ng-show="showRemoveIcon || $ctrl.checkMobileView()"
                aria-hidden="true"
                ng-click="$ctrl.openRemoveActivityModal($ctrl.activeSection, $ctrl.activeSubsection, tile)"
                uib-tooltip="Remove"
@@ -438,7 +438,7 @@
                  ng-repeat="tile in $ctrl.collectionPlaylist track by $index"
                  ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false">
               <i class="remove-icon fa fa-times text-dark"
-                 ng-show="showRemoveIcon"
+                 ng-show="showRemoveIcon || $ctrl.checkMobileView()"
                  aria-hidden="true"
                  ng-click="$ctrl.openRemoveActivityModal($ctrl.activeSection, $ctrl.activeSubsection, tile)"
                  uib-tooltip="Remove"
