@@ -27,6 +27,7 @@ from core.domain import suggestion_registry
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
+import heapq
 import feconf
 
 (feedback_models, suggestion_models, user_models) = (
@@ -35,6 +36,9 @@ import feconf
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a user'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
+
+# The maximum number of suggestions to recommend to a reviewer to review.
+MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER = 5
 
 
 def create_suggestion(
@@ -597,6 +601,94 @@ def get_translation_suggestions_waiting_longest_for_review_per_lang(
                 language_code)
         )
     ]
+
+
+def get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
+        reviewer_ids):
+    """For each user, returns information that will be used to notify reviewers
+    about the suggestions waiting longest for review that the reviewer has
+    permissions to review.
+
+    Args:
+        reviewer_ids: list(str). A list of the reviewer user ids to notify.
+
+    Returns:
+        list(list(ReviewableSuggestionEmailContentInfo)). A list of suggestion
+        email content info objects for each reviewer. Each suggestion email
+        content info object contains the type of the suggestion, the language
+        of the suggestion, the suggestion content (question/translation) and
+        the date that the suggestion was submitted for review. For each user
+        the objects are sorted in descending order based on review wait time.
+    """
+
+    # Get each reviewer's review permissions.
+    users_contribution_rights = user_services.get_users_contribution_rights(
+        reviewer_ids
+    )
+
+    # Get the question suggestions that have been waiting longest for review.
+    question_suggestions = (
+        get_question_suggestions_waiting_longest_for_review()
+    )
+
+    # Create a dictionary to keep track of the translation suggestions that
+    # have been waiting longest for review in each language code.
+    translation_suggestions_by_lang_code_dict = {}
+
+    reviewers_reviewable_suggestion_infos = []
+
+    for user_contribution_rights in user_contribution_rights:
+        heap = []
+        if user_contribution_rights.can_review_questions:
+            for question_suggestion in question_suggestions:
+                if len(heap) == (
+                        MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
+                    break
+                elif question_suggestion.author_id != user_contribution_rights.id:
+                    heapq.heappush(heap, (
+                        question_suggestion.last_updated, question_suggestion)
+                    )
+
+        elif user_contribution_rights.can_review_translation_for_language_codes:
+            for language_code in (
+                    user_contribution_rights
+                    .can_review_translation_for_language_codes):
+                if language_code not in (
+                        translation_suggestions_by_lang_code_dict):
+                    translation_suggestions_by_lang_code_dict[language_code] = (
+                        get_translation_suggestions_waiting_longest_for_review_per_lang(
+                            language_code
+                        )
+                    )
+                translation_suggestions = translation_suggestions_by_lang_code_dict[
+                    language_code]
+                for translation_suggestion in translation_suggestions:
+                    shortest_review_wait_time = heap[0][0]
+                    if len(heap) == (
+                            MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER) and (
+                                translation_suggestion.last_updated < shortest_review_wait_time):
+                        break
+                    elif translation_suggestion.author_id != user_contribution_rights.id:
+                        heapq.heappush(heap, (
+                            translation_suggestion.last_updated, translation_suggestion)
+                        )
+
+        reviewer_reviewable_suggestion_infos = []
+        for i in python_utils.RANGE(MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
+            suggestion = heapq.heappop(heap)
+            html_content_strings = suggestion.get_all_html_content_strings()
+            reviewer_reviewable_suggestion_infos.append(
+                suggestion_registry.ReviewableSuggestionEmailContentInfo(
+                    suggestion.suggestion_type, suggestion.language_code,
+                    html_content_strings[0], suggestion.last_updated
+                )
+            )
+        reviewer_reviewable_suggestion_infos.reverse()
+        reviewers_reviewable_suggestion_infos.append(
+            reviewer_reviewable_suggestion_infos
+        )
+
+    return reviewers_reviewable_suggestion_infos
 
 
 def get_submitted_suggestions(user_id, suggestion_type):

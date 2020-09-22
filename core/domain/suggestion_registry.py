@@ -1095,3 +1095,25 @@ SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
         SuggestionTranslateContent),
     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: SuggestionAddQuestion
 }
+
+class ReviewableSuggestionEmailContentInfo(python_utils.OBJECT):
+    """Stores key information that is used to create the email content for
+    notifying adminsand reviewers that there are suggestions that need to be
+    reviewed.
+
+    Attributes: 
+        suggestion_type: str. The type of the suggestion.
+        language_code: str|None. The language code of the suggestion or None if
+            it is not applicable.
+        suggestion_content: str. The question or translation of the suggestion.
+        submission_datetime: datetime.datetime. Date and time when the
+            suggestion was submitted for review.
+   """
+  
+    def __init__(
+            self, suggestion_type, language_code, suggestion_content,
+            out_for_review_on):
+        self.suggestion_type = suggestion_type
+        self.language_code = language_code
+        self.suggestion_content = suggestion_content
+        self.out_for_review_on = out_for_review_on
