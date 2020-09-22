@@ -167,6 +167,25 @@ describe('Assets Backend API Service', () => {
       expect(onFailure).not.toHaveBeenCalled();
     }));
 
+    it('should successfully save a math SVG', fakeAsync(() => {
+      const successMessage = 'Math SVG was successfully saved.';
+      const onSuccess = jasmine.createSpy('onSuccess');
+      const onFailure = jasmine.createSpy('onFailure');
+
+      assetsBackendApiService.saveMathExpresionImage(
+        imageBlob, 'newMathExpression.svg', 'exploration', 'expid12345')
+        .then(onSuccess, onFailure);
+      flushMicrotasks();
+
+      httpTestingController.expectOne(
+        '/createhandler/imageupload/exploration/expid12345'
+      ).flush(successMessage);
+      flushMicrotasks();
+
+      expect(onSuccess).toHaveBeenCalledWith(successMessage);
+      expect(onFailure).not.toHaveBeenCalled();
+    }));
+
     it('should handle rejection when saving a math SVG fails', fakeAsync(() => {
       const onSuccess = jasmine.createSpy('onSuccess');
       const onFailure = jasmine.createSpy('onFailure');
