@@ -29,6 +29,7 @@ from core.domain import user_services
 from core.platform import models
 import heapq
 import feconf
+import python_utils
 
 (feedback_models, suggestion_models, user_models) = (
     models.Registry.import_models(
@@ -637,7 +638,7 @@ def get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
 
     reviewers_reviewable_suggestion_infos = []
 
-    for user_contribution_rights in user_contribution_rights:
+    for user_contribution_rights in users_contribution_rights:
         heap = []
         if user_contribution_rights.can_review_questions:
             for question_suggestion in question_suggestions:
@@ -663,30 +664,33 @@ def get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
                 translation_suggestions = translation_suggestions_by_lang_code_dict[
                     language_code]
                 for translation_suggestion in translation_suggestions:
-                    shortest_review_wait_time = heap[0][0]
-                    if len(heap) == (
-                            MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER) and (
-                                translation_suggestion.last_updated < shortest_review_wait_time):
-                        break
+                    if len(heap) == (MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
+                        shortest_review_wait_time = heap[0][0]
+                        if translation_suggestion.last_updated < shortest_review_wait_time:
+                            break
                     elif translation_suggestion.author_id != user_contribution_rights.id:
                         heapq.heappush(heap, (
                             translation_suggestion.last_updated, translation_suggestion)
                         )
+        
 
-        reviewer_reviewable_suggestion_infos = []
-        for i in python_utils.RANGE(MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
-            suggestion = heapq.heappop(heap)
-            html_content_strings = suggestion.get_all_html_content_strings()
-            reviewer_reviewable_suggestion_infos.append(
-                suggestion_registry.ReviewableSuggestionEmailContentInfo(
-                    suggestion.suggestion_type, suggestion.language_code,
-                    html_content_strings[0], suggestion.last_updated
+            reviewer_reviewable_suggestion_infos = []
+            #raise Exception('{}'.format(len(heap)))
+            for i in python_utils.RANGE(MAX_NUMER_OF_SUGGESTIONS_PER_REVIEWER):
+                if len(heap) == 0:         
+                    break
+                key, suggestion = heapq.heappop(heap)
+                html_content_strings = suggestion.get_all_html_content_strings()
+                reviewer_reviewable_suggestion_infos.append(
+                    suggestion_registry.ReviewableSuggestionEmailContentInfo(
+                        suggestion.suggestion_type, suggestion.language_code,
+                        html_content_strings[0], suggestion.last_updated
+                    )
                 )
+            reviewer_reviewable_suggestion_infos.reverse()
+            reviewers_reviewable_suggestion_infos.append(
+                reviewer_reviewable_suggestion_infos
             )
-        reviewer_reviewable_suggestion_infos.reverse()
-        reviewers_reviewable_suggestion_infos.append(
-            reviewer_reviewable_suggestion_infos
-        )
 
     return reviewers_reviewable_suggestion_infos
 

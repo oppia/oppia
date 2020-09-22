@@ -1641,3 +1641,203 @@ class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
             'Invalid target type for voiceover application: invalid_type'):
             suggestion_services.get_voiceover_application(
                 self.voiceover_application_model.id)
+
+
+class RetrieveEmailInfoUnitTests(
+        test_utils.GenericTestBase):
+
+    target_id = 'exp1'
+    target_version_at_submission = 1
+    exploration_category = 'Algebra'
+    EXPLORATION_THREAD_ID = 'exploration.exp1.thread_1'
+    SKILL_THREAD_ID = 'skill1.thread1'
+    AUTHOR_EMAIL = 'author1@example.com'
+    TRANSLATION_REVIEWER_EMAIL = 'translator@community.org'
+    QUESTION_REVIEWER_EMAIL = 'question@community.org'
+    COMMIT_MESSAGE = 'commit message'
+
+    class MockExploration(python_utils.OBJECT):
+        """Mocks an exploration. To be used only for testing."""
+
+        def __init__(self, exploration_id, states):
+            self.id = exploration_id
+            self.states = states
+            self.category = 'Algebra'
+
+        def get_content_html(self, unused_state_name, unused_content_id):
+            """Used to mock the get_content_html method for explorations."""
+            return '<p>This is html to translate.</p>'
+
+    # A mock exploration created for testing.
+    explorations = [
+        MockExploration('exp1', {'state_1': {}, 'state_2': {}})
+    ]
+
+    def mock_generate_new_exploration_thread_id(
+            self, unused_entity_type, unused_entity_id):
+        return self.EXPLORATION_THREAD_ID
+
+    def mock_generate_new_skill_thread_id(
+            self, unused_entity_type, unused_entity_id):
+        return self.SKILL_THREAD_ID
+
+    def mock_get_exploration_by_id(self, exp_id):
+        for exp in self.explorations:
+            if exp.id == exp_id:
+                return exp
+
+    def _create_edit_state_content_suggestion(self):
+        """Creates an "edit state content" suggestion."""
+
+        edit_state_content_change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': {
+                'content_id': 'content',
+                'html': 'new html content'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': 'old html content'
+            }
+        }
+
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            edit_state_content_suggestion = (
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, edit_state_content_change_dict,
+                    'test description')
+            )
+
+        return edit_state_content_suggestion
+
+    def _create_translation_suggestion_with_language_code_and_author_id(
+            self, language_code, author_id):
+        """Creates a translation suggestion in the given language_code."""
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'state_1',
+            'content_id': 'content',
+            'language_code': language_code,
+            'content_html': '<p>This is html to translate.</p>',
+            'translation_html': '<p>This is translated html.</p>'
+        }
+
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            with self.swap(
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                translation_suggestion = (
+                    suggestion_services.create_suggestion(
+                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                        suggestion_models.TARGET_TYPE_EXPLORATION,
+                        self.target_id, self.target_version_at_submission,
+                        author_id, add_translation_change_dict,
+                        'test description')
+                )
+
+        return translation_suggestion
+
+    def _create_question_suggestion_with_skill_id_and_author_id(
+            self, skill_id, author_id):
+        """Creates a question suggestion with the given skill_id."""
+        add_question_change_dict = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid-1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+    
+        with self.swap(
+            feedback_models.GeneralFeedbackThreadModel,
+            'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
+            question_suggestion = suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+                suggestion_models.TARGET_TYPE_SKILL,
+                skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+                author_id, add_question_change_dict,
+                'test description')
+
+        return question_suggestion
+
+
+    def setUp(self):
+        super(
+            RetrieveEmailInfoUnitTests,
+            self).setUp()
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translationReviewer')
+        self.translation_reviewer_id = self.get_user_id_from_email(
+            self.TRANSLATION_REVIEWER_EMAIL)
+        self.signup(self.QUESTION_REVIEWER_EMAIL, 'questionReviewer')
+        self.question_reviewer_id = self.get_user_id_from_email(
+            self.QUESTION_REVIEWER_EMAIL)
+
+    def test_get_suggestion_info_to_notify_reviewers_returns_empty_for_authors(
+            self):
+        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.translation_reviewer_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.translation_reviewer_id, 'en')
+        self._create_question_suggestion_with_skill_id_and_author_id(
+            'skill_1', self.question_reviewer_id)
+        self._create_translation_suggestion_with_language_code_and_author_id(
+            'hi', self.translation_reviewer_id)
+
+        reviewers_reviewable_suggestion_infos = (
+            suggestion_services
+            .get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
+                [self.question_reviewer_id, self.translation_reviewer_id]
+            )
+        )
+
+        self.assertEqual(len(reviewers_reviewable_suggestion_infos), 2)
+        self.assertEqual(reviewers_reviewable_suggestion_infos[0], [])
+        self.assertEqual(reviewers_reviewable_suggestion_infos[1], [])
+
+    def test_get_suggestion_info_to_notify_reviewers_success_for_one_reviewer(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.translation_reviewer_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.translation_reviewer_id, 'en')
+        self._create_translation_suggestion_with_language_code_and_author_id(
+            'hi', self.author_id)
+        self._create_translation_suggestion_with_language_code_and_author_id(
+            'hi', self.author_id)
+        self._create_translation_suggestion_with_language_code_and_author_id(
+            'hi', self.author_id)
+        self._create_translation_suggestion_with_language_code_and_author_id(
+            'en', self.author_id)
+        self._create_translation_suggestion_with_language_code_and_author_id(
+            'hi', self.author_id)
+
+        reviewers_reviewable_suggestion_infos = (
+            suggestion_services
+            .get_suggestions_waiting_longest_for_review_info_to_notify_reviewers(
+                [self.question_reviewer_id, self.translation_reviewer_id]
+            )
+        )
+        blah = reviewers_reviewable_suggestion_infos[0]
+
+        raise Exception('{}'.format(blah[3].language_code))
