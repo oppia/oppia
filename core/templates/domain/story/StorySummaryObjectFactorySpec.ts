@@ -25,7 +25,7 @@ import { StoryNodeObjectFactory } from './StoryNodeObjectFactory';
 describe('Story summary object factory', () => {
   let factory: StorySummaryObjectFactory;
   let _sampleStorySummary: StorySummary;
-  let storyNodeObjectFactory: StoryNodeObjectFactory
+  let storyNodeObjectFactory: StoryNodeObjectFactory;
 
   beforeEach(() => {
     factory = TestBed.get(StorySummaryObjectFactory);

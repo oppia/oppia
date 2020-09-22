@@ -98,7 +98,8 @@ export class StorySummary {
 export class StorySummaryObjectFactory {
   constructor(
     private storyNodeObjectFactory: StoryNodeObjectFactory
-  ) {};
+  ) {}
+
   createFromBackendDict(
       storySummaryBackendDict: StorySummaryBackendDict): StorySummary {
     let pendingNodes = (
