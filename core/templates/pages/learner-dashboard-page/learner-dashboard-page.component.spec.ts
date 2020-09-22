@@ -31,7 +31,6 @@ describe('Learner dashboard page', function() {
   var $rootScope = null;
   var $scope = null;
   var $uibModal = null;
-  var $window = null;
   var AlertsService = null;
   var CollectionObjectFactory = null;
   var collectionSummaryObjectFactory = null;
@@ -65,7 +64,6 @@ describe('Learner dashboard page', function() {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       $uibModal = $injector.get('$uibModal');
-      $window = $injector.get('$window');
       CollectionObjectFactory = $injector.get('CollectionObjectFactory');
       collectionSummaryObjectFactory = $injector.get(
         'CollectionSummaryObjectFactory');

@@ -171,7 +171,6 @@ angular.module('oppia').component('preferencesPage', {
       };
       ctrl.$onInit = function() {
         ctrl.profilePictureDataUrl = '';
-        ctrl.hostname = $window.location.host;
         ctrl.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
         ctrl.DASHBOARD_TYPE_LEARNER = DASHBOARD_TYPE_LEARNER;
 

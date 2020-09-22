@@ -424,7 +424,7 @@
     "I18N_PLAYER_UNRATED": "Unrated",
     "I18N_PLAYER_VIEWS_TOOLTIP": "Views",
     "I18N_PREFERENCES_BIO": "Bio",
-    "I18N_PREFERENCES_BIO_EXPLAIN_TEXT": "This field is optional. Anything you write here is public and world-viewable at <[profileUrl]>.",
+    "I18N_PREFERENCES_BIO_EXPLAIN_TEXT": "This field is optional. Anything you write here is public and world-viewable.",
     "I18N_PREFERENCES_BREADCRUMB": "Preferences",
     "I18N_PREFERENCES_CANCEL_BUTTON": "Cancel",
     "I18N_PREFERENCES_CHANGE_PICTURE": "Change profile picture",
