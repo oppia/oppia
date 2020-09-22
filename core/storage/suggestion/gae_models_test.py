@@ -668,6 +668,147 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(question_suggestion_models), 1)
         self.assertEqual(question_suggestion_models[0].id, 'skill1.thread1')
 
+    def test_get_num_translation_suggestions_in_review_in_lang_code_wrong_lang(
+            self):
+        number_of_translation_suggestions = (
+            suggestion_models.GeneralSuggestionModel
+            .get_number_of_translation_suggestions_in_review_in_lang_code(
+                'invalid_language_code'
+            )
+        )
+
+        self.assertEqual(number_of_translation_suggestions, 0)
+
+    def test_get_num_translation_suggestions_in_review_in_lang_code_success(
+            self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread1', self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp2', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp2.thread1', self.translation_language_code)
+
+        number_of_translation_suggestions = (
+            suggestion_models.GeneralSuggestionModel
+            .get_number_of_translation_suggestions_in_review_in_lang_code(
+                self.translation_language_code
+            )
+        )
+
+        self.assertEqual(number_of_translation_suggestions, 2)
+
+    def test_get_num_translation_suggestions_in_review_in_lang_code_not_review(
+            self):
+        # A suggestion that has already been accepted.
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_ACCEPTED, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread1', self.translation_language_code)
+        # A suggestion that has already been rejected.
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp2', self.target_version_at_submission,
+            suggestion_models.STATUS_REJECTED, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp2.thread1', self.translation_language_code)
+
+        number_of_translation_suggestions = (
+            suggestion_models.GeneralSuggestionModel
+            .get_number_of_translation_suggestions_in_review_in_lang_code(
+                self.translation_language_code
+            )
+        )
+
+        # We're only looking for suggestions that are in review.
+        self.assertEqual(number_of_translation_suggestions, 0)
+
+    def test_get_num_translation_suggestions_in_review_in_lang_code_diff_lang(
+            self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread1', 'fr')
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp2', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp2.thread1', 'fr')
+
+        number_of_translation_suggestions = (
+            suggestion_models.GeneralSuggestionModel
+            .get_number_of_translation_suggestions_in_review_in_lang_code('en')
+        )
+
+        self.assertEqual(number_of_translation_suggestions, 0)
+
+    def test_get_num_question_suggestions_in_review_returns_zero_if_not_review(
+            self):
+        # A suggestion that has already been accepted.
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            'skill_1', self.target_version_at_submission,
+            suggestion_models.STATUS_ACCEPTED, 'author_3',
+            'reviewer_2', self.change_cmd, 'category1',
+            'skill1.thread1', self.question_language_code)
+        # A suggestion that has already been rejected.
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            'skill_2', self.target_version_at_submission,
+            suggestion_models.STATUS_REJECTED, 'author_3',
+            'reviewer_2', self.change_cmd, 'category2',
+            'skill2.thread1', self.question_language_code)
+
+        number_of_question_suggestions = (
+            suggestion_models.GeneralSuggestionModel
+            .get_number_of_question_suggestions_in_review()
+        )
+
+        # We're only looking for suggestions that are in review.
+        self.assertEqual(number_of_question_suggestions, 0)
+
+    def test_get_number_of_question_suggestions_in_review_success(
+            self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            'skill_1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, 'category1',
+            'skill1.thread1', self.question_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            'skill_2', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, 'category2',
+            'skill2.thread1', self.question_language_code)
+
+        number_of_question_suggestions = (
+            suggestion_models.GeneralSuggestionModel
+            .get_number_of_question_suggestions_in_review()
+        )
+
+        self.assertEqual(number_of_question_suggestions, 2)
+
     def test_export_data_trivial(self):
         user_data = (
             suggestion_models.GeneralSuggestionModel

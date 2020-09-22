@@ -2245,6 +2245,94 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
         self.assertTrue(self.USER_ID_1 in translation_reviewer_ids)
         self.assertTrue(self.USER_ID_2 in translation_reviewer_ids)
 
+    def test_get_num_reviewers_for_translations_in_lang_code_for_no_reviewers(
+            self):
+        number_of_translation_reviewers = (
+            user_models.UserContributionRightsModel
+            .get_number_of_reviewers_for_translations_in_lang_code('hi')
+        )
+
+        self.assertEqual(number_of_translation_reviewers, 0)
+
+    def test_get_num_of_reviewers_for_translations_in_lang_code_for_reviewers(
+            self):
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=['hi'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=True).put()
+
+        number_of_translation_reviewers = (
+            user_models.UserContributionRightsModel
+            .get_number_of_reviewers_for_translations_in_lang_code('hi')
+        )
+
+        self.assertEqual(number_of_translation_reviewers, 2)
+
+    def test_get_num_of_reviewers_for_translations_in_lang_code_for_diff_lang(
+            self):
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['en'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=['en'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=True).put()
+
+        number_of_translation_reviewers = (
+            user_models.UserContributionRightsModel
+            .get_number_of_reviewers_for_translations_in_lang_code('hi')
+        )
+
+        self.assertEqual(number_of_translation_reviewers, 0)
+
+    def test_get_num_reviewers_for_translations_in_lang_code_for_invalid_lang(
+            self):
+        number_of_translation_reviewers = (
+            user_models.UserContributionRightsModel
+            .get_number_of_reviewers_for_translations_in_lang_code(
+                'invalid_lang')
+        )
+
+        self.assertEqual(number_of_translation_reviewers, 0)
+
+    def test_get_number_of_question_reviewers_returns_zero_for_no_reviewers(
+            self):
+        number_of_question_reviewers = (
+            user_models.UserContributionRightsModel
+            .get_number_of_question_reviewers()
+        )
+
+        self.assertEqual(number_of_question_reviewers, 0)
+
+    def test_get_number_of_question_reviewers_success_for_multiple_reviewers(
+            self):
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=[],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
+        user_models.UserContributionRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=[],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=True).put()
+
+        number_of_question_reviewers = (
+            user_models.UserContributionRightsModel
+            .get_number_of_question_reviewers()
+        )
+
+        self.assertEqual(number_of_question_reviewers, 1)
+
     def test_get_voiceover_reviewer_user_ids(self):
         voiceover_reviewer_ids = (
             user_models.UserContributionRightsModel

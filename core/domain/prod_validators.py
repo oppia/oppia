@@ -57,6 +57,7 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.domain import voiceover_services
 from core.platform import models
+from constants import constants
 import feconf
 import python_utils
 import utils
@@ -3125,6 +3126,34 @@ class CommunityContributionStatsModelValidator(
             suggestion_services
             .create_community_contribution_stats_from_model(item)
         )
+
+    @classmethod
+    def _validate_translation_reviewer_counts(cls, item):
+        supported_language_codes = [
+            language_code['id'] for language_code in
+            constants.SUPPORTED_AUDIO_LANGUAGES
+        ]
+        for language_code in supported_language_codes:
+            expected_reviewer_count = (
+                user_models.UserContributionRightsModel
+                .get_number_of_reviewers_for_translations_in_lang_code(
+                    language_code)
+            )
+            if language_code in item.translation_reviewer_counts_by_lang_code:
+                if item.translation_reviewer_counts_by_lang_code[
+                        language_code] != expected_reviewer_count:
+                    cls._add_error(
+                    'translation reviewer %s' % (
+                        base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
+                    'Entity id %s: Translation reviewer counts: %s does not match the '
+                    'expected translation counts: %s' % (
+                        item.id, item.translation_reviewer_counts_by_lang_code[
+                            language_code], expected_reviewer_count)
+                    )
+                      
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_translation_reviewer_counts]
 
 
 class TopicModelValidator(base_model_validators.BaseModelValidator):

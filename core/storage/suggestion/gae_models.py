@@ -401,6 +401,42 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )
 
     @classmethod
+    def get_number_of_translation_suggestions_in_review_in_lang_code(
+            cls, language_code):
+        """Returns the total number of translation suggestions in the
+        given language code that are in review.
+
+        Args:
+            language_code: str. The language code of the translation
+                suggestions.
+
+        Returns:
+            Int. The total number of translation suggestions in the
+            given language code that are in review.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            .filter(cls.language_code == language_code)
+            .count()
+        )
+
+    @classmethod
+    def get_number_of_question_suggestions_in_review(cls):
+        """Returns the total number of question suggestions that are in review.
+
+        Returns:
+            Int. The total number of question suggestions that are in review.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.suggestion_type == SUGGESTION_TYPE_ADD_QUESTION)
+            .count()
+        )   
+
+    @classmethod
     def get_user_created_suggestions_of_suggestion_type(
             cls, suggestion_type, user_id):
         """Gets all suggestions of suggestion_type which the user has created.

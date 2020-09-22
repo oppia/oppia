@@ -2260,6 +2260,37 @@ class UserContributionRightsModel(base_models.BaseModel):
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
     @classmethod
+    def get_number_of_reviewers_for_translations_in_lang_code(
+            cls, language_code):
+        """Returns the number of reviewers who have permission to review
+        translation suggestions in the language code given.
+
+        Args:
+            language_code: str. The language code of the translation
+                suggestions that reviewers have permission to review.
+
+        Returns:
+            Int. The number of reviewers who have permission to review
+            translation suggestions in the language code given.
+        """
+        return (
+            cls.query(
+                cls.can_review_translation_for_language_codes == language_code)
+            .count()
+        )
+
+    @classmethod
+    def get_number_of_question_reviewers(cls):
+        """Returns the number of reviewers who have permission to question
+        suggestions.
+
+        Returns:
+            Int. The number of reviewers who have permission to review
+            question suggestions.
+        """
+        return cls.query(cls.can_review_questions == True).count()
+
+    @classmethod
     def get_voiceover_reviewer_user_ids(cls, language_code):
         """Returns the IDs of the users who have rights to review voiceovers in
         the given language code.
