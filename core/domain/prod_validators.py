@@ -260,9 +260,9 @@ class ClassifierTrainingJobModelValidator(
             cls._validate_state_name]
 
 
-class TrainingJobExplorationMappingModelValidator(
+class StateTrainingJobsMappingModelValidator(
         base_model_validators.BaseModelValidator):
-    """Class for validating TrainingJobExplorationMappingModels."""
+    """Class for validating StateTrainingJobsMappingModels."""
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -273,8 +273,9 @@ class TrainingJobExplorationMappingModelValidator(
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return classifier_domain.TrainingJobExplorationMapping(
-            item.exp_id, item.exp_version, item.state_name, item.job_id)
+        return classifier_domain.StateTrainingJobsMapping(
+            item.exp_id, item.exp_version, item.state_name,
+            item.algorithm_ids_to_job_ids)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -289,7 +290,7 @@ class TrainingJobExplorationMappingModelValidator(
         of exploration corresponding to exp_id.
 
         Args:
-            item: ndb.Model. TrainingJobExplorationMappingModel to validate.
+            item: ndb.Model. StateTrainingJobsMappingModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -335,7 +336,7 @@ class TrainingJobExplorationMappingModelValidator(
         exploration corresponding to exp_id.
 
         Args:
-            item: ndb.Model. TrainingJobExplorationMappingbModel to validate.
+            item: ndb.Model. StateTrainingJobsMappingModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -2157,6 +2158,50 @@ class QuestionModelValidator(base_model_validators.BaseModelValidator):
             base_model_validators.ExternalModelFetcherDetails(
                 'linked_skill_ids',
                 skill_models.SkillModel, item.linked_skill_ids)]
+
+    @classmethod
+    def _validate_inapplicable_skill_misconception_ids(cls, item):
+        """Validate that inapplicable skill misconception ids are valid.
+
+        Args:
+            item: ndb.Model. QuestionModel to validate.
+        """
+        inapplicable_skill_misconception_ids = (
+            item.inapplicable_skill_misconception_ids)
+        skill_misconception_id_mapping = {}
+        skill_ids = []
+        for skill_misconception_id in inapplicable_skill_misconception_ids:
+            skill_id, misconception_id = skill_misconception_id.split('-')
+            skill_misconception_id_mapping[skill_id] = misconception_id
+            skill_ids.append(skill_id)
+
+        skills = skill_fetchers.get_multi_skills(skill_ids, strict=False)
+        for skill in skills:
+            if skill is not None:
+                misconception_ids = [
+                    misconception.id
+                    for misconception in skill.misconceptions
+                ]
+                expected_misconception_id = (
+                    skill_misconception_id_mapping[skill.id])
+                if int(expected_misconception_id) not in misconception_ids:
+                    cls._add_error(
+                        'misconception id',
+                        'Entity id %s: misconception with the id %s does '
+                        'not exist in the skill with id %s' % (
+                            item.id, expected_misconception_id, skill.id))
+        missing_skill_ids = utils.compute_list_difference(
+            skill_ids,
+            [skill.id for skill in skills if skill is not None])
+        for skill_id in missing_skill_ids:
+            cls._add_error(
+                'skill id',
+                'Entity id %s: skill with the following id does not exist:'
+                ' %s' % (item.id, skill_id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_inapplicable_skill_misconception_ids]
 
 
 class ExplorationContextModelValidator(

@@ -42,6 +42,7 @@ from core.domain import draft_upgrade_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.domain import html_validation_service
@@ -773,6 +774,9 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
     # necessary.
     activity_services.remove_featured_activities(
         constants.ACTIVITY_TYPE_EXPLORATION, exploration_ids)
+
+    feedback_services.delete_threads_for_multiple_entities(
+        feconf.ENTITY_TYPE_EXPLORATION, exploration_ids)
 
     # Remove from subscribers.
     taskqueue_services.defer(
@@ -1581,16 +1585,6 @@ def get_user_exploration_data(
         user_services.get_email_preferences_for_exploration(
             user_id, exploration_id))
 
-    # Retrieve all classifiers for the exploration.
-    state_classifier_mapping = {}
-    classifier_training_jobs = (
-        classifier_services.get_classifier_training_jobs(
-            exploration_id, exploration.version, exploration.states))
-    for index, state_name in enumerate(exploration.states):
-        if classifier_training_jobs[index] is not None:
-            state_classifier_mapping[state_name] = (
-                classifier_training_jobs[index].to_player_dict())
-
     editor_dict = {
         'auto_tts_enabled': exploration.auto_tts_enabled,
         'category': exploration.category,
@@ -1614,7 +1608,6 @@ def get_user_exploration_data(
         'is_version_of_draft_valid': is_valid_draft_version,
         'draft_changes': draft_changes,
         'email_preferences': exploration_email_preferences.to_dict(),
-        'state_classifier_mapping': state_classifier_mapping
     }
 
     return editor_dict

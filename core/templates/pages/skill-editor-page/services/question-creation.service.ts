@@ -61,17 +61,17 @@ require('services/question-validation.service.ts');
 
 
 angular.module('oppia').factory('QuestionCreationService', [
-  '$location', '$uibModal', 'AlertsService',
+  '$location', '$rootScope', '$uibModal', 'AlertsService',
   'EditableQuestionBackendApiService', 'ImageLocalStorageService',
-  'MisconceptionObjectFactory', 'QuestionObjectFactory',
+  'QuestionObjectFactory',
   'QuestionUndoRedoService', 'SkillBackendApiService',
   'SkillDifficultyObjectFactory', 'SkillEditorStateService',
   'UrlInterpolationService', 'DEFAULT_SKILL_DIFFICULTY',
   'MODE_SELECT_DIFFICULTY', 'SKILL_DIFFICULTIES',
   function(
-      $location, $uibModal, AlertsService,
+      $location, $rootScope, $uibModal, AlertsService,
       EditableQuestionBackendApiService, ImageLocalStorageService,
-      MisconceptionObjectFactory, QuestionObjectFactory,
+      QuestionObjectFactory,
       QuestionUndoRedoService, SkillBackendApiService,
       SkillDifficultyObjectFactory, SkillEditorStateService,
       UrlInterpolationService, DEFAULT_SKILL_DIFFICULTY,
@@ -90,15 +90,12 @@ angular.module('oppia').factory('QuestionCreationService', [
     var populateMisconceptions = function() {
       SkillBackendApiService.fetchMultiSkills(
         newQuestionSkillIds).then(
-        function(skillDicts) {
-          skillDicts.forEach(function(skillDict) {
-            misconceptionsBySkill[skillDict.id] =
-                  skillDict.misconceptions.map(
-                    function(misconceptionsBackendDict) {
-                      return MisconceptionObjectFactory
-                        .createFromBackendDict(misconceptionsBackendDict);
-                    });
+        function(skills) {
+          skills.forEach(function(skill) {
+            misconceptionsBySkill[skill.getId()] =
+              skill.getMisconceptions();
           });
+          $rootScope.$apply();
         }, function(error) {
           AlertsService.addWarning();
         });
