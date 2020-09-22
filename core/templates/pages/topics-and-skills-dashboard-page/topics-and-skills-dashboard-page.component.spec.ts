@@ -491,7 +491,7 @@ describe('Topics and Skills Dashboard Page', function() {
     });
 
     it('should navigate skill page forward', function() {
-      var skillSpy = spyOn(ctrl, 'fetchSkills');
+      var skillSpy = spyOn(ctrl, 'fetchSkillsDebounced');
       ctrl.navigateSkillPage('next_page');
       expect(skillSpy).toHaveBeenCalled();
     });

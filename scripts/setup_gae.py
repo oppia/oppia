@@ -41,13 +41,9 @@ def main(args=None):
     coverage_home = os.path.join(
         common.OPPIA_TOOLS_DIR, 'coverage-%s' % common.COVERAGE_VERSION)
 
-    # Note that if the following line is changed so that it uses webob_1_1_1,
-    # PUT requests from the frontend fail.
     sys.path.append('.')
     sys.path.append(coverage_home)
     sys.path.append(common.GOOGLE_APP_ENGINE_SDK_HOME)
-    sys.path.append(
-        os.path.join(common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'webob_0_9'))
     sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.33'))
 
     # Delete old *.pyc files.

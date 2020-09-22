@@ -39,6 +39,7 @@ CURRENT_PYTHON_BIN = sys.executable
 COVERAGE_VERSION = '5.1'
 ESPRIMA_VERSION = '4.0.1'
 ISORT_VERSION = '4.3.21'
+PROTOBUF_VERSION = '3.12.0'
 PYCODESTYLE_VERSION = '2.5.0'
 PSUTIL_VERSION = '5.7.0'
 PYLINT_VERSION = '1.9.5'
@@ -55,6 +56,9 @@ YARN_VERSION = '1.22.4'
 
 # Versions of libraries used in backend.
 PILLOW_VERSION = '6.2.2'
+
+# Prototool version.
+PROTOTOOL_VERSION = '1.10.0'
 
 # We use redis 6.0.5 instead of the latest stable build of redis (6.0.6) because
 # there is a `make test` bug in redis 6.0.6 where the solution has not been
@@ -371,9 +375,6 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
                 'git@github.com:oppia/release-scripts.git'])
 
     with CD(release_scripts_dirpath):
-        ask_user_to_confirm(
-            'Please make sure that the ../release-scripts repo is clean and '
-            'you are on master branch in ../release-scripts repo.')
         python_utils.PRINT('Verifying that ../release-scripts repo is clean...')
         verify_local_repo_is_clean()
         python_utils.PRINT(
