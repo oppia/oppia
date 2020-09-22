@@ -22,6 +22,7 @@ import datetime
 from core.platform import models
 import feconf
 
+from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models, user_models) = models.Registry.import_models(
@@ -323,7 +324,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_in_review_suggestions_of_suggestion_type(
-            cls, suggestion_type, user_id):
+            cls, suggestion_type, user_id, page_size, urlsafe_start_cursor):
         """Gets all suggestions of suggestion_type which are in review.
 
         Args:
@@ -331,32 +332,80 @@ class GeneralSuggestionModel(base_models.BaseModel):
             user_id: str. The id of the user trying to make this query.
                 As a user cannot review their own suggestions, suggestions
                 authored by the user will be excluded.
+            page_size: int. The maximum number of entities to be returned.
+            urlsafe_start_cursor: str or None. If provided, the list of
+                returned entities starts from this datastore cursor.
+                Otherwise, the returned entities start from the beginning
+                of the full list of entities.
 
         Returns:
-            list(SuggestionModel). A list of suggestions that are of the given
-            type, which are in review, but not created by the given user.
+            3-tuple of (results, cursor, more). As described in fetch_page() at:
+            https://developers.google.com/appengine/docs/python/ndb/queryclass,
+            where:
+                results: list(SuggestionModel). A list of suggestions that are
+                    of the given type, which are in review, but not created by
+                    the given user.
+                cursor: str or None. A query cursor pointing to the next
+                    batch of results. If there are no more results, this might
+                    be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results after
+                    this batch.
         """
-        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
+        if urlsafe_start_cursor:
+            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+        else:
+            start_cursor = datastore_query.Cursor()
+
+        results, cursor, more = cls.query(
+            cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == suggestion_type).filter(
-                cls.author_id != user_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+                cls.author_id != user_id).order(cls.created_on).fetch_page(
+                    page_size, start_cursor=start_cursor)
+        return (results, (cursor.urlsafe() if cursor else None), more)
 
     @classmethod
     def get_user_created_suggestions_of_suggestion_type(
-            cls, suggestion_type, user_id):
+            cls, suggestion_type, user_id, page_size, urlsafe_start_cursor):
         """Gets all suggestions of suggestion_type which the user has created.
 
         Args:
             suggestion_type: str. The type of suggestion to query for.
             user_id: str. The id of the user trying to make this query.
+            page_size: int. The maximum number of entities to be returned.
+            urlsafe_start_cursor: str or None. If provided, the list of
+                returned entities starts from this datastore cursor.
+                Otherwise, the returned entities start from the beginning
+                of the full list of entities.
+
+        Returns:
+            3-tuple of (results, cursor, more). As described in fetch_page() at:
+            https://developers.google.com/appengine/docs/python/ndb/queryclass,
+            where:
+                results: list(SuggestionModel). A list of suggestions that are
+                    of the given type, which are in review, which the given user
+                    has created.
+                cursor: str or None. A query cursor pointing to the next
+                    batch of results. If there are no more results, this might
+                    be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results after
+                    this batch.
 
         Returns:
             list(SuggestionModel). A list of suggestions that are of the given
             type, which the given user has created.
         """
-        return cls.get_all().filter(
+        if urlsafe_start_cursor:
+            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+        else:
+            start_cursor = datastore_query.Cursor()
+
+        results, cursor, more = cls.query(
             cls.suggestion_type == suggestion_type).filter(
-                cls.author_id == user_id).order(-cls.created_on).fetch(
-                    feconf.DEFAULT_QUERY_LIMIT)
+                cls.author_id == user_id).order(-cls.created_on).fetch_page(
+                    page_size, start_cursor=start_cursor)
+        return (results, (cursor.urlsafe() if cursor else None), more)
 
     @classmethod
     def get_all_score_categories(cls):

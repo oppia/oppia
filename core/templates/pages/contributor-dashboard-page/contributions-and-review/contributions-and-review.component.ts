@@ -73,6 +73,25 @@ angular.module('oppia').component('contributionsAndReview', {
           color: '#e76c8c'
         }
       };
+      SUGGESTION_TYPE_QUESTION = 'add_question';
+      SUGGESTION_TYPE_TRANSLATE = 'translate_content';
+      ctrl.TAB_TYPE_CONTRIBUTIONS = 'contributions';
+      ctrl.TAB_TYPE_REVIEWS = 'reviews';
+
+      var tabNameToOpportunityFetchFunction = {
+        [SUGGESTION_TYPE_QUESTION]: {
+          [ctrl.TAB_TYPE_CONTRIBUTIONS]: (
+            ContributionAndReviewService.getUserCreatedQuestionSuggestions),
+          [ctrl.TAB_TYPE_REVIEWS]: (
+            ContributionAndReviewService.getReviewableQuestionSuggestions)
+        },
+        [SUGGESTION_TYPE_TRANSLATE]: {
+          [ctrl.TAB_TYPE_CONTRIBUTIONS]: (
+            ContributionAndReviewService.getUserCreatedTranslationSuggestions),
+          [ctrl.TAB_TYPE_REVIEWS]: (
+            ContributionAndReviewService.getReviewableTranslationSuggestions)
+        }
+      };
 
       var getQuestionContributionsSummary = function() {
         var questionContributionsSummaryList = [];
@@ -88,10 +107,7 @@ angular.module('oppia').component('contributionsAndReview', {
             labelText: SUGGESTION_LABELS[suggestion.status].text,
             labelColor: SUGGESTION_LABELS[suggestion.status].color,
             actionButtonTitle: (
-              ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION ?
-                'Review' :
-                'View'
-            )
+              ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS ? 'Review' : 'View')
           };
           questionContributionsSummaryList.push(requiredData);
         });
@@ -113,11 +129,7 @@ angular.module('oppia').component('contributionsAndReview', {
             labelText: SUGGESTION_LABELS[suggestion.status].text,
             labelColor: SUGGESTION_LABELS[suggestion.status].color,
             actionButtonTitle: (
-              ctrl.activeReviewTab ===
-              ctrl.SUGGESTION_TYPE_TRANSLATE ?
-                'Review' :
-                'View'
-            )
+              ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS ? 'Review' : 'View')
           };
           translationContributionsSummaryList.push(requiredData);
         });
@@ -224,11 +236,33 @@ angular.module('oppia').component('contributionsAndReview', {
         });
       };
 
+      ctrl.isActiveTab = function(tabType, suggestionType) {
+        return (
+          ctrl.activeTabType === tabType &&
+          ctrl.activeSuggestionType === suggestionType);
+      };
+
+      ctrl.onLoadMoreContributions = function() {
+        if (ctrl.contributionsDataLoading || !ctrl.moreOpportunitiesAvailable) {
+          return;
+        }
+        ctrl.contributionsDataLoading = true;
+
+        var fetchFunction = tabNameToOpportunityFetchFunction[
+          ctrl.activeSuggestionType][ctrl.activeTabType];
+        fetchFunction(function(suggestionIdToSuggestions, more) {
+          ctrl.contributions = Object.assign(
+            ctrl.contributions, suggestionIdToSuggestions);
+          ctrl.moreOpportunitiesAvailable = more;
+          updateContributionSummaries();
+          ctrl.contributionsDataLoading = false;
+        });
+      };
+
       ctrl.onClickViewSuggestion = function(suggestionId) {
         var suggestion = ctrl.contributions[suggestionId].suggestion;
-        if (suggestion.suggestion_type === ctrl.SUGGESTION_TYPE_QUESTION) {
-          var reviewable =
-            ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION;
+        var reviewable = ctrl.activeTabType === ctrl.TAB_TYPE_REVIEWS;
+        if (suggestion.suggestion_type === SUGGESTION_TYPE_QUESTION) {
           var contributionDetails = (
             ctrl.contributions[suggestionId].details);
           var skillId = suggestion.change.skill_id;
@@ -249,9 +283,7 @@ angular.module('oppia').component('contributionsAndReview', {
               misconceptionsBySkill);
           });
         }
-        if (suggestion.suggestion_type === ctrl.SUGGESTION_TYPE_TRANSLATE) {
-          var reviewable = (
-            ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_TRANSLATE);
+        if (suggestion.suggestion_type === SUGGESTION_TYPE_TRANSLATE) {
           ContextService.setCustomEntityContext(
             IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS, suggestion.target_id);
           _showTranslationSuggestionModal(
@@ -261,60 +293,30 @@ angular.module('oppia').component('contributionsAndReview', {
         }
       };
 
-      ctrl.switchToContributionsTab = function(suggestionType) {
-        ctrl.activeReviewTab = '';
-        ctrl.contributionsDataLoading = true;
-        ctrl.contributionSummaries = [];
-        if (suggestionType === ctrl.SUGGESTION_TYPE_QUESTION) {
-          ctrl.activeContributionTab = ctrl.SUGGESTION_TYPE_QUESTION;
-          ContributionAndReviewService.getUserCreatedQuestionSuggestions(
-            function(suggestionIdToSuggestions) {
-              ctrl.contributions = suggestionIdToSuggestions;
-              ctrl.contributionSummaries = (
-                getQuestionContributionsSummary());
-              ctrl.contributionsDataLoading = false;
-            });
-        }
-        if (suggestionType === ctrl.SUGGESTION_TYPE_TRANSLATE) {
-          ctrl.activeContributionTab = ctrl.SUGGESTION_TYPE_TRANSLATE;
-          ContributionAndReviewService
-            .getUserCreatedTranslationSuggestions(
-              function(suggestionIdToSuggestions) {
-                ctrl.contributions = suggestionIdToSuggestions;
-                ctrl.contributionSummaries = (
-                  getTranslationContributionsSummary());
-                ctrl.contributionsDataLoading = false;
-              });
+      var updateContributionSummaries = function() {
+        if (ctrl.activeSuggestionType === SUGGESTION_TYPE_TRANSLATE) {
+          ctrl.contributionSummaries = getTranslationContributionsSummary();
+        } else if (ctrl.activeSuggestionType === SUGGESTION_TYPE_QUESTION) {
+          ctrl.contributionSummaries = getQuestionContributionsSummary();
         }
       };
 
-      ctrl.switchToReviewTab = function(suggestionType) {
-        ctrl.activeContributionTab = '';
-        ctrl.contributionsDataLoading = true;
-        ctrl.contributionSummaries = [];
+      ctrl.switchToTab = function(tabType, suggestionType) {
+        var fetchFunction = tabNameToOpportunityFetchFunction[
+          suggestionType][tabType];
 
-        if (suggestionType === ctrl.SUGGESTION_TYPE_QUESTION) {
-          ctrl.activeReviewTab = ctrl.SUGGESTION_TYPE_QUESTION;
-          ContributionAndReviewService.getReviewableQuestionSuggestions(
-            function(suggestionIdToSuggestions) {
-              ctrl.contributions = suggestionIdToSuggestions;
-              ctrl.contributionSummaries = (
-                getQuestionContributionsSummary());
-              ctrl.contributionsDataLoading = false;
-            }
-          );
-        }
-        if (suggestionType === ctrl.SUGGESTION_TYPE_TRANSLATE) {
-          ctrl.activeReviewTab = ctrl.SUGGESTION_TYPE_TRANSLATE;
-          ContributionAndReviewService
-            .getReviewableTranslationSuggestions(
-              function(suggestionIdToSuggestions) {
-                ctrl.contributions = suggestionIdToSuggestions;
-                ctrl.contributionSummaries = (
-                  getTranslationContributionsSummary());
-                ctrl.contributionsDataLoading = false;
-              });
-        }
+        ctrl.activeTabType = tabType;
+        ctrl.activeSuggestionType = suggestionType;
+        ctrl.contributionsDataLoading = true;
+        ctrl.contributions = [];
+        updateContributionSummaries();
+
+        fetchFunction(function(suggestionIdToSuggestions, more) {
+          ctrl.contributions = suggestionIdToSuggestions;
+          ctrl.moreOpportunitiesAvailable = more;
+          updateContributionSummaries();
+          ctrl.contributionsDataLoading = false;
+        });
       };
 
       ctrl.$onInit = function() {
@@ -323,21 +325,21 @@ angular.module('oppia').component('contributionsAndReview', {
         ctrl.contributions = {};
         ctrl.contributionSummaries = [];
         ctrl.contributionsDataLoading = true;
-        ctrl.SUGGESTION_TYPE_QUESTION = 'add_question';
-        ctrl.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
-        ctrl.activeReviewTab = '';
+        ctrl.activeTabType = '';
+        ctrl.activeSuggestionType = '';
         ctrl.reviewTabs = [];
-        ctrl.activeContributionTab = '';
+        ctrl.moreOpportunitiesAvailable = true;
         ctrl.contributionTabs = [
           {
-            suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
+            suggestionType: SUGGESTION_TYPE_QUESTION,
             text: 'Questions'
           },
           {
-            suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
+            suggestionType: SUGGESTION_TYPE_TRANSLATE,
             text: 'Translations'
           }
         ];
+
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           ctrl.userDetailsLoading = false;
@@ -351,7 +353,7 @@ angular.module('oppia').component('contributionsAndReview', {
                   userContributionRights.can_review_questions);
                 if (userCanReviewQuestionSuggestions) {
                   ctrl.reviewTabs.push({
-                    suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
+                    suggestionType: SUGGESTION_TYPE_QUESTION,
                     text: 'Review Questions'
                   });
                 }
@@ -359,15 +361,16 @@ angular.module('oppia').component('contributionsAndReview', {
                   userCanReviewTranslationSuggestionsInLanguages
                     .length > 0) {
                   ctrl.reviewTabs.push({
-                    suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
+                    suggestionType: SUGGESTION_TYPE_TRANSLATE,
                     text: 'Review Translations'
                   });
                 }
                 if (ctrl.reviewTabs.length > 0) {
-                  ctrl.switchToReviewTab(ctrl.reviewTabs[0].suggestionType);
+                  ctrl.switchToTab(
+                    ctrl.TAB_TYPE_REVIEWS, ctrl.reviewTabs[0].suggestionType);
                 } else {
-                  ctrl.switchToContributionsTab(
-                    ctrl.SUGGESTION_TYPE_QUESTION);
+                  ctrl.switchToTab(
+                    ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_QUESTION);
                 }
               });
           }

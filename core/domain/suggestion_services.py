@@ -522,53 +522,73 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
     ])
 
 
-def get_reviewable_suggestions(user_id, suggestion_type):
+def get_reviewable_suggestions(user_id, suggestion_type, cursor):
     """Returns a list of suggestions of given suggestion_type which the user
     can review.
 
     Args:
         user_id: str. The ID of the user.
         suggestion_type: str. The type of the suggestion.
+        cursor: str or None. If provided, the list of returned entities
+            starts from this datastore cursor. Otherwise, the returned
+            entities start from the beginning of the full list of entities.
 
     Returns:
-        list(Suggestion). A list of suggestions which the given user is allowed
-        to review.
+        3-tuple(suggestions, cursor, more). where:
+            list(Suggestion). A list of suggestions which the given user is
+                allowed to review.
+            cursor: str or None. A query cursor pointing to the next batch of
+                results. If there are no more results, this might be None.
+            more: bool. If True, there are (probably) more results after this
+                batch. If False, there are no further results after this batch.
     """
-    all_suggestions = ([
-        get_suggestion_from_model(s) for s in (
-            suggestion_models.GeneralSuggestionModel
-            .get_in_review_suggestions_of_suggestion_type(
-                suggestion_type, user_id))
-    ])
+    model_list, cursor, more = (
+        suggestion_models.GeneralSuggestionModel
+        .get_in_review_suggestions_of_suggestion_type(
+            suggestion_type, user_id, feconf.OPPORTUNITIES_PAGE_SIZE,
+            cursor))
+    suggestions = [get_suggestion_from_model(s) for s in model_list]
+
     user_review_rights = user_services.get_user_contribution_rights(user_id)
     if suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
         language_codes = (
             user_review_rights.can_review_translation_for_language_codes)
         return [
-            suggestion for suggestion in all_suggestions
+            suggestion for suggestion in suggestions
             if suggestion.change.language_code in language_codes]
 
-    return all_suggestions
+    return suggestions, cursor, more
 
 
-def get_submitted_suggestions(user_id, suggestion_type):
+def get_submitted_suggestions(user_id, suggestion_type, cursor):
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.
 
     Args:
         user_id: str. The ID of the user.
         suggestion_type: str. The type of the suggestion.
+        cursor: str or None. If provided, the list of returned entities
+            starts from this datastore cursor. Otherwise, the returned
+            entities start from the beginning of the full list of entities.
 
     Returns:
-        list(Suggestion). A list of suggestions which the given user has
-        submitted.
+        3-tuple(suggestions, cursor, more). where:
+            list(Suggestion). A list of suggestions which the given user has
+                submitted.
+            cursor: str or None. A query cursor pointing to the next batch of
+                results. If there are no more results, this might be None.
+            more: bool. If True, there are (probably) more results after this
+                batch. If False, there are no further results after this batch.
     """
-    return ([
-        get_suggestion_from_model(s) for s in (
-            suggestion_models.GeneralSuggestionModel
-            .get_user_created_suggestions_of_suggestion_type(
-                suggestion_type, user_id))
-    ])
+    model_list, cursor, more = (
+        suggestion_models.GeneralSuggestionModel
+        .get_user_created_suggestions_of_suggestion_type(
+            suggestion_type, user_id, feconf.OPPORTUNITIES_PAGE_SIZE,
+            cursor))
+
+    suggestions = [get_suggestion_from_model(s) for s in model_list]
+
+    return (suggestions, cursor, more)
 
 
 def get_user_proficiency_from_model(user_proficiency_model):

@@ -38,19 +38,25 @@ angular.module('oppia').factory('ContributionAndReviewService', [
     var _SUGGESTION_TO_SKILL_ACTION_HANDLER_URL = (
       '/suggestionactionhandler/skill/<skill_id>/<suggestion_id>');
 
+    var nextCursor = null;
+
     var _fetchSuggestions = function(url, onSuccess) {
-      var suggestionsPromise = $http.get(url);
+      const params = {
+        cursor: nextCursor
+      };
+      var suggestionsPromise = $http.get(url, { params });
 
       return $q.when(suggestionsPromise, function(res) {
         var suggestionIdToSuggestions = {};
         var targetIdToDetails = res.data.target_id_to_opportunity_dict;
+        nextCursor = res.data.next_cursor;
         res.data.suggestions.forEach(function(suggestion) {
           suggestionIdToSuggestions[suggestion.suggestion_id] = {
             suggestion: suggestion,
             details: targetIdToDetails[suggestion.target_id]
           };
         });
-        onSuccess(suggestionIdToSuggestions);
+        onSuccess(suggestionIdToSuggestions, res.data.more);
       });
     };
 

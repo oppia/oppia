@@ -74,7 +74,7 @@ describe('Contributions and review component', function() {
             },
             details: 'skill_1'
           }
-        }));
+        }, true));
       spyOn(
         contributionAndReviewService, 'getReviewableQuestionSuggestions')
         .and.callFake(callback => callback({
@@ -157,7 +157,7 @@ describe('Contributions and review component', function() {
               skill_description: 'Skill description'
             }
           }
-        }));
+        }, false));
 
       $scope = $rootScope.$new();
       ctrl = $componentController('contributionsAndReview', {
@@ -172,8 +172,8 @@ describe('Contributions and review component', function() {
 
     it('should initialize $scope properties after controller is' +
       ' initialized', function() {
-      expect(ctrl.activeReviewTab).toBe('add_question');
-      expect(ctrl.activeContributionTab).toBe('');
+      expect(ctrl.activeTabType).toBe('reviews');
+      expect(ctrl.activeSuggestionType).toBe('add_question');
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.userDetailsLoading).toBe(false);
       expect(ctrl.reviewTabs.length).toEqual(2);
@@ -191,7 +191,7 @@ describe('Contributions and review component', function() {
 
     it('should open show translation suggestion modal when clicking on' +
       ' suggestion', function() {
-      ctrl.switchToContributionsTab('translate_content');
+      ctrl.switchToTab('reviews', 'translate_content');
       $scope.$apply();
 
       spyOn($uibModal, 'open').and.callThrough();
@@ -202,7 +202,7 @@ describe('Contributions and review component', function() {
 
     it('should resolve suggestion when closing show suggestion modal',
       function() {
-        ctrl.switchToContributionsTab('translate_content');
+        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
         $scope.$apply();
 
         spyOn(contributionAndReviewService, 'resolveSuggestionToExploration');
@@ -223,7 +223,7 @@ describe('Contributions and review component', function() {
 
     it('should not resolve suggestion when dismissing show suggestion modal',
       function() {
-        ctrl.switchToContributionsTab('translate_content');
+        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
         $scope.$apply();
 
         spyOn(contributionAndReviewService, 'resolveSuggestionToExploration');
@@ -387,8 +387,8 @@ describe('Contributions and review component', function() {
 
     it('should initialize $scope properties after controller is' +
       ' initialized', function() {
-      expect(ctrl.activeReviewTab).toBe('');
-      expect(ctrl.activeContributionTab).toBe('add_question');
+      expect(ctrl.activeTabType).toBe('contributions');
+      expect(ctrl.activeSuggestionType).toBe('add_question');
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.userDetailsLoading).toBe(false);
       expect(ctrl.reviewTabs.length).toEqual(0);
@@ -426,8 +426,8 @@ describe('Contributions and review component', function() {
               chapter_title: 'Chapter title'
             }
           }
-        }));
-      ctrl.switchToReviewTab('translate_content');
+        }, false));
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
       $scope.$apply();
 
       expect(Object.keys(ctrl.contributions)).toContain('suggestion_1');
