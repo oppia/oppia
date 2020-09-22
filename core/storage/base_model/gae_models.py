@@ -1230,8 +1230,8 @@ class BaseSnapshotContentModel(BaseModel):
         the content field of ExplorationRightsSnapshotContentModel.
 
         The pseudonymization of these models is handled in the wipeout service
-        (in the relevant psudonymization function, e.g. in the
-        _pseudonymize_activity_models_with_associated_rights_models for
+        (in the relevant pseudonymization function, e.g. in the
+        _pseudonymize_activity_models_with_associated_rights_models() for
         CollectionRightsModel or ExplorationRightsModel), based on
         the content_user_ids field of the relevant metadata model.
         E.g. the content_user_ids in ExplorationRightsSnapshotMetadataModel are
