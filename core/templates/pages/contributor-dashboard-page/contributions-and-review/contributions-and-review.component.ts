@@ -79,21 +79,23 @@ angular.module('oppia').component('contributionsAndReview', {
         Object.keys(ctrl.contributions).forEach(function(key) {
           var suggestion = ctrl.contributions[key].suggestion;
           var details = ctrl.contributions[key].details;
-          var change = suggestion.change;
-          var requiredData = {
-            id: suggestion.suggestion_id,
-            heading: $filter('formatRtePreview')(
-              change.question_dict.question_state_data.content.html),
-            subheading: details.skill_description,
-            labelText: SUGGESTION_LABELS[suggestion.status].text,
-            labelColor: SUGGESTION_LABELS[suggestion.status].color,
-            actionButtonTitle: (
-              ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION ?
-                'Review' :
-                'View'
-            )
-          };
-          questionContributionsSummaryList.push(requiredData);
+          if(details != null) {
+            var change = suggestion.change;
+            var requiredData = {
+              id: suggestion.suggestion_id,
+              heading: $filter('formatRtePreview')(
+                change.question_dict.question_state_data.content.html),
+              subheading: details.skill_description,
+              labelText: SUGGESTION_LABELS[suggestion.status].text,
+              labelColor: SUGGESTION_LABELS[suggestion.status].color,
+              actionButtonTitle: (
+                ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION ?
+                  'Review' :
+                  'View'
+              )
+            };
+            questionContributionsSummaryList.push(requiredData);
+          }
         });
         return questionContributionsSummaryList;
       };
@@ -103,23 +105,25 @@ angular.module('oppia').component('contributionsAndReview', {
         Object.keys(ctrl.contributions).forEach(function(key) {
           var suggestion = ctrl.contributions[key].suggestion;
           var details = ctrl.contributions[key].details;
-          var change = suggestion.change;
-          var requiredData = {
-            id: suggestion.suggestion_id,
-            heading: $filter('formatRtePreview')(change.translation_html),
-            subheading: (
-              details.topic_name + ' / ' + details.story_title +
-              ' / ' + details.chapter_title),
-            labelText: SUGGESTION_LABELS[suggestion.status].text,
-            labelColor: SUGGESTION_LABELS[suggestion.status].color,
-            actionButtonTitle: (
-              ctrl.activeReviewTab ===
-              ctrl.SUGGESTION_TYPE_TRANSLATE ?
-                'Review' :
-                'View'
-            )
-          };
-          translationContributionsSummaryList.push(requiredData);
+          if(details != null) {
+            var change = suggestion.change;
+            var requiredData = {
+              id: suggestion.suggestion_id,
+              heading: $filter('formatRtePreview')(change.translation_html),
+              subheading: (
+                details.topic_name + ' / ' + details.story_title +
+                ' / ' + details.chapter_title),
+              labelText: SUGGESTION_LABELS[suggestion.status].text,
+              labelColor: SUGGESTION_LABELS[suggestion.status].color,
+              actionButtonTitle: (
+                ctrl.activeReviewTab ===
+                ctrl.SUGGESTION_TYPE_TRANSLATE ?
+                  'Review' :
+                  'View'
+              )
+            };
+            translationContributionsSummaryList.push(requiredData);
+          }
         });
         return translationContributionsSummaryList;
       };
