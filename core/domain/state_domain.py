@@ -24,6 +24,7 @@ import copy
 import itertools
 import json
 import logging
+import re
 
 from constants import constants
 from core.domain import android_validation_constants
@@ -129,7 +130,9 @@ class AnswerGroup(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Expected tagged skill misconception id to be a str, '
                     'received %s' % self.tagged_skill_misconception_id)
-            if self.tagged_skill_misconception_id.count('-') != 1:
+            if not re.match(
+                    constants.VALID_SKILL_MISCONCEPTION_ID_REGEX,
+                    self.tagged_skill_misconception_id):
                 raise utils.ValidationError(
                     'Expected the format of tagged skill misconception id '
                     'to be <skill_id>-<misconception_id>, received %s'
