@@ -54,6 +54,7 @@ from core.domain import subscription_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_query_services
 from core.domain import user_services
@@ -642,6 +643,38 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'code': 'en', 'description': 'English'}]):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
+
+    def test_private_collection_with_missing_title(self):
+        collection_services.update_collection(
+            self.owner_id, '0', [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': ''
+            }], 'Changes.')
+        expected_output = [
+            u'[u\'fully-validated CollectionModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_public_collection_with_missing_title(self):
+        collection_services.update_collection(
+            self.owner_id, '0', [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': ''
+            }], 'Changes.')
+        owner = user_services.UserActionsInfo(self.owner_id)
+        rights_manager.publish_collection(owner, '0')
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check of '
+                'CollectionModel\', [u\'Entity id 0: Entity fails '
+                'domain validation with the error A title must be specified '
+                'for the collection.\']]'
+            ),
+            u'[u\'fully-validated CollectionModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('1').delete(
@@ -3334,6 +3367,26 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
                 'code': 'en', 'description': 'English'}]):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
+
+    def test_private_exploration_with_missing_interaction_in_state(self):
+        expected_output = [
+            u'[u\'fully-validated ExplorationModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_public_exploration_with_missing_interaction_in_state(self):
+        owner = user_services.UserActionsInfo(self.owner_id)
+        rights_manager.publish_exploration(owner, '0')
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check of '
+                'ExplorationModel\', [u\'Entity id 0: Entity fails '
+                'domain validation with the error This state does not have any '
+                'interaction specified.\']]'
+            ),
+            u'[u\'fully-validated ExplorationModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_commit_log_entry_model_failure(self):
         exp_services.update_exploration(
@@ -9527,6 +9580,32 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 'code': 'en', 'description': 'English'}]):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
+
+    def test_private_topic_with_missing_thumbnail_filename(self):
+        expected_output = [
+            u'[u\'fully-validated TopicModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_public_topic_with_missing_thumbnail_filename(self):
+        topic_rights = topic_fetchers.get_topic_rights('0', strict=False)
+        topic_rights.topic_is_published = True
+        commit_cmds = [topic_domain.TopicRightsChange({
+            'cmd': topic_domain.CMD_PUBLISH_TOPIC
+        })]
+        topic_services.save_topic_rights(
+            topic_rights, self.owner_id, 'Published the topic', commit_cmds)
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check of '
+                'TopicModel\', [u\'Entity id 0: Entity fails '
+                'domain validation with the error Expected thumbnail filename '
+                'to be a string, received None.\']]'
+            ),
+            u'[u\'fully-validated TopicModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_story_model_failure(self):
         story_models.StoryModel.get_by_id('1').delete(

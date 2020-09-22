@@ -390,13 +390,20 @@ class CollectionModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        collection_rights_exist = rights_manager.get_collection_rights(
-            item.id, strict=False) is not None
-
-        if collection_rights_exist and (
-                rights_manager.is_collection_private(item.id)):
-            cls.use_non_strict_domain_validation = True
         return collection_services.get_collection_from_model(item)
+
+    @classmethod
+    def _get_domain_object_validation_type(cls, item):
+        collection_rights = rights_manager.get_collection_rights(
+            item.id, strict=False)
+
+        if collection_rights is None:
+            return base_model_validators.VALIDATION_MODE_NEUTRAL
+
+        if rights_manager.is_collection_private(item.id):
+            return base_model_validators.VALIDATION_MODE_NON_STRICT
+
+        return base_model_validators.VALIDATION_MODE_STRICT
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1340,12 +1347,20 @@ class ExplorationModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        exp_rights_exist = rights_manager.get_exploration_rights(
-            item.id, strict=False) is not None
-
-        if exp_rights_exist and rights_manager.is_exploration_private(item.id):
-            cls.use_non_strict_domain_validation = True
         return exp_fetchers.get_exploration_from_model(item)
+
+    @classmethod
+    def _get_domain_object_validation_type(cls, item):
+        exp_rights = rights_manager.get_exploration_rights(
+            item.id, strict=False)
+
+        if exp_rights is None:
+            return base_model_validators.VALIDATION_MODE_NEUTRAL
+
+        if rights_manager.is_exploration_private(item.id):
+            return base_model_validators.VALIDATION_MODE_NON_STRICT
+
+        return base_model_validators.VALIDATION_MODE_STRICT
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -3093,6 +3108,19 @@ class TopicModelValidator(base_model_validators.BaseModelValidator):
     @classmethod
     def _get_model_domain_object_instance(cls, item):
         return topic_fetchers.get_topic_from_model(item)
+
+    @classmethod
+    def _get_domain_object_validation_type(cls, item):
+        topic_rights = topic_fetchers.get_topic_rights(
+            item.id, strict=False)
+
+        if topic_rights is None:
+            return base_model_validators.VALIDATION_MODE_NEUTRAL
+
+        if topic_rights.topic_is_published:
+            return base_model_validators.VALIDATION_MODE_STRICT
+
+        return base_model_validators.VALIDATION_MODE_NON_STRICT
 
     @classmethod
     def _get_external_id_relationships(cls, item):

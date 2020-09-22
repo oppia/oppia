@@ -60,6 +60,10 @@ ERROR_CATEGORY_TIME_FIELD_CHECK = 'time field relation check'
 ERROR_CATEGORY_TYPE_CHECK = 'type check'
 ERROR_CATEGORY_VERSION_CHECK = 'version check'
 
+VALIDATION_MODE_NEUTRAL = 'neutral'
+VALIDATION_MODE_STRICT = 'strict'
+VALIDATION_MODE_NON_STRICT = 'non-strict'
+
 
 class ExternalModelFetcherDetails(python_utils.OBJECT):
     """Value object providing the class and ids to fetch an external model."""
@@ -110,13 +114,6 @@ class BaseModelValidator(python_utils.OBJECT):
     # model for which the external model is being fetched. Each value consists
     # of a list of ExternalModelReference objects.
     field_name_to_external_model_references = collections.defaultdict(list)
-    # Domain validation for some models provides an option of strict vs non
-    # strict check. Currently the models which provide this feature are
-    # collection model and exploration model.
-    # In cases when models are not published, domain validation should be
-    # non strict. The subclasses should override this var whenever the
-    # validation should be non strict.
-    use_non_strict_domain_validation = False
 
     @classmethod
     def _add_error(cls, error_category, error_message):
@@ -175,6 +172,26 @@ class BaseModelValidator(python_utils.OBJECT):
         return None
 
     @classmethod
+    def _get_domain_object_validation_type(cls, unused_item):
+        """Returns the type of domain object validation to be performed.
+
+        Some of the storage models support a strict/non strict mode depending
+        on whether the model is published or not. Currently the models which
+        provide this feature are collection, exploration and topic models.
+
+        Other models do not support any strict/non strict validation. So,
+        this function returns neutral mode in the base class. It can be
+        overridden by subclasses to enable strict/non strict mode, if needed.
+
+        Args:
+            unused_item: ndb.Model. Entity to validate.
+
+        Returns:
+            str. The type of validation mode: neutral, strict or non strict.
+        """
+        return VALIDATION_MODE_NEUTRAL
+
+    @classmethod
     def _validate_model_domain_object_instances(cls, item):
         """Checks that model instance passes the validation of the domain
         object for model.
@@ -183,15 +200,18 @@ class BaseModelValidator(python_utils.OBJECT):
             item: ndb.Model. Entity to validate.
         """
         try:
-            model_domain_object_instance = (
+            domain_object = (
                 cls._get_model_domain_object_instance(item))
-            if model_domain_object_instance is None:
+            if domain_object is None:
                 # No domain object exists for this storage model class.
                 return
-            if cls.use_non_strict_domain_validation:
-                model_domain_object_instance.validate(strict=False)
+            validation_type = cls._get_domain_object_validation_type(item)
+            if validation_type == VALIDATION_MODE_NEUTRAL:
+                domain_object.validate()
+            elif validation_type == VALIDATION_MODE_STRICT:
+                domain_object.validate(strict=True)
             else:
-                model_domain_object_instance.validate()
+                domain_object.validate(strict=False)
         except Exception as e:
             cls._add_error(
                 ERROR_CATEGORY_DOMAIN_OBJECT_CHECK,
