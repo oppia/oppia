@@ -46,10 +46,12 @@ requests-toolbelt==0.9.1  # via -r requirements.in
 requests==2.24.0          # via -r requirements.in, google-api-core, requests-toolbelt
 rsa==4.5                  # via google-auth
 simplejson==3.17.0        # via -r requirements.in, googleappenginemapreduce
-six==1.15.0               # via -r requirements.in, bleach, google-api-core, google-auth, grpcio, html5lib, mock, packaging, protobuf
+six==1.15.0               # via -r requirements.in, bleach, google-api-core, google-auth, grpcio, html5lib, mock, packaging, protobuf, webapp2
 soupsieve==1.9.5          # via -r requirements.in, beautifulsoup4
 urllib3==1.25.10          # via requests
+webapp2==3.0.0b1          # via -r requirements.in
 webencodings==0.5.1       # via -r requirements.in, bleach, html5lib
+webob==1.8.6              # via webapp2
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

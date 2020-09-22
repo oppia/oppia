@@ -25,3 +25,4 @@ requests==2.24.0
 requests-toolbelt==0.9.1
 google-cloud-tasks==1.5.0
 googleapis_common_protos==1.52.0
+webapp2==3.0.0b1

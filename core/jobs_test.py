@@ -44,6 +44,27 @@ transaction_services = models.Registry.import_transaction_services()
 
 JOB_FAILED_MESSAGE = 'failed (as expected)'
 
+class MockJobManagerOne(jobs.BaseMapReduceJobManager):
+    """Test job that counts the total number of explorations."""
+
+    @classmethod
+    def _run(cls, additional_job_params):
+        return 'output'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        current_class = MockJobManagerOne
+        if current_class.entity_created_before_job_queued(item):
+            yield ('sum', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, sum([int(value) for value in values]))
+
 
 class JobManagerUnitTests(test_utils.GenericTestBase):
     """Test basic job manager operations."""
@@ -60,6 +81,44 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
             Exception, 'directly create a job using the abstract base'
             ):
             jobs.BaseJobManager.create_new()
+
+    def test_compress_output_list_with_single_char_outputs(self):
+        job_id = MockJobManagerOne.create_new()
+        input_list = [1, 2, 3, 4, 5]
+        expected_output = ['1', '2', '3', '<TRUNCATED>']
+        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        MockJobManagerOne.register_start(job_id)
+        MockJobManagerOne.register_completion(
+            job_id, input_list, max_output_len_chars=3)
+        actual_output = MockJobManagerOne.get_output(job_id)
+        self.assertEqual(actual_output, expected_output)
+
+    def test_cancelling_multiple_unfinished_jobs(self):
+        job1_id = MockJobManagerOne.create_new()
+        MockJobManagerOne.enqueue(
+            job1_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        job2_id = MockJobManagerOne.create_new()
+        MockJobManagerOne.enqueue(
+            job2_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+
+        MockJobManagerOne.register_start(job1_id)
+        MockJobManagerOne.register_start(job2_id)
+        MockJobManagerOne.cancel_all_unfinished_jobs('admin_user_id')
+
+        self.assertFalse(MockJobManagerOne.is_active(job1_id))
+        self.assertFalse(MockJobManagerOne.is_active(job2_id))
+        self.assertEqual(
+            MockJobManagerOne.get_status_code(job1_id),
+            jobs.STATUS_CODE_CANCELED)
+        self.assertEqual(
+            MockJobManagerOne.get_status_code(job2_id),
+            jobs.STATUS_CODE_CANCELED)
+        self.assertIsNone(MockJobManagerOne.get_output(job1_id))
+        self.assertIsNone(MockJobManagerOne.get_output(job2_id))
+        self.assertEqual(
+            'Canceled by admin_user_id', MockJobManagerOne.get_error(job1_id))
+        self.assertEqual(
+            'Canceled by admin_user_id', MockJobManagerOne.get_error(job2_id))
 
 
 SUM_MODEL_ID = 'all_data_id'
@@ -95,24 +154,6 @@ class DatastoreJobIntegrationTests(test_utils.GenericTestBase):
         MockNumbersModel(number=2).put()
         MockNumbersModel(number=1).put()
         MockNumbersModel(number=2).put()
-
-
-class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
-    """Test job that counts the total number of explorations."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        current_class = SampleMapReduceJobManager
-        if current_class.entity_created_before_job_queued(item):
-            yield ('sum', 1)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, sum([int(value) for value in values]))
 
 
 class MapReduceJobForCheckingParamNames(jobs.BaseMapReduceOneOffJobManager):

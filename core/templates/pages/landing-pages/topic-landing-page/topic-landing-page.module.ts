@@ -27,7 +27,7 @@ angular.module('oppia', [
 
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 
@@ -37,6 +37,8 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { TopicLandingPageComponent } from
   'pages/landing-pages/topic-landing-page/topic-landing-page.component';
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { platformFeatureInitFactory, PlatformFeatureService } from
+  'services/platform-feature.service';
 
 @NgModule({
   imports: [
@@ -56,6 +58,12 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: platformFeatureInitFactory,
+      deps: [PlatformFeatureService],
       multi: true
     }
   ]
