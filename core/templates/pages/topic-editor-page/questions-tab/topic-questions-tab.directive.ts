@@ -85,7 +85,7 @@ angular.module('oppia').directive('questionsTab', [
             $scope.selectedSkillId = skillId;
             QuestionsListService.resetPageNumber();
             $scope.getQuestionSummariesAsync(
-              [skillId], true, true
+              skillId, true, true
             );
           };
           ctrl.$onInit = function() {
