@@ -41,10 +41,11 @@ from core.platform import models
 from core.tests import test_utils
 import python_utils
 
-(   
+(
     suggestion_models, feedback_models,
     opportunity_models) = models.Registry.import_models([
-    models.NAMES.suggestion, models.NAMES.feedback, models.NAMES.opportunity])
+        models.NAMES.suggestion, models.NAMES.feedback,
+        models.NAMES.opportunity])
 
 
 class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
