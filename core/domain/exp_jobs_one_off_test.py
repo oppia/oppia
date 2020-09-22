@@ -2327,3 +2327,44 @@ class PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests(
             'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg with following '
             'error: Unsupported tags/attributes found in the SVG:'
             '\\n\\nattributes: [u\'svg:role\']"]]'])
+
+    def test_the_job_does_not_changes_a_valid_svg_image(self):
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+
+        old_svg_string = (
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" '
+            'width="100pt" height="100pt" '
+            'viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
+            '="884px" font-family="serif">Ì</text></svg>')
+
+        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
+
+        image_validation_services.validate_image_and_filename(
+            old_svg_string.encode(encoding='utf-8'), svg_filename)
+
+        filepath = 'image/%s' % svg_filename
+        fs.commit(filepath, old_svg_string, mimetype='image/svg+xml')
+
+        job_id = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob.create_new())
+        (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
+            .get_output(job_id))
+
+        self.assertEqual(actual_output, [u'[u\'SUCCESS\', 1]'])
+
+        new_svg_string = fs.get(filepath)
+
+        self.assertEqual(
+            old_svg_string.encode(encoding='utf-8'), new_svg_string)

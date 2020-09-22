@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import logging
+import re
 import xml
 
 import bs4
@@ -976,10 +977,16 @@ def get_svg_with_xmlns_attribute(svg_string):
         str. The svg_string with xmlns attribute in the svg tag.
     """
     soup = bs4.BeautifulSoup(svg_string, 'html.parser')
-    for svg_tag in soup.findAll(name='svg'):
-        svg_tag['xmlns'] = 'http://www.w3.org/2000/svg'
+    if soup.find(
+            name='svg', attrs={'xmlns': 'http://www.w3.org/2000/svg'}) is None:
+        # Editing svg_string with soup will result into an invalid svg strings
+        # which browsers are not able to render. We are adding required
+        # attribute using regex search.
+        svg_string = re.sub(
+            '<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ',
+            svg_string.decode(encoding='utf-8'))
 
-    return python_utils.UNICODE(soup)
+    return svg_string
 
 
 def get_invalid_svg_tags_and_attrs(svg_string):

@@ -510,7 +510,7 @@ class PopulateXmlnsAttributeInExplorationMathSvgImagesJob(
                     old_svg_image))
             try:
                 image_validation_services.validate_image_and_filename(
-                    new_svg_image.encode('utf-8'), filename)
+                    new_svg_image, filename)
             except Exception as e:
                 yield (
                     'FAILED validation',
