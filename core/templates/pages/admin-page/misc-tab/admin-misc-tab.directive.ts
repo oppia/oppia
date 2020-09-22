@@ -215,15 +215,16 @@ angular.module('oppia').directive('adminMiscTab', [
             'Getting the number of PendingDeletionRequestModels...');
           $http.get(
             NUMBER_OF_DELETION_REQUEST_HANDLER_URL, {email: ctrl.email}).then(
-              function(response) {
-                ctrl.setStatusMessage(
-                  'The number of PendingDeletionRequestModels is:'
-                  + response.data.number_of_pending_deletion_models);
-              }, function(errorResponse) {
-                ctrl.setStatusMessage(
-                  'Server error: ' + errorResponse.data.error);
-              }
-            );
+            function(response) {
+              ctrl.setStatusMessage(
+                'The number of PendingDeletionRequestModels is:' +
+                response.data.number_of_pending_deletion_models);
+            },
+            function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            }
+          );
         };
 
         ctrl.deleteAccount = function() {
@@ -232,7 +233,8 @@ angular.module('oppia').directive('adminMiscTab', [
             function(response) {
               ctrl.setStatusMessage(
                 'Deletion run with result:' + response.data.result);
-            }, function(errorResponse) {
+            },
+            function(errorResponse) {
               ctrl.setStatusMessage(
                 'Server error: ' + errorResponse.data.error);
             }
@@ -242,11 +244,12 @@ angular.module('oppia').directive('adminMiscTab', [
         ctrl.verifyAccountDeleted = function() {
           ctrl.setStatusMessage('Running the verification...');
           $http.post(
-              VERIFY_ACCOUNT_DELETED_HANDLER_URL, {email: ctrl.email}).then(
+            VERIFY_ACCOUNT_DELETED_HANDLER_URL, {email: ctrl.email}).then(
             function(response) {
               ctrl.setStatusMessage(
                 'Verification run with result:' + response.data.result);
-            }, function(errorResponse) {
+            },
+            function(errorResponse) {
               ctrl.setStatusMessage(
                 'Server error: ' + errorResponse.data.error);
             }

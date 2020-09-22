@@ -51,7 +51,16 @@ transaction_services = models.Registry.import_transaction_services()
 MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
 
 
-def _transform(pending_deletion_request_model):
+def _transform_pending_deletion_request(pending_deletion_request_model):
+    """Transform PendingDeletionRequestModel to its domain object.
+
+    Args:
+        pending_deletion_request_model: PendingDeletionRequestModel.
+            The model to transform.
+
+    Returns:
+        PendingDeletionRequest. The final domain object.
+    """
     return wipeout_domain.PendingDeletionRequest(
         pending_deletion_request_model.id,
         pending_deletion_request_model.email,
@@ -74,7 +83,7 @@ def get_pending_deletion_request(user_id):
     """
     pending_deletion_request_model = (
         user_models.PendingDeletionRequestModel.get_by_id(user_id))
-    return _transform(pending_deletion_request_model)
+    return _transform_pending_deletion_request(pending_deletion_request_model)
 
 
 def get_pending_deletion_request_by_email(email):
@@ -94,7 +103,7 @@ def get_pending_deletion_request_by_email(email):
     if pending_deletion_request_model is None:
         return None
 
-    return _transform(pending_deletion_request_model)
+    return _transform_pending_deletion_request(pending_deletion_request_model)
 
 
 def get_number_of_pending_deletion_requests():
@@ -278,6 +287,16 @@ def pre_delete_user(user_id):
 
 
 def run_user_deletion(pending_deletion_request):
+    """Run the user deletion.
+
+    Args:
+        pending_deletion_request: PendingDeletionRequest. The domain object of
+            the user being deleted.
+
+    Returns:
+        str. The outcome of the deletion.
+    """
+
     if pending_deletion_request.deletion_complete:
         return wipeout_domain.USER_DELETION_ALREADY_DONE
     else:
@@ -288,6 +307,16 @@ def run_user_deletion(pending_deletion_request):
 
 
 def run_user_verification(pending_deletion_request):
+    """Run the user deletion verification.
+
+    Args:
+        pending_deletion_request: PendingDeletionRequest. The domain object of
+            the user being verified.
+
+    Returns:
+        str. The outcome of the verification.
+    """
+
     if not pending_deletion_request.deletion_complete:
         return wipeout_domain.USER_VERIFICATION_NOT_DELETED
     elif verify_user_deleted(pending_deletion_request):

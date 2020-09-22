@@ -2290,6 +2290,7 @@ class MemoryCacheAdminHandlerTest(test_utils.GenericTestBase):
 
 
 class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
+    """Tests NumberOfDeletionRequestsHandler."""
 
     def setUp(self):
         super(NumberOfDeletionRequestsHandlerTest, self).setUp()
@@ -2313,6 +2314,7 @@ class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
 
 
 class DeleteAccountHandlerTest(test_utils.GenericTestBase):
+    """Tests DeleteAccountHandler."""
 
     def setUp(self):
         super(DeleteAccountHandlerTest, self).setUp()
@@ -2363,6 +2365,7 @@ class DeleteAccountHandlerTest(test_utils.GenericTestBase):
 
 
 class VerifyAccountDeletedHandler(test_utils.GenericTestBase):
+    """Tests VerifyAccountDeletedHandler."""
 
     def setUp(self):
         super(VerifyAccountDeletedHandler, self).setUp()

@@ -1072,4 +1072,3 @@ class VerifyAccountDeletedHandler(base.BaseHandler):
         result = wipeout_service.run_user_verification(pending_deletion_request)
 
         self.render_json({'result': result})
-

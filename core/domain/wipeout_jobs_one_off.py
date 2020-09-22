@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core import jobs
-from core.domain import email_manager
 from core.domain import wipeout_service
 from core.platform import models
 
@@ -80,5 +79,3 @@ class FullyCompleteUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
-
-
