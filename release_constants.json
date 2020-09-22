@@ -1,5 +1,11 @@
 {
+    "APP_DEV_YAML_PATH": "app_dev.yaml",
+    "APP_YAML_PATH_TO_VERSION_USAGE_DICT": {
+        "app.yaml": true,
+        "export/app.yaml": false
+    },
     "BLOCKING_BUG_MILESTONE_NUMBER": 39,
+    "BUILD_MODULE_PATH": "scripts.build",
     "CHANGELOG_HEADER": "### Changelog:\n",
     "COMMIT_HISTORY_HEADER": "### Commit History:\n",
     "CONSTANTS_PATH": "assets/constants.ts",
@@ -10,6 +16,7 @@
     "GCLOUD_PATH": "../oppia_tools/google-cloud-sdk-304.0.0/google-cloud-sdk/bin/gcloud",
     "GITHUB_RELEASE_TAB_URL": "https://github.com/oppia/oppia/releases",
     "INDEX_YAML_PATH": "index.yaml",
+    "INSTALL_THIRD_PARTY_MODULE_PATH": "scripts.install_third_party_libs",
     "ISSUE_FILING_URL": "https://github.com/oppia/oppia/milestone/39",
     "ISSUE_URL_FORMAT_STRING": "https://github.com/oppia/oppia/issues/%s",
     "ISSUES_HEADER": "### Issues mentioned in commits:\n",
@@ -40,5 +47,7 @@
         "CURRENT_STORY_CONTENTS_SCHEMA_VERSION": "StoryMigrationOneOffJob",
         "CURRENT_SUBTOPIC_SCHEMA_VERSION": "TopicMigrationOneOffJob",
         "CURRENT_STORY_REFERENCE_SCHEMA_VERSION": "TopicMigrationOneOffJob"
-    }
+    },
+    "THIRD_PARTY_DIR": "third_party",
+    "UPDATE_CONFIGS_MODULE_PATH": "scripts.release_scripts.update_configs"
 }
