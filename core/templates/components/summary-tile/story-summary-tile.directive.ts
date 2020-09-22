@@ -88,6 +88,13 @@ angular.module('oppia').directive('storySummaryTile', [
             return segmentLength.toString() + ' ' + gapLength.toString();
           };
 
+          ctrl.getChapterUrl = function(nodeTitle) {
+            let node = this.storySummary.getPendingNodes().find(node => {
+              return node.getTitle() === nodeTitle;
+            });
+            return `/explore/${node.getExplorationId()}`;
+          };
+
           ctrl.getCompletedStrokeDashArrayValues = function() {
             var completedStrokeValues = '';
             var remainingCircumference = circumference;

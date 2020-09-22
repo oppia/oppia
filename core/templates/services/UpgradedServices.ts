@@ -1465,6 +1465,7 @@ export class UpgradedServices {
         upgradedServices['SubtopicObjectFactory']);
     upgradedServices['ReadOnlyTopicObjectFactory'] =
       new ReadOnlyTopicObjectFactory(
+        upgradedServices['StoryNodeObjectFactory'],
         upgradedServices['SubtopicObjectFactory'],
         upgradedServices['ShortSkillSummaryObjectFactory']);
     upgradedServices['ReviewTestBackendApiService'] =
