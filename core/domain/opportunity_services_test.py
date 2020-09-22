@@ -47,6 +47,7 @@ import python_utils
 (opportunity_models,) = models.Registry.import_models(
     [models.NAMES.opportunity])
 
+
 class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     """Test the opportunity services module."""
 
@@ -884,11 +885,9 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 'Missing language codes [u\'new_lang\'] in exploration '
                 'opportunity model with id 0')
 
-
     def _mock_get_multi_function(self, unused_ids):
         """Mocks opportunity_models.SkillOpportunityModel.get_multi()"""
         return [None]
-
 
     def test_get_skill_opportunities_by_ids_if_returns_empty_list(
             self):
