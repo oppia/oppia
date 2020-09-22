@@ -218,7 +218,7 @@ angular.module('oppia').directive('adminMiscTab', [
               function(response) {
                 ctrl.setStatusMessage(
                   'The number of PendingDeletionRequestModels is:'
-                  + response.data.number_of_deletion_models);
+                  + response.data.number_of_pending_deletion_models);
               }, function(errorResponse) {
                 ctrl.setStatusMessage(
                   'Server error: ' + errorResponse.data.error);
@@ -228,7 +228,7 @@ angular.module('oppia').directive('adminMiscTab', [
 
         ctrl.deleteAccount = function() {
           ctrl.setStatusMessage('Running the deletion...');
-          $http.delete(DELETE_ACCOUNT_HANDLER_URL, {email: ctrl.email}).then(
+          $http.post(DELETE_ACCOUNT_HANDLER_URL, {email: ctrl.email}).then(
             function(response) {
               ctrl.setStatusMessage(
                 'Deletion run with result:' + response.data.result);

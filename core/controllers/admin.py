@@ -1016,25 +1016,26 @@ class NumberOfDeletionRequestsHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
-
-        self.render_json({'result': result})
+        self.render_json({
+            'number_of_pending_deletion_models': (
+                wipeout_service.get_number_of_pending_deletion_requests())
+        })
 
 
 class DeleteAccountHandler(base.BaseHandler):
     """Handler for deleting account via admin page."""
 
     @acl_decorators.can_access_admin_page
-    def delete(self):
+    def post(self):
         email = self.payload.get('email', None)
 
         if email is None:
             raise self.InvalidInputException(
-                'Invalid request: The email must be specified.')
+                'Invalid request: email must be specified')
 
         if not isinstance(email, python_utils.UNICODE):
             raise self.InvalidInputException(
-                'Expected old username to be a unicode string, received %s'
-                % email)
+                'Expected email to be a unicode string, received %s' % email)
 
         pending_deletion_request = (
             wipeout_service.get_pending_deletion_request_by_email(email))
@@ -1056,12 +1057,11 @@ class VerifyAccountDeletedHandler(base.BaseHandler):
 
         if email is None:
             raise self.InvalidInputException(
-                'Invalid request: The email must be specified.')
+                'Invalid request: email must be specified')
 
         if not isinstance(email, python_utils.UNICODE):
             raise self.InvalidInputException(
-                'Expected old username to be a unicode string, received %s'
-                % email)
+                'Expected email to be a unicode string, received %s' % email)
 
         pending_deletion_request = (
             wipeout_service.get_pending_deletion_request_by_email(email))

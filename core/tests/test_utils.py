@@ -949,12 +949,16 @@ tags: []
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
 
-    def delete_json(self, url, params='', expected_status_int=200):
+    def delete_json(
+            self, url, params='', csrf_token=None, expected_status_int=200):
         """Delete object on the server using a JSON call."""
         if params:
             self.assertTrue(
                 isinstance(params, dict),
                 msg='Expected params to be a dict, received %s' % params)
+
+        if csrf_token:
+            params['csrf_token'] = csrf_token
 
         expect_errors = False
         if expected_status_int >= 400:

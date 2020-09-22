@@ -51,6 +51,18 @@ transaction_services = models.Registry.import_transaction_services()
 MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
 
 
+def _transform(pending_deletion_request_model):
+    return wipeout_domain.PendingDeletionRequest(
+        pending_deletion_request_model.id,
+        pending_deletion_request_model.email,
+        pending_deletion_request_model.role,
+        pending_deletion_request_model.deletion_complete,
+        pending_deletion_request_model.exploration_ids,
+        pending_deletion_request_model.collection_ids,
+        pending_deletion_request_model.pseudonymizable_entity_mappings
+    )
+
+
 def get_pending_deletion_request(user_id):
     """Return the pending deletion request.
 
@@ -62,15 +74,7 @@ def get_pending_deletion_request(user_id):
     """
     pending_deletion_request_model = (
         user_models.PendingDeletionRequestModel.get_by_id(user_id))
-    return wipeout_domain.PendingDeletionRequest(
-        pending_deletion_request_model.id,
-        pending_deletion_request_model.email,
-        pending_deletion_request_model.role,
-        pending_deletion_request_model.deletion_complete,
-        pending_deletion_request_model.exploration_ids,
-        pending_deletion_request_model.collection_ids,
-        pending_deletion_request_model.pseudonymizable_entity_mappings
-    )
+    return _transform(pending_deletion_request_model)
 
 
 def get_pending_deletion_request_by_email(email):
@@ -90,15 +94,16 @@ def get_pending_deletion_request_by_email(email):
     if pending_deletion_request_model is None:
         return None
 
-    return wipeout_domain.PendingDeletionRequest(
-        pending_deletion_request_model.id,
-        pending_deletion_request_model.email,
-        pending_deletion_request_model.role,
-        pending_deletion_request_model.deletion_complete,
-        pending_deletion_request_model.exploration_ids,
-        pending_deletion_request_model.collection_ids,
-        pending_deletion_request_model.activity_mappings
-    )
+    return _transform(pending_deletion_request_model)
+
+
+def get_number_of_pending_deletion_requests():
+    """Get number of pending deletion request.
+
+    Returns:
+        int. The number of pending deletion requests.
+    """
+    return user_models.PendingDeletionRequestModel.query().count()
 
 
 def save_pending_deletion_requests(pending_deletion_requests):
@@ -274,26 +279,26 @@ def pre_delete_user(user_id):
 
 def run_user_deletion(pending_deletion_request):
     if pending_deletion_request.deletion_complete:
-        return 'ALREADY DONE'
+        return wipeout_domain.USER_DELETION_ALREADY_DONE
     else:
         delete_user(pending_deletion_request)
         pending_deletion_request.deletion_complete = True
         save_pending_deletion_requests([pending_deletion_request])
-        return 'SUCCESS'
+        return wipeout_domain.USER_DELETION_SUCCESS
 
 
 def run_user_verification(pending_deletion_request):
     if not pending_deletion_request.deletion_complete:
-        return 'NOT DELETED'
+        return wipeout_domain.USER_VERIFICATION_NOT_DELETED
     elif verify_user_deleted(pending_deletion_request):
         delete_pending_deletion_request(pending_deletion_request.user_id)
         email_manager.send_account_deleted_email(
             pending_deletion_request.user_id, pending_deletion_request.email)
-        return 'SUCCESS'
+        return wipeout_domain.USER_VERIFICATION_SUCCESS
     else:
         pending_deletion_request.deletion_complete = False
         save_pending_deletion_requests([pending_deletion_request])
-        return 'FAILURE'
+        return wipeout_domain.USER_VERIFICATION_FAILURE
 
 
 def delete_user(pending_deletion_request):
