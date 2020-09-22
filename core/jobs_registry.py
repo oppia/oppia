@@ -65,6 +65,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.PopulateXmlnsAttributeInExplorationMathSvgImagesJob,
     exp_jobs_one_off.RTECustomizationArgsValidationOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
+    exp_jobs_one_off.RemoveTranslatorIdsOneOffJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
     (
         interaction_jobs_one_off
@@ -109,7 +110,8 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
     user_jobs_one_off.UsernameLengthAuditOneOffJob,
-    user_jobs_one_off.UsernameLengthDistributionOneOffJob
+    user_jobs_one_off.UsernameLengthDistributionOneOffJob,
+    user_jobs_one_off.RemoveGaeUserIdOneOffJob,
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
@@ -153,7 +155,6 @@ AUDIT_JOB_MANAGERS = [
         prod_validation_jobs_one_off
         .ExplorationOpportunitySummaryModelAuditOneOffJob
     ),
-    prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationRightsModelAuditOneOffJob,
     (
@@ -228,7 +229,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.TopicSummaryModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
-        .TrainingJobExplorationMappingModelAuditOneOffJob
+        .StateTrainingJobsMappingModelAuditOneOffJob
     ),
     prod_validation_jobs_one_off.UnsentFeedbackEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserAuthDetailsModelAuditOneOffJob,
