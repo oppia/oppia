@@ -487,7 +487,7 @@ describe('Contributions and review component', function() {
             details: undefined
           }
         }));
-      ctrl.switchToReviewTab('add_question')
+      ctrl.switchToReviewTab('add_question');
 
       expect(Object.keys(ctrl.contributions)).toContain(
         'suggestion_undefined_2');
