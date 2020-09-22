@@ -794,6 +794,8 @@ def delete_explorations_from_subscribed_users(exploration_ids):
     if not exploration_ids:
         return
 
+    # TODO(#10727): activity_ids in UserSubscriptionsModel should be renamed
+    # to explorations_id.
     subscription_models = user_models.UserSubscriptionsModel.query(
         user_models.UserSubscriptionsModel.activity_ids.IN(exploration_ids)
     ).fetch()
@@ -954,8 +956,8 @@ def update_exploration(
 
 
 def regenerate_exploration_summary(exploration_id, contributor_id_to_add):
-    """Create the summary model for an exploration, and store it in the
-    datastore.
+    """Regenerate a summary of the given exploration. If the summary does not
+    exist, this function generates a new one.
 
     Args:
         exploration_id: str. The id of the exploration.
