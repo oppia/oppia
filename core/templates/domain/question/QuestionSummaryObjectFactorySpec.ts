@@ -28,7 +28,8 @@ describe('Question summary object factory', () => {
     summaryDict = {
       id: 'question_id',
       question_content: 'Question 1',
-      interaction_id: 'TextInput'
+      interaction_id: 'TextInput',
+      misconception_ids: ['skillid-0']
     };
   });
 
@@ -38,6 +39,7 @@ describe('Question summary object factory', () => {
     expect(questionSummary.getQuestionId()).toEqual('question_id');
     expect(questionSummary.getQuestionContent()).toEqual('Question 1');
     expect(questionSummary.getInteractionId()).toEqual('TextInput');
+    expect(questionSummary.getMisconceptionIds()).toEqual(['skillid-0']);
   });
 
   it('should change question content in a question summary', () => {

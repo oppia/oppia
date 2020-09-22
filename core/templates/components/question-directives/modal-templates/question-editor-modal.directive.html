@@ -42,14 +42,6 @@
     <div class="alert alert-danger" ng-if="question.getStateData().interaction.id && question.getValidationErrorMessage()">
       <[question.getValidationErrorMessage()]>
     </div>
-    <div class="alert alert-danger" ng-if="question.getStateData().interaction.id && !question.getValidationErrorMessage() && question.getUnaddressedMisconceptionNames(misconceptionsBySkill).length">
-      Remaining misconceptions that need to be addressed:
-      <ul>
-        <li ng-repeat="misconceptionName in question.getUnaddressedMisconceptionNames(misconceptionsBySkill)">
-          <[misconceptionName]>
-        </li>
-      </ul>
-    </div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" ng-click="cancel()"> Cancel </button>

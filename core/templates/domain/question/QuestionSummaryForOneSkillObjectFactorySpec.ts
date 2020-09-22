@@ -43,7 +43,8 @@ describe('Question summary for one skill object factory', () => {
         summary: {
           id: 'question_id',
           question_content: 'Question 1',
-          interaction_id: 'TextInput'
+          interaction_id: 'TextInput',
+          misconception_ids: []
         }
       };
     });
