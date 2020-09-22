@@ -98,11 +98,11 @@ describe('Editable story backend API service', () => {
 
       expect(successHandler).toHaveBeenCalledWith({
         story: sampleDataResults.story,
-        topic_name: sampleDataResults.topic_name,
-        story_is_published: true,
-        skill_summaries: sampleDataResults.skill_summaries,
-        topic_url_fragment: undefined,
-        classroom_url_fragment: undefined
+        topicName: sampleDataResults.topic_name,
+        storyIsPublished: true,
+        skillSummaries: sampleDataResults.skill_summaries,
+        topicUrlFragment: undefined,
+        classroomUrlFragment: undefined
       });
       expect(failHandler).not.toHaveBeenCalled();
     }
