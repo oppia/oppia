@@ -716,7 +716,9 @@ def get_interaction_id_for_question(question_id):
     return question.question_state_data.interaction.id
 
 
-def untag_deleted_misconceptions(committer_id, skill_id, skill_description):
+def untag_deleted_misconceptions(
+        committer_id, skill_id, skill_description,
+        deleted_skill_misconception_ids):
     """Untags deleted misconceptions from questions belonging
     to a skill with the provided skill_id.
 
@@ -724,35 +726,32 @@ def untag_deleted_misconceptions(committer_id, skill_id, skill_description):
         committer_id: str. The id of the user who triggered the update.
         skill_id: str. The skill id.
         skill_description: str. The description of the skill.
+        deleted_skill_misconception_ids: list(str). The skill misconception
+            ids of deleted misconceptions. The list items take the form
+            <skill_id>-<misconception_id>.
     """
     question_skill_links = get_question_skill_links_of_skill(
         skill_id, skill_description)
     question_ids = [model.question_id for model in question_skill_links]
     questions = question_fetchers.get_questions_by_ids(question_ids)
-    skill = skill_fetchers.get_skill_by_id(skill_id)
-    skill_misconception_ids = (
-        [
-            skill.generate_skill_misconception_id(misconception.id)
-            for misconception in skill.misconceptions
-        ]
-    )
     for question in questions:
         change_list = []
         inapplicable_skill_misconception_ids = (
             question.inapplicable_skill_misconception_ids)
         deleted_inapplicable_skill_misconception_ids = (
-            utils.compute_list_difference(
-                inapplicable_skill_misconception_ids, skill_misconception_ids))
-        for misconception_id in deleted_inapplicable_skill_misconception_ids:
-            old_misconception_ids = list(
-                question.inapplicable_skill_misconception_ids)
-            question.inapplicable_skill_misconception_ids.remove(
-                misconception_id)
+            list(
+                set(deleted_skill_misconception_ids) &
+                set(inapplicable_skill_misconception_ids)))
+        if deleted_inapplicable_skill_misconception_ids:
+            new_inapplicable_skill_misconception_ids = (
+                utils.compute_list_difference(
+                    question.inapplicable_skill_misconception_ids,
+                    deleted_inapplicable_skill_misconception_ids))
             change_list.append(question_domain.QuestionChange({
                 'cmd': 'update_question_property',
                 'property_name': 'inapplicable_skill_misconception_ids',
-                'new_value': question.inapplicable_skill_misconception_ids,
-                'old_value': old_misconception_ids
+                'new_value': new_inapplicable_skill_misconception_ids,
+                'old_value': question.inapplicable_skill_misconception_ids
             }))
         old_question_state_data_dict = question.question_state_data.to_dict()
         answer_groups = (
@@ -760,7 +759,8 @@ def untag_deleted_misconceptions(committer_id, skill_id, skill_description):
         for i in python_utils.RANGE(len(answer_groups)):
             tagged_skill_misconception_id = (
                 answer_groups[i].to_dict()['tagged_skill_misconception_id'])
-            if tagged_skill_misconception_id not in skill_misconception_ids:
+            if (tagged_skill_misconception_id
+                    in deleted_skill_misconception_ids):
                 answer_groups[i].tagged_skill_misconception_id = None
         question.question_state_data.interaction.answer_groups = answer_groups
         change_list.append(question_domain.QuestionChange({
@@ -771,4 +771,4 @@ def untag_deleted_misconceptions(committer_id, skill_id, skill_description):
         }))
         update_question(
             committer_id, question.id, change_list,
-            'Untagged deleted misconception id.')
+            'Untagged deleted skill misconception ids.')

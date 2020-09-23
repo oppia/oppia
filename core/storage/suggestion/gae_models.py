@@ -434,7 +434,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             .filter(cls.status == STATUS_IN_REVIEW)
             .filter(cls.suggestion_type == SUGGESTION_TYPE_ADD_QUESTION)
             .count()
-        )   
+        )
 
     @classmethod
     def get_user_created_suggestions_of_suggestion_type(
