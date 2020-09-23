@@ -472,7 +472,6 @@
 	"I18N_SIGNUP_UPDATE_WARNING": "Bitte beachte, dass wir kürzlich unsere Nutzungsbedingungen aktualisiert haben.",
 	"I18N_SIGNUP_USERNAME": "Benutzername",
 	"I18N_SIGNUP_USERNAME_EXPLANATION": "Dein Benutzername wird neben deinen Beiträgen angezeigt.",
-	"I18N_SIGNUP_WAIVER_OBJECTIVE": "Der Verzicht auf die Namensnennungs-Bedingung (BY) bedeutet, dass jemand, falls er dieses Werk weiterverwendet, nicht die Namen der Autoren nennen muss. Jedoch sind all deine einzelnen Beiträge zu Erforschungen auf dieser Website im Erforschungs-Änderungs-Logbuch verfügbar und Benutzer, die die Erforschung weiterverwenden, werden ermutigt (sind jedoch nicht dazu verpflichtet), einen Link auf diese Seite einzubinden.",
 	"I18N_SIGNUP_WHY_LICENSE": "Warum CC-BY-SA?",
 	"I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION": "Die Lektionen von Oppia &ndash; auch bekannt als Erforschungen &ndash; bieten umfassendere Erfahrungen als statische Videos oder Texte. Sie helfen Benutzern beim Lernen durch Handeln.",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION": "Oppia ist eine freie Lernplattform auf Open-Source-Basis voller interaktiver Aktivitäten namens „Erforschungen“. Leider erfordert Oppia aktiviertes JavaScript in deinem Webbrowser, um ordnungsgemäß zu funktionieren. Bei deinem Webbrowser ist JavaScript jedoch deaktiviert. Falls du bei der Aktivierung von JavaScript Hilfe benötigst, <a href=\"<[hrefUrl]>\">klicke hier</a>.",
