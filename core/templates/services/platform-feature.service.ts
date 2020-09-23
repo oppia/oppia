@@ -35,7 +35,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
