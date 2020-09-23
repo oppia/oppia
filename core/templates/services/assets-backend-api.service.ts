@@ -175,9 +175,12 @@ export class AssetsBackendApiService {
     form.append('raw_audio_file', rawAssetData);
     form.append('payload', JSON.stringify({filename}));
     form.append('csrf_token', await this.csrfTokenService.getTokenAsync());
-    return this.http.post<SaveAudioResponse>(
-      this.getAudioUploadUrl(explorationId), form).toPromise()
-      ['catch']((e: HttpErrorResponse) => Promise.reject(e.error));
+    try {
+      return await this.http.post<SaveAudioResponse>(
+        this.getAudioUploadUrl(explorationId), form).toPromise();
+    } catch (err) {
+      return Promise.reject(err.error);
+    }
   }
 
   async saveMathExpresionImage(
@@ -188,9 +191,12 @@ export class AssetsBackendApiService {
     form.append(
       'payload', JSON.stringify({filename, filename_prefix: 'image'}));
     form.append('csrf_token', await this.csrfTokenService.getTokenAsync());
-    return this.http.post<SaveImageResponse>(
-      this.getImageUploadUrl(entityType, entityId), form).toPromise()
-      ['catch']((e: HttpErrorResponse) => Promise.reject(e.error));
+    try {
+      return await this.http.post<SaveImageResponse>(
+        this.getImageUploadUrl(entityType, entityId), form).toPromise();
+    } catch (err) {
+      return Promise.reject(err.error);
+    }
   }
 
   isCached(filename: string): boolean {
