@@ -61,7 +61,7 @@ describe('Add Audio Translation Modal Controller', function() {
 
   it('should initialize $scope properties after controller is initialized',
     function() {
-      expect($scope.getErrorMessage()).toBe(null);
+      expect($scope.errorMessage).toBe(null);
       expect($scope.saveButtonText).toBe('Save');
       expect($scope.saveInProgress).toBe(false);
       expect($scope.isAudioAvailable).toBe(isAudioAvailable);
@@ -111,13 +111,13 @@ describe('Add Audio Translation Modal Controller', function() {
 
     $scope.$apply();
 
-    expect($scope.getErrorMessage()).toEqual(
+    expect($scope.errorMessage).toBe(
       'There was an error uploading the audio file.');
     expect($scope.saveButtonText).toBe('Save');
     expect($scope.saveInProgress).toBe(false);
     expect($uibModalInstance.close).not.toHaveBeenCalled();
 
     $scope.clearUploadedFile();
-    expect($scope.getErrorMessage()).toBe(null);
+    expect($scope.errorMessage).toBe(null);
   });
 });
