@@ -9471,6 +9471,7 @@ class CommunityContributionStatsModelValidatorTests(
     question_suggestion_count = 1
 
     negative_count = -1
+    non_integer_count = 'non_integer_count'
     sample_language_code = 'hi'
     invalid_language_code = 'invalid'
 
@@ -9551,12 +9552,7 @@ class CommunityContributionStatsModelValidatorTests(
 
     def test_model_validation_success_when_model_has_default_values(self):
         suggestion_models.CommunityContributionStatsModel(
-            id=suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
-            translation_reviewer_counts_by_lang_code={},
-            translation_suggestion_counts_by_lang_code={},
-            question_reviewer_count=0,
-            question_suggestion_count=0
-        ).put()
+            id=suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID).put()
         expected_output = [
             u'[u\'fully-validated CommunityContributionStatsModel\', 1]'
         ]
@@ -9565,13 +9561,7 @@ class CommunityContributionStatsModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_validation_fails_with_invalid_model_id(self):
-        suggestion_models.CommunityContributionStatsModel(
-            id='invalid_id',
-            translation_reviewer_counts_by_lang_code={},
-            translation_suggestion_counts_by_lang_code={},
-            question_reviewer_count=0,
-            question_suggestion_count=0
-        ).put()
+        suggestion_models.CommunityContributionStatsModel(id='invalid_id').put()
 
         expected_output = [
             u'[u\'failed validation check for model id check of '
@@ -9676,10 +9666,117 @@ class CommunityContributionStatsModelValidatorTests(
             'suggestion count: %s does not match the expected question '
             'suggestion count: 0.\']]' % (
                 stats_model.id, stats_model.question_suggestion_count),
+
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the '
             'question suggestion count to be non-negative, recieved: '
+            '%s.\']]' % (
+                stats_model.id, stats_model.question_suggestion_count)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_for_non_integer_translation_reviewer_counts(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_reviewer_counts_by_lang_code = {
+            self.sample_language_code: self.non_integer_count}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for translation reviewer count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation reviewer count for language code %s: %s does not '
+            'match the expected translation reviewer count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code),
+
+            u'[u\'failed validation check for domain object check of '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the translation '
+            'reviewer count to be an integer for %s language code, '
+            'recieved: %s.\']]' % (
+                stats_model.id,
+                self.sample_language_code,
+                stats_model.translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code])
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_non_integer_translation_suggestion_count(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_suggestion_counts_by_lang_code = {
+            self.sample_language_code: self.non_integer_count}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for translation suggestion count '
+            'check of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation suggestion count for language code %s: %s does not '
+            'match the expected translation suggestion count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code),
+
+            u'[u\'failed validation check for domain object check of '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the translation '
+            'suggestion count to be an integer for %s language code, '
+            'recieved: %s.\']]' % (
+                stats_model.id,
+                self.sample_language_code,
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code])
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_for_non_integer_question_reviewer_count(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.question_reviewer_count = self.non_integer_count
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for question reviewer count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'reviewer count: %s does not match the expected question '
+            'reviewer count: 0.\']]' % (
+                stats_model.id, stats_model.question_reviewer_count),
+
+            u'[u\'failed validation check for domain object check of '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the '
+            'question reviewer count to be an integer, recieved: %s.\']]' % (
+                stats_model.id, stats_model.question_reviewer_count)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_for_non_integer_question_suggestion_count(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.question_suggestion_count = self.non_integer_count
+
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for question suggestion count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'suggestion count: %s does not match the expected question '
+            'suggestion count: 0.\']]' % (
+                stats_model.id, stats_model.question_suggestion_count),
+
+            u'[u\'failed validation check for domain object check of '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the '
+            'question suggestion count to be an integer, recieved: '
             '%s.\']]' % (
                 stats_model.id, stats_model.question_suggestion_count)
         ]
@@ -9759,7 +9856,7 @@ class CommunityContributionStatsModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-    def test_model_validation_fails_if_translation_suggestion_counts_not_in_dict(
+    def test_model_validation_fails_if_translation_suggestion_count_not_in_dict(
             self):
         missing_language_code = 'hi'
         self._create_translation_suggestion_with_language_code(
@@ -9779,7 +9876,7 @@ class CommunityContributionStatsModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-    def test_model_validation_fails_if_translation_reviewer_counts_not_in_dict(
+    def test_model_validation_fails_if_translation_reviewer_count_not_in_dict(
             self):
         missing_language_code = 'hi'
         user_services.allow_user_to_review_translation_in_language(

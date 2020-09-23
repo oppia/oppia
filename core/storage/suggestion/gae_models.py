@@ -662,16 +662,18 @@ class CommunityContributionStatsModel(base_models.BaseModel):
     # suggestions are offered in and the values correspond to the total number
     # of reviewers who have permission to review translation suggestions in
     # that language.
-    translation_reviewer_counts_by_lang_code = ndb.JsonProperty(required=True)
+    translation_reviewer_counts_by_lang_code = ndb.JsonProperty(
+        default={}, required=True)
     # A dictionary where the keys represent the language codes that translation
     # suggestions are offered in and the values correspond to the total number
     # of translation suggestions that are currently in review in that language.
-    translation_suggestion_counts_by_lang_code = ndb.JsonProperty(required=True)
+    translation_suggestion_counts_by_lang_code = ndb.JsonProperty(
+        default={}, required=True)
     # The total number of reviewers who have permission to review question
     # suggestions.
-    question_reviewer_count = ndb.IntegerProperty(required=True)
+    question_reviewer_count = ndb.IntegerProperty(default=0, required=True)
     # The total number of question suggestions that are currently in review.
-    question_suggestion_count = ndb.IntegerProperty(required=True)
+    question_suggestion_count = ndb.IntegerProperty(default=0, required=True)
 
     @classmethod
     def get(cls):
@@ -689,11 +691,7 @@ class CommunityContributionStatsModel(base_models.BaseModel):
 
         if community_contribution_stats_model is None:
             community_contribution_stats_model = cls(
-                id=COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
-                translation_reviewer_counts_by_lang_code={},
-                translation_suggestion_counts_by_lang_code={},
-                question_reviewer_count=0,
-                question_suggestion_count=0
+                id=COMMUNITY_CONTRIBUTION_STATS_MODEL_ID
             )
             community_contribution_stats_model.put()
             return community_contribution_stats_model
