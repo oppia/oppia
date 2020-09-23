@@ -619,7 +619,7 @@ class CommunityContributionStatsModel(base_models.BaseModel):
     """Records the contributor dashboard contribution stats. This includes the
     total number of reviewers for each suggestion type and the total number of
     suggestions in review for each suggestion type. There is only ever one
-    instance of this model with ID COMMUNITY_CONTRIBUTION_STATS_MODEL_ID.
+    instance of this model, and its ID is COMMUNITY_CONTRIBUTION_STATS_MODEL_ID.
     """
 
     # A dictionary where the keys represent the language codes that translation
