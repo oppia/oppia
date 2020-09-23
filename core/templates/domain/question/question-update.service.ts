@@ -27,13 +27,15 @@ require('domain/question/QuestionObjectFactory.ts');
 require('domain/question/question-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('QuestionUpdateService', [
-  'QuestionUndoRedoService', 'CMD_UPDATE_QUESTION_PROPERTY',
-  'QUESTION_PROPERTY_LANGUAGE_CODE',
-  'QUESTION_PROPERTY_QUESTION_STATE_DATA',
+  'QuestionUndoRedoService',
+  'CMD_UPDATE_QUESTION_PROPERTY',
+  'QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS',
+  'QUESTION_PROPERTY_LANGUAGE_CODE', 'QUESTION_PROPERTY_QUESTION_STATE_DATA',
   function(
-      QuestionUndoRedoService, CMD_UPDATE_QUESTION_PROPERTY,
-      QUESTION_PROPERTY_LANGUAGE_CODE,
-      QUESTION_PROPERTY_QUESTION_STATE_DATA) {
+      QuestionUndoRedoService,
+      CMD_UPDATE_QUESTION_PROPERTY,
+      QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
+      QUESTION_PROPERTY_LANGUAGE_CODE, QUESTION_PROPERTY_QUESTION_STATE_DATA) {
     var _applyChange = function(question, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
@@ -116,6 +118,22 @@ angular.module('oppia').factory('QuestionUpdateService', [
             question.setLanguageCode(languageCode);
           }, function(changeDict, question) {
             question.setLanguageCode(oldLanguageCode);
+          });
+      },
+      setQuestionInapplicableSkillMisconceptionIds: function(
+          question, newInapplicableSkillMisconceptionIds) {
+        var oldInapplicableSkillMisconceptionIds = angular.copy(
+          question.getInapplicableSkillMisconceptionIds());
+        _applyPropertyChange(
+          question, QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
+          newInapplicableSkillMisconceptionIds,
+          oldInapplicableSkillMisconceptionIds,
+          function(changeDict, question) {
+            var languageCode = _getNewPropertyValueFromChangeDict(changeDict);
+            question.setInapplicableSkillMisconceptionIds(languageCode);
+          }, function(changeDict, question) {
+            question.setInapplicableSkillMisconceptionIds(
+              oldInapplicableSkillMisconceptionIds);
           });
       },
       setQuestionStateData: function(question, updateFunction) {
