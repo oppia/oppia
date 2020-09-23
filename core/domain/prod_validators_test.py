@@ -9759,6 +9759,46 @@ class CommunityContributionStatsModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+    def test_model_validation_fails_if_translation_suggestion_counts_not_in_dict(
+            self):
+        missing_language_code = 'hi'
+        self._create_translation_suggestion_with_language_code(
+            missing_language_code)
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+
+        expected_output = [
+            u'[u\'failed validation check for translation suggestion count '
+            'field check of CommunityContributionStatsModel\', [u"Entity id '
+            '%s: The translation suggestion count for language code %s is 1, '
+            'expect model CommunityContributionStatsModel to have the language '
+            'code %s in its translation suggestion counts but it doesn\'t '
+            'exist."]]' % (
+                stats_model.id, missing_language_code, missing_language_code)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_translation_reviewer_counts_not_in_dict(
+            self):
+        missing_language_code = 'hi'
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id, missing_language_code)
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+
+        expected_output = [
+            u'[u\'failed validation check for translation reviewer count '
+            'field check of CommunityContributionStatsModel\', [u"Entity id '
+            '%s: The translation reviewer count for language code %s is 1, '
+            'expect model CommunityContributionStatsModel to have the language '
+            'code %s in its translation reviewer counts but it doesn\'t '
+            'exist."]]' % (
+                stats_model.id, missing_language_code, missing_language_code)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
     def test_model_validation_fails_for_invalid_lang_code_in_reviewer_counts(
             self):
         stats_model = suggestion_models.CommunityContributionStatsModel.get()

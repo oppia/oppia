@@ -3211,12 +3211,12 @@ class CommunityContributionStatsModelValidator(
                     'translation reviewer count %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: The translation reviewer count for '
-                    'language code %s is %s, expect model %s to have the '
-                    'language code %s in its translation reviewer counts '
-                    'but it doesn\'t exist.' % (
+                    'language code %s is %s, expect model '
+                    'CommunityContributionStatsModel to have the language code '
+                    '%s in its translation reviewer counts but it doesn\'t '
+                    'exist.' % (
                         item.id, language_code,
-                        expected_translation_reviewer_count,
-                        item.model_class.__name__, language_code)
+                        expected_translation_reviewer_count, language_code)
                 )
 
     @classmethod
@@ -3261,12 +3261,12 @@ class CommunityContributionStatsModelValidator(
                     'translation suggestion count %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: The translation suggestion count for '
-                    'language code %s is %s, expect model %s to have the '
-                    'language code %s in its translation suggestion '
-                    'counts but it doesn\'t exist.' % (
+                    'language code %s is %s, expect model '
+                    'CommunityContributionStatsModel to have the language code '
+                    '%s in its translation suggestion counts but it doesn\'t '
+                    'exist.' % (
                         item.id, language_code,
-                        expected_translation_suggestion_count,
-                        item.model_class.__name__, language_code)
+                        expected_translation_suggestion_count, language_code)
                 )
 
     @classmethod
