@@ -184,7 +184,7 @@ class BaseSuggestion(python_utils.OBJECT):
 
         if (
                 self.author_id is not None and
-                not user_services.is_user_id_correct(self.author_id)
+                not user_services.is_user_id_valid(self.author_id)
         ):
             raise utils.ValidationError(
                 'Expected author_id to be in a valid user ID format, '
@@ -196,7 +196,7 @@ class BaseSuggestion(python_utils.OBJECT):
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
             if (
-                    not user_services.is_user_id_correct(
+                    not user_services.is_user_id_valid(
                         self.final_reviewer_id) and
                     self.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID
             ):
