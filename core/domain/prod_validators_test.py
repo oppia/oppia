@@ -9390,31 +9390,71 @@ class GeneralVoiceoverApplicationModelValidatorTests(
 class CommunityContributionStatsModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
+    target_id = 'exp1'
+    skill_id = 'skill1'
+    target_version_at_submission = 1
+    exploration_category = 'Algebra'
+    AUTHOR_EMAIL = 'author@example.com'
+    AUTHOR_USERNAME = 'author'
     REVIEWER_EMAIL = 'reviewer@community.org'
     REVIEWER_USERNAME = 'reviewer'
+    EXPLORATION_THREAD_ID = 'exploration.exp1.thread_1'
+    SKILL_THREAD_ID = 'skill1.thread1'
+    change_cmd = {}
 
     translation_reviewer_counts_by_lang_code = {
-        'hi': 1,
-        'en': 1
+        'hi': 1
     }
 
     translation_suggestion_counts_by_lang_code = {
-        'fr': 1,
-        'en': 1,
+        'hi': 1
     }
 
     question_reviewer_count = 1
     question_suggestion_count = 1
 
     negative_count = -1
-    sample_language_code = 'en'
+    sample_language_code = 'hi'
     invalid_language_code = 'invalid'
 
-    def _create_t
+    def _create_translation_suggestion_with_language_code(self, language_code):
+        """Creates a translation suggestion in the given language_code."""
+        score_category = '%s%s%s' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+            self.exploration_category
+        )
+
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            self.target_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, self.author_id,
+            self.reviewer_id, self.change_cmd, score_category,
+            self.EXPLORATION_THREAD_ID, language_code)
+
+    def _create_question_suggestion(self):
+        """Creates a question suggestion."""
+        score_category = '%s%s%s' % (
+            suggestion_models.SCORE_TYPE_QUESTION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+            self.target_id
+        )
+
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            self.skill_id, self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, self.author_id,
+            self.reviewer_id, self.change_cmd, score_category,
+            self.SKILL_THREAD_ID, 'en')
 
     def setUp(self):
         super(CommunityContributionStatsModelValidatorTests, self).setUp()
 
+        self.signup(
+            self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
+        self.author_id= self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(
             self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
         self.reviewer_id= self.get_user_id_from_email(self.REVIEWER_EMAIL)
@@ -9432,11 +9472,10 @@ class CommunityContributionStatsModelValidatorTests(
 
     def test_model_validation_success_when_model_has_non_zero_counts(self):
         user_services.allow_user_to_review_question(self.reviewer_id)
-        for language_code in self.translation_reviewer_counts_by_lang_code.keys():
-            user_services.allow_user_to_review_translation_in_language(
-                self.reviewer_id, language_code)
         user_services.allow_user_to_review_translation_in_language(
-            self.translator_id, 'en')
+            self.reviewer_id, 'hi')
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_question_suggestion()
 
         suggestion_models.CommunityContributionStatsModel(
             id=suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
@@ -9494,6 +9533,15 @@ class CommunityContributionStatsModelValidatorTests(
             self.sample_language_code: self.negative_count}
         stats_model.put()
         expected_output = [
+            u'[u\'failed validation check for translation reviewer count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation reviewer count for language code %s: %s does not '
+            'match the expected translation reviewer count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code),
+        
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the translation '
@@ -9506,7 +9554,7 @@ class CommunityContributionStatsModelValidatorTests(
         ]
 
         self.run_job_and_check_output(
-            [], sort=True, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_validation_fails_for_negative_translation_suggestion_counts(
             self):
@@ -9515,6 +9563,15 @@ class CommunityContributionStatsModelValidatorTests(
             self.sample_language_code: self.negative_count}
         stats_model.put()
         expected_output = [
+            u'[u\'failed validation check for translation suggestion count '
+            'check of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation suggestion count for language code %s: %s does not '
+            'match the expected translation suggestion count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code),
+
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the translation '
@@ -9535,6 +9592,12 @@ class CommunityContributionStatsModelValidatorTests(
         stats_model.question_reviewer_count = self.negative_count
         stats_model.put()
         expected_output = [
+            u'[u\'failed validation check for question reviewer count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'reviewer count: %s does not match the expected question '
+            'reviewer count: 0.\']]' % (
+                stats_model.id, stats_model.question_reviewer_count),
+
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the '
@@ -9551,11 +9614,88 @@ class CommunityContributionStatsModelValidatorTests(
         stats_model.question_suggestion_count = self.negative_count
         stats_model.put()
         expected_output = [
+            u'[u\'failed validation check for question suggestion count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'suggestion count: %s does not match the expected question '
+            'suggestion count: 0.\']]' % (
+                stats_model.id, stats_model.question_suggestion_count),
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the '
             'question suggestion count to be non-negative, recieved: '
             '%s.\']]' % (
+                stats_model.id, stats_model.question_suggestion_count)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_translation_suggestion_counts_dont_match(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_suggestion_counts_by_lang_code = {
+            self.sample_language_code: 1}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for translation suggestion count '
+            'check of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation suggestion count for language code %s: %s does not '
+            'match the expected translation suggestion count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_translation_reviewer_counts_dont_match(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_reviewer_counts_by_lang_code = {
+            self.sample_language_code: 1}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for translation reviewer count '
+            'check of CommunityContributionStatsModel\', [u\'Entity id %s: '
+            'Translation reviewer count for language code %s: %s does not '
+            'match the expected translation reviewer count for language code '
+            '%s: 0\']]' % (
+                stats_model.id, self.sample_language_code,
+                stats_model.translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code], self.sample_language_code)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_question_reviewer_count_do_not_match(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.question_reviewer_count = 1
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for question reviewer count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'reviewer count: %s does not match the expected question '
+            'reviewer count: 0.\']]' % (
+                stats_model.id, stats_model.question_reviewer_count)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_if_question_suggestion_count_do_not_match(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.question_suggestion_count = 1
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for question suggestion count check '
+            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
+            'suggestion count: %s does not match the expected question '
+            'suggestion count: 0.\']]' % (
                 stats_model.id, stats_model.question_suggestion_count)
         ]
 
@@ -9580,23 +9720,6 @@ class CommunityContributionStatsModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
     def test_model_validation_fails_for_invalid_lang_code_in_suggestion_counts(
-            self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        stats_model.translation_suggestion_counts_by_lang_code = {
-            self.invalid_language_code: 1}
-        stats_model.put()
-        expected_output = [
-            u'[u\'failed validation check for domain object check of '
-            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
-            'fails domain validation with the error Invalid language code for '
-            'the translation suggestion counts: %s.\']]' % (
-                stats_model.id, self.invalid_language_code)
-        ]
-
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_validation_fails_if_translation_suggestion_counts_dont_match(
             self):
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
         stats_model.translation_suggestion_counts_by_lang_code = {
