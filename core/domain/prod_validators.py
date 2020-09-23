@@ -62,19 +62,42 @@ import python_utils
 import utils
 
 (
-    base_models, collection_models,
-    config_models, email_models, exp_models,
-    feedback_models, improvements_models, job_models,
-    question_models, recommendations_models,
-    skill_models, stats_models, story_models,
-    suggestion_models, topic_models, user_models,) = (
-        models.Registry.import_models([
-            models.NAMES.base_model, models.NAMES.collection,
-            models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
-            models.NAMES.question, models.NAMES.recommendations,
-            models.NAMES.skill, models.NAMES.statistics, models.NAMES.story,
-            models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
+    base_models,
+    collection_models,
+    config_models,
+    email_models,
+    exp_models,
+    feedback_models,
+    improvements_models,
+    job_models,
+    question_models,
+    recommendations_models,
+    skill_models,
+    stats_models,
+    story_models,
+    subtopic_models,
+    suggestion_models,
+    topic_models,
+    user_models
+) = models.Registry.import_models([
+    models.NAMES.base_model,
+    models.NAMES.collection,
+    models.NAMES.config,
+    models.NAMES.email,
+    models.NAMES.exploration,
+    models.NAMES.feedback,
+    models.NAMES.improvements,
+    models.NAMES.job,
+    models.NAMES.question,
+    models.NAMES.recommendations,
+    models.NAMES.skill,
+    models.NAMES.statistics, 
+    models.NAMES.story,
+    models.NAMES.subtopic,
+    models.NAMES.suggestion,
+    models.NAMES.topic,
+    models.NAMES.user
+])
 
 ALLOWED_AUDIO_EXTENSIONS = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
@@ -3193,7 +3216,8 @@ class TopicModelValidator(base_model_validators.BaseModelValidator):
             base_model_validators.ExternalModelFetcherDetails(
                 'skill_ids', skill_models.SkillModel, skill_ids),
             base_model_validators.ExternalModelFetcherDetails(
-                'subtopic_page_ids', topic_models.SubtopicPageModel,
+                'subtopic_page_ids',
+                subtopic_models.SubtopicPageModel,
                 ['%s-%s' % (
                     item.id, subtopic['id']) for subtopic in item.subtopics])]
 
@@ -3702,17 +3726,17 @@ class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
         return [
             base_model_validators.ExternalModelFetcherDetails(
                 'subtopic_page_commit_log_entry_ids',
-                topic_models.SubtopicPageCommitLogEntryModel,
+                subtopic_models.SubtopicPageCommitLogEntryModel,
                 ['subtopicpage-%s-%s'
                  % (item.id, version) for version in python_utils.RANGE(
                      1, item.version + 1)]),
             base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
-                topic_models.SubtopicPageSnapshotMetadataModel,
+                subtopic_models.SubtopicPageSnapshotMetadataModel,
                 snapshot_model_ids),
             base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_content_ids',
-                topic_models.SubtopicPageSnapshotContentModel,
+                subtopic_models.SubtopicPageSnapshotContentModel,
                 snapshot_model_ids),
             base_model_validators.ExternalModelFetcherDetails(
                 'topic_ids', topic_models.TopicModel, [item.topic_id])]
@@ -3740,7 +3764,8 @@ class SubtopicPageSnapshotMetadataModelValidator(
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.ExternalModelFetcherDetails(
-                'subtopic_page_ids', topic_models.SubtopicPageModel,
+                'subtopic_page_ids',
+                subtopic_models.SubtopicPageModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
@@ -3761,7 +3786,8 @@ class SubtopicPageSnapshotContentModelValidator(
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.ExternalModelFetcherDetails(
-                'subtopic_page_ids', topic_models.SubtopicPageModel,
+                'subtopic_page_ids',
+                subtopic_models.SubtopicPageModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
 
@@ -3794,7 +3820,8 @@ class SubtopicPageCommitLogEntryModelValidator(
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.ExternalModelFetcherDetails(
-                'subtopic_page_ids', topic_models.SubtopicPageModel,
+                'subtopic_page_ids',
+                subtopic_models.SubtopicPageModel,
                 [item.subtopic_page_id])]
 
 

@@ -30,15 +30,16 @@ import utils
 NAMES = utils.create_enum(
     'activity', 'audit', 'base_model', 'classifier', 'collection', 'config',
     'email', 'exploration', 'feedback', 'improvements', 'job', 'opportunity',
-    'question', 'recommendations', 'skill', 'statistics', 'story', 'suggestion',
-    'topic', 'user')
+    'question', 'recommendations', 'skill', 'statistics', 'story', 'subtopic',
+    'suggestion', 'topic', 'user')
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
 MODULES_WITH_PSEUDONYMIZABLE_CLASSES = utils.create_enum(  # pylint: disable=invalid-name
     NAMES.collection, NAMES.config, NAMES.exploration, NAMES.feedback,
-    NAMES.question, NAMES.skill, NAMES.story, NAMES.suggestion, NAMES.topic)
+    NAMES.question, NAMES.skill, NAMES.story, NAMES.subtopic, NAMES.suggestion,
+    NAMES.topic)
 
 GAE_PLATFORM = 'gae'
 

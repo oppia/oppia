@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 import re
 
+import core.storage.subtopic.gae_models
 from core.domain import collection_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -887,12 +888,12 @@ def _pseudonymize_topic_models(pending_deletion_request):
         subtopic_commit_log_models,
     ) = _collect_entity_ids_from_snapshots_and_commit(
         pending_deletion_request.user_id,
-        [topic_models.SubtopicPageSnapshotMetadataModel],
-        topic_models.SubtopicPageCommitLogEntryModel,
+        [core.storage.subtopic.gae_models.SubtopicPageSnapshotMetadataModel],
+        core.storage.subtopic.gae_models.SubtopicPageCommitLogEntryModel,
         'subtopic_page_id'
     )
 
-    subtopic_models = topic_models.SubtopicPageModel.get_multi(
+    subtopic_models = SubtopicPageModel.get_multi(
         subtopic_model_ids, include_deleted=True)
     subtopic_id_to_topic_id = {
         subtopic_model.id: subtopic_model.topic_id
@@ -921,7 +922,8 @@ def _pseudonymize_topic_models(pending_deletion_request):
 
         metadata_model_classes = (
             topic_metadata_model_classes +
-            (topic_models.SubtopicPageSnapshotMetadataModel,))
+            (
+            core.storage.subtopic.gae_models.SubtopicPageSnapshotMetadataModel,))
 
         snapshot_metadata_models = [
             model for model in topic_related_models
@@ -976,7 +978,7 @@ def _pseudonymize_topic_models(pending_deletion_request):
                 model,
                 (
                     topic_models.TopicCommitLogEntryModel,
-                    topic_models.SubtopicPageCommitLogEntryModel,
+                    core.storage.subtopic.gae_models.SubtopicPageCommitLogEntryModel,
                 ),
             )
         ]

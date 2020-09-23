@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import json
 
+import core.storage.subtopic.gae_models
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -652,7 +653,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS
         ).put()
-        topic_models.SubtopicPageSnapshotMetadataModel(
+        core.storage.subtopic.gae_models.SubtopicPageSnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS

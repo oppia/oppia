@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
+import core.storage.subtopic.gae_models
 from core import jobs
 from core.domain import collection_services
 from core.domain import exp_fetchers
@@ -165,7 +166,7 @@ class RemoveCommitUsernamesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             skill_models.SkillCommitLogEntryModel,
             story_models.StoryCommitLogEntryModel,
             topic_models.TopicCommitLogEntryModel,
-            topic_models.SubtopicPageCommitLogEntryModel
+            core.storage.subtopic.gae_models.SubtopicPageCommitLogEntryModel
         ]
 
     @staticmethod
@@ -217,7 +218,7 @@ class FixCommitLastUpdatedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             skill_models.SkillCommitLogEntryModel,
             story_models.StoryCommitLogEntryModel,
             topic_models.TopicCommitLogEntryModel,
-            topic_models.SubtopicPageCommitLogEntryModel
+            core.storage.subtopic.gae_models.SubtopicPageCommitLogEntryModel
         ]
 
     @staticmethod
