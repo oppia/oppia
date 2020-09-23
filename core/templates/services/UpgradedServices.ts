@@ -391,7 +391,6 @@ import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
-import { PlaythroughService } from 'services/playthrough.service';
 import { PredictionAlgorithmRegistryService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
@@ -533,8 +532,6 @@ import { StateWrittenTranslationsService } from
 import { StatsReportingBackendApiService } from
   'domain/exploration/stats-reporting-backend-api.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { StatsReportingService } from
-  'pages/exploration-player-page/services/stats-reporting.service';
 import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 import { StoryContentsObjectFactory } from
@@ -644,6 +641,12 @@ interface UpgradedServicesDict {
 export class UpgradedServices {
   getUpgradedServices(): UpgradedServicesDict {
     var upgradedServices = {};
+    // We are using eslint disable here for multilines because we have not used
+    // dot notation at a lot of places so it does not seem practical to use
+    // "eslint disable next line" for each of them. Also, we can't use dot
+    // notation either because then "Property 'AdminRouterService' does not
+    // exist on type '{}'" lint error will be raised by the linter.
+    /* eslint-disable-next-line oppia/no-multiline-disable */
     /* eslint-disable dot-notation */
 
     // Topological level: 0.
@@ -1537,13 +1540,6 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
 
     // Topological level: 6.
-    upgradedServices['PlaythroughService'] =
-      new PlaythroughService(
-        upgradedServices['ExplorationFeaturesService'],
-        upgradedServices['LearnerActionObjectFactory'],
-        upgradedServices['PlaythroughBackendApiService'],
-        upgradedServices['PlaythroughObjectFactory'],
-        upgradedServices['StopwatchObjectFactory']);
     upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['ExplorationHtmlFormatterService']);
@@ -1558,13 +1554,6 @@ export class UpgradedServices {
         upgradedServices['AnswerClassificationService'],
         upgradedServices['InteractionRulesRegistryService'],
         upgradedServices['StateTopAnswersStatsBackendApiService']);
-    upgradedServices['StatsReportingService'] = new StatsReportingService(
-      upgradedServices['ContextService'],
-      upgradedServices['MessengerService'],
-      upgradedServices['PlaythroughService'],
-      upgradedServices['SiteAnalyticsService'],
-      upgradedServices['StatsReportingBackendApiService'],
-      upgradedServices['StopwatchObjectFactory']);
 
     // Topological level: 7.
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
