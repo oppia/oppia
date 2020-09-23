@@ -710,7 +710,6 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         for model in all_models:
             export_policy = model.get_export_policy()
             if 'export_method' in export_policy and export_policy['export_method'] != base_models.EXPORT_METHOD.NOT_EXPORTED:
-                print(export_policy)
                 per_field_policy = export_policy['per_field_policy']
                 exported_props = [
                     prop for prop in model._properties
@@ -743,7 +742,6 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                     exported_data = model.export_data(self.USER_ID_1)
                     
                     # Retrieve the first ID.
-                    print(exported_data)
                     model_id = exported_data.keys()[0]
                     self.assertEqual(
                         sorted(exported_data[model_id].keys()),
