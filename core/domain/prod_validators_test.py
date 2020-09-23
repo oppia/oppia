@@ -15136,6 +15136,75 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
+class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
+
+    def setUp(self):
+        super(DeletedUserModelValidatorTests, self).setUp()
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        wipeout_service.pre_delete_user(self.user_id)
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_id))
+
+        user_models.DeletedUserModel(id=self.user_id).put()
+
+        self.model_instance = (
+            user_models.DeletedUserModel.get_by_id(self.user_id))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.DeletedUserModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated DeletedUserModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of DeletedUserModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'DeletedUserModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with self.mock_datetime_for_audit(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
+
+    def test_existing_user_settings_model_failure(self):
+        user_models.UserSettingsModel(
+            id=self.user_id, email='email@email.com', gae_id='gae_id').put()
+        expected_output = [
+            (
+                '[u\'failed validation check for deleted '
+                'user settings of DeletedUserModel\', '
+                '[u\'Entity id %s: UserSettingsModel is not deleted\']]'
+            ) % (self.model_instance.id)]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+
 class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):

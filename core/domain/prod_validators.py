@@ -5251,6 +5251,31 @@ class PendingDeletionRequestModelValidator(
             cls._validate_activity_mapping_contains_only_allowed_keys]
 
 
+class DeletedUserModelValidator(base_model_validators.BaseUserModelValidator):
+    """Class for validating DeletedUserModels."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return []
+
+    @classmethod
+    def _validate_user_settings_are_deleted(cls, item):
+        """Validates that user settings do not exist for the deleted user ID.
+
+        Args:
+            item: DeletedUserModel. Pending deletion request model to validate.
+        """
+        user_model = user_models.UserSettingsModel.get_by_id(item.id)
+        if user_model is not None:
+            cls._add_error(
+                'deleted user settings',
+                'Entity id %s: UserSettingsModel is not deleted' % (item.id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_user_settings_are_deleted]
+
+
 class TaskEntryModelValidator(base_model_validators.BaseModelValidator):
     """One off job for auditing task entries."""
 

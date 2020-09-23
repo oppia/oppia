@@ -2380,6 +2380,18 @@ class DeletedUserModel(base_models.BaseModel):
         """DeletedUserModel contains only IDs that were deleted."""
         return dict(super(cls, cls).get_export_policy(), **{})
 
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether DeletedUserModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
 
 class PseudonymizedUserModel(base_models.BaseModel):
     """Model for storing pseudonymized user IDs."""
