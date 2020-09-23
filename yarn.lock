@@ -4022,7 +4022,7 @@ eslint-plugin-html@^6.0.0:
   dependencies:
     htmlparser2 "^4.1.0"
 
-"eslint-plugin-oppia@file:scripts/linters/custom_eslint_checks":
+"eslint-plugin-oppia@file:./scripts/linters/custom_eslint_checks":
   version "0.0.0"
 
 eslint-plugin-unused-imports@^0.1.3:
