@@ -225,12 +225,16 @@ class DeployTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output)
         get_token_swap = self.swap(
             common, 'get_personal_access_token', mock_get_personal_access_token)
-        with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
-            with self.release_script_exist_swap, self.gcloud_available_swap:
-                with self.run_swap, self.release_doc_swap, args_swap, out_swap:
-                    with get_token_swap, self.assertRaisesRegexp(
-                        Exception, 'Invalid last commit message: Invalid.'):
-                        deploy.execute_deployment()
+        with contextlib.nested(
+            self.get_branch_swap, self.install_swap, self.cwd_check_swap,
+            self.release_script_exist_swap, self.gcloud_available_swap,
+            self.run_swap, self.release_doc_swap, args_swap, out_swap,
+            get_token_swap
+        ):
+            with self.assertRaisesRegexp(
+                Exception, 'Invalid last commit message: Invalid.'
+            ):
+                deploy.execute_deployment()
 
     def test_mailgun_api_update_done_for_prod_server(self):
         check_function_calls = {
@@ -317,19 +321,19 @@ class DeployTests(test_utils.GenericTestBase):
             deploy, 'check_travis_and_circleci_tests',
             mock_check_travis_and_circleci_tests)
         third_party_swap = self.swap(deploy, 'THIRD_PARTY_DIR', 'INVALID_DIR')
-        with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
-            with self.release_script_exist_swap, self.gcloud_available_swap:
-                with self.run_swap, self.release_doc_swap, args_swap:
-                    with get_token_swap, get_org_swap, get_repo_swap:
-                        with bug_check_swap, pr_check_swap, out_swap:
-                            with check_tests_swap, third_party_swap:
-                                with self.assertRaisesRegexp(
-                                    Exception,
-                                    'Could not find third_party directory at '
-                                    'INVALID_DIR. Please run '
-                                    'install_third_party_libs.py prior to '
-                                    'running this script.'):
-                                    deploy.execute_deployment()
+        with contextlib.nested(
+            self.get_branch_swap, self.install_swap, self.cwd_check_swap,
+            self.release_script_exist_swap, self.gcloud_available_swap,
+            self.run_swap, self.release_doc_swap, get_token_swap, get_org_swap,
+            get_repo_swap, bug_check_swap, pr_check_swap, out_swap,
+            check_tests_swap, third_party_swap
+        ):
+            with self.assertRaisesRegexp(
+                Exception,
+                'Could not find third_party directory at INVALID_DIR. Please '
+                'run install_third_party_libs.py prior to running this script.'
+            ):
+                deploy.execute_deployment()
 
     def test_invalid_dir_access(self):
         def mock_verify_number_of_pending_deletion_requests(unused_app_name):
@@ -342,16 +346,16 @@ class DeployTests(test_utils.GenericTestBase):
             mock_verify_number_of_pending_deletion_requests)
         getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
         with contextlib.nested(
-                self.get_branch_swap, self.install_swap, self.cwd_check_swap,
-                self.release_script_exist_swap, self.gcloud_available_swap,
-                self.args_swap, self.exists_swap, self.check_output_swap,
-                self.dir_exists_swap, self.copytree_swap, self.cd_swap,
-                verify_number_of_pending_deletion_requests_swap, self.run_swap,
-                getcwd_swap
+            self.get_branch_swap, self.install_swap, self.cwd_check_swap,
+            self.release_script_exist_swap, self.gcloud_available_swap,
+            self.args_swap, self.exists_swap, self.check_output_swap,
+            self.dir_exists_swap, self.copytree_swap, self.cd_swap, getcwd_swap,
+            verify_number_of_pending_deletion_requests_swap, self.run_swap,
         ):
             with self.assertRaisesRegexp(
-                    Exception,
-                    'Invalid directory accessed during deployment: invalid'):
+                Exception,
+                'Invalid directory accessed during deployment: invalid'
+            ):
                 deploy.execute_deployment()
 
     def test_function_calls(self):
@@ -436,13 +440,13 @@ class DeployTests(test_utils.GenericTestBase):
             mock_update_configs_in_deploy_data)
 
         with contextlib.nested(
-                self.get_branch_swap, self.install_swap, self.cwd_check_swap,
-                self.release_script_exist_swap, self.gcloud_available_swap,
-                self.args_swap, self.exists_swap, self.check_output_swap,
-                self.dir_exists_swap, self.copytree_swap, self.cd_swap,
-                verify_number_of_pending_deletion_requests_swap, cwd_swap,
-                preprocess_swap, uc_swap, build_swap, update_swap, deploy_swap,
-                switch_swap, check_breakage_swap, memcache_swap
+            self.get_branch_swap, self.install_swap, self.cwd_check_swap,
+            self.release_script_exist_swap, self.gcloud_available_swap,
+            self.args_swap, self.exists_swap, self.check_output_swap, cwd_swap,
+            self.dir_exists_swap, self.copytree_swap, self.cd_swap, build_swap,
+            verify_number_of_pending_deletion_requests_swap, update_swap,
+            preprocess_swap, uc_swap, deploy_swap, check_breakage_swap,
+            memcache_swap, switch_swap
         ):
             deploy.execute_deployment()
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -534,13 +538,13 @@ class DeployTests(test_utils.GenericTestBase):
             mock_update_configs_in_deploy_data)
 
         with contextlib.nested(
-                self.get_branch_swap, self.install_swap, self.cwd_check_swap,
-                self.release_script_exist_swap, self.gcloud_available_swap,
-                args_swap, self.exists_swap, self.check_output_swap,
-                self.dir_exists_swap, self.copytree_swap, self.cd_swap,
-                verify_number_of_pending_deletion_requests_swap, cwd_swap,
-                deploy_swap, switch_swap, uc_swap, build_swap, preprocess_swap,
-                update_swap, memcache_swap, check_breakage_swap
+            self.get_branch_swap, self.install_swap, self.cwd_check_swap,
+            self.release_script_exist_swap, self.gcloud_available_swap, uc_swap,
+            self.exists_swap, self.check_output_swap, memcache_swap, args_swap,
+            self.dir_exists_swap, self.copytree_swap, self.cd_swap, switch_swap,
+            verify_number_of_pending_deletion_requests_swap, cwd_swap,
+            deploy_swap, build_swap, preprocess_swap, update_swap,
+            check_breakage_swap
         ):
             deploy.execute_deployment()
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -620,7 +624,7 @@ class DeployTests(test_utils.GenericTestBase):
             with self.listdir_swap, self.assertRaisesRegexp(
                 AssertionError,
                 '"name: projects/PROJECT_ID" string is missing in app_dev.yaml'
-                ):
+            ):
                 deploy.preprocess_release('oppiaserver', 'deploy_dir')
 
     def test_constants_and_app_dev_are_updated_correctly(self):
@@ -902,8 +906,7 @@ class DeployTests(test_utils.GenericTestBase):
         ask_user_swap = self.swap(
             common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
         with open_tab_swap, ask_user_swap:
-            deploy.verify_number_of_pending_deletion_requests(
-                'oppiaserver')
+            deploy.verify_number_of_pending_deletion_requests('oppiaserver')
         self.assertEqual(check_function_calls, expected_check_function_calls)
         self.assertEqual(check_url_list, expected_check_url_list)
 
