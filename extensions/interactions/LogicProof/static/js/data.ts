@@ -28,7 +28,7 @@ var logicProofData = (function() {
     arbitrary: ['was arbitrary', 'is arbitrary'],
     take: ['take'],
     satisfying: ['satisfying', 'such that'],
-    // eslint-disable quote-props
+    // eslint-disable-next-line quote-props
     'if': ['if'],
     given: ['given'],
     contradiction: ['contradiction'],
@@ -49,8 +49,8 @@ var logicProofData = (function() {
   // symbol keys from the list of operators).
   var BASE_STUDENT_LANGUAGE = {
     types: {
+      // eslint-disable-next-line quote-props
       'boolean': {
-        // eslint-enable quote-props
         quantifiable: false
       },
       element: {
