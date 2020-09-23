@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { SkillRightsBackendDict, SkillRightsObjectFactory, SkillRights } from
   'domain/skill/SkillRightsObjectFactory.ts';
