@@ -1,8 +1,8 @@
 {
     "APP_DEV_YAML_PATH": "app_dev.yaml",
     "APP_YAML_PATH_TO_VERSION_USAGE_DICT": {
-        "app.yaml": true,
-        "export/app.yaml": false
+        "app.yaml": "VERSION_GIVEN",
+        "export/app.yaml": "VERSION_LATEST"
     },
     "BLOCKING_BUG_MILESTONE_NUMBER": 39,
     "BUILD_MODULE_PATH": "scripts.build",
