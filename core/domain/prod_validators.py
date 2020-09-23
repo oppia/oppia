@@ -5193,7 +5193,7 @@ class PendingDeletionRequestModelValidator(
 
     @classmethod
     def _validate_activity_mapping_contains_only_allowed_keys(cls, item):
-        """Validates that activity_mappings keys are only from
+        """Validates that pseudonymizable_entity_mappings keys are only from
         the core.platform.models.NAMES enum.
 
         Args:
@@ -5201,15 +5201,19 @@ class PendingDeletionRequestModelValidator(
                 to validate.
         """
         incorrect_keys = []
-        for key in item.activity_mappings.keys():
-            if key not in [name for name in models.NAMES.__dict__]:
+        allowed_keys = [
+            name for name in
+            models.MODULES_WITH_PSEUDONYMIZABLE_CLASSES.__dict__]
+        for key in item.pseudonymizable_entity_mappings.keys():
+            if key not in allowed_keys:
                 incorrect_keys.append(key)
 
         if incorrect_keys:
             cls._add_error(
-                'correct activity_mappings check',
-                'Entity id %s: activity_mappings contains keys %s that are not '
-                'allowed' % (item.id, incorrect_keys))
+                'correct pseudonymizable_entity_mappings check',
+                'Entity id %s: pseudonymizable_entity_mappings '
+                'contains keys %s that are not allowed' % (
+                    item.id, incorrect_keys))
 
     @classmethod
     def _get_custom_validation_functions(cls):

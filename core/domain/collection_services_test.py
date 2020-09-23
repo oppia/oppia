@@ -1823,6 +1823,13 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
     COLLECTION_ID_1 = 'cid1'
     COLLECTION_ID_2 = 'cid2'
 
+    def setUp(self):
+        super(CollectionSummaryTests, self).setUp()
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
+
     def test_is_editable_by(self):
         self.save_new_default_collection(self.COLLECTION_0_ID, self.owner_id)
 
@@ -1855,15 +1862,10 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             user_id=self.viewer_id))
 
     def test_contributor_ids(self):
-        # Sign up two users.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
-        albert = user_services.UserActionsInfo(albert_id)
+        albert = user_services.UserActionsInfo(self.albert_id)
 
         # Have Albert create a collection.
-        self.save_new_valid_collection(self.COLLECTION_0_ID, albert_id)
+        self.save_new_valid_collection(self.COLLECTION_0_ID, self.albert_id)
         # Have Bob edit the collection.
         changelist_cmds = [{
             'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
@@ -1871,7 +1873,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             'new_value': 'Collection Bob title'
         }]
         collection_services.update_collection(
-            bob_id, self.COLLECTION_0_ID, changelist_cmds,
+            self.bob_id, self.COLLECTION_0_ID, changelist_cmds,
             'Changed title to Bob title.')
         # Albert adds an owner and an editor.
         rights_manager.assign_role_for_collection(
@@ -1886,7 +1888,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             self.COLLECTION_0_ID)
         self.assertItemsEqual(
             collection_summary.contributor_ids,
-            [albert_id, bob_id])
+            [self.albert_id, self.bob_id])
 
     def _check_contributors_summary(self, collection_id, expected):
         """Checks the contributors summary with the expected summary."""
@@ -1895,14 +1897,10 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         self.assertEqual(expected, contributors_summary)
 
     def test_contributor_summary(self):
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
-
         # Have Albert create a new collection. Version 1.
-        self.save_new_valid_collection(self.COLLECTION_0_ID, albert_id)
-        self._check_contributors_summary(self.COLLECTION_0_ID, {albert_id: 1})
+        self.save_new_valid_collection(self.COLLECTION_0_ID, self.albert_id)
+        self._check_contributors_summary(
+            self.COLLECTION_0_ID, {self.albert_id: 1})
         changelist_cmds = [{
             'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
             'property_name': 'title',
@@ -1910,23 +1908,32 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         }]
         # Have Bob update that collection. Version 2.
         collection_services.update_collection(
-            bob_id, self.COLLECTION_0_ID, changelist_cmds, 'Changed title.')
+            self.bob_id,
+            self.COLLECTION_0_ID,
+            changelist_cmds,
+            'Changed title.')
         self._check_contributors_summary(
             self.COLLECTION_0_ID,
-            {albert_id: 1, bob_id: 1})
+            {self.albert_id: 1, self.bob_id: 1})
         # Have Bob update that collection. Version 3.
         collection_services.update_collection(
-            bob_id, self.COLLECTION_0_ID, changelist_cmds, 'Changed title.')
+            self.bob_id,
+            self.COLLECTION_0_ID,
+            changelist_cmds,
+            'Changed title.')
         self._check_contributors_summary(
             self.COLLECTION_0_ID,
-            {albert_id: 1, bob_id: 2})
+            {self.albert_id: 1, self.bob_id: 2})
 
         # Have Albert update that collection. Version 4.
         collection_services.update_collection(
-            albert_id, self.COLLECTION_0_ID, changelist_cmds, 'Changed title.')
+            self.albert_id,
+            self.COLLECTION_0_ID,
+            changelist_cmds,
+            'Changed title.')
         self._check_contributors_summary(
             self.COLLECTION_0_ID,
-            {albert_id: 2, bob_id: 2})
+            {self.albert_id: 2, self.bob_id: 2})
 
         # TODO(madiyar): Uncomment after revert_collection implementation
         # Have Albert revert to version 3. Version 5
@@ -1934,6 +1941,31 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         #       self.COLLECTION_ID, 4, 3)
         # self._check_contributors_summary(self.COLLECTION_ID,
         #                                 {albert_id: 1, bob_id: 2})
+
+    def test_create_collection_summary_with_contributor_to_remove(self):
+        self.save_new_valid_collection(
+            self.COLLECTION_0_ID, self.albert_id)
+        collection_services.update_collection(
+            self.bob_id,
+            self.COLLECTION_0_ID,
+            [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'Collection Bob title'
+            }],
+            'Changed title.')
+        collection_services.regenerate_collection_summary(
+            self.COLLECTION_0_ID, None)
+
+        self._check_contributors_summary(
+            self.COLLECTION_0_ID, {self.albert_id: 1, self.bob_id: 1})
+
+        user_services.mark_user_for_deletion(self.bob_id)
+        collection_services.regenerate_collection_summary(
+            self.COLLECTION_0_ID, None)
+
+        self._check_contributors_summary(
+            self.COLLECTION_0_ID, {self.albert_id: 1})
 
 
 class GetCollectionAndCollectionRightsTests(CollectionServicesUnitTests):

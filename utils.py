@@ -760,6 +760,21 @@ def get_supported_audio_language_description(language_code):
     raise Exception('Unsupported audio language code: %s' % language_code)
 
 
+def is_pseudonymous_id(user_id):
+    """Check that the ID is a pseudonymous one.
+
+    Args:
+        user_id: str. The ID to be checked.
+
+    Returns:
+        bool. Whether the ID represents a pseudonymous user.
+    """
+    return all((
+        user_id.islower(),
+        user_id.startswith('pid_'),
+        len(user_id) == feconf.USER_ID_LENGTH))
+
+
 def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent.
 

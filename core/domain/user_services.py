@@ -192,7 +192,7 @@ class UserSettings(python_utils.OBJECT):
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
-        if not is_user_id_correct(self.user_id):
+        if not is_user_id_valid(self.user_id):
             raise utils.ValidationError('The user ID is in a wrong format.')
 
         if not isinstance(self.role, python_utils.BASESTRING):
@@ -453,7 +453,7 @@ class UserAuthDetails(python_utils.OBJECT):
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
-        if not is_user_id_correct(self.user_id):
+        if not is_user_id_valid(self.user_id):
             raise utils.ValidationError('The user ID is in a wrong format.')
 
         if (self.gae_id is not None and
@@ -464,7 +464,7 @@ class UserAuthDetails(python_utils.OBJECT):
             )
 
         if (self.parent_user_id is not None and
-                not is_user_id_correct(self.parent_user_id)):
+                not is_user_id_valid(self.parent_user_id)):
             raise utils.ValidationError(
                 'The parent user ID is in a wrong format.')
 
@@ -479,7 +479,7 @@ class UserAuthDetails(python_utils.OBJECT):
                 'for a user.')
 
 
-def is_user_id_correct(user_id):
+def is_user_id_valid(user_id):
     """Verify that the user ID is in a correct format or that it belongs to
     a system user.
 
@@ -496,22 +496,7 @@ def is_user_id_correct(user_id):
     return all((
         user_id.islower(),
         user_id.startswith('uid_'),
-        len(user_id) == user_models.USER_ID_LENGTH))
-
-
-def is_pseudonymous_id(user_id):
-    """Check that the ID is a pseudonymous one.
-
-    Args:
-        user_id: str. The ID to be checked.
-
-    Returns:
-        bool. Whether the ID represents a pseudonymous user.
-    """
-    return all((
-        user_id.islower(),
-        user_id.startswith('pid_'),
-        len(user_id) == user_models.USER_ID_LENGTH))
+        len(user_id) == feconf.USER_ID_LENGTH))
 
 
 def is_username_taken(username):
@@ -1454,7 +1439,7 @@ def get_usernames(user_ids, strict=False):
     for index, user_id in enumerate(user_ids):
         if user_id in feconf.SYSTEM_USERS:
             usernames[index] = feconf.SYSTEM_USERS[user_id]
-        elif is_pseudonymous_id(user_id):
+        elif utils.is_pseudonymous_id(user_id):
             usernames[index] = _get_pseudonymous_username(user_id)
         else:
             non_system_user_indices.append(index)
@@ -1720,8 +1705,6 @@ def get_human_readable_user_ids(user_ids):
             logging.error('User id %s not known in list of user_ids %s' % (
                 user_ids[ind], user_ids))
             raise Exception('User not found.')
-        elif user_settings.user_id == feconf.SYSTEM_COMMITTER_ID:
-            usernames.append('admin')
         elif user_settings.username:
             usernames.append(user_settings.username)
         else:
