@@ -43,16 +43,9 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_has_reference_to_user_id(self):
-        collection = collection_domain.Collection.create_default_collection(
-            'id', title='A title',
-            category='A Category', objective='An Objective')
-        collection_services.save_new_collection('committer_id', collection)
-        self.assertTrue(
-            collection_models.CollectionModel
-            .has_reference_to_user_id('committer_id'))
         self.assertFalse(
             collection_models.CollectionModel
-            .has_reference_to_user_id('x_id'))
+            .has_reference_to_user_id('any_id'))
 
     def test_get_collection_count(self):
         collection = collection_domain.Collection.create_default_collection(
@@ -171,9 +164,6 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             self.assertTrue(
                 collection_models.CollectionRightsModel
                 .has_reference_to_user_id(self.USER_ID_4))
-            self.assertTrue(
-                collection_models.CollectionRightsModel
-                .has_reference_to_user_id(self.USER_ID_COMMITTER))
             self.assertFalse(
                 collection_models.CollectionRightsModel
                 .has_reference_to_user_id(self.USER_ID_3))
