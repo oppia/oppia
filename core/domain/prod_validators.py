@@ -109,7 +109,6 @@ TARGET_TYPE_TO_TARGET_MODEL = {
 VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION = [
     '%s\\.[A-Za-z0-9-_]{1,%s}' % (
         suggestion_models.SCORE_TYPE_QUESTION, base_models.ID_LENGTH)]
-ALLOWED_SENDER_EMAIL_ADDRESSES = ['noreply@oppia.org', 'admin@oppia.org']
 
 
 class RoleQueryAuditModelValidator(base_model_validators.BaseModelValidator):
@@ -1140,21 +1139,6 @@ class SentEmailModelValidator(base_model_validators.BaseModelValidator):
                     item.id, item.sent_datetime))
 
     @classmethod
-    def _validate_sender_email(cls, item):
-        """Validate that sender email is in the ALLOWED_SENDER_EMAIL_ADDRESSES
-        list.
-
-        Args:
-            item: ndb.Model. SentEmailModel to validate.
-        """
-        if item.sender_email not in ALLOWED_SENDER_EMAIL_ADDRESSES:
-            cls._add_error(
-                'sender %s' % (
-                    base_model_validators.ERROR_CATEGORY_EMAIL_CHECK),
-                'Entity id %s: Sender email %s in entity is not allowed.' % (
-                    item.id, item.sender_email))
-
-    @classmethod
     def _validate_recipient_email(
             cls, item, field_name_to_external_model_references):
         """Validate that recipient email corresponds to email of user obtained
@@ -1202,7 +1186,7 @@ class SentEmailModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _get_custom_validation_functions(cls):
-        return [cls._validate_sent_datetime, cls._validate_sender_email]
+        return [cls._validate_sent_datetime]
 
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):

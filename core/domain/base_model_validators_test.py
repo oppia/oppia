@@ -155,7 +155,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         expected_errors = {
             'domain object check': [
                 'Entity id mockmodel: Entity fails domain validation with '
-                'the error Invalid Validation Type for domain object: Invalid']}
+                'the error Invalid validation type for domain object: Invalid']}
         self.assertEqual(
             MockModelValidatorWithInvalidValidationType.errors, expected_errors)
 

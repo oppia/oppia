@@ -2972,18 +2972,6 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
-    def test_model_with_invalid_sender_email(self):
-        self.model_instance.sender_email = 'invalid@email.com'
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for sender email check of '
-            'SentEmailModel\', '
-            '[u\'Entity id %s: Sender email %s in entity is not '
-            'allowed.\']]') % (
-                self.model_instance.id, self.model_instance.sender_email)]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
     def test_model_with_invalid_recipient_email(self):
         self.recipient_model.email = 'invalid@email.com'
         self.recipient_model.put()
