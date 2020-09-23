@@ -41,6 +41,22 @@ class MockBaseModelValidator(base_model_validators.BaseModelValidator):
     pass
 
 
+class MockModelValidatorWithInvalidValidationType(
+        base_model_validators.BaseModelValidator):
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return []
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, unused_item):
+        return MockModel()
+
+    @classmethod
+    def _get_domain_object_validation_type(cls, unused_item):
+        return 'Invalid'
+
+
 class MockSummaryModelValidator(
         base_model_validators.BaseSummaryModelValidator):
 
@@ -132,6 +148,16 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             with self.swap(jobs_registry, 'ONE_OFF_JOB_MANAGERS', [job_class]):
                 job_id = job_class.create_new()
                 job_class.enqueue(job_id)
+
+    def test_error_is_raised_with_invalid_validation_type_for_domain_objects(
+            self):
+        MockModelValidatorWithInvalidValidationType.validate(self.item)
+        expected_errors = {
+            'domain object check': [
+                'Entity id mockmodel: Entity fails domain validation with '
+                'the error Invalid Validation Type for domain object: Invalid']}
+        self.assertEqual(
+            MockModelValidatorWithInvalidValidationType.errors, expected_errors)
 
     def test_no_error_is_raised_for_base_user_model(self):
         user = MockModel(id='12345')

@@ -198,7 +198,7 @@ class InteractionCustomizationArgsValidationOneOffJob(
                         state.interaction.id, e))
 
         if error_messages:
-            error_msg = ', '.encode(encoding='utf-8').join(error_messages)
+            error_msg = (', '.join(error_messages)).encode(encoding='utf-8')
             yield (
                 'Failed customization args validation for exp '
                 'id %s' % item.id, python_utils.convert_to_bytes(error_msg))

@@ -210,8 +210,12 @@ class BaseModelValidator(python_utils.OBJECT):
                 domain_object.validate()
             elif validation_type == VALIDATION_MODE_STRICT:
                 domain_object.validate(strict=True)
-            else:
+            elif validation_type == VALIDATION_MODE_NON_STRICT:
                 domain_object.validate(strict=False)
+            else:
+                raise Exception(
+                    'Invalid Validation Type for domain object: %s' % (
+                        validation_type))
         except Exception as e:
             cls._add_error(
                 ERROR_CATEGORY_DOMAIN_OBJECT_CHECK,
