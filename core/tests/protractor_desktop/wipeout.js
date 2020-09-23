@@ -16,6 +16,8 @@
  * @fileoverview End-to-end tests for user preferences.
  */
 var DeleteAccountPage = require('../protractor_utils/DeleteAccountPage.js');
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
@@ -36,8 +38,8 @@ describe('When account is deleted it', function() {
   });
 
   it('should delete account', async function() {
-    await users.createUser('user@delete.com', 'userToDelete');
-    await users.login('user@delete.com');
+    await users.createUser('user1@delete.com', 'userToDelete1');
+    await users.login('user1@delete.com');
     await deleteAccountPage.get();
     await deleteAccountPage.deleteAccount();
     expect(await browser.getCurrentUrl()).toEqual(
@@ -45,9 +47,9 @@ describe('When account is deleted it', function() {
   });
 
   it('should delete private exploration', async function() {
-    await users.createUser('user@delete.com', 'userToDelete');
+    await users.createUser('user2@delete.com', 'userToDelete2');
     await users.createUser('voiceArtist@oppia.com', 'voiceArtist');
-    await users.login('user@delete.com');
+    await users.login('user2@delete.com');
     await workflow.createExploration();
     var explorationId = await general.getExplorationIdFromEditor();
     await explorationEditorPage.navigateToSettingsTab();
@@ -60,12 +62,13 @@ describe('When account is deleted it', function() {
     await users.logout();
     await users.login('voiceArtist@oppia.com');
     await general.openEditor(explorationId); // Should fail
+    await general.expect404Error();
   });
 
   it('should set published exploration as community owned', async function() {
-    await users.createUser('user@delete.com', 'userToDelete');
+    await users.createUser('user3@delete.com', 'userToDelete3');
     await users.createUser('user@check.com', 'userForChecking');
-    await users.login('user@delete.com');
+    await users.login('user3@delete.com');
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
       EXPLORATION_CATEGORY,
@@ -83,7 +86,8 @@ describe('When account is deleted it', function() {
   });
 
   afterEach(async function() {
-    await general.checkForConsoleErrors([]);
+    await general.checkForConsoleErrors(
+      ['http://localhost:9001/create/.* - Failed to load resource: the server responded with a status of 404 (Not Found)']);
     await users.logout();
   });
 });
