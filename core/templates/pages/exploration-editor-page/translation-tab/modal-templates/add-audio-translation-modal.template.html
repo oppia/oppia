@@ -18,10 +18,10 @@
                  class="oppia-updated-audio-file-upload-message">
               <strong>Note:</strong> Uploading a new audio file will replace the existing audio file.
             </div>
-            <div ng-if="getErrorMessage()"
+            <div ng-if="errorMessage"
                  class="oppia-audio-file-upload-field-error-message protractor-test-audio-file-upload-field-error-message">
               <i class="material-icons">&#xE002;</i>
-              <[getErrorMessage()]>
+              <[errorMessage]>
             </div>
           </div>
         </div>

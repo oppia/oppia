@@ -24,11 +24,11 @@ require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
 
 angular.module('oppia').controller('AddAudioTranslationModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'AssetsBackendApiService',
+  '$controller', '$q', '$scope', '$uibModalInstance', 'AssetsBackendApiService',
   'ContextService', 'audioFile', 'generatedFilename', 'isAudioAvailable',
   'languageCode',
   function(
-      $controller, $scope, $uibModalInstance, AssetsBackendApiService,
+      $controller, $q, $scope, $uibModalInstance, AssetsBackendApiService,
       ContextService, audioFile, generatedFilename, isAudioAvailable,
       languageCode) {
     $controller('ConfirmOrCancelModalController', {
@@ -43,9 +43,6 @@ angular.module('oppia').controller('AddAudioTranslationModalController', [
 
     // Whether there was an error uploading the audio file.
     $scope.errorMessage = null;
-    // Getter which angular uses to notice when the message changes.
-    $scope.getErrorMessage = () => $scope.errorMessage;
-
     $scope.saveButtonText = BUTTON_TEXT_SAVE;
     $scope.saveInProgress = false;
     $scope.isAudioAvailable = isAudioAvailable;
@@ -75,8 +72,9 @@ angular.module('oppia').controller('AddAudioTranslationModalController', [
         $scope.saveInProgress = true;
         var explorationId = (
           ContextService.getExplorationId());
-        AssetsBackendApiService.saveAudio(
-          explorationId, generatedFilename, uploadedFile
+        $q.when(
+          AssetsBackendApiService.saveAudio(
+            explorationId, generatedFilename, uploadedFile)
         ).then(function(response) {
           $uibModalInstance.close({
             languageCode: languageCode,
