@@ -3148,6 +3148,29 @@ class GeneralVoiceoverApplicationModelValidator(
         return field_name_to_external_model_references
 
 
+class CommunityContributionStatsModelValidator(
+        base_model_validators.BaseModelValidator):
+    """Class for validating CommunityContributionStatsModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        # Since this is a singleton model, it has only one valid ID:
+        # community_contribution_stats.
+        return '^%s$' % (
+            suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return []
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return (
+            suggestion_services
+            .create_community_contribution_stats_from_model(item)
+        )
+
+
 class TopicModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating TopicModel."""
 
