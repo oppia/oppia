@@ -20,10 +20,9 @@
 // training-data.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-/* eslint-disable max-len */
 import { AnswerGroupsCacheService } from
+  /* eslint-disable-next-line max-len */
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
-/* eslint-enable max-len */
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';

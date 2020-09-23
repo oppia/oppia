@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model class for creating new frontend instances of ParamMetadata
- * domain objects.
+ * @fileoverview Model class for creating new frontend instances of
+ * ParamMetadata domain objects.
  */
 
 import { ExplorationEditorPageConstants } from

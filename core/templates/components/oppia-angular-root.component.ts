@@ -390,8 +390,7 @@ import { PlaythroughIssuesBackendApiService } from
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { PlaythroughService } from 'services/playthrough.service';
-import { PredictionAlgorithmRegistryService } from
-  'pages/exploration-player-page/services/prediction-algorithm-registry.service';
+import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
 import { ProfileLinkImageBackendApiService } from
@@ -685,12 +684,16 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static endExplorationRulesService: EndExplorationRulesService;
   static endExplorationValidationService: EndExplorationValidationService;
   static explorationDiffService: ExplorationDiffService;
-  static explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService;
+  static explorationFeaturesBackendApiService:
+    ExplorationFeaturesBackendApiService;
   static explorationFeaturesService: ExplorationFeaturesService;
   static explorationHtmlFormatterService: ExplorationHtmlFormatterService;
-  static explorationImprovementsBackendApiService: ExplorationImprovementsBackendApiService;
-  static explorationImprovementsConfigObjectFactory: ExplorationImprovementsConfigObjectFactory;
-  static explorationImprovementsTaskRegistryService: ExplorationImprovementsTaskRegistryService;
+  static explorationImprovementsBackendApiService:
+    ExplorationImprovementsBackendApiService;
+  static explorationImprovementsConfigObjectFactory:
+    ExplorationImprovementsConfigObjectFactory;
+  static explorationImprovementsTaskRegistryService:
+    ExplorationImprovementsTaskRegistryService;
   static explorationObjectFactory: ExplorationObjectFactory;
   static explorationOpportunitySummaryObjectFactory:
     ExplorationOpportunitySummaryObjectFactory;
@@ -932,9 +935,11 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static threadStatusDisplayService: ThreadStatusDisplayService;
   static topicCreationBackendApiService: TopicCreationBackendApiService;
   static topicObjectFactory: TopicObjectFactory;
-  static topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService;
+  static topicsAndSkillsDashboardBackendApiService:
+    TopicsAndSkillsDashboardBackendApiService;
   static topicSummaryObjectFactory: TopicSummaryObjectFactory;
-  static topicsAndSkillsDashboardPageService: TopicsAndSkillsDashboardPageService;
+  static topicsAndSkillsDashboardPageService:
+    TopicsAndSkillsDashboardPageService;
   static topicViewerBackendApiService: TopicViewerBackendApiService;
   static translateService: TranslateService;
   static unitsObjectFactory: UnitsObjectFactory;
@@ -1036,12 +1041,16 @@ private emailDashboardQueryResultsObjectFactory:
 private endExplorationRulesService: EndExplorationRulesService,
 private endExplorationValidationService: EndExplorationValidationService,
 private explorationDiffService: ExplorationDiffService,
-private explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService,
+private explorationFeaturesBackendApiService:
+  ExplorationFeaturesBackendApiService,
 private explorationFeaturesService: ExplorationFeaturesService,
 private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
-private explorationImprovementsBackendApiService: ExplorationImprovementsBackendApiService,
-private explorationImprovementsConfigObjectFactory: ExplorationImprovementsConfigObjectFactory,
-private explorationImprovementsTaskRegistryService: ExplorationImprovementsTaskRegistryService,
+private explorationImprovementsBackendApiService:
+  ExplorationImprovementsBackendApiService,
+private explorationImprovementsConfigObjectFactory:
+  ExplorationImprovementsConfigObjectFactory,
+private explorationImprovementsTaskRegistryService:
+  ExplorationImprovementsTaskRegistryService,
 private explorationObjectFactory: ExplorationObjectFactory,
 private explorationOpportunitySummaryObjectFactory:
   ExplorationOpportunitySummaryObjectFactory,
@@ -1285,9 +1294,11 @@ private threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory,
 private threadStatusDisplayService: ThreadStatusDisplayService,
 private topicCreationBackendApiService: TopicCreationBackendApiService,
 private topicObjectFactory: TopicObjectFactory,
-private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService,
+private topicsAndSkillsDashboardBackendApiService:
+  TopicsAndSkillsDashboardBackendApiService,
 private topicSummaryObjectFactory: TopicSummaryObjectFactory,
-private topicsAndSkillsDashboardPageService: TopicsAndSkillsDashboardPageService,
+private topicsAndSkillsDashboardPageService:
+  TopicsAndSkillsDashboardPageService,
 private topicViewerBackendApiService: TopicViewerBackendApiService,
 private translateService: TranslateService,
 private unitsObjectFactory: UnitsObjectFactory,
@@ -1323,43 +1334,77 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.algebraicExpressionInputValidationService = (
       this.algebraicExpressionInputValidationService);
     OppiaAngularRootComponent.angularNameService = this.angularNameService;
-    OppiaAngularRootComponent.answerClassificationService = this.answerClassificationService;
-    OppiaAngularRootComponent.answerGroupsCacheService = this.answerGroupsCacheService;
-    OppiaAngularRootComponent.answerGroupObjectFactory = this.answerGroupObjectFactory;
-    OppiaAngularRootComponent.answerStatsObjectFactory = this.answerStatsObjectFactory;
+    OppiaAngularRootComponent.answerClassificationService = (
+      this.answerClassificationService);
+    OppiaAngularRootComponent.answerGroupsCacheService = (
+      this.answerGroupsCacheService);
+    OppiaAngularRootComponent.answerGroupObjectFactory = (
+      this.answerGroupObjectFactory);
+    OppiaAngularRootComponent.answerStatsObjectFactory = (
+      this.answerStatsObjectFactory);
     OppiaAngularRootComponent.appService = this.appService;
-    OppiaAngularRootComponent.assignedSkillObjectFactory = this.assignedSkillObjectFactory;
-    OppiaAngularRootComponent.audioBarStatusService = this.audioBarStatusService;
-    OppiaAngularRootComponent.audioTranslationLanguageService = this.audioTranslationLanguageService;
-    OppiaAngularRootComponent.audioTranslationManagerService = this.audioTranslationManagerService;
-    OppiaAngularRootComponent.augmentedSkillSummaryObjectFactory = this.augmentedSkillSummaryObjectFactory;
-    OppiaAngularRootComponent.autogeneratedAudioPlayerService = this.autogeneratedAudioPlayerService;
-    OppiaAngularRootComponent.autoplayedVideosService = this.autoplayedVideosService;
-    OppiaAngularRootComponent.backgroundMaskService = this.backgroundMaskService;
-    OppiaAngularRootComponent.baseInteractionValidationService = this.baseInteractionValidationService;
-    OppiaAngularRootComponent.bottomNavbarStatusService = this.bottomNavbarStatusService;
-    OppiaAngularRootComponent.browserCheckerService = this.browserCheckerService;
-    OppiaAngularRootComponent.camelCaseToHyphensPipe = this.camelCaseToHyphensPipe;
-    OppiaAngularRootComponent.ckEditorCopyContentService = this.ckEditorCopyContentService,
-    OppiaAngularRootComponent.classroomBackendApiService = this.classroomBackendApiService;
-    OppiaAngularRootComponent.classroomDataObjectFactory = this.classroomDataObjectFactory;
-    OppiaAngularRootComponent.clientContextObjectFactory = this.clientContextObjectFactory;
-    OppiaAngularRootComponent.codeNormalizerService = this.codeNormalizerService;
-    OppiaAngularRootComponent.codeReplPredictionService = this.codeReplPredictionService;
+    OppiaAngularRootComponent.assignedSkillObjectFactory = (
+      this.assignedSkillObjectFactory);
+    OppiaAngularRootComponent.audioBarStatusService = (
+      this.audioBarStatusService);
+    OppiaAngularRootComponent.audioTranslationLanguageService = (
+      this.audioTranslationLanguageService);
+    OppiaAngularRootComponent.audioTranslationManagerService = (
+      this.audioTranslationManagerService);
+    OppiaAngularRootComponent.augmentedSkillSummaryObjectFactory = (
+      this.augmentedSkillSummaryObjectFactory);
+    OppiaAngularRootComponent.autogeneratedAudioPlayerService = (
+      this.autogeneratedAudioPlayerService);
+    OppiaAngularRootComponent.autoplayedVideosService = (
+      this.autoplayedVideosService);
+    OppiaAngularRootComponent.backgroundMaskService = (
+      this.backgroundMaskService);
+    OppiaAngularRootComponent.baseInteractionValidationService = (
+      this.baseInteractionValidationService);
+    OppiaAngularRootComponent.bottomNavbarStatusService = (
+      this.bottomNavbarStatusService);
+    OppiaAngularRootComponent.browserCheckerService = (
+      this.browserCheckerService);
+    OppiaAngularRootComponent.camelCaseToHyphensPipe = (
+      this.camelCaseToHyphensPipe);
+    OppiaAngularRootComponent.ckEditorCopyContentService = (
+      this.ckEditorCopyContentService),
+    OppiaAngularRootComponent.classroomBackendApiService = (
+      this.classroomBackendApiService);
+    OppiaAngularRootComponent.classroomDataObjectFactory = (
+      this.classroomDataObjectFactory);
+    OppiaAngularRootComponent.clientContextObjectFactory = (
+      this.clientContextObjectFactory);
+    OppiaAngularRootComponent.codeNormalizerService = (
+      this.codeNormalizerService);
+    OppiaAngularRootComponent.codeReplPredictionService = (
+      this.codeReplPredictionService);
     OppiaAngularRootComponent.codeReplRulesService = this.codeReplRulesService;
-    OppiaAngularRootComponent.codeReplValidationService = this.codeReplValidationService;
-    OppiaAngularRootComponent.collectionCreationBackendService = this.collectionCreationBackendService;
-    OppiaAngularRootComponent.collectionCreationService = this.collectionCreationService;
-    OppiaAngularRootComponent.collectionNodeObjectFactory = this.collectionNodeObjectFactory;
-    OppiaAngularRootComponent.collectionObjectFactory = this.collectionObjectFactory;
-    OppiaAngularRootComponent.collectionPlaythroughObjectFactory = this.collectionPlaythroughObjectFactory;
-    OppiaAngularRootComponent.collectionRightsBackendApiService = this.collectionRightsBackendApiService;
-    OppiaAngularRootComponent.collectionRightsObjectFactory = this.collectionRightsObjectFactory;
-    OppiaAngularRootComponent.collectionSummaryObjectFactory = this.collectionSummaryObjectFactory;
-    OppiaAngularRootComponent.collectionValidationService = this.collectionValidationService;
-    OppiaAngularRootComponent.computationDataObjectFactory = this.computationDataObjectFactory;
+    OppiaAngularRootComponent.codeReplValidationService = (
+      this.codeReplValidationService);
+    OppiaAngularRootComponent.collectionCreationBackendService = (
+      this.collectionCreationBackendService);
+    OppiaAngularRootComponent.collectionCreationService = (
+      this.collectionCreationService);
+    OppiaAngularRootComponent.collectionNodeObjectFactory = (
+      this.collectionNodeObjectFactory);
+    OppiaAngularRootComponent.collectionObjectFactory = (
+      this.collectionObjectFactory);
+    OppiaAngularRootComponent.collectionPlaythroughObjectFactory = (
+      this.collectionPlaythroughObjectFactory);
+    OppiaAngularRootComponent.collectionRightsBackendApiService = (
+      this.collectionRightsBackendApiService);
+    OppiaAngularRootComponent.collectionRightsObjectFactory = (
+      this.collectionRightsObjectFactory);
+    OppiaAngularRootComponent.collectionSummaryObjectFactory = (
+      this.collectionSummaryObjectFactory);
+    OppiaAngularRootComponent.collectionValidationService = (
+      this.collectionValidationService);
+    OppiaAngularRootComponent.computationDataObjectFactory = (
+      this.computationDataObjectFactory);
     OppiaAngularRootComponent.computeGraphService = this.computeGraphService;
-    OppiaAngularRootComponent.conceptCardObjectFactory = this.conceptCardObjectFactory;
+    OppiaAngularRootComponent.conceptCardObjectFactory = (
+      this.conceptCardObjectFactory);
     OppiaAngularRootComponent.contextService = this.contextService;
     OppiaAngularRootComponent.continueRulesService = this.continueRulesService;
     OppiaAngularRootComponent.continueValidationService = (
@@ -1392,39 +1437,71 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.editableCollectionBackendApiService = (
       this.editableCollectionBackendApiService);
     OppiaAngularRootComponent.editabilityService = this.editabilityService;
-    OppiaAngularRootComponent.editorFirstTimeEventsService = this.editorFirstTimeEventsService;
-    OppiaAngularRootComponent.emailDashboardBackendApiService = this.emailDashboardBackendApiService;
-    OppiaAngularRootComponent.emailDashboardDataService = this.emailDashboardDataService;
-    OppiaAngularRootComponent.emailDashboardQueryObjectFactory = this.emailDashboardQueryObjectFactory;
-    OppiaAngularRootComponent.emailDashboardQueryResultsObjectFactory = this.emailDashboardQueryResultsObjectFactory;
-    OppiaAngularRootComponent.endExplorationRulesService = this.endExplorationRulesService;
-    OppiaAngularRootComponent.endExplorationValidationService = this.endExplorationValidationService;
-    OppiaAngularRootComponent.explorationDiffService = this.explorationDiffService;
-    OppiaAngularRootComponent.explorationFeaturesBackendApiService = this.explorationFeaturesBackendApiService;
-    OppiaAngularRootComponent.explorationFeaturesService = this.explorationFeaturesService;
-    OppiaAngularRootComponent.explorationHtmlFormatterService = this.explorationHtmlFormatterService;
-    OppiaAngularRootComponent.explorationImprovementsBackendApiService = this.explorationImprovementsBackendApiService;
-    OppiaAngularRootComponent.explorationImprovementsConfigObjectFactory = this.explorationImprovementsConfigObjectFactory;
-    OppiaAngularRootComponent.explorationImprovementsTaskRegistryService = this.explorationImprovementsTaskRegistryService;
-    OppiaAngularRootComponent.explorationObjectFactory = this.explorationObjectFactory;
-    OppiaAngularRootComponent.explorationOpportunitySummaryObjectFactory = this.explorationOpportunitySummaryObjectFactory;
-    OppiaAngularRootComponent.expressionParserService = this.expressionParserService;
-    OppiaAngularRootComponent.explorationPermissionsBackendApiService = this.explorationPermissionsBackendApiService;
-    OppiaAngularRootComponent.explorationPermissionsObjectFactory = this.explorationPermissionsObjectFactory;
-    OppiaAngularRootComponent.explorationRecommendationsBackendApiService = this.explorationRecommendationsBackendApiService;
-    OppiaAngularRootComponent.explorationRecommendationsService = this.explorationRecommendationsService;
-    OppiaAngularRootComponent.explorationStatsBackendApiService = this.explorationStatsBackendApiService;
-    OppiaAngularRootComponent.explorationStatsObjectFactory = this.explorationStatsObjectFactory;
-    OppiaAngularRootComponent.explorationStatsService = this.explorationStatsService;
-    OppiaAngularRootComponent.explorationTaskObjectFactory = this.explorationTaskObjectFactory;
-    OppiaAngularRootComponent.expressionSyntaxTreeService = this.expressionSyntaxTreeService;
-    OppiaAngularRootComponent.extensionTagAssemblerService = this.extensionTagAssemblerService;
+    OppiaAngularRootComponent.editorFirstTimeEventsService = (
+      this.editorFirstTimeEventsService);
+    OppiaAngularRootComponent.emailDashboardBackendApiService = (
+      this.emailDashboardBackendApiService);
+    OppiaAngularRootComponent.emailDashboardDataService = (
+      this.emailDashboardDataService);
+    OppiaAngularRootComponent.emailDashboardQueryObjectFactory = (
+      this.emailDashboardQueryObjectFactory);
+    OppiaAngularRootComponent.emailDashboardQueryResultsObjectFactory = (
+      this.emailDashboardQueryResultsObjectFactory);
+    OppiaAngularRootComponent.endExplorationRulesService = (
+      this.endExplorationRulesService);
+    OppiaAngularRootComponent.endExplorationValidationService = (
+      this.endExplorationValidationService);
+    OppiaAngularRootComponent.explorationDiffService = (
+      this.explorationDiffService);
+    OppiaAngularRootComponent.explorationFeaturesBackendApiService = (
+      this.explorationFeaturesBackendApiService);
+    OppiaAngularRootComponent.explorationFeaturesService = (
+      this.explorationFeaturesService);
+    OppiaAngularRootComponent.explorationHtmlFormatterService = (
+      this.explorationHtmlFormatterService);
+    OppiaAngularRootComponent.explorationImprovementsBackendApiService = (
+      this.explorationImprovementsBackendApiService);
+    OppiaAngularRootComponent.explorationImprovementsConfigObjectFactory = (
+      this.explorationImprovementsConfigObjectFactory);
+    OppiaAngularRootComponent.explorationImprovementsTaskRegistryService = (
+      this.explorationImprovementsTaskRegistryService);
+    OppiaAngularRootComponent.explorationObjectFactory = (
+      this.explorationObjectFactory);
+    OppiaAngularRootComponent.explorationOpportunitySummaryObjectFactory = (
+      this.explorationOpportunitySummaryObjectFactory);
+    OppiaAngularRootComponent.expressionParserService = (
+      this.expressionParserService);
+    OppiaAngularRootComponent.explorationPermissionsBackendApiService = (
+      this.explorationPermissionsBackendApiService);
+    OppiaAngularRootComponent.explorationPermissionsObjectFactory = (
+      this.explorationPermissionsObjectFactory);
+    OppiaAngularRootComponent.explorationRecommendationsBackendApiService = (
+      this.explorationRecommendationsBackendApiService);
+    OppiaAngularRootComponent.explorationRecommendationsService = (
+      this.explorationRecommendationsService);
+    OppiaAngularRootComponent.explorationStatsBackendApiService = (
+      this.explorationStatsBackendApiService);
+    OppiaAngularRootComponent.explorationStatsObjectFactory = (
+      this.explorationStatsObjectFactory);
+    OppiaAngularRootComponent.explorationStatsService = (
+      this.explorationStatsService);
+    OppiaAngularRootComponent.explorationTaskObjectFactory = (
+      this.explorationTaskObjectFactory);
+    OppiaAngularRootComponent.expressionSyntaxTreeService = (
+      this.expressionSyntaxTreeService);
+    OppiaAngularRootComponent.extensionTagAssemblerService = (
+      this.extensionTagAssemblerService);
     OppiaAngularRootComponent.externalSaveService = this.externalSaveService;
-    OppiaAngularRootComponent.extractImageFilenamesFromStateService = this.extractImageFilenamesFromStateService;
-    OppiaAngularRootComponent.featuredTranslationLanguageObjectFactory = this.featuredTranslationLanguageObjectFactory;
-    OppiaAngularRootComponent.featureStatusSummaryObjectFactory = this.featureStatusSummaryObjectFactory;
-    OppiaAngularRootComponent.feedbackMessageSummaryObjectFactory = this.feedbackMessageSummaryObjectFactory;
-    OppiaAngularRootComponent.feedbackThreadObjectFactory = this.feedbackThreadObjectFactory;
+    OppiaAngularRootComponent.extractImageFilenamesFromStateService = (
+      this.extractImageFilenamesFromStateService);
+    OppiaAngularRootComponent.featuredTranslationLanguageObjectFactory = (
+      this.featuredTranslationLanguageObjectFactory);
+    OppiaAngularRootComponent.featureStatusSummaryObjectFactory = (
+      this.featureStatusSummaryObjectFactory);
+    OppiaAngularRootComponent.feedbackMessageSummaryObjectFactory = (
+      this.feedbackMessageSummaryObjectFactory);
+    OppiaAngularRootComponent.feedbackThreadObjectFactory = (
+      this.feedbackThreadObjectFactory);
     OppiaAngularRootComponent.formatTimePipe = this.formatTimePipe;
     OppiaAngularRootComponent.fractionInputRulesService = (
       this.fractionInputRulesService);
@@ -1455,8 +1532,10 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.i18nLanguageCodeService = (
       this.i18nLanguageCodeService);
     OppiaAngularRootComponent.idGenerationService = this.idGenerationService;
-    OppiaAngularRootComponent.imageClickInputRulesService = this.imageClickInputRulesService;
-    OppiaAngularRootComponent.imageClickInputValidationService = this.imageClickInputValidationService;
+    OppiaAngularRootComponent.imageClickInputRulesService = (
+      this.imageClickInputRulesService);
+    OppiaAngularRootComponent.imageClickInputValidationService = (
+      this.imageClickInputValidationService);
     OppiaAngularRootComponent.improvementsService = this.improvementsService;
     OppiaAngularRootComponent.ineffectiveFeedbackLoopTaskObjectFactory = (
       this.ineffectiveFeedbackLoopTaskObjectFactory);

@@ -20,7 +20,7 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 
-import { AnswerClassificationResult } from 
+import { AnswerClassificationResult } from
   'domain/classifier/answer-classification-result.model';
 
 require('domain/exploration/OutcomeObjectFactory.ts');

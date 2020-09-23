@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model class for creating new frontend instances of feedback thread
-   domain objects.
+ * @fileoverview Model class for creating new frontend instances of
+ * feedback thread domain objects.
  */
 
 export interface FeedbackThreadSummaryBackendDict {

@@ -13,9 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model class for creating and mutating instances of frontend change
- * domain objects. This frontend object represents both CollectionChange and
- * ExplorationChange backend domain objects.
+ * @fileoverview Model class for creating and mutating instances of frontend
+ * change domain objects. This frontend object represents both CollectionChange
+ * and ExplorationChange backend domain objects.
  */
 
 // TODO(bhenning): Consolidate the backend ExplorationChange and
