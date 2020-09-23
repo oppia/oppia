@@ -269,6 +269,14 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/pages/library-page/search-bar/'
             'search-bar.component.spec.ts'),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'import \{.*\} from \'lodash\''),
+        'message': (
+            'Please do not use "import { someFunction } from \'lodash\'". '
+            'Use "import someFunction from \'lodash/someFunction\'" instead.'),
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 
