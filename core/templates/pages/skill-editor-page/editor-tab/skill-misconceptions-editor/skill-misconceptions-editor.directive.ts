@@ -111,8 +111,10 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
           };
 
           $scope.toggleMisconceptionLists = function() {
-            $scope.misconceptionsListIsShown = (
-              !$scope.misconceptionsListIsShown);
+            if (WindowDimensionsService.isWindowNarrow()) {
+              $scope.misconceptionsListIsShown = (
+                !$scope.misconceptionsListIsShown);
+            }
           };
 
           ctrl.$onInit = function() {

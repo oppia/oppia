@@ -18,9 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-/* eslint-disable max-len */
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
-/* eslint-disable max-len */
 
 describe('State hints service', () => {
   let shs: StateHintsService = null;

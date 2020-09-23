@@ -30,6 +30,7 @@ from core.domain import draft_upgrade_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import param_domain
 from core.domain import rating_services
@@ -46,10 +47,10 @@ import python_utils
 import utils
 
 (
-    exp_models, opportunity_models,
+    feedback_models, exp_models, opportunity_models,
     recommendations_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.opportunity,
+    models.NAMES.feedback, models.NAMES.exploration, models.NAMES.opportunity,
     models.NAMES.recommendations, models.NAMES.user
 ])
 search_services = models.Registry.import_search_services()
@@ -152,8 +153,13 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                         self.owner_id, self.EXP_0_ID, change_list, '')
 
         exp = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        job = classifier_services.get_classifier_training_jobs(
-            self.EXP_0_ID, exp.version, [feconf.DEFAULT_INIT_STATE_NAME])[0]
+        interaction_id = exp.states[
+            feconf.DEFAULT_INIT_STATE_NAME].interaction.id
+        algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            interaction_id]['algorithm_id']
+        job = classifier_services.get_classifier_training_job(
+            self.EXP_0_ID, exp.version, feconf.DEFAULT_INIT_STATE_NAME,
+            algorithm_id)
         self.assertIsNotNone(job)
 
         change_list = [exp_domain.ExplorationChange({
@@ -174,9 +180,9 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                         self.owner_id, self.EXP_0_ID, exp.version,
                         exp.version - 1)
 
-        exp = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        new_job = classifier_services.get_classifier_training_jobs(
-            self.EXP_0_ID, exp.version, [feconf.DEFAULT_INIT_STATE_NAME])[0]
+        new_job = classifier_services.get_classifier_training_job(
+            self.EXP_0_ID, exp.version, feconf.DEFAULT_INIT_STATE_NAME,
+            algorithm_id)
         self.assertIsNotNone(new_job)
         self.assertEqual(job.job_id, new_job.job_id)
 
@@ -822,6 +828,31 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
                 self.EXP_1_ID))
 
+    def test_feedbacks_belonging_to_exploration_are_deleted(self):
+        """Tests that feedbacks belonging to exploration are deleted."""
+        self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
+        thread_1_id = feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.EXP_0_ID,
+            self.owner_id,
+            'subject',
+            'text'
+        )
+        thread_2_id = feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.EXP_0_ID,
+            self.owner_id,
+            'subject 2',
+            'text 2'
+        )
+
+        exp_services.delete_explorations(self.owner_id, [self.EXP_0_ID])
+
+        self.assertIsNone(feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            thread_1_id))
+        self.assertIsNone(feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            thread_2_id))
+
     def test_exploration_is_removed_from_index_when_deleted(self):
         """Tests that exploration is removed from the search index when
         deleted.
@@ -1037,30 +1068,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(explorations['exp_id_2'].category, 'category 2')
         self.assertEqual(
             explorations['exp_id_2'].objective, 'objective 2')
-
-    def test_get_state_classifier_mapping(self):
-        yaml_path = os.path.join(
-            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        with python_utils.open_file(
-            yaml_path, 'rb', encoding=None) as yaml_file:
-            yaml_content = yaml_file.read()
-
-        exploration = exp_fetchers.get_exploration_by_id('exp_id', strict=False)
-        self.assertIsNone(exploration)
-
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.save_new_exploration_from_yaml_and_assets(
-                feconf.SYSTEM_COMMITTER_ID, yaml_content, 'exp_id', [])
-
-        state_classifier_mapping = exp_services.get_user_exploration_data(
-            'user_id', 'exp_id')['state_classifier_mapping']
-
-        self.assertEqual(len(state_classifier_mapping), 1)
-
-        self.assertEqual(
-            state_classifier_mapping['Home']['data_schema_version'], 1)
-        self.assertEqual(
-            state_classifier_mapping['Home']['algorithm_id'], 'TextClassifier')
 
     def test_cannot_get_multiple_explorations_by_version_with_invalid_handler(
             self):
