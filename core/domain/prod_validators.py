@@ -23,6 +23,7 @@ import datetime
 import itertools
 import re
 
+from constants import constants
 from core.domain import base_model_validators
 from core.domain import classifier_domain
 from core.domain import classifier_services
@@ -57,7 +58,6 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.domain import voiceover_services
 from core.platform import models
-from constants import constants
 import feconf
 import python_utils
 import utils
@@ -3173,6 +3173,12 @@ class CommunityContributionStatsModelValidator(
 
     @classmethod
     def _validate_translation_reviewer_counts(cls, item):
+        """For each language code, validate that the translation reviewer
+        count matches the number of translation reviewers in the datastore.
+
+        Args:
+            item: ndb.Model. CommunityContributionStatsModel to validate.
+        """
         supported_language_codes = [
             language_code['id'] for language_code in
             constants.SUPPORTED_AUDIO_LANGUAGES
@@ -3191,30 +3197,37 @@ class CommunityContributionStatsModelValidator(
                 if model_translation_reviewer_count != (
                         expected_translation_reviewer_count):
                     cls._add_error(
-                    'translation reviewer %s' % (
-                        base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
-                    'Entity id %s: Translation reviewer count for language '
-                    'code %s: %s does not match the expected translation '
-                    'reviewer count for language code %s: %s' % (
-                        item.id, language_code,
-                        model_translation_reviewer_count, language_code,
-                        expected_translation_reviewer_count)
-                    )
+                        'translation reviewer %s' % (
+                            base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
+                        'Entity id %s: Translation reviewer count for language'
+                        ' code %s: %s does not match the expected translation '
+                        'reviewer count for language code %s: %s' % (
+                            item.id, language_code,
+                            model_translation_reviewer_count, language_code,
+                            expected_translation_reviewer_count)
+                        )
             elif expected_translation_reviewer_count != 0:
                 cls._add_error(
                     'translation reviewer count %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
-                        'Entity id %s: The translation reviewer count for '
-                        'language code %s is %s, expect model %s to have the '
-                        'language code %s in its translation reviewer counts '
-                        'but it doesn\'t exist.' % (
-                            item.id, language_code,
-                            expected_translation_reviewer_count,
-                            model_class.__name__, language_code)
-                    )
+                    'Entity id %s: The translation reviewer count for '
+                    'language code %s is %s, expect model %s to have the '
+                    'language code %s in its translation reviewer counts '
+                    'but it doesn\'t exist.' % (
+                        item.id, language_code,
+                        expected_translation_reviewer_count,
+                        item.model_class.__name__, language_code)
+                )
 
     @classmethod
     def _validate_translation_suggestion_counts(cls, item):
+        """For each language code, validate that the translation suggestion
+        count matches the number of translation suggestions in the datastore
+        that are currently in review.
+
+        Args:
+            item: ndb.Model. CommunityContributionStatsModel to validate.
+        """
         supported_language_codes = [
             language_code['id'] for language_code in
             constants.SUPPORTED_AUDIO_LANGUAGES
@@ -3233,30 +3246,37 @@ class CommunityContributionStatsModelValidator(
                 if model_translation_suggestion_count != (
                         expected_translation_suggestion_count):
                     cls._add_error(
-                    'translation suggestion %s' % (
-                        base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
-                    'Entity id %s: Translation suggestion count for language '
-                    'code %s: %s does not match the expected translation '
-                    'suggestion count for language code %s: %s' % (
-                        item.id, language_code,
-                        model_translation_suggestion_count, language_code,
-                        expected_translation_suggestion_count)
-                    )
+                        'translation suggestion %s' % (
+                            base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
+                        'Entity id %s: Translation suggestion count for '
+                        'language code %s: %s does not match the expected '
+                        'translation suggestion count for language code %s: '
+                        '%s' % (
+                            item.id, language_code,
+                            model_translation_suggestion_count, language_code,
+                            expected_translation_suggestion_count)
+                        )
             elif expected_translation_suggestion_count != 0:
                 cls._add_error(
                     'translation suggestion count %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
-                        'Entity id %s: The translation suggestion count for '
-                        'language code %s is %s, expect model %s to have the '
-                        'language code %s in its translation suggestion '
-                        'counts but it doesn\'t exist.' % (
-                            item.id, language_code,
-                            expected_translation_suggestion_count,
-                            model_class.__name__, language_code)
-                    )
+                    'Entity id %s: The translation suggestion count for '
+                    'language code %s is %s, expect model %s to have the '
+                    'language code %s in its translation suggestion '
+                    'counts but it doesn\'t exist.' % (
+                        item.id, language_code,
+                        expected_translation_suggestion_count,
+                        item.model_class.__name__, language_code)
+                )
 
     @classmethod
     def _validate_question_reviewer_count(cls, item):
+        """Validate that the question reviewer count matches the number of
+        question reviewers in the datastore.
+
+        Args:
+            item: ndb.Model. CommunityContributionStatsModel to validate.
+        """
         expected_question_reviewer_count = (
             user_models.UserContributionRightsModel
             .get_number_of_question_reviewers()
@@ -3273,6 +3293,12 @@ class CommunityContributionStatsModelValidator(
 
     @classmethod
     def _validate_question_suggestion_count(cls, item):
+        """Validate that the question suggestion count matches the number of
+        question suggestions in the datastore that are currently in review.
+
+        Args:
+            item: ndb.Model. CommunityContributionStatsModel to validate.
+        """
         expected_question_suggestion_count = (
             suggestion_models.GeneralSuggestionModel
             .get_number_of_question_suggestions_in_review()
@@ -3286,7 +3312,7 @@ class CommunityContributionStatsModelValidator(
                     item.id, item.question_suggestion_count,
                     expected_question_suggestion_count)
             )
-                  
+
     @classmethod
     def _get_custom_validation_functions(cls):
         return [

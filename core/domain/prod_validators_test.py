@@ -9511,10 +9511,10 @@ class CommunityContributionStatsModelValidatorTests(
 
         self.signup(
             self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
-        self.author_id= self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(
             self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
-        self.reviewer_id= self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -9598,7 +9598,7 @@ class CommunityContributionStatsModelValidatorTests(
                 stats_model.id, self.sample_language_code,
                 stats_model.translation_reviewer_counts_by_lang_code[
                     self.sample_language_code], self.sample_language_code),
-        
+
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the translation '

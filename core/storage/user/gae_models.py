@@ -2288,7 +2288,7 @@ class UserContributionRightsModel(base_models.BaseModel):
             Int. The number of reviewers who have permission to review
             question suggestions.
         """
-        return cls.query(cls.can_review_questions == True).count()
+        return cls.query(cls.can_review_questions == True).count() # pylint: disable=singleton-comparison
 
     @classmethod
     def get_voiceover_reviewer_user_ids(cls, language_code):
