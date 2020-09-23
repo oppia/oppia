@@ -17,9 +17,9 @@
  */
 
 import { FeatureStatusSummary, FeatureNames } from
-  './feature-status-summary.model';
+  'domain/platform_feature/feature-status-summary.model';
 
-describe('FeatureStatusSummaryObjectFactory', () => {
+describe('Feature Status Summary Model', () => {
   it('should create an instance from a backend dict.', () => {
     const summary = FeatureStatusSummary.createFromBackendDict({
       [FeatureNames.DummyFeature]: true,

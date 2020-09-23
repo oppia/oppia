@@ -21,7 +21,7 @@ import {
   ExplorationOpportunitySummaryBackendDict,
 } from 'domain/opportunity/exploration-opportunity-summary.model';
 
-describe('Exploration opportunity summary object factory', () => {
+describe('Exploration opportunity summary model', () => {
   describe('ExplorationOpportunitySummaryObjectFactory', () => {
     let backendDict: ExplorationOpportunitySummaryBackendDict;
 

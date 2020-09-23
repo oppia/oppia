@@ -34,7 +34,7 @@ import {
 import {
   Job,
   JobDataBackendDict,
-} from 'domain/admin/job-data.model';
+} from 'domain/admin/job.model';
 import {
   JobStatusSummary,
   JobStatusSummaryBackendDict,

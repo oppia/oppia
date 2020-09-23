@@ -101,8 +101,7 @@ describe('Topics and Skills Dashboard Page', function() {
                 .createFromBackendDict(backendDict)),
             untriagedSkillSummaries: (
               sampleDataResults.untriaged_skill_summary_dicts.map(
-                (backendDict: unknown) => SkillSummary
-                  .createFromBackendDict(
+                (backendDict: unknown) => SkillSummary.createFromBackendDict(
                     backendDict as SkillSummaryBackendDict))),
             allClassroomNames: sampleDataResults.all_classroom_names,
             canCreateTopic: sampleDataResults.can_create_topic,

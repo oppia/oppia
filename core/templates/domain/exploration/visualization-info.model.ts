@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend domain object for visualization info.
+ * @fileoverview Frontend model for visualization info.
  */
 
 import { AnswerStats } from

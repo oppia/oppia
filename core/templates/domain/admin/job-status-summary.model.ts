@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend domain object factory for job specs.
+ * @fileoverview Frontend model for job specs.
  */
 
 export interface JobStatusSummaryBackendDict {

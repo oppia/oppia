@@ -24,9 +24,9 @@ import { AdminPageData, AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
-import { ComputationData } from './computation-data.model';
-import { Job } from './job-data.model';
-import { JobStatusSummary } from './job-status-summary.model';
+import { ComputationData } from 'domain/admin/computation-data.model';
+import { Job } from 'domain/admin/job.model';
+import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;

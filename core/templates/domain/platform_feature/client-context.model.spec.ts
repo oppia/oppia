@@ -19,7 +19,7 @@
 import { ClientContext } from
   'domain/platform_feature/client-context.model';
 
-describe('PlatformParameterMetadataObjectFactory', () => {
+describe('Client Context Model', () => {
   it('should create an instance.', () => {
     const context = ClientContext.create('Web', 'Chrome', 'en');
 

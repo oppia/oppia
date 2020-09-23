@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating FeatureStatusSummary domain objects.
+ * @fileoverview Factory model for FeatureStatusSummary.
  */
 
 /**

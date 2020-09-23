@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for job-data.model.
  */
 
-import { Job } from 'domain/admin/job-data.model';
+import { Job } from 'domain/admin/job.model';
 
-describe('Job Data Object Factory', () => {
+describe('Job Data Model', () => {
   it('should correctly convert backend dict to JobData object.', () => {
     let backendDict = {
       human_readable_time_started: 'June 04 12:17:36',

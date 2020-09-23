@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend domain object factory for creator dashboard stats.
+ * @fileoverview Frontend model for creator dashboard stats.
  */
 
 export interface CreatorDashboardStatsBackendDict {

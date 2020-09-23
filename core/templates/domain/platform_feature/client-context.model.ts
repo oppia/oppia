@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating ClientContext domain objects.
+ * @fileoverview Factory model for ClientContext.
  */
 
 export interface ClientContextBackendDict {

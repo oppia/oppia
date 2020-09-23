@@ -28,7 +28,7 @@ import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 import { ComputationData } from 'domain/admin/computation-data.model';
 import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
-import { Job } from 'domain/admin/job-data.model';
+import { Job } from 'domain/admin/job.model';
 
 
 describe('Admin Data Service', () => {

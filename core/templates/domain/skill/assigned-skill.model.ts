@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend domain object factory for assigned skill.
+ * @fileoverview Frontend model for assigned skill.
  */
 
 export interface AssignedSkillBackendDict {

@@ -19,7 +19,7 @@
 import { AugmentedSkillSummary } from
   'domain/skill/augmented-skill-summary.model';
 
-describe('Augmented Skill Summary Object Factory', () => {
+describe('Augmented Skill Summary Model', () => {
   it('should correctly convert backend dict to domain object.', () => {
     let backendDict = {
       language_code: 'en',

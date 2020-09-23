@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
- * skill summary domain objects.
+ * @fileoverview Frontend model for skill summary domain objects.
  */
 
 export interface SkillSummaryBackendDict {

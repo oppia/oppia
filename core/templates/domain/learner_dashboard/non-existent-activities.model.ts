@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend domain object factory for the number of non existent
+ * @fileoverview Frontend model for the number of non existent
  * activities.
  */
 

@@ -19,7 +19,7 @@
 import { LearnerAnswerInfo } from
   'domain/statistics/learner-answer-info.model';
 
-describe('Learner answer info object factory', () => {
+describe('Learner answer info model', () => {
   it('should create a learner answer info object from a backend dict',
     () => {
       var learnerAnswerInfoBackendDict = {

@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Object factory for creating frontend instances of
- * exploration opportunity summary domain object.
+ * @fileoverview Frontend model for exploration opportunity summary.
  */
 
 export interface TranslationCountsDict {

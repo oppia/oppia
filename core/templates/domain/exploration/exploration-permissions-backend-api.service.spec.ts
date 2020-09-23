@@ -23,7 +23,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ContextService } from 'services/context.service';
 import { ExplorationPermissionsBackendApiService } from
   'domain/exploration/exploration-permissions-backend-api.service';
-import { ExplorationPermissions } from './exploration-permissions.model';
+import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
 
 describe('Exploration permissions backend api service', () => {
   let epbas: ExplorationPermissionsBackendApiService;

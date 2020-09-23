@@ -16,10 +16,9 @@
  * @fileoverview Unit tests for AssignedSkill.
  */
 
-import { AssignedSkill} from
-  'domain/skill/assigned-skill.model';
+import { AssignedSkill } from 'domain/skill/assigned-skill.model';
 
-describe('Assigned Skill Object Factory', () => {
+describe('Assigned Skill Model', () => {
   it('should correctly convert backend dict to Assigned Skill Object.',
     () => {
       let backendDict = {

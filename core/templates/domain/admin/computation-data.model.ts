@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend domain object factory for computation data.
+ * @fileoverview Frontend model for computation data.
  */
 
 export interface ComputationDataBackendDict {

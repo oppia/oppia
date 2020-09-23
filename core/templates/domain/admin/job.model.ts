@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend domain object factory for job data.
+ * @fileoverview Frontend model for job data.
  */
 
 export interface JobDataBackendDict {

@@ -19,7 +19,7 @@
 import { ExplorationPermissions } from
   'domain/exploration/exploration-permissions.model';
 
-describe('Exploration permissions object factory', () => {
+describe('Exploration permissions model', () => {
   it('should correctly convert backend dict to permissions object.', () => {
     let backendDict = {
       can_unpublish: true,
@@ -31,8 +31,8 @@ describe('Exploration permissions object factory', () => {
       can_edit: true
     };
 
-    let permissionsObject =
-      ExplorationPermissions.createFromBackendDict(backendDict);
+    let permissionsObject = ExplorationPermissions.createFromBackendDict(
+      backendDict);
 
     expect(permissionsObject.canUnpublish).toEqual(true);
     expect(permissionsObject.canReleaseOwnership).toEqual(false);

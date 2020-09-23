@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend domain object factory for user exploration
- * permissions.
+ * @fileoverview Frontend model for user exploration permissions.
  */
 
 export interface ExplorationPermissionsBackendDict {

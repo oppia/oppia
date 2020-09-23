@@ -21,7 +21,7 @@ import { VisualizationInfo } from
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 
-describe('Visualization info object factory', () => {
+describe('Visualization info model', () => {
   let asof: AnswerStatsObjectFactory;
 
   beforeEach(() =>{

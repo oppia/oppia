@@ -22,7 +22,7 @@ import {
 } from
   'domain/opportunity/featured-translation-language.model';
 
-describe('Featured Translation Language object factory', () => {
+describe('Featured Translation Language model', () => {
   let sampleFTL: FeaturedTranslationLanguage = null;
 
   beforeEach(() => {

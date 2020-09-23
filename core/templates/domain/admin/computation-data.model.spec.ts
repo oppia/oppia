@@ -16,10 +16,9 @@
  * @fileoverview Unit tests for ComputationData.
  */
 
-import { ComputationData } from
-  'domain/admin/computation-data.model';
+import { ComputationData } from 'domain/admin/computation-data.model';
 
-describe('Computation Data Object Factory', () => {
+describe('Computation Data Model', () => {
   it('should correctly convert backend dict to Computation Data Object.',
     () => {
       let backendDict = {
@@ -33,17 +32,17 @@ describe('Computation Data Object Factory', () => {
         last_stopped_msec: null
       };
 
-      let computationDataObject =
+      let computationData =
         ComputationData.createFromBackendDict(backendDict);
 
-      expect(computationDataObject.isStoppable).toEqual(false);
-      expect(computationDataObject.isStartable).toEqual(true);
-      expect(computationDataObject.activeRealtimeLayerIndex).toEqual(null);
-      expect(computationDataObject.computationType).toEqual(
+      expect(computationData.isStoppable).toEqual(false);
+      expect(computationData.isStartable).toEqual(true);
+      expect(computationData.activeRealtimeLayerIndex).toEqual(null);
+      expect(computationData.computationType).toEqual(
         'FeedbackAnalyticsAggregator');
-      expect(computationDataObject.statusCode).toEqual('never_started');
-      expect(computationDataObject.lastStartedMsec).toEqual(null);
-      expect(computationDataObject.lastFinishedMsec).toEqual(null);
-      expect(computationDataObject.lastStoppedMsec).toEqual(null);
+      expect(computationData.statusCode).toEqual('never_started');
+      expect(computationData.lastStartedMsec).toEqual(null);
+      expect(computationData.lastFinishedMsec).toEqual(null);
+      expect(computationData.lastStoppedMsec).toEqual(null);
     });
 });

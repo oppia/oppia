@@ -19,7 +19,7 @@
 import { ProfileSummary } from
   'domain/user/profile-summary.model';
 
-describe('Subscriber Summary object factory', () => {
+describe('Subscriber Summary model', () => {
   it('should correctly convert subscriber backend dict to object', () => {
     let backendDict = {
       subscriber_picture_data_url: 'path/to/img',

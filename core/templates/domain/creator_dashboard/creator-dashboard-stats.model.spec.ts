@@ -19,7 +19,7 @@
 import { CreatorDashboardStats } from
   'domain/creator_dashboard/creator-dashboard-stats.model';
 
-describe('Creator dashboard stats object factory', () => {
+describe('Creator dashboard stats model', () => {
   it('should correctly convert backend dict to object', () => {
     let backendDict = {
       average_ratings: 1,

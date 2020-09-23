@@ -19,7 +19,7 @@
 import { NonExistentActivities } from
   'domain/learner_dashboard/non-existent-activities.model';
 
-describe('Non existent activities object factory', () => {
+describe('Non existent activities model', () => {
   it('should correctly convert backend dict to object', () => {
     let backendDict = {
       incomplete_explorations: 1,

@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating instances of frontend learner answer info
- * domain objects.
+ * @fileoverview Factory model for frontend learner answer info
  */
 
 export interface LearnerAnswerInfoBackendDict {

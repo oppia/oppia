@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend domain object factory for review test.
+ * @fileoverview Frontend model for review test.
  */
 
 interface SkillDescriptions {

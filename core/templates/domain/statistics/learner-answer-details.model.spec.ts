@@ -18,9 +18,9 @@
 
 import { LearnerAnswerDetails } from
   'domain/statistics/learner-answer-details.model';
-import { LearnerAnswerInfo } from './learner-answer-info.model';
+import { LearnerAnswerInfo } from 'domain/statistics/learner-answer-info.model';
 
-describe('Learner answer details object factory', () => {
+describe('Learner answer details model', () => {
   it('should create a default learner answer details object', () => {
     var learnerAnswerInfo = (
       LearnerAnswerInfo.createDefaultLearnerAnswerInfo(

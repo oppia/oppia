@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for CollectionSummary.
  */
 
-import { CollectionSummary } from './collection-summary.model';
+import { CollectionSummary } from 'domain/collection/collection-summary.model';
 
-describe('Collection summary object factory', () => {
+describe('Collection summary model', () => {
   it('should correctly convert dict to collection summary object', () => {
     let backendDict = {
       last_updated_msec: 1591296737470.528,
@@ -36,8 +35,8 @@ describe('Collection summary object factory', () => {
       node_count: 0
     };
 
-    let collectionSummaryObject =
-      CollectionSummary.createFromBackendDict(backendDict);
+    let collectionSummaryObject = CollectionSummary.createFromBackendDict(
+      backendDict);
 
     expect(collectionSummaryObject.lastUpdatedMsec).toEqual(1591296737470.528);
     expect(collectionSummaryObject.communityOwned).toEqual(false);

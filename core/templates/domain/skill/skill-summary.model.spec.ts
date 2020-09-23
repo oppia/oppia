@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for SkillSummary.
  */
 
-import { SkillSummary } from './skill-summary.model';
+import { SkillSummary } from 'domain/skill/skill-summary.model';
 
-describe('Skill Summary Object Factory', () => {
+describe('Skill Summary Model', () => {
   it('should correctly convert backend dict to domain object.', () => {
     let backendDict = {
       language_code: 'en',

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend domain object factory for collection summary.
+ * @fileoverview Frontend model for collection summary.
  */
 
 export interface CollectionSummaryBackendDict {

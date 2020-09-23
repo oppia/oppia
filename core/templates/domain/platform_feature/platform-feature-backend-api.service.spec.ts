@@ -24,8 +24,8 @@ import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
 import { PlatformFeatureDomainConstants } from
   'domain/platform_feature/platform-feature-domain.constants';
-import { ClientContext } from './client-context.model';
-import { FeatureStatusSummary } from './feature-status-summary.model';
+import { ClientContext } from 'domain/platform_feature/client-context.model';
+import { FeatureStatusSummary } from 'domain/platform_feature/feature-status-summary.model';
 
 describe('PlatformFeatureBackendApiService', () => {
   let httpTestingController: HttpTestingController;

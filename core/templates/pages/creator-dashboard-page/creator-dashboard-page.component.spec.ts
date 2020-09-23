@@ -18,7 +18,6 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // creator-dashboard-page.component.ts is upgraded to Angular 8.
-
 import { CollectionSummary, CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
 import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboard-stats.model';
 import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';

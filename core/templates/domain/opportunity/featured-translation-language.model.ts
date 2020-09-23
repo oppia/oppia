@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
- * featured translation language domain objects.
+ * @fileoverview Factory model for featured translation language.
  */
 
 export interface FeaturedTranslationLanguageBackendDict {

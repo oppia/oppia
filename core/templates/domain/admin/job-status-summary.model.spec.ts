@@ -16,10 +16,9 @@
  * @fileoverview Unit tests for JobStatusSummary.
  */
 
-import { JobStatusSummary } from
-  'domain/admin/job-status-summary.model';
+import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 
-describe('Job Spec Object Factory', () => {
+describe('Job Spec Model', () => {
   it('should correctly convert backend dict to JobSpec object.', () => {
     let backendDict = {
       job_type: 'ActivityReferencesModelAuditOneOffJob',

@@ -22,7 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { StateInteractionStatsBackendApiService } from
   'domain/exploration/state-interaction-stats-backend-api.service';
-import { VisualizationInfo } from './visualization-info.model';
+import { VisualizationInfo } from 'domain/exploration/visualization-info.model';
 
 describe('State interaction stats backend api service', () => {
   let sisbas: StateInteractionStatsBackendApiService;

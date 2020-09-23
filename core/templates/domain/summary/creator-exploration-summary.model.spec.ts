@@ -19,7 +19,7 @@
 import { CreatorExplorationSummary } from
   'domain/summary/creator-exploration-summary.model';
 
-describe('Creator Exploration summary object factory', () => {
+describe('Creator Exploration summary model', () => {
   it('should correctly convert backend dict to exp summary object', () => {
     let backendDict = {
       last_updated_msec: 1591296737470.528,
