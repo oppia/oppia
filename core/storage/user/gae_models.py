@@ -2260,7 +2260,7 @@ class UserContributionRightsModel(base_models.BaseModel):
     def get_number_of_reviewers_for_translations_in_lang_code(
             cls, language_code):
         """Returns the number of reviewers who have permission to review
-        translation suggestions in the language code given.
+        translation suggestions in the given language code.
 
         Args:
             language_code: str. The language code of the translation
@@ -2268,7 +2268,7 @@ class UserContributionRightsModel(base_models.BaseModel):
 
         Returns:
             Int. The number of reviewers who have permission to review
-            translation suggestions in the language code given.
+            translation suggestions in the given language code.
         """
         return (
             cls.query(

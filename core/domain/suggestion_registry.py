@@ -1203,8 +1203,8 @@ class CommunityContributionStats(python_utils.OBJECT):
 
     def set_translation_reviewer_count_for_language_code(
             self, language_code, count):
-        """Sets the translation reviewer count to be count, for the language
-        code given.
+        """Sets the translation reviewer count to be count, for the given
+        language code.
 
         Args:
             language_code: str. The translation suggestion language code that

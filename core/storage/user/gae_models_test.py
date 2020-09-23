@@ -2245,7 +2245,7 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
         self.assertTrue(self.USER_ID_1 in translation_reviewer_ids)
         self.assertTrue(self.USER_ID_2 in translation_reviewer_ids)
 
-    def test_get_num_reviewers_for_translations_in_lang_code_for_no_reviewers(
+    def test_get_num_reviewers_for_translations_in_lang_code_if_no_reviewers(
             self):
         number_of_translation_reviewers = (
             user_models.UserContributionRightsModel
@@ -2254,7 +2254,7 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
 
         self.assertEqual(number_of_translation_reviewers, 0)
 
-    def test_get_num_of_reviewers_for_translations_in_lang_code_for_reviewers(
+    def test_get_num_of_reviewers_for_translations_in_lang_code_if_same_lang(
             self):
         user_models.UserContributionRightsModel(
             id=self.USER_ID_1,
@@ -2274,7 +2274,7 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
 
         self.assertEqual(number_of_translation_reviewers, 2)
 
-    def test_get_num_of_reviewers_for_translations_in_lang_code_for_diff_lang(
+    def test_get_num_of_reviewers_for_translations_in_lang_code_if_diff_lang(
             self):
         user_models.UserContributionRightsModel(
             id=self.USER_ID_1,
@@ -2294,7 +2294,7 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
 
         self.assertEqual(number_of_translation_reviewers, 0)
 
-    def test_get_num_reviewers_for_translations_in_lang_code_for_invalid_lang(
+    def test_get_num_reviewers_for_translations_in_lang_code_if_invalid_lang(
             self):
         number_of_translation_reviewers = (
             user_models.UserContributionRightsModel

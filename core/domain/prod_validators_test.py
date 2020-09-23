@@ -9459,17 +9459,6 @@ class CommunityContributionStatsModelValidatorTests(
     SKILL_THREAD_ID = 'skill1.thread1'
     change_cmd = {}
 
-    translation_reviewer_counts_by_lang_code = {
-        'hi': 1
-    }
-
-    translation_suggestion_counts_by_lang_code = {
-        'hi': 1
-    }
-
-    question_reviewer_count = 1
-    question_suggestion_count = 1
-
     negative_count = -1
     non_integer_count = 'non_integer_count'
     sample_language_code = 'hi'
@@ -9529,20 +9518,28 @@ class CommunityContributionStatsModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_validation_success_when_model_has_non_zero_counts(self):
-        user_services.allow_user_to_review_question(self.reviewer_id)
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id, 'hi')
         self._create_translation_suggestion_with_language_code('hi')
+        user_services.allow_user_to_review_question(self.reviewer_id)
         self._create_question_suggestion()
+        translation_reviewer_counts_by_lang_code = {
+            'hi': 1
+        }
+        translation_suggestion_counts_by_lang_code = {
+            'hi': 1
+        }
+        question_reviewer_count = 1
+        question_suggestion_count = 1
 
         suggestion_models.CommunityContributionStatsModel(
             id=suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
             translation_reviewer_counts_by_lang_code=(
-                self.translation_reviewer_counts_by_lang_code),
+                translation_reviewer_counts_by_lang_code),
             translation_suggestion_counts_by_lang_code=(
-                self.translation_suggestion_counts_by_lang_code),
-            question_reviewer_count=self.question_reviewer_count,
-            question_suggestion_count=self.question_suggestion_count
+                translation_suggestion_counts_by_lang_code),
+            question_reviewer_count=question_reviewer_count,
+            question_suggestion_count=question_suggestion_count
         ).put()
         expected_output = [(
             u'[u\'fully-validated CommunityContributionStatsModel\', 1]')]
@@ -9824,7 +9821,7 @@ class CommunityContributionStatsModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-    def test_model_validation_fails_if_question_reviewer_count_do_not_match(
+    def test_model_validation_fails_if_question_reviewer_count_does_not_match(
             self):
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
         stats_model.question_reviewer_count = 1
@@ -9840,7 +9837,7 @@ class CommunityContributionStatsModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-    def test_model_validation_fails_if_question_suggestion_count_do_not_match(
+    def test_model_validation_fails_if_question_suggestion_count_does_not_match(
             self):
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
         stats_model.question_suggestion_count = 1
@@ -9856,7 +9853,7 @@ class CommunityContributionStatsModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-    def test_model_validation_fails_if_translation_suggestion_count_not_in_dict(
+    def test_model_validation_fails_if_translation_suggestion_lang_not_in_dict(
             self):
         missing_language_code = 'hi'
         self._create_translation_suggestion_with_language_code(
@@ -9876,7 +9873,7 @@ class CommunityContributionStatsModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-    def test_model_validation_fails_if_translation_reviewer_count_not_in_dict(
+    def test_model_validation_fails_if_translation_reviewer_lang_not_in_dict(
             self):
         missing_language_code = 'hi'
         user_services.allow_user_to_review_translation_in_language(
