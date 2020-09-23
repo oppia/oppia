@@ -2159,6 +2159,50 @@ class QuestionModelValidator(base_model_validators.BaseModelValidator):
                 'linked_skill_ids',
                 skill_models.SkillModel, item.linked_skill_ids)]
 
+    @classmethod
+    def _validate_inapplicable_skill_misconception_ids(cls, item):
+        """Validate that inapplicable skill misconception ids are valid.
+
+        Args:
+            item: ndb.Model. QuestionModel to validate.
+        """
+        inapplicable_skill_misconception_ids = (
+            item.inapplicable_skill_misconception_ids)
+        skill_misconception_id_mapping = {}
+        skill_ids = []
+        for skill_misconception_id in inapplicable_skill_misconception_ids:
+            skill_id, misconception_id = skill_misconception_id.split('-')
+            skill_misconception_id_mapping[skill_id] = misconception_id
+            skill_ids.append(skill_id)
+
+        skills = skill_fetchers.get_multi_skills(skill_ids, strict=False)
+        for skill in skills:
+            if skill is not None:
+                misconception_ids = [
+                    misconception.id
+                    for misconception in skill.misconceptions
+                ]
+                expected_misconception_id = (
+                    skill_misconception_id_mapping[skill.id])
+                if int(expected_misconception_id) not in misconception_ids:
+                    cls._add_error(
+                        'misconception id',
+                        'Entity id %s: misconception with the id %s does '
+                        'not exist in the skill with id %s' % (
+                            item.id, expected_misconception_id, skill.id))
+        missing_skill_ids = utils.compute_list_difference(
+            skill_ids,
+            [skill.id for skill in skills if skill is not None])
+        for skill_id in missing_skill_ids:
+            cls._add_error(
+                'skill id',
+                'Entity id %s: skill with the following id does not exist:'
+                ' %s' % (item.id, skill_id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_inapplicable_skill_misconception_ids]
+
 
 class ExplorationContextModelValidator(
         base_model_validators.BaseModelValidator):
@@ -5149,7 +5193,7 @@ class PendingDeletionRequestModelValidator(
 
     @classmethod
     def _validate_activity_mapping_contains_only_allowed_keys(cls, item):
-        """Validates that activity_mappings keys are only from
+        """Validates that pseudonymizable_entity_mappings keys are only from
         the core.platform.models.NAMES enum.
 
         Args:
@@ -5157,15 +5201,19 @@ class PendingDeletionRequestModelValidator(
                 to validate.
         """
         incorrect_keys = []
-        for key in item.activity_mappings.keys():
-            if key not in [name for name in models.NAMES.__dict__]:
+        allowed_keys = [
+            name for name in
+            models.MODULES_WITH_PSEUDONYMIZABLE_CLASSES.__dict__]
+        for key in item.pseudonymizable_entity_mappings.keys():
+            if key not in allowed_keys:
                 incorrect_keys.append(key)
 
         if incorrect_keys:
             cls._add_error(
-                'correct activity_mappings check',
-                'Entity id %s: activity_mappings contains keys %s that are not '
-                'allowed' % (item.id, incorrect_keys))
+                'correct pseudonymizable_entity_mappings check',
+                'Entity id %s: pseudonymizable_entity_mappings '
+                'contains keys %s that are not allowed' % (
+                    item.id, incorrect_keys))
 
     @classmethod
     def _get_custom_validation_functions(cls):

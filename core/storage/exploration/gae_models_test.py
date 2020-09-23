@@ -43,16 +43,8 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_has_reference_to_user_id(self):
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'id', title='A Title',
-            category='A Category', objective='An Objective')
-        exp_services.save_new_exploration('committer_id', exploration)
-        self.assertTrue(
-            exp_models.ExplorationModel
-            .has_reference_to_user_id('committer_id'))
         self.assertFalse(
-            exp_models.ExplorationModel
-            .has_reference_to_user_id('x_id'))
+            exp_models.ExplorationModel.has_reference_to_user_id('any_id'))
 
     def test_get_exploration_count(self):
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -189,9 +181,6 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             self.assertTrue(
                 exp_models.ExplorationRightsModel
                 .has_reference_to_user_id(self.USER_ID_4))
-            self.assertTrue(
-                exp_models.ExplorationRightsModel
-                .has_reference_to_user_id(self.USER_ID_COMMITTER))
             self.assertFalse(
                 exp_models.ExplorationRightsModel
                 .has_reference_to_user_id(self.USER_ID_3))
