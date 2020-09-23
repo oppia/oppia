@@ -126,6 +126,9 @@ INCREMENT_SCORE_OF_AUTHOR_BY = 1
 ACTION_TYPE_ACCEPT = 'accept'
 ACTION_TYPE_REJECT = 'reject'
 
+# The unique ID for the CommunityContributionStatsModel.
+COMMUNITY_CONTRIBUTION_STATS_MODEL_ID = 'community_contribution_stats'
+
 
 class GeneralSuggestionModel(base_models.BaseModel):
     """Model to store suggestions made by Oppia users.
@@ -610,3 +613,79 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
                 'rejection_message': voiceover_model.rejection_message
             }
         return user_data
+
+
+class CommunityContributionStatsModel(base_models.BaseModel):
+    """Records the contributor dashboard contribution stats. This includes the
+    total number of reviewers for each suggestion type and the total number of
+    suggestions in review for each suggestion type. There is only ever one
+    instance of this model, and its ID is COMMUNITY_CONTRIBUTION_STATS_MODEL_ID.
+    """
+
+    # A dictionary where the keys represent the language codes that translation
+    # suggestions are offered in and the values correspond to the total number
+    # of reviewers who have permission to review translation suggestions in
+    # that language.
+    translation_reviewer_counts_by_lang_code = ndb.JsonProperty(required=True)
+    # A dictionary where the keys represent the language codes that translation
+    # suggestions are offered in and the values correspond to the total number
+    # of translation suggestions that are currently in review in that language.
+    translation_suggestion_counts_by_lang_code = ndb.JsonProperty(required=True)
+    # The total number of reviewers who have permission to review question
+    # suggestions.
+    question_reviewer_count = ndb.IntegerProperty(required=True)
+    # The total number of question suggestions that are currently in review.
+    question_suggestion_count = ndb.IntegerProperty(required=True)
+
+    @classmethod
+    def get(cls):
+        """Gets the CommunityContributionStatsModel instance. If the
+        CommunityContributionStatsModel does not exist yet, it is created.
+        This method helps enforce that there should only ever be one instance
+        of this model.
+
+        Returns:
+            CommunityContributionStatsModel. The single model instance.
+        """
+        community_contribution_stats_model = cls.get_by_id(
+            COMMUNITY_CONTRIBUTION_STATS_MODEL_ID
+        )
+
+        if community_contribution_stats_model is None:
+            community_contribution_stats_model = cls(
+                id=COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
+                translation_reviewer_counts_by_lang_code={},
+                translation_suggestion_counts_by_lang_code={},
+                question_reviewer_count=0,
+                question_suggestion_count=0
+            )
+            community_contribution_stats_model.put()
+            return community_contribution_stats_model
+
+        else:
+            return super(
+                CommunityContributionStatsModel, cls).get(
+                    COMMUNITY_CONTRIBUTION_STATS_MODEL_ID)
+
+    @classmethod
+    def get_deletion_policy(cls):
+        """NOT_APPLICABLE - this model does not directly contain user
+        information because the data is aggregated.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def get_export_policy(cls):
+        """NOT_APPLICABLE - this model does not directly contain user
+        information because the data is aggregated.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'translation_reviewer_counts_by_lang_code':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'translation_suggestion_counts_by_lang_code':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_reviewer_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_suggestion_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
