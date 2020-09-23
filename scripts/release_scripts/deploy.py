@@ -282,6 +282,21 @@ def deploy_application_and_write_log_entry(
                 current_git_revision))
 
 
+def get_admin_misc_tab_url(app_name):
+    """Get the URL to the admin misc tab.
+
+    Args:
+        app_name: str. The name of the app to deploy.
+
+    Returns:
+        str. URL of the admin misc tab.
+    """
+    if app_name == APP_NAME_OPPIASERVER:
+        return 'https://www.oppia.org/admin#/misc'
+    else:
+        return 'https://%s.appspot.com/admin#/misc' % app_name
+
+
 def flush_memcache(app_name):
     """Flushes the memcache.
 
@@ -294,15 +309,21 @@ def flush_memcache(app_name):
     common.open_new_tab_in_browser_if_possible(memcache_url)
     common.ask_user_to_confirm('Please flush the memcache.')
 
-    admin_misc_tab_url = None
-    if app_name == APP_NAME_OPPIASERVER:
-        admin_misc_tab_url = 'https://www.oppia.org/admin#/misc'
-    else:
-        admin_misc_tab_url = 'https://%s.appspot.com/admin#/misc' % app_name
+    admin_misc_tab_url = get_admin_misc_tab_url(app_name)
+    common.open_new_tab_in_browser_if_possible(admin_misc_tab_url)
+    common.ask_user_to_confirm('Please flush the cache on Oppia website.')
 
-    if admin_misc_tab_url:
-        common.open_new_tab_in_browser_if_possible(admin_misc_tab_url)
-        common.ask_user_to_confirm('Please flush the cache on Oppia website.')
+
+def verify_number_of_pending_deletion_requests(app_name):
+    """Verify that the number of PendingDeletionRequestModels is zero.
+
+    Args:
+        app_name: str. The name of the app to deploy.
+    """
+    common.open_new_tab_in_browser_if_possible(get_admin_misc_tab_url(app_name))
+    common.ask_user_to_confirm(
+        'Please check that the number of PendingDeletionRequestModels '
+        'models is zero (you need to navigate at the bottom of the page).')
 
 
 def switch_version(app_name, current_release_version):
@@ -588,6 +609,8 @@ def execute_deployment():
             'Could not find third_party directory at %s. Please run '
             'install_third_party_libs.py prior to running this script.'
             % THIRD_PARTY_DIR)
+
+    verify_number_of_pending_deletion_requests(app_name)
 
     current_git_revision = subprocess.check_output(
         ['git', 'rev-parse', 'HEAD']).strip()
