@@ -29,8 +29,8 @@ from core.tests import test_utils
 
 import feconf
 
-(base_models, subtopic_models, topic_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.subtopic, models.NAMES.topic])
+(base_models, subtopic_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.subtopic])
 
 
 class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
