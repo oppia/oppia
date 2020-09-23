@@ -325,7 +325,7 @@ class DeployTests(test_utils.GenericTestBase):
             self.get_branch_swap, self.install_swap, self.cwd_check_swap,
             self.release_script_exist_swap, self.gcloud_available_swap,
             self.run_swap, self.release_doc_swap, get_token_swap, get_org_swap,
-            get_repo_swap, bug_check_swap, pr_check_swap, out_swap,
+            get_repo_swap, bug_check_swap, pr_check_swap, out_swap, args_swap,
             check_tests_swap, third_party_swap
         ):
             with self.assertRaisesRegexp(
