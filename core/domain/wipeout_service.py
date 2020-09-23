@@ -179,13 +179,13 @@ def pre_delete_user(user_id):
     collections_to_be_deleted_ids = []
     if user_settings.role != feconf.ROLE_ID_LEARNER:
         subscribed_exploration_summaries = (
-            exp_fetchers.get_exploration_summaries_subscribed_to(
-                user_id))
+            exp_fetchers.get_exploration_summaries_subscribed_to(user_id))
 
         explorations_to_be_deleted_ids = [
             exp_summary.id for exp_summary in subscribed_exploration_summaries
-            if exp_summary.is_private()
-            and exp_summary.is_solely_owned_by_user(user_id)]
+            if exp_summary.is_private() and
+            exp_summary.is_solely_owned_by_user(user_id)
+        ]
         exp_services.delete_explorations(
             user_id, explorations_to_be_deleted_ids)
 
@@ -193,26 +193,28 @@ def pre_delete_user(user_id):
         # by the to-be-deleted user.
         explorations_to_release_ownership_ids = [
             exp_summary.id for exp_summary in subscribed_exploration_summaries
-            if not exp_summary.is_private()
-            and exp_summary.is_solely_owned_by_user(user_id)]
+            if not exp_summary.is_private() and
+            exp_summary.is_solely_owned_by_user(user_id)
+        ]
         for exp_id in explorations_to_release_ownership_ids:
             rights_manager.release_ownership_of_exploration(
                 user_services.get_system_user(), exp_id)
 
         explorations_to_remove_user_from_ids = [
             exp_summary.id for exp_summary in subscribed_exploration_summaries
-            if not exp_summary.is_solely_owned_by_user(user_id)]
+            if not exp_summary.is_solely_owned_by_user(user_id)
+        ]
         for exp_id in explorations_to_remove_user_from_ids:
             rights_manager.deassign_role_for_exploration(
                 user_services.get_system_user(), exp_id, user_id)
 
         subscribed_collection_summaries = (
-            collection_services.get_collection_summaries_subscribed_to(
-                user_id))
+            collection_services.get_collection_summaries_subscribed_to(user_id))
         collections_to_be_deleted_ids = [
             col_summary.id for col_summary in subscribed_collection_summaries
-            if col_summary.is_private()
-            and col_summary.is_solely_owned_by_user(user_id)]
+            if col_summary.is_private() and
+            col_summary.is_solely_owned_by_user(user_id)
+        ]
         collection_services.delete_collections(
             user_id, collections_to_be_deleted_ids)
 
@@ -220,8 +222,9 @@ def pre_delete_user(user_id):
         # by the to-be-deleted user.
         collections_to_release_ownership_ids = [
             col_summary.id for col_summary in subscribed_collection_summaries
-            if not col_summary.is_private()
-            and col_summary.is_solely_owned_by_user(user_id)]
+            if not col_summary.is_private() and
+            col_summary.is_solely_owned_by_user(user_id)
+        ]
         for col_id in collections_to_release_ownership_ids:
             rights_manager.release_ownership_of_collection(
                 user_services.get_system_user(), col_id)
@@ -324,13 +327,11 @@ def verify_user_deleted(pending_deletion_request):
         bool. True if all the models were correctly deleted, False otherwise.
     """
     for model_class in models.Registry.get_all_storage_model_classes():
-        if (
-                model_class.get_deletion_policy() not in [
-                    base_models.DELETION_POLICY.KEEP,
-                    base_models.DELETION_POLICY.NOT_APPLICABLE
-                ] and model_class.has_reference_to_user_id(
-                    pending_deletion_request.user_id)
-        ):
+        if (model_class.get_deletion_policy() not in
+                [base_models.DELETION_POLICY.KEEP,
+                 base_models.DELETION_POLICY.NOT_APPLICABLE] and
+                model_class.has_reference_to_user_id(
+                    pending_deletion_request.user_id)):
             return False
     return True
 
@@ -590,14 +591,14 @@ def _pseudonymize_config_models(pending_deletion_request):
                 pseudonymized_id
             )
 
-
 def _pseudonymize_activity_models_without_associated_rights_models(
         pending_deletion_request,
         activity_category,
-        snapshot_model_class,
+        snapshot_metadata_model_classes,
         commit_log_model_class,
         commit_log_model_field_name):
-    """Pseudonymize the activity models for the user with user_id.
+    """Collect the activity IDs that for the user with user_id. Verify that each
+    snapshot has corresponding commit log.
 
     Activity models are models that have a main VersionedModel,
     CommitLogEntryModel, and other additional models that mostly use the same ID
@@ -616,7 +617,11 @@ def _pseudonymize_activity_models_without_associated_rights_models(
         commit_log_model_class: class. The commit log model class that is being
             pseudonymized.
         commit_log_model_field_name: str. The name of the field holding the
-            activity id in the corresponding commit log model.
+            activity ID in the corresponding commit log model.
+
+    Returns:
+        (list(BaseSnapshotMetadataModel), list(BaseCommitLogEntryModel)).
+        The tuple of snapshot metadata and commit log models.
     """
     snapshot_metadata_models, commit_log_models = (
         _collect_and_save_entity_ids_from_snapshots_and_commit(
