@@ -43,6 +43,9 @@ angular.module('oppia').controller('AddAudioTranslationModalController', [
 
     // Whether there was an error uploading the audio file.
     $scope.errorMessage = null;
+    // Getter which angular uses to notice when the message changes.
+    $scope.getErrorMessage = () => $scope.errorMessage;
+
     $scope.saveButtonText = BUTTON_TEXT_SAVE;
     $scope.saveInProgress = false;
     $scope.isAudioAvailable = isAudioAvailable;

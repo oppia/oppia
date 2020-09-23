@@ -17,7 +17,7 @@
  * assets from Google Cloud Storage.
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
@@ -29,6 +29,15 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 const Constants = require('constants.ts');
+
+interface SaveAudioResponse {
+  'filename': string;
+  'duration_secs': number;
+}
+
+interface SaveImageResponse {
+  'filename': string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -161,25 +170,27 @@ export class AssetsBackendApiService {
 
   async saveAudio(
       explorationId: string, filename: string,
-      rawAssetData: Blob): Promise<void> {
+      rawAssetData: Blob): Promise<SaveAudioResponse> {
     const form = new FormData();
     form.append('raw_audio_file', rawAssetData);
     form.append('payload', JSON.stringify({filename}));
     form.append('csrf_token', await this.csrfTokenService.getTokenAsync());
-    return this.http.post<void>(
-      this.getAudioUploadUrl(explorationId), form).toPromise();
+    return this.http.post<SaveAudioResponse>(
+      this.getAudioUploadUrl(explorationId), form).toPromise()
+      ['catch']((e: HttpErrorResponse) => Promise.reject(e.error));
   }
 
   async saveMathExpresionImage(
       resampledFile: Blob, filename: string, entityType: string,
-      entityId: string): Promise<void> {
+      entityId: string): Promise<SaveImageResponse> {
     const form = new FormData();
     form.append('image', resampledFile);
     form.append(
       'payload', JSON.stringify({filename, filename_prefix: 'image'}));
     form.append('csrf_token', await this.csrfTokenService.getTokenAsync());
-    return this.http.post<void>(
-      this.getImageUploadUrl(entityType, entityId), form).toPromise();
+    return this.http.post<SaveImageResponse>(
+      this.getImageUploadUrl(entityType, entityId), form).toPromise()
+      ['catch']((e: HttpErrorResponse) => Promise.reject(e.error));
   }
 
   isCached(filename: string): boolean {
