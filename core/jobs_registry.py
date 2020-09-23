@@ -143,6 +143,7 @@ AUDIT_JOB_MANAGERS = [
         .ConfigPropertySnapshotMetadataModelAuditOneOffJob
     ),
     prod_validation_jobs_one_off.ContinuousComputationModelAuditOneOffJob,
+    prod_validation_jobs_one_off.DeletedUserModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExpSummaryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExpUserLastPlaythroughModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob,
