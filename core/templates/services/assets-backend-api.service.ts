@@ -70,82 +70,6 @@ export class AssetsBackendApiService {
       urlPrefix + '/<entity_type>/<entity_id>/assets/<asset_type>/<filename>');
   }
 
-  private getDownloadUrl(
-      entityType: string, entityId: string, filename: string,
-      assetType: string): string {
-    return this.urlInterpolationService.interpolateUrl(
-      this.downloadUrlTemplate, {
-        entity_type: entityType,
-        entity_id: entityId,
-        asset_type: assetType,
-        filename: filename,
-      });
-  }
-
-  private getFileDownloadRequestsByAssetType(
-      assetType: string): FileDownloadRequest[] {
-    return (assetType === AppConstants.ASSET_TYPE_AUDIO) ?
-      this.audioFileDownloadRequests :
-      this.imageFileDownloadRequests;
-  }
-
-  private async fetchFile(
-      entityType: string, entityId: string, filename: string,
-      assetType: string): Promise<AudioFile | ImageFile> {
-    let onResolve: (_: Blob) => void;
-    let onReject: () => void;
-    const blobPromise = new Promise<Blob>((resolve, reject) => {
-      onResolve = resolve;
-      onReject = reject;
-    });
-
-    const subscription = this.http.get(
-      this.getDownloadUrl(entityType, entityId, filename, assetType), {
-        responseType: 'blob'
-      }).subscribe(onResolve, onReject);
-
-    const fileDownloadRequests = (
-      this.getFileDownloadRequestsByAssetType(assetType));
-    fileDownloadRequests.push(
-      this.fileDownloadRequestObjectFactory.createNew(filename, subscription));
-
-    try {
-      const blob = await blobPromise;
-      const assetBlob = new Blob([blob], {type: blob.type});
-      const fileObjectFactory = (assetType === AppConstants.ASSET_TYPE_AUDIO) ?
-        this.audioFileObjectFactory : this.imageFileObjectFactory;
-      this.assetsCache.set(filename, assetBlob);
-      return fileObjectFactory.createNew(filename, assetBlob);
-    } catch {
-      return Promise.reject(filename);
-    } finally {
-      const i = fileDownloadRequests.findIndex(r => r.filename === filename);
-      if (i !== -1) {
-        fileDownloadRequests.splice(i, 1);
-      }
-    }
-  }
-
-  private abortAllCurrentDownloads(assetType: string): void {
-    const fileDownloadRequests = (
-      this.getFileDownloadRequestsByAssetType(assetType));
-    fileDownloadRequests.forEach(r => r.subscription.unsubscribe());
-    fileDownloadRequests.length = 0;
-  }
-
-  private getAudioUploadUrl(explorationId: string): string {
-    return this.urlInterpolationService.interpolateUrl(
-      AppConstants.AUDIO_UPLOAD_URL_TEMPLATE, {
-        exploration_id: explorationId
-      });
-  }
-
-  private getImageUploadUrl(entityType: string, entityId: string): string {
-    return this.urlInterpolationService.interpolateUrl(
-      AppConstants.IMAGE_UPLOAD_URL_TEMPLATE,
-      { entity_type: entityType, entity_id: entityId });
-  }
-
   async loadAudio(explorationId: string, filename: string): Promise<AudioFile> {
     if (this.isCached(filename)) {
       return Promise.resolve(
@@ -235,6 +159,82 @@ export class AssetsBackendApiService {
       entityType: string, entityId: string, filename: string): string {
     return this.getDownloadUrl(
       entityType, entityId, filename, AppConstants.ASSET_TYPE_THUMBNAIL);
+  }
+
+  private getDownloadUrl(
+      entityType: string, entityId: string, filename: string,
+      assetType: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      this.downloadUrlTemplate, {
+        entity_type: entityType,
+        entity_id: entityId,
+        asset_type: assetType,
+        filename: filename,
+      });
+  }
+
+  private getFileDownloadRequestsByAssetType(
+      assetType: string): FileDownloadRequest[] {
+    return (assetType === AppConstants.ASSET_TYPE_AUDIO) ?
+      this.audioFileDownloadRequests :
+      this.imageFileDownloadRequests;
+  }
+
+  private async fetchFile(
+      entityType: string, entityId: string, filename: string,
+      assetType: string): Promise<AudioFile | ImageFile> {
+    let onResolve: (_: Blob) => void;
+    let onReject: () => void;
+    const blobPromise = new Promise<Blob>((resolve, reject) => {
+      onResolve = resolve;
+      onReject = reject;
+    });
+
+    const subscription = this.http.get(
+      this.getDownloadUrl(entityType, entityId, filename, assetType), {
+        responseType: 'blob'
+      }).subscribe(onResolve, onReject);
+
+    const fileDownloadRequests = (
+      this.getFileDownloadRequestsByAssetType(assetType));
+    fileDownloadRequests.push(
+      this.fileDownloadRequestObjectFactory.createNew(filename, subscription));
+
+    try {
+      const blob = await blobPromise;
+      const assetBlob = new Blob([blob], {type: blob.type});
+      const fileObjectFactory = (assetType === AppConstants.ASSET_TYPE_AUDIO) ?
+        this.audioFileObjectFactory : this.imageFileObjectFactory;
+      this.assetsCache.set(filename, assetBlob);
+      return fileObjectFactory.createNew(filename, assetBlob);
+    } catch {
+      return Promise.reject(filename);
+    } finally {
+      const i = fileDownloadRequests.findIndex(r => r.filename === filename);
+      if (i !== -1) {
+        fileDownloadRequests.splice(i, 1);
+      }
+    }
+  }
+
+  private abortAllCurrentDownloads(assetType: string): void {
+    const fileDownloadRequests = (
+      this.getFileDownloadRequestsByAssetType(assetType));
+    fileDownloadRequests.forEach(r => r.subscription.unsubscribe());
+    fileDownloadRequests.length = 0;
+  }
+
+  private getAudioUploadUrl(explorationId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      AppConstants.AUDIO_UPLOAD_URL_TEMPLATE, {
+        exploration_id: explorationId
+      });
+  }
+
+  private getImageUploadUrl(entityType: string, entityId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      AppConstants.IMAGE_UPLOAD_URL_TEMPLATE,
+      { entity_type: entityType, entity_id: entityId });
   }
 }
 
