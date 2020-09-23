@@ -45,6 +45,8 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
+from core.domain import wipeout_domain
+from core.domain import wipeout_service
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
@@ -52,10 +54,20 @@ import feconf
 import utils
 
 (
-    exp_models, job_models, opportunity_models, audit_models,
-    suggestion_models) = models.Registry.import_models(
-        [models.NAMES.exploration, models.NAMES.job, models.NAMES.opportunity,
-         models.NAMES.audit, models.NAMES.suggestion])
+    audit_models,
+    exp_models,
+    job_models,
+    opportunity_models,
+    suggestion_models,
+    user_models
+) = models.Registry.import_models([
+    models.NAMES.audit,
+    models.NAMES.exploration,
+    models.NAMES.job,
+    models.NAMES.opportunity,
+    models.NAMES.suggestion,
+    models.NAMES.user
+])
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
@@ -2275,3 +2287,131 @@ class MemoryCacheAdminHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/memorycacheadminhandler')
         self.assertEqual(response['total_keys_stored'], 0)
+
+
+class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
+    """Tests NumberOfDeletionRequestsHandler."""
+
+    def setUp(self):
+        super(NumberOfDeletionRequestsHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+    def test_get_with_no_deletion_request_returns_zero(self):
+        response = self.get_json('/numberofpendingdeletionrequests')
+        self.assertEqual(response['number_of_pending_deletion_models'], 0)
+
+    def test_get_with_two_deletion_request_returns_zero(self):
+        user_models.PendingDeletionRequestModel(
+            id='id1', email='id1@email.com', role='role'
+        ).put()
+        user_models.PendingDeletionRequestModel(
+            id='id2', email='id2@email.com', role='role'
+        ).put()
+
+        response = self.get_json('/numberofpendingdeletionrequests')
+        self.assertEqual(response['number_of_pending_deletion_models'], 2)
+
+
+class DeleteAccountHandlerTest(test_utils.GenericTestBase):
+    """Tests DeleteAccountHandler."""
+
+    def setUp(self):
+        super(DeleteAccountHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.csrf_token = self.get_new_csrf_token()
+
+    def test_delete_with_no_email_returns_400(self):
+        response = self.post_json(
+            '/deleteaccounthandler',
+            {},
+            csrf_token=self.csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Invalid request: email must be specified')
+
+    def test_delete_with_email_set_to_number_returns_400(self):
+        response = self.post_json(
+            '/deleteaccounthandler',
+            {'email': 123},
+            csrf_token=self.csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'Expected email to be a unicode string, received 123')
+
+    def test_delete_with_email_of_user_that_is_not_pending_returns_400(self):
+        response = self.post_json(
+            '/deleteaccounthandler',
+            {'email': self.NEW_USER_EMAIL},
+            csrf_token=self.csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'There is no pending deletion request for email: %s' % (
+                self.NEW_USER_EMAIL))
+
+    def test_delete_with_email_of_user_that_is_pending_returns_200(self):
+        wipeout_service.pre_delete_user(self.new_user_id)
+        response = self.post_json(
+            '/deleteaccounthandler',
+            {'email': self.NEW_USER_EMAIL},
+            csrf_token=self.csrf_token)
+        self.assertEqual(
+            response['result'], wipeout_domain.USER_DELETION_SUCCESS)
+
+
+class VerifyAccountDeletedHandler(test_utils.GenericTestBase):
+    """Tests VerifyAccountDeletedHandler."""
+
+    def setUp(self):
+        super(VerifyAccountDeletedHandler, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.csrf_token = self.get_new_csrf_token()
+
+    def test_post_with_no_email_returns_400(self):
+        response = self.post_json(
+            '/verifyaccountdeletedhandler',
+            {},
+            csrf_token=self.csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Invalid request: email must be specified')
+
+    def test_post_with_email_set_to_number_returns_400(self):
+        response = self.post_json(
+            '/verifyaccountdeletedhandler',
+            {'email': 123},
+            csrf_token=self.csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'Expected email to be a unicode string, received 123')
+
+    def test_post_with_email_of_user_that_is_not_pending_returns_400(self):
+        response = self.post_json(
+            '/verifyaccountdeletedhandler',
+            {'email': self.NEW_USER_EMAIL},
+            csrf_token=self.csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'There is no pending deletion request for email: %s' % (
+                self.NEW_USER_EMAIL))
+
+    def test_delete_with_email_of_user_that_is_pending_returns_200(self):
+        wipeout_service.pre_delete_user(self.new_user_id)
+        wipeout_service.run_user_deletion(
+            wipeout_service.get_pending_deletion_request(self.new_user_id))
+        response = self.post_json(
+            '/verifyaccountdeletedhandler',
+            {'email': self.NEW_USER_EMAIL},
+            csrf_token=self.csrf_token)
+        self.assertEqual(
+            response['result'], wipeout_domain.USER_VERIFICATION_SUCCESS)
