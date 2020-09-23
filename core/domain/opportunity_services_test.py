@@ -43,8 +43,7 @@ import python_utils
 
 (
     suggestion_models, feedback_models, opportunity_models
-) =
-    models.Registry.import_models([
+) = models.Registry.import_models([
     models.NAMES.suggestion, models.NAMES.feedback, models.NAMES.opportunity
 ])
 
@@ -892,7 +891,6 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_skill_opportunities_by_ids_if_returns_empty_list(
             self):
-
         get_multi_swap = self.swap(
             opportunity_models.SkillOpportunityModel,
             'get_multi', self._mock_get_multi_function)

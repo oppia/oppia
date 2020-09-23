@@ -448,7 +448,7 @@ describe('Contributions and review component', function() {
       expect(ctrl.contributionsDataLoading).toBe(false);
     });
 
-    it('should handle undefined translation opportunities' +
+    it('should not throw error for undefined translation opportunities' +
       ' in review tab', function() {
       spyOn(
         contributionAndReviewService, 'getReviewableTranslationSuggestions')
@@ -471,7 +471,7 @@ describe('Contributions and review component', function() {
         'suggestion_undefined_1');
     });
 
-    it('should handle undefined question opportunities' +
+    it('should not throw error for undefined question opportunities' +
       ' in review tab', function() {
       spyOn(
         contributionAndReviewService, 'getReviewableQuestionSuggestions')
