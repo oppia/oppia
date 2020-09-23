@@ -42,6 +42,7 @@ angular.module('oppia').directive('storySummaryTile', [
           var ctrl = this;
           var circumference = (20 * 2 * Math.PI);
           var gapLength = 5;
+          var EXPLORE_PAGE_PREFIX = '/explore/';
 
           ctrl.getStoryLink = function() {
             // This component is being used in the topic editor as well and
@@ -88,11 +89,12 @@ angular.module('oppia').directive('storySummaryTile', [
             return segmentLength.toString() + ' ' + gapLength.toString();
           };
 
+          // Returns the exploration page URL for the provided chapter title.
           ctrl.getChapterUrl = function(nodeTitle) {
             let node = this.storySummary.getPendingNodes().find(node => {
               return node.getTitle() === nodeTitle;
             });
-            return `/explore/${node.getExplorationId()}`;
+            return `${EXPLORE_PAGE_PREFIX}${node.getExplorationId()}`;
           };
 
           ctrl.getCompletedStrokeDashArrayValues = function() {
