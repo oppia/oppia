@@ -425,7 +425,6 @@ import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
-import { PlaythroughService } from 'services/playthrough.service';
 import { PredictionAlgorithmRegistryService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
@@ -573,8 +572,6 @@ import { StateWrittenTranslationsService } from
 import { StatsReportingBackendApiService } from
   'domain/exploration/stats-reporting-backend-api.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { StatsReportingService } from
-  'pages/exploration-player-page/services/stats-reporting.service';
 import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 import { StoryContentsObjectFactory } from
@@ -1646,13 +1643,6 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
 
     // Topological level: 6.
-    upgradedServices['PlaythroughService'] =
-      new PlaythroughService(
-        upgradedServices['ExplorationFeaturesService'],
-        upgradedServices['LearnerActionObjectFactory'],
-        upgradedServices['PlaythroughBackendApiService'],
-        upgradedServices['PlaythroughObjectFactory'],
-        upgradedServices['StopwatchObjectFactory']);
     upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['ExplorationHtmlFormatterService']);
@@ -1667,13 +1657,6 @@ export class UpgradedServices {
         upgradedServices['AnswerClassificationService'],
         upgradedServices['InteractionRulesRegistryService'],
         upgradedServices['StateTopAnswersStatsBackendApiService']);
-    upgradedServices['StatsReportingService'] = new StatsReportingService(
-      upgradedServices['ContextService'],
-      upgradedServices['MessengerService'],
-      upgradedServices['PlaythroughService'],
-      upgradedServices['SiteAnalyticsService'],
-      upgradedServices['StatsReportingBackendApiService'],
-      upgradedServices['StopwatchObjectFactory']);
 
     // Topological level: 7.
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(

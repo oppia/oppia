@@ -66,7 +66,14 @@ class QuestionModel(base_models.VersionedModel):
     # The skill ids linked to this question.
     linked_skill_ids = ndb.StringProperty(
         indexed=True, repeated=True)
-    # The optional misconception ids marked as not relevant to the question.
+    # The optional skill misconception ids marked as not relevant to the
+    # question.
+    # Note: Misconception ids are represented in two ways. In the Misconception
+    # domain object the id is a number. But in the context of a question
+    # (used here), the skill id needs to be included along with the
+    # misconception id, this is because questions can have multiple skills
+    # attached to it. Hence, the format for this field will be
+    # <skill-id>-<misconceptionid>.
     inapplicable_skill_misconception_ids = ndb.StringProperty(
         indexed=True, repeated=True)
 
@@ -89,16 +96,17 @@ class QuestionModel(base_models.VersionedModel):
         })
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, unused_user_id):
         """Check whether QuestionModel snapshots references the given user.
 
         Args:
-            user_id: str. The ID of the user whose data should be checked.
+            unused_user_id: str. The ID of the user whose data should be
+                checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+        return False
 
     @classmethod
     def _get_new_id(cls):
@@ -167,7 +175,8 @@ class QuestionModel(base_models.VersionedModel):
             version: str. The version of the question.
             linked_skill_ids: list(str). The skill ids linked to the question.
             inapplicable_skill_misconception_ids: list(str). The optional
-                misconception ids marked as not applicable to the question.
+                skill misconception ids marked as not applicable to the
+                question.
 
         Returns:
             QuestionModel. Instance of the new QuestionModel entry.

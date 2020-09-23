@@ -184,7 +184,7 @@ class BaseSuggestion(python_utils.OBJECT):
 
         if (
                 self.author_id is not None and
-                not user_services.is_user_id_correct(self.author_id)
+                not user_services.is_user_id_valid(self.author_id)
         ):
             raise utils.ValidationError(
                 'Expected author_id to be in a valid user ID format, '
@@ -196,7 +196,7 @@ class BaseSuggestion(python_utils.OBJECT):
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
             if (
-                    not user_services.is_user_id_correct(
+                    not user_services.is_user_id_valid(
                         self.final_reviewer_id) and
                     self.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID
             ):
@@ -1097,8 +1097,13 @@ SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
 }
 
 
+<<<<<<< HEAD
 class ReviewerAndSuggestionCounts(python_utils.OBJECT):
     """Domain object for the ReviewerAndSuggestionCountsModel.
+=======
+class CommunityContributionStats(python_utils.OBJECT):
+    """Domain object for the CommunityContributionStatsModel.
+>>>>>>> upstream/develop
 
     Attributes:
         translation_reviewer_counts_by_lang_code: dict. A dictionary where the
@@ -1131,21 +1136,37 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
         self.question_suggestion_count = question_suggestion_count
 
     def validate(self):
+<<<<<<< HEAD
         """Validates the ReviewerAndSuggestionCounts object.
 
         Raises:
             ValidationError. One or more attributes of the
                 ReviewerAndSuggestionCounts object is invalid.
+=======
+        """Validates the CommunityContributionStats object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                CommunityContributionStats object is invalid.
+>>>>>>> upstream/develop
         """
         for language_code, reviewer_count in (
                 self.translation_reviewer_counts_by_lang_code.items()):
             if reviewer_count < 0:
                 raise utils.ValidationError(
                     'Expected the translation reviewer count to be '
+<<<<<<< HEAD
                     'non-negative, recieved: %s. The language code for the '
                     'translation was %s.' % (reviewer_count, language_code)
                 )
             if not utils.is_valid_language_code(language_code):
+=======
+                    'non-negative for %s language code, recieved: %s.' % (
+                        language_code, reviewer_count)
+                )
+            # Translation languages are a part of audio languages.
+            if not utils.is_supported_audio_language_code(language_code):
+>>>>>>> upstream/develop
                 raise utils.ValidationError(
                     'Invalid language code for the translation reviewer '
                     'counts: %s.' % language_code)
@@ -1155,10 +1176,18 @@ class ReviewerAndSuggestionCounts(python_utils.OBJECT):
             if suggestion_count < 0:
                 raise utils.ValidationError(
                     'Expected the translation suggestion count to be '
+<<<<<<< HEAD
                     'non-negative, recieved: %s. The language code for the '
                     'translation was %s.' % (suggestion_count, language_code)
                 )
             if not utils.is_valid_language_code(language_code):
+=======
+                    'non-negative for %s language code, recieved: %s.' % (
+                        language_code, suggestion_count)
+                )
+            # Translation languages are a part of audio languages.
+            if not utils.is_supported_audio_language_code(language_code):
+>>>>>>> upstream/develop
                 raise utils.ValidationError(
                     'Invalid language code for the translation suggestion '
                     'counts: %s.' % language_code)

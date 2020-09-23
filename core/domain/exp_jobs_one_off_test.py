@@ -39,6 +39,8 @@ import feconf
 import python_utils
 import utils
 
+from google.appengine.ext import ndb
+
 (job_models, exp_models, base_models, classifier_models) = (
     models.Registry.import_models([
         models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
@@ -392,7 +394,7 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
-        exp_services.create_exploration_summary(
+        exp_services.regenerate_exploration_summary(
             self.NEW_EXP_ID, None)
 
         # Delete the exploration before migration occurs.
@@ -701,7 +703,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
-        exp_services.create_exploration_summary(
+        exp_services.regenerate_exploration_summary(
             self.NEW_EXP_ID, None)
 
         # Delete the exploration before migration occurs.
@@ -758,9 +760,9 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             datetime.datetime.utcnow(), {}, initial_state_name,
             feconf.TRAINING_JOB_STATUS_COMPLETE, 1)
         # Store training job model for the classifier model.
-        classifier_models.TrainingJobExplorationMappingModel.create(
+        classifier_models.StateTrainingJobsMappingModel.create(
             self.NEW_EXP_ID, exploration.version, initial_state_name,
-            classifier_model_id)
+            {'TextClassifier': classifier_model_id})
 
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
@@ -773,11 +775,12 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         new_exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         initial_state_name = list(new_exploration.states.keys())[0]
         self.assertLess(exploration.version, new_exploration.version)
-        classifier_exp_mapping_model = classifier_models.TrainingJobExplorationMappingModel.get_models( # pylint: disable=line-too-long
+        classifier_exp_mapping_model = classifier_models.StateTrainingJobsMappingModel.get_models( # pylint: disable=line-too-long
             self.NEW_EXP_ID, new_exploration.version,
             [initial_state_name])[0]
         self.assertEqual(
-            classifier_exp_mapping_model.job_id, classifier_model_id)
+            classifier_exp_mapping_model.algorithm_ids_to_job_ids[
+                'TextClassifier'], classifier_model_id)
 
     def test_migration_job_fails_with_invalid_exploration(self):
         observed_log_messages = []
@@ -2217,3 +2220,94 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
             '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
 
         self.assertEqual(actual_output, expected_output)
+
+
+class MockExpSummaryModel(exp_models.ExpSummaryModel):
+    """Mock ExpSummaryModel so that it allows to set `translator_ids`."""
+
+    translator_ids = ndb.StringProperty(
+        indexed=True, repeated=True, required=False)
+
+
+class RemoveTranslatorIdsOneOffJobTests(test_utils.GenericTestBase):
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            exp_jobs_one_off.RemoveTranslatorIdsOneOffJob.create_new())
+        exp_jobs_one_off.RemoveTranslatorIdsOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            exp_jobs_one_off.RemoveTranslatorIdsOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def test_one_summary_model_with_translator_id(self):
+        with self.swap(exp_models, 'ExpSummaryModel', MockExpSummaryModel):
+            original_summary_model = (
+                exp_models.ExpSummaryModel(
+                    id='id',
+                    title='title',
+                    category='category',
+                    objective='Objective',
+                    language_code='en',
+                    tags=[],
+                    ratings=feconf.get_empty_ratings(),
+                    scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+                    community_owned=False,
+                    translator_ids=['translator_id']
+                )
+            )
+            original_summary_model.put()
+
+            self.assertIsNotNone(original_summary_model.translator_ids)
+            self.assertIn('translator_ids', original_summary_model._values)  # pylint: disable=protected-access
+            self.assertIn('translator_ids', original_summary_model._properties)  # pylint: disable=protected-access
+
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_REMOVED - ExpSummaryModel', 1]], output)
+
+            migrated_summary_model = exp_models.ExpSummaryModel.get_by_id('id')
+
+            self.assertNotIn('translator_ids', migrated_summary_model._values)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'translator_ids', migrated_summary_model._properties)  # pylint: disable=protected-access
+            self.assertEqual(
+                original_summary_model.last_updated,
+                migrated_summary_model.last_updated)
+
+    def test_one_summary_model_without_username(self):
+        original_summary_model = (
+            exp_models.ExpSummaryModel(
+                id='id',
+                title='title',
+                category='category',
+                objective='Objective',
+                language_code='en',
+                tags=[],
+                ratings=feconf.get_empty_ratings(),
+                scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+                community_owned=False,
+            )
+        )
+        original_summary_model.put()
+
+        self.assertNotIn('translator_ids', original_summary_model._values)  # pylint: disable=protected-access
+        self.assertNotIn('translator_ids', original_summary_model._properties)  # pylint: disable=protected-access
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - ExpSummaryModel', 1]], output)
+
+        migrated_summary_model = exp_models.ExpSummaryModel.get_by_id('id')
+        self.assertNotIn('translator_ids', migrated_summary_model._values)  # pylint: disable=protected-access
+        self.assertNotIn('translator_ids', migrated_summary_model._properties)  # pylint: disable=protected-access
+        self.assertEqual(
+            original_summary_model.last_updated,
+            migrated_summary_model.last_updated)

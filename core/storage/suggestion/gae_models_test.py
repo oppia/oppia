@@ -925,8 +925,8 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(expected_data, user_data)
 
 
-class ReviewerAndSuggestionCountsModelUnitTests(test_utils.GenericTestBase):
-    """Tests the ReviewerAndSuggestionCountsModel class."""
+class CommunityContributionStatsModelUnitTests(test_utils.GenericTestBase):
+    """Tests the CommunityContributionStatsModel class."""
 
     translation_reviewer_counts_by_lang_code = {
         'hi': 0,
@@ -941,10 +941,10 @@ class ReviewerAndSuggestionCountsModelUnitTests(test_utils.GenericTestBase):
     question_reviewer_count = 1
     question_suggestion_count = 4
 
-    def test_get_returns_reviewer_and_suggestion_counts_model_when_it_exists(
+    def test_get_returns_community_contribution_stats_model_when_it_exists(
             self):
-        suggestion_models.ReviewerAndSuggestionCountsModel(
-            id=suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID,
+        suggestion_models.CommunityContributionStatsModel(
+            id=suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
             translation_reviewer_counts_by_lang_code=(
                 self.translation_reviewer_counts_by_lang_code),
             translation_suggestion_counts_by_lang_code=(
@@ -953,73 +953,73 @@ class ReviewerAndSuggestionCountsModelUnitTests(test_utils.GenericTestBase):
             question_suggestion_count=self.question_suggestion_count
         ).put()
 
-        reviewer_and_suggestion_counts_model = (
-            suggestion_models.ReviewerAndSuggestionCountsModel.get()
+        community_contribution_stats_model = (
+            suggestion_models.CommunityContributionStatsModel.get()
         )
 
         self.assertEqual(
-            reviewer_and_suggestion_counts_model.id,
-            suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID
+            community_contribution_stats_model.id,
+            suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID
         )
         self.assertEqual(
             (
-                reviewer_and_suggestion_counts_model
+                community_contribution_stats_model
                 .translation_reviewer_counts_by_lang_code
             ),
             self.translation_reviewer_counts_by_lang_code
         )
         self.assertEqual(
             (
-                reviewer_and_suggestion_counts_model
+                community_contribution_stats_model
                 .translation_suggestion_counts_by_lang_code
             ),
             self.translation_suggestion_counts_by_lang_code
         )
         self.assertEqual(
-            reviewer_and_suggestion_counts_model.question_reviewer_count,
+            community_contribution_stats_model.question_reviewer_count,
             self.question_reviewer_count
         )
         self.assertEqual(
-            reviewer_and_suggestion_counts_model.question_suggestion_count,
+            community_contribution_stats_model.question_suggestion_count,
             self.question_suggestion_count
         )
 
-    def test_get_returns_new_reviewer_and_suggestion_counts_model_if_not_found(
+    def test_get_returns_new_community_contribution_stats_model_if_not_found(
             self):
         """If the model has not been created yet, get should create the model
         with default values.
         """
-        reviewer_and_suggestion_counts_model = (
-            suggestion_models.ReviewerAndSuggestionCountsModel.get()
+        community_contribution_stats_model = (
+            suggestion_models.CommunityContributionStatsModel.get()
         )
 
         self.assertEqual(
-            reviewer_and_suggestion_counts_model.id,
-            suggestion_models.REVIEWER_AND_SUGGESTION_COUNTS_MODEL_ID
+            community_contribution_stats_model.id,
+            suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID
         )
         self.assertEqual(
             (
-                reviewer_and_suggestion_counts_model
+                community_contribution_stats_model
                 .translation_reviewer_counts_by_lang_code
             ), {}
         )
         self.assertEqual(
             (
-                reviewer_and_suggestion_counts_model
+                community_contribution_stats_model
                 .translation_suggestion_counts_by_lang_code
             ), {}
         )
         self.assertEqual(
-            reviewer_and_suggestion_counts_model.question_reviewer_count, 0
+            community_contribution_stats_model.question_reviewer_count, 0
         )
         self.assertEqual(
-            reviewer_and_suggestion_counts_model.question_suggestion_count, 0
+            community_contribution_stats_model.question_suggestion_count, 0
         )
 
     def test_get_deletion_policy_returns_not_applicable(self):
         self.assertEqual(
             (
-                suggestion_models.ReviewerAndSuggestionCountsModel
+                suggestion_models.CommunityContributionStatsModel
                 .get_deletion_policy()
             ),
             base_models.DELETION_POLICY.NOT_APPLICABLE

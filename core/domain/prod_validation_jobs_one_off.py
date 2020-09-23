@@ -167,13 +167,13 @@ class ClassifierTrainingJobModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [classifier_models.ClassifierTrainingJobModel]
 
 
-class TrainingJobExplorationMappingModelAuditOneOffJob(
+class StateTrainingJobsMappingModelAuditOneOffJob(
         ProdValidationAuditOneOffJob):
-    """Job that audits and validates TrainingJobExplorationMappingModel."""
+    """Job that audits and validates StateTrainingJobsMappingModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [classifier_models.TrainingJobExplorationMappingModel]
+        return [classifier_models.StateTrainingJobsMappingModel]
 
 
 class CollectionModelAuditOneOffJob(ProdValidationAuditOneOffJob):
@@ -609,13 +609,13 @@ class GeneralVoiceoverApplicationModelAuditOneOffJob(
         return [suggestion_models.GeneralVoiceoverApplicationModel]
 
 
-class ReviewerAndSuggestionCountsModelAuditOneOffJob(
+class CommunityContributionStatsModelAuditOneOffJob(
         ProdValidationAuditOneOffJob):
-    """Job that audits and validates ReviewerAndSuggestionCountsModel."""
+    """Job that audits and validates CommunityContributionStatsModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [suggestion_models.ReviewerAndSuggestionCountsModel]
+        return [suggestion_models.CommunityContributionStatsModel]
 
 
 class TopicModelAuditOneOffJob(ProdValidationAuditOneOffJob):
