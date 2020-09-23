@@ -25,6 +25,7 @@ import logging
 from core.domain import caching_services
 from core.domain import feedback_services
 from core.domain import opportunity_services
+from core.domain import rights_domain
 from core.domain import role_services
 from core.domain import state_domain
 from core.domain import story_fetchers
@@ -1221,7 +1222,7 @@ def assign_role(committer, assignee, new_role, topic_id):
     else:
         raise Exception('Invalid role: %s' % new_role)
 
-    commit_message = topic_domain.ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
+    commit_message = rights_domain.ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
         assignee_username, old_role, new_role)
     commit_cmds = [topic_domain.TopicRightsChange({
         'cmd': topic_domain.CMD_CHANGE_ROLE,

@@ -20,14 +20,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 import re
 
-import core.storage.subtopic.gae_models
 from core.domain import collection_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import role_services
-from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_domain
@@ -47,6 +45,7 @@ current_user_services = models.Registry.import_current_user_services()
     question_models,
     skill_models,
     story_models,
+    subtopic_models,
     suggestion_models,
     topic_models,
     user_models
@@ -59,6 +58,7 @@ current_user_services = models.Registry.import_current_user_services()
     models.NAMES.question,
     models.NAMES.skill,
     models.NAMES.story,
+    models.NAMES.subtopic,
     models.NAMES.suggestion,
     models.NAMES.topic,
     models.NAMES.user,
@@ -296,6 +296,12 @@ def delete_user(pending_deletion_request):
             story_models.StorySnapshotMetadataModel,
             story_models.StoryCommitLogEntryModel,
             'story_id')
+        _pseudonymize_activity_models_without_associated_rights_models(
+            pending_deletion_request,
+            models.NAMES.subtopic,
+            subtopic_models.SubtopicPageSnapshotMetadataModel,
+            subtopic_models.SubtopicPageCommitLogEntryModel,
+            'subtopic_page_id')
         _pseudonymize_activity_models_with_associated_rights_models(
             pending_deletion_request,
             models.NAMES.exploration,
@@ -303,7 +309,9 @@ def delete_user(pending_deletion_request):
             exp_models.ExplorationRightsSnapshotMetadataModel,
             exp_models.ExplorationRightsSnapshotContentModel,
             exp_models.ExplorationCommitLogEntryModel,
-            'exploration_id')
+            'exploration_id',
+            feconf.EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS,
+            ('owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids'))
         _pseudonymize_activity_models_with_associated_rights_models(
             pending_deletion_request,
             models.NAMES.collection,
@@ -311,8 +319,19 @@ def delete_user(pending_deletion_request):
             collection_models.CollectionRightsSnapshotMetadataModel,
             collection_models.CollectionRightsSnapshotContentModel,
             collection_models.CollectionCommitLogEntryModel,
-            'collection_id')
-        _pseudonymize_topic_models(pending_deletion_request)
+            'collection_id',
+            feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS,
+            ('owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids'))
+        _pseudonymize_activity_models_with_associated_rights_models(
+            pending_deletion_request,
+            models.NAMES.topic,
+            topic_models.TopicSnapshotMetadataModel,
+            topic_models.TopicRightsSnapshotMetadataModel,
+            topic_models.TopicRightsSnapshotContentModel,
+            topic_models.TopicCommitLogEntryModel,
+            'topic_id',
+            feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS,
+            ('manager_ids',))
     _delete_models(user_id, user_role, models.NAMES.email)
 
 
@@ -435,6 +454,8 @@ def _collect_entity_ids_from_snapshots_and_commit(
     Args:
         user_id: str. The user for which to collect the entites.
             model classes that contain the entity IDs.
+        snapshot_metadata_model_classes: list(class). The snapshot metadata
+            model classes that contain the entity IDs.
         commit_log_model_class: class. The metadata model classes that
             contains the entity IDs.
         commit_log_model_field_name: str. The name of the field holding the
@@ -499,7 +520,7 @@ def _collect_and_save_entity_ids_from_snapshots_and_commit(
         snapshot_metadata_model_classes,
         commit_log_model_class,
         commit_log_model_field_name):
-    """Collect  and save the activity IDs that for the user with user_id.
+    """Collect and save the activity IDs that for the user with user_id.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
@@ -592,10 +613,11 @@ def _pseudonymize_config_models(pending_deletion_request):
                 pseudonymized_id
             )
 
+
 def _pseudonymize_activity_models_without_associated_rights_models(
         pending_deletion_request,
         activity_category,
-        snapshot_metadata_model_classes,
+        snapshot_model_class,
         commit_log_model_class,
         commit_log_model_field_name):
     """Collect the activity IDs that for the user with user_id. Verify that each
@@ -687,7 +709,9 @@ def _pseudonymize_activity_models_with_associated_rights_models(
         rights_snapshot_metadata_model_class,
         rights_snapshot_content_model_class,
         commit_log_model_class,
-        commit_log_model_field_name):
+        commit_log_model_field_name,
+        allowed_commands,
+        rights_user_id_fields):
     """Pseudonymize the activity models with associated rights models for the
     user with user_id.
 
@@ -708,6 +732,10 @@ def _pseudonymize_activity_models_with_associated_rights_models(
             The commit log model class.
         commit_log_model_field_name: str. The name of the field holding the
             activity id in the corresponding commit log model.
+        allowed_commands: list(dict). The commands that are allowed for the
+            activity commits.
+        rights_user_id_fields: list(str). The names of user ID fields of
+            the activity rights model.
     """
     user_id = pending_deletion_request.user_id
     metadata_model_classes = (
@@ -745,11 +773,6 @@ def _pseudonymize_activity_models_with_associated_rights_models(
         snapshot_metadata_models = [
             model for model in col_or_exp_related_models
             if isinstance(model, metadata_model_classes)]
-        allowed_commands = (
-            feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS
-            if activity_category == models.NAMES.collection else
-            feconf.EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS
-        )
         for snapshot_metadata_model in snapshot_metadata_models:
             for commit_cmd in snapshot_metadata_model.commit_cmds:
                 user_id_attribute_names = python_utils.NEXT(
@@ -796,15 +819,12 @@ def _pseudonymize_activity_models_with_associated_rights_models(
                 snapshot_metadata_model.committer_id = pseudonymized_id
 
         rights_snapshot_content_models = [
-            model
-            for model in col_or_exp_related_models
+            model for model in col_or_exp_related_models
             if isinstance(model, rights_snapshot_content_model_class)
         ]
         for rights_snapshot_content_model in rights_snapshot_content_models:
             model_dict = rights_snapshot_content_model.content
-            for field_name in (
-                    'owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids'
-            ):
+            for field_name in rights_user_id_fields:
                 model_dict[field_name] = [
                     pseudonymized_id if field_id == user_id else field_id
                     for field_id in model_dict[field_name]]
@@ -857,178 +877,6 @@ def _pseudonymize_activity_models_with_associated_rights_models(
                 _pseudonymize_models,
                 col_or_exp_related_models[
                     i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
-                pseudonymized_id
-            )
-
-
-def _pseudonymize_topic_models(pending_deletion_request):
-    """Pseudonymize the topic models for the user with
-    user_id.
-
-    Args:
-        pending_deletion_request: PendingDeletionRequest. The pending deletion
-            request object to be saved in the datastore.
-    """
-    user_id = pending_deletion_request.user_id
-    topic_metadata_model_classes = (
-        topic_models.TopicSnapshotMetadataModel,
-        topic_models.TopicRightsSnapshotMetadataModel)
-
-    topic_model_ids, topic_snapshot_metadata_models, topic_commit_log_models = (
-        _collect_entity_ids_from_snapshots_and_commit(
-            pending_deletion_request.user_id,
-            topic_metadata_model_classes,
-            topic_models.TopicCommitLogEntryModel,
-            'topic_id'
-        )
-    )
-    (
-        subtopic_model_ids,
-        subtopic_snapshot_metadata_models,
-        subtopic_commit_log_models,
-    ) = _collect_entity_ids_from_snapshots_and_commit(
-        pending_deletion_request.user_id,
-        [core.storage.subtopic.gae_models.SubtopicPageSnapshotMetadataModel],
-        core.storage.subtopic.gae_models.SubtopicPageCommitLogEntryModel,
-        'subtopic_page_id'
-    )
-
-    subtopic_models = SubtopicPageModel.get_multi(
-        subtopic_model_ids, include_deleted=True)
-    subtopic_id_to_topic_id = {
-        subtopic_model.id: subtopic_model.topic_id
-        for subtopic_model in subtopic_models
-    }
-    subtopic_topic_model_ids = set(subtopic_id_to_topic_id.values())
-    _save_pseudonymizable_entity_mappings(
-        pending_deletion_request,
-        models.NAMES.topic,
-        list(topic_model_ids | subtopic_topic_model_ids))
-
-    def _pseudonymize_models(topic_related_models, pseudonymized_id):
-        """Pseudonymize user ID fields in the models.
-
-        This function is run in a transaction, with the maximum number of
-        activity_related_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
-
-        Args:
-            topic_related_models: list(BaseModel). Models whose user IDs should
-                be pseudonymized.
-            pseudonymized_id: str. New pseudonymized user ID to be used for
-                the models.
-        """
-        pseudonymized_username = user_services.get_pseudonymous_username(
-            pseudonymized_id)
-
-        metadata_model_classes = (
-            topic_metadata_model_classes +
-            (
-            core.storage.subtopic.gae_models.SubtopicPageSnapshotMetadataModel,))
-
-        snapshot_metadata_models = [
-            model for model in topic_related_models
-            if isinstance(model, metadata_model_classes)]
-        for snapshot_metadata_model in snapshot_metadata_models:
-            for commit_cmd in snapshot_metadata_model.commit_cmds:
-                user_id_attribute_names = python_utils.NEXT(
-                    cmd['user_id_attribute_names']
-                    for cmd in feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS
-                    if cmd['name'] == commit_cmd['cmd']
-                )
-                for user_id_attribute_name in user_id_attribute_names:
-                    if commit_cmd[user_id_attribute_name] == user_id:
-                        commit_cmd[user_id_attribute_name] = pseudonymized_id
-
-            assign_commit_message_match = re.match(
-                topic_domain.ASSIGN_ROLE_COMMIT_MESSAGE_REGEX,
-                snapshot_metadata_model.commit_message)
-            if assign_commit_message_match:
-                snapshot_metadata_model.commit_message = (
-                    topic_domain.ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
-                        pseudonymized_username,
-                        assign_commit_message_match.group(2),
-                        assign_commit_message_match.group(3),
-                    )
-                )
-
-            snapshot_metadata_model.content_user_ids = [
-                pseudonymized_id if model_user_id == user_id else model_user_id
-                for model_user_id in snapshot_metadata_model.content_user_ids]
-            snapshot_metadata_model.commit_cmds_user_ids = [
-                pseudonymized_id if model_user_id == user_id else model_user_id
-                for model_user_id
-                in snapshot_metadata_model.commit_cmds_user_ids]
-            if user_id == snapshot_metadata_model.committer_id:
-                snapshot_metadata_model.committer_id = pseudonymized_id
-
-        rights_snapshot_content_models = [
-            model for model in topic_related_models
-            if isinstance(model, topic_models.TopicRightsSnapshotContentModel)]
-        for rights_snapshot_content_model in rights_snapshot_content_models:
-            model_dict = rights_snapshot_content_model.content
-            model_dict['manager_ids'] = [
-                pseudonymized_id if manager_id == user_id else manager_id
-                for manager_id in model_dict['manager_ids']
-            ]
-            rights_snapshot_content_model.content = model_dict
-
-        commit_log_models = [
-            model for model in topic_related_models
-            if isinstance(
-                model,
-                (
-                    topic_models.TopicCommitLogEntryModel,
-                    core.storage.subtopic.gae_models.SubtopicPageCommitLogEntryModel,
-                ),
-            )
-        ]
-        for commit_log_model in commit_log_models:
-            commit_log_model.user_id = pseudonymized_id
-
-        ndb.put_multi(
-            snapshot_metadata_models +
-            rights_snapshot_content_models +
-            commit_log_models)
-
-    topic_ids_to_pids = (
-        pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.topic])
-    for topic_id, pseudonymized_id in topic_ids_to_pids.items():
-        topic_related_snapshot_metadata_models = [
-            model for model in topic_snapshot_metadata_models
-            if model.get_unversioned_instance_id() == topic_id]
-
-        topic_related_rights_snapshots_ids = [
-            model.id for model in topic_related_snapshot_metadata_models
-            if isinstance(model, topic_models.TopicRightsSnapshotMetadataModel)]
-        topic_related_snapshot_content_models = (
-            topic_models.TopicRightsSnapshotContentModel.get_multi(
-                topic_related_rights_snapshots_ids, include_deleted=True
-            )
-        )
-
-        topic_related_models = (
-            topic_related_snapshot_metadata_models +
-            topic_related_snapshot_content_models +
-            [
-                model for model in subtopic_snapshot_metadata_models
-                if subtopic_id_to_topic_id[
-                    model.get_unversioned_instance_id()] == topic_id
-            ] + [
-                model for model in topic_commit_log_models
-                if getattr(model, 'topic_id') == topic_id
-            ] + [
-                model for model in subtopic_commit_log_models
-                if subtopic_id_to_topic_id[
-                    getattr(model, 'subtopic_page_id')] == topic_id
-            ]
-        )
-
-        for i in python_utils.RANGE(
-                0, len(topic_related_models), MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-            transaction_services.run_in_transaction(
-                _pseudonymize_models,
-                topic_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 pseudonymized_id
             )
 

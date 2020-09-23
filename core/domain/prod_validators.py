@@ -91,7 +91,7 @@ import utils
     models.NAMES.question,
     models.NAMES.recommendations,
     models.NAMES.skill,
-    models.NAMES.statistics, 
+    models.NAMES.statistics,
     models.NAMES.story,
     models.NAMES.subtopic,
     models.NAMES.suggestion,

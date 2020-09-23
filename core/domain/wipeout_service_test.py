@@ -54,6 +54,7 @@ from google.appengine.ext import ndb
     question_models,
     skill_models,
     story_models,
+    subtopic_models,
     suggestion_models,
     topic_models,
     user_models
@@ -68,6 +69,7 @@ from google.appengine.ext import ndb
     models.NAMES.question,
     models.NAMES.skill,
     models.NAMES.story,
+    models.NAMES.subtopic,
     models.NAMES.suggestion,
     models.NAMES.topic,
     models.NAMES.user,
@@ -559,7 +561,6 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             metadata_model_2.committer_id, config_mappings[self.CONFIG_2_ID])
-
 
     def test_multiple_config_properties_with_multiple_users_are_pseudonymized(
             self):
@@ -1347,7 +1348,6 @@ class WipeoutServiceDeleteEmailModelsTests(test_utils.GenericTestBase):
     THREAD_2_ID = 'thread_2_id'
     REPLY_1_ID = 'reply_1_id'
     REPLY_2_ID = 'reply_2_id'
-
 
     def setUp(self):
         super(WipeoutServiceDeleteEmailModelsTests, self).setUp()
@@ -2932,6 +2932,348 @@ class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_2_id)))
 
 
+class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
+    """Provides testing of the deletion part of wipeout service."""
+
+    USER_1_EMAIL = 'some@email.com'
+    USER_1_USERNAME = 'username1'
+    USER_2_EMAIL = 'some-other@email.com'
+    USER_2_USERNAME = 'username2'
+    TOP_1_ID = 'top_1_id'
+    SUBTOP_1_ID = 'subtop_1_id'
+    SUBTOP_2_ID = 'subtop_2_id'
+
+    def setUp(self):
+        super(WipeoutServiceDeleteSubtopicModelsTests, self).setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+        self.save_new_topic(self.TOP_1_ID, self.user_1_id)
+        self.subtopic_page = self.save_new_subtopic(
+            self.SUBTOP_1_ID, self.user_1_id, self.TOP_1_ID)
+        wipeout_service.pre_delete_user(self.user_1_id)
+        wipeout_service.pre_delete_user(self.user_2_id)
+
+    def test_one_subtopic_is_pseudonymized(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        # Verify user is deleted.
+        subtopic_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id
+            ).pseudonymizable_entity_mappings[models.NAMES.subtopic]
+        )
+        metadata_model = (
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+                '%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
+        self.assertEqual(
+            metadata_model.committer_id,
+            subtopic_mappings['%s-%s' % (self.TOP_1_ID, self.SUBTOP_1_ID)])
+        commit_log_model = (
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+                'subtopicpage-%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
+        self.assertEqual(
+            commit_log_model.user_id,
+            subtopic_mappings['%s-%s' % (self.TOP_1_ID, self.SUBTOP_1_ID)])
+
+    def test_one_subtopic_with_missing_snapshot_is_pseudonymized(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.warning()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+
+        subtopic_models.SubtopicPageCommitLogEntryModel(
+            id='%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_2_ID),
+            subtopic_page_id=self.SUBTOP_2_ID,
+            user_id=self.user_1_id,
+            commit_type='create_new',
+            commit_cmds=[{}],
+            post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+            version=1
+        ).put()
+
+        with logging_swap:
+            wipeout_service.delete_user(
+                wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertEqual(
+            observed_log_messages,
+            ['The commit log model \'SubtopicPageCommitLogEntryModel\' and '
+             'snapshot models [\'SubtopicPageSnapshotMetadataModel\'] '
+             'IDs differ. Snapshots without commit logs: [], '
+             'commit logs without snapshots: [u\'%s\'].' % self.SUBTOP_2_ID])
+
+        # Verify user is deleted.
+        subtopic_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id
+            ).pseudonymizable_entity_mappings[models.NAMES.subtopic]
+        )
+        metadata_model = (
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+                '%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
+        self.assertEqual(
+            metadata_model.committer_id,
+            subtopic_mappings['%s-%s' % (self.TOP_1_ID, self.SUBTOP_1_ID)])
+        commit_log_model = (
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+                'subtopicpage-%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
+        self.assertEqual(
+            commit_log_model.user_id,
+            subtopic_mappings['%s-%s' % (self.TOP_1_ID, self.SUBTOP_1_ID)])
+
+    def test_one_subtopic_when_the_deletion_is_repeated_is_pseudonymized(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        # Return metadata model to the original user ID.
+        metadata_model = (
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+                '%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
+        metadata_model.committer_id = self.user_1_id
+        metadata_model.put()
+
+        # Run the user deletion again.
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        # Verify that both the commit and the metadata have the same
+        # pseudonymous user ID.
+        subtopic_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id
+            ).pseudonymizable_entity_mappings[models.NAMES.subtopic]
+        )
+        metadata_model = (
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+                '%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
+        self.assertEqual(
+            metadata_model.committer_id,
+            subtopic_mappings['%s-%s' % (self.TOP_1_ID, self.SUBTOP_1_ID)])
+        commit_log_model = (
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+                'subtopicpage-%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
+        self.assertEqual(
+            commit_log_model.user_id,
+            subtopic_mappings['%s-%s' % (self.TOP_1_ID, self.SUBTOP_1_ID)])
+
+    def test_multiple_subtopics_are_pseudonymized(self):
+        self.save_new_subtopic(self.SUBTOP_2_ID, self.user_1_id, self.TOP_1_ID)
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        subtopic_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id
+            ).pseudonymizable_entity_mappings[models.NAMES.subtopic]
+        )
+        metadata_model = (
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+                '%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
+        self.assertEqual(
+            metadata_model.committer_id,
+            subtopic_mappings['%s-%s' % (self.TOP_1_ID, self.SUBTOP_1_ID)])
+        commit_log_model = (
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+                'subtopicpage-%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
+        self.assertEqual(
+            commit_log_model.user_id,
+            subtopic_mappings['%s-%s' % (self.TOP_1_ID, self.SUBTOP_1_ID)])
+        metadata_model = (
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+                '%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_2_ID)))
+        self.assertEqual(
+            metadata_model.committer_id,
+            subtopic_mappings['%s-%s' % (self.TOP_1_ID, self.SUBTOP_2_ID)])
+        commit_log_model = (
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+                'subtopicpage-%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_2_ID)))
+        self.assertEqual(
+            commit_log_model.user_id,
+            subtopic_mappings['%s-%s' % (self.TOP_1_ID, self.SUBTOP_2_ID)])
+
+    def test_multiple_subtopics_with_multiple_users_are_pseudonymized(self):
+        self.save_new_subtopic(self.SUBTOP_2_ID, self.user_2_id, self.TOP_1_ID)
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        # Verify first user is deleted.
+        subtopic_mappings_1 = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id
+            ).pseudonymizable_entity_mappings[models.NAMES.subtopic]
+        )
+        metadata_model = (
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+                '%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
+        self.assertEqual(
+            metadata_model.committer_id,
+            subtopic_mappings_1['%s-%s' % (self.TOP_1_ID, self.SUBTOP_1_ID)])
+        commit_log_model = (
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+                'subtopicpage-%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
+        self.assertEqual(
+            commit_log_model.user_id,
+            subtopic_mappings_1['%s-%s' % (self.TOP_1_ID, self.SUBTOP_1_ID)])
+
+        # Verify second user is not yet deleted.
+        metadata_model = (
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+                '%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_2_ID)))
+        self.assertEqual(metadata_model.committer_id, self.user_2_id)
+        commit_log_model = (
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+                'subtopicpage-%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_2_ID)))
+        self.assertEqual(commit_log_model.user_id, self.user_2_id)
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_2_id))
+
+        # Verify second user is deleted.
+        subtopic_mappings_2 = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_2_id
+            ).pseudonymizable_entity_mappings[models.NAMES.subtopic]
+        )
+        metadata_model = (
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+                '%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_2_ID)))
+        self.assertEqual(
+            metadata_model.committer_id,
+            subtopic_mappings_2['%s-%s' % (self.TOP_1_ID, self.SUBTOP_2_ID)])
+        commit_log_model = (
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+                'subtopicpage-%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_2_ID)))
+        self.assertEqual(
+            commit_log_model.user_id,
+            subtopic_mappings_2['%s-%s' % (self.TOP_1_ID, self.SUBTOP_2_ID)])
+
+    def test_one_subtopic_with_multiple_users_is_pseudonymized(self):
+        subtopic_page_services.save_subtopic_page(
+            self.user_2_id,
+            self.subtopic_page,
+            'Change subtopic',
+            [
+                subtopic_page_domain.SubtopicPageChange({
+                    'cmd': (
+                        subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY),
+                    'property_name': (
+                        subtopic_page_domain
+                        .SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML),
+                    'new_value': 'new value',
+                    'old_value': 'old value',
+                    'subtopic_id': self.SUBTOP_1_ID
+                })
+            ]
+        )
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        # Verify first user is deleted.
+        subtopic_mappings_1 = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id
+            ).pseudonymizable_entity_mappings[models.NAMES.subtopic]
+        )
+        metadata_model = (
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+                '%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
+        self.assertEqual(
+            metadata_model.committer_id,
+            subtopic_mappings_1['%s-%s' % (self.TOP_1_ID, self.SUBTOP_1_ID)])
+        commit_log_model = (
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+                'subtopicpage-%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
+        self.assertEqual(
+            commit_log_model.user_id,
+            subtopic_mappings_1['%s-%s' % (self.TOP_1_ID, self.SUBTOP_1_ID)])
+
+        # Verify second user is not yet deleted.
+        metadata_model = (
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+                '%s-%s-2' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
+        self.assertEqual(metadata_model.committer_id, self.user_2_id)
+        commit_log_model = (
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+                'subtopicpage-%s-%s-2' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
+        self.assertEqual(commit_log_model.user_id, self.user_2_id)
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_2_id))
+
+        # Verify second user is deleted.
+        subtopic_mappings_2 = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_2_id
+            ).pseudonymizable_entity_mappings[models.NAMES.subtopic]
+        )
+        metadata_model = (
+            subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
+                '%s-%s-2' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
+        self.assertEqual(
+            metadata_model.committer_id,
+            subtopic_mappings_2['%s-%s' % (self.TOP_1_ID, self.SUBTOP_1_ID)])
+        commit_log_model = (
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+                'subtopicpage-%s-%s-2' % (self.TOP_1_ID, self.SUBTOP_1_ID)))
+        self.assertEqual(
+            commit_log_model.user_id,
+            subtopic_mappings_2['%s-%s' % (self.TOP_1_ID, self.SUBTOP_1_ID)])
+
+
+class WipeoutServiceVerifyDeleteSubtopicModelsTests(test_utils.GenericTestBase):
+    """Provides testing of the verification part of wipeout service."""
+
+    USER_1_EMAIL = 'some@email.com'
+    USER_1_USERNAME = 'username1'
+    TOP_1_ID = 'top_1_id'
+    SUBTOP_1_ID = 'subtop_1_id'
+
+    def setUp(self):
+        super(WipeoutServiceVerifyDeleteSubtopicModelsTests, self).setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.save_new_topic(self.TOP_1_ID, self.user_1_id)
+        self.save_new_subtopic(self.SUBTOP_1_ID, self.user_1_id, self.TOP_1_ID)
+        wipeout_service.pre_delete_user(self.user_1_id)
+
+    def test_verification_is_successful(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        self.assertTrue(wipeout_service.verify_user_deleted(
+            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+
+    def test_verification_when_deletion_failed_is_unsuccessful(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        self.assertTrue(wipeout_service.verify_user_deleted(
+            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+
+        subtopic_models.SubtopicPageSnapshotMetadataModel(
+            id='%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_1_ID),
+            committer_id=self.user_1_id,
+            commit_message='123',
+            commit_type='create',
+            commit_cmds={}
+        ).put()
+
+        self.assertFalse(wipeout_service.verify_user_deleted(
+            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        self.assertTrue(wipeout_service.verify_user_deleted(
+            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+
+
 class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
 
@@ -3087,8 +3429,6 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
     USER_2_USERNAME = 'username2'
     TOP_1_ID = 'top_1_id'
     TOP_2_ID = 'top_2_id'
-    SUBTOP_1_ID = 'subtop_1_id'
-    SUBTOP_2_ID = 'subtop_2_id'
 
     def setUp(self):
         super(WipeoutServiceDeleteTopicModelsTests, self).setUp()
@@ -3355,25 +3695,12 @@ class WipeoutServiceVerifyDeleteTopicModelsTests(test_utils.GenericTestBase):
     TOP_1_ID = 'top_1_id'
     TOP_2_ID = 'top_2_id'
     SUBTOP_1_ID = 'subtop_1_id'
-    SUBTOP_2_ID = 'subtop_2_id'
 
     def setUp(self):
         super(WipeoutServiceVerifyDeleteTopicModelsTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.save_new_topic(self.TOP_1_ID, self.user_1_id)
-        subtopic_page_services.save_subtopic_page(
-            self.user_1_id,
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                self.SUBTOP_1_ID, self.TOP_1_ID),
-            'create new subtopic',
-            [
-                subtopic_page_domain.SubtopicPageChange({
-                    'cmd': subtopic_page_domain.CMD_CREATE_NEW,
-                    'topic_id': self.SUBTOP_1_ID,
-                    'subtopic_id': self.TOP_1_ID
-                })
-            ])
         wipeout_service.pre_delete_user(self.user_1_id)
 
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):

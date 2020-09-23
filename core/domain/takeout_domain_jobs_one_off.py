@@ -19,20 +19,31 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import core.storage.subtopic.gae_models
 from core import jobs
 from core.platform import models
 
 import python_utils
 
 (
-    base_models, config_models, collection_models, exploration_models,
-    skill_models, story_models, topic_models,
+    base_models,
+    config_models,
+    collection_models,
+    exploration_models,
+    skill_models,
+    story_models,
+    subtopic_models,
+    topic_models,
     question_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.config, models.NAMES.collection,
-    models.NAMES.exploration, models.NAMES.skill, models.NAMES.story,
-    models.NAMES.topic, models.NAMES.question
+    models.NAMES.base_model,
+    models.NAMES.config,
+    models.NAMES.collection,
+    models.NAMES.exploration,
+    models.NAMES.skill,
+    models.NAMES.story,
+    models.NAMES.subtopic,
+    models.NAMES.topic,
+    models.NAMES.question
 ])
 
 
@@ -53,7 +64,7 @@ class SnapshotMetadataCommitMsgMigrationOneOffJob(
             exploration_models.ExplorationSnapshotMetadataModel,
             skill_models.SkillSnapshotMetadataModel,
             story_models.StorySnapshotMetadataModel,
-            core.storage.subtopic.gae_models.SubtopicPageSnapshotMetadataModel,
+            subtopic_models.SubtopicPageSnapshotMetadataModel,
             topic_models.TopicRightsSnapshotMetadataModel,
             topic_models.TopicSnapshotMetadataModel,
             question_models.QuestionSnapshotMetadataModel,

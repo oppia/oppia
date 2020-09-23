@@ -86,7 +86,8 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self):
         self.assertEqual(
-            subtopic_models.SubtopicPageCommitLogEntryModel.get_deletion_policy(),
+            subtopic_models.SubtopicPageCommitLogEntryModel
+            .get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_has_reference_to_user_id(self):
