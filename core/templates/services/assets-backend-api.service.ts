@@ -202,11 +202,12 @@ export class AssetsBackendApiService {
 
     try {
       const blob = await blobPromise;
-      const assetBlob = new Blob([blob], {type: blob.type});
-      const fileObjectFactory = (assetType === AppConstants.ASSET_TYPE_AUDIO) ?
-        this.audioFileObjectFactory : this.imageFileObjectFactory;
-      this.assetsCache.set(filename, assetBlob);
-      return fileObjectFactory.createNew(filename, assetBlob);
+      this.assetsCache.set(filename, blob);
+      if (assetType === AppConstants.ASSET_TYPE_AUDIO) {
+        return this.audioFileObjectFactory.createNew(filename, blob);
+      } else {
+        return this.imageFileObjectFactory.createNew(filename, blob);
+      }
     } catch {
       return Promise.reject(filename);
     } finally {
