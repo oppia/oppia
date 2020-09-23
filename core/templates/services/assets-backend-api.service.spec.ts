@@ -16,10 +16,8 @@
  * @fileoverview Unit tests for AssetsBackendApiService
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from
-  '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AppConstants } from 'app.constants';
 import { AudioFile, AudioFileObjectFactory } from 'domain/utilities/AudioFileObjectFactory';
