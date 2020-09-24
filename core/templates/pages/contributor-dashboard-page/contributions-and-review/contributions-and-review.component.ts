@@ -73,8 +73,8 @@ angular.module('oppia').component('contributionsAndReview', {
           color: '#e76c8c'
         }
       };
-      SUGGESTION_TYPE_QUESTION = 'add_question';
-      SUGGESTION_TYPE_TRANSLATE = 'translate_content';
+      var SUGGESTION_TYPE_QUESTION = 'add_question';
+      var SUGGESTION_TYPE_TRANSLATE = 'translate_content';
       ctrl.TAB_TYPE_CONTRIBUTIONS = 'contributions';
       ctrl.TAB_TYPE_REVIEWS = 'reviews';
 
@@ -311,7 +311,7 @@ angular.module('oppia').component('contributionsAndReview', {
         ctrl.contributionsDataLoading = true;
         ctrl.contributions = [];
         updateContributionSummaries();
-
+        ContributionAndReviewService.resetCursor();
         fetchFunction(function(suggestionIdToSuggestions, more) {
           ctrl.contributions = suggestionIdToSuggestions;
           ctrl.moreOpportunitiesAvailable = more;

@@ -125,6 +125,9 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         }).then(function() {
           onSuccess(suggestionId);
         });
+      },
+      resetCursor: function() {
+        nextCursor = null;
       }
     };
   }
