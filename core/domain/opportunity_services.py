@@ -623,9 +623,10 @@ def get_skill_opportunities_by_ids(ids):
         opportunity_models.SkillOpportunityModel.get_multi(ids))
     opportunities = []
     for skill_opportunity_model in skill_opportunity_models:
-        skill_opportunity = (
-            get_skill_opportunity_from_model(skill_opportunity_model))
-        opportunities.append(skill_opportunity)
+        if skill_opportunity_model is not None:
+            skill_opportunity = (
+                get_skill_opportunity_from_model(skill_opportunity_model))
+            opportunities.append(skill_opportunity)
     return opportunities
 
 
