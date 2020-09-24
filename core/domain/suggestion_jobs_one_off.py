@@ -297,7 +297,7 @@ class PopulateCommunityContributionStatsOneOffJob(
                 (
                     community_contribution_stats
                     .set_translation_reviewer_count_for_language_code(
-                        key[:-1], len(values))
+                        keys[-1], len(values))
                 )
         # Update the suggestion counts.
         else:
@@ -315,7 +315,7 @@ class PopulateCommunityContributionStatsOneOffJob(
                 (
                     community_contribution_stats
                     .set_translation_suggestion_count_for_language_code(
-                        key[:-1], len(values))
+                        keys[-1], len(values))
                 )
         # Make sure the counts that have been updated are valid.
         try:
