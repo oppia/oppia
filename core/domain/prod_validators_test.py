@@ -9862,7 +9862,7 @@ class CommunityContributionStatsModelValidatorTests(
             u'[u\'failed validation check for translation suggestion count '
             'field check of CommunityContributionStatsModel\', [u"Entity id '
             '%s: The translation suggestion count for language code %s is 1, '
-            'expect model CommunityContributionStatsModel to have the '
+            'expected model CommunityContributionStatsModel to have the '
             'language code %s in its translation suggestion counts but it '
             'doesn\'t exist."]]' % (
                 stats_model.id, missing_language_code, missing_language_code)
@@ -9882,7 +9882,7 @@ class CommunityContributionStatsModelValidatorTests(
             u'[u\'failed validation check for translation reviewer count '
             'field check of CommunityContributionStatsModel\', [u"Entity id '
             '%s: The translation reviewer count for language code %s is 1, '
-            'expect model CommunityContributionStatsModel to have the '
+            'expected model CommunityContributionStatsModel to have the '
             'language code %s in its translation reviewer counts but it '
             'doesn\'t exist."]]' % (
                 stats_model.id, missing_language_code, missing_language_code)
