@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 
+from core import jobs
 from core import jobs_registry
 from core.controllers import base
 from core.domain import email_manager
@@ -187,6 +188,8 @@ class DeferredTasksHandler(base.BaseHandler):
             stats_services.update_stats),
         taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS: (
             question_services.untag_deleted_misconceptions),
+        taskqueue_services.FUNCTION_ID_RUN_JOB: (
+            jobs.BaseDeferredJobManager.run_job),
     }
 
     def post(self):

@@ -56,6 +56,7 @@ FUNCTION_ID_DISPATCH_EVENT = 'dispatch_event'
 FUNCTION_ID_UPDATE_STATS = 'update_stats'
 FUNCTION_ID_DELETE_EXPLORATIONS = 'delete_explorations'
 FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS = 'untag_deleted_misconceptions'
+FUNCTION_ID_RUN_JOB = 'run_job'
 
 
 def defer(fn_identifier, queue_name, *args, **kwargs):
