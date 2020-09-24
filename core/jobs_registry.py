@@ -52,6 +52,7 @@ ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.FixCommitLastUpdatedOneOffJob,
     activity_jobs_one_off.IndexAllActivitiesJobManager,
     activity_jobs_one_off.RemoveCommitUsernamesOneOffJob,
+    activity_jobs_one_off.ValidateSnapshotMetadataModelsJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,

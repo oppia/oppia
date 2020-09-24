@@ -46,10 +46,12 @@ gae_search_services = models.Registry.import_search_services()
 
 (
     base_models, collection_models,
-    exp_models, topic_models
+    exp_models, question_models, skill_models,
+    story_models, topic_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.collection,
-    models.NAMES.exploration, models.NAMES.topic
+    models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
+    models.NAMES.story, models.NAMES.topic
 ])
 
 
@@ -2078,3 +2080,413 @@ class AuditSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
                 ['topic-length-0', 1]
             ]
         )
+
+
+class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    EXP_ID = 'exp_id0'
+    COLLECTION_ID = 'collection_id0'
+    QUESTION_ID = 'question_id0'
+    SKILL_ID = 'skill_id0'
+    STORY_ID = 'story_id0'
+    TOPIC_ID = 'topic_id0'
+    # Note that the subtopic id is topicId-subtopicNum.
+    SUBTOPIC_ID = 'topic_id0-1'
+    TOPIC_RIGHTS_ID = 'topic_rights_id0'
+    DUMMY_COMMIT_CMDS = [
+        {
+            'cmd': 'some_command',
+            'other_field': 'test'
+        }, {
+            'cmd': 'some_other_command',
+            'other_field': 'test',
+            'different_field': 'test'
+        }
+    ]
+
+    def setUp(self):
+        super(ValidateSnapshotMetadataModelsJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            activity_jobs_one_off.ValidateSnapshotMetadataModelsJob.create_new()) # pylint: disable=line-too-long
+        activity_jobs_one_off.ValidateSnapshotMetadataModelsJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            activity_jobs_one_off.ValidateSnapshotMetadataModelsJob
+            .get_output(job_id))
+
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def test_correct_collection_models(self):
+        collection_models.CollectionSnapshotMetadataModel(
+            id='%s-1' % self.COLLECTION_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        commit_model_id = 'collection-%s-%s' % (self.COLLECTION_ID, 1)
+        collection_models.CollectionCommitLogEntryModel(
+            id=commit_model_id,
+            collection_id=self.COLLECTION_ID,
+            user_id=self.albert_id,
+            commit_type='edit',
+            post_commit_status='public',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        actual_output = self._run_one_off_job()
+
+        expected_output = [
+            [
+                'FOUND COMMIT LOGS-CollectionSnapshotMetadataModel',
+                ['collection_id0-1']
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_correct_exp_models(self):
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-1' % self.EXP_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        commit_model_id = 'exploration-%s-%s' % (self.EXP_ID, 1)
+        exp_models.ExplorationCommitLogEntryModel(
+            id=commit_model_id,
+            exploration_id=self.EXP_ID,
+            user_id=self.albert_id,
+            commit_type='edit',
+            post_commit_status='public',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        actual_output = self._run_one_off_job()
+
+        expected_output = [
+            [
+                'FOUND COMMIT LOGS-ExplorationRightsSnapshotMetadataModel',
+                ['exp_id0-1']
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_correct_question_models(self):
+        question_models.QuestionSnapshotMetadataModel(
+            id='%s-1' % self.QUESTION_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        commit_model_id = 'question-%s-%s' % (self.QUESTION_ID, 1)
+        question_models.QuestionCommitLogEntryModel(
+            id=commit_model_id,
+            question_id=self.QUESTION_ID,
+            user_id=self.albert_id,
+            commit_type='edit',
+            post_commit_status='public',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        actual_output = self._run_one_off_job()
+
+        expected_output = [
+            [
+                'FOUND COMMIT LOGS-QuestionSnapshotMetadataModel',
+                ['question_id0-1']
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_correct_skill_models(self):
+        skill_models.SkillSnapshotMetadataModel(
+            id='%s-1' % self.SKILL_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        commit_model_id = 'skill-%s-%s' % (self.SKILL_ID, 1)
+        skill_models.SkillCommitLogEntryModel(
+            id=commit_model_id,
+            skill_id=self.SKILL_ID,
+            user_id=self.albert_id,
+            commit_type='edit',
+            post_commit_status='public',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        actual_output = self._run_one_off_job()
+
+        expected_output = [
+            [
+                'FOUND COMMIT LOGS-SkillSnapshotMetadataModel',
+                ['skill_id0-1']
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_correct_story_models(self):
+        story_models.StorySnapshotMetadataModel(
+            id='%s-1' % self.STORY_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        commit_model_id = 'story-%s-%s' % (self.STORY_ID, 1)
+        story_models.StoryCommitLogEntryModel(
+            id=commit_model_id,
+            story_id=self.STORY_ID,
+            user_id=self.albert_id,
+            commit_type='edit',
+            post_commit_status='public',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        actual_output = self._run_one_off_job()
+
+        expected_output = [
+            [
+                'FOUND COMMIT LOGS-StorySnapshotMetadataModel',
+                ['story_id0-1']
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_correct_topic_models(self):
+        topic_models.TopicSnapshotMetadataModel(
+            id='%s-1' % self.TOPIC_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        commit_model_id = 'topic-%s-%s' % (self.TOPIC_ID, 1)
+        topic_models.TopicCommitLogEntryModel(
+            id=commit_model_id,
+            topic_id=self.TOPIC_ID,
+            user_id=self.albert_id,
+            commit_type='edit',
+            post_commit_status='public',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        actual_output = self._run_one_off_job()
+
+        expected_output = [
+            [
+                'FOUND COMMIT LOGS-TopicSnapshotMetadataModel',
+                ['topic_id0-1']
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_correct_subtopic_models(self):
+        topic_models.SubtopicPageSnapshotMetadataModel(
+            id='%s-1' % self.SUBTOPIC_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        commit_model_id = 'subtopicpage-%s-%s' % (self.SUBTOPIC_ID, 1)
+        topic_models.SubtopicPageCommitLogEntryModel(
+            id=commit_model_id,
+            subtopic_page_id=self.SUBTOPIC_ID,
+            user_id=self.albert_id,
+            commit_type='edit',
+            post_commit_status='public',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        actual_output = self._run_one_off_job()
+
+        expected_output = [
+            [
+                'FOUND COMMIT LOGS-SubtopicPageSnapshotMetadataModel',
+                ['topic_id0-1-1']
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_correct_topic_rights_models(self):
+        topic_models.TopicRightsSnapshotMetadataModel(
+            id='%s-1' % self.TOPIC_RIGHTS_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        commit_model_id = 'rights-%s-%s' % (self.TOPIC_RIGHTS_ID, 1)
+        topic_models.TopicCommitLogEntryModel(
+            id=commit_model_id,
+            topic_id=self.TOPIC_RIGHTS_ID,
+            user_id=self.albert_id,
+            commit_type='edit',
+            post_commit_status='public',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        actual_output = self._run_one_off_job()
+
+        expected_output = [
+            [
+                'FOUND COMMIT LOGS-TopicRightsSnapshotMetadataModel',
+                ['topic_rights_id0-1']
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_missing_collection_commit_logs(self):
+        collection_models.CollectionSnapshotMetadataModel(
+            id='%s-1' % self.COLLECTION_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        actual_output = self._run_one_off_job()
+
+        expected_output = [
+            [
+                'MISSING COMMIT LOGS-CollectionSnapshotMetadataModel',
+                ['collection_id0-1']
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_missing_exp_commit_logs(self):
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-1' % self.EXP_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        actual_output = self._run_one_off_job()
+
+        expected_output = [
+            [
+                'MISSING COMMIT LOGS-ExplorationRightsSnapshotMetadataModel',
+                ['exp_id0-1']
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_missing_question_commit_logs(self):
+        question_models.QuestionSnapshotMetadataModel(
+            id='%s-1' % self.QUESTION_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        actual_output = self._run_one_off_job()
+
+        expected_output = [
+            [
+                'MISSING COMMIT LOGS-QuestionSnapshotMetadataModel',
+                ['question_id0-1']
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_missing_skill_commit_logs(self):
+        skill_models.SkillSnapshotMetadataModel(
+            id='%s-1' % self.SKILL_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        actual_output = self._run_one_off_job()
+
+        expected_output = [
+            [
+                'MISSING COMMIT LOGS-SkillSnapshotMetadataModel',
+                ['skill_id0-1']
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_missing_story_commit_logs(self):
+        story_models.StorySnapshotMetadataModel(
+            id='%s-1' % self.STORY_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        actual_output = self._run_one_off_job()
+
+        expected_output = [
+            [
+                'MISSING COMMIT LOGS-StorySnapshotMetadataModel',
+                ['story_id0-1']
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_missing_topic_commit_logs(self):
+        topic_models.TopicSnapshotMetadataModel(
+            id='%s-1' % self.TOPIC_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        actual_output = self._run_one_off_job()
+
+        expected_output = [
+            [
+                'MISSING COMMIT LOGS-TopicSnapshotMetadataModel',
+                ['topic_id0-1']
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_missing_subtopic_commit_logs(self):
+        topic_models.SubtopicPageSnapshotMetadataModel(
+            id='%s-1' % self.SUBTOPIC_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        actual_output = self._run_one_off_job()
+
+        expected_output = [
+            [
+                'MISSING COMMIT LOGS-SubtopicPageSnapshotMetadataModel',
+                ['topic_id0-1-1']
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_missing_topic_rights_commit_logs(self):
+        topic_models.TopicRightsSnapshotMetadataModel(
+            id='%s-1' % self.TOPIC_RIGHTS_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+        actual_output = self._run_one_off_job()
+
+        expected_output = [
+            [
+                'MISSING COMMIT LOGS-TopicRightsSnapshotMetadataModel',
+                ['topic_rights_id0-1']
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)

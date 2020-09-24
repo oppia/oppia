@@ -589,3 +589,103 @@ class AuditSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         """Implements the reduce function for this job."""
         yield (key, len(values))
+
+
+class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that validates the commit logs of the SnapshotMetadataModels.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        # Considering all the models that has a SnapshotMetadata except
+        # config model because it does not have commit logs.
+        return [collection_models.CollectionSnapshotMetadataModel,
+                exp_models.ExplorationRightsSnapshotMetadataModel,
+                question_models.QuestionSnapshotMetadataModel,
+                skill_models.SkillSnapshotMetadataModel,
+                story_models.StorySnapshotMetadataModel,
+                topic_models.TopicSnapshotMetadataModel,
+                topic_models.SubtopicPageSnapshotMetadataModel,
+                topic_models.TopicRightsSnapshotMetadataModel]
+
+    @staticmethod
+    def map(snapshot_model):
+        if snapshot_model.deleted:
+            return
+
+        class_name = snapshot_model.__class__.__name__
+
+        if isinstance(
+                snapshot_model,
+                topic_models.SubtopicPageSnapshotMetadataModel):
+            # The subtopic snapshot id topicId-subtopicNum-version.
+            topic_id, subtopic_num, version = snapshot_model.id.split('-')
+            model_id = '%s-%s' % (topic_id, subtopic_num)
+        else:
+            model_id, version = snapshot_model.id.split('-')
+
+        if isinstance(
+                snapshot_model,
+                collection_models.CollectionSnapshotMetadataModel):
+            commit_log_id = 'collection-%s-%s' % (model_id, version)
+            commit_log_model = (
+                collection_models.CollectionCommitLogEntryModel.get_by_id(
+                    commit_log_id))
+        if isinstance(
+                snapshot_model,
+                exp_models.ExplorationRightsSnapshotMetadataModel):
+            commit_log_id = 'exploration-%s-%s' % (model_id, version)
+            commit_log_model = (
+                exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                    commit_log_id))
+        if isinstance(
+                snapshot_model,
+                question_models.QuestionSnapshotMetadataModel):
+            commit_log_id = 'question-%s-%s' % (model_id, version)
+            commit_log_model = (
+                question_models.QuestionCommitLogEntryModel.get_by_id(
+                    commit_log_id))
+        if isinstance(
+                snapshot_model,
+                skill_models.SkillSnapshotMetadataModel):
+            commit_log_id = 'skill-%s-%s' % (model_id, version)
+            commit_log_model = (
+                skill_models.SkillCommitLogEntryModel.get_by_id(
+                    commit_log_id))
+        if isinstance(
+                snapshot_model,
+                story_models.StorySnapshotMetadataModel):
+            commit_log_id = 'story-%s-%s' % (model_id, version)
+            commit_log_model = (
+                story_models.StoryCommitLogEntryModel.get_by_id(
+                    commit_log_id))
+        if isinstance(
+                snapshot_model,
+                topic_models.TopicSnapshotMetadataModel):
+            commit_log_id = 'topic-%s-%s' % (model_id, version)
+            commit_log_model = (
+                topic_models.TopicCommitLogEntryModel.get_by_id(
+                    commit_log_id))
+        if isinstance(
+                snapshot_model,
+                topic_models.SubtopicPageSnapshotMetadataModel):
+            commit_log_id = 'subtopicpage-%s-%s' % (model_id, version)
+            commit_log_model = (
+                topic_models.SubtopicPageCommitLogEntryModel.get_by_id(
+                    commit_log_id))
+        if isinstance(
+                snapshot_model,
+                topic_models.TopicRightsSnapshotMetadataModel):
+            commit_log_id = 'rights-%s-%s' % (model_id, version)
+            commit_log_model = (
+                topic_models.TopicCommitLogEntryModel.get_by_id(
+                    commit_log_id))
+        if commit_log_model is None:
+            yield ('MISSING COMMIT LOGS-%s' % class_name, snapshot_model.id)
+        else:
+            yield ('FOUND COMMIT LOGS-%s' % class_name, snapshot_model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, values)
