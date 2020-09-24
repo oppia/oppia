@@ -2028,7 +2028,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         self._run_job_and_verify_output(expected_output)
 
 
-class PopulateReviewerAndSuggestionCountsOneOffJobTests(
+class PopulateCommunityContributionStatsOneOffJobTests(
         test_utils.GenericTestBase):
 
     target_id = 'exp1'
@@ -2037,8 +2037,8 @@ class PopulateReviewerAndSuggestionCountsOneOffJobTests(
     EXPLORATION_THREAD_ID = 'exploration.exp1.thread_1'
     SKILL_THREAD_ID = 'skill1.thread1'
     AUTHOR_EMAIL = 'author1@example.com'
-    TRANSLATION_REVIEWER_EMAIL = 'translator@community.org'
-    QUESTION_REVIEWER_EMAIL = 'question@community.org'
+    REVIEWER_1_EMAIL = 'reviewer1@community.org'
+    REVIEWER_2_EMAIL = 'reviewer2@community.org'
     COMMIT_MESSAGE = 'commit message'
 
     class MockExploration(python_utils.OBJECT):
@@ -2115,7 +2115,6 @@ class PopulateReviewerAndSuggestionCountsOneOffJobTests(
             }
         }
 
-
         with self.swap(
             exp_fetchers, 'get_exploration_by_id',
             self.mock_get_exploration_by_id):
@@ -2171,7 +2170,7 @@ class PopulateReviewerAndSuggestionCountsOneOffJobTests(
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION),
                 'linked_skill_ids': ['skill_1'],
-                'inapplicable_skill_misconception_ids': ['skillid-1']
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
             },
             'skill_id': skill_id,
             'skill_difficulty': 0.3
@@ -2190,7 +2189,7 @@ class PopulateReviewerAndSuggestionCountsOneOffJobTests(
         return question_suggestion
 
     def _run_job_and_verify_output(self, expected_output):
-        """Runs the PopulateReviewerAndSuggestionCountsOneOffJob and verifies
+        """Runs the PopulateCommunityContributionStatsOneOffJob and verifies
         that the output matches the expected output.
 
         Args:
@@ -2199,17 +2198,17 @@ class PopulateReviewerAndSuggestionCountsOneOffJobTests(
         """
         job_id = (
             suggestion_jobs_one_off
-            .PopulateReviewerAndSuggestionCountsOneOffJob.create_new())
+            .PopulateCommunityContributionStatsOneOffJob.create_new())
         (
             suggestion_jobs_one_off
-            .PopulateReviewerAndSuggestionCountsOneOffJob
+            .PopulateCommunityContributionStatsOneOffJob
             .enqueue(job_id)
         )
         self.process_and_flush_pending_tasks()
 
         actual_output = (
             suggestion_jobs_one_off
-            .PopulateReviewerAndSuggestionCountsOneOffJob
+            .PopulateCommunityContributionStatsOneOffJob
             .get_output(job_id)
         )
 
@@ -2218,7 +2217,7 @@ class PopulateReviewerAndSuggestionCountsOneOffJobTests(
 
     def assert_reviewer_and_suggestion_counts_model_has_not_been_populated(
             self):
-        """Asserts that the ReviewerAndSuggestionCountsModel has not been
+        """Asserts that the CommunityContributionStatsModel has not been
         populated yet.
         """
         reviewer_and_suggestion_counts = (
@@ -2227,16 +2226,16 @@ class PopulateReviewerAndSuggestionCountsOneOffJobTests(
 
     def setUp(self):
         super(
-            PopulateReviewerAndSuggestionCountsOneOffJobTests,
+            PopulateCommunityContributionStatsOneOffJobTests,
             self).setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
-        self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translationReviewer')
-        self.translation_reviewer_id = self.get_user_id_from_email(
-            self.TRANSLATION_REVIEWER_EMAIL)
-        self.signup(self.QUESTION_REVIEWER_EMAIL, 'questionReviewer')
-        self.question_reviewer_id = self.get_user_id_from_email(
-            self.QUESTION_REVIEWER_EMAIL)
+        self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
+        self.reviewer_1_id = self.get_user_id_from_email(
+            self.REVIEWER_1_EMAIL)
+        self.signup(self.REVIEWER_2_EMAIL, 'reviewer2')
+        self.reviewer_2_id = self.get_user_id_from_email(
+            self.REVIEWER_2_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_no_action_is_performed_for_suggestions_that_are_marked_deleted(
@@ -2267,12 +2266,12 @@ class PopulateReviewerAndSuggestionCountsOneOffJobTests(
             self):
         # Allowing the reviewer to review questions will create an associated
         # user contribution rights model, if it doesn't already exist.
-        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
         expected_output = []
 
         user_contribution_rights_model = (
             user_models.UserContributionRightsModel.get_by_id(
-                self.question_reviewer_id)
+                self.reviewer_1_id)
         )
         user_contribution_rights_model.deleted = True
         user_contribution_rights_model.put()
@@ -2282,12 +2281,12 @@ class PopulateReviewerAndSuggestionCountsOneOffJobTests(
     def test_no_action_is_performed_for_deleted_user_contribution_rights(self):
         # Allowing the reviewer to review questions will create an associated
         # user contribution rights model, if it doesn't already exist.
-        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
         expected_output = []
 
         # Removing the contribution reviewer deletes their user contribution
         # rights model.
-        user_services.remove_contribution_reviewer(self.question_reviewer_id)
+        user_services.remove_contribution_reviewer(self.reviewer_1_id)
 
         self._run_job_and_verify_output(expected_output)
 
@@ -2305,7 +2304,7 @@ class PopulateReviewerAndSuggestionCountsOneOffJobTests(
         expected_output = []
 
         suggestion_services.reject_suggestion(
-            question_suggestion.suggestion_id, self.question_reviewer_id, 
+            question_suggestion.suggestion_id, self.reviewer_1_id, 
             'reject message'
         )
 
@@ -2335,6 +2334,56 @@ class PopulateReviewerAndSuggestionCountsOneOffJobTests(
         expected_output = ['[u\'suggestion_translate_content_hi\', 2]']
 
         self._run_job_and_verify_output(expected_output)
+
+    def test_job_updates_counts_for_translation_suggestions_in_diff_lang_code(
+            self):
+        translation_suggestion_1 = (
+            self._create_translation_suggestion_with_language_code('hi')
+        )
+        translation_suggestion_2 = (
+            self._create_translation_suggestion_with_language_code('en')
+        )
+        expected_output = [
+            '[u\'suggestion_translate_content_hi\', 1]',
+            '[u\'suggestion_translate_content_en\', 1]'
+        ]
+
+        self._run_job_and_verify_output(expected_output)
+
+    def test_job_updates_counts_for_translation_reviewers_in_same_lang_code(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_2_id, 'hi')
+        expected_output = ['[u\'suggestion_translate_content_hi\', 2]']
+
+        self._run_job_and_verify_output(expected_output)
+
+    def test_job_updates_counts_for_translation_reviewers_in_diff_lang_code(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_2_id, 'en')
+        expected_output = ['[u\'suggestion_translate_content_hi\', 2]']
+
+        self._run_job_and_verify_output(expected_output)
+
+    def test_job_updates_question_suggestion_count(self):
+        self._create_question_suggestion_with_skill_id('skill_3')
+        self._create_question_suggestion_with_skill_id('skill_4')
+        expected_output = ['[u\'suggestion_translate_content_hi\', 2]']
+
+        self._run_job_and_verify_output(expected_output)
+
+    def test_job_updates_question_reviewer_count(
+            self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        user_services.allow_user_to_review_question(self.reviewer_2_id)
+        expected_output = ['[u\'suggestion_translate_content_hi\', 2]']
+
+        self._run_job_and_verify_output(expected_output)
 """
 - add translation suggestions and see count increase
 - add question suggestions and see count increase
@@ -2344,7 +2393,7 @@ class PopulateReviewerAndSuggestionCountsOneOffJobTests(
 
 
     def test_success(self):
-        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
         user_services.allow_user_to_review_translation_in_language(
             self.translator_id, 'hi')
         user_services.allow_user_to_review_translation_in_language(

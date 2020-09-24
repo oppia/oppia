@@ -239,13 +239,13 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
         yield (key, len(values))
 
 
-class PopulateReviewerAndSuggestionCountsOneOffJob(
+class PopulateCommunityContributionStatsOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to initialize, or regenerate,
-    the reviewer and suggestion counts of the ReviewerAndSuggestionCountsModel.
+    the reviewer and suggestion counts of the CommunityContributionStatsModel.
     """
 
-    _VALIDATION_ERROR_KEY = 'reviewer_and_suggestion_counts_validation_error'
+    _VALIDATION_ERROR_KEY = 'community_contribution_stats_validation_error'
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -283,19 +283,19 @@ class PopulateReviewerAndSuggestionCountsOneOffJob(
 
     @staticmethod
     def reduce(key, values):
-        reviewer_and_suggestion_counts = (
-            suggestion_services.get_reviewer_and_suggestion_counts()
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
         )
         keys = key.split('_')
 
         # Update the reviewer counts.
         if keys[0] == 'reviewer':
             if keys[1] == 'question':
-                reviewer_and_suggestion_counts.question_reviewer_count = len(
+                community_contribution_stats.question_reviewer_count = len(
                     values)
             elif keys[1] == 'translation':
                 (
-                    reviewer_and_suggestion_counts
+                    community_contribution_stats
                     .set_translation_reviewer_count_for_language_code(
                         key[:-1], len(values))
                 )
@@ -309,29 +309,29 @@ class PopulateReviewerAndSuggestionCountsOneOffJob(
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION.split('_')
             )
             if keys[1] == question_suggestion_key[0]:
-                reviewer_and_suggestion_counts.question_suggestion_count = len(
+                community_contribution_stats.question_suggestion_count = len(
                     values)
             elif keys[1] == translation_suggestion_key[0]:
                 (
-                    reviewer_and_suggestion_counts
+                    community_contribution_stats
                     .set_translation_suggestion_count_for_language_code(
                         key[:-1], len(values))
                 )
         # Make sure the counts that have been updated are valid.
         try:
-            reviewer_and_suggestion_counts.validate()
+            community_contribution_stats.validate()
         except Exception as e:
             logging.error(
                 'Reviewer and suggestion counts failed validation: %s' % e
             )
             yield (
-                PopulateReviewerAndSuggestionCountsOneOffJob
+                PopulateCommunityContributionStatsOneOffJob
                 ._VALIDATION_ERROR_KEY,
                 'Reviewer and suggestion counts failed validation: %s' % e
             )
             return
 
-        suggestion_services.update_reviewer_and_suggestion_counts(
-            reviewer_and_suggestion_counts
+        suggestion_services.update_community_contribution_stats(
+            community_contribution_stats
         )
         yield (key, len(values))

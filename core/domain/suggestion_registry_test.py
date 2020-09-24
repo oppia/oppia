@@ -2410,102 +2410,59 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     sample_language_code = 'en'
     invalid_language_code = 'invalid'
 
-<<<<<<< HEAD
-    def test_initialize_reviewer_and_suggestion_counts(self):
-        reviewer_and_suggestion_counts = (
-            suggestion_registry.ReviewerAndSuggestionCounts(
-=======
     def test_initialize_community_contribution_stats(self):
         community_contribution_stats = (
             suggestion_registry.CommunityContributionStats(
->>>>>>> upstream/develop
                 self.translation_reviewer_counts_by_lang_code,
                 self.translation_suggestion_counts_by_lang_code,
                 self.question_reviewer_count,
                 self.question_suggestion_count
             )
         )
-<<<<<<< HEAD
-        reviewer_and_suggestion_counts.validate()
-
-        self.assertEqual(
-            (
-                reviewer_and_suggestion_counts
-=======
         community_contribution_stats.validate()
 
         self.assertEqual(
             (
                 community_contribution_stats
->>>>>>> upstream/develop
                 .translation_reviewer_counts_by_lang_code
             ),
             self.translation_reviewer_counts_by_lang_code)
         self.assertEqual(
             (
-<<<<<<< HEAD
-                reviewer_and_suggestion_counts
-=======
                 community_contribution_stats
->>>>>>> upstream/develop
                 .translation_suggestion_counts_by_lang_code
             ),
             self.translation_suggestion_counts_by_lang_code
         )
         self.assertEqual(
-<<<<<<< HEAD
-            reviewer_and_suggestion_counts.question_reviewer_count,
-            self.question_reviewer_count
-        )
-        self.assertEqual(
-            reviewer_and_suggestion_counts.question_suggestion_count,
-=======
             community_contribution_stats.question_reviewer_count,
             self.question_reviewer_count
         )
         self.assertEqual(
             community_contribution_stats.question_suggestion_count,
->>>>>>> upstream/develop
             self.question_suggestion_count
         )
 
     def test_set_translation_reviewer_count_for_lang_code_updates_empty_dict(
             self):
-<<<<<<< HEAD
-        reviewer_and_suggestion_counts = (
-            suggestion_services.get_reviewer_and_suggestion_counts()
-        )
-        reviewer_and_suggestion_counts.validate()
-        (
-            reviewer_and_suggestion_counts
-=======
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
         community_contribution_stats.validate()
         (
             community_contribution_stats
->>>>>>> upstream/develop
             .translation_reviewer_counts_by_lang_code
         ) = {}
 
         (
-<<<<<<< HEAD
-            reviewer_and_suggestion_counts
-=======
             community_contribution_stats
->>>>>>> upstream/develop
             .set_translation_reviewer_count_for_language_code(
                 self.sample_language_code, 2)
         )
 
         self.assertDictEqual(
             (
-<<<<<<< HEAD
-                reviewer_and_suggestion_counts
-=======
                 community_contribution_stats
->>>>>>> upstream/develop
                 .translation_reviewer_counts_by_lang_code
             ),
             {self.sample_language_code: 2}
@@ -2513,41 +2470,24 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
     def test_set_translation_reviewer_count_for_lang_code_updates_count_value(
             self):
-<<<<<<< HEAD
-        reviewer_and_suggestion_counts = (
-            suggestion_services.get_reviewer_and_suggestion_counts()
-        )
-        reviewer_and_suggestion_counts.validate()
-        (
-            reviewer_and_suggestion_counts
-=======
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
         community_contribution_stats.validate()
         (
             community_contribution_stats
->>>>>>> upstream/develop
             .translation_reviewer_counts_by_lang_code
         ) = {self.sample_language_code: 1}
 
         (
-<<<<<<< HEAD
-            reviewer_and_suggestion_counts
-=======
             community_contribution_stats
->>>>>>> upstream/develop
             .set_translation_reviewer_count_for_language_code(
                 self.sample_language_code, 2)
         )
 
         self.assertDictEqual(
             (
-<<<<<<< HEAD
-                reviewer_and_suggestion_counts
-=======
                 community_contribution_stats
->>>>>>> upstream/develop
                 .translation_reviewer_counts_by_lang_code
             ),
             {self.sample_language_code: 2}
@@ -2555,40 +2495,23 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
     def test_set_translation_reviewer_count_for_lang_code_adds_new_lang_key(
             self):
-<<<<<<< HEAD
-        reviewer_and_suggestion_counts = (
-            suggestion_services.get_reviewer_and_suggestion_counts()
-        )
-        reviewer_and_suggestion_counts.validate()
-        (
-            reviewer_and_suggestion_counts
-=======
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
         community_contribution_stats.validate()
         (
             community_contribution_stats
->>>>>>> upstream/develop
             .translation_reviewer_counts_by_lang_code
         ) = {'en': 1}
 
         (
-<<<<<<< HEAD
-            reviewer_and_suggestion_counts
-=======
             community_contribution_stats
->>>>>>> upstream/develop
             .set_translation_reviewer_count_for_language_code('hi', 2)
         )
 
         self.assertDictEqual(
             (
-<<<<<<< HEAD
-                reviewer_and_suggestion_counts
-=======
                 community_contribution_stats
->>>>>>> upstream/develop
                 .translation_reviewer_counts_by_lang_code
             ),
             {'en': 1, 'hi': 2}
@@ -2596,82 +2519,48 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
     def test_set_translation_suggestion_count_for_lang_code_updates_empty_dict(
             self):
-<<<<<<< HEAD
-        reviewer_and_suggestion_counts = (
-            suggestion_services.get_reviewer_and_suggestion_counts()
-        )
-        reviewer_and_suggestion_counts.validate()
-        (
-            reviewer_and_suggestion_counts
-=======
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
         community_contribution_stats.validate()
         (
             community_contribution_stats
->>>>>>> upstream/develop
             .translation_suggestion_counts_by_lang_code
         ) = {}
 
         (
-<<<<<<< HEAD
-            reviewer_and_suggestion_counts
-=======
             community_contribution_stats
->>>>>>> upstream/develop
             .set_translation_suggestion_count_for_language_code(
                 self.sample_language_code, 2)
         )
 
         self.assertDictEqual(
             (
-<<<<<<< HEAD
-                reviewer_and_suggestion_counts
-=======
                 community_contribution_stats
->>>>>>> upstream/develop
                 .translation_suggestion_counts_by_lang_code
             ), {self.sample_language_code: 2}
         )
 
     def test_set_translation_suggestion_count_for_lang_code_updates_count_value(
             self):
-<<<<<<< HEAD
-        reviewer_and_suggestion_counts = (
-            suggestion_services.get_reviewer_and_suggestion_counts()
-        )
-        reviewer_and_suggestion_counts.validate()
-        (
-            reviewer_and_suggestion_counts
-=======
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
         community_contribution_stats.validate()
         (
             community_contribution_stats
->>>>>>> upstream/develop
             .translation_suggestion_counts_by_lang_code
         ) = {self.sample_language_code: 1}
 
         (
-<<<<<<< HEAD
-            reviewer_and_suggestion_counts
-=======
             community_contribution_stats
->>>>>>> upstream/develop
             .set_translation_suggestion_count_for_language_code(
                 self.sample_language_code, 2)
         )
 
         self.assertDictEqual(
             (
-<<<<<<< HEAD
-                reviewer_and_suggestion_counts
-=======
                 community_contribution_stats
->>>>>>> upstream/develop
                 .translation_suggestion_counts_by_lang_code
             ),
             {self.sample_language_code: 2}
@@ -2679,40 +2568,23 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
     def test_set_translation_suggestion_count_for_lang_code_adds_new_lang_key(
             self):
-<<<<<<< HEAD
-        reviewer_and_suggestion_counts = (
-            suggestion_services.get_reviewer_and_suggestion_counts()
-        )
-        reviewer_and_suggestion_counts.validate()
-        (
-            reviewer_and_suggestion_counts
-=======
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
         community_contribution_stats.validate()
         (
             community_contribution_stats
->>>>>>> upstream/develop
             .translation_suggestion_counts_by_lang_code
         ) = {'en': 1}
 
         (
-<<<<<<< HEAD
-            reviewer_and_suggestion_counts
-=======
             community_contribution_stats
->>>>>>> upstream/develop
             .set_translation_suggestion_count_for_language_code('hi', 2)
         )
 
         self.assertDictEqual(
             (
-<<<<<<< HEAD
-                reviewer_and_suggestion_counts
-=======
                 community_contribution_stats
->>>>>>> upstream/develop
                 .translation_suggestion_counts_by_lang_code
             ),
             {'en': 1, 'hi': 2}
@@ -2720,39 +2592,17 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
     def test_validate_translation_reviewer_counts_fails_for_negative_counts(
             self):
-<<<<<<< HEAD
-        reviewer_and_suggestion_counts = (
-            suggestion_services.get_reviewer_and_suggestion_counts()
-        )
-        (
-            reviewer_and_suggestion_counts
-=======
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
         (
             community_contribution_stats
->>>>>>> upstream/develop
             .set_translation_reviewer_count_for_language_code(
                 self.sample_language_code, self.negative_count)
         )
 
         with self.assertRaisesRegexp(
             Exception,
-<<<<<<< HEAD
-            'Expected the translation reviewer count to be non-negative, '
-            'recieved: %s. The language code for the translation was %s.' % (
-                self.negative_count, self.sample_language_code)):
-            reviewer_and_suggestion_counts.validate()
-
-    def test_validate_translation_suggestion_counts_fails_for_negative_counts(
-            self):
-        reviewer_and_suggestion_counts = (
-            suggestion_services.get_reviewer_and_suggestion_counts()
-        )
-        (
-            reviewer_and_suggestion_counts
-=======
             'Expected the translation reviewer count to be non-negative for '
             '%s language code, recieved: %s.' % (
                 self.sample_language_code, self.negative_count)):
@@ -2765,25 +2615,12 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
         (
             community_contribution_stats
->>>>>>> upstream/develop
             .set_translation_suggestion_count_for_language_code(
                 self.sample_language_code, self.negative_count)
         )
 
         with self.assertRaisesRegexp(
             Exception,
-<<<<<<< HEAD
-            'Expected the translation suggestion count to be non-negative, '
-            'recieved: %s. The language code for the translation was %s.' % (
-                self.negative_count, self.sample_language_code)):
-            reviewer_and_suggestion_counts.validate()
-
-    def test_validate_question_reviewer_count_fails_for_negative_counts(self):
-        reviewer_and_suggestion_counts = (
-            suggestion_services.get_reviewer_and_suggestion_counts()
-        )
-        reviewer_and_suggestion_counts.question_reviewer_count = (
-=======
             'Expected the translation suggestion count to be non-negative for '
             '%s language code, recieved: %s.' % (
                 self.sample_language_code, self.negative_count)):
@@ -2794,7 +2631,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             suggestion_services.get_community_contribution_stats()
         )
         community_contribution_stats.question_reviewer_count = (
->>>>>>> upstream/develop
             self.negative_count
         )
 
@@ -2802,16 +2638,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             Exception,
             'Expected the question reviewer count to be non-negative, '
             'recieved: %s.' % (
-<<<<<<< HEAD
-                reviewer_and_suggestion_counts.question_reviewer_count)):
-            reviewer_and_suggestion_counts.validate()
-
-    def test_validate_question_suggestion_count_fails_for_negative_counts(self):
-        reviewer_and_suggestion_counts = (
-            suggestion_services.get_reviewer_and_suggestion_counts()
-        )
-        reviewer_and_suggestion_counts.question_suggestion_count = (
-=======
                 community_contribution_stats.question_reviewer_count)):
             community_contribution_stats.validate()
 
@@ -2820,7 +2646,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             suggestion_services.get_community_contribution_stats()
         )
         community_contribution_stats.question_suggestion_count = (
->>>>>>> upstream/develop
             self.negative_count
         )
 
@@ -2828,18 +2653,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             Exception,
             'Expected the question suggestion count to be non-negative, '
             'recieved: %s.' % (
-<<<<<<< HEAD
-                reviewer_and_suggestion_counts.question_suggestion_count)):
-            reviewer_and_suggestion_counts.validate()
-
-    def test_validate_translation_reviewer_counts_fails_for_invalid_lang_code(
-            self):
-        reviewer_and_suggestion_counts = (
-            suggestion_services.get_reviewer_and_suggestion_counts()
-        )
-        (
-            reviewer_and_suggestion_counts
-=======
                 community_contribution_stats.question_suggestion_count)):
             community_contribution_stats.validate()
 
@@ -2850,7 +2663,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
         (
             community_contribution_stats
->>>>>>> upstream/develop
             .set_translation_reviewer_count_for_language_code(
                 self.invalid_language_code, 1)
         )
@@ -2859,17 +2671,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             Exception,
             'Invalid language code for the translation reviewer counts: '
             '%s.' % self.invalid_language_code):
-<<<<<<< HEAD
-            reviewer_and_suggestion_counts.validate()
-
-    def test_validate_translation_suggestion_counts_fails_for_invalid_lang_code(
-            self):
-        reviewer_and_suggestion_counts = (
-            suggestion_services.get_reviewer_and_suggestion_counts()
-        )
-        (
-            reviewer_and_suggestion_counts
-=======
             community_contribution_stats.validate()
 
     def test_validate_translation_suggestion_counts_fails_for_invalid_lang_code(
@@ -2879,7 +2680,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
         (
             community_contribution_stats
->>>>>>> upstream/develop
             .set_translation_suggestion_count_for_language_code(
                 self.invalid_language_code, 1)
         )
@@ -2888,8 +2688,4 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             Exception,
             'Invalid language code for the translation suggestion counts: '
             '%s.' % self.invalid_language_code):
-<<<<<<< HEAD
-            reviewer_and_suggestion_counts.validate()
-=======
             community_contribution_stats.validate()
->>>>>>> upstream/develop
