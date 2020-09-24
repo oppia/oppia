@@ -629,10 +629,10 @@ LINEAR_INTERACTION_IDS = ['Continue']
 # either a YAML file or a directory (depending on whether it ends in .yaml).
 # These explorations can be found under data/explorations.
 DEMO_EXPLORATIONS = {
-    u'0': 'welcome.yaml',
+    u'0': 'welcome',
     u'1': 'multiples.yaml',
     u'2': 'binary_search',
-    u'3': 'root_linear_coefficient_theorem.yaml',
+    u'3': 'root_linear_coefficient_theorem',
     u'4': 'three_balls',
     # TODO(bhenning): Replace demo exploration '5' with a new exploration
     # described in #1376.
