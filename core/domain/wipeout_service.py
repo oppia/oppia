@@ -86,26 +86,6 @@ def get_pending_deletion_request(user_id):
     return _transform_pending_deletion_request(pending_deletion_request_model)
 
 
-def get_pending_deletion_request_by_email(email):
-    """Return the pending deletion request.
-
-    Args:
-        email: str. The email of the user being deleted.
-
-    Returns:
-        PendingDeletionRequest|None. The pending deletion request domain object.
-    """
-    pending_deletion_request_model = (
-        user_models.PendingDeletionRequestModel.query(
-            user_models.PendingDeletionRequestModel.email == email
-        ).get()
-    )
-    if pending_deletion_request_model is None:
-        return None
-
-    return _transform_pending_deletion_request(pending_deletion_request_model)
-
-
 def get_number_of_pending_deletion_requests():
     """Get number of pending deletion request.
 
@@ -306,7 +286,7 @@ def run_user_deletion(pending_deletion_request):
         return wipeout_domain.USER_DELETION_SUCCESS
 
 
-def run_user_verification(pending_deletion_request):
+def run_user_deletion_completion(pending_deletion_request):
     """Run the user deletion verification.
 
     Args:

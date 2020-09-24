@@ -92,27 +92,6 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         self.assertEqual(
             pending_deletion_request.pseudonymizable_entity_mappings, {})
 
-    def test_gets_pending_deletion_request_by_email_returns_correctly(self):
-        wipeout_service.save_pending_deletion_requests(
-            [wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_1_id, self.USER_1_EMAIL, self.user_1_role,
-                ['exp1', 'exp2'],
-                ['col1']
-            )]
-        )
-
-        pending_deletion_request = (
-            wipeout_service.get_pending_deletion_request_by_email(
-                self.USER_1_EMAIL))
-        self.assertEqual(pending_deletion_request.user_id, self.user_1_id)
-        self.assertEqual(pending_deletion_request.email, self.USER_1_EMAIL)
-        self.assertEqual(pending_deletion_request.deletion_complete, False)
-        self.assertEqual(
-            pending_deletion_request.exploration_ids, ['exp1', 'exp2'])
-        self.assertEqual(pending_deletion_request.collection_ids, ['col1'])
-        self.assertEqual(
-            pending_deletion_request.pseudonymizable_entity_mappings, {})
-
     def test_get_number_of_pending_deletion_requests_returns_correct_number(
             self):
         number_of_pending_deletion_requests = (
@@ -538,22 +517,22 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             wipeout_domain.USER_DELETION_ALREADY_DONE
         )
 
-    def test_run_user_verification_with_user_not_yet_deleted(self):
+    def test_run_user_deletion_completion_with_user_not_yet_deleted(self):
         self.assertEqual(
-            wipeout_service.run_user_verification(
+            wipeout_service.run_user_deletion_completion(
                 self.pending_deletion_request),
             wipeout_domain.USER_VERIFICATION_NOT_DELETED
         )
 
-    def test_run_user_verification_with_user_wrongly_deleted(self):
+    def test_run_user_deletion_completion_with_user_wrongly_deleted(self):
         wipeout_service.run_user_deletion(self.pending_deletion_request)
         self.assertEqual(
-            wipeout_service.run_user_verification(
+            wipeout_service.run_user_deletion_completion(
                 self.pending_deletion_request),
             wipeout_domain.USER_VERIFICATION_SUCCESS
         )
 
-    def test_run_user_verification_with_user_properly_deleted(self):
+    def test_run_user_deletion_completion_with_user_properly_deleted(self):
         wipeout_service.run_user_deletion(self.pending_deletion_request)
 
         user_models.CompletedActivitiesModel(
@@ -561,7 +540,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
         ).put()
 
         self.assertEqual(
-            wipeout_service.run_user_verification(
+            wipeout_service.run_user_deletion_completion(
                 self.pending_deletion_request),
             wipeout_domain.USER_VERIFICATION_FAILURE
         )

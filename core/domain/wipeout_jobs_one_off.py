@@ -73,7 +73,7 @@ class FullyCompleteUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             pending_deletion_request_model.id)
         # The final status of the completion. Either 'NOT DELETED', 'SUCCESS',
         # or 'FAILURE'.
-        completion_status = wipeout_service.run_user_verification(
+        completion_status = wipeout_service.run_user_deletion_completion(
             pending_deletion_request)
         yield (completion_status, pending_deletion_request.user_id)
 
