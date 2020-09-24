@@ -9735,52 +9735,6 @@ class CommunityContributionStatsModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-    def test_model_validation_fails_for_non_integer_question_reviewer_count(
-            self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        stats_model.question_reviewer_count = self.non_integer_count
-        stats_model.put()
-        expected_output = [
-            u'[u\'failed validation check for question reviewer count check '
-            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
-            'reviewer count: %s does not match the expected question '
-            'reviewer count: 0.\']]' % (
-                stats_model.id, stats_model.question_reviewer_count),
-
-            u'[u\'failed validation check for domain object check of '
-            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
-            'fails domain validation with the error Expected the '
-            'question reviewer count to be an integer, recieved: %s.\']]' % (
-                stats_model.id, stats_model.question_reviewer_count)
-        ]
-
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
-    def test_model_validation_fails_for_non_integer_question_suggestion_count(
-            self):
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        stats_model.question_suggestion_count = self.non_integer_count
-
-        stats_model.put()
-        expected_output = [
-            u'[u\'failed validation check for question suggestion count check '
-            'of CommunityContributionStatsModel\', [u\'Entity id %s: Question '
-            'suggestion count: %s does not match the expected question '
-            'suggestion count: 0.\']]' % (
-                stats_model.id, stats_model.question_suggestion_count),
-
-            u'[u\'failed validation check for domain object check of '
-            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
-            'fails domain validation with the error Expected the '
-            'question suggestion count to be an integer, recieved: '
-            '%s.\']]' % (
-                stats_model.id, stats_model.question_suggestion_count)
-        ]
-
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
-
     def test_model_validation_fails_if_translation_suggestion_counts_dont_match(
             self):
         stats_model = suggestion_models.CommunityContributionStatsModel.get()
