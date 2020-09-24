@@ -31,6 +31,11 @@
     }
   },
   "files": [
+    "core/templates/domain/collection/CollectionPlaythroughObjectFactory.ts",
+    "core/templates/domain/collection/CollectionRightsObjectFactory.ts",
+    "core/templates/domain/collection/CollectionRightsObjectFactorySpec.ts",
+    "core/templates/domain/collection/collection-summary-object.factory.ts",
+    "core/templates/domain/collection/collection-summary-object.factory.spec.ts",
     "core/templates/domain/skill/assigned-skill-object.factory.ts",
     "core/templates/domain/skill/assigned-skill-object.factory.spec.ts",
     "core/templates/domain/utilities/AudioFileObjectFactory.ts",

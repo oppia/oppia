@@ -20,7 +20,7 @@ import { CollectionRightsObjectFactory } from
   'domain/collection/CollectionRightsObjectFactory';
 
 describe('Collection rights object factory', () => {
-  let collectionRightsObjectFactory: CollectionRightsObjectFactory = null;
+  let collectionRightsObjectFactory: CollectionRightsObjectFactory;
 
   beforeEach(() => {
     collectionRightsObjectFactory = new CollectionRightsObjectFactory();
@@ -152,10 +152,10 @@ describe('Collection rights object factory', () => {
       collectionRightsObjectFactory.createEmptyCollectionRights());
 
     expect(
-      emptyCollectionRightsBackendObject.getCollectionId()).toBeNull();
-    expect(emptyCollectionRightsBackendObject.canEdit()).toBeNull();
-    expect(emptyCollectionRightsBackendObject.canUnpublish()).toBeNull();
-    expect(emptyCollectionRightsBackendObject.isPrivate()).toBeNull();
+      emptyCollectionRightsBackendObject.getCollectionId()).toEqual(0);
+    expect(emptyCollectionRightsBackendObject.canEdit()).toBe(false);
+    expect(emptyCollectionRightsBackendObject.canUnpublish()).toBe(false);
+    expect(emptyCollectionRightsBackendObject.isPrivate()).toBe(false);
     expect(emptyCollectionRightsBackendObject.getOwnerNames()).toEqual([]);
   });
 
