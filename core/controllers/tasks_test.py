@@ -397,7 +397,7 @@ class TasksTests(test_utils.EmailTestBase):
             'aggregated_stats': aggregated_stats,
             'exp_version': exp_version})
         self.assertEqual(self.count_jobs_in_taskqueue(
-            queue_name=taskqueue_services.QUEUE_NAME_STATS), 1)
+            taskqueue_services.QUEUE_NAME_STATS), 1)
         self.process_and_flush_pending_tasks()
 
         # Check that the models are updated.

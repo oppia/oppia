@@ -45,12 +45,9 @@ transaction_services = models.Registry.import_transaction_services()
 
 JOB_FAILED_MESSAGE = 'failed (as expected)'
 
+
 class MockJobManagerOne(jobs.BaseMapReduceJobManager):
     """Test job that counts the total number of explorations."""
-
-    @classmethod
-    def _run(cls, additional_job_params):
-        return 'output'
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -84,10 +81,8 @@ class MockJobManagerTwo(jobs.BaseMapReduceJobManager):
     def reduce(key, values):
         yield (key, sum([int(value) for value in values]))
 
+
 class MockFailingJobManager(jobs.BaseMapReduceJobManager):
-    @classmethod
-    def _run(cls, additional_job_params):
-        raise Exception(JOB_FAILED_MESSAGE)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -123,39 +118,6 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.assertFalse(MockJobManagerOne.is_active(job_id))
         self.assertFalse(MockJobManagerOne.has_finished(job_id))
 
-    def test_failing_jobs(self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-
-        # Mocks GoogleCloudStorageInputReader() to fail a job.
-        _mock_input_reader = lambda _, __: python_utils.divide(1, 0)
-
-        input_reader_swap = self.swap(
-            input_readers, 'GoogleCloudStorageInputReader', _mock_input_reader)
-        assert_raises_context_manager = self.assertRaisesRegexp(
-            Exception,
-            r'Invalid status code change for job '
-            r'MockJobManagerOne-\w+-\w+: from new to failed')
-
-        job_id = MockJobManagerOne.create_new()
-        store_map_reduce_results = jobs.StoreMapReduceResults()
-
-        with input_reader_swap, assert_raises_context_manager, logging_swap:
-            store_map_reduce_results.run(
-                job_id, 'core.jobs_test.MockJobManagerOne', 'output')
-
-        expected_log_message = 'Job %s failed at' % job_id
-
-        # The first log message is ignored as it is the traceback.
-        self.assertEqual(len(observed_log_messages), 2)
-        self.assertTrue(
-            observed_log_messages[1].startswith(expected_log_message))
-
     def test_enqueue_job(self):
         """Test the enqueueing of a job."""
         job_id = MockJobManagerOne.create_new()
@@ -185,7 +147,6 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.assertLess(time_queued_msec, time_started_msec)
         self.assertLess(time_started_msec, time_finished_msec)
 
-        metadata = MockJobManagerOne.get_metadata(job_id)
         output = MockJobManagerOne.get_output(job_id)
         error = MockJobManagerOne.get_error(job_id)
         self.assertEqual(output, [])
@@ -303,10 +264,6 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.error, 'Error')
         self.assertEqual(model.status_code, jobs.STATUS_CODE_FAILED)
 
-    def test_no_error_raised_with_pre_cancel_hook(self):
-        jobs.BaseJobManager._pre_cancel_hook(
-            'job_id', 'cancelled')
-
 
 SUM_MODEL_ID = 'all_data_id'
 
@@ -322,13 +279,6 @@ class MockSumModel(ndb.Model):
 
 class FailingAdditionJobManager(jobs.BaseMapReduceJobManager):
     """Test job that stores stuff in MockSumModel and then fails."""
-
-    @classmethod
-    def _run(cls, additional_job_params):
-        total = sum([
-            numbers_model.number for numbers_model in MockNumbersModel.query()])
-        MockSumModel(id=SUM_MODEL_ID, total=total).put()
-        raise Exception('Oops, I failed.')
 
     @classmethod
     def _post_failure_hook(cls, job_id):
@@ -873,7 +823,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 StartExplorationEventCounter.get_count(self.EXP_ID), 0)
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_EVENTS), 1)
+                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
 
             # When the task queue is flushed, the data is recorded in the two
             # realtime layers.
@@ -881,7 +831,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_EVENTS), 0)
+                    taskqueue_services.QUEUE_NAME_EVENTS), 0)
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
             self.assertEqual(MockStartExplorationRealtimeModel.get(

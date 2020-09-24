@@ -1821,7 +1821,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
                 'exp_version': self.exp_version})
 
         self.assertEqual(self.count_jobs_in_taskqueue(
-            queue_name=taskqueue_services.QUEUE_NAME_STATS), 1)
+            taskqueue_services.QUEUE_NAME_STATS), 1)
         self.process_and_flush_pending_tasks()
 
         # Check that the models are updated.
