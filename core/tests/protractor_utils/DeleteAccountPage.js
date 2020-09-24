@@ -32,7 +32,7 @@ var DeleteAccountPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.deleteAccount = async function() {
+  this.requestAccountDeletion = async function() {
     await action.click('Delete Account button', deleteMyAccountButton);
     await waitFor.modalPopupToAppear();
     await action.click('Confirm deletion button', confirmDeletionButton);

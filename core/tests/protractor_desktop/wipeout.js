@@ -37,9 +37,8 @@ describe('When account is deleted it', function() {
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
   });
 
-  it('should delete account', async function() {
-    await users.createUser('user1@delete.com', 'userToDelete1');
-    await users.login('user1@delete.com');
+  it('should request account deletion', async function() {
+    await users.createAndLoginUser('user1@delete.com', 'userToDelete1');
     await deleteAccountPage.get();
     await deleteAccountPage.deleteAccount();
     expect(await browser.getCurrentUrl()).toEqual(
@@ -47,28 +46,26 @@ describe('When account is deleted it', function() {
   });
 
   it('should delete private exploration', async function() {
-    await users.createUser('user2@delete.com', 'userToDelete2');
     await users.createUser('voiceArtist@oppia.com', 'voiceArtist');
-    await users.login('user2@delete.com');
+    await users.createAndLoginUser('user2@delete.com', 'userToDelete2');
     await workflow.createExploration();
     var explorationId = await general.getExplorationIdFromEditor();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('voice artists');
     await workflow.addExplorationVoiceArtist('voiceArtist');
     await deleteAccountPage.get();
-    await deleteAccountPage.deleteAccount();
+    await deleteAccountPage.requestAccountDeletion();
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
     await users.logout();
     await users.login('voiceArtist@oppia.com');
-    await general.openEditor(explorationId); // Should fail
+    await general.openEditor(explorationId);
     await general.expect404Error();
   });
 
   it('should set published exploration as community owned', async function() {
-    await users.createUser('user3@delete.com', 'userToDelete3');
     await users.createUser('user@check.com', 'userForChecking');
-    await users.login('user3@delete.com');
+    await users.createAndLoginUser('user3@delete.com', 'userToDelete3');
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
       EXPLORATION_CATEGORY,
@@ -76,13 +73,33 @@ describe('When account is deleted it', function() {
     );
     var explorationId = await general.getExplorationIdFromEditor();
     await deleteAccountPage.get();
-    await deleteAccountPage.deleteAccount();
+    await deleteAccountPage.requestAccountDeletion();
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
     await users.logout();
     await users.login('user@check.com');
     await general.openEditor(explorationId);
     await workflow.isExplorationCommunityOwned();
+  });
+
+    it(
+      'should\'t modify published exploration with other owner',
+      async function() {
+    await users.createUser('secondOwner@check.com', 'secondOwner');
+    await users.createAndLoginUser('user4@delete.com', 'userToDelete4');
+    await workflow.createExploration();
+    var explorationId = await general.getExplorationIdFromEditor();
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle('second owner');
+    await workflow.addExplorationManager('secondOwner');
+    await deleteAccountPage.get();
+    await deleteAccountPage.requestAccountDeletion();
+    expect(await browser.getCurrentUrl()).toEqual(
+      'http://localhost:9001/pending-account-deletion');
+    await users.logout();
+    await users.login('secondOwner@check.com');
+    await general.openEditor(explorationId);
+    expect(await workflow.getExplorationManagers()).toEqual(['secondOwner']);
   });
 
   afterEach(async function() {

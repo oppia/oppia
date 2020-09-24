@@ -290,7 +290,7 @@ describe('Permissions for private explorations', function() {
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('voice artists');
     await workflow.addExplorationVoiceArtist('voiceArtist');
-    expect(await workflow.getExplorationManagers()).toEqual(['expOwner']);
+
     expect(await workflow.getExplorationCollaborators()).toEqual([]);
     expect(await workflow.getExplorationVoiceArtists()).toEqual(
       ['voiceArtist']);

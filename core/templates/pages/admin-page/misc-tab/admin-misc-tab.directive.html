@@ -145,10 +145,15 @@
       </div>
       <div class="form-group row">
         <label>Email:</label>
-        <input type="text" ng-model="$ctrl.email" required="true">
+        <input type="text"
+               class="protractor-test-form-delete-account-email-field"
+               ng-model="$ctrl.emailToDelete"
+               required="true">
       </div>
       <div class="form-group row">
-        <input type="submit" value="Delete account">
+        <input type="submit"
+               class="protractor-test-form-delete-account-button"
+               value="Delete account">
       </div>
     </form>
   </div>
@@ -160,7 +165,7 @@
       </div>
       <div class="form-group row">
         <label>Email:</label>
-        <input type="text" ng-model="$ctrl.email" required="true">
+        <input type="text" ng-model="$ctrl.emailToVerify" required="true">
       </div>
       <div class="form-group row">
         <input type="submit" value="Verify account deleted">
