@@ -526,6 +526,7 @@ class BaseJobManager(python_utils.OBJECT):
     def _pre_cancel_hook(cls, job_id, cancel_message):
         """A hook or a callback function triggered before marking a job as
         cancelled.
+
         Args:
             job_id: str. The unique ID of the job to be marked as cancelled.
             cancel_message: str. The message to be displayed before
