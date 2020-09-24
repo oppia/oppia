@@ -157,7 +157,7 @@ var ExplorationEditorMainTab = function() {
 
     if (isVisible) {
       await action.click(
-        'Dismiss Welcome Modal not showing up', dismissWelcomeModalButton);
+        'Dismiss Welcome Modal Button', dismissWelcomeModalButton);
     }
 
     await waitFor.invisibilityOf(
@@ -166,7 +166,7 @@ var ExplorationEditorMainTab = function() {
     // Otherwise, if the editor tutorial shows up, exit it.
     var buttons = element.all(by.css('.skipBtn'));
     if (await buttons.count() === 1) {
-      await action.click('Skip button', await buttons.get(0));
+      await action.click('Skip button', buttons.get(0));
     } else if (await buttons.count() !== 0) {
       throw new Error(
         'Expected to find at most one \'exit tutorial\' button');
@@ -177,7 +177,7 @@ var ExplorationEditorMainTab = function() {
     // Finish the tutorial.
     var finishTutorialButtons = element.all(by.buttonText('Finish'));
     await waitFor.elementToBeClickable(
-      await finishTutorialButtons.first(),
+      finishTutorialButtons.first(),
       'Finish Tutorial Stage button is not clickable');
     if (await finishTutorialButtons.count() === 1) {
       await action.click(
@@ -205,7 +205,7 @@ var ExplorationEditorMainTab = function() {
       // Progress to the next instruction in the tutorial.
       var nextTutorialStageButtons = element.all(by.css('.nextBtn'));
       await waitFor.elementToBeClickable(
-        await nextTutorialStageButtons.first(),
+        nextTutorialStageButtons.first(),
         'Next Tutorial Stage button is not clickable');
       if (await nextTutorialStageButtons.count() === 1) {
         await action.click(
@@ -886,7 +886,7 @@ var ExplorationEditorMainTab = function() {
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover takes too long to disappear');
     await action.click('State Name Container', stateNameContainer);
-    await stateNameInput.clear();
+    await action.clear('State Name input', stateNameInput);
     await action.sendKeys('State Name input', stateNameInput, name);
 
     await action.click('State Name Submit button', stateNameSubmitButton);

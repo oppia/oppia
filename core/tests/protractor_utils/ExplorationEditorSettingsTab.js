@@ -117,13 +117,16 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setObjective = async function(objective) {
+    await action.clear(
+      'Exploration Objective Input', explorationObjectiveInput);
     await action.sendKeys(
       'Exploration Objective Input', explorationObjectiveInput, objective);
   };
 
   this.setTitle = async function(title) {
-    await explorationTitleInput.clear();
-    await explorationTitleInput.sendKeys(title);
+    await action.clear('Exploration Title Input', explorationTitleInput);
+    await action.sendKeys(
+      'Exploration Title Input', explorationTitleInput, title);
   };
 
   this.expectCategoryToBe = async function(category) {

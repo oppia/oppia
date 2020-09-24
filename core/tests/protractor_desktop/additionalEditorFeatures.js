@@ -101,6 +101,8 @@ describe('Full exploration editor', function() {
       var hideHeightWarningIcon = element(
         by.css('.oppia-hide-card-height-warning-icon'));
       await action.click('Hide Height Warning icon', hideHeightWarningIcon);
+      await waitFor.invisibilityOf(
+        heightMessage, 'Height message taking too long to disappear.');
       expect(await heightMessage.isPresent()).toBe(false);
 
       await users.logout();
