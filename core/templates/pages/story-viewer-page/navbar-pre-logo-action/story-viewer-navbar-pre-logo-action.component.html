@@ -1,5 +1,12 @@
-<a ng-if="$ctrl.topicName" ng-href="<[$ctrl.getTopicUrl()]>">
+<a ng-if="$ctrl.topicName" ng-href="<[$ctrl.getTopicUrl()]>" class="oppia-story-viewer-back-button">
   <span class="material-icons oppia-navbar-back-button">
     arrow_back
   </span>
 </a>
+<style>
+  @media (max-width: 570px) {
+    .oppia-story-viewer-back-button {
+      margin-left: -10px;
+    }
+  }
+</style>
