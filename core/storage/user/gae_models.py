@@ -2256,7 +2256,6 @@ class UserContributionRightsModel(base_models.BaseModel):
             .fetch(keys_only=True))
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
-
     @classmethod
     def get_voiceover_reviewer_user_ids(cls, language_code):
         """Returns the IDs of the users who have rights to review voiceovers in

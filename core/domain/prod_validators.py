@@ -3170,8 +3170,8 @@ class CommunityContributionStatsModelValidator(
                     (
                         user_models.UserContributionRightsModel
                         .can_review_translation_for_language_codes
-                    ) == language_code
-                ).count()
+                    ) == language_code)
+                .count()
             )
             if language_code in item.translation_reviewer_counts_by_lang_code:
                 model_translation_reviewer_count = (
@@ -3223,10 +3223,15 @@ class CommunityContributionStatsModelValidator(
                     suggestion_models.GeneralSuggestionModel.status == (
                         suggestion_models.STATUS_IN_REVIEW))
                 .filter(
-                    suggestion_models.GeneralSuggestionModel.suggestion_type == (
-                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT))
-                .filter(suggestion_models.GeneralSuggestionModel.language_code == (
-                    language_code))
+                    (
+                        suggestion_models.GeneralSuggestionModel
+                        .suggestion_type
+                    ) == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+                .filter(
+                    (
+                        suggestion_models.GeneralSuggestionModel
+                        .language_code
+                    ) == language_code)
                 .count()
             )
             if language_code in item.translation_suggestion_counts_by_lang_code:
@@ -3270,9 +3275,11 @@ class CommunityContributionStatsModelValidator(
         """
         expected_question_reviewer_count = (
             user_models.UserContributionRightsModel.query(
-                user_models.UserContributionRightsModel.can_review_questions == (
-                    True)
-            ).count()
+                (
+                    user_models.UserContributionRightsModel
+                    .can_review_questions
+                ) == True) # pylint: disable=singleton-comparison
+            .count()
         )
         if item.question_reviewer_count != expected_question_reviewer_count:
             cls._add_error(
@@ -3294,10 +3301,12 @@ class CommunityContributionStatsModelValidator(
         """
         expected_question_suggestion_count = (
             suggestion_models.GeneralSuggestionModel.get_all()
-            .filter(suggestion_models.GeneralSuggestionModel.status == (
-                suggestion_models.STATUS_IN_REVIEW))
-            .filter(suggestion_models.GeneralSuggestionModel.suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION))
+            .filter(
+                suggestion_models.GeneralSuggestionModel.status == (
+                    suggestion_models.STATUS_IN_REVIEW))
+            .filter(
+                suggestion_models.GeneralSuggestionModel.suggestion_type == (
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION))
             .count()
         )
         if item.question_suggestion_count != expected_question_suggestion_count:
