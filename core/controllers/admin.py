@@ -1025,7 +1025,11 @@ class NumberOfDeletionRequestsHandler(base.BaseHandler):
 
 
 class DeleteAccountHandler(base.BaseHandler):
-    """Handler for deleting account via admin page."""
+    """Handler for deleting account via admin page. Accounts are commonly
+    deleted by cron job, but this way the deletion can be forced before the cron
+    executes it, this should be mainly used in the e2e tests. This deletion can
+    be only done on user that already requested the deletion.
+    """
 
     @acl_decorators.can_access_admin_page
     def post(self):
@@ -1039,6 +1043,8 @@ class DeleteAccountHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Expected email to be a unicode string, received %s' % email)
 
+        # Get the pending deletion request of the user with email, who requested
+        # the deletion.
         pending_deletion_request = (
             wipeout_service.get_pending_deletion_request_by_email(email))
         if pending_deletion_request is None:
@@ -1051,7 +1057,11 @@ class DeleteAccountHandler(base.BaseHandler):
 
 
 class VerifyAccountDeletedHandler(base.BaseHandler):
-    """Handler for verifying that account was deleted via admin page."""
+    """Handler for verifying that account was deleted via admin page.
+    The deletion can be verified by cron job, but this way the verification can
+    be forced before the cron executes it, this should be mainly used in the
+    e2e tests.
+    """
 
     @acl_decorators.can_access_admin_page
     def post(self):
@@ -1065,6 +1075,8 @@ class VerifyAccountDeletedHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Expected email to be a unicode string, received %s' % email)
 
+        # Get the pending deletion request of the user with email, who requested
+        # the deletion.
         pending_deletion_request = (
             wipeout_service.get_pending_deletion_request_by_email(email))
         if pending_deletion_request is None:

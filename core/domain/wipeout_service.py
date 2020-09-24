@@ -290,7 +290,7 @@ def run_user_deletion(pending_deletion_request):
     """Run the user deletion.
 
     Args:
-        pending_deletion_request: PendingDeletionRequest. The domain object of
+        pending_deletion_request: PendingDeletionRequest. The domain object for
             the user being deleted.
 
     Returns:
@@ -310,7 +310,7 @@ def run_user_verification(pending_deletion_request):
     """Run the user deletion verification.
 
     Args:
-        pending_deletion_request: PendingDeletionRequest. The domain object of
+        pending_deletion_request: PendingDeletionRequest. The domain object for
             the user being verified.
 
     Returns:
