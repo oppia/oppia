@@ -346,7 +346,6 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                             'url': 'https://bootstrap/bootstrap-4.3.1-dist.zip',
                             'rootDir': 'bootstrap-4.3.1-dist',
                             'targetDir': 'bootstrap'}}}}
-
         def mock_validate_manifest(unused_filepath):
             check_function_calls['validate_manifest_is_called'] = True
         def mock_download_files(

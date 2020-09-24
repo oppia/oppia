@@ -66,8 +66,6 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     common.GOOGLE_APP_ENGINE_SDK_HOME,
     os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-%s' % common.WEBTEST_VERSION),
     os.path.join(common.OPPIA_TOOLS_DIR, 'Pillow-%s' % common.PILLOW_VERSION),
-    os.path.join(
-        common.OPPIA_TOOLS_DIR, 'protobuf-%s' % common.PROTOBUF_VERSION),
     os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-%s' % common.PSUTIL_VERSION),
     os.path.join(
         common.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common.PYGITHUB_VERSION),

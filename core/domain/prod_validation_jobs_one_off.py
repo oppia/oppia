@@ -167,13 +167,13 @@ class ClassifierTrainingJobModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [classifier_models.ClassifierTrainingJobModel]
 
 
-class StateTrainingJobsMappingModelAuditOneOffJob(
+class TrainingJobExplorationMappingModelAuditOneOffJob(
         ProdValidationAuditOneOffJob):
-    """Job that audits and validates StateTrainingJobsMappingModel."""
+    """Job that audits and validates TrainingJobExplorationMappingModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [classifier_models.StateTrainingJobsMappingModel]
+        return [classifier_models.TrainingJobExplorationMappingModel]
 
 
 class CollectionModelAuditOneOffJob(ProdValidationAuditOneOffJob):
