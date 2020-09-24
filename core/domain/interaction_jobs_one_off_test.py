@@ -815,7 +815,7 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
         self.assertEqual(actual_output, [])
 
         customization_args_dict2 = {
-            'minAllowableSelectionCount': {'value': '1b'},
+            'minAllowableSelectionCount': {'value': '1bθ'},
             'maxAllowableSelectionCount': {'value': 1},
             'choices': {'value': [{
                 'html': '<p>This is value1 for ItemSelection</p>',
@@ -841,7 +841,8 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
             .InteractionCustomizationArgsValidationOneOffJob.get_output(job_id))
         expected_output = [(
             u'[u\'Failed customization args validation for exp id exp_id0\', '
-            '[u\'ItemSelectionInput: Could not convert unicode to int: 1b\']]')]
+            '[u\'ItemSelectionInput: Could not convert unicode to int: '
+            '1b\\u03b8\']]')]
         self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
