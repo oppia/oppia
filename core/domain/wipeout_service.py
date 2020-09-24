@@ -51,27 +51,6 @@ transaction_services = models.Registry.import_transaction_services()
 MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
 
 
-def _transform_pending_deletion_request(pending_deletion_request_model):
-    """Transform PendingDeletionRequestModel to its domain object.
-
-    Args:
-        pending_deletion_request_model: PendingDeletionRequestModel.
-            The model to transform.
-
-    Returns:
-        PendingDeletionRequest. The final domain object.
-    """
-    return wipeout_domain.PendingDeletionRequest(
-        pending_deletion_request_model.id,
-        pending_deletion_request_model.email,
-        pending_deletion_request_model.role,
-        pending_deletion_request_model.deletion_complete,
-        pending_deletion_request_model.exploration_ids,
-        pending_deletion_request_model.collection_ids,
-        pending_deletion_request_model.pseudonymizable_entity_mappings
-    )
-
-
 def get_pending_deletion_request(user_id):
     """Return the pending deletion request.
 
@@ -83,7 +62,15 @@ def get_pending_deletion_request(user_id):
     """
     pending_deletion_request_model = (
         user_models.PendingDeletionRequestModel.get_by_id(user_id))
-    return _transform_pending_deletion_request(pending_deletion_request_model)
+    return wipeout_domain.PendingDeletionRequest(
+        pending_deletion_request_model.id,
+        pending_deletion_request_model.email,
+        pending_deletion_request_model.role,
+        pending_deletion_request_model.deletion_complete,
+        pending_deletion_request_model.exploration_ids,
+        pending_deletion_request_model.collection_ids,
+        pending_deletion_request_model.pseudonymizable_entity_mappings
+    )
 
 
 def get_number_of_pending_deletion_requests():
