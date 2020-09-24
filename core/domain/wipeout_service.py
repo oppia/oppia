@@ -37,31 +37,15 @@ from google.appengine.ext import ndb
 
 current_user_services = models.Registry.import_current_user_services()
 (
-    base_models,
-    collection_models,
-    config_models,
-    exp_models,
-    feedback_models,
-    question_models,
-    skill_models,
-    story_models,
-    subtopic_models,
-    suggestion_models,
-    topic_models,
-    user_models
+    base_models, collection_models, config_models,
+    exp_models, feedback_models, question_models,
+    skill_models, story_models, subtopic_models,
+    suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model,
-    models.NAMES.collection,
-    models.NAMES.config,
-    models.NAMES.exploration,
-    models.NAMES.feedback,
-    models.NAMES.question,
-    models.NAMES.skill,
-    models.NAMES.story,
-    models.NAMES.subtopic,
-    models.NAMES.suggestion,
-    models.NAMES.topic,
-    models.NAMES.user,
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.question,
+    models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
+    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user,
 ])
 transaction_services = models.Registry.import_transaction_services()
 
@@ -444,7 +428,7 @@ def _delete_models(user_id, user_role, module_name):
             model_class.apply_deletion_policy(user_id)
 
 
-def _collect_and_save_entity_ids_from_snapshots_and_commit(
+def _collect_and_save_entity_ids_from_snapshots_and_commits(
         pending_deletion_request,
         activity_category,
         snapshot_metadata_model_classes,
@@ -528,7 +512,7 @@ def _pseudonymize_config_models(pending_deletion_request):
         config_models.PlatformParameterSnapshotMetadataModel)
 
     snapshot_metadata_models, _ = (
-        _collect_and_save_entity_ids_from_snapshots_and_commit(
+        _collect_and_save_entity_ids_from_snapshots_and_commits(
             pending_deletion_request,
             models.NAMES.config,
             snapshot_model_classes,
@@ -608,7 +592,7 @@ def _pseudonymize_activity_models_without_associated_rights_models(
         The tuple of snapshot metadata and commit log models.
     """
     snapshot_metadata_models, commit_log_models = (
-        _collect_and_save_entity_ids_from_snapshots_and_commit(
+        _collect_and_save_entity_ids_from_snapshots_and_commits(
             pending_deletion_request,
             activity_category,
             [snapshot_model_class],
@@ -704,7 +688,7 @@ def _pseudonymize_activity_models_with_associated_rights_models(
         rights_snapshot_metadata_model_class)
 
     snapshot_metadata_models, commit_log_models = (
-        _collect_and_save_entity_ids_from_snapshots_and_commit(
+        _collect_and_save_entity_ids_from_snapshots_and_commits(
             pending_deletion_request,
             activity_category,
             [
@@ -958,7 +942,7 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
 
     voiceover_application_models = voiceover_application_class.query(ndb.OR(
         voiceover_application_class.author_id == user_id,
-        voiceover_application_class.final_reviewer_id == user_id,
+        voiceover_application_class.final_reviewer_id == user_id
     )).fetch()
     suggestion_ids = set([model.id for model in voiceover_application_models])
 

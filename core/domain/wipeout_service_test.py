@@ -44,35 +44,17 @@ import python_utils
 from google.appengine.ext import ndb
 
 (
-    base_models,
-    collection_models,
-    config_models,
-    email_models,
-    exp_models,
-    feedback_models,
-    improvements_models,
-    question_models,
-    skill_models,
-    story_models,
-    subtopic_models,
-    suggestion_models,
-    topic_models,
+    collection_models, config_models, email_models,
+    exp_models, feedback_models, improvements_models,
+    question_models, skill_models, story_models,
+    subtopic_models, suggestion_models, topic_models,
     user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model,
-    models.NAMES.collection,
-    models.NAMES.config,
-    models.NAMES.email,
-    models.NAMES.exploration,
-    models.NAMES.feedback,
-    models.NAMES.improvements,
-    models.NAMES.question,
-    models.NAMES.skill,
-    models.NAMES.story,
-    models.NAMES.subtopic,
-    models.NAMES.suggestion,
-    models.NAMES.topic,
-    models.NAMES.user,
+    models.NAMES.collection, models.NAMES.config, models.NAMES.email,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
+    models.NAMES.question, models.NAMES.skill, models.NAMES.story,
+    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic,
+    models.NAMES.user
 ])
 
 
