@@ -617,7 +617,6 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
             StoreMapReduceResults. Will be constructed with whatever output the
             caller sends back to the coroutine.
         """
-
         job_class = mapreduce_util.for_name(job_class_str)
         job_class.register_start(job_id, metadata={
             job_class._OUTPUT_KEY_ROOT_PIPELINE_ID: self.root_pipeline_id  # pylint: disable=protected-access
@@ -838,6 +837,10 @@ class BaseMapReduceJobManager(BaseJobManager):
                 cancellation.
         """
         metadata = cls.get_metadata(job_id)
+        if metadata is None:
+            # This indicates that the job has been queued but not started by the
+            # MapReduceJobPipeline.
+            return
         root_pipeline_id = metadata[cls._OUTPUT_KEY_ROOT_PIPELINE_ID]
         pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
 
