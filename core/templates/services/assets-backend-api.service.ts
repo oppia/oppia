@@ -72,9 +72,8 @@ export class AssetsBackendApiService {
 
   async loadAudio(explorationId: string, filename: string): Promise<AudioFile> {
     if (this.isCached(filename)) {
-      return Promise.resolve(
-        this.audioFileObjectFactory.createNew(
-          filename, this.assetsCache.get(filename)));
+      return this.audioFileObjectFactory.createNew(
+        filename, this.assetsCache.get(filename));
     }
     return this.fetchFile(
       AppConstants.ENTITY_TYPE.EXPLORATION, explorationId, filename,
@@ -85,8 +84,8 @@ export class AssetsBackendApiService {
       entityType: string, entityId: string,
       filename: string): Promise<ImageFile> {
     if (this.isCached(filename)) {
-      return Promise.resolve(this.imageFileObjectFactory.createNew(
-        filename, this.assetsCache.get(filename)));
+      return this.imageFileObjectFactory.createNew(
+        filename, this.assetsCache.get(filename));
     }
     return this.fetchFile(
       entityType, entityId, filename, AppConstants.ASSET_TYPE_IMAGE);
@@ -102,8 +101,8 @@ export class AssetsBackendApiService {
     try {
       return await this.http.post<SaveAudioResponse>(
         this.getAudioUploadUrl(explorationId), form).toPromise();
-    } catch (err) {
-      return Promise.reject(err.error);
+    } catch (reason) {
+      return Promise.reject(reason.error);
     }
   }
 
@@ -118,8 +117,8 @@ export class AssetsBackendApiService {
     try {
       return await this.http.post<SaveImageResponse>(
         this.getImageUploadUrl(entityType, entityId), form).toPromise();
-    } catch (err) {
-      return Promise.reject(err.error);
+    } catch (reason) {
+      return Promise.reject(reason.error);
     }
   }
 
@@ -175,9 +174,11 @@ export class AssetsBackendApiService {
 
   private getFileDownloadRequestsByAssetType(
       assetType: string): FileDownloadRequest[] {
-    return (assetType === AppConstants.ASSET_TYPE_AUDIO) ?
-      this.audioFileDownloadRequests :
-      this.imageFileDownloadRequests;
+    if (assetType === AppConstants.ASSET_TYPE_AUDIO) {
+      return this.audioFileDownloadRequests;
+    } else {
+      return this.imageFileDownloadRequests;
+    }
   }
 
   private async fetchFile(

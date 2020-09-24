@@ -21,8 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
 import { Exploration } from 'domain/exploration/ExplorationObjectFactory';
-import { AudioTranslationLanguageService } from
-  'pages/exploration-player-page/services/audio-translation-language.service';
+import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ContextService } from 'services/context.service';
@@ -34,9 +33,9 @@ export class AudioPreloaderService {
   private filenamesOfAudioCurrentlyDownloading: string[] = [];
   private filenamesOfAudioToBeDownloaded: string[] = [];
 
-  private exploration: Exploration;
-  private audioLoadedCallback: (_: string) => void;
-  private mostRecentlyRequestedAudioFilename: string;
+  private exploration: Exploration = null;
+  private audioLoadedCallback: (_: string) => void = null;
+  private mostRecentlyRequestedAudioFilename: string = null;
 
   constructor(
       private assetsBackendApiService: AssetsBackendApiService,
@@ -48,62 +47,18 @@ export class AudioPreloaderService {
     this.exploration = exploration;
   }
 
-  private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
-    const languageCode = (
-      this.audioTranslationLanguageService.getCurrentAudioLanguageCode());
-    const stateNamesInBfsOrder =
-      this.computeGraphService.computeBfsTraversalOfStates(
-        this.exploration.getInitialState().name, this.exploration.getStates(),
-        sourceStateName);
-    const audioFilenames = [];
-    const allAudioTranslations = (
-      this.exploration.getAllVoiceovers(languageCode));
-
-    stateNamesInBfsOrder.forEach(stateName => {
-      const allAudioTranslationsForState = allAudioTranslations[stateName];
-      allAudioTranslationsForState.forEach(audioTranslation => {
-        audioFilenames.push(audioTranslation.filename);
-      });
-    });
-    return audioFilenames;
-  }
-
-  private loadAudio(audioFilename: string): void {
-    this.assetsBackendApiService.loadAudio(
-      this.contextService.getExplorationId(), audioFilename
-    ).then(loadedAudio => {
-      const index = this.filenamesOfAudioCurrentlyDownloading.findIndex(
-        filename => filename === loadedAudio.filename);
-      if (index !== -1) {
-        this.filenamesOfAudioCurrentlyDownloading.splice(index, 1);
-      }
-
-      if (this.filenamesOfAudioToBeDownloaded.length > 0) {
-        const nextAudioFilename = this.filenamesOfAudioToBeDownloaded.shift();
-        this.filenamesOfAudioCurrentlyDownloading.push(nextAudioFilename);
-        this.loadAudio(nextAudioFilename);
-      }
-      if (this.audioLoadedCallback) {
-        this.audioLoadedCallback(loadedAudio.filename);
-      }
-    });
-  }
-
   kickOffAudioPreloader(sourceStateName: string): void {
-    this.filenamesOfAudioToBeDownloaded =
-      this.getAudioFilenamesInBfsOrder(sourceStateName);
-    while (this.filenamesOfAudioCurrentlyDownloading.length <
-        AppConstants.MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY &&
-        this.filenamesOfAudioToBeDownloaded.length > 0) {
-      const audioFilename = this.filenamesOfAudioToBeDownloaded.shift();
-      this.filenamesOfAudioCurrentlyDownloading.push(audioFilename);
-      this.loadAudio(audioFilename);
+    this.filenamesOfAudioToBeDownloaded = (
+      this.getAudioFilenamesInBfsOrder(sourceStateName));
+    const numFilesToDownload = (
+      AppConstants.MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY -
+      this.filenamesOfAudioCurrentlyDownloading.length);
+    if (numFilesToDownload > 0) {
+      const filesToDownload = (
+        this.filenamesOfAudioToBeDownloaded.splice(0, numFilesToDownload));
+      filesToDownload.forEach(filename => this.loadAudio(filename));
+      this.filenamesOfAudioCurrentlyDownloading.push(...filesToDownload);
     }
-  }
-
-  private cancelPreloading(): void {
-    this.assetsBackendApiService.abortAllCurrentAudioDownloads();
-    this.filenamesOfAudioCurrentlyDownloading = [];
   }
 
   isLoadingAudioFile(filename: string): boolean {
@@ -133,6 +88,45 @@ export class AudioPreloaderService {
 
   getFilenamesOfAudioCurrentlyDownloading(): string[] {
     return this.filenamesOfAudioCurrentlyDownloading;
+  }
+
+  private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
+    const languageCode = (
+      this.audioTranslationLanguageService.getCurrentAudioLanguageCode());
+    const bfsTraversalOfStates = (
+      this.computeGraphService.computeBfsTraversalOfStates(
+        this.exploration.getInitialState().name, this.exploration.getStates(),
+        sourceStateName));
+    return bfsTraversalOfStates.map(stateName => {
+      return this.exploration.getVoiceover(stateName, languageCode).filename;
+    });
+  }
+
+  private loadAudio(audioFilename: string): void {
+    this.assetsBackendApiService.loadAudio(
+      this.contextService.getExplorationId(), audioFilename
+    ).then(loadedAudio => {
+      const index = this.filenamesOfAudioCurrentlyDownloading.findIndex(
+        filename => filename === loadedAudio.filename);
+      if (index !== -1) {
+        this.filenamesOfAudioCurrentlyDownloading.splice(index, 1);
+      }
+
+      if (this.filenamesOfAudioToBeDownloaded.length > 0) {
+        const nextAudioFilename = this.filenamesOfAudioToBeDownloaded.shift();
+        this.loadAudio(nextAudioFilename);
+        this.filenamesOfAudioCurrentlyDownloading.push(nextAudioFilename);
+      }
+
+      if (this.audioLoadedCallback) {
+        this.audioLoadedCallback(loadedAudio.filename);
+      }
+    });
+  }
+
+  private cancelPreloading(): void {
+    this.assetsBackendApiService.abortAllCurrentAudioDownloads();
+    this.filenamesOfAudioCurrentlyDownloading.length = 0;
   }
 }
 
