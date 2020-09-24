@@ -3195,7 +3195,7 @@ class CommunityContributionStatsModelValidator(
                     'translation reviewer count %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: The translation reviewer count for '
-                    'language code %s is %s, expected model '
+                    'language code %s is %s, expect model '
                     'CommunityContributionStatsModel to have the language code '
                     '%s in its translation reviewer counts but it doesn\'t '
                     'exist.' % (
@@ -3257,7 +3257,7 @@ class CommunityContributionStatsModelValidator(
                     'translation suggestion count %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: The translation suggestion count for '
-                    'language code %s is %s, expected model '
+                    'language code %s is %s, expect model '
                     'CommunityContributionStatsModel to have the language code '
                     '%s in its translation suggestion counts but it doesn\'t '
                     'exist.' % (
@@ -3274,13 +3274,13 @@ class CommunityContributionStatsModelValidator(
             item: ndb.Model. CommunityContributionStatsModel to validate.
         """
         expected_question_reviewer_count = (
-            user_models.UserContributionRightsModel.query( # pylint: disable=singleton-comparison
+            user_models.UserContributionRightsModel.query(
                 ( # pylint: disable=singleton-comparison
                     user_models.UserContributionRightsModel # pylint: disable=singleton-comparison
                     .can_review_questions # pylint: disable=singleton-comparison
                 ) == True) # pylint: disable=singleton-comparison
-            .count() # pylint: disable=singleton-comparison
-        ) # pylint: disable=singleton-comparison
+            .count()
+        )
         if item.question_reviewer_count != expected_question_reviewer_count:
             cls._add_error(
                 'question reviewer %s' % (
