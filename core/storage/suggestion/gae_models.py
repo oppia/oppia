@@ -401,42 +401,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_number_of_translation_suggestions_in_review_in_lang_code(
-            cls, language_code):
-        """Returns the total number of translation suggestions in the
-        given language code that are in review.
-
-        Args:
-            language_code: str. The language code of the translation
-                suggestions.
-
-        Returns:
-            Int. The total number of translation suggestions in the
-            given language code that are in review.
-        """
-        return (
-            cls.get_all()
-            .filter(cls.status == STATUS_IN_REVIEW)
-            .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
-            .filter(cls.language_code == language_code)
-            .count()
-        )
-
-    @classmethod
-    def get_number_of_question_suggestions_in_review(cls):
-        """Returns the total number of question suggestions that are in review.
-
-        Returns:
-            Int. The total number of question suggestions that are in review.
-        """
-        return (
-            cls.get_all()
-            .filter(cls.status == STATUS_IN_REVIEW)
-            .filter(cls.suggestion_type == SUGGESTION_TYPE_ADD_QUESTION)
-            .count()
-        )
-
-    @classmethod
     def get_user_created_suggestions_of_suggestion_type(
             cls, suggestion_type, user_id):
         """Gets all suggestions of suggestion_type which the user has created.
@@ -662,18 +626,16 @@ class CommunityContributionStatsModel(base_models.BaseModel):
     # suggestions are offered in and the values correspond to the total number
     # of reviewers who have permission to review translation suggestions in
     # that language.
-    translation_reviewer_counts_by_lang_code = ndb.JsonProperty(
-        default={}, required=True)
+    translation_reviewer_counts_by_lang_code = ndb.JsonProperty(required=True)
     # A dictionary where the keys represent the language codes that translation
     # suggestions are offered in and the values correspond to the total number
     # of translation suggestions that are currently in review in that language.
-    translation_suggestion_counts_by_lang_code = ndb.JsonProperty(
-        default={}, required=True)
+    translation_suggestion_counts_by_lang_code = ndb.JsonProperty(required=True)
     # The total number of reviewers who have permission to review question
     # suggestions.
-    question_reviewer_count = ndb.IntegerProperty(default=0, required=True)
+    question_reviewer_count = ndb.IntegerProperty(required=True)
     # The total number of question suggestions that are currently in review.
-    question_suggestion_count = ndb.IntegerProperty(default=0, required=True)
+    question_suggestion_count = ndb.IntegerProperty(required=True)
 
     @classmethod
     def get(cls):
@@ -691,7 +653,11 @@ class CommunityContributionStatsModel(base_models.BaseModel):
 
         if community_contribution_stats_model is None:
             community_contribution_stats_model = cls(
-                id=COMMUNITY_CONTRIBUTION_STATS_MODEL_ID
+                id=COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
+                translation_reviewer_counts_by_lang_code={},
+                translation_suggestion_counts_by_lang_code={},
+                question_reviewer_count=0,
+                question_suggestion_count=0
             )
             community_contribution_stats_model.put()
             return community_contribution_stats_model

@@ -2600,7 +2600,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Expected the translation reviewer count to be non-negative for '
-            '%s language code, recieved: %s.' % (
+            '%s language code, received: %s.' % (
                 self.sample_language_code, self.negative_count)):
             community_contribution_stats.validate()
 
@@ -2618,7 +2618,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Expected the translation suggestion count to be non-negative for '
-            '%s language code, recieved: %s.' % (
+            '%s language code, received: %s.' % (
                 self.sample_language_code, self.negative_count)):
             community_contribution_stats.validate()
 
@@ -2633,7 +2633,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Expected the question reviewer count to be non-negative, '
-            'recieved: %s.' % (
+            'received: %s.' % (
                 community_contribution_stats.question_reviewer_count)):
             community_contribution_stats.validate()
 
@@ -2648,7 +2648,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Expected the question suggestion count to be non-negative, '
-            'recieved: %s.' % (
+            'received: %s.' % (
                 community_contribution_stats.question_suggestion_count)):
             community_contribution_stats.validate()
 
@@ -2666,7 +2666,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Expected the translation reviewer count to be an integer for '
-            '%s language code, recieved: %s.' % (
+            '%s language code, received: %s.' % (
                 self.sample_language_code, self.non_integer_count)):
             community_contribution_stats.validate()
 
@@ -2684,7 +2684,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Expected the translation suggestion count to be an integer for '
-            '%s language code, recieved: %s.' % (
+            '%s language code, received: %s.' % (
                 self.sample_language_code, self.non_integer_count)):
             community_contribution_stats.validate()
 
@@ -2700,7 +2700,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Expected the question reviewer count to be an integer, '
-            'recieved: %s.' % (
+            'received: %s.' % (
                 community_contribution_stats.question_reviewer_count)):
             community_contribution_stats.validate()
 
@@ -2716,7 +2716,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Expected the question suggestion count to be an integer, '
-            'recieved: %s.' % (
+            'received: %s.' % (
                 community_contribution_stats.question_suggestion_count)):
             community_contribution_stats.validate()
 

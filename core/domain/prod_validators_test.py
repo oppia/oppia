@@ -9549,7 +9549,12 @@ class CommunityContributionStatsModelValidatorTests(
 
     def test_model_validation_success_when_model_has_default_values(self):
         suggestion_models.CommunityContributionStatsModel(
-            id=suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID).put()
+            id=suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
+            translation_reviewer_counts_by_lang_code={},
+            translation_suggestion_counts_by_lang_code={},
+            question_reviewer_count=0,
+            question_suggestion_count=0
+        ).put()
         expected_output = [
             u'[u\'fully-validated CommunityContributionStatsModel\', 1]'
         ]
@@ -9558,7 +9563,13 @@ class CommunityContributionStatsModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_validation_fails_with_invalid_model_id(self):
-        suggestion_models.CommunityContributionStatsModel(id='invalid_id').put()
+        suggestion_models.CommunityContributionStatsModel(
+            id='invalid_id',
+            translation_reviewer_counts_by_lang_code={},
+            translation_suggestion_counts_by_lang_code={},
+            question_reviewer_count=0,
+            question_suggestion_count=0
+        ).put()
 
         expected_output = [
             u'[u\'failed validation check for model id check of '
@@ -9590,7 +9601,7 @@ class CommunityContributionStatsModelValidatorTests(
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the translation '
             'reviewer count to be non-negative for %s language code, '
-            'recieved: %s.\']]' % (
+            'received: %s.\']]' % (
                 stats_model.id,
                 self.sample_language_code,
                 stats_model.translation_reviewer_counts_by_lang_code[
@@ -9620,7 +9631,7 @@ class CommunityContributionStatsModelValidatorTests(
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the translation '
             'suggestion count to be non-negative for %s language code, '
-            'recieved: %s.\']]' % (
+            'received: %s.\']]' % (
                 stats_model.id,
                 self.sample_language_code,
                 stats_model.translation_suggestion_counts_by_lang_code[
@@ -9645,7 +9656,7 @@ class CommunityContributionStatsModelValidatorTests(
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the '
-            'question reviewer count to be non-negative, recieved: %s.\']]' % (
+            'question reviewer count to be non-negative, received: %s.\']]' % (
                 stats_model.id, stats_model.question_reviewer_count)
         ]
 
@@ -9667,7 +9678,7 @@ class CommunityContributionStatsModelValidatorTests(
             u'[u\'failed validation check for domain object check of '
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the '
-            'question suggestion count to be non-negative, recieved: '
+            'question suggestion count to be non-negative, received: '
             '%s.\']]' % (
                 stats_model.id, stats_model.question_suggestion_count)
         ]
@@ -9695,7 +9706,7 @@ class CommunityContributionStatsModelValidatorTests(
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the translation '
             'reviewer count to be an integer for %s language code, '
-            'recieved: %s.\']]' % (
+            'received: %s.\']]' % (
                 stats_model.id,
                 self.sample_language_code,
                 stats_model.translation_reviewer_counts_by_lang_code[
@@ -9725,7 +9736,7 @@ class CommunityContributionStatsModelValidatorTests(
             'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
             'fails domain validation with the error Expected the translation '
             'suggestion count to be an integer for %s language code, '
-            'recieved: %s.\']]' % (
+            'received: %s.\']]' % (
                 stats_model.id,
                 self.sample_language_code,
                 stats_model.translation_suggestion_counts_by_lang_code[
@@ -9818,9 +9829,9 @@ class CommunityContributionStatsModelValidatorTests(
             u'[u\'failed validation check for translation suggestion count '
             'field check of CommunityContributionStatsModel\', [u"Entity id '
             '%s: The translation suggestion count for language code %s is 1, '
-            'expect model CommunityContributionStatsModel to have the language '
-            'code %s in its translation suggestion counts but it doesn\'t '
-            'exist."]]' % (
+            'expected model CommunityContributionStatsModel to have the '
+            'language code %s in its translation suggestion counts but it '
+            'doesn\'t exist."]]' % (
                 stats_model.id, missing_language_code, missing_language_code)
         ]
 
@@ -9838,9 +9849,9 @@ class CommunityContributionStatsModelValidatorTests(
             u'[u\'failed validation check for translation reviewer count '
             'field check of CommunityContributionStatsModel\', [u"Entity id '
             '%s: The translation reviewer count for language code %s is 1, '
-            'expect model CommunityContributionStatsModel to have the language '
-            'code %s in its translation reviewer counts but it doesn\'t '
-            'exist."]]' % (
+            'expected model CommunityContributionStatsModel to have the '
+            'language code %s in its translation reviewer counts but it '
+            'doesn\'t exist."]]' % (
                 stats_model.id, missing_language_code, missing_language_code)
         ]
 

@@ -1148,13 +1148,13 @@ class CommunityContributionStats(python_utils.OBJECT):
             if not isinstance(reviewer_count, int):
                 raise utils.ValidationError(
                     'Expected the translation reviewer count to be '
-                    'an integer for %s language code, recieved: %s.' % (
+                    'an integer for %s language code, received: %s.' % (
                         language_code, reviewer_count)
                 )
             elif reviewer_count < 0:
                 raise utils.ValidationError(
                     'Expected the translation reviewer count to be '
-                    'non-negative for %s language code, recieved: %s.' % (
+                    'non-negative for %s language code, received: %s.' % (
                         language_code, reviewer_count)
                 )
 
@@ -1169,36 +1169,36 @@ class CommunityContributionStats(python_utils.OBJECT):
             if not isinstance(suggestion_count, int):
                 raise utils.ValidationError(
                     'Expected the translation suggestion count to be '
-                    'an integer for %s language code, recieved: %s.' % (
+                    'an integer for %s language code, received: %s.' % (
                         language_code, suggestion_count)
                 )
             elif suggestion_count < 0:
                 raise utils.ValidationError(
                     'Expected the translation suggestion count to be '
-                    'non-negative for %s language code, recieved: %s.' % (
+                    'non-negative for %s language code, received: %s.' % (
                         language_code, suggestion_count)
                 )
 
         if not isinstance(self.question_reviewer_count, int):
             raise utils.ValidationError(
                 'Expected the question reviewer count to be an integer, '
-                'recieved: %s.' % self.question_reviewer_count
+                'received: %s.' % self.question_reviewer_count
             )
         if self.question_reviewer_count < 0:
             raise utils.ValidationError(
                 'Expected the question reviewer count to be non-negative, '
-                'recieved: %s.' % (self.question_reviewer_count)
+                'received: %s.' % (self.question_reviewer_count)
             )
 
         if not isinstance(self.question_suggestion_count, int):
             raise utils.ValidationError(
                 'Expected the question suggestion count to be an integer, '
-                'recieved: %s.' % self.question_suggestion_count
+                'received: %s.' % self.question_suggestion_count
             )
         if self.question_suggestion_count < 0:
             raise utils.ValidationError(
                 'Expected the question suggestion count to be non-negative, '
-                'recieved: %s.' % (self.question_suggestion_count)
+                'received: %s.' % (self.question_suggestion_count)
             )
 
     def set_translation_reviewer_count_for_language_code(
