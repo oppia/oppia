@@ -98,9 +98,9 @@ export class QuestionsListService {
               createFromBackendDict(summary));
         });
 
-        this._setNextQuestionsCursor(response.nextCursor);
         this._setQuestionSummariesForOneSkill(
           questionSummaries, resetHistory);
+        this._setNextQuestionsCursor(response.nextCursor);
       });
     }
   }
