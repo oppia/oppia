@@ -3276,9 +3276,9 @@ class CommunityContributionStatsModelValidator(
         expected_question_reviewer_count = (
             user_models.UserContributionRightsModel.query(
                 ( # pylint: disable=singleton-comparison
-                    user_models.UserContributionRightsModel # pylint: disable=singleton-comparison
-                    .can_review_questions # pylint: disable=singleton-comparison
-                ) == True) # pylint: disable=singleton-comparison
+                    user_models.UserContributionRightsModel
+                    .can_review_questions
+                ) == True)
             .count()
         )
         if item.question_reviewer_count != expected_question_reviewer_count:
