@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
-import json
 import math
 import random
 import time
@@ -54,11 +53,11 @@ from core.domain import subscription_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_query_services
 from core.domain import user_services
 from core.domain import wipeout_service
-from core.domain.proto import text_classifier_pb2
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
@@ -295,26 +294,23 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.AuditJobsTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         next_scheduled_check_time = datetime.datetime.utcnow()
-        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
-        classifier_data_proto.model_json = json.dumps(
-            {'classifier_data': 'data'})
-
+        classifier_data = {'classifier_data': 'data'}
         id0 = classifier_models.ClassifierTrainingJobModel.create(
             'TextClassifier', 'TextInput', '0', 1,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'StateTest0', feconf.TRAINING_JOB_STATUS_NEW, 1)
         fs_services.save_classifier_data(
-            'TextClassifier', id0, classifier_data_proto)
+            'TextClassifier', id0, classifier_data)
         self.model_instance_0 = (
             classifier_models.ClassifierTrainingJobModel.get_by_id(id0))
         id1 = classifier_models.ClassifierTrainingJobModel.create(
-            'TextClassifier', 'TextInput', '1', 1,
+            'CodeClassifier', 'CodeRepl', '1', 1,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'StateTest1', feconf.TRAINING_JOB_STATUS_NEW, 1)
         fs_services.save_classifier_data(
-            'TextClassifier', id1, classifier_data_proto)
+            'CodeClassifier', id1, classifier_data)
         self.model_instance_1 = (
             classifier_models.ClassifierTrainingJobModel.get_by_id(id1))
 
@@ -417,11 +413,11 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
-class StateTrainingJobsMappingModelValidatorTests(
+class TrainingJobExplorationMappingModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
     def setUp(self):
-        super(StateTrainingJobsMappingModelValidatorTests, self).setUp()
+        super(TrainingJobExplorationMappingModelValidatorTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -437,22 +433,22 @@ class StateTrainingJobsMappingModelValidatorTests(
             exp.add_states(['StateTest%s' % exp.id])
             exp_services.save_new_exploration(self.owner_id, exp)
 
-        id0 = classifier_models.StateTrainingJobsMappingModel.create(
-            '0', 1, 'StateTest0', {'TextClassifier': 'job0'})
+        id0 = classifier_models.TrainingJobExplorationMappingModel.create(
+            '0', 1, 'StateTest0', 'job0')
         self.model_instance_0 = (
-            classifier_models.StateTrainingJobsMappingModel.get_by_id(id0))
-        id1 = classifier_models.StateTrainingJobsMappingModel.create(
-            '1', 1, 'StateTest1', {'TextClassifier': 'job1'})
+            classifier_models.TrainingJobExplorationMappingModel.get_by_id(id0))
+        id1 = classifier_models.TrainingJobExplorationMappingModel.create(
+            '1', 1, 'StateTest1', 'job1')
         self.model_instance_1 = (
-            classifier_models.StateTrainingJobsMappingModel.get_by_id(id1))
+            classifier_models.TrainingJobExplorationMappingModel.get_by_id(id1))
 
         self.job_class = (
             prod_validation_jobs_one_off
-            .StateTrainingJobsMappingModelAuditOneOffJob)
+            .TrainingJobExplorationMappingModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
-            u'[u\'fully-validated StateTrainingJobsMappingModel\', 2]']
+            u'[u\'fully-validated TrainingJobExplorationMappingModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -462,14 +458,14 @@ class StateTrainingJobsMappingModelValidatorTests(
         self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
-            'of StateTrainingJobsMappingModel\', '
+            'of TrainingJobExplorationMappingModel\', '
             '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
-            ), u'[u\'fully-validated StateTrainingJobsMappingModel\', 1]']
+            ), u'[u\'fully-validated TrainingJobExplorationMappingModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -477,7 +473,7 @@ class StateTrainingJobsMappingModelValidatorTests(
         self.model_instance_1.delete()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
-            'StateTrainingJobsMappingModel\', '
+            'TrainingJobExplorationMappingModel\', '
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
@@ -494,47 +490,45 @@ class StateTrainingJobsMappingModelValidatorTests(
         expected_output = [
             (
                 u'[u\'failed validation check for exploration_ids field '
-                'check of StateTrainingJobsMappingModel\', '
+                'check of TrainingJobExplorationMappingModel\', '
                 '[u"Entity id %s: based on field exploration_ids having value '
                 '0, expect model ExplorationModel with id 0 but it doesn\'t '
                 'exist"]]') % self.model_instance_0.id,
-            u'[u\'fully-validated StateTrainingJobsMappingModel\', 1]']
+            u'[u\'fully-validated TrainingJobExplorationMappingModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
     def test_invalid_exp_version(self):
         model_instance_with_invalid_exp_version = (
-            classifier_models.StateTrainingJobsMappingModel(
+            classifier_models.TrainingJobExplorationMappingModel(
                 id='0.5.StateTest0', exp_id='0', exp_version=5,
-                state_name='StateTest0',
-                algorithm_ids_to_job_ids={'TextClassifier': 'job_id'}))
+                state_name='StateTest0', job_id='job_id'))
         model_instance_with_invalid_exp_version.put()
         expected_output = [
             (
                 u'[u\'failed validation check for exp version check '
-                'of StateTrainingJobsMappingModel\', [u\'Entity id %s: '
+                'of TrainingJobExplorationMappingModel\', [u\'Entity id %s: '
                 'Exploration version 5 in entity is greater than the '
                 'version 1 of exploration corresponding to exp_id 0\']]'
             ) % model_instance_with_invalid_exp_version.id,
-            u'[u\'fully-validated StateTrainingJobsMappingModel\', 2]']
+            u'[u\'fully-validated TrainingJobExplorationMappingModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
     def test_invalid_state_name(self):
         model_instance_with_invalid_state_name = (
-            classifier_models.StateTrainingJobsMappingModel(
+            classifier_models.TrainingJobExplorationMappingModel(
                 id='0.1.invalid', exp_id='0', exp_version=1,
-                state_name='invalid',
-                algorithm_ids_to_job_ids={'TextClassifier': 'job_id'}))
+                state_name='invalid', job_id='job_id'))
         model_instance_with_invalid_state_name.put()
         expected_output = [
             (
                 u'[u\'failed validation check for state name check '
-                'of StateTrainingJobsMappingModel\', [u\'Entity id %s: '
+                'of TrainingJobExplorationMappingModel\', [u\'Entity id %s: '
                 'State name invalid in entity is not present in '
                 'states of exploration corresponding to exp_id 0\']]'
             ) % model_instance_with_invalid_state_name.id,
-            u'[u\'fully-validated StateTrainingJobsMappingModel\', 2]']
+            u'[u\'fully-validated TrainingJobExplorationMappingModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
@@ -642,6 +636,38 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
                 'code': 'en', 'description': 'English'}]):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
+
+    def test_private_collection_with_missing_title(self):
+        collection_services.update_collection(
+            self.owner_id, '0', [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': ''
+            }], 'Changes.')
+        expected_output = [
+            u'[u\'fully-validated CollectionModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_public_collection_with_missing_title(self):
+        collection_services.update_collection(
+            self.owner_id, '0', [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': ''
+            }], 'Changes.')
+        owner = user_services.UserActionsInfo(self.owner_id)
+        rights_manager.publish_collection(owner, '0')
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check of '
+                'CollectionModel\', [u\'Entity id 0: Entity fails '
+                'domain validation with the error A title must be specified '
+                'for the collection.\']]'
+            ),
+            u'[u\'fully-validated CollectionModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
         exp_models.ExplorationModel.get_by_id('1').delete(
@@ -2845,7 +2871,7 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
                 unused_email_body):
             return 'Email Hash'
 
-        self.sender_email = 'sender@email.com'
+        self.sender_email = 'noreply@oppia.org'
         self.sender_id = 'sender'
         self.sender_model = user_models.UserSettingsModel(
             id=self.sender_id,
@@ -2939,19 +2965,6 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
-    def test_model_with_invalid_sender_email(self):
-        self.sender_model.email = 'invalid@email.com'
-        self.sender_model.put()
-        expected_output = [(
-            u'[u\'failed validation check for sender email check of '
-            'SentEmailModel\', '
-            '[u\'Entity id %s: Sender email %s in entity does not match with '
-            'email %s of user obtained through sender id %s\']]') % (
-                self.model_instance.id, self.model_instance.sender_email,
-                self.sender_model.email, self.model_instance.sender_id)]
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
-
     def test_model_with_invalid_recipient_email(self):
         self.recipient_model.email = 'invalid@email.com'
         self.recipient_model.put()
@@ -2982,7 +2995,7 @@ class SentEmailModelValidatorTests(test_utils.AuditJobsTestBase):
         model_instance_with_invalid_id = email_models.SentEmailModel(
             id='invalid', recipient_id=self.recipient_id,
             recipient_email=self.recipient_email, sender_id=self.sender_id,
-            sender_email=self.sender_email, intent=feconf.EMAIL_INTENT_SIGNUP,
+            sender_email='noreply@oppia.org', intent=feconf.EMAIL_INTENT_SIGNUP,
             subject='Email Subject', html_body='Email Body',
             sent_datetime=datetime.datetime.utcnow())
         model_instance_with_invalid_id.put()
@@ -3335,6 +3348,26 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
                 'code': 'en', 'description': 'English'}]):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
+
+    def test_private_exploration_with_missing_interaction_in_state(self):
+        expected_output = [
+            u'[u\'fully-validated ExplorationModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_public_exploration_with_missing_interaction_in_state(self):
+        owner = user_services.UserActionsInfo(self.owner_id)
+        rights_manager.publish_exploration(owner, '0')
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check of '
+                'ExplorationModel\', [u\'Entity id 0: Entity fails '
+                'domain validation with the error This state does not have any '
+                'interaction specified.\']]'
+            ),
+            u'[u\'fully-validated ExplorationModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_commit_log_entry_model_failure(self):
         exp_services.update_exploration(
@@ -9444,6 +9477,202 @@ class GeneralVoiceoverApplicationModelValidatorTests(
                 expected_output, sort=True, literal_eval=False)
 
 
+class CommunityContributionStatsModelValidatorTests(
+        test_utils.AuditJobsTestBase):
+
+    translation_reviewer_counts_by_lang_code = {
+        'hi': 0,
+        'en': 1
+    }
+
+    translation_suggestion_counts_by_lang_code = {
+        'fr': 6,
+        'en': 5
+    }
+
+    question_reviewer_count = 1
+    question_suggestion_count = 4
+
+    negative_count = -1
+    sample_language_code = 'en'
+    invalid_language_code = 'invalid'
+
+    def setUp(self):
+        super(CommunityContributionStatsModelValidatorTests, self).setUp()
+
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .CommunityContributionStatsModelAuditOneOffJob
+        )
+
+    def test_model_validation_success_when_no_model_has_been_created(self):
+        expected_output = []
+
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_validation_success_when_model_has_non_zero_counts(self):
+        suggestion_models.CommunityContributionStatsModel(
+            id=suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
+            translation_reviewer_counts_by_lang_code=(
+                self.translation_reviewer_counts_by_lang_code),
+            translation_suggestion_counts_by_lang_code=(
+                self.translation_suggestion_counts_by_lang_code),
+            question_reviewer_count=self.question_reviewer_count,
+            question_suggestion_count=self.question_suggestion_count
+        ).put()
+        expected_output = [(
+            u'[u\'fully-validated CommunityContributionStatsModel\', 1]')]
+
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_validation_success_when_model_has_default_values(self):
+        suggestion_models.CommunityContributionStatsModel(
+            id=suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
+            translation_reviewer_counts_by_lang_code={},
+            translation_suggestion_counts_by_lang_code={},
+            question_reviewer_count=0,
+            question_suggestion_count=0
+        ).put()
+        expected_output = [
+            u'[u\'fully-validated CommunityContributionStatsModel\', 1]'
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_validation_fails_with_invalid_model_id(self):
+        suggestion_models.CommunityContributionStatsModel(
+            id='invalid_id',
+            translation_reviewer_counts_by_lang_code=(
+                self.translation_reviewer_counts_by_lang_code),
+            translation_suggestion_counts_by_lang_code=(
+                self.translation_suggestion_counts_by_lang_code),
+            question_reviewer_count=self.question_reviewer_count,
+            question_suggestion_count=self.question_suggestion_count
+        ).put()
+
+        expected_output = [
+            u'[u\'failed validation check for model id check of '
+            'CommunityContributionStatsModel\', '
+            '[u\'Entity id invalid_id: Entity id does not match regex '
+            'pattern\']]'
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_for_negative_translation_reviewer_counts(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_reviewer_counts_by_lang_code = {
+            self.sample_language_code: self.negative_count}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for domain object check of '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the translation '
+            'reviewer count to be non-negative for %s language code, '
+            'recieved: %s.\']]' % (
+                stats_model.id,
+                self.sample_language_code,
+                stats_model.translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code])
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_for_negative_translation_suggestion_counts(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_suggestion_counts_by_lang_code = {
+            self.sample_language_code: self.negative_count}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for domain object check of '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the translation '
+            'suggestion count to be non-negative for %s language code, '
+            'recieved: %s.\']]' % (
+                stats_model.id,
+                self.sample_language_code,
+                stats_model.translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code])
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_for_negative_question_reviewer_count(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.question_reviewer_count = self.negative_count
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for domain object check of '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the '
+            'question reviewer count to be non-negative, recieved: %s.\']]' % (
+                stats_model.id, stats_model.question_reviewer_count)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_for_negative_question_suggestion_count(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.question_suggestion_count = self.negative_count
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for domain object check of '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Expected the '
+            'question suggestion count to be non-negative, recieved: '
+            '%s.\']]' % (
+                stats_model.id, stats_model.question_suggestion_count)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_for_invalid_lang_code_in_reviewer_counts(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_reviewer_counts_by_lang_code = {
+            self.invalid_language_code: 1}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for domain object check of '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Invalid language code for '
+            'the translation reviewer counts: %s.\']]' % (
+                stats_model.id, self.invalid_language_code)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_validation_fails_for_invalid_lang_code_in_suggestion_counts(
+            self):
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+        stats_model.translation_suggestion_counts_by_lang_code = {
+            self.invalid_language_code: 1}
+        stats_model.put()
+        expected_output = [
+            u'[u\'failed validation check for domain object check of '
+            'CommunityContributionStatsModel\', [u\'Entity id %s: Entity '
+            'fails domain validation with the error Invalid language code for '
+            'the translation suggestion counts: %s.\']]' % (
+                stats_model.id, self.invalid_language_code)
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+
 class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
@@ -9585,6 +9814,32 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
                 'code': 'en', 'description': 'English'}]):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
+
+    def test_private_topic_with_missing_thumbnail_filename(self):
+        expected_output = [
+            u'[u\'fully-validated TopicModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_public_topic_with_missing_thumbnail_filename(self):
+        topic_rights = topic_fetchers.get_topic_rights('0', strict=False)
+        topic_rights.topic_is_published = True
+        commit_cmds = [topic_domain.TopicRightsChange({
+            'cmd': topic_domain.CMD_PUBLISH_TOPIC
+        })]
+        topic_services.save_topic_rights(
+            topic_rights, self.owner_id, 'Published the topic', commit_cmds)
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check of '
+                'TopicModel\', [u\'Entity id 0: Entity fails '
+                'domain validation with the error Expected thumbnail filename '
+                'to be a string, received None.\']]'
+            ),
+            u'[u\'fully-validated TopicModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_story_model_failure(self):
         story_models.StoryModel.get_by_id('1').delete(
@@ -12281,6 +12536,16 @@ class UserNormalizedNameAuditOneOffJobTests(test_utils.AuditJobsTestBase):
             'u"Users with ids [\'%s\', \'%s\'] have the same normalized '
             'username username"]') % (
                 sorted_user_ids[0], sorted_user_ids[1])]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
+
+    def test_normalized_username_not_set(self):
+        self.model_instance_0.normalized_username = None
+        self.model_instance_0.put()
+        self.model_instance_1.normalized_username = None
+        self.model_instance_1.put()
+
+        expected_output = []
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=True)
 
