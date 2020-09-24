@@ -17,6 +17,8 @@
  * from the backend.
  */
 
+import { ExplorationSummary } from 'domain/exploration/exploration-summary.model';
+
 require('services/alerts.service.ts');
 require('services/validators.service.ts');
 
@@ -52,7 +54,16 @@ angular.module('oppia').factory('ExplorationSummaryBackendApiService', [
             includePrivateExplorations)
         }
       }).then(function(response) {
-        var summaries = angular.copy(response.data.summaries);
+        var summaries = [];
+        if (response.data.summaries) {
+          response.data.summaries.forEach(summary => {
+            summaries.push(ExplorationSummary.createFromBackendDict(
+              summary));
+          });
+        }
+        else {
+          summaries = null;
+        }
         if (successCallback) {
           if (summaries === null) {
             var summariesError = (
