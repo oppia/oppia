@@ -26,6 +26,7 @@ import re
 from constants import constants
 from core.domain import android_validation_constants
 from core.domain import change_domain
+from core.domain import subtopic_page_domain
 from core.domain import user_services
 import feconf
 import python_utils
@@ -126,6 +127,11 @@ class TopicChange(change_domain.BaseChange):
         SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
         SUBTOPIC_PROPERTY_URL_FRAGMENT)
 
+    # The allowed list of subtopic page properties which can be used in
+    # update_subtopic_page_property command.
+    SUBTOPIC_PAGE_PROPERTIES = (
+        subtopic_page_domain.SubtopicPageChange.SUBTOPIC_PAGE_PROPERTIES)
+
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': ['name'],
@@ -214,6 +220,13 @@ class TopicChange(change_domain.BaseChange):
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
         'allowed_values': {'property_name': SUBTOPIC_PROPERTIES}
+    }, {
+        'name': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+        'required_attribute_names': [
+            'property_name', 'new_value', 'old_value', 'subtopic_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {'property_name': SUBTOPIC_PAGE_PROPERTIES}
     }, {
         'name': CMD_UPDATE_TOPIC_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value', 'old_value'],
