@@ -45,31 +45,44 @@ transaction_services = models.Registry.import_transaction_services()
 
 JOB_FAILED_MESSAGE = 'failed (as expected)'
 
+class MockJobManagerOne(jobs.BaseMapReduceJobManager):
+    """Test job that counts the total number of explorations."""
 
-class MockJobManagerOne(jobs.BaseDeferredJobManager):
     @classmethod
     def _run(cls, additional_job_params):
         return 'output'
 
-
-class MockJobManagerTwo(jobs.BaseDeferredJobManager):
-    pass
-
-
-class MockJobManagerWithParams(jobs.BaseDeferredJobManager):
     @classmethod
-    def _run(cls, additional_job_params):
-        return additional_job_params['correct']
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        current_class = MockJobManagerOne
+        if current_class.entity_created_before_job_queued(item):
+            yield ('sum', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, sum([int(value) for value in values]))
 
 
-class MockFailingJobManager(jobs.BaseDeferredJobManager):
+class MockJobManagerTwo(jobs.BaseMapReduceJobManager):
+    """Test job that counts the total number of explorations."""
+
     @classmethod
-    def _run(cls, additional_job_params):
-        raise Exception(JOB_FAILED_MESSAGE)
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
 
+    @staticmethod
+    def map(item):
+        current_class = MockJobManagerOne
+        if current_class.entity_created_before_job_queued(item):
+            yield ('sum', 1)
 
-class MockJobManagerWithNoRunMethod(jobs.BaseDeferredJobManager):
-    pass
+    @staticmethod
+    def reduce(key, values):
+        yield (key, sum([int(value) for value in values]))
 
 
 class JobManagerUnitTests(test_utils.GenericTestBase):
@@ -91,13 +104,6 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.assertFalse(MockJobManagerOne.is_active(job_id))
         self.assertFalse(MockJobManagerOne.has_finished(job_id))
 
-    def test_base_job_manager_enqueue_raises_error(self):
-        with self.assertRaisesRegexp(
-            NotImplementedError,
-            'Subclasses of BaseJobManager should implement _real_enqueue().'):
-            jobs.BaseJobManager._real_enqueue(  # pylint: disable=protected-access
-                'job_id', taskqueue_services.QUEUE_NAME_DEFAULT, None, None)
-
     def test_failing_jobs(self):
         observed_log_messages = []
 
@@ -112,7 +118,10 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
         input_reader_swap = self.swap(
             input_readers, 'GoogleCloudStorageInputReader', _mock_input_reader)
-        assert_raises_context_manager = self.assertRaises(Exception)
+        assert_raises_context_manager = self.assertRaisesRegexp(
+            Exception,
+            r'Invalid status code change for job '
+            r'MockJobManagerOne-\w+-\w+: from new to failed')
 
         job_id = MockJobManagerOne.create_new()
         store_map_reduce_results = jobs.StoreMapReduceResults()
@@ -128,316 +137,18 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.assertTrue(
             observed_log_messages[1].startswith(expected_log_message))
 
-    def test_enqueue_job(self):
-        """Test the enqueueing of a job."""
-        job_id = MockJobManagerOne.create_new()
-        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_DEFAULT), 1)
-
-        self.assertEqual(
-            MockJobManagerOne.get_status_code(job_id), jobs.STATUS_CODE_QUEUED)
-        self.assertIsNotNone(MockJobManagerOne.get_time_queued_msec(job_id))
-        self.assertIsNone(MockJobManagerOne.get_output(job_id))
-
-    def test_failure_for_job_enqueued_using_wrong_manager(self):
-        job_id = MockJobManagerOne.create_new()
-        with self.assertRaisesRegexp(Exception, 'Invalid job type'):
-            MockJobManagerTwo.enqueue(
-                job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-
-    def test_failure_for_job_with_no_run_method(self):
-        job_id = MockJobManagerWithNoRunMethod.create_new()
-        MockJobManagerWithNoRunMethod.enqueue(
-            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
-        with self.assertRaisesRegexp(Exception, 'NotImplementedError'):
-            self.process_and_flush_pending_tasks()
-            self.process_and_flush_pending_mapreduce_tasks()
-
-    def test_complete_job(self):
-        job_id = MockJobManagerOne.create_new()
-        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
-        self.process_and_flush_pending_tasks()
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        self.assertEqual(
-            MockJobManagerOne.get_status_code(job_id),
-            jobs.STATUS_CODE_COMPLETED)
-        time_queued_msec = MockJobManagerOne.get_time_queued_msec(job_id)
-        time_started_msec = MockJobManagerOne.get_time_started_msec(job_id)
-        time_finished_msec = MockJobManagerOne.get_time_finished_msec(job_id)
-        self.assertIsNotNone(time_queued_msec)
-        self.assertIsNotNone(time_started_msec)
-        self.assertIsNotNone(time_finished_msec)
-        self.assertLess(time_queued_msec, time_started_msec)
-        self.assertLess(time_started_msec, time_finished_msec)
-
-        metadata = MockJobManagerOne.get_metadata(job_id)
-        output = MockJobManagerOne.get_output(job_id)
-        error = MockJobManagerOne.get_error(job_id)
-        self.assertIsNone(metadata)
-        self.assertEqual(output, ['output'])
-        self.assertIsNone(error)
-
-        self.assertFalse(MockJobManagerOne.is_active(job_id))
-        self.assertTrue(MockJobManagerOne.has_finished(job_id))
-
-    def test_deferred_job_with_additional_params(self):
-        """Test the enqueueing of a job with additional parameters."""
-        job_id_1 = MockJobManagerWithParams.create_new()
-        MockJobManagerWithParams.enqueue(
-            job_id_1, taskqueue_services.QUEUE_NAME_DEFAULT,
-            additional_job_params={'random': 3, 'correct': 60})
-        job_id_2 = MockJobManagerWithParams.create_new()
-        MockJobManagerWithParams.enqueue(
-            job_id_2, taskqueue_services.QUEUE_NAME_DEFAULT,
-            additional_job_params={'random': 20, 'correct': 25})
-
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
-            2)
-        self.process_and_flush_pending_tasks()
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        self.assertTrue(MockJobManagerWithParams.has_finished(job_id_1))
-        self.assertEqual(MockJobManagerWithParams.get_output(job_id_1), ['60'])
-        self.assertTrue(MockJobManagerWithParams.has_finished(job_id_2))
-        self.assertEqual(MockJobManagerWithParams.get_output(job_id_2), ['25'])
-
-    def test_job_failure(self):
-        job_id = MockFailingJobManager.create_new()
-        MockFailingJobManager.enqueue(
-            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
-        with self.assertRaisesRegexp(Exception, 'Task failed'):
-            self.process_and_flush_pending_tasks()
-            self.process_and_flush_pending_mapreduce_tasks()
-
-        self.assertEqual(
-            MockFailingJobManager.get_status_code(job_id),
-            jobs.STATUS_CODE_FAILED)
-        time_queued_msec = MockFailingJobManager.get_time_queued_msec(job_id)
-        time_started_msec = MockFailingJobManager.get_time_started_msec(
-            job_id)
-        time_finished_msec = MockFailingJobManager.get_time_finished_msec(
-            job_id)
-        self.assertIsNotNone(time_queued_msec)
-        self.assertIsNotNone(time_started_msec)
-        self.assertIsNotNone(time_finished_msec)
-        self.assertLess(time_queued_msec, time_started_msec)
-        self.assertLess(time_started_msec, time_finished_msec)
-
-        metadata = MockFailingJobManager.get_metadata(job_id)
-        output = MockFailingJobManager.get_output(job_id)
-        error = MockFailingJobManager.get_error(job_id)
-        self.assertIsNone(metadata)
-        self.assertIsNone(output)
-        self.assertIn(JOB_FAILED_MESSAGE, error)
-
-        self.assertFalse(MockFailingJobManager.is_active(job_id))
-        self.assertTrue(MockFailingJobManager.has_finished(job_id))
-
-    def test_status_code_transitions(self):
-        """Test that invalid status code transitions are caught."""
-        job_id = MockJobManagerOne.create_new()
-        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        MockJobManagerOne.register_start(job_id)
-        MockJobManagerOne.register_completion(job_id, ['output'])
-
-        with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
-            MockJobManagerOne.enqueue(
-                job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
-            MockJobManagerOne.register_completion(job_id, ['output'])
-        with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
-            MockJobManagerOne.register_failure(job_id, 'error')
-
-    def test_different_jobs_are_independent(self):
-        job_id = MockJobManagerOne.create_new()
-        another_job_id = MockJobManagerTwo.create_new()
-
-        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        MockJobManagerOne.register_start(job_id)
-        MockJobManagerTwo.enqueue(
-            another_job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-
-        self.assertEqual(
-            MockJobManagerOne.get_status_code(job_id), jobs.STATUS_CODE_STARTED)
-        self.assertEqual(
-            MockJobManagerTwo.get_status_code(another_job_id),
-            jobs.STATUS_CODE_QUEUED)
+    def test_base_job_manager_enqueue_raises_error(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Subclasses of BaseJobManager should implement _real_enqueue().'):
+            jobs.BaseJobManager._real_enqueue(  # pylint: disable=protected-access
+                'job_id', taskqueue_services.QUEUE_NAME_DEFAULT, None, None)
 
     def test_cannot_instantiate_jobs_from_abstract_base_classes(self):
         with self.assertRaisesRegexp(
             Exception, 'directly create a job using the abstract base'
             ):
             jobs.BaseJobManager.create_new()
-
-    def test_cannot_enqueue_same_job_twice(self):
-        job_id = MockJobManagerOne.create_new()
-        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
-            MockJobManagerOne.enqueue(
-                job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-
-    def test_can_enqueue_two_instances_of_the_same_job(self):
-        job_id = MockJobManagerOne.create_new()
-        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        job_id_2 = MockJobManagerOne.create_new()
-        MockJobManagerOne.enqueue(
-            job_id_2, taskqueue_services.QUEUE_NAME_DEFAULT)
-
-    def test_cancel_kills_queued_job(self):
-        job_id = MockJobManagerOne.create_new()
-        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertTrue(MockJobManagerOne.is_active(job_id))
-        MockJobManagerOne.cancel(job_id, 'admin_user_id')
-
-        self.assertFalse(MockJobManagerOne.is_active(job_id))
-        self.assertEqual(
-            MockJobManagerOne.get_status_code(job_id),
-            jobs.STATUS_CODE_CANCELED)
-        self.assertIsNone(MockJobManagerOne.get_output(job_id))
-        self.assertEqual(
-            MockJobManagerOne.get_error(job_id), 'Canceled by admin_user_id')
-
-    def test_cancel_kills_started_job(self):
-        job_id = MockJobManagerOne.create_new()
-        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertTrue(MockJobManagerOne.is_active(job_id))
-        MockJobManagerOne.register_start(job_id)
-
-        # Cancel the job immediately after it has started.
-        MockJobManagerOne.cancel(job_id, 'admin_user_id')
-
-        # The job then finishes.
-        with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
-            MockJobManagerOne.register_completion(job_id, ['job_output'])
-
-        self.assertFalse(MockJobManagerOne.is_active(job_id))
-        self.assertEqual(
-            MockJobManagerOne.get_status_code(job_id),
-            jobs.STATUS_CODE_CANCELED)
-        # Note that no results are recorded for this job.
-        self.assertIsNone(MockJobManagerOne.get_output(job_id))
-        self.assertEqual(
-            MockJobManagerOne.get_error(job_id), 'Canceled by admin_user_id')
-
-    def test_cancel_does_not_kill_completed_job(self):
-        job_id = MockJobManagerOne.create_new()
-        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertTrue(MockJobManagerOne.is_active(job_id))
-        # Complete the job.
-        self.process_and_flush_pending_tasks()
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        self.assertFalse(MockJobManagerOne.is_active(job_id))
-        self.assertEqual(
-            MockJobManagerOne.get_status_code(job_id),
-            jobs.STATUS_CODE_COMPLETED)
-        # Cancel the job after it has finished.
-        with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
-            MockJobManagerOne.cancel(job_id, 'admin_user_id')
-
-        # The job should still have 'completed' status.
-        self.assertFalse(MockJobManagerOne.is_active(job_id))
-        self.assertEqual(
-            MockJobManagerOne.get_status_code(job_id),
-            jobs.STATUS_CODE_COMPLETED)
-        self.assertEqual(MockJobManagerOne.get_output(job_id), ['output'])
-        self.assertIsNone(MockJobManagerOne.get_error(job_id))
-
-    def test_cancel_does_not_kill_failed_job(self):
-        job_id = MockFailingJobManager.create_new()
-        MockFailingJobManager.enqueue(
-            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertTrue(MockFailingJobManager.is_active(job_id))
-        with self.assertRaisesRegexp(Exception, 'Task failed'):
-            self.process_and_flush_pending_tasks()
-            self.process_and_flush_pending_mapreduce_tasks()
-
-        self.assertFalse(MockFailingJobManager.is_active(job_id))
-        self.assertEqual(
-            MockFailingJobManager.get_status_code(job_id),
-            jobs.STATUS_CODE_FAILED)
-        # Cancel the job after it has finished.
-        with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
-            MockFailingJobManager.cancel(job_id, 'admin_user_id')
-
-        # The job should still have 'failed' status.
-        self.assertFalse(MockFailingJobManager.is_active(job_id))
-        self.assertEqual(
-            MockFailingJobManager.get_status_code(job_id),
-            jobs.STATUS_CODE_FAILED)
-        self.assertIsNone(MockFailingJobManager.get_output(job_id))
-        self.assertIn(
-            'raise Exception', MockFailingJobManager.get_error(job_id))
-
-    def test_cancelling_multiple_unfinished_jobs(self):
-        job1_id = MockJobManagerOne.create_new()
-        MockJobManagerOne.enqueue(
-            job1_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        job2_id = MockJobManagerOne.create_new()
-        MockJobManagerOne.enqueue(
-            job2_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-
-        MockJobManagerOne.register_start(job1_id)
-        MockJobManagerOne.register_start(job2_id)
-        MockJobManagerOne.cancel_all_unfinished_jobs('admin_user_id')
-
-        self.assertFalse(MockJobManagerOne.is_active(job1_id))
-        self.assertFalse(MockJobManagerOne.is_active(job2_id))
-        self.assertEqual(
-            MockJobManagerOne.get_status_code(job1_id),
-            jobs.STATUS_CODE_CANCELED)
-        self.assertEqual(
-            MockJobManagerOne.get_status_code(job2_id),
-            jobs.STATUS_CODE_CANCELED)
-        self.assertIsNone(MockJobManagerOne.get_output(job1_id))
-        self.assertIsNone(MockJobManagerOne.get_output(job2_id))
-        self.assertEqual(
-            'Canceled by admin_user_id', MockJobManagerOne.get_error(job1_id))
-        self.assertEqual(
-            'Canceled by admin_user_id', MockJobManagerOne.get_error(job2_id))
-
-    def test_cancelling_one_unfinished_job(self):
-        job1_id = MockJobManagerOne.create_new()
-        MockJobManagerOne.enqueue(
-            job1_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        job2_id = MockJobManagerOne.create_new()
-        MockJobManagerOne.enqueue(
-            job2_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-
-        MockJobManagerOne.register_start(job1_id)
-        MockJobManagerOne.register_start(job2_id)
-        MockJobManagerOne.cancel(job1_id, 'admin_user_id')
-        with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
-            self.process_and_flush_pending_tasks()
-            self.process_and_flush_pending_mapreduce_tasks()
-        MockJobManagerOne.register_completion(job2_id, ['output'])
-
-        self.assertFalse(MockJobManagerOne.is_active(job1_id))
-        self.assertFalse(MockJobManagerOne.is_active(job2_id))
-        self.assertEqual(
-            MockJobManagerOne.get_status_code(job1_id),
-            jobs.STATUS_CODE_CANCELED)
-        self.assertEqual(
-            MockJobManagerOne.get_status_code(job2_id),
-            jobs.STATUS_CODE_COMPLETED)
-        self.assertIsNone(MockJobManagerOne.get_output(job1_id))
-        self.assertEqual(MockJobManagerOne.get_output(job2_id), ['output'])
-        self.assertEqual(
-            'Canceled by admin_user_id', MockJobManagerOne.get_error(job1_id))
-        self.assertIsNone(MockJobManagerOne.get_error(job2_id))
 
     def test_compress_output_list_with_single_char_outputs(self):
         job_id = MockJobManagerOne.create_new()
@@ -450,72 +161,37 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         actual_output = MockJobManagerOne.get_output(job_id)
         self.assertEqual(actual_output, expected_output)
 
-    def test_compress_output_list_with_multi_char_outputs(self):
+    def test_failure_for_job_enqueued_using_wrong_manager(self):
         job_id = MockJobManagerOne.create_new()
-        input_list = ['abcd', 'efgh', 'ijkl']
-        expected_output = ['abcd', 'efgh', 'ij <TRUNCATED>']
-        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        MockJobManagerOne.register_start(job_id)
-        MockJobManagerOne.register_completion(
-            job_id, input_list, max_output_len_chars=10)
-        actual_output = MockJobManagerOne.get_output(job_id)
-        self.assertEqual(actual_output, expected_output)
+        with self.assertRaisesRegexp(Exception, 'Invalid job type'):
+            MockJobManagerTwo.enqueue(
+                job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+    # def test_cancelling_multiple_unfinished_jobs(self):
+    #     job1_id = MockJobManagerOne.create_new()
+    #     MockJobManagerOne.enqueue(
+    #         job1_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+    #     job2_id = MockJobManagerOne.create_new()
+    #     MockJobManagerOne.enqueue(
+    #         job2_id, taskqueue_services.QUEUE_NAME_DEFAULT)
 
-    def test_compress_output_list_with_zero_max_output_len(self):
-        job_id = MockJobManagerOne.create_new()
-        input_list = [1, 2, 3]
-        expected_output = ['<TRUNCATED>']
-        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        MockJobManagerOne.register_start(job_id)
-        MockJobManagerOne.register_completion(
-            job_id, input_list, max_output_len_chars=0)
-        actual_output = MockJobManagerOne.get_output(job_id)
-        self.assertEqual(actual_output, expected_output)
+    #     MockJobManagerOne.register_start(job1_id)
+    #     MockJobManagerOne.register_start(job2_id)
+    #     MockJobManagerOne.cancel_all_unfinished_jobs('admin_user_id')
 
-    def test_compress_output_list_with_exact_max_output_len(self):
-        job_id = MockJobManagerOne.create_new()
-        input_list = ['abc']
-        expected_output = ['abc']
-        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        MockJobManagerOne.register_start(job_id)
-        MockJobManagerOne.register_completion(
-            job_id, input_list, max_output_len_chars=3)
-        actual_output = MockJobManagerOne.get_output(job_id)
-        self.assertEqual(actual_output, expected_output)
-
-    def test_compress_output_list_with_empty_outputs(self):
-        job_id = MockJobManagerOne.create_new()
-        input_list = []
-        expected_output = []
-        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        MockJobManagerOne.register_start(job_id)
-        MockJobManagerOne.register_completion(job_id, input_list)
-        actual_output = MockJobManagerOne.get_output(job_id)
-        self.assertEqual(actual_output, expected_output)
-
-    def test_compress_output_list_with_duplicate_outputs(self):
-        job_id = MockJobManagerOne.create_new()
-        input_list = ['bar', 'foo'] * 3
-        expected_output = ['(3x) bar', '(3x) foo']
-        max_length_for_output = sum(len(s) for s in expected_output)
-        MockJobManagerOne.enqueue(
-            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        MockJobManagerOne.register_start(job_id)
-        MockJobManagerOne.register_completion(
-            job_id, input_list, max_output_len_chars=max_length_for_output)
-        actual_output = MockJobManagerOne.get_output(job_id)
-        self.assertEqual(actual_output, expected_output)
-
-    def test_compress_output_list_with_truncated_duplicate_outputs(self):
-        job_id = MockJobManagerOne.create_new()
-        input_list = ['supercalifragilisticexpialidocious'] * 3
-        expected_output = ['(3x) super <TRUNCATED>']
-        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        MockJobManagerOne.register_start(job_id)
-        MockJobManagerOne.register_completion(
-            job_id, input_list, max_output_len_chars=10)
-        actual_output = MockJobManagerOne.get_output(job_id)
-        self.assertEqual(actual_output, expected_output)
+    #     self.assertFalse(MockJobManagerOne.is_active(job1_id))
+    #     self.assertFalse(MockJobManagerOne.is_active(job2_id))
+    #     self.assertEqual(
+    #         MockJobManagerOne.get_status_code(job1_id),
+    #         jobs.STATUS_CODE_CANCELED)
+    #     self.assertEqual(
+    #         MockJobManagerOne.get_status_code(job2_id),
+    #         jobs.STATUS_CODE_CANCELED)
+    #     self.assertIsNone(MockJobManagerOne.get_output(job1_id))
+    #     self.assertIsNone(MockJobManagerOne.get_output(job2_id))
+    #     self.assertEqual(
+    #         'Canceled by admin_user_id', MockJobManagerOne.get_error(job1_id))
+    #     self.assertEqual(
+    #         'Canceled by admin_user_id', MockJobManagerOne.get_error(job2_id))
 
 
 SUM_MODEL_ID = 'all_data_id'
@@ -530,24 +206,7 @@ class MockSumModel(ndb.Model):
     failed = ndb.BooleanProperty(default=False)
 
 
-class TestDeferredJobManager(jobs.BaseDeferredJobManager):
-    """Base class for testing deferred jobs."""
-    pass
-
-
-class TestAdditionJobManager(TestDeferredJobManager):
-    """Test job that sums all MockNumbersModel data.
-
-    The result is stored in a MockSumModel entity with id SUM_MODEL_ID.
-    """
-    @classmethod
-    def _run(cls, additional_job_params):
-        total = sum([
-            numbers_model.number for numbers_model in MockNumbersModel.query()])
-        MockSumModel(id=SUM_MODEL_ID, total=total).put()
-
-
-class FailingAdditionJobManager(TestDeferredJobManager):
+class FailingAdditionJobManager(jobs.BaseMapReduceJobManager):
     """Test job that stores stuff in MockSumModel and then fails."""
 
     @classmethod
@@ -585,74 +244,6 @@ class DatastoreJobIntegrationTests(test_utils.GenericTestBase):
         MockNumbersModel(number=2).put()
         MockNumbersModel(number=1).put()
         MockNumbersModel(number=2).put()
-
-    def test_sequential_jobs(self):
-        self._populate_data()
-        self.assertEqual(self._get_stored_total(), 0)
-
-        TestAdditionJobManager.enqueue(
-            TestAdditionJobManager.create_new(),
-            taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
-        self.process_and_flush_pending_tasks()
-        self.process_and_flush_pending_mapreduce_tasks()
-        self.assertEqual(self._get_stored_total(), 6)
-
-        MockNumbersModel(number=3).put()
-
-        TestAdditionJobManager.enqueue(
-            TestAdditionJobManager.create_new(),
-            taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
-        self.process_and_flush_pending_tasks()
-        self.process_and_flush_pending_mapreduce_tasks()
-        self.assertEqual(self._get_stored_total(), 9)
-
-    def test_multiple_enqueued_jobs(self):
-        self._populate_data()
-        TestAdditionJobManager.enqueue(
-            TestAdditionJobManager.create_new(),
-            taskqueue_services.QUEUE_NAME_DEFAULT)
-
-        MockNumbersModel(number=3).put()
-        TestAdditionJobManager.enqueue(
-            TestAdditionJobManager.create_new(),
-            taskqueue_services.QUEUE_NAME_DEFAULT)
-
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
-            2)
-        self.process_and_flush_pending_tasks()
-        self.process_and_flush_pending_mapreduce_tasks()
-        self.assertEqual(self._get_stored_total(), 9)
-
-    def test_failing_job(self):
-        self._populate_data()
-        job_id = FailingAdditionJobManager.create_new()
-        FailingAdditionJobManager.enqueue(
-            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
-        with self.assertRaisesRegexp(
-            taskqueue_services.PermanentTaskFailure, 'Oops, I failed'
-            ):
-            self.process_and_flush_pending_tasks()
-            self.process_and_flush_pending_mapreduce_tasks()
-        # The work that the failing job did before it failed is still done.
-        self.assertEqual(self._get_stored_total(), 6)
-
-        # The post-failure hook should have run.
-        self.assertTrue(MockSumModel.get_by_id(SUM_MODEL_ID).failed)
-
-        self.assertTrue(
-            FailingAdditionJobManager.get_status_code(job_id),
-            msg=jobs.STATUS_CODE_FAILED)
 
 
 class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
@@ -708,7 +299,6 @@ class ParamNameTests(test_utils.GenericTestBase):
             Exception, 'MapReduce task to URL .+ failed')
 
         with assert_raises_regexp_context_manager:
-            self.process_and_flush_pending_tasks()
             self.process_and_flush_pending_mapreduce_tasks()
 
     def test_job_with_correct_param_name(self):
@@ -728,11 +318,10 @@ class ParamNameTests(test_utils.GenericTestBase):
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
-        self.process_and_flush_pending_tasks()
         self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
 
@@ -745,7 +334,6 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exp_services.save_new_exploration('owner_id', exploration)
-        self.process_and_flush_pending_tasks()
         self.process_and_flush_pending_mapreduce_tasks()
 
     def test_count_all_explorations(self):
@@ -755,7 +343,6 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_DEFAULT), 1)
-        self.process_and_flush_pending_tasks()
         self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(jobs.get_job_output(job_id), ['[u\'sum\', 1]'])
@@ -803,9 +390,24 @@ class JobRegistryTests(test_utils.GenericTestBase):
         for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
             self.assertTrue(issubclass(klass, jobs.BaseJobManager))
 
+    def test_is_abstract_method_raises_exception_for_abstract_classes(self):
+        class TestMockAbstractClass(jobs.BaseJobManager):
+            """A sample Abstract Class."""
+
+            pass
+
+        mock_abstract_base_classes = [TestMockAbstractClass]
+        with self.assertRaisesRegexp(
+            Exception,
+            'Tried to directly create a job using the abstract base '
+            'manager class TestMockAbstractClass, which is not allowed.'):
+            with self.swap(
+                jobs, 'ABSTRACT_BASE_CLASSES', mock_abstract_base_classes):
+                TestMockAbstractClass.create_new()
+
     def test_each_one_off_class_is_not_abstract(self):
         for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
-            self.assertFalse(klass._is_abstract())  # pylint: disable=protected-access
+            klass.create_new()
 
     def test_validity_of_each_continuous_computation_class(self):
         for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
@@ -921,25 +523,6 @@ class BaseContinuousComputationManagerTests(test_utils.GenericTestBase):
                 1, 'event_type')
 
 
-class JobQueriesTests(test_utils.GenericTestBase):
-    """Tests queries for jobs."""
-
-    def test_get_data_for_recent_jobs(self):
-        self.assertEqual(jobs.get_data_for_recent_jobs(), [])
-
-        job_id = MockJobManagerOne.create_new()
-        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        recent_jobs = jobs.get_data_for_recent_jobs()
-        self.assertEqual(len(recent_jobs), 1)
-        self.assertDictContainsSubset({
-            'id': job_id,
-            'status_code': jobs.STATUS_CODE_QUEUED,
-            'job_type': 'MockJobManagerOne',
-            'is_cancelable': True,
-            'error': None
-        }, recent_jobs[0])
-
-
 class TwoClassesMapReduceJobManager(jobs.BaseMapReduceJobManager):
     """A test job handler that counts entities in two datastore classes."""
 
@@ -967,7 +550,7 @@ class TwoClassesMapReduceJobIntegrationTests(test_utils.GenericTestBase):
         # Note that this ends up creating an entry in the
         # ExplorationRightsModel as well.
         exp_services.save_new_exploration('owner_id', exploration)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_count_entities(self):
         self.assertEqual(exp_models.ExplorationModel.query().count(), 1)
@@ -980,7 +563,6 @@ class TwoClassesMapReduceJobIntegrationTests(test_utils.GenericTestBase):
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_DEFAULT),
             1)
-        self.process_and_flush_pending_tasks()
         self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
@@ -1143,7 +725,6 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID)
         exp_services.save_new_exploration('owner_id', exploration)
-        self.process_and_flush_pending_tasks()
         self.process_and_flush_pending_mapreduce_tasks()
 
     def test_cannot_get_entity_with_invalid_id(self):
@@ -1178,7 +759,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 StartExplorationEventCounter.get_count(self.EXP_ID), 0)
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 1)
+                    queue_name=taskqueue_services.QUEUE_NAME_EVENTS), 1)
 
             # When the task queue is flushed, the data is recorded in the two
             # realtime layers.
@@ -1186,7 +767,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_EVENTS), 0)
+                    queue_name=taskqueue_services.QUEUE_NAME_EVENTS), 0)
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
             self.assertEqual(MockStartExplorationRealtimeModel.get(
@@ -1196,7 +777,10 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
 
             # The batch job has not run yet, so no entity for self.EXP_ID will
             # have been created in the batch model yet.
-            with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+            with self.assertRaisesRegexp(
+                base_models.BaseModel.EntityNotFoundError,
+                'Entity for class ExplorationAnnotationsModel with id exp_id '
+                'not found'):
                 stats_models.ExplorationAnnotationsModel.get(self.EXP_ID)
 
             # Launch the batch computation.
@@ -1209,13 +793,12 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 '1:%s' % self.EXP_ID, strict=False))
 
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.assertTrue(
                 MockStartExplorationMRJobManager.is_active(batch_job_id))
             self.assertFalse(
                 MockStartExplorationMRJobManager.has_finished(batch_job_id))
-            self.process_and_flush_pending_tasks()
             self.process_and_flush_pending_mapreduce_tasks()
             self.assertFalse(
                 MockStartExplorationMRJobManager.is_active(batch_job_id))
@@ -1262,7 +845,6 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
 
             # Finish the job.
-            self.process_and_flush_pending_tasks()
             self.process_and_flush_pending_mapreduce_tasks()
             # When the batch job completes, the overall count is still 1.
             self.assertEqual(
@@ -1274,7 +856,6 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 'Entity for class ExplorationAnnotationsModel with id exp_id '
                 'not found'):
                 stats_models.ExplorationAnnotationsModel.get(self.EXP_ID)
-
 
     def test_cannot_start_new_job_while_existing_job_still_running(self):
         with self.swap(
@@ -1288,7 +869,6 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 'which is already running'):
                 StartExplorationEventCounter.start_computation()
 
-            self.process_and_flush_pending_tasks()
             self.process_and_flush_pending_mapreduce_tasks()
             StartExplorationEventCounter.stop_computation('admin_user_id')
 
@@ -1328,7 +908,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         with self.swap(logging, 'error', _mock_logging_function):
             StartExplorationEventCounter.on_batch_job_failure()
 
-        self.process_and_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_mapreduce_tasks()
         StartExplorationEventCounter.stop_computation('admin_user_id')
 
         self.assertEqual(
@@ -1350,7 +930,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         with self.swap(logging, 'info', _mock_logging_function):
             StartExplorationEventCounter.on_batch_job_canceled()
 
-        self.process_and_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_mapreduce_tasks()
         StartExplorationEventCounter.stop_computation('admin_user_id')
 
         self.assertEqual(
@@ -1373,7 +953,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
 
-            self.process_and_flush_pending_tasks()
+            self.run_but_do_not_flush_pending_mapreduce_tasks()
             MockContinuousComputationManager.stop_computation('admin_user_id')
             status = MockContinuousComputationManager.get_status_code()
 
