@@ -97,7 +97,7 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the collection.
-        collection_services.create_collection_summary(
+        collection_services.regenerate_collection_summary(
             self.COLLECTION_ID, None)
 
         # Delete the exploration before migration occurs.

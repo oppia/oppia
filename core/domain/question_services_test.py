@@ -75,7 +75,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_1'],
-            inapplicable_skill_misconception_ids=['skill-1', 'skill-2'])
+            inapplicable_skill_misconception_ids=[
+                'skillid12345-1', 'skillid12345-2'])
 
         self.question_id_1 = question_services.get_new_question_id()
         self.question_1 = self.save_new_question(
@@ -500,11 +501,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
     def test_update_inapplicable_skill_misconception_ids(self):
         self.assertEqual(
             self.question.inapplicable_skill_misconception_ids,
-            ['skill-1', 'skill-2'])
+            ['skillid12345-1', 'skillid12345-2'])
         change_dict = {
             'cmd': 'update_question_property',
             'property_name': 'inapplicable_skill_misconception_ids',
-            'new_value': ['skill-1'],
+            'new_value': ['skillid12345-1'],
             'old_value': []
         }
         change_list = [question_domain.QuestionChange(change_dict)]
@@ -515,7 +516,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         question = question_services.get_question_by_id(self.question_id)
         self.assertEqual(
-            question.inapplicable_skill_misconception_ids, ['skill-1'])
+            question.inapplicable_skill_misconception_ids, ['skillid12345-1'])
         self.assertEqual(question.version, 2)
 
     def test_cannot_update_question_with_invalid_change_list(self):
@@ -668,7 +669,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 '<p>default_feedback</p>', False)
         ]
         self.save_new_skill(
-            'skill_with_misconceptions', self.admin_id,
+            'skillid12345', self.admin_id,
             description='Skill with misconceptions',
             misconceptions=misconceptions)
 
@@ -694,7 +695,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                     'rule_type': 'Contains'
                 }],
                 'training_data': [],
-                'tagged_skill_misconception_id': 'skill_with_misconceptions-0'
+                'tagged_skill_misconception_id': 'skillid12345-0'
             }),
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
@@ -715,7 +716,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                     'rule_type': 'Contains'
                 }],
                 'training_data': [],
-                'tagged_skill_misconception_id': 'skill_with_misconceptions-1'
+                'tagged_skill_misconception_id': 'skillid12345-1'
             }),
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
@@ -736,7 +737,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                     'rule_type': 'Contains'
                 }],
                 'training_data': [],
-                'tagged_skill_misconception_id': 'skill_with_misconceptions-2'
+                'tagged_skill_misconception_id': 'skillid12345-2'
             })
         ]
         question_state_data.written_translations.translations_mapping.update({
@@ -750,16 +751,16 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'feedback_2': {}
         })
         inapplicable_skill_misconception_ids = [
-            'skill_with_misconceptions-3',
-            'skill_with_misconceptions-4'
+            'skillid12345-3',
+            'skillid12345-4'
         ]
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
-            question_state_data, ['skill_with_misconceptions'],
+            question_state_data, ['skillid12345'],
             inapplicable_skill_misconception_ids=(
                 inapplicable_skill_misconception_ids))
         question_services.create_new_question_skill_link(
-            self.editor_id, self.question_id, 'skill_with_misconceptions', 0.5)
+            self.editor_id, self.question_id, 'skillid12345', 0.5)
         answer_groups = (
             self.question.question_state_data.interaction.answer_groups)
         actual_misconception_ids = [
@@ -767,20 +768,20 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             for answer_group in answer_groups
             if answer_group.to_dict()['tagged_skill_misconception_id']]
         expected_misconception_ids = [
-            'skill_with_misconceptions-0',
-            'skill_with_misconceptions-1',
-            'skill_with_misconceptions-2'
+            'skillid12345-0',
+            'skillid12345-1',
+            'skillid12345-2'
         ]
         self.assertEqual(
             self.question.inapplicable_skill_misconception_ids,
             inapplicable_skill_misconception_ids)
         self.assertEqual(actual_misconception_ids, expected_misconception_ids)
-        # Try to untag deleted misconceptions when there are no deleted
+        # Try to untag deleted skill misconceptions when there are no deleted
         # misconceptions.
         question_services.untag_deleted_misconceptions(
-            self.editor_id, 'skill_with_misconceptions',
-            'Skill with misconceptions')
-        # No change when misconception ids exist.
+            self.editor_id, 'skillid12345',
+            'Skill with misconceptions', [])
+        # No change when skill misconception ids exist.
         updated_question = question_services.get_question_by_id(
             self.question_id)
         self.assertEqual(
@@ -807,7 +808,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 '<p>default_feedback</p>', False)
         ]
         self.save_new_skill(
-            'skill_with_misconceptions', self.admin_id,
+            'skillid12345', self.admin_id,
             description='Skill with misconceptions',
             misconceptions=misconceptions)
 
@@ -833,7 +834,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                     'rule_type': 'Contains'
                 }],
                 'training_data': [],
-                'tagged_skill_misconception_id': 'skill_with_misconceptions-0'
+                'tagged_skill_misconception_id': 'skillid12345-0'
             }),
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
@@ -854,7 +855,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                     'rule_type': 'Contains'
                 }],
                 'training_data': [],
-                'tagged_skill_misconception_id': 'skill_with_misconceptions-1'
+                'tagged_skill_misconception_id': 'skillid12345-1'
             }),
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
@@ -875,7 +876,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                     'rule_type': 'Contains'
                 }],
                 'training_data': [],
-                'tagged_skill_misconception_id': 'skill_with_misconceptions-2'
+                'tagged_skill_misconception_id': 'skillid12345-2'
             })
         ]
         question_state_data.written_translations.translations_mapping.update({
@@ -889,16 +890,16 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'feedback_2': {}
         })
         inapplicable_skill_misconception_ids = [
-            'skill_with_misconceptions-3',
-            'skill_with_misconceptions-4'
+            'skillid12345-3',
+            'skillid12345-4'
         ]
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
-            question_state_data, ['skill_with_misconceptions'],
+            question_state_data, ['skillid12345'],
             inapplicable_skill_misconception_ids=(
                 inapplicable_skill_misconception_ids))
         question_services.create_new_question_skill_link(
-            self.editor_id, self.question_id, 'skill_with_misconceptions', 0.5)
+            self.editor_id, self.question_id, 'skillid12345', 0.5)
         answer_groups = (
             self.question.question_state_data.interaction.answer_groups)
         actual_misconception_ids = [
@@ -906,9 +907,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             for answer_group in answer_groups
             if answer_group.to_dict()['tagged_skill_misconception_id']]
         expected_misconception_ids = [
-            'skill_with_misconceptions-0',
-            'skill_with_misconceptions-1',
-            'skill_with_misconceptions-2'
+            'skillid12345-0',
+            'skillid12345-1',
+            'skillid12345-2'
         ]
         self.assertEqual(
             self.question.inapplicable_skill_misconception_ids,
@@ -930,11 +931,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             })
         ]
         skill_services.update_skill(
-            self.editor_id, 'skill_with_misconceptions',
+            self.editor_id, 'skillid12345',
             change_list, 'Delete misconceptions.')
-        skill_fetchers.get_skill_by_id('skill_with_misconceptions')
-        self.process_and_flush_pending_mapreduce_tasks()
+
+        skill_fetchers.get_skill_by_id('skillid12345')
         self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         updated_question = question_services.get_question_by_id(
             self.question_id)
         updated_answer_groups = (
@@ -943,11 +945,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             answer_group.to_dict()['tagged_skill_misconception_id']
             for answer_group in updated_answer_groups
             if answer_group.to_dict()['tagged_skill_misconception_id']]
-        expected_misconception_ids = ['skill_with_misconceptions-1']
+        expected_misconception_ids = ['skillid12345-1']
         actual_inapplicable_skill_misconception_ids = (
             updated_question.inapplicable_skill_misconception_ids)
         expected_inapplicable_skill_misconception_ids = (
-            ['skill_with_misconceptions-3'])
+            ['skillid12345-3'])
         self.assertEqual(
             actual_inapplicable_skill_misconception_ids,
             expected_inapplicable_skill_misconception_ids)

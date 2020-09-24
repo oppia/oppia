@@ -42,12 +42,6 @@ if os.path.isdir(OPPIA_TOOLS_PATH):
         raise Exception('Invalid path for oppia_tools library: %s' % PIL_PATH)
     sys.path.insert(0, PIL_PATH)
 
-    # PROTOBUF_PATH = os.path.join(OPPIA_TOOLS_PATH, 'protobuf-3.12.0')
-    # if not os.path.isdir(PROTOBUF_PATH):
-    #     raise Exception('Invalid path for oppia_tools library: %s' % (
-    #         PROTOBUF_PATH))
-    # sys.path.insert(0, PROTOBUF_PATH)
-
 # Google App Engine (GAE) uses its own virtual environment that sets up the
 # python library system path using their third party python library, vendor. In
 # order to inform GAE of the packages that are required for Oppia, we need to

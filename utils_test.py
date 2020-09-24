@@ -424,6 +424,13 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.get_supported_audio_language_description(
                 invalid_language_code)
 
+    def test_is_pseudonymous_id(self):
+        self.assertTrue(utils.is_pseudonymous_id('pid_' + 'a' * 32))
+        self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 32))
+        self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 31 + 'A'))
+        self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 31))
+        self.assertFalse(utils.is_pseudonymous_id('a' * 36))
+
     def test_snake_case_to_camel_case(self):
         camel_case_str1 = utils.snake_case_to_camel_case('user_id_number')
         camel_case_str2 = utils.snake_case_to_camel_case('hello_world')
