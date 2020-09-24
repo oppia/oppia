@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
+
 /**
  * @fileoverview Component for the subtopic viewer.
  */
@@ -29,7 +32,6 @@ require('components/summary-tile/subtopic-summary-tile.directive.ts');
 require('domain/subtopic_viewer/subtopic-viewer-backend-api.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
-require('services/page-title.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
@@ -37,14 +39,15 @@ angular.module('oppia').component('subtopicViewerPage', {
   template: require('./subtopic-viewer-page.component.html'),
   controller: [
     '$rootScope', 'AlertsService', 'ContextService', 'LoaderService',
-    'PageTitleService', 'SubtopicViewerBackendApiService', 'UrlService',
+    'SubtopicViewerBackendApiService', 'UrlService',
     'WindowDimensionsService', 'ENTITY_TYPE', 'FATAL_ERROR_CODES',
     function(
         $rootScope, AlertsService, ContextService, LoaderService,
-        PageTitleService, SubtopicViewerBackendApiService, UrlService,
+        SubtopicViewerBackendApiService, UrlService,
         WindowDimensionsService, ENTITY_TYPE, FATAL_ERROR_CODES) {
       var ctrl = this;
       ctrl.nextSubtopicSummaryIsShown = false;
+      ctrl.pageTitleService = OppiaAngularRootComponent.pageTitleService;
 
       ctrl.checkMobileView = function() {
         return (WindowDimensionsService.getWidth() < 500);
@@ -69,8 +72,10 @@ angular.module('oppia').component('subtopicViewerPage', {
             ctrl.parentTopicId = subtopicDataObject.getParentTopicId();
             ContextService.setCustomEntityContext(
               ENTITY_TYPE.TOPIC, ctrl.parentTopicId);
-            PageTitleService.setPageTitle(
+            ctrl.pageTitleService.setPageTitle(
               `Review ${ctrl.subtopicTitle} | Oppia`);
+            ctrl.pageTitleService.updateMetaTag(
+              `Review the skill of ${ctrl.subtopicTitle.toLowerCase()}.`);
 
             let nextSubtopic = (
               subtopicDataObject.getNextSubtopic());

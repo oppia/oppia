@@ -63,6 +63,13 @@ SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
+# Daily emails are sent to reviewers to notify them of suggestions on the
+# Contributor Dashboard to review. The constants below define the number of
+# question and translation suggestions to fetch to come up with these daily
+# suggestion recommendations.
+MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS = 30
+MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS = 30
+
 # Defines what is the minimum role required to review suggestions
 # of a particular type.
 SUGGESTION_MINIMUM_ROLE_FOR_REVIEW = {
@@ -85,7 +92,7 @@ SCORE_CATEGORY_DELIMITER = '.'
 
 ALLOWED_QUERY_FIELDS = ['suggestion_type', 'target_type', 'target_id',
                         'status', 'author_id', 'final_reviewer_id',
-                        'score_category']
+                        'score_category', 'language_code']
 
 # Threshold number of days after which suggestion will be accepted.
 THRESHOLD_DAYS_BEFORE_ACCEPT = 7
@@ -119,6 +126,9 @@ INCREMENT_SCORE_OF_AUTHOR_BY = 1
 # Action types for incoming requests to the suggestion action handlers.
 ACTION_TYPE_ACCEPT = 'accept'
 ACTION_TYPE_REJECT = 'reject'
+
+# The unique ID for the CommunityContributionStatsModel.
+COMMUNITY_CONTRIBUTION_STATS_MODEL_ID = 'community_contribution_stats'
 
 
 class GeneralSuggestionModel(base_models.BaseModel):
@@ -154,6 +164,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # separated by a ., the first will be a value from SCORE_TYPE_CHOICES and
     # the second will be the subcategory of the suggestion.
     score_category = ndb.StringProperty(required=True, indexed=True)
+    # The ISO 639-1 code used to query suggestions by language, or None if the
+    # suggestion type is not queryable by language.
+    language_code = ndb.StringProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -173,7 +186,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             'author_id': base_models.EXPORT_POLICY.EXPORTED,
             'final_reviewer_id': base_models.EXPORT_POLICY.EXPORTED,
             'change_cmd': base_models.EXPORT_POLICY.EXPORTED,
-            'score_category': base_models.EXPORT_POLICY.EXPORTED
+            'score_category': base_models.EXPORT_POLICY.EXPORTED,
+            'language_code': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -193,9 +207,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, suggestion_type, target_type, target_id,
-            target_version_at_submission, status, author_id,
-            final_reviewer_id, change_cmd, score_category,
-            thread_id):
+            target_version_at_submission, status, author_id, final_reviewer_id,
+            change_cmd, score_category, thread_id, language_code):
         """Creates a new SuggestionModel entry.
 
         Args:
@@ -212,6 +225,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
             score_category: str. The scoring category for the suggestion.
             thread_id: str. The ID of the feedback thread linked to the
                 suggestion.
+            language_code: str|None. The ISO 639-1 code used to query
+                suggestions by language, or None if the suggestion type is not
+                queryable by language.
 
         Raises:
             Exception. There is already a suggestion with the given id.
@@ -229,7 +245,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             target_version_at_submission=target_version_at_submission,
             status=status, author_id=author_id,
             final_reviewer_id=final_reviewer_id, change_cmd=change_cmd,
-            score_category=score_category).put()
+            score_category=score_category, language_code=language_code).put()
 
     @classmethod
     def query_suggestions(cls, query_fields_and_values):
@@ -365,6 +381,50 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return (results, (cursor.urlsafe() if cursor else None), more)
 
     @classmethod
+    def get_question_suggestions_waiting_longest_for_review(cls):
+        """Returns MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS number
+        of question suggestions, sorted in descending order by review wait
+        time.
+
+        Returns:
+            list(GeneralSuggestionModel). A list of question suggestions,
+            sorted in descending order based on how long the suggestions have
+            been waiting for review.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.suggestion_type == SUGGESTION_TYPE_ADD_QUESTION)
+            .order(cls.last_updated)
+            .fetch(MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
+        )
+
+    @classmethod
+    def get_translation_suggestions_waiting_longest_for_review_per_lang(
+            cls, language_code):
+        """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
+        number of translation suggestions in the specified language code,
+        sorted in descending order by review wait time.
+
+        Args:
+            language_code: str. The ISO 639-1 language code of the translation
+                suggestions.
+
+        Returns:
+            list(GeneralSuggestionModel). A list of translation suggestions,
+            sorted in descending order based on how long the suggestions have
+            been waiting for review.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            .filter(cls.language_code == language_code)
+            .order(cls.last_updated)
+            .fetch(MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS)
+        )
+
+    @classmethod
     def get_user_created_suggestions_of_suggestion_type(
             cls, suggestion_type, user_id, page_size, urlsafe_start_cursor):
         """Gets all suggestions of suggestion_type which the user has created.
@@ -444,7 +504,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     suggestion_model
                     .target_version_at_submission),
                 'status': suggestion_model.status,
-                'change_cmd': suggestion_model.change_cmd,
+                'change_cmd': suggestion_model.change_cmd
             }
 
         return user_data
@@ -602,3 +662,79 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
                 'rejection_message': voiceover_model.rejection_message
             }
         return user_data
+
+
+class CommunityContributionStatsModel(base_models.BaseModel):
+    """Records the contributor dashboard contribution stats. This includes the
+    total number of reviewers for each suggestion type and the total number of
+    suggestions in review for each suggestion type. There is only ever one
+    instance of this model, and its ID is COMMUNITY_CONTRIBUTION_STATS_MODEL_ID.
+    """
+
+    # A dictionary where the keys represent the language codes that translation
+    # suggestions are offered in and the values correspond to the total number
+    # of reviewers who have permission to review translation suggestions in
+    # that language.
+    translation_reviewer_counts_by_lang_code = ndb.JsonProperty(required=True)
+    # A dictionary where the keys represent the language codes that translation
+    # suggestions are offered in and the values correspond to the total number
+    # of translation suggestions that are currently in review in that language.
+    translation_suggestion_counts_by_lang_code = ndb.JsonProperty(required=True)
+    # The total number of reviewers who have permission to review question
+    # suggestions.
+    question_reviewer_count = ndb.IntegerProperty(required=True)
+    # The total number of question suggestions that are currently in review.
+    question_suggestion_count = ndb.IntegerProperty(required=True)
+
+    @classmethod
+    def get(cls):
+        """Gets the CommunityContributionStatsModel instance. If the
+        CommunityContributionStatsModel does not exist yet, it is created.
+        This method helps enforce that there should only ever be one instance
+        of this model.
+
+        Returns:
+            CommunityContributionStatsModel. The single model instance.
+        """
+        community_contribution_stats_model = cls.get_by_id(
+            COMMUNITY_CONTRIBUTION_STATS_MODEL_ID
+        )
+
+        if community_contribution_stats_model is None:
+            community_contribution_stats_model = cls(
+                id=COMMUNITY_CONTRIBUTION_STATS_MODEL_ID,
+                translation_reviewer_counts_by_lang_code={},
+                translation_suggestion_counts_by_lang_code={},
+                question_reviewer_count=0,
+                question_suggestion_count=0
+            )
+            community_contribution_stats_model.put()
+            return community_contribution_stats_model
+
+        else:
+            return super(
+                CommunityContributionStatsModel, cls).get(
+                    COMMUNITY_CONTRIBUTION_STATS_MODEL_ID)
+
+    @classmethod
+    def get_deletion_policy(cls):
+        """NOT_APPLICABLE - this model does not directly contain user
+        information because the data is aggregated.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def get_export_policy(cls):
+        """NOT_APPLICABLE - this model does not directly contain user
+        information because the data is aggregated.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'translation_reviewer_counts_by_lang_code':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'translation_suggestion_counts_by_lang_code':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_reviewer_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'question_suggestion_count':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })

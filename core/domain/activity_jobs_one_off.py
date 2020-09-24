@@ -382,15 +382,15 @@ class AddCommitCmdsUserIdsMetadataJob(jobs.BaseMapReduceOneOffJobManager):
             assignee_id = commit_cmd['assignee_id']
             if (
                     commit_cmd['cmd'] == rights_domain.CMD_CHANGE_ROLE and
-                    not user_services.is_user_id_correct(assignee_id)
+                    not user_services.is_user_id_valid(assignee_id)
             ):
-                user_settings_model = (
-                    user_models.UserSettingsModel.get_by_gae_id(assignee_id))
-                if user_settings_model is None:
+                user_settings = user_services.get_user_settings_by_gae_id(
+                    assignee_id)
+                if user_settings is None:
                     return (
                         'MIGRATION_FAILURE', (snapshot_model.id, assignee_id))
 
-                new_user_ids[i] = user_settings_model.id
+                new_user_ids[i] = user_settings.user_id
 
         # This loop is used for setting the actual commit_cmds and is separate
         # because if the second commit results in MIGRATION_FAILURE we do not

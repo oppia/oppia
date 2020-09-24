@@ -29,6 +29,7 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_domain
 from core.domain import user_jobs_continuous
 from core.domain import user_services
 from core.platform import models
@@ -68,26 +69,30 @@ class MockUserStatsMRJobManager(
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
 
-    def test_is_user_id_correct(self):
-        self.assertTrue(
-            user_services.is_user_id_correct(feconf.SYSTEM_COMMITTER_ID))
-        self.assertTrue(
-            user_services.is_user_id_correct(feconf.MIGRATION_BOT_USER_ID))
-        self.assertTrue(
-            user_services.is_user_id_correct(feconf.SUGGESTION_BOT_USER_ID))
-        self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
-        self.assertFalse(
-            user_services.is_user_id_correct('uid_' + 'a' * 31 + 'A'))
-        self.assertFalse(user_services.is_user_id_correct('uid_' + 'a' * 31))
-        self.assertFalse(user_services.is_user_id_correct('a' * 36))
+    def setUp(self):
+        super(UserServicesUnitTests, self).setUp()
+        schema_version = 1
+        self.modifiable_user_data = user_domain.ModifiableUserData(
+            'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
+            None, None, schema_version, 'user_id'
+        )
+        self.modifiable_new_user_data = user_domain.ModifiableUserData(
+            'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
+            None, None, schema_version
+        )
 
-    def test_is_pseudonymous_id(self):
-        self.assertTrue(user_services.is_pseudonymous_id('pid_' + 'a' * 32))
-        self.assertFalse(user_services.is_pseudonymous_id('uid_' + 'a' * 32))
+    def test_is_user_id_valid(self):
+        self.assertTrue(
+            user_services.is_user_id_valid(feconf.SYSTEM_COMMITTER_ID))
+        self.assertTrue(
+            user_services.is_user_id_valid(feconf.MIGRATION_BOT_USER_ID))
+        self.assertTrue(
+            user_services.is_user_id_valid(feconf.SUGGESTION_BOT_USER_ID))
+        self.assertTrue(user_services.is_user_id_valid('uid_%s' % ('a' * 32)))
         self.assertFalse(
-            user_services.is_pseudonymous_id('uid_' + 'a' * 31 + 'A'))
-        self.assertFalse(user_services.is_pseudonymous_id('uid_' + 'a' * 31))
-        self.assertFalse(user_services.is_pseudonymous_id('a' * 36))
+            user_services.is_user_id_valid('uid_%s%s' % ('a' * 31, 'A')))
+        self.assertFalse(user_services.is_user_id_valid('uid_%s' % ('a' * 31)))
+        self.assertFalse(user_services.is_user_id_valid('a' * 36))
 
     def test_set_and_get_username(self):
         gae_id = 'someUser'
@@ -189,7 +194,38 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(utils.ValidationError, error_msg):
                 user_services.set_username(user_id, username)
 
-    def test_invalid_emails(self):
+    def test_update_user_settings_for_invalid_display_alias_raises_error(self):
+        gae_id = 'someUser'
+        user_id = user_services.create_new_user(
+            gae_id, 'user@example.com').user_id
+        bad_display_aliases_with_expected_error = [
+            ('', 'Expected display_alias to be a string, received .'),
+            (0, 'Expected display_alias to be a string, received 0.'),
+            (None, 'Expected display_alias to be a string, received None.')
+        ]
+        self.modifiable_new_user_data.user_id = user_id
+        self.modifiable_new_user_data.pin = None
+        for display_alias, error_msg in bad_display_aliases_with_expected_error:
+            with self.assertRaisesRegexp(utils.ValidationError, error_msg):
+                self.modifiable_new_user_data.display_alias = display_alias
+                user_services.update_multiple_users_data(
+                    [self.modifiable_new_user_data])
+
+    def test_update_user_settings_valid_display_alias_set_successfully(self):
+        gae_id = 'someUser'
+        user_id = user_services.create_new_user(
+            gae_id, 'user@example.com').user_id
+        display_alias = 'Name'
+        user_settings = user_services.get_user_settings(user_id)
+        self.assertIsNone(user_settings.display_alias)
+        self.modifiable_user_data.user_id = user_id
+        self.modifiable_user_data.pin = None
+        self.modifiable_user_data.display_alias = display_alias
+        user_services.update_multiple_users_data([self.modifiable_user_data])
+        user_settings = user_services.get_user_settings(user_id)
+        self.assertEqual(user_settings.display_alias, display_alias)
+
+    def test_create_new_user_with_invalid_emails_raises_exception(self):
         bad_email_addresses_with_expected_error_message = [
             ('@', 'Invalid email address: @'),
             ('@@', 'Invalid email address: @@'),
@@ -202,7 +238,23 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 r'\[u\'a\', u\'@\', u\'b.com\'\]')]
         for email, error_msg in bad_email_addresses_with_expected_error_message:
             with self.assertRaisesRegexp(utils.ValidationError, error_msg):
-                user_services.create_new_user('user_id', email)
+                user_services.create_new_user('gae_id', email)
+
+    def test_create_new_user_with_invalid_email_creates_no_user_models(self):
+        bad_email = '@'
+        error_msg = 'Invalid email address: @'
+        with self.assertRaisesRegexp(utils.ValidationError, error_msg):
+            user_services.create_new_user('gae_id', bad_email)
+        tmp_admin_user_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+        user_ids_in_user_settings = [
+            model.id for model in user_models.UserSettingsModel.get_all()]
+        user_ids_in_user_auth_details = [
+            model.id for model in user_models.UserAuthDetailsModel.get_all()]
+        user_ids_in_user_contributions = [
+            model.id for model in user_models.UserContributionsModel.get_all()]
+        self.assertEqual(user_ids_in_user_settings, [tmp_admin_user_id])
+        self.assertEqual(user_ids_in_user_auth_details, [tmp_admin_user_id])
+        self.assertEqual(user_ids_in_user_contributions, [tmp_admin_user_id])
 
     def test_email_truncation(self):
         email_addresses = [
@@ -263,40 +315,60 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
 
-    def test_get_user_settings_by_gae_id(self):
+    def test_get_user_settings_by_gae_id_for_existing_user_is_correct(self):
         gae_id = 'gae_id'
+        email = 'user@example.com'
+        user_id = 'user_id'
+        username = 'username'
         user_models.UserSettingsModel(
-            id='user_id',
+            id=user_id,
             gae_id=gae_id,
-            email='user@example.com',
-            username='username',
+            email=email,
+            username=username,
         ).put()
-        user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
-            gae_id)
+        user_models.UserAuthDetailsModel(
+            id=user_id,
+            gae_id=gae_id
+        ).put()
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
         user_settings = user_services.get_user_settings_by_gae_id(gae_id)
         self.assertEqual(user_settings_model.id, user_settings.user_id)
+        self.assertEqual(user_settings_model.gae_id, user_settings.gae_id)
         self.assertEqual(user_settings_model.email, user_settings.email)
         self.assertEqual(user_settings_model.username, user_settings.username)
-        self.assertIsNone(user_services.get_user_settings_by_gae_id('id_x'))
 
-    def test_get_user_settings_by_gae_id_strict(self):
+    def test_get_user_settings_by_gae_id_for_nonexistent_gae_id_is_none(self):
+        self.assertIsNone(user_services.get_user_settings_by_gae_id('gae_id_x'))
+
+    def test_get_auth_details_by_gae_id_for_nonexistent_gae_id_is_none(self):
+        self.assertIsNone(user_services.get_user_settings_by_gae_id('gae_id_x'))
+
+    def test_get_user_settings_by_gae_id_strict_existing_user_is_correct(self):
+        non_existent_user_id = 'id_x'
         gae_id = 'gae_id'
+        email = 'user@example.com'
+        user_id = 'user_id'
+        username = 'username'
         user_models.UserSettingsModel(
-            id='user_id',
+            id=user_id,
             gae_id=gae_id,
-            email='user@example.com',
-            username='username',
+            email=email,
+            username=username,
         ).put()
-        user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
-            gae_id)
-        user_settings = user_services.get_user_settings_by_gae_id(
-            gae_id, strict=True)
+        user_models.UserAuthDetailsModel(
+            id=user_id,
+            gae_id=gae_id
+        ).put()
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        user_settings = user_services.get_user_settings_by_gae_id(gae_id)
         self.assertEqual(user_settings_model.id, user_settings.user_id)
+        self.assertEqual(user_settings_model.gae_id, user_settings.gae_id)
         self.assertEqual(user_settings_model.email, user_settings.email)
         self.assertEqual(user_settings_model.username, user_settings.username)
 
         with self.assertRaisesRegexp(Exception, 'User not found.'):
-            user_services.get_user_settings_by_gae_id('id_x', strict=True)
+            user_services.get_user_settings_by_gae_id(
+                non_existent_user_id, strict=True)
 
     def test_fetch_gravatar_success(self):
         user_email = 'user@example.com'
@@ -572,7 +644,57 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_user_role_from_id(user_id),
             feconf.ROLE_ID_COLLECTION_EDITOR)
 
-    def test_create_new_user_creates_a_new_user_auth_details_entry(self):
+    def test_get_all_profiles_auth_details_non_existent_id_raises_error(self):
+        non_existent_user_id = 'id_x'
+        error_msg = 'Parent user not found.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            user_services.get_all_profiles_auth_details_by_parent_user_id(
+                non_existent_user_id)
+
+    def test_update_user_role_from_learner_to_other_role_raises_exception(self):
+        gae_id = 'test_id'
+        user_email = 'test@email.com'
+        user_pin = '12345'
+        profile_pin = '123'
+        display_alias = 'display_alias'
+        display_alias_2 = 'display_alias_2'
+        user_id = user_services.create_new_user(gae_id, user_email).user_id
+
+        self.modifiable_user_data.user_id = user_id
+        self.modifiable_user_data.pin = user_pin
+        self.modifiable_user_data.display_alias = display_alias
+        user_services.update_multiple_users_data([self.modifiable_user_data])
+        self.modifiable_new_user_data.display_alias = display_alias_2
+        self.modifiable_new_user_data.pin = profile_pin
+
+        user_services.create_new_profiles(
+            gae_id, user_email, [self.modifiable_new_user_data])
+        profile_user_id = (
+            user_services.get_all_profiles_auth_details_by_parent_user_id(
+                user_id)[0].user_id
+        )
+        self.assertEqual(
+            user_services.get_user_role_from_id(profile_user_id),
+            feconf.ROLE_ID_LEARNER)
+        error_msg = 'The role of a Learner cannot be changed.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            user_services.update_user_role(
+                profile_user_id, feconf.ROLE_ID_EXPLORATION_EDITOR)
+
+    def test_update_user_role_from_other_role_to_learner_raises_exception(self):
+        gae_id = 'test_id'
+        user_email = 'test@email.com'
+
+        user_id = user_services.create_new_user(gae_id, user_email).user_id
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_EXPLORATION_EDITOR)
+        error_msg = 'Updating to a Learner role is not allowed.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            user_services.update_user_role(
+                user_id, feconf.ROLE_ID_LEARNER)
+
+    def test_create_new_user_also_creates_a_new_user_auth_details_entry(self):
         new_gae_id = 'new_gae_id'
         new_email = 'new@example.com'
 
@@ -587,6 +709,334 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_auth_details = user_models.UserAuthDetailsModel.get_by_id(
             user_settings.user_id)
         self.assertEqual(user_auth_details.gae_id, user_settings.gae_id)
+
+    def test_get_auth_details_by_user_id_for_existing_user_works_fine(self):
+        gae_id = 'new_gae_id'
+        email = 'new@example.com'
+        user_services.create_new_user(gae_id, email)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, gae_id)
+        )
+        user_auth_details = user_services.get_auth_details_by_user_id(
+            user_auth_details_model.id)
+        self.assertEqual(
+            user_auth_details.user_id, user_auth_details_model.id)
+        self.assertEqual(
+            user_auth_details.gae_id, user_auth_details_model.gae_id)
+        self.assertEqual(
+            user_auth_details.parent_user_id,
+            user_auth_details_model.parent_user_id
+        )
+
+    def test_get_auth_details_by_user_id_non_existing_user_returns_none(self):
+        non_existent_user_id = 'id_x'
+        self.assertIsNone(
+            user_services.get_auth_details_by_user_id(non_existent_user_id))
+
+    def test_get_auth_details_by_user_id_strict_non_existing_user_error(self):
+        non_existent_user_id = 'id_x'
+        error_msg = 'User not found'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            user_services.get_auth_details_by_user_id(
+                non_existent_user_id, strict=True)
+
+    def test_get_auth_details_by_gae_id_non_existing_user_returns_none(self):
+        non_existent_user_id = 'id_x'
+        self.assertIsNone(
+            user_services.get_auth_details_by_user_id(non_existent_user_id))
+
+    def test_create_new_profile_with_parent_user_pin_set_is_success(self):
+        gae_id = 'gae_id'
+        email = 'new@example.com'
+        display_alias = 'display_alias'
+        display_alias_2 = 'display_alias2'
+        user_pin = '12345'
+        profile_pin = '123'
+        user_services.create_new_user(gae_id, email)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, gae_id)
+        )
+        user_id = user_auth_details_model.id
+        self.modifiable_user_data.user_id = user_id
+        self.modifiable_user_data.pin = user_pin
+        self.modifiable_user_data.display_alias = display_alias
+        user_services.update_multiple_users_data([self.modifiable_user_data])
+        self.modifiable_new_user_data.display_alias = display_alias_2
+        self.modifiable_new_user_data.pin = profile_pin
+        user_services.create_new_profiles(
+            gae_id, email, [self.modifiable_new_user_data]
+        )
+
+        user_auth_details_models = (
+            user_services.get_all_profiles_auth_details_by_parent_user_id(
+                user_id)
+        )
+        self.assertEqual(len(user_auth_details_models), 1)
+        self.assertEqual(user_auth_details_models[0].parent_user_id, user_id)
+        self.assertIsNone(user_auth_details_models[0].gae_id)
+
+    def test_create_new_profile_with_parent_user_pin_not_set_raises_error(self):
+        gae_id = 'gae_id'
+        email = 'new@example.com'
+        display_alias = 'display_alias'
+        profile_pin = '123'
+        user_services.create_new_user(gae_id, email)
+        error_msg = 'Pin must be set for a full user before creating a profile.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            self.modifiable_new_user_data.display_alias = display_alias
+            self.modifiable_new_user_data.pin = profile_pin
+            user_services.create_new_profiles(
+                gae_id, email, [self.modifiable_new_user_data])
+
+    def test_create_multiple_new_profiles_for_same_user_works_correctly(self):
+        schema_version = 1
+        gae_id = 'gae_id'
+        email = 'new@example.com'
+        display_alias = 'display_alias'
+        display_alias_2 = 'display_alias2'
+        display_alias_3 = 'display_alias3'
+        user_pin = '12345'
+        profile_pin = '123'
+        user_services.create_new_user(gae_id, email)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, gae_id)
+        )
+        user_id = user_auth_details_model.id
+        self.modifiable_user_data.user_id = user_id
+        self.modifiable_user_data.pin = user_pin
+        self.modifiable_user_data.display_alias = display_alias
+        user_services.update_multiple_users_data([self.modifiable_user_data])
+        self.modifiable_new_user_data.display_alias = display_alias_2
+        self.modifiable_new_user_data.pin = profile_pin
+        modifiable_new_user_data_2 = user_domain.ModifiableUserData(
+            display_alias_3, None, [constants.DEFAULT_LANGUAGE_CODE],
+            None, None, schema_version
+        )
+        user_settings_list = user_services.create_new_profiles(
+            gae_id, email, [
+                self.modifiable_new_user_data, modifiable_new_user_data_2
+            ]
+        )
+        profile_1_id = user_settings_list[0].user_id
+        profile_2_id = user_settings_list[1].user_id
+
+        user_auth_details_models = [
+            {
+                'id': model.id,
+                'gae_id': model.gae_id,
+                'parent_user_id': model.parent_user_id
+            } for model in
+            user_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
+                user_id)
+        ]
+
+        expected_user_auth_output = [
+            {
+                'id': profile_1_id,
+                'gae_id': None,
+                'parent_user_id': user_id
+            },
+            {
+                'id': profile_2_id,
+                'gae_id': None,
+                'parent_user_id': user_id
+            }
+        ]
+        self.assertItemsEqual(
+            user_auth_details_models, expected_user_auth_output)
+
+        user_settings_models = [
+            {
+                'id': model.id,
+                'display_alias': model.display_alias,
+                'pin': model.pin,
+                'role': model.role
+            } for model in
+            user_models.UserSettingsModel.get_multi(
+                [profile_1_id, profile_2_id])
+        ]
+
+        expected_user_settings_output = [
+            {
+                'id': profile_1_id,
+                'display_alias': display_alias_2,
+                'pin': profile_pin,
+                'role': feconf.ROLE_ID_LEARNER
+            },
+            {
+                'id': profile_2_id,
+                'display_alias': display_alias_3,
+                'pin': None,
+                'role': feconf.ROLE_ID_LEARNER
+            }
+        ]
+        self.assertItemsEqual(
+            user_settings_models, expected_user_settings_output)
+
+    def test_create_new_profile_with_nonexistent_user_raises_error(self):
+        non_existent_gae_id = 'gae_id_x'
+        non_existent_email = 'x@example.com'
+        profile_pin = '123'
+        display_alias = 'display_alias'
+        error_msg = 'User not found.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            self.modifiable_new_user_data.display_alias = display_alias
+            self.modifiable_new_user_data.pin = profile_pin
+            user_services.create_new_profiles(
+                non_existent_gae_id, non_existent_email,
+                [self.modifiable_new_user_data]
+            )
+
+    def test_create_new_profile_modifiable_user_with_user_id_raises_error(self):
+        gae_id = 'gae_id'
+        email = 'new@example.com'
+        display_alias = 'display_alias'
+        display_alias_2 = 'display_alias2'
+        user_pin = '12345'
+        profile_pin = '123'
+        user_services.create_new_user(gae_id, email)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, gae_id)
+        )
+        user_id = user_auth_details_model.id
+        self.modifiable_user_data.user_id = user_id
+        self.modifiable_user_data.pin = user_pin
+        self.modifiable_user_data.display_alias = display_alias
+        user_services.update_multiple_users_data([self.modifiable_user_data])
+        error_msg = 'User id cannot already exist for a new user.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            self.modifiable_new_user_data.display_alias = display_alias_2
+            self.modifiable_new_user_data.pin = profile_pin
+            self.modifiable_new_user_data.user_id = 'user_id'
+            user_services.create_new_profiles(
+                gae_id, email, [self.modifiable_new_user_data]
+            )
+
+    def test_update_users_modifiable_object_user_id_not_set_raises_error(self):
+        gae_id = 'gae_id'
+        email = 'new@example.com'
+        display_alias = 'display_alias2'
+        user_pin = '12345'
+        user_services.create_new_user(gae_id, email)
+        self.modifiable_user_data.user_id = None
+        self.modifiable_user_data.pin = user_pin
+        self.modifiable_user_data.display_alias = display_alias
+
+        error_msg = 'Missing user ID.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            user_services.update_multiple_users_data(
+                [self.modifiable_user_data])
+
+    def test_update_users_for_user_with_non_existent_id_raises_error(self):
+        gae_id = 'gae_id'
+        non_existent_user_id = 'id_x'
+        email = 'new@example.com'
+        display_alias = 'display_alias2'
+        user_pin = '12345'
+        user_services.create_new_user(gae_id, email)
+        self.modifiable_user_data.user_id = non_existent_user_id
+        self.modifiable_user_data.pin = user_pin
+        self.modifiable_user_data.display_alias = display_alias
+
+        error_msg = 'User not found.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            user_services.update_multiple_users_data(
+                [self.modifiable_user_data])
+
+    def test_update_users_data_for_multiple_users_works_correctly(self):
+        # Preparing for the test.
+        schema_version = 1
+        gae_id = 'gae_id'
+        email = 'new@example.com'
+        display_alias = 'display_alias'
+        display_alias_2 = 'display_alias2'
+        display_alias_3 = 'display_alias3'
+        user_pin = '12345'
+        profile_pin = '123'
+        user_services.create_new_user(gae_id, email)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, gae_id)
+        )
+        user_id = user_auth_details_model.id
+        self.modifiable_user_data.user_id = user_id
+        self.modifiable_user_data.pin = user_pin
+        self.modifiable_user_data.display_alias = display_alias
+        user_services.update_multiple_users_data([self.modifiable_user_data])
+        self.modifiable_new_user_data.display_alias = display_alias_2
+        self.modifiable_new_user_data.pin = profile_pin
+        modifiable_new_user_data_2 = user_domain.ModifiableUserData(
+            display_alias_3, None, [constants.DEFAULT_LANGUAGE_CODE],
+            None, None, schema_version
+        )
+        user_settings_list = user_services.create_new_profiles(
+            gae_id, email, [
+                self.modifiable_new_user_data, modifiable_new_user_data_2
+            ]
+        )
+        profile_user_ids = [
+            user_settings_list[0].user_id, user_settings_list[1].user_id]
+        self.modifiable_new_user_data.user_id = profile_user_ids[0]
+        modifiable_new_user_data_2.user_id = profile_user_ids[1]
+
+        # Performing the actual action.
+        modifiable_new_user_data_2.pin = '345'
+        self.modifiable_new_user_data.display_alias = 'xyz'
+        user_services.update_multiple_users_data(
+            [self.modifiable_new_user_data, modifiable_new_user_data_2])
+
+        # Post-checking.
+        user_auth_details_models = [
+            {
+                'id': model.id,
+                'gae_id': model.gae_id,
+                'parent_user_id': model.parent_user_id
+            } for model in
+            user_models.UserAuthDetailsModel.get_multi(profile_user_ids)
+        ]
+
+        expected_auth_details_output = [
+            {
+                'id': profile_user_ids[0],
+                'gae_id': None,
+                'parent_user_id': user_id
+            },
+            {
+                'id': profile_user_ids[1],
+                'gae_id': None,
+                'parent_user_id': user_id
+            }
+        ]
+        self.assertItemsEqual(
+            expected_auth_details_output, user_auth_details_models)
+
+        user_settings_models = [
+            {
+                'id': model.id,
+                'display_alias': model.display_alias,
+                'pin': model.pin
+            } for model in
+            user_models.UserSettingsModel.get_multi(profile_user_ids)
+        ]
+
+        expected_user_settings_output = [
+            {
+                'id': profile_user_ids[0],
+                'display_alias': 'xyz',
+                'pin': profile_pin
+            },
+            {
+                'id': profile_user_ids[1],
+                'display_alias': display_alias_3,
+                'pin': '345'
+            }
+        ]
+        self.assertItemsEqual(
+            expected_user_settings_output, user_settings_models)
 
     def test_mark_user_for_deletion_deletes_user_settings(self):
         gae_id = 'test_id'
@@ -1327,15 +1777,24 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings = user_services.get_user_settings(self.owner_id)
         self.user_settings.validate()
         self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
+        schema_version = 1
+        self.modifiable_user_data = user_domain.ModifiableUserData(
+            'display_alias', '12345', [constants.DEFAULT_LANGUAGE_CODE],
+            None, None, schema_version, 'user_id'
+        )
+        self.modifiable_new_user_data = user_domain.ModifiableUserData(
+            'display_alias3', '12345', [constants.DEFAULT_LANGUAGE_CODE],
+            None, None, schema_version
+        )
 
-    def test_validate_non_str_user_id(self):
+    def test_validate_non_str_user_id_raises_exception(self):
         self.user_settings.user_id = 0
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected user_id to be a string'
         ):
             self.user_settings.validate()
 
-    def test_validate_user_id(self):
+    def test_validate_wrong_format_user_id_raises_exception(self):
         self.user_settings.user_id = 'uid_%sA' % ('a' * 31)
         with self.assertRaisesRegexp(
             utils.ValidationError, 'The user ID is in a wrong format.'
@@ -1354,7 +1813,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    def test_validate_non_str_gae_id(self):
+    def test_validate_non_str_gae_id_raises_exception(self):
         self.user_settings.gae_id = 0
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected gae_id to be a string'
@@ -1397,27 +1856,34 @@ class UserSettingsTests(test_utils.GenericTestBase):
                 self.user_settings.pin = pin
                 self.user_settings.validate()
 
-    def test_validate_empty_user_id(self):
+    def test_validate_empty_user_id_raises_exception(self):
         self.user_settings.user_id = ''
         with self.assertRaisesRegexp(
             utils.ValidationError, 'No user id specified.'
         ):
             self.user_settings.validate()
 
-    def test_validate_non_str_role(self):
+    def test_validate_non_str_role_raises_exception(self):
         self.user_settings.role = 0
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected role to be a string'
         ):
             self.user_settings.validate()
 
-    def test_validate_role(self):
+    def test_validate_invalid_role_name_raises_exception(self):
         self.user_settings.role = 'invalid_role'
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Role invalid_role does not exist.'):
             self.user_settings.validate()
 
-    def test_validate_non_str_creator_dashboard_display_pref(self):
+    def test_validate_non_str_display_alias_raises_error(self):
+        self.user_settings.display_alias = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected display_alias to be a string,'
+            ' received %s' % self.user_settings.display_alias):
+            self.user_settings.validate()
+
+    def test_validate_non_str_creator_dashboard_display_pref_raises_error(self):
         self.user_settings.creator_dashboard_display_pref = 0
         with self.assertRaisesRegexp(
             utils.ValidationError,
@@ -1425,7 +1891,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    def test_validate_creator_dashboard_display_pref(self):
+    def test_validate_invalid_creator_dashboard_display_pref_raises_error(self):
         self.user_settings.creator_dashboard_display_pref = (
             'invalid_creator_dashboard_display_pref')
         with self.assertRaisesRegexp(
@@ -1435,7 +1901,23 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    def test_guest_has_not_fully_registered(self):
+    def test_validate_empty_display_alias_for_profiles_raises_error(self):
+        self.modifiable_user_data.user_id = self.owner_id
+        self.modifiable_user_data.pin = '12345'
+        self.modifiable_user_data.display_alias = 'temp_name'
+        user_services.update_multiple_users_data([self.modifiable_user_data])
+
+        gae_id = self.get_gae_id_from_email(self.OWNER_EMAIL)
+        profile_pin = '123'
+        error_msg = 'Expected display_alias to be a string, received'
+        with self.assertRaisesRegexp(utils.ValidationError, error_msg):
+            self.modifiable_new_user_data.display_alias = ''
+            self.modifiable_new_user_data.pin = profile_pin
+            user_services.create_new_profiles(
+                gae_id, self.OWNER_EMAIL, [self.modifiable_new_user_data]
+            )
+
+    def test_has_not_fully_registered_for_guest_user_is_false(self):
         self.assertFalse(user_services.has_fully_registered_account(None))
 
     def test_create_new_user_with_existing_gae_id_raises_error(self):
@@ -1729,7 +2211,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.signup(
             self.QUESTION_REVIEWER_EMAIL, self.QUESTION_REVIEWER_USERNAME)
         self.question_reviewer_id = (
-            self.get_user_id_from_email(self.TRANSLATOR_EMAIL))
+            self.get_user_id_from_email(self.QUESTION_REVIEWER_EMAIL))
 
     def test_assign_user_review_translation_suggestion_in_language(self):
         self.assertFalse(
@@ -1798,8 +2280,57 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.assertTrue(
             user_services.can_review_question_suggestions(self.voice_artist_id))
 
-    def test_get_all_contribution_reviewers(self):
-        self.assertEqual(user_services.get_all_contribution_reviewers(), [])
+    def test_get_users_contribution_rights_with_multiple_reviewer_user_ids(
+            self):
+        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'en')
+        expected_reviewer_ids = [self.question_reviewer_id, self.translator_id]
+
+        users_contribution_rights = (
+            user_services.get_users_contribution_rights(expected_reviewer_ids)
+        )
+
+        reviewer_ids = [
+            user_contribution_rights.id for user_contribution_rights in
+            users_contribution_rights
+        ]
+        self.assertEqual(len(users_contribution_rights), 2)
+        self.assertItemsEqual(reviewer_ids, expected_reviewer_ids)
+
+    def test_get_users_contribution_rights_with_one_reviewer_user_id(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'en')
+
+        users_contribution_rights = (
+            user_services.get_users_contribution_rights([self.translator_id])
+        )
+
+        self.assertEqual(len(users_contribution_rights), 1)
+        self.assertEqual(users_contribution_rights[0].id, self.translator_id)
+        self.assertEqual(
+            (
+                users_contribution_rights[0]
+                .can_review_translation_for_language_codes
+            ), ['en', 'hi']
+        )
+
+    def test_get_users_contribution_rights_returns_empty_for_no_reviewers_ids(
+            self):
+        users_contribution_rights = (
+            user_services.get_users_contribution_rights([])
+        )
+
+        self.assertEqual(len(users_contribution_rights), 0)
+
+    def test_get_all_reviewers_contribution_rights(self):
+        self.assertEqual(
+            user_services.get_all_reviewers_contribution_rights(), [])
 
         user_services.allow_user_to_review_voiceover_in_language(
             self.voice_artist_id, 'hi')
@@ -1807,10 +2338,75 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.translator_id, 'hi')
 
-        all_reviewers = user_services.get_all_contribution_reviewers()
+        all_reviewers = user_services.get_all_reviewers_contribution_rights()
         self.assertItemsEqual(
             [reviewer.id for reviewer in all_reviewers],
             [self.voice_artist_id, self.translator_id])
+
+    def test_get_reviewer_user_ids_to_notify_when_reviewers_want_notifications(
+            self):
+        # Assert that there are no reviewers at the start.
+        self.assertEqual(
+            user_services.get_all_reviewers_contribution_rights(), [])
+        # Add a question reviewer and a translation reviewer.
+        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'hi')
+        # Ensure that these reviewers want email updates.
+        user_services.update_email_preferences(
+            self.question_reviewer_id, True,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+        user_services.update_email_preferences(
+            self.translator_id, True,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+
+        reviewer_ids_to_notify = (
+            user_services.get_reviewer_user_ids_to_notify())
+
+        self.assertEqual(len(reviewer_ids_to_notify), 2)
+        self.assertIn(self.question_reviewer_id, reviewer_ids_to_notify)
+        self.assertIn(self.translator_id, reviewer_ids_to_notify)
+
+    def test_get_reviewer_user_ids_to_notify_when_reviewers_do_not_want_emails(
+            self):
+        # Assert that there are no reviewers at the start.
+        self.assertEqual(
+            user_services.get_all_reviewers_contribution_rights(), [])
+        # Add a question reviewer and a translation reviewer.
+        user_services.allow_user_to_review_question(self.question_reviewer_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.translator_id, 'hi')
+        # Ensure that these reviewers do not want email updates.
+        user_services.update_email_preferences(
+            self.question_reviewer_id, False,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+        user_services.update_email_preferences(
+            self.translator_id, False,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+
+        reviewer_ids_to_notify = (
+            user_services.get_reviewer_user_ids_to_notify())
+
+        self.assertEqual(len(reviewer_ids_to_notify), 0)
+
+    def test_get_reviewer_user_ids_to_notify_returns_empty_for_no_reviewers(
+            self):
+        # Assert that there are no reviewers.
+        self.assertEqual(
+            user_services.get_all_reviewers_contribution_rights(), [])
+
+        reviewer_ids_to_notify = (
+            user_services.get_reviewer_user_ids_to_notify())
+
+        self.assertEqual(len(reviewer_ids_to_notify), 0)
 
     def test_remove_translation_review_rights_in_language(self):
         user_services.allow_user_to_review_translation_in_language(

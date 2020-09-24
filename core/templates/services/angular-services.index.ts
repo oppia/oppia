@@ -150,13 +150,14 @@ import { WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFact
 import { AssignedSkillObjectFactory } from 'domain/skill/assigned-skill-object.factory';
 import { AugmentedSkillSummaryObjectFactory } from 'domain/skill/augmented-skill-summary-object.factory';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
+import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillCreationBackendApiService } from 'domain/skill/skill-creation-backend-api.service';
 import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backend-api.service';
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service.ts';
 import { SkillSummaryObjectFactory } from 'domain/skill/skill-summary-object.factory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
-import { ExplorationStatsObjectFactory, ExplorationStats } from 'domain/statistics/ExplorationStatsObjectFactory';
+import { ExplorationStatsObjectFactory } from 'domain/statistics/ExplorationStatsObjectFactory';
 import { LearnerActionObjectFactory } from 'domain/statistics/LearnerActionObjectFactory';
 import { LearnerAnswerDetailsObjectFactory } from 'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerAnswerInfoObjectFactory } from 'domain/statistics/LearnerAnswerInfoObjectFactory';
@@ -206,6 +207,7 @@ import { StopwatchObjectFactory } from 'domain/utilities/StopwatchObjectFactory'
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ExpressionEvaluatorService } from 'expressions/expression-evaluator.service';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExpressionSyntaxTreeService } from 'expressions/expression-syntax-tree.service';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
@@ -349,6 +351,7 @@ import { StateInteractionStatsService } from 'services/state-interaction-stats.s
 import { StateTopAnswersStatsBackendApiService } from 'services/state-top-answers-stats-backend-api.service';
 import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionsService } from 'services/suggestions.service';
 import { TranslateService } from 'services/translate.service';
@@ -466,11 +469,11 @@ export const angularServices: [string, unknown][] = [
   ['ExplorationRecommendationsBackendApiService',
     ExplorationRecommendationsBackendApiService],
   ['ExplorationRecommendationsService', ExplorationRecommendationsService],
-  ['ExplorationStats', ExplorationStats],
   ['ExplorationStatsBackendApiService', ExplorationStatsBackendApiService],
   ['ExplorationStatsObjectFactory', ExplorationStatsObjectFactory],
   ['ExplorationStatsService', ExplorationStatsService],
   ['ExplorationTaskObjectFactory', ExplorationTaskObjectFactory],
+  ['ExpressionEvaluatorService', ExpressionEvaluatorService],
   ['ExpressionParserService', ExpressionParserService],
   ['ExpressionSyntaxTreeService', ExpressionSyntaxTreeService],
   ['ExtensionTagAssemblerService', ExtensionTagAssemblerService],
@@ -485,6 +488,7 @@ export const angularServices: [string, unknown][] = [
   ['FeedbackThreadObjectFactory', FeedbackThreadObjectFactory],
   ['FeedbackThreadSummaryObjectFactory', FeedbackThreadSummaryObjectFactory],
   ['FileDownloadRequestObjectFactory', FileDownloadRequestObjectFactory],
+  ['FocusManagerService', FocusManagerService],
   ['FormatTimePipe', FormatTimePipe],
   ['FractionInputRulesService', FractionInputRulesService],
   ['FractionInputValidationService', FractionInputValidationService],
@@ -637,6 +641,7 @@ export const angularServices: [string, unknown][] = [
   ['ShortSkillSummaryObjectFactory', ShortSkillSummaryObjectFactory],
   ['SidebarStatusService', SidebarStatusService],
   ['SiteAnalyticsService', SiteAnalyticsService],
+  ['SkillBackendApiService', SkillBackendApiService],
   ['SkillCreationBackendApiService', SkillCreationBackendApiService],
   ['SkillDifficultyObjectFactory', SkillDifficultyObjectFactory],
   ['SkillMasteryBackendApiService', SkillMasteryBackendApiService],
