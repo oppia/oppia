@@ -3274,13 +3274,13 @@ class CommunityContributionStatsModelValidator(
             item: ndb.Model. CommunityContributionStatsModel to validate.
         """
         expected_question_reviewer_count = (
-            user_models.UserContributionRightsModel.query(
-                (
-                    user_models.UserContributionRightsModel
-                    .can_review_questions
+            user_models.UserContributionRightsModel.query( # pylint: disable=singleton-comparison
+                ( # pylint: disable=singleton-comparison
+                    user_models.UserContributionRightsModel # pylint: disable=singleton-comparison
+                    .can_review_questions # pylint: disable=singleton-comparison
                 ) == True) # pylint: disable=singleton-comparison
-            .count()
-        )
+            .count() # pylint: disable=singleton-comparison
+        ) # pylint: disable=singleton-comparison
         if item.question_reviewer_count != expected_question_reviewer_count:
             cls._add_error(
                 'question reviewer %s' % (
