@@ -81,6 +81,12 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             r'derived class. It should be implemented in the derived class.'):
             base_models.BaseModel.export_data('user_id')
 
+    def test_get_lowest_supported_role_is_exploration_editor(self):
+        self.assertEqual(
+            base_models.BaseModel.get_lowest_supported_role(),
+            feconf.ROLE_ID_EXPLORATION_EDITOR
+        )
+
     def test_generic_query_put_get_and_delete_operations(self):
         model = base_models.BaseModel()
 
@@ -332,7 +338,7 @@ class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
 
 class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
 
-    def test_exists_for_user_id(self):
+    def test_has_reference_to_user_id(self):
         model1 = base_models.BaseSnapshotMetadataModel(
             id='model_id-1',
             committer_id='committer_id',
@@ -343,22 +349,22 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
         model1.put()
         self.assertTrue(
             base_models.BaseSnapshotMetadataModel
-            .exists_for_user_id('committer_id'))
+            .has_reference_to_user_id('committer_id'))
         self.assertTrue(
             base_models.BaseSnapshotMetadataModel
-            .exists_for_user_id('commit_cmds_user_1_id'))
+            .has_reference_to_user_id('commit_cmds_user_1_id'))
         self.assertTrue(
             base_models.BaseSnapshotMetadataModel
-            .exists_for_user_id('commit_cmds_user_2_id'))
+            .has_reference_to_user_id('commit_cmds_user_2_id'))
         self.assertTrue(
             base_models.BaseSnapshotMetadataModel
-            .exists_for_user_id('content_user_1_id'))
+            .has_reference_to_user_id('content_user_1_id'))
         self.assertTrue(
             base_models.BaseSnapshotMetadataModel
-            .exists_for_user_id('content_user_2_id'))
+            .has_reference_to_user_id('content_user_2_id'))
         self.assertFalse(
             base_models.BaseSnapshotMetadataModel
-            .exists_for_user_id('x_id'))
+            .has_reference_to_user_id('x_id'))
 
     def test_get_version_string(self):
         model1 = base_models.BaseSnapshotMetadataModel(

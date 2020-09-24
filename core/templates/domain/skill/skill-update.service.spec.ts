@@ -385,7 +385,7 @@ describe('Skill update service', function() {
       workedExampleObjectFactory.createFromBackendDict(example2)]);
   });
 
-  it('shoud delete a worked example', function() {
+  it('should delete a worked example', function() {
     var skill = SkillObjectFactory.createFromBackendDict(skillDict);
     var example1 = {
       question: {

@@ -7,7 +7,7 @@ backports.functools-lru-cache==1.6.1
 beautifulSoup4==4.9.1
 bleach==3.1.5
 callbacks==0.3.0
-future==0.17.1
+future==0.18.2
 GoogleAppEngineCloudStorageClient==1.9.22.1
 GoogleAppEngineMapReduce==1.9.22.0
 GoogleAppEnginePipeline==1.9.22.1
@@ -21,3 +21,4 @@ six==1.15.0
 soupsieve==1.9.5
 webencodings==0.5.1
 redis==3.5.3
+webapp2==3.0.0b1
