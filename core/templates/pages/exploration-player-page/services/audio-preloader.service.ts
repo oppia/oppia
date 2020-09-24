@@ -93,13 +93,18 @@ export class AudioPreloaderService {
   private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
     const languageCode = (
       this.audioTranslationLanguageService.getCurrentAudioLanguageCode());
+    const allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
     const bfsTraversalOfStates = (
       this.computeGraphService.computeBfsTraversalOfStates(
         this.exploration.getInitialState().name, this.exploration.getStates(),
         sourceStateName));
-    return bfsTraversalOfStates.map(stateName => {
-      return this.exploration.getVoiceover(stateName, languageCode).filename;
-    });
+    const audioFilenamesInBfsOrder = [];
+    for (const stateName of bfsTraversalOfStates) {
+      for (const voiceover of allVoiceovers[stateName]) {
+        audioFilenamesInBfsOrder.push(voiceover.filename);
+      }
+    }
+    return audioFilenamesInBfsOrder;
   }
 
   private loadAudio(audioFilename: string): void {
