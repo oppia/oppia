@@ -35,6 +35,9 @@ var login = async function(email, isSuperAdmin = false) {
   await (await driver.findElement(protractor.By.name('email'))).sendKeys(email);
   if (isSuperAdmin) {
     await (await driver.findElement(protractor.By.name('admin'))).click();
+    let adminCheckboxStatus = await driver.findElement(
+      protractor.By.name('admin')).getAttribute('checked');
+    expect(adminCheckboxStatus).toBeTruthy();
   }
   await (await driver.findElement(protractor.By.id('submit-login'))).click();
   // The statement below uses a browser.wait() to determine if the user has
