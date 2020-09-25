@@ -493,12 +493,12 @@ class UtilsTests(test_utils.GenericTestBase):
         os.environ['SERVER_SOFTWARE'] = 'Google App Engine/'
         self.assertTrue(utils.is_appengine_cloud_environment())
 
-        if saved_appengine_runtime:
+        if saved_appengine_runtime is not None:
             os.environ['SERVER_SOFTWARE'] = saved_appengine_runtime
         else:
             del os.environ['SERVER_SOFTWARE']
 
-        if saved_server_software:
+        if saved_server_software is not None:
             os.environ['SERVER_SOFTWARE'] = saved_server_software
         else:
             del os.environ['SERVER_SOFTWARE']
