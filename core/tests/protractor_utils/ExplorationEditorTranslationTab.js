@@ -381,6 +381,7 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this._isAudioPlaying = async function() {
+    await waitFor.visibilityOf(audioMaterialSliderDiv);
     var firstValue = await audioMaterialSliderDiv.getAttribute(
       'aria-valuenow');
     try {
