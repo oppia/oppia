@@ -62,6 +62,15 @@ angular.module('oppia').directive('inputResponsePair', [
               'answer-popup-container.template.html');
           };
 
+          $scope.isVideoRteElementPresentInResponse = function() {
+            if (
+              $scope.data.oppiaResponse.includes(
+                'oppia-noninteractive-video')) {
+              return true;
+            }
+            return false;
+          };
+
           $scope.isCurrentCardAtEndOfTranscript = function() {
             return PlayerTranscriptService.isLastCard(
               PlayerPositionService.getDisplayedCardIndex());
