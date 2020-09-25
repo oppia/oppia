@@ -74,11 +74,9 @@
 # Answer classification team.
 /core/controllers/classifier*.py @prasanna08
 /core/domain/classifier*.py @prasanna08
-/core/domain/proto/ @prasanna08
 /core/storage/classifier/ @prasanna08
 /core/templates/domain/classifier/ @prasanna08
 /extensions/classifiers/ @prasanna08
-/prototool.yaml @prasanna08
 
 
 # Audio and Translation team.
@@ -476,6 +474,7 @@
 /core/templates/services/translation-file-hash-loader.service.ts @nithusha21
 /redis.conf @seanlip
 /release_constants.py @ankita240796 @nithusha21 @DubeySandeep
+/release_constants.json @ankita240796 @nithusha21 @DubeySandeep
 
 
 # Miscellaneous.

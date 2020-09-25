@@ -39,6 +39,8 @@ export const QuestionDomainConstants = {
 
   QUESTION_PROPERTY_LANGUAGE_CODE: 'language_code',
   QUESTION_PROPERTY_QUESTION_STATE_DATA: 'question_state_data',
+  QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS: (
+    'inapplicable_skill_misconception_ids'),
 
   CMD_UPDATE_QUESTION_PROPERTY: 'update_question_property',
 } as const;
