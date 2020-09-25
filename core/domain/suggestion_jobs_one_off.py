@@ -320,12 +320,12 @@ class PopulateCommunityContributionStatsOneOffJob(
             community_contribution_stats.validate()
         except Exception as e:
             logging.error(
-                'Reviewer and suggestion counts failed validation: %s' % e
+                'Community contribution stats failed validation: %s' % e
             )
             yield (
                 PopulateCommunityContributionStatsOneOffJob
                 ._VALIDATION_ERROR_KEY,
-                'Reviewer and suggestion counts failed validation: %s' % e
+                'Community contribution stats failed validation: %s' % e
             )
             return
         suggestion_services.update_community_contribution_stats(

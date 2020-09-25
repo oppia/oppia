@@ -2285,7 +2285,6 @@ class PopulateCommunityContributionStatsOneOffJobTests(
         self._assert_community_contribution_stats_is_in_default_state()
         expected_output = []
 
-        # Mark the user contribution rights model deleted.
         user_contribution_rights_model = (
             user_models.UserContributionRightsModel.get_by_id(
                 self.reviewer_1_id)
@@ -2324,7 +2323,7 @@ class PopulateCommunityContributionStatsOneOffJobTests(
 
     def test_no_action_is_performed_for_rejected_suggestions(self):
         question_suggestion = self._create_question_suggestion_with_skill_id(
-            'skill_2'
+            'skill_1'
         )
         self._assert_community_contribution_stats_is_in_default_state()
         expected_output = []
@@ -2361,7 +2360,6 @@ class PopulateCommunityContributionStatsOneOffJobTests(
             self.sample_language_code)
         self._create_translation_suggestion_with_language_code(
             self.sample_language_code)
-
         self._assert_community_contribution_stats_is_in_default_state()
         expected_output = [
             '[u\'suggestion_translate_content_%s\', 2]' % (
@@ -2378,8 +2376,7 @@ class PopulateCommunityContributionStatsOneOffJobTests(
                 community_contribution_stats
                 .translation_suggestion_counts_by_lang_code[
                     self.sample_language_code]
-            ), 2
-        )
+            ), 2)
 
     def test_job_updates_counts_for_translation_suggestions_in_diff_lang_code(
             self):
@@ -2399,14 +2396,12 @@ class PopulateCommunityContributionStatsOneOffJobTests(
             (
                 community_contribution_stats
                 .translation_suggestion_counts_by_lang_code['hi']
-            ), 1
-        )
+            ), 1)
         self.assertEqual(
             (
                 community_contribution_stats
                 .translation_suggestion_counts_by_lang_code['en']
-            ), 1
-        )
+            ), 1)
 
     def test_job_updates_counts_for_translation_reviewers_in_same_lang_code(
             self):
@@ -2429,8 +2424,7 @@ class PopulateCommunityContributionStatsOneOffJobTests(
                 community_contribution_stats
                 .translation_reviewer_counts_by_lang_code[
                     self.sample_language_code]
-            ), 2
-        )
+            ), 2)
 
     def test_job_updates_counts_for_translation_reviewers_in_diff_lang_code(
             self):
@@ -2453,14 +2447,12 @@ class PopulateCommunityContributionStatsOneOffJobTests(
             (
                 community_contribution_stats
                 .translation_reviewer_counts_by_lang_code['hi']
-            ), 1
-        )
+            ), 1)
         self.assertEqual(
             (
                 community_contribution_stats
                 .translation_reviewer_counts_by_lang_code['en']
-            ), 1
-        )
+            ), 1)
 
     def test_job_updates_question_suggestion_count(self):
         self._create_question_suggestion_with_skill_id('skill_1')
@@ -2490,8 +2482,7 @@ class PopulateCommunityContributionStatsOneOffJobTests(
             suggestion_services.get_community_contribution_stats()
         )
         self.assertEqual(
-            community_contribution_stats.question_reviewer_count, 2
-        )
+            community_contribution_stats.question_reviewer_count, 2)
 
     def test_job_updates_both_reviewer_and_suggestion_counts(self):
         # Create two question suggestions.
@@ -2527,35 +2518,29 @@ class PopulateCommunityContributionStatsOneOffJobTests(
             suggestion_services.get_community_contribution_stats()
         )
         self.assertEqual(
-            community_contribution_stats.question_suggestion_count, 2
-        )
+            community_contribution_stats.question_suggestion_count, 2)
         self.assertEqual(
             (
                 community_contribution_stats
                 .translation_suggestion_counts_by_lang_code['hi']
-            ), 1
-        )
+            ), 1)
         self.assertEqual(
             (
                 community_contribution_stats
                 .translation_suggestion_counts_by_lang_code['en']
-            ), 2
-        )
+            ), 2)
         self.assertEqual(
-            community_contribution_stats.question_reviewer_count, 2
-        )
+            community_contribution_stats.question_reviewer_count, 2)
         self.assertEqual(
             (
                 community_contribution_stats
                 .translation_reviewer_counts_by_lang_code['hi']
-            ), 2
-        )
+            ), 2)
         self.assertEqual(
             (
                 community_contribution_stats
                 .translation_reviewer_counts_by_lang_code['en']
-            ), 1
-        )
+            ), 1)
 
     def test_job_produces_validation_error_for_invalid_contribution_stats_model(
             self):
@@ -2564,9 +2549,9 @@ class PopulateCommunityContributionStatsOneOffJobTests(
         stats_model.question_suggestion_count = -1
         stats_model.put()
         expected_output = [
-            u'[u\'community_contribution_stats_validation_error\', u\'Reviewer '
-            'and suggestion counts failed validation: Expected the question '
-            'suggestion count to be non-negative, recieved: %s.\']' % (
+            u'[u\'community_contribution_stats_validation_error\', '
+            'u\'Community contribution stats failed validation: Expected the '
+            'question suggestion count to be non-negative, recieved: %s.\']' % (
                 stats_model.question_suggestion_count)
         ]
 
