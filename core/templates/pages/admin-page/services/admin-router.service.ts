@@ -25,11 +25,18 @@ import { AdminPageConstants } from
 @Injectable({
   providedIn: 'root'
 })
+
 export class AdminRouterService {
   currentTabHash: string = (
     AdminPageConstants.ADMIN_TAB_URLS.ACTIVITIES);
 
+  /**
+   * @param {string} tabHash tab url hash value.
+   * @returns {string|null} tab name corresponding to the hash value. If no match returns null.
+   */
   getTabNameByHash(tabHash: string): string | null {
+    // Iterates through the ADMIN_TAB_URLS map and returns the 
+    // tab name corresponding to the hash.
     for (const [tabName, tabUrl] of Object.entries(
       AdminPageConstants.ADMIN_TAB_URLS)) {
       if (tabUrl === tabHash) {
@@ -40,16 +47,17 @@ export class AdminRouterService {
   }
 
   /**
-   * Navigates the page to the specified tab based on its HTML hash.
+   * @param {string} tabHash tab url hash value.
    */
   showTab(tabHash: string): void {
+    // Navigates the page to the specified tab based on its HTML hash.
     if (this.getTabNameByHash(tabHash)) {
       this.currentTabHash = tabHash;
     }
   }
 
   /**
-   * Returns whether the activities tab is open.
+   * @returns {boolean} returns whether the activities tab is open.
    */
   isActivitiesTabOpen(): boolean {
     return this.currentTabHash === (
@@ -57,28 +65,28 @@ export class AdminRouterService {
   }
 
   /**
-   * Returns whether the jobs tab is open.
+   * @returns {boolean} returns whether the jobs tab is open.
    */
   isJobsTabOpen(): boolean {
     return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.JOBS;
   }
 
   /**
-   * Returns whether the config tab is open.
+   * @returns {boolean} returns whether the config tab is open.
    */
   isConfigTabOpen(): boolean {
     return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.CONFIG;
   }
 
   /**
-   * Returns whether the roles tab is open.
+   * @returns {boolean} returns whether the roles tab is open.
    */
   isRolesTabOpen(): boolean {
     return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.ROLES;
   }
 
   /**
-   * Returns whether the miscellaneous tab is open.
+   * @returns {boolean} returns whether the miscellaneous tab is open.
    */
   isMiscTabOpen(): boolean {
     return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.MISC;
