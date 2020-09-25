@@ -21,6 +21,7 @@ var general = require('../protractor_utils/general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var action = require('../protractor_utils/action.js');
 
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
@@ -40,9 +41,14 @@ describe('rich-text components', function() {
   });
 
   it('should display correctly', async function() {
+    /*
     await users.createUser(
       'user@richTextComponents.com', 'userRichTextComponents');
     await users.login('user@richTextComponents.com');
+    */
+
+    await users.createAndLoginUser(
+      'user@richTextComponents.com', 'userRichTextComponents');
 
     await workflow.createExploration();
 
@@ -146,8 +152,11 @@ describe('Interactions', function() {
         var confirmDeleteResponseButton = element(by.css(
           '.protractor-test-confirm-delete-response'));
         if (await deleteResponseButton.isPresent()) {
-          await deleteResponseButton.click();
-          await confirmDeleteResponseButton.click();
+          await action.click('Delete Response button', deleteResponseButton);
+          await action.click(
+            'Confirm Delete Response button', confirmDeleteResponseButton);
+          // await deleteResponseButton.click();
+          // await confirmDeleteResponseButton.click();
         }
 
         await explorationEditorMainTab.addResponse.apply(
@@ -179,9 +188,10 @@ describe('Interactions', function() {
         // Dismiss conversation help card.
         var clearHelpcardButton = element(by.css(
           '.protractor-test-close-help-card-button'));
-        var isPresent = await clearHelpcardButton.isPresent();
-        if (isPresent) {
-          await clearHelpcardButton.click();
+        // var isPresent = await clearHelpcardButton.isPresent();
+        if (await clearHelpcardButton.isPresent()) {
+          await action.click('Clear Help Card button', clearHelpcardButton);
+          // await clearHelpcardButton.click();
         }
 
         for (var j = 0; j < test.correctAnswers.length; j++) {

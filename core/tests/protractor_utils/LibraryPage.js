@@ -77,8 +77,8 @@ var LibraryPage = function() {
     var searchInput = (
       browser.isMobile ? await searchInputs.get(1) :
       await searchInputs.first());
-    await searchInput.clear();
-    await searchInput.sendKeys(searchQuery);
+    await action.clear('Search input', searchInput);
+    await action.sendKeys('Search input', searchInput, searchQuery);
     let searchButtonExists = await searchButton.isPresent();
     if (searchButtonExists) {
       await action.click('Search button', searchButton);

@@ -230,9 +230,13 @@ var ExplorationEditorPage = function() {
   };
 
   this.discardChanges = async function() {
-    await saveDiscardToggleButton.click();
-    await discardChangesButton.click();
-    await confirmDiscardChangesButton.click();
+    await action.click('Save Discard Toggle button', saveDiscardToggleButton);
+    // await saveDiscardToggleButton.click();
+    await action.click('Discard Changes button', discardChangesButton);
+    // await discardChangesButton.click();
+    await action.click(
+      'Confirm Discard Changes button', confirmDiscardChangesButton);
+    // await confirmDiscardChangesButton.click();
     await waitFor.invisibilityOf(
       loadingModal, 'Loading modal taking too long to disappear');
     await waitFor.invisibilityOfInfoToast(
