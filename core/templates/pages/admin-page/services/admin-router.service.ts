@@ -32,10 +32,10 @@ export class AdminRouterService {
 
   /**
    * @param {string} tabHash tab url hash value.
-   * @returns {string|null} tab name corresponding to the hash value. If no match returns null.
+   * @returns {string|null} tab name of the hash value. If no match returns null.
    */
   getTabNameByHash(tabHash: string): string | null {
-    // Iterates through the ADMIN_TAB_URLS map and returns the 
+    // Iterates through the ADMIN_TAB_URLS map and returns the
     // tab name corresponding to the hash.
     for (const [tabName, tabUrl] of Object.entries(
       AdminPageConstants.ADMIN_TAB_URLS)) {
