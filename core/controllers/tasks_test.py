@@ -37,7 +37,6 @@ import python_utils
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.suggestion])
 transaction_services = models.Registry.import_transaction_services()
-platform_taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class TasksTests(test_utils.EmailTestBase):

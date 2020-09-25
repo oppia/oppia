@@ -789,6 +789,7 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
             queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
         self.assertEqual(
             tasks[0].url, feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS)
+        self.assertDictEqual(tasks[0].payload['reference_dict'], reference_dict)
 
 
 class FeedbackMessageEmailTests(test_utils.EmailTestBase):

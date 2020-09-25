@@ -266,7 +266,7 @@ class _Gae(Platform):
         Returns:
             module. The core.platform.taskqueue services module.
         """
-        if (constants.DEV_MODE or utils.is_appengine_simulated_environment()):
+        if (constants.DEV_MODE or utils.is_local_server_environment()):
             from core.platform.taskqueue import dev_mode_taskqueue_services
             return dev_mode_taskqueue_services
         else:

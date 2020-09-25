@@ -933,7 +933,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         skill_services.update_skill(
             self.editor_id, 'skillid12345',
             change_list, 'Delete misconceptions.')
-
         skill_fetchers.get_skill_by_id('skillid12345')
         self.process_and_flush_pending_tasks()
         self.process_and_flush_pending_mapreduce_tasks()

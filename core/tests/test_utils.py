@@ -2646,7 +2646,7 @@ class AppEngineTestBase(TestBase):
         else:
             return self.mapreduce_taskqueue_stub.get_filtered_tasks()
 
-    def _execute_map_reduce_tasks(self, tasks):
+    def _execute_mapreduce_tasks(self, tasks):
         """Execute mapreduce queued tasks.
 
         Args:
@@ -2697,7 +2697,7 @@ class AppEngineTestBase(TestBase):
             self.mapreduce_taskqueue_stub.FlushQueue(queue)
 
         while tasks:
-            self._execute_map_reduce_tasks(tasks)
+            self._execute_mapreduce_tasks(tasks)
             tasks = self.mapreduce_taskqueue_stub.get_filtered_tasks(
                 queue_names=queue_names)
             for queue in queue_names:
@@ -2712,7 +2712,7 @@ class AppEngineTestBase(TestBase):
         for queue in queue_names:
             self.mapreduce_taskqueue_stub.FlushQueue(queue)
 
-        self._execute_map_reduce_tasks(tasks)
+        self._execute_mapreduce_tasks(tasks)
 
     def _create_valid_question_data(self, default_dest_state_name):
         """Creates a valid question_data dict.

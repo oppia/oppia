@@ -408,14 +408,15 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
-# Replace this with the correct Redis Host and Port when switching to prod
-# server. Keep this in sync with redis.conf in the root folder. Specifically,
-# REDISPORT should always be the same as the port in redis.conf.
+# NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
+# Port when switching to prod server. Keep this in sync with redis.conf in the
+# root folder. Specifically, REDISPORT should always be the same as the port in
+# redis.conf.
 REDISHOST = 'localhost'
 REDISPORT = 6379
 
-# Replace project id with the correct project id when switching to the prod
-# server.
+# NOTE TO RELEASE COORDINATORS: Replace this project id with the correct oppia
+# project id when switching to the prod server.
 OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
 
@@ -676,9 +677,11 @@ GOOGLE_GROUP_URL = (
 # External URL for the Foundation site.
 FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
 
-# External URL for the oppia production site. Change this for internal testing
-# in testing production environments.
-OPPIA_SITE_URL = 'https://oppia.org'
+# NOTE TO RELEASE COORDINATORS: External URL for the oppia production site.
+# Change to the correct url for internal testing in the testing production
+# environment.
+# Change to the production URL when deploying to production site.
+OPPIA_SITE_URL = 'http://localhost:8181'
 
 # Prefix for all taskqueue-related URLs.
 TASKQUEUE_URL_PREFIX = '/task'

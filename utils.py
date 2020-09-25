@@ -856,7 +856,7 @@ def compute_list_difference(list_a, list_b):
     return list(set(list_a) - set(list_b))
 
 
-def is_appengine_simulated_environment():
+def is_local_server_environment():
     """Returns wheter the app is being run locally in a development server.
     More information can be found here:
     https://cloud.google.com/appengine/docs/standard/python/tools/

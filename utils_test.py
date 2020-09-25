@@ -481,7 +481,24 @@ class UtilsTests(test_utils.GenericTestBase):
             datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))
 
     def test_get_current_appengine_environment(self):
+        saved_appengine_runtime = (
+            os.environ['APPENGINE_RUNTIME'] if 'APPENGINE_RUNTIME' in os.environ
+            else None)
+        saved_server_software = (
+            os.environ['SERVER_SOFTWARE'] if 'SERVER_SOFTWARE' in os.environ
+            else None)
+
         os.environ['APPENGINE_RUNTIME'] = 'True'
-        self.assertTrue(utils.is_appengine_simulated_environment())
+        self.assertTrue(utils.is_local_server_environment())
         os.environ['SERVER_SOFTWARE'] = 'Google App Engine/'
         self.assertTrue(utils.is_appengine_cloud_environment())
+
+        if saved_appengine_runtime:
+            os.environ['SERVER_SOFTWARE'] = saved_appengine_runtime
+        else:
+            del os.environ['SERVER_SOFTWARE']
+
+        if saved_server_software:
+            os.environ['SERVER_SOFTWARE'] = saved_server_software
+        else:
+            del os.environ['SERVER_SOFTWARE']

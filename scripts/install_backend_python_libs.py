@@ -399,14 +399,14 @@ def pip_install_to_system(package, version):
     Note: These libraries are installed to the user's default system-wide
     'site-packages' folder, not to a local Oppia third-party directory. This is
     ONLY required in very specific cases where the development server scripts
-    require default libraries (When running another python script using
+    require default libraries. (When running another python script using
     the shell, the call stack that is instantiated for that python script cannot
     be edited by us; therefore, we have no control over which system paths, the
     script visits when it looks for libraries and can only install those
-    necessary libraries to the default system path).
+    necessary libraries to the default system path.)
 
-    Please use pip_install instead if you are installing packages required for
-    oppia.
+    In general, please DO NOT use this method when installing packages required
+    for oppia. Use pip_install instead.
 
     Args:
         package: str. The package name.

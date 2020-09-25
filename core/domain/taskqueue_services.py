@@ -46,8 +46,9 @@ QUEUE_NAME_STATS = 'stats'
 
 # Function identifiers inform the deferred task handler of which deferred
 # function should be run for the relevant task.
-# NOTE for developers: If you want to defer a function, visit the file
-# core/controllers/tasks.py, and check the DeferredTasksHandler.
+# NOTE for developers: If you want to defer a function (i.e. run it
+# asynchronously), please visit the file core/controllers/tasks.py, and check
+# the DeferredTasksHandler.
 # 1. If the function you want to defer already exists in the handler, choose the
 #    correct FUNCTION_ID and defer the function using that FUNCTION_ID.
 # 2. If the function does not exist in the handler, add it to the handler and

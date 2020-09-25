@@ -7117,6 +7117,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.AuditJobsTestBase):
         }
         self.model_instance.content = content
         self.model_instance.put()
+
         expected_output = [(
             u'[u\'failed validation check for topic similarity '
             'check of TopicSimilaritiesModel\', '
