@@ -21,6 +21,7 @@ import logging
 import re
 
 from core.domain import collection_services
+from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_domain
@@ -72,6 +73,15 @@ def get_pending_deletion_request(user_id):
         pending_deletion_request_model.collection_ids,
         pending_deletion_request_model.pseudonymizable_entity_mappings
     )
+
+
+def get_number_of_pending_deletion_requests():
+    """Get number of pending deletion request.
+
+    Returns:
+        int. The number of pending deletion requests.
+    """
+    return user_models.PendingDeletionRequestModel.query().count()
 
 
 def save_pending_deletion_requests(pending_deletion_requests):
@@ -242,6 +252,50 @@ def pre_delete_user(user_id):
     )
 
     save_pending_deletion_requests(pending_deletion_requests)
+
+
+def run_user_deletion(pending_deletion_request):
+    """Run the user deletion.
+
+    Args:
+        pending_deletion_request: PendingDeletionRequest. The domain object for
+            the user being deleted.
+
+    Returns:
+        str. The outcome of the deletion.
+    """
+
+    if pending_deletion_request.deletion_complete:
+        return wipeout_domain.USER_DELETION_ALREADY_DONE
+    else:
+        delete_user(pending_deletion_request)
+        pending_deletion_request.deletion_complete = True
+        save_pending_deletion_requests([pending_deletion_request])
+        return wipeout_domain.USER_DELETION_SUCCESS
+
+
+def run_user_deletion_completion(pending_deletion_request):
+    """Run the user deletion verification.
+
+    Args:
+        pending_deletion_request: PendingDeletionRequest. The domain object for
+            the user being verified.
+
+    Returns:
+        str. The outcome of the verification.
+    """
+
+    if not pending_deletion_request.deletion_complete:
+        return wipeout_domain.USER_VERIFICATION_NOT_DELETED
+    elif verify_user_deleted(pending_deletion_request):
+        delete_pending_deletion_request(pending_deletion_request.user_id)
+        email_manager.send_account_deleted_email(
+            pending_deletion_request.user_id, pending_deletion_request.email)
+        return wipeout_domain.USER_VERIFICATION_SUCCESS
+    else:
+        pending_deletion_request.deletion_complete = False
+        save_pending_deletion_requests([pending_deletion_request])
+        return wipeout_domain.USER_VERIFICATION_FAILURE
 
 
 def delete_user(pending_deletion_request):

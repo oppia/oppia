@@ -89,9 +89,13 @@ AUDIO_PATH_REGEX = (
         ASSETS_PATH_REGEX, ('|').join(ALLOWED_AUDIO_EXTENSIONS)))
 USER_ID_REGEX = 'uid_[a-z]{32}'
 ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES = [
+    'DashboardRecentUpdatesAggregator',
+    'ExplorationRecommendationsAggregator',
     'FeedbackAnalyticsAggregator',
     'InteractionAnswerSummariesAggregator',
-    'DashboardRecentUpdatesAggregator',
+    'SearchRanker',
+    'StatisticsAggregator',
+    'UserImpactAggregator',
     'UserStatsAggregator']
 TARGET_TYPE_TO_TARGET_MODEL = {
     suggestion_models.TARGET_TYPE_EXPLORATION: (
@@ -261,9 +265,9 @@ class ClassifierTrainingJobModelValidator(
             cls._validate_state_name]
 
 
-class StateTrainingJobsMappingModelValidator(
+class TrainingJobExplorationMappingModelValidator(
         base_model_validators.BaseModelValidator):
-    """Class for validating StateTrainingJobsMappingModels."""
+    """Class for validating TrainingJobExplorationMappingModels."""
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -274,9 +278,8 @@ class StateTrainingJobsMappingModelValidator(
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return classifier_domain.StateTrainingJobsMapping(
-            item.exp_id, item.exp_version, item.state_name,
-            item.algorithm_ids_to_job_ids)
+        return classifier_domain.TrainingJobExplorationMapping(
+            item.exp_id, item.exp_version, item.state_name, item.job_id)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -291,7 +294,7 @@ class StateTrainingJobsMappingModelValidator(
         of exploration corresponding to exp_id.
 
         Args:
-            item: ndb.Model. StateTrainingJobsMappingModel to validate.
+            item: ndb.Model. TrainingJobExplorationMappingModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -337,7 +340,7 @@ class StateTrainingJobsMappingModelValidator(
         exploration corresponding to exp_id.
 
         Args:
-            item: ndb.Model. StateTrainingJobsMappingModel to validate.
+            item: ndb.Model. TrainingJobExplorationMappingbModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -387,6 +390,19 @@ class CollectionModelValidator(base_model_validators.BaseModelValidator):
     @classmethod
     def _get_model_domain_object_instance(cls, item):
         return collection_services.get_collection_from_model(item)
+
+    @classmethod
+    def _get_domain_object_validation_type(cls, item):
+        collection_rights = rights_manager.get_collection_rights(
+            item.id, strict=False)
+
+        if collection_rights is None:
+            return base_model_validators.VALIDATION_MODE_NEUTRAL
+
+        if rights_manager.is_collection_private(item.id):
+            return base_model_validators.VALIDATION_MODE_NON_STRICT
+
+        return base_model_validators.VALIDATION_MODE_STRICT
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1123,52 +1139,6 @@ class SentEmailModelValidator(base_model_validators.BaseModelValidator):
                     item.id, item.sent_datetime))
 
     @classmethod
-    def _validate_sender_email(
-            cls, item, field_name_to_external_model_references):
-        """Validate that sender email corresponds to email of user obtained
-        by using the sender_id.
-
-        Args:
-            item: ndb.Model. SentEmailModel to validate.
-            field_name_to_external_model_references:
-                dict(str, (list(base_model_validators.ExternalModelReference))).
-                A dict keyed by field name. The field name represents
-                a unique identifier provided by the storage
-                model to which the external model is associated. Each value
-                contains a list of ExternalModelReference objects corresponding
-                to the field_name. For examples, all the external Exploration
-                Models corresponding to a storage model can be associated
-                with the field name 'exp_ids'. This dict is used for
-                validation of External Model properties linked to the
-                storage model.
-        """
-        sender_model_references = (
-            field_name_to_external_model_references['sender_id'])
-
-        for sender_model_reference in sender_model_references:
-            sender_model = sender_model_reference.model_instance
-            if sender_model is None or sender_model.deleted:
-                model_class = sender_model_reference.model_class
-                model_id = sender_model_reference.model_id
-                cls._add_error(
-                    'sender_id %s' % (
-                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
-                    'Entity id %s: based on field sender_id having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
-                    ' exist' % (
-                        item.id, model_id, model_class.__name__, model_id))
-                continue
-            if sender_model.email != item.sender_email:
-                cls._add_error(
-                    'sender %s' % (
-                        base_model_validators.ERROR_CATEGORY_EMAIL_CHECK),
-                    'Entity id %s: Sender email %s in entity does not '
-                    'match with email %s of user obtained through '
-                    'sender id %s' % (
-                        item.id, item.sender_email, sender_model.email,
-                        item.sender_id))
-
-    @classmethod
     def _validate_recipient_email(
             cls, item, field_name_to_external_model_references):
         """Validate that recipient email corresponds to email of user obtained
@@ -1220,9 +1190,7 @@ class SentEmailModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
-        return [
-            cls._validate_sender_email,
-            cls._validate_recipient_email]
+        return [cls._validate_recipient_email]
 
 
 class BulkEmailModelValidator(base_model_validators.BaseModelValidator):
@@ -1364,6 +1332,19 @@ class ExplorationModelValidator(base_model_validators.BaseModelValidator):
     @classmethod
     def _get_model_domain_object_instance(cls, item):
         return exp_fetchers.get_exploration_from_model(item)
+
+    @classmethod
+    def _get_domain_object_validation_type(cls, item):
+        exp_rights = rights_manager.get_exploration_rights(
+            item.id, strict=False)
+
+        if exp_rights is None:
+            return base_model_validators.VALIDATION_MODE_NEUTRAL
+
+        if rights_manager.is_exploration_private(item.id):
+            return base_model_validators.VALIDATION_MODE_NON_STRICT
+
+        return base_model_validators.VALIDATION_MODE_STRICT
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -3149,12 +3130,48 @@ class GeneralVoiceoverApplicationModelValidator(
         return field_name_to_external_model_references
 
 
+class CommunityContributionStatsModelValidator(
+        base_model_validators.BaseModelValidator):
+    """Class for validating CommunityContributionStatsModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        # Since this is a singleton model, it has only one valid ID:
+        # community_contribution_stats.
+        return '^%s$' % (
+            suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return []
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return (
+            suggestion_services
+            .create_community_contribution_stats_from_model(item)
+        )
+
+
 class TopicModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating TopicModel."""
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
         return topic_fetchers.get_topic_from_model(item)
+
+    @classmethod
+    def _get_domain_object_validation_type(cls, item):
+        topic_rights = topic_fetchers.get_topic_rights(
+            item.id, strict=False)
+
+        if topic_rights is None:
+            return base_model_validators.VALIDATION_MODE_NEUTRAL
+
+        if topic_rights.topic_is_published:
+            return base_model_validators.VALIDATION_MODE_STRICT
+
+        return base_model_validators.VALIDATION_MODE_NON_STRICT
 
     @classmethod
     def _get_external_id_relationships(cls, item):
