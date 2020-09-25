@@ -15438,9 +15438,21 @@ class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
             id=self.user_id, email='email@email.com', gae_id='gae_id').put()
         expected_output = [
             (
-                '[u\'failed validation check for deleted '
-                'user settings of DeletedUserModel\', '
-                '[u\'Entity id %s: UserSettingsModel is not deleted\']]'
+                '[u\'failed validation check for '
+                'user properly deleted of DeletedUserModel\', '
+                '[u\'Entity id %s: The deletion verification fails\']]'
+            ) % (self.model_instance.id)]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_existing_feedback_email_reply_to_id_model_failure(self):
+        email_models.GeneralFeedbackEmailReplyToIdModel(
+            id='id', user_id=self.user_id, reply_to_id='id').put()
+        expected_output = [
+            (
+                '[u\'failed validation check for '
+                'user properly deleted of DeletedUserModel\', '
+                '[u\'Entity id %s: The deletion verification fails\']]'
             ) % (self.model_instance.id)]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)

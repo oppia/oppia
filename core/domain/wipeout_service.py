@@ -287,8 +287,11 @@ def run_user_deletion_completion(pending_deletion_request):
 
     if not pending_deletion_request.deletion_complete:
         return wipeout_domain.USER_VERIFICATION_NOT_DELETED
-    elif verify_user_deleted(pending_deletion_request):
+    elif verify_user_deleted(pending_deletion_request.user_id):
         delete_pending_deletion_request(pending_deletion_request.user_id)
+        user_models.DeletedUserModel(
+            id=pending_deletion_request.user_id
+        ).put()
         email_manager.send_account_deleted_email(
             pending_deletion_request.user_id, pending_deletion_request.email)
         return wipeout_domain.USER_VERIFICATION_SUCCESS
@@ -373,13 +376,12 @@ def delete_user(pending_deletion_request):
     _delete_models(user_id, user_role, models.NAMES.email)
 
 
-def verify_user_deleted(pending_deletion_request):
+def verify_user_deleted(user_id):
     """Verify that all the models for user specified in pending_deletion_request
     are deleted.
 
     Args:
-        pending_deletion_request: PendingDeletionRequest. The pending deletion
-            request object to be saved in the datastore.
+        user_id: str. The ID of the user whose deletion should be verified.
 
     Returns:
         bool. True if all the models were correctly deleted, False otherwise.
@@ -388,8 +390,7 @@ def verify_user_deleted(pending_deletion_request):
         if (model_class.get_deletion_policy() not in
                 [base_models.DELETION_POLICY.KEEP,
                  base_models.DELETION_POLICY.NOT_APPLICABLE] and
-                model_class.has_reference_to_user_id(
-                    pending_deletion_request.user_id)):
+                model_class.has_reference_to_user_id(user_id)):
             return False
     return True
 

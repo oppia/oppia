@@ -760,26 +760,22 @@ class WipeoutServiceVerifyDeleteConfigModelsTests(test_utils.GenericTestBase):
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
     def test_verify_user_delete_when_user_is_not_deleted_returns_false(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
         config_models.ConfigPropertyModel(
             id=self.CONFIG_2_ID, value='a'
         ).commit(self.user_1_id, [{'cmd': 'command'}])
 
-        self.assertFalse(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
 
 class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
@@ -1082,14 +1078,12 @@ class WipeoutServiceVerifyDeleteCollectionModelsTests(
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
     def test_verify_user_delete_when_user_is_not_deleted_returns_false(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
         collection_models.CollectionSnapshotMetadataModel(
             id='%s-1' % self.COL_1_ID,
@@ -1099,13 +1093,11 @@ class WipeoutServiceVerifyDeleteCollectionModelsTests(
             commit_cmds={}
         ).put()
 
-        self.assertFalse(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
 
 class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
@@ -1393,14 +1385,12 @@ class WipeoutServiceVerifyDeleteExplorationModelsTests(
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
     def test_verify_user_delete_when_user_is_not_deleted_returns_false(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
         exp_models.ExplorationSnapshotMetadataModel(
             id='%s-1' % self.EXP_1_ID,
@@ -1410,13 +1400,11 @@ class WipeoutServiceVerifyDeleteExplorationModelsTests(
             commit_cmds={}
         ).put()
 
-        self.assertFalse(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
 
 class WipeoutServiceDeleteEmailModelsTests(test_utils.GenericTestBase):
@@ -1522,14 +1510,12 @@ class WipeoutServiceVerifyDeleteEmailModelsTests(test_utils.GenericTestBase):
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
     def test_verify_user_delete_when_user_is_not_deleted_returns_false(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
         email_models.GeneralFeedbackEmailReplyToIdModel(
             id='%s.%s' % (self.user_1_id, self.THREAD_1_ID),
@@ -1538,13 +1524,11 @@ class WipeoutServiceVerifyDeleteEmailModelsTests(test_utils.GenericTestBase):
             reply_to_id=self.REPLY_1_ID
         ).put()
 
-        self.assertFalse(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
 
 class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
@@ -1808,14 +1792,12 @@ class WipeoutServiceVerifyDeleteFeedbackModelsTests(test_utils.GenericTestBase):
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
     def test_verify_user_delete_when_user_is_not_deleted_returns_false(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
         feedback_models.GeneralFeedbackThreadModel(
             id=self.FEEDBACK_1_ID,
@@ -1828,13 +1810,11 @@ class WipeoutServiceVerifyDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             last_nonempty_message_author_id=self.user_1_id
         ).put()
 
-        self.assertFalse(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
 
 class WipeoutServiceDeleteImprovementsModelsTests(test_utils.GenericTestBase):
@@ -1941,14 +1921,12 @@ class WipeoutServiceVerifyDeleteImprovementsModelsTests(
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
     def test_verify_user_delete_when_user_is_not_deleted_returns_false(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
         improvements_models.TaskEntryModel.create(
             entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
@@ -1962,13 +1940,11 @@ class WipeoutServiceVerifyDeleteImprovementsModelsTests(
             resolver_id=self.user_1_id
         )
 
-        self.assertFalse(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
 
 class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
@@ -2356,14 +2332,12 @@ class WipeoutServiceVerifyDeleteQuestionModelsTests(test_utils.GenericTestBase):
     def test_verification_is_successful(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
     def test_verification_when_deletion_failed_is_unsuccessful(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_2_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_2_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_2_id))
 
         question_services.update_question(
             self.user_2_id,
@@ -2656,14 +2630,12 @@ class WipeoutServiceVerifyDeleteSkillModelsTests(test_utils.GenericTestBase):
     def test_verification_is_successful(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
     def test_verification_when_deletion_failed_is_unsuccessful(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_2_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_2_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_2_id))
 
         skill_services.update_skill(
             self.user_2_id,
@@ -2677,13 +2649,11 @@ class WipeoutServiceVerifyDeleteSkillModelsTests(test_utils.GenericTestBase):
             'Change language.'
         )
 
-        self.assertFalse(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_2_id)))
+        self.assertFalse(wipeout_service.verify_user_deleted(self.user_2_id))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_2_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_2_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_2_id))
 
 
 class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
@@ -2985,14 +2955,12 @@ class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
     def test_verification_is_successful(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
     def test_verification_when_deletion_failed_is_unsuccessful(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_2_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_2_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_2_id))
 
         story_services.update_story(
             self.user_2_id,
@@ -3005,13 +2973,11 @@ class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
             'Add node.'
         )
 
-        self.assertFalse(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_2_id)))
+        self.assertFalse(wipeout_service.verify_user_deleted(self.user_2_id))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_2_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_2_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_2_id))
 
 
 class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
@@ -3330,14 +3296,12 @@ class WipeoutServiceVerifyDeleteSubtopicModelsTests(test_utils.GenericTestBase):
     def test_verification_is_successful(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
     def test_verification_when_deletion_failed_is_unsuccessful(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
         subtopic_models.SubtopicPageSnapshotMetadataModel(
             id='%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_1_ID),
@@ -3347,13 +3311,11 @@ class WipeoutServiceVerifyDeleteSubtopicModelsTests(test_utils.GenericTestBase):
             commit_cmds={}
         ).put()
 
-        self.assertFalse(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
 
 class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
@@ -3472,14 +3434,12 @@ class WipeoutServiceVerifyDeleteSuggestionModelsTests(
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
     def test_verify_user_delete_when_user_is_not_deleted_returns_false(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
         suggestion_models.GeneralVoiceoverApplicationModel(
             id=self.VOICEOVER_1_ID,
@@ -3493,13 +3453,11 @@ class WipeoutServiceVerifyDeleteSuggestionModelsTests(
             final_reviewer_id=self.user_2_id,
         ).put()
 
-        self.assertFalse(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
 
 class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
@@ -3788,14 +3746,12 @@ class WipeoutServiceVerifyDeleteTopicModelsTests(test_utils.GenericTestBase):
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
     def test_verify_user_delete_when_user_is_not_deleted_returns_false(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
         topic_models.TopicSnapshotMetadataModel(
             id='%s-1' % self.TOP_1_ID,
@@ -3805,13 +3761,11 @@ class WipeoutServiceVerifyDeleteTopicModelsTests(test_utils.GenericTestBase):
             commit_cmds={}
         ).put()
 
-        self.assertFalse(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
 
 class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
@@ -4148,30 +4102,24 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.profile_user_id)
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.profile_user_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.profile_user_id)))
+        self.assertTrue(
+            wipeout_service.verify_user_deleted(self.profile_user_id))
 
     def test_verify_user_delete_when_user_is_deleted_returns_true(self):
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_1_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.profile_user_id)
         )
         self.assertTrue(
-            wipeout_service.verify_user_deleted(
-                wipeout_service.get_pending_deletion_request(
-                    self.profile_user_id)
-            )
-        )
+            wipeout_service.verify_user_deleted(self.profile_user_id))
 
     def test_verify_user_delete_when_user_is_not_deleted_returns_false(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_2_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_2_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_2_id))
 
         user_models.CompletedActivitiesModel(
             id=self.user_2_id, exploration_ids=[], collection_ids=[]
@@ -4183,20 +4131,18 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             id=self.user_2_id, exploration_ids=[], collection_ids=[]
         ).put()
 
-        self.assertFalse(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_2_id)))
+        self.assertFalse(wipeout_service.verify_user_deleted(self.user_2_id))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_2_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.user_2_id)))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_2_id))
 
     def test_verify_user_delete_when_profile_user_not_deleted_is_false(self):
         wipeout_service.pre_delete_user(self.profile_user_id)
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.profile_user_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.profile_user_id)))
+        self.assertTrue(
+            wipeout_service.verify_user_deleted(self.profile_user_id))
 
         user_models.CompletedActivitiesModel(
             id=self.profile_user_id, exploration_ids=[], collection_ids=[]
@@ -4208,10 +4154,10 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             id=self.profile_user_id, exploration_ids=[], collection_ids=[]
         ).put()
 
-        self.assertFalse(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.profile_user_id)))
+        self.assertFalse(
+            wipeout_service.verify_user_deleted(self.profile_user_id))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.profile_user_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(
-            wipeout_service.get_pending_deletion_request(self.profile_user_id)))
+        self.assertTrue(
+            wipeout_service.verify_user_deleted(self.profile_user_id))

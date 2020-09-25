@@ -56,6 +56,7 @@ from core.domain import topic_services
 from core.domain import user_domain
 from core.domain import user_services
 from core.domain import voiceover_services
+from core.domain import wipeout_service
 from core.platform import models
 import feconf
 import python_utils
@@ -5254,21 +5255,21 @@ class DeletedUserModelValidator(base_model_validators.BaseUserModelValidator):
         return []
 
     @classmethod
-    def _validate_user_settings_are_deleted(cls, item):
+    def _validate_user_is_properly_deleted(cls, item):
         """Validates that user settings do not exist for the deleted user ID.
 
         Args:
             item: DeletedUserModel. Pending deletion request model to validate.
         """
-        user_model = user_models.UserSettingsModel.get_by_id(item.id)
-        if user_model is not None:
+
+        if not wipeout_service.verify_user_deleted(item.id):
             cls._add_error(
-                'deleted user settings',
-                'Entity id %s: UserSettingsModel is not deleted' % (item.id))
+                'user properly deleted',
+                'Entity id %s: The deletion verification fails' % (item.id))
 
     @classmethod
     def _get_custom_validation_functions(cls):
-        return [cls._validate_user_settings_are_deleted]
+        return [cls._validate_user_is_properly_deleted]
 
 
 class TaskEntryModelValidator(base_model_validators.BaseModelValidator):
