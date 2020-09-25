@@ -242,8 +242,6 @@ libraries:
 # This is needed for sending requests to a mailgun HTTPS URL.
 - name: ssl
   version: "2.7.11"
-- name: webapp2
-  version: "2.5.2"
 - name: grpcio
   version: 1.0.0
 - name: setuptools
