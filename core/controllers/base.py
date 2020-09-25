@@ -37,7 +37,6 @@ import feconf
 import python_utils
 import utils
 
-
 import webapp2
 
 current_user_services = models.Registry.import_current_user_services()
