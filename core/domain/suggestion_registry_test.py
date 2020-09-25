@@ -2385,13 +2385,8 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
             self.voiceover_application.rejection_message, 'rejection message')
 
 
-<<<<<<< HEAD
-class ReviewerAndSuggestionCountsUnitTests(test_utils.GenericTestBase):
-    """Tests for the ReviewerAndSuggestionCounts class."""
-=======
 class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     """Tests for the CommunityContributionStats class."""
->>>>>>> upstream/develop
 
     translation_reviewer_counts_by_lang_code = {
         'hi': 0,
