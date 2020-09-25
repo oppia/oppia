@@ -32,7 +32,7 @@ export class AdminRouterService {
 
   /**
    * @param {string} tabHash tab url hash value.
-   * @returns {string|null} tab name of the hash value. If no match returns null.
+   * @returns {string|null} tab name of the hash value. If no match then null.
    */
   getTabNameByHash(tabHash: string): string | null {
     // Iterates through the ADMIN_TAB_URLS map and returns the
