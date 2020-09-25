@@ -54,27 +54,31 @@ describe('Topics and skills dashboard functionality', function() {
   });
 
   it('should assign, unassign, create and delete a skill', async function() {
+    let topicName = 'Topic1 TASD';
+    let skillName = 'skill1 TASD'
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.createTopic(
-      'Topic1 TASD', 'topic-tasd-one', 'Topic 1 description', true);
+      topicName, 'topic-tasd-one', 'Topic 1 description', true);
 
     await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword(topicName);
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
 
     await topicsAndSkillsDashboardPage
       .createSkillWithDescriptionAndExplanation(
-        'Skill 2', 'Concept card explanation', true);
+        skillName, 'Concept card explanation', true);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.filterSkillsByStatus(
       Constants.SKILL_STATUS_UNASSIGNED);
     await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
-    await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      skillName, topicName);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
 
-    await topicsAndSkillsDashboardPage.unassignSkillFromTopicWithIndex(
-      'Skill 2', 0);
+    await topicsAndSkillsDashboardPage.unassignSkillFromTopic(
+      skillName, topicName);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.filterSkillsByStatus(
@@ -85,62 +89,95 @@ describe('Topics and skills dashboard functionality', function() {
       Constants.SKILL_STATUS_UNASSIGNED);
     await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
-    await topicsAndSkillsDashboardPage.deleteSkillWithIndex(0);
+    await topicsAndSkillsDashboardPage.deleteSkillWithName(skillName);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.searchSkillByName(skillName);
     await topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
 
     await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword(topicName);
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
-    await topicsAndSkillsDashboardPage.deleteTopicWithIndex(0);
-    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    await topicsAndSkillsDashboardPage.deleteTopicWithName(topicName);
+    let topicsTableIsPresent = (
+      await topicsAndSkillsDashboardPage.isTopicTablePresent());
+    if (topicsTableIsPresent) {
+      await topicsAndSkillsDashboardPage.filterTopicsByKeyword(topicName);
+      await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    }
   });
 
   it('should filter the topics', async function() {
-    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    let topicNameAlpha = 'Alpha TASD';
+    let topicNameBeta = 'Beta TASD';
+    let topicsTableIsPresent = (
+      await topicsAndSkillsDashboardPage.isTopicTablePresent());
+    if (topicsTableIsPresent) {
+      await topicsAndSkillsDashboardPage.filterTopicsByKeyword(topicNameAlpha);
+      await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+      await topicsAndSkillsDashboardPage.resetTopicFilters();
+      await topicsAndSkillsDashboardPage.filterTopicsByKeyword(topicNameBeta);
+      await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
+    }
     await topicsAndSkillsDashboardPage.createTopic(
-      'Alpha TASD', 'alpha-tasd', 'Alpha description', true);
+      topicNameAlpha, 'alpha-tasd', 'Alpha description', true);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
-      'Beta TASD', 'beta-tasd', 'Beta description', true);
+      topicNameBeta, 'beta-tasd', 'Beta description', true);
 
     await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword(topicNameAlpha);
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword(topicNameBeta);
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
+
     await topicsAndSkillsDashboardPage.filterTopicsByKeyword('alp');
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
-    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
 
     await topicsAndSkillsDashboardPage.filterTopicsByKeyword('be');
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
-    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
 
     await topicsAndSkillsDashboardPage.filterTopicsByClassroom('Math');
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
-    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
 
     await topicsAndSkillsDashboardPage.filterTopicsByKeyword('gamma');
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
-
-    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
   });
 
   it('should move skill to a topic', async function() {
+    let skillName = 'skill2 TASD';
+    let topicName = 'Topic2 TASD';
+    await topicsAndSkillsDashboardPage.createTopic(
+      topicName, 'topic-tasd-two', 'Topic 2 description', true);
     await topicsAndSkillsDashboardPage
       .createSkillWithDescriptionAndExplanation(
-        'Skill 2', 'Concept card explanation', true);
+        skillName, 'Concept card explanation', true);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
-    await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      skillName, topicName);
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    await topicsAndSkillsDashboardPage.editTopic(topicName);
     await topicEditorPage.expectNumberOfUncategorizedSkillsToBe(1);
   });
 
   it('should merge an outside skill with one in a topic', async function() {
+    let skillName = 'skill3 TASD';
+    let topicName = 'Topic3 TASD';
+    await topicsAndSkillsDashboardPage.createTopic(
+      topicName, 'topic-tasd-three', 'Topic 3 description', true);
+    await topicsAndSkillsDashboardPage
+      .createSkillWithDescriptionAndExplanation(
+        skillName, 'Concept card explanation', true);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      skillName, topicName);
+    await topicsAndSkillsDashboardPage.get();
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage
       .createSkillWithDescriptionAndExplanation(
@@ -167,13 +204,13 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.filterSkillsByStatus(
       Constants.SKILL_STATUS_UNASSIGNED);
-    await topicsAndSkillsDashboardPage.mergeSkillWithIndexToSkillWithIndex(
-      0, 0);
+    await topicsAndSkillsDashboardPage.mergeSkills(
+      'Skill to be merged', skillName);
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    await topicsAndSkillsDashboardPage.editTopic(topicName);
     await topicEditorPage.moveToQuestionsTab();
     await topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
-      1, 'Skill 2');
+      1, skillName);
   });
 
   afterEach(async function() {
