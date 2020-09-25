@@ -193,7 +193,7 @@ describe('Contributions and review component', function() {
 
     it('should open show translation suggestion modal when clicking on' +
       ' suggestion', function() {
-      ctrl.switchToTab('reviews', 'translate_content');
+      ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
       $scope.$apply();
 
       spyOn($uibModal, 'open').and.callThrough();
@@ -348,7 +348,7 @@ describe('Contributions and review component', function() {
             },
             details: 'skill_1'
           }
-        }));
+        }, false));
       spyOn(skillBackendApiService, 'fetchSkill').and.returnValue(
         $q.resolve({
           skill: skillObjectFactory.createFromBackendDict({
@@ -464,7 +464,7 @@ describe('Contributions and review component', function() {
             details: undefined
           }
         }));
-      ctrl.switchToReviewTab('translate_content');
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
       $scope.$apply();
 
       expect(Object.keys(ctrl.contributions)).toContain(
@@ -487,7 +487,7 @@ describe('Contributions and review component', function() {
             details: undefined
           }
         }));
-      ctrl.switchToReviewTab('add_question');
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
 
       expect(Object.keys(ctrl.contributions)).toContain(
         'suggestion_undefined_2');

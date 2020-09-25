@@ -1446,6 +1446,14 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                         'content_id': 'content',
                         'html': '<p>new content html</p>'
                     }
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'End State',
+                    'new_value': {
+                        'content_id': 'content',
+                        'html': '<p>End content html</p>'
+                    }
                 })], 'Add content')
 
         self.logout()
@@ -1467,6 +1475,24 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'language_code': 'hi',
                     'content_html': '<p>new content html</p>',
                     'translation_html': '<p>new content html in Hindi</p>'
+                },
+                'description': 'Adds translation',
+            }, csrf_token=csrf_token)
+
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': (suggestion_models.TARGET_TYPE_EXPLORATION),
+                'target_id': self.EXP_ID,
+                'target_version_at_submission': exploration.version,
+                'change': {
+                    'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                    'state_name': 'End State',
+                    'content_id': 'content',
+                    'language_code': 'hi',
+                    'content_html': '<p>End content html</p>',
+                    'translation_html': '<p>End content html in Hindi</p>'
                 },
                 'description': 'Adds translation',
             }, csrf_token=csrf_token)
@@ -1499,51 +1525,87 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'description': 'Add new question to skill'
             }, csrf_token=csrf_token)
 
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
+                'target_type': suggestion_models.TARGET_TYPE_SKILL,
+                'target_id': self.SKILL_ID,
+                'target_version_at_submission': 1,
+                'change': {
+                    'cmd': (
+                        question_domain
+                        .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+                    'question_dict': self.question_dict,
+                    'skill_id': None,
+                    'skill_difficulty': 0.3
+                },
+                'description': 'Add new question to skill'
+            }, csrf_token=csrf_token)
+
         self.logout()
 
     def test_exploration_handler_returns_data(self):
         self.login(self.AUTHOR_EMAIL)
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+            response = self.get_json(
+                '/getsubmittedsuggestions/exploration/translate_content')
+            self.assertEqual(len(response['suggestions']), 1)
+            self.assertTrue(response['more'])
 
-        response = self.get_json(
-            '/getsubmittedsuggestions/exploration/translate_content')
-        self.assertEqual(len(response['suggestions']), 1)
-        self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
-        response = self.get_json(
-            '/getsubmittedsuggestions/topic/translate_content')
-        self.assertEqual(response, {})
+            response = self.get_json(
+                '/getsubmittedsuggestions/exploration/translate_content',
+                params={'cursor': response['next_cursor']})
+
+            self.assertEqual(len(response['suggestions']), 1)
+            self.assertFalse(response['more'])
+
+            self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+            response = self.get_json(
+                '/getsubmittedsuggestions/topic/translate_content')
+            self.assertEqual(response, {})
 
     def test_skill_handler_returns_data(self):
         self.login(self.AUTHOR_EMAIL)
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+            response = self.get_json(
+                '/getsubmittedsuggestions/skill/add_question')
+            self.assertEqual(len(response['suggestions']), 1)
+            self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+            self.assertTrue(response['more'])
 
-        response = self.get_json(
-            '/getsubmittedsuggestions/skill/add_question')
-        self.assertEqual(len(response['suggestions']), 1)
-        self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
-        response = self.get_json(
-            '/getsubmittedsuggestions/topic/add_question')
-        self.assertEqual(response, {})
+            response = self.get_json(
+                '/getsubmittedsuggestions/skill/add_question',
+                params={'cursor': response['next_cursor']})
+            self.assertEqual(len(response['suggestions']), 1)
+            self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+            self.assertFalse(response['more'])
+
+            response = self.get_json(
+                '/getsubmittedsuggestions/topic/add_question')
+            self.assertEqual(response, {})
 
     def test_handler_with_invalid_suggestion_type_raise_error(self):
         self.login(self.AUTHOR_EMAIL)
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+            response = self.get_json(
+                '/getsubmittedsuggestions/exploration/translate_content')
+            self.assertEqual(len(response['suggestions']), 1)
 
-        response = self.get_json(
-            '/getsubmittedsuggestions/exploration/translate_content')
-        self.assertEqual(len(response['suggestions']), 1)
-
-        self.get_json(
-            '/getsubmittedsuggestions/exploration/invalid_suggestion_type',
-            expected_status_int=400)
+            self.get_json(
+                '/getsubmittedsuggestions/exploration/invalid_suggestion_type',
+                expected_status_int=400)
 
     def test_handler_with_invalid_target_type_raise_error(self):
         self.login(self.AUTHOR_EMAIL)
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+            response = self.get_json(
+                '/getsubmittedsuggestions/exploration/translate_content')
+            self.assertEqual(len(response['suggestions']), 1)
 
-        response = self.get_json(
-            '/getsubmittedsuggestions/exploration/translate_content')
-        self.assertEqual(len(response['suggestions']), 1)
-
-        self.get_json(
-            '/getsubmittedsuggestions/invalid_target_type'
-            '/translate_content', expected_status_int=400)
+            self.get_json(
+                '/getsubmittedsuggestions/invalid_target_type'
+                '/translate_content', expected_status_int=400)
 
 
 class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
@@ -1631,6 +1693,14 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                         'content_id': 'content',
                         'html': '<p>new content html</p>'
                     }
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'End State',
+                    'new_value': {
+                        'content_id': 'content',
+                        'html': '<p>End content html</p>'
+                    }
                 })], 'Add content')
 
         self.logout()
@@ -1652,6 +1722,24 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'language_code': 'hi',
                     'content_html': '<p>new content html</p>',
                     'translation_html': '<p>new content html in Hindi</p>'
+                },
+                'description': 'Adds translation',
+            }, csrf_token=csrf_token)
+
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': (suggestion_models.TARGET_TYPE_EXPLORATION),
+                'target_id': self.EXP_ID,
+                'target_version_at_submission': exploration.version,
+                'change': {
+                    'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                    'state_name': 'End State',
+                    'content_id': 'content',
+                    'language_code': 'hi',
+                    'content_html': '<p>End content html</p>',
+                    'translation_html': '<p>End content html in Hindi</p>'
                 },
                 'description': 'Adds translation',
             }, csrf_token=csrf_token)
@@ -1684,48 +1772,88 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'description': 'Add new question to skill'
             }, csrf_token=csrf_token)
 
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
+                'target_type': suggestion_models.TARGET_TYPE_SKILL,
+                'target_id': self.SKILL_ID,
+                'target_version_at_submission': 1,
+                'change': {
+                    'cmd': (
+                        question_domain
+                        .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+                    'question_dict': self.question_dict,
+                    'skill_id': None,
+                    'skill_difficulty': 0.3
+                },
+                'description': 'Add new question to skill'
+            }, csrf_token=csrf_token)
+
         self.logout()
 
     def test_exploration_handler_returns_data(self):
         self.login(self.REVIEWER_EMAIL)
 
-        response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content')
-        self.assertEqual(len(response['suggestions']), 1)
-        self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
-        response = self.get_json(
-            '/getreviewablesuggestions/topic/translate_content')
-        self.assertEqual(response, {})
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+            response = self.get_json(
+                '/getreviewablesuggestions/exploration/translate_content')
+            self.assertEqual(len(response['suggestions']), 1)
+            self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+            self.assertTrue(response['more'])
+
+            response = self.get_json(
+                '/getreviewablesuggestions/exploration/translate_content',
+                params={'cursor': response['next_cursor']})
+            self.assertEqual(len(response['suggestions']), 1)
+            self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+            self.assertFalse(response['more'])
+
+            response = self.get_json(
+                '/getreviewablesuggestions/topic/translate_content')
+            self.assertEqual(response, {})
 
     def test_skill_handler_returns_data(self):
         self.login(self.REVIEWER_EMAIL)
 
-        response = self.get_json(
-            '/getreviewablesuggestions/skill/add_question')
-        self.assertEqual(len(response['suggestions']), 1)
-        self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
-        response = self.get_json(
-            '/getreviewablesuggestions/topic/add_question')
-        self.assertEqual(response, {})
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+            response = self.get_json(
+                '/getreviewablesuggestions/skill/add_question')
+            self.assertEqual(len(response['suggestions']), 1)
+            self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+            self.assertTrue(response['more'])
+
+            response = self.get_json(
+                '/getreviewablesuggestions/skill/add_question',
+                params={'cursor': response['next_cursor']})
+            self.assertEqual(len(response['suggestions']), 1)
+            self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+            self.assertFalse(response['more'])
+
+            response = self.get_json(
+                '/getreviewablesuggestions/topic/add_question')
+            self.assertEqual(response, {})
 
     def test_handler_with_invalid_suggestion_type_raise_error(self):
         self.login(self.REVIEWER_EMAIL)
 
-        response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content')
-        self.assertEqual(len(response['suggestions']), 1)
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+            response = self.get_json(
+                '/getreviewablesuggestions/exploration/translate_content')
+            self.assertEqual(len(response['suggestions']), 1)
 
-        self.get_json(
-            '/getreviewablesuggestions/exploration/invalid_suggestion_type',
-            expected_status_int=404)
+            self.get_json(
+                '/getreviewablesuggestions/exploration/invalid_suggestion_type',
+                expected_status_int=404)
 
     def test_handler_with_invalid_target_type_raise_error(self):
         self.login(self.REVIEWER_EMAIL)
 
-        response = self.get_json(
-            '/getreviewablesuggestions/exploration/translate_content')
-        self.assertEqual(len(response['suggestions']), 1)
+        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+            response = self.get_json(
+                '/getreviewablesuggestions/exploration/translate_content')
+            self.assertEqual(len(response['suggestions']), 1)
 
-        self.get_json(
-            '/getreviewablesuggestions/invalid_target_type'
-            '/translate_content', expected_status_int=400)
+            self.get_json(
+                '/getreviewablesuggestions/invalid_target_type'
+                '/translate_content', expected_status_int=400)

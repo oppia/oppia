@@ -374,10 +374,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
             start_cursor = datastore_query.Cursor()
 
         results, cursor, more = cls.query(
-            cls.status == STATUS_IN_REVIEW,
-            cls.suggestion_type == suggestion_type).filter(
-                cls.author_id != user_id).order(cls.created_on).fetch_page(
-                    page_size, start_cursor=start_cursor)
+            cls.status == STATUS_IN_REVIEW).filter(
+                cls.suggestion_type == suggestion_type).filter(
+                    cls.author_id != user_id).order(cls.created_on).fetch_page(
+                        page_size, start_cursor=start_cursor)
         return (results, (cursor.urlsafe() if cursor else None), more)
 
     @classmethod

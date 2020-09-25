@@ -561,7 +561,7 @@ def get_reviewable_suggestions(user_id, suggestion_type, cursor):
     if suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
         language_codes = (
             user_review_rights.can_review_translation_for_language_codes)
-        return [
+        suggestions = [
             suggestion for suggestion in suggestions
             if suggestion.change.language_code in language_codes]
 

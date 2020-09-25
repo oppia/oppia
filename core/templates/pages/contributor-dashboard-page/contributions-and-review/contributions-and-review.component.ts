@@ -309,7 +309,7 @@ angular.module('oppia').component('contributionsAndReview', {
         ctrl.activeTabType = tabType;
         ctrl.activeSuggestionType = suggestionType;
         ctrl.contributionsDataLoading = true;
-        ctrl.contributions = [];
+        ctrl.contributions = {};
         updateContributionSummaries();
         ContributionAndReviewService.resetCursor();
         fetchFunction(function(suggestionIdToSuggestions, more) {
