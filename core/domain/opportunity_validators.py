@@ -28,11 +28,10 @@ from core.domain import story_fetchers
 from core.platform import models
 
 (
-    exp_models, collection_models,
-    skill_models, story_models,
+    exp_models, skill_models, story_models,
     topic_models) = (
         models.Registry.import_models([
-            models.NAMES.exploration, models.NAMES.collection,
+            models.NAMES.exploration,
             models.NAMES.skill, models.NAMES.story,
             models.NAMES.topic]))
 
