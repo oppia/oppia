@@ -81,26 +81,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             None, None, schema_version
         )
 
-    def test_is_user_id_correct(self):
+    def test_is_user_id_valid(self):
         self.assertTrue(
-            user_services.is_user_id_correct(feconf.SYSTEM_COMMITTER_ID))
+            user_services.is_user_id_valid(feconf.SYSTEM_COMMITTER_ID))
         self.assertTrue(
-            user_services.is_user_id_correct(feconf.MIGRATION_BOT_USER_ID))
+            user_services.is_user_id_valid(feconf.MIGRATION_BOT_USER_ID))
         self.assertTrue(
-            user_services.is_user_id_correct(feconf.SUGGESTION_BOT_USER_ID))
-        self.assertTrue(user_services.is_user_id_correct('uid_' + 'a' * 32))
+            user_services.is_user_id_valid(feconf.SUGGESTION_BOT_USER_ID))
+        self.assertTrue(user_services.is_user_id_valid('uid_%s' % ('a' * 32)))
         self.assertFalse(
-            user_services.is_user_id_correct('uid_' + 'a' * 31 + 'A'))
-        self.assertFalse(user_services.is_user_id_correct('uid_' + 'a' * 31))
-        self.assertFalse(user_services.is_user_id_correct('a' * 36))
-
-    def test_is_pseudonymous_id(self):
-        self.assertTrue(user_services.is_pseudonymous_id('pid_' + 'a' * 32))
-        self.assertFalse(user_services.is_pseudonymous_id('uid_' + 'a' * 32))
-        self.assertFalse(
-            user_services.is_pseudonymous_id('uid_' + 'a' * 31 + 'A'))
-        self.assertFalse(user_services.is_pseudonymous_id('uid_' + 'a' * 31))
-        self.assertFalse(user_services.is_pseudonymous_id('a' * 36))
+            user_services.is_user_id_valid('uid_%s%s' % ('a' * 31, 'A')))
+        self.assertFalse(user_services.is_user_id_valid('uid_%s' % ('a' * 31)))
+        self.assertFalse(user_services.is_user_id_valid('a' * 36))
 
     def test_set_and_get_username(self):
         gae_id = 'someUser'
