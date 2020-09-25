@@ -113,13 +113,13 @@ describe('Email Dashboard Page', function() {
     ctrl.editedAtLeastNExps = true;
     ctrl.editedFewerThanNExps = false;
 
-    spyOn(EmailDashboardDataService, 'submitQuery').and.callFake(function() {
+    spyOn(EmailDashboardDataService, 'submitQueryAsync').and.callFake(function() {
       var deferred = $q.defer();
       deferred.resolve(firstPageQueries);
       return deferred.promise;
     });
 
-    ctrl.submitQuery();
+    ctrl.submitQueryAsync();
     $scope.$apply();
 
     expect(ctrl.currentPageOfQueries).toEqual(firstPageQueries);
@@ -134,7 +134,7 @@ describe('Email Dashboard Page', function() {
   });
 
   it('should get next page of queries', function() {
-    spyOn(EmailDashboardDataService, 'getNextQueries').and.callFake(
+    spyOn(EmailDashboardDataService, 'getNextQueriesAsync').and.callFake(
       function() {
         var deferred = $q.defer();
         deferred.resolve(secondPageQueries);
@@ -167,7 +167,7 @@ describe('Email Dashboard Page', function() {
   describe('recheckStatus', function() {
     it('should fetch query page again when getting next page of queries',
       function() {
-        spyOn(EmailDashboardDataService, 'getNextQueries').and.callFake(
+        spyOn(EmailDashboardDataService, 'getNextQueriesAsync').and.callFake(
           function() {
             var deferred = $q.defer();
             deferred.resolve(secondPageQueries);
@@ -180,7 +180,7 @@ describe('Email Dashboard Page', function() {
         expect(ctrl.currentPageOfQueries).toEqual(secondPageQueries);
 
         var updatedQuery = {id: 3, status: 'completed'};
-        spyOn(EmailDashboardDataService, 'fetchQuery').and.callFake(
+        spyOn(EmailDashboardDataService, 'fetchQueryAsync').and.callFake(
           function() {
             var deferred = $q.defer();
             deferred.resolve(updatedQuery);
@@ -202,7 +202,7 @@ describe('Email Dashboard Page', function() {
 
   it('should get user info and next queries after controller initialization',
     function() {
-      spyOn(EmailDashboardDataService, 'getNextQueries').and.callFake(
+      spyOn(EmailDashboardDataService, 'getNextQueriesAsync').and.callFake(
         function() {
           var deferred = $q.defer();
           deferred.resolve(secondPageQueries);
