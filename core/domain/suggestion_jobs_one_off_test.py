@@ -2188,20 +2188,16 @@ class PopulateCommunityContributionStatsOneOffJobTests(
             (
                 community_contribution_stats
                 .translation_reviewer_counts_by_lang_code
-            ), {}
-        )
+            ), {})
         self.assertEqual(
             (
                 community_contribution_stats
                 .translation_suggestion_counts_by_lang_code
-            ), {}
-        )
+            ), {})
         self.assertEqual(
-            community_contribution_stats.question_reviewer_count, 0
-        )
+            community_contribution_stats.question_reviewer_count, 0)
         self.assertEqual(
-            community_contribution_stats.question_suggestion_count, 0
-        )
+            community_contribution_stats.question_suggestion_count, 0)
 
     def _run_job_and_verify_output(self, expected_output):
         """Runs the PopulateCommunityContributionStatsOneOffJob and verifies
