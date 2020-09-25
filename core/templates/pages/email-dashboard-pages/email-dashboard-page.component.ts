@@ -45,7 +45,8 @@ angular.module('oppia').component('emailDashboardPage', {
           editedAtLeastNExps: ctrl.editedAtLeastNExps,
           editedFewerThanNExps: ctrl.editedFewerThanNExps
         };
-        EmailDashboardDataService.submitQueryAsync(data).then(function(queries) {
+        EmailDashboardDataService.submitQueryAsync(data).then(
+          function(queries) {
           ctrl.currentPageOfQueries = queries;
           // TODO(#8521): Remove the use of $rootScope.$apply()
           // once the directive is migrated to angular.

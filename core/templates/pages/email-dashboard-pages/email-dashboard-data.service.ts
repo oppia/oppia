@@ -65,7 +65,7 @@ export class EmailDashboardDataService {
     });
   }
 
-  aync getNextQueriesAsync(): Promise<EmailDashboardQuery[]> {
+  async getNextQueriesAsync(): Promise<EmailDashboardQuery[]> {
     var startQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 2) * this.QUERIES_PER_PAGE;
 

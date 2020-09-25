@@ -113,7 +113,8 @@ describe('Email Dashboard Page', function() {
     ctrl.editedAtLeastNExps = true;
     ctrl.editedFewerThanNExps = false;
 
-    spyOn(EmailDashboardDataService, 'submitQueryAsync').and.callFake(function() {
+    spyOn(EmailDashboardDataService, 'submitQueryAsync').and.callFake(
+      function() {
       var deferred = $q.defer();
       deferred.resolve(firstPageQueries);
       return deferred.promise;
