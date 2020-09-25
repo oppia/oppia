@@ -156,6 +156,7 @@ var modalPopupToAppear = async function() {
     element(by.css('.modal-body')), 'Modal taking too long to appear.');
 };
 
+exports.DEFAULT_WAIT_TIME_MSECS = DEFAULT_WAIT_TIME_MSECS;
 exports.alertToBePresent = alertToBePresent;
 exports.elementToBeClickable = elementToBeClickable;
 exports.invisibilityOf = invisibilityOf;

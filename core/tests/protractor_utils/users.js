@@ -23,8 +23,6 @@ var waitFor = require('./waitFor.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
 
-var DEFAULT_WAIT_TIME_MSECS = 10000;
-
 var login = async function(email, isSuperAdmin = false) {
   // Use of element is not possible because the login page is non-angular.
   // The full url is also necessary.
@@ -49,7 +47,7 @@ var login = async function(email, isSuperAdmin = false) {
         await driver.findElement(protractor.By.tagName('h3')));
       let text = await loginStatusHeaderElement.getText();
       return text !== 'Logged In';
-    }, DEFAULT_WAIT_TIME_MSECS, 'Login takes too long.');
+    }, waitFor.DEFAULT_WAIT_TIME_MSECS, 'Login takes too long.');
 };
 
 var logout = async function() {
