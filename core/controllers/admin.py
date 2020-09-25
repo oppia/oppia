@@ -1012,7 +1012,9 @@ class UpdateUsernameHandler(base.BaseHandler):
 
 
 class NumberOfDeletionRequestsHandler(base.BaseHandler):
-    """Handler for deleting account via admin page."""
+    """Handler for getting the number of pending deletion requests via admin
+    page.
+    """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

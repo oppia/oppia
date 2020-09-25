@@ -2291,7 +2291,7 @@ class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
         response = self.get_json('/numberofpendingdeletionrequests')
         self.assertEqual(response['number_of_pending_deletion_models'], 0)
 
-    def test_get_with_two_deletion_request_returns_zero(self):
+    def test_get_with_two_deletion_request_returns_two(self):
         user_models.PendingDeletionRequestModel(
             id='id1', email='id1@email.com', role='role'
         ).put()
