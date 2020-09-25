@@ -115,10 +115,10 @@ describe('Email Dashboard Page', function() {
 
     spyOn(EmailDashboardDataService, 'submitQueryAsync').and.callFake(
       function() {
-      var deferred = $q.defer();
-      deferred.resolve(firstPageQueries);
-      return deferred.promise;
-    });
+        var deferred = $q.defer();
+        deferred.resolve(firstPageQueries);
+        return deferred.promise;
+      });
 
     ctrl.submitQueryAsync();
     $scope.$apply();

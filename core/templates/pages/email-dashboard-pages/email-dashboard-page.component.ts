@@ -47,11 +47,11 @@ angular.module('oppia').component('emailDashboardPage', {
         };
         EmailDashboardDataService.submitQueryAsync(data).then(
           function(queries) {
-          ctrl.currentPageOfQueries = queries;
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the directive is migrated to angular.
-          $rootScope.$apply();
-        });
+            ctrl.currentPageOfQueries = queries;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
+            $rootScope.$apply();
+          });
         ctrl.resetForm();
         ctrl.showSuccessMessage = true;
       };
