@@ -25,7 +25,7 @@ import { StoryContentsObjectFactory } from
 import { StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
@@ -48,12 +48,7 @@ describe('Story update service', function() {
       'StoryObjectFactory', new StoryObjectFactory(
         new StoryContentsObjectFactory(new StoryNodeObjectFactory())));
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector) {
     StoryUpdateService = $injector.get('StoryUpdateService');

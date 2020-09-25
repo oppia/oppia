@@ -163,8 +163,6 @@ import { EditableCollectionBackendApiService } from
 import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
-import { EditableStoryBackendApiService } from
-  'domain/story/editable-story-backend-api.service';
 import { EmailDashboardBackendApiService } from
   'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EmailDashboardDataService } from
@@ -976,12 +974,6 @@ export class UpgradedServices {
       upgradedServices['WindowRef']);
     upgradedServices['DocumentAttributeCustomizationService'] =
       new DocumentAttributeCustomizationService(upgradedServices['WindowRef']);
-    upgradedServices['EditableStoryBackendApiService'] =
-      new EditableStoryBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService']
-      );
-
     upgradedServices['EmailDashboardQueryResultsObjectFactory'] =
       new EmailDashboardQueryResultsObjectFactory(
         upgradedServices['EmailDashboardQueryObjectFactory']);

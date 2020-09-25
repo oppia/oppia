@@ -24,37 +24,38 @@ import { UrlInterpolationService } from
 import { StoryDomainConstants } from 'domain/story/story-domain.constants';
 
 interface FetchStoryResponse {
-  'story':object;
-  'topic_name':string;
-  'story_is_published':boolean;
-  'skill_summaries':object;
-  'topic_url_fragment':string;
-  'classroom_url_fragment':string;
+  'story': object;
+  'topic_name': string;
+  'story_is_published': boolean;
+  'skill_summaries': string;
+  'topic_url_fragment': string;
+  'classroom_url_fragment': string;
 }
+
 @Injectable({
   providedIn: 'root'
 })
 export class EditableStoryBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolation: UrlInterpolationService) {}
+    private urlInterpolationService : UrlInterpolationService) {}
   private _fetchStory(
       storyId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
-    const editableStoryDataUrl = this.urlInterpolation.interpolateUrl(
+      errorCallback: (reason?: string | PromiseLike<Object>) => void): void {
+    const editableStoryDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
         story_id: storyId
       });
     this.http.get<FetchStoryResponse>(
       editableStoryDataUrl).toPromise().then(
       (response) => {
-        var story = angular.copy(response.story);
-        var topicName = angular.copy(response.topic_name);
-        var storyIsPublished = response.story_is_published;
-        var skillSummaries = angular.copy(response.skill_summaries);
-        var topicUrlFragment = response.topic_url_fragment;
-        var classroomUrlFragment = response.classroom_url_fragment;
+        const story = (response.story);
+        const topicName = (response.topic_name);
+        const storyIsPublished = response.story_is_published;
+        const skillSummaries = (response.skill_summaries);
+        const topicUrlFragment = response.topic_url_fragment;
+        const classroomUrlFragment = response.classroom_url_fragment;
         if (successCallback) {
           successCallback({
             story: story,
@@ -68,7 +69,7 @@ export class EditableStoryBackendApiService {
       }, (errorResponse) => {
         if (errorCallback) {
           errorCallback(
-            errorResponse.error
+            errorResponse.error.error
           );
         }
       });
@@ -77,9 +78,9 @@ export class EditableStoryBackendApiService {
         storyId: string, storyVersion: string,
         commitMessage: string,
         changeList: string[],
-        successCallback: (value?: Object | PromiseLike<Object>) =>void,
-        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
-      const editableStoryDataUrl = this.urlInterpolation.interpolateUrl(
+        successCallback: (value?: string | PromiseLike<Object>) =>void,
+        errorCallback: (reason?: string | PromiseLike<Object>) => void): void {
+      const editableStoryDataUrl = this.urlInterpolationService.interpolateUrl(
         StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
           story_id: storyId
         });
@@ -90,15 +91,15 @@ export class EditableStoryBackendApiService {
       };
       this.http.put(editableStoryDataUrl, putData).toPromise().then(
         response => successCallback(response.story),
-        errorResponse => errorCallback(errorResponse.error)
+        errorResponse => errorCallback(errorResponse.error.error)
       );
     };
     private _changeStoryPublicationStatus = function(
         storyId: string,
         newStoryStatusIsPublic: boolean,
-        successCallback: (value?: Object | PromiseLike<Object>) =>void,
-        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
-      const storyPublishUrl = this.urlInterpolation.interpolateUrl(
+        successCallback: (value?: string | PromiseLike<Object>) =>void,
+        errorCallback: (reason?: string | PromiseLike<Object>) => void): void {
+      const storyPublishUrl = this.urlInterpolationService.interpolateUrl(
         StoryDomainConstants.STORY_PUBLISH_URL_TEMPLATE, {
           story_id: storyId
         });
@@ -107,18 +108,19 @@ export class EditableStoryBackendApiService {
       };
       this.http.put(storyPublishUrl, putData).toPromise().then(
         response => successCallback(response.status),
-        errorResponse => errorCallback(errorResponse.error));
+        errorResponse => errorCallback(errorResponse.error.error));
     };
 
     private _validateExplorations = function(
         storyId: string,
         expIds: string[],
-        successCallback: (value?: Object | PromiseLike<Object>) =>void,
-        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
-      const validateExplorationsUrl = this.urlInterpolation.interpolateUrl(
-        StoryDomainConstants.VALIDATE_EXPLORATIONS_URL_TEMPLATE, {
-          story_id: storyId
-        });
+        successCallback: (value?: string | PromiseLike<Object>) =>void,
+        errorCallback: (reason?: string | PromiseLike<Object>) => void): void {
+      const validateExplorationsUrl =
+        this.urlInterpolationService.interpolateUrl(
+          StoryDomainConstants.VALIDATE_EXPLORATIONS_URL_TEMPLATE, {
+            story_id: storyId
+          });
 
       this.http.get(
         validateExplorationsUrl, {
@@ -128,14 +130,14 @@ export class EditableStoryBackendApiService {
         }
       ).toPromise().then(
         response => successCallback(response.status),
-        errorResponse => errorCallback(errorResponse.error));
+        errorResponse => errorCallback(errorResponse.error.error));
     };
 
     private _deleteStory = function(
         storyId: string,
-        successCallback: (value?: Object | PromiseLike<Object>) =>void,
-        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
-      var storyDataUrl = this.urlInterpolation.interpolateUrl(
+        successCallback: (value?: string | PromiseLike<Object>) =>void,
+        errorCallback: (reason?: string | PromiseLike<Object>) => void): void {
+      const storyDataUrl = this.urlInterpolationService.interpolateUrl(
         StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
           story_id: storyId
         });
@@ -149,15 +151,15 @@ export class EditableStoryBackendApiService {
           }
         }, function(errorResponse) {
           if (errorCallback) {
-            errorCallback(errorResponse.error);
+            errorCallback(errorResponse.error.error);
           }
         });
     };
     private _doesStoryWithUrlFragmentExist = function(
         storyUrlFragment: string,
-        successCallback: (value?: Object | PromiseLike<Object>) =>void,
-        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
-      var storyUrlFragmentUrl = this.urlInterpolation.interpolateUrl(
+        successCallback: (value?: string | PromiseLike<Object>) =>void,
+        errorCallback: (reason?: string | PromiseLike<Object>) => void): void {
+      const storyUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
         StoryDomainConstants.STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
           story_url_fragment: storyUrlFragment
         });
@@ -169,7 +171,7 @@ export class EditableStoryBackendApiService {
           }
         }, function(errorResponse) {
           if (errorCallback) {
-            errorCallback(errorResponse.error);
+            errorCallback(errorResponse.error.error);
           }
         });
     };

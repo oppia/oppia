@@ -85,11 +85,11 @@ describe('Editable story backend API service', () => {
 
   it('should successfully fetch an existing story from the backend',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
       editableStoryBackendApiService.fetchStory('storyId').then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/story_editor_handler/data/storyId');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
@@ -110,11 +110,11 @@ describe('Editable story backend API service', () => {
 
   it('should successfully delete a story from the backend',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
       editableStoryBackendApiService.deleteStory('storyId').then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/story_editor_handler/data/storyId');
       expect(req.request.method).toEqual('DELETE');
       req.flush(200);
@@ -127,14 +127,14 @@ describe('Editable story backend API service', () => {
 
   it('should use the rejection handler if the backend request failed',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
       editableStoryBackendApiService.fetchStory('2').then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/story_editor_handler/data/2');
       expect(req.request.method).toEqual('GET');
-      req.flush('Error loading story 2.', {
+      req.flush({error: 'Error loading story 2.'}, {
         status: 500,
         statusText: 'Error loading story 2.'
       });
@@ -157,7 +157,7 @@ describe('Editable story backend API service', () => {
         (data: any) => {
           story = data.story;
         });
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/story_editor_handler/data/storyId');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
@@ -193,17 +193,17 @@ describe('Editable story backend API service', () => {
     ));
   it('should use the rejection handler if the story to update doesn\'t exist',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
 
       // Loading a story the first time should fetch it from the backend.
       editableStoryBackendApiService.updateStory(
         'storyId_1', '1', 'Update an invalid Story.', []
       ).then(successHandler, failHandler);
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/story_editor_handler/data/storyId_1');
       expect(req.request.method).toEqual('PUT');
-      req.flush('Story with given id doesn\'t exist.', {
+      req.flush({error: 'Story with given id doesn\'t exist.'}, {
         status: 404,
         statusText: 'Story with given id doesn\'t exist.'
       });
@@ -223,7 +223,7 @@ describe('Editable story backend API service', () => {
     // Send a request to update story.
     editableStoryBackendApiService.changeStoryPublicationStatus(
       'storyId', true).then(successHandler, failHandler);
-    var req = httpTestingController.expectOne(
+    let req = httpTestingController.expectOne(
       '/story_publish_handler/storyId');
     expect(req.request.method).toEqual('PUT');
     req.flush(200);
@@ -235,16 +235,16 @@ describe('Editable story backend API service', () => {
 
   it('should use the rejection handler if the story to publish doesn\'t exist',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
 
       // Loading a story the first time should fetch it from the backend.
       editableStoryBackendApiService.changeStoryPublicationStatus(
         'storyId', true).then(successHandler, failHandler);
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/story_publish_handler/storyId');
       expect(req.request.method).toEqual('PUT');
-      req.flush('Story with given id doesn\'t exist.', {
+      req.flush({error: 'Story with given id doesn\'t exist.'}, {
         status: 404,
         statusText: 'Story with given id doesn\'t exist.'
       });
