@@ -1913,7 +1913,8 @@ tags: []
             linked_skill_ids: list(str). List of skill IDs linked to the
                 question.
             inapplicable_skill_misconception_ids: list(str). List of
-                misconceptions ids that are not applicable to the question.
+                skill misconceptions ids that are not applicable to the
+                question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 
@@ -1953,7 +1954,8 @@ tags: []
             owner_id: str. The id of the user creating the question.
             linked_skill_ids: list(str). The skill IDs linked to the question.
             inapplicable_skill_misconception_ids: list(str). List of
-                misconceptions ids that are not applicable to the question.
+                skill misconceptions ids that are not applicable to the
+                question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
@@ -2723,6 +2725,7 @@ class AuditJobsTestBase(GenericTestBase):
             literal_eval: bool. Whether to use ast.literal_eval before
                 comparison.
         """
+        self.process_and_flush_pending_tasks()
         job_id = self.job_class.create_new()
         self.assertEqual(
             self.count_jobs_in_taskqueue(
