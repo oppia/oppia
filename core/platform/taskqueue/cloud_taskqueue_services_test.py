@@ -25,6 +25,7 @@ import json
 from core.domain import taskqueue_services
 from core.platform.taskqueue import cloud_taskqueue_services
 from core.tests import test_utils
+import feconf
 from google.protobuf import timestamp_pb2
 import python_utils
 
@@ -59,7 +60,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
                 {
                     'http_request': {
                         'http_method': 1,
-                        'url': 'https://oppia.org%s' % dummy_url,
+                        'url': '%s%s' % (feconf.OPPIA_SITE_URL, dummy_url),
                         'headers': {
                             'Content-type': 'application/json'
                         },
@@ -98,7 +99,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
                 {
                     'http_request': {
                         'http_method': 1,
-                        'url': 'https://oppia.org%s' % dummy_url,
+                        'url': '%s%s' % (feconf.OPPIA_SITE_URL, dummy_url),
                         'headers': {
                             'Content-type': 'application/json'
                         },
