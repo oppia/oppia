@@ -183,6 +183,8 @@ class BaseJobManager(python_utils.OBJECT):
             job_id, model.status_code, STATUS_CODE_STARTED)
         cls._require_correct_job_type(model.job_type)
 
+        cls._pre_start_hook(job_id)
+
         model.metadata = metadata
         model.status_code = STATUS_CODE_STARTED
         model.time_started_msec = utils.get_current_time_in_millisecs()
@@ -503,6 +505,16 @@ class BaseJobManager(python_utils.OBJECT):
                 'Invalid job type %s for class %s' % (job_type, cls.__name__))
 
     @classmethod
+    def _pre_start_hook(cls, job_id):
+        """A hook or a callback function triggered before marking a job
+        as started.
+
+        Args:
+            job_id: str. The unique ID of the job to be marked as started.
+        """
+        pass
+
+    @classmethod
     def _post_completed_hook(cls, job_id):
         """A hook or a callback function triggered after marking a job as
         completed.
@@ -511,6 +523,7 @@ class BaseJobManager(python_utils.OBJECT):
             job_id: str. The unique ID of the job marked as completed.
         """
         pass
+
 
     @classmethod
     def _post_failure_hook(cls, job_id):

@@ -1592,9 +1592,9 @@ class RemoveGaeUserIdOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.RemoveGaeUserIdOneOffJob.create_new())
         user_jobs_one_off.RemoveGaeUserIdOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             user_jobs_one_off.RemoveGaeUserIdOneOffJob
             .get_output(job_id))

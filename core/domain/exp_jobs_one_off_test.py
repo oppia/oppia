@@ -2236,9 +2236,9 @@ class RemoveTranslatorIdsOneOffJobTests(test_utils.GenericTestBase):
             exp_jobs_one_off.RemoveTranslatorIdsOneOffJob.create_new())
         exp_jobs_one_off.RemoveTranslatorIdsOneOffJob.enqueue(job_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             exp_jobs_one_off.RemoveTranslatorIdsOneOffJob
             .get_output(job_id))
