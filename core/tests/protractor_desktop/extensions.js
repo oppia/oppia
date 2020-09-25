@@ -41,12 +41,6 @@ describe('rich-text components', function() {
   });
 
   it('should display correctly', async function() {
-    /*
-    await users.createUser(
-      'user@richTextComponents.com', 'userRichTextComponents');
-    await users.login('user@richTextComponents.com');
-    */
-
     await users.createAndLoginUser(
       'user@richTextComponents.com', 'userRichTextComponents');
 
@@ -155,8 +149,6 @@ describe('Interactions', function() {
           await action.click('Delete Response button', deleteResponseButton);
           await action.click(
             'Confirm Delete Response button', confirmDeleteResponseButton);
-          // await deleteResponseButton.click();
-          // await confirmDeleteResponseButton.click();
         }
 
         await explorationEditorMainTab.addResponse.apply(
@@ -188,10 +180,9 @@ describe('Interactions', function() {
         // Dismiss conversation help card.
         var clearHelpcardButton = element(by.css(
           '.protractor-test-close-help-card-button'));
-        // var isPresent = await clearHelpcardButton.isPresent();
-        if (await clearHelpcardButton.isPresent()) {
+        var isPresent = await clearHelpcardButton.isPresent();
+        if (isPresent) {
           await action.click('Clear Help Card button', clearHelpcardButton);
-          // await clearHelpcardButton.click();
         }
 
         for (var j = 0; j < test.correctAnswers.length; j++) {
