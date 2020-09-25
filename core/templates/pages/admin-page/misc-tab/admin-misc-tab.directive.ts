@@ -41,14 +41,16 @@ angular.module('oppia').directive('adminMiscTab', [
         '/pages/admin-page/misc-tab/admin-misc-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
-        var ctrl = this;
-        var DATA_EXTRACTION_QUERY_HANDLER_URL = (
+        const ctrl = this;
+        const DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
-        var SEND_DUMMY_MAIL_HANDLER_URL = (
+        const SEND_DUMMY_MAIL_HANDLER_URL = (
           '/senddummymailtoadminhandler');
-        var MEMORY_CACHE_HANDLER_URL = '/memorycacheadminhandler';
-        var UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
-        var irreversibleActionMessage = (
+        const MEMORY_CACHE_HANDLER_URL = '/memorycacheadminhandler';
+        const UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
+        const NUMBER_OF_DELETION_REQUEST_HANDLER_URL = (
+          '/numberofdeletionrequestshandler');
+        const irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
 
         ctrl.MAX_USERNAME_LENGTH = MAX_USERNAME_LENGTH;
@@ -151,7 +153,6 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.dataExtractionQueryStatusMessage = message;
         };
 
-
         ctrl.sendDummyMailToAdmin = function() {
           $http.post(SEND_DUMMY_MAIL_HANDLER_URL)
             .then(function(response) {
@@ -200,6 +201,22 @@ angular.module('oppia').directive('adminMiscTab', [
                 'Successfully renamed ' + ctrl.oldUsername + ' to ' +
                   ctrl.newUsername + '!');
             }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            }
+          );
+        };
+
+        ctrl.getNumberOfPendingDeletionRequestModels = function() {
+          ctrl.setStatusMessage(
+            'Getting the number of users that are being deleted...');
+          $http.get(NUMBER_OF_DELETION_REQUEST_HANDLER_URL).then(
+            function(response) {
+              ctrl.setStatusMessage(
+                'The number of users that are being deleted is: ' +
+                response.data.number_of_pending_deletion_models);
+            },
+            function(errorResponse) {
               ctrl.setStatusMessage(
                 'Server error: ' + errorResponse.data.error);
             }

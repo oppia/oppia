@@ -65,12 +65,18 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         super(WipeoutServiceHelpersTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        self.role = user_services.get_user_settings(self.user_1_id).role
+        self.user_1_role = user_services.get_user_settings(self.user_1_id).role
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+        self.user_2_role = user_services.get_user_settings(self.user_2_id).role
 
     def test_gets_pending_deletion_request(self):
         wipeout_service.save_pending_deletion_requests(
             [wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_1_id, self.USER_1_EMAIL, self.role, ['exp1', 'exp2'],
+                self.user_1_id,
+                self.USER_1_EMAIL,
+                self.user_1_role,
+                ['exp1', 'exp2'],
                 ['col1']
             )]
         )
@@ -86,10 +92,38 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         self.assertEqual(
             pending_deletion_request.pseudonymizable_entity_mappings, {})
 
+    def test_get_number_of_pending_deletion_requests_returns_correct_number(
+            self):
+        number_of_pending_deletion_requests = (
+            wipeout_service.get_number_of_pending_deletion_requests())
+        self.assertEqual(number_of_pending_deletion_requests, 0)
+
+        wipeout_service.save_pending_deletion_requests(
+            [
+                wipeout_domain.PendingDeletionRequest.create_default(
+                    self.user_1_id,
+                    self.USER_1_EMAIL,
+                    self.user_1_role,
+                    [],
+                    []
+                ),
+                wipeout_domain.PendingDeletionRequest.create_default(
+                    self.user_2_id,
+                    self.USER_2_EMAIL,
+                    self.user_2_role,
+                    [],
+                    []
+                )
+            ]
+        )
+        number_of_pending_deletion_requests = (
+            wipeout_service.get_number_of_pending_deletion_requests())
+        self.assertEqual(number_of_pending_deletion_requests, 2)
+
     def test_saves_pending_deletion_request_when_new(self):
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_1_id, self.USER_1_EMAIL, self.role, [], []))
+                self.user_1_id, self.USER_1_EMAIL, self.user_1_role, [], []))
         wipeout_service.save_pending_deletion_requests(
             [pending_deletion_request])
 
@@ -111,7 +145,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel(
                 id=self.user_1_id,
                 email=self.USER_1_EMAIL,
-                role=self.role,
+                role=self.user_1_role,
                 deletion_complete=False,
                 exploration_ids=['exp1', 'exp2'],
                 collection_ids=['col1'],
@@ -122,7 +156,10 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
 
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_1_id, self.USER_1_EMAIL, self.role, ['exp1', 'exp2'],
+                self.user_1_id,
+                self.USER_1_EMAIL,
+                self.user_1_role,
+                ['exp1', 'exp2'],
                 ['col1']
             )
         )
@@ -156,7 +193,10 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
     def test_deletes_pending_deletion_request(self):
         wipeout_service.save_pending_deletion_requests(
             [wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_1_id, self.USER_1_EMAIL, self.role, ['exp1', 'exp2'],
+                self.user_1_id,
+                self.USER_1_EMAIL,
+                self.user_1_role,
+                ['exp1', 'exp2'],
                 ['col1']
             )]
         )
@@ -444,6 +484,66 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
 
         top_rights_model = topic_models.TopicRightsModel.get_by_id('top_id')
         self.assertEqual(top_rights_model.manager_ids, [])
+
+
+class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
+    """Provides testing of the pre-deletion part of wipeout service."""
+
+    USER_1_EMAIL = 'some@email.com'
+    USER_1_USERNAME = 'username1'
+    USER_2_EMAIL = 'some-other@email.com'
+    USER_2_USERNAME = 'username2'
+
+    def setUp(self):
+        super(WipeoutServiceRunFunctionsTests, self).setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.set_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
+        self.user_1_actions = user_services.UserActionsInfo(self.user_1_id)
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.pending_deletion_request = (
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+    def test_run_user_deletion_with_user_not_deleted(self):
+        self.assertEqual(
+            wipeout_service.run_user_deletion(self.pending_deletion_request),
+            wipeout_domain.USER_DELETION_SUCCESS
+        )
+
+    def test_run_user_deletion_with_user_already_deleted(self):
+        wipeout_service.run_user_deletion(self.pending_deletion_request)
+        self.assertEqual(
+            wipeout_service.run_user_deletion(self.pending_deletion_request),
+            wipeout_domain.USER_DELETION_ALREADY_DONE
+        )
+
+    def test_run_user_deletion_completion_with_user_not_yet_deleted(self):
+        self.assertEqual(
+            wipeout_service.run_user_deletion_completion(
+                self.pending_deletion_request),
+            wipeout_domain.USER_VERIFICATION_NOT_DELETED
+        )
+
+    def test_run_user_deletion_completion_with_user_wrongly_deleted(self):
+        wipeout_service.run_user_deletion(self.pending_deletion_request)
+        self.assertEqual(
+            wipeout_service.run_user_deletion_completion(
+                self.pending_deletion_request),
+            wipeout_domain.USER_VERIFICATION_SUCCESS
+        )
+
+    def test_run_user_deletion_completion_with_user_properly_deleted(self):
+        wipeout_service.run_user_deletion(self.pending_deletion_request)
+
+        user_models.CompletedActivitiesModel(
+            id=self.user_1_id, exploration_ids=[], collection_ids=[]
+        ).put()
+
+        self.assertEqual(
+            wipeout_service.run_user_deletion_completion(
+                self.pending_deletion_request),
+            wipeout_domain.USER_VERIFICATION_FAILURE
+        )
 
 
 class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):

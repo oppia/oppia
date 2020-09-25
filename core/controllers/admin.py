@@ -52,6 +52,7 @@ from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
+from core.domain import wipeout_service
 from core.platform import models
 import feconf
 import python_utils
@@ -1008,3 +1009,18 @@ class UpdateUsernameHandler(base.BaseHandler):
         user_services.log_username_change(
             self.user_id, old_username, new_username)
         self.render_json({})
+
+
+class NumberOfDeletionRequestsHandler(base.BaseHandler):
+    """Handler for getting the number of pending deletion requests via admin
+    page.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        self.render_json({
+            'number_of_pending_deletion_models': (
+                wipeout_service.get_number_of_pending_deletion_requests())
+        })
