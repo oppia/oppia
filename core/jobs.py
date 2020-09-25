@@ -524,7 +524,6 @@ class BaseJobManager(python_utils.OBJECT):
         """
         pass
 
-
     @classmethod
     def _post_failure_hook(cls, job_id):
         """A hook or a callback function triggered after marking a job as
