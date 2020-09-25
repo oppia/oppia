@@ -2288,7 +2288,7 @@ class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
     def test_get_with_no_deletion_request_returns_zero(self):
-        response = self.get_json('/numberofpendingdeletionrequests')
+        response = self.get_json('/numberofdeletionrequestshandler')
         self.assertEqual(response['number_of_pending_deletion_models'], 0)
 
     def test_get_with_two_deletion_request_returns_two(self):
@@ -2299,5 +2299,5 @@ class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
             id='id2', email='id2@email.com', role='role'
         ).put()
 
-        response = self.get_json('/numberofpendingdeletionrequests')
+        response = self.get_json('/numberofdeletionrequestshandler')
         self.assertEqual(response['number_of_pending_deletion_models'], 2)
