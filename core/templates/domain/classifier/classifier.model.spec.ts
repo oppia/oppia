@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the Classifier.
+ * @fileoverview Unit tests for the Classifier model.
  */
 
 import { Classifier } from 'domain/classifier/classifier.model';

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for TopicRights.
+ * @fileoverview Tests for TopicRights model.
  */
 
 import { TopicRights } from 'domain/topic/topic-rights.model';

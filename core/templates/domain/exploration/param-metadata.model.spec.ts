@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ParamMetadata.
+ * @fileoverview Unit tests for ParamMetadata model.
  */
 
 import { ParamMetadata } from 'domain/exploration/param-metadata.model';

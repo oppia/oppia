@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for AudioLanguage.
+ * @fileoverview Unit tests for AudioLanguage model.
  */
 
 import { AudioLanguage } from 'domain/utilities/audio-language.model';

@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for NewlyCreatedTopic.
+ * @fileoverview Unit tests for NewlyCreatedTopic model.
  */
 
 import { NewlyCreatedTopic } from

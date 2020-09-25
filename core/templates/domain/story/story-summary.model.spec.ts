@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for StorySummary.
+ * @fileoverview Tests for StorySummary model.
  */
 
 import { StorySummary } from 'domain/story/story-summary.model';

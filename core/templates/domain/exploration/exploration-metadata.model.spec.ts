@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for ExplorationMetadata.
+ * @fileoverview Tests for ExplorationMetadata model.
  */
 import { ExplorationMetadata } from
   'domain/exploration/exploration-metadata.model';

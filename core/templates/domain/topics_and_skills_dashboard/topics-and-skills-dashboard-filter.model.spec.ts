@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for TopicsAndSkillsDashboardFilter.
+ * @fileoverview Unit tests for TopicsAndSkillsDashboardFilter model.
  */
 
 import { ETopicPublishedOptions, ETopicSortOptions } from

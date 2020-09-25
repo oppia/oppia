@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for EntityContext.
+ * @fileoverview Unit tests for EntityContext model.
  */
 
 import { EntityContext } from 'domain/utilities/entity-context.model';

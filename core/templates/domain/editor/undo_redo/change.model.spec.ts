@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for Change.
+ * @fileoverview Tests for Change model.
  */
 
 import { BackendChangeObject, Change } from

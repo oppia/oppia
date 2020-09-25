@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for LearnerDashboardActivityIds.
+ * @fileoverview Tests for LearnerDashboardActivityIds model.
  */
 
 import {

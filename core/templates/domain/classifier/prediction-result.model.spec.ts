@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the PredictionResult.
+ * @fileoverview Unit tests for the PredictionResult model.
  */
 import { PredictionResult } from 'domain/classifier/prediction-result.model';
 

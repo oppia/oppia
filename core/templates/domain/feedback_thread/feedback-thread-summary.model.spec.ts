@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for FeedbackThreadSummary.
+ * @fileoverview Tests for FeedbackThreadSummary model.
  */
 
 import { FeedbackThreadSummary } from

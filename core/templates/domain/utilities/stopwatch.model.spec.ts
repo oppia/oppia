@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Stopwatch.
+ * @fileoverview Unit tests for Stopwatch model.
  */
 
 import { Stopwatch } from 'domain/utilities/stopwatch.model';

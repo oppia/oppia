@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the AnswerClassificationResult.
+ * @fileoverview Unit tests for the AnswerClassificationResult model.
  */
 
 import { AnswerClassificationResult } from
