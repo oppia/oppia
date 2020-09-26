@@ -28,10 +28,10 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -1839,7 +1839,7 @@ class UserQueryModel(base_models.BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        cursor = datastore_query.Cursor(urlsafe=cursor)
+        cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
         query_models, next_cursor, more = (
             cls.query().order(-cls.created_on).
             fetch_page(page_size, start_cursor=cursor))
