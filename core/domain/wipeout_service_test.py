@@ -1313,7 +1313,8 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
                     text='Some text'
                 )
             )
-        datastore_services.put_multi(feedback_thread_models + feedback_message_models)
+        datastore_services.put_multi(
+            feedback_thread_models + feedback_message_models)
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))

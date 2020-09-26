@@ -59,7 +59,8 @@ class StoryModel(base_models.VersionedModel):
     # A set of notes, that describe the characters, main storyline, and setting.
     notes = datastore_services.TextProperty(indexed=False)
     # The ISO 639-1 code for the language this story is written in.
-    language_code = datastore_services.StringProperty(required=True, indexed=True)
+    language_code = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The story contents dict specifying the list of story nodes and the
     # connection between them. Modelled by class StoryContents
     # (see story_domain.py for its current schema).
@@ -68,9 +69,11 @@ class StoryModel(base_models.VersionedModel):
     story_contents_schema_version = (
         datastore_services.IntegerProperty(required=True, indexed=True))
     # The topic id to which the story belongs.
-    corresponding_topic_id = datastore_services.StringProperty(indexed=True, required=True)
+    corresponding_topic_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
     # The url fragment for the story.
-    url_fragment = datastore_services.StringProperty(required=True, indexed=True)
+    url_fragment = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The content of the meta tag in the Story viewer page.
     meta_tag_content = datastore_services.StringProperty(indexed=True)
 
@@ -214,26 +217,31 @@ class StorySummaryModel(base_models.BaseModel):
     # The title of the story.
     title = datastore_services.StringProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this story is written in.
-    language_code = datastore_services.StringProperty(required=True, indexed=True)
+    language_code = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # A high-level description of the story.
     description = datastore_services.StringProperty(required=True, indexed=True)
     # Time when the story model was last updated (not to be
     # confused with last_updated, which is the time when the
     # story *summary* model was last updated).
-    story_model_last_updated = datastore_services.DateTimeProperty(required=True, indexed=True)
+    story_model_last_updated = (
+        datastore_services.DateTimeProperty(required=True, indexed=True))
     # Time when the story model was created (not to be confused
     # with created_on, which is the time when the story *summary*
     # model was created).
-    story_model_created_on = datastore_services.DateTimeProperty(required=True, indexed=True)
+    story_model_created_on = (
+        datastore_services.DateTimeProperty(required=True, indexed=True))
     # The titles of the nodes in the story, in the same order as present there.
-    node_titles = datastore_services.StringProperty(repeated=True, indexed=False)
+    node_titles = (
+        datastore_services.StringProperty(repeated=True, indexed=False))
     # The thumbnail filename of the story.
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # The thumbnail background color of the story.
     thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
     version = datastore_services.IntegerProperty(required=True)
     # The url fragment for the story.
-    url_fragment = datastore_services.StringProperty(required=True, indexed=True)
+    url_fragment = (
+        datastore_services.StringProperty(required=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():

@@ -1148,7 +1148,8 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
     relevant layer prefix gets appended.
     """
 
-    realtime_layer = datastore_services.IntegerProperty(required=True, choices=[0, 1])
+    realtime_layer = (
+        datastore_services.IntegerProperty(required=True, choices=[0, 1]))
 
     @classmethod
     def get_realtime_id(cls, layer_index, raw_entity_id):
