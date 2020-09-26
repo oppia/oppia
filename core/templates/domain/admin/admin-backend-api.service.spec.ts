@@ -20,13 +20,11 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { AdminPageData, AdminBackendApiService } from
-  'domain/admin/admin-backend-api.service';
-import { TopicSummaryObjectFactory } from
-  'domain/topic/TopicSummaryObjectFactory';
+import { AdminPageData, AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { ComputationData } from 'domain/admin/computation-data.model';
 import { Job } from 'domain/admin/job.model';
 import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
+import { TopicSummaryObjectFactory } from 'domain/topic/TopicSummaryObjectFactory';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
