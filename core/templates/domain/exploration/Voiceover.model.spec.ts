@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for the Voiceover object factory.
  */
 
-import { Voiceover } from
-  'domain/exploration/VoiceoverObjectFactory';
+import { Voiceover } from 'domain/exploration/Voiceover.model';
 
 describe('Voiceover object factory', () => {
   let voiceover: Voiceover;
