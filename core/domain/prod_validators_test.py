@@ -6575,7 +6575,7 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 '[u"Entity id question-0-1: based on field question_ids '
                 'having value 0, expected model QuestionModel with id '
                 '0 but it doesn\'t exist", u"Entity id question-0-2: '
-                'based on field question_ids having value 0, expect '
+                'based on field question_ids having value 0, expected '
                 'model QuestionModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
         self.run_job_and_check_output(
@@ -7873,7 +7873,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 '[u"Entity id skill-0-1: based on field skill_ids '
                 'having value 0, expected model SkillModel with id '
                 '0 but it doesn\'t exist", u"Entity id skill-0-2: '
-                'based on field skill_ids having value 0, expect '
+                'based on field skill_ids having value 0, expected '
                 'model SkillModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
         self.run_job_and_check_output(
@@ -11109,7 +11109,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
                 '[u"Entity id rights-0-1: based on field topic_rights_ids '
                 'having value 0, expected model TopicRightsModel with id 0 '
                 'but it doesn\'t exist", u"Entity id rights-0-2: based '
-                'on field topic_rights_ids having value 0, expect '
+                'on field topic_rights_ids having value 0, expected '
                 'model TopicRightsModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated TopicCommitLogEntryModel\', 5]']
         self.run_job_and_check_output(
@@ -15203,7 +15203,7 @@ class UserContributionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             (
                 u'[u\'failed validation check for user_settings_ids field '
                 'check of UserContributionRightsModel\', [u"Entity id %s: '
-                'based on field user_settings_ids having value %s, expect '
+                'based on field user_settings_ids having value %s, expected '
                 'model UserSettingsModel with id %s but it doesn\'t exist"]]'
             ) % (self.translator_id, self.translator_id, self.translator_id),
             u'[u\'fully-validated UserContributionRightsModel\', 1]']

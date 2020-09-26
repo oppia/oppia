@@ -262,7 +262,7 @@ class BaseModelValidator(python_utils.OBJECT):
                     cls._add_error(
                         '%s %s' % (field_name, ERROR_CATEGORY_FIELD_CHECK),
                         'Entity id %s: based on field %s having'
-                        ' value %s, expect model %s with id %s but it doesn\'t'
+                        ' value %s, expected model %s with id %s but it doesn\'t'
                         ' exist' % (
                             item.id, field_name, model_id,
                             model_class.__name__, model_id))
@@ -441,7 +441,7 @@ class BaseSummaryModelValidator(BaseModelValidator):
                             external_model_field_key,
                             ERROR_CATEGORY_FIELD_CHECK),
                         'Entity id %s: based on field %s having value %s, '
-                        'expect model %s with id %s but it doesn\'t'
+                        'expected model %s with id %s but it doesn\'t'
                         ' exist' % (
                             item.id, external_model_field_key,
                             model_id, model_class.__name__, model_id))
@@ -545,7 +545,7 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
                 cls._add_error(
                     '%s_ids %s' % (key_to_fetch, ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field %s_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, key_to_fetch, model_id,
                         model_class.__name__, model_id))
@@ -776,7 +776,7 @@ class BaseUserModelValidator(BaseModelValidator):
                 cls._add_error(
                     'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -826,7 +826,7 @@ class BaseUserModelValidator(BaseModelValidator):
                 cls._add_error(
                     'collection_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field collection_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
