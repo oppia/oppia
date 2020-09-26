@@ -240,7 +240,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
         yield (key, len(values))
 
 
-class PopulateCommunityContributionStatsOneOffJob(
+class PopulateContributionStatsOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to initialize, or regenerate,
     the reviewer and suggestion counts in the CommunityContributionStatsModel.
@@ -275,12 +275,10 @@ class PopulateCommunityContributionStatsOneOffJob(
                 return
             suggestion = suggestion_services.get_suggestion_from_model(item)
             yield ('%s%s%s%s%s' % (
-                (
-                    PopulateCommunityContributionStatsOneOffJob
-                    .ITEM_TYPE_SUGGESTION
-                ), PopulateCommunityContributionStatsOneOffJob.KEY_DELIMITER,
+                PopulateContributionStatsOneOffJob.ITEM_TYPE_SUGGESTION,
+                PopulateContributionStatsOneOffJob.KEY_DELIMITER,
                 suggestion.suggestion_type,
-                PopulateCommunityContributionStatsOneOffJob.KEY_DELIMITER,
+                PopulateContributionStatsOneOffJob.KEY_DELIMITER,
                 suggestion.language_code), 1)
 
         else:
@@ -288,72 +286,53 @@ class PopulateCommunityContributionStatsOneOffJob(
                 for language_code in (
                         item.can_review_translation_for_language_codes):
                     yield ('%s%s%s%s%s' % (
+                        PopulateContributionStatsOneOffJob.ITEM_TYPE_REVIEWER,
+                        PopulateContributionStatsOneOffJob.KEY_DELIMITER,
                         (
-                            PopulateCommunityContributionStatsOneOffJob
-                            .ITEM_TYPE_REVIEWER
-                        ),
-                        (
-                            PopulateCommunityContributionStatsOneOffJob
-                            .KEY_DELIMITER
-                        ),
-                        (
-                            PopulateCommunityContributionStatsOneOffJob
+                            PopulateContributionStatsOneOffJob
                             .ITEM_CATEGORY_TRANSLATION
                         ),
-                        (
-                            PopulateCommunityContributionStatsOneOffJob
-                            .KEY_DELIMITER
-                        ),
+                        PopulateContributionStatsOneOffJob.KEY_DELIMITER,
                         language_code), 1)
             if item.can_review_questions:
                 yield ('%s%s%s%s%s' % (
-                    (
-                        PopulateCommunityContributionStatsOneOffJob
-                        .ITEM_TYPE_REVIEWER
-                    ),
-                    PopulateCommunityContributionStatsOneOffJob.KEY_DELIMITER,
-                    (
-                        PopulateCommunityContributionStatsOneOffJob
-                        .ITEM_CATEGORY_QUESTION
-                    ),
-                    PopulateCommunityContributionStatsOneOffJob.KEY_DELIMITER,
+                    PopulateContributionStatsOneOffJob.ITEM_TYPE_REVIEWER,
+                    PopulateContributionStatsOneOffJob.KEY_DELIMITER,
+                    PopulateContributionStatsOneOffJob.ITEM_CATEGORY_QUESTION,
+                    PopulateContributionStatsOneOffJob.KEY_DELIMITER,
                     constants.DEFAULT_LANGUAGE_CODE), 1)
 
     @staticmethod
     def reduce(key, values):
-        community_contribution_stats_model = (
-            suggestion_models.CommunityContributionStatsModel.get()
-        )
+        stats_model = suggestion_models.CommunityContributionStatsModel.get()
+
         item_type, item_category, language_code = key.split(
-            PopulateCommunityContributionStatsOneOffJob.KEY_DELIMITER)
+            PopulateContributionStatsOneOffJob.KEY_DELIMITER)
 
         # Update the reviewer counts.
-        if item_type == (
-                PopulateCommunityContributionStatsOneOffJob.ITEM_TYPE_REVIEWER):
+        if item_type == PopulateContributionStatsOneOffJob.ITEM_TYPE_REVIEWER:
             if item_category == (
-                    PopulateCommunityContributionStatsOneOffJob
+                    PopulateContributionStatsOneOffJob
                     .ITEM_CATEGORY_QUESTION):
-                community_contribution_stats_model.question_reviewer_count = (
-                    len(values))
+                stats_model.question_reviewer_count = len(values)
             elif item_category == (
-                    PopulateCommunityContributionStatsOneOffJob
+                    PopulateContributionStatsOneOffJob
                     .ITEM_CATEGORY_TRANSLATION):
                 (
-                    community_contribution_stats_model
+                    stats_model
                     .translation_reviewer_counts_by_lang_code[language_code]
                 ) = len(values)
         # Update the suggestion counts.
         else:
             if item_category == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
-                community_contribution_stats_model.question_suggestion_count = (
-                    len(values))
+                stats_model.question_suggestion_count = len(values)
             elif item_category == (
                     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
                 (
-                    community_contribution_stats_model
+                    stats_model
                     .translation_suggestion_counts_by_lang_code[language_code]
                 ) = len(values)
 
-        community_contribution_stats_model.put()
+        stats_model.put()
 
         yield (key, len(values))

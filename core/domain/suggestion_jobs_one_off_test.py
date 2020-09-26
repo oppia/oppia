@@ -2029,7 +2029,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         self._run_job_and_verify_output(expected_output)
 
 
-class PopulateCommunityContributionStatsOneOffJobTests(
+class PopulateContributionStatsOneOffJobTests(
         test_utils.GenericTestBase):
 
     target_id = 'exp1'
@@ -2200,7 +2200,7 @@ class PopulateCommunityContributionStatsOneOffJobTests(
             community_contribution_stats.question_suggestion_count, 0)
 
     def _run_job_and_verify_output(self, expected_output):
-        """Runs the PopulateCommunityContributionStatsOneOffJob and verifies
+        """Runs the PopulateContributionStatsOneOffJob and verifies
         that the output matches the expected output.
 
         Args:
@@ -2209,17 +2209,17 @@ class PopulateCommunityContributionStatsOneOffJobTests(
         """
         job_id = (
             suggestion_jobs_one_off
-            .PopulateCommunityContributionStatsOneOffJob.create_new())
+            .PopulateContributionStatsOneOffJob.create_new())
         (
             suggestion_jobs_one_off
-            .PopulateCommunityContributionStatsOneOffJob
+            .PopulateContributionStatsOneOffJob
             .enqueue(job_id)
         )
         self.process_and_flush_pending_tasks()
 
         actual_output = (
             suggestion_jobs_one_off
-            .PopulateCommunityContributionStatsOneOffJob
+            .PopulateContributionStatsOneOffJob
             .get_output(job_id)
         )
 
@@ -2228,7 +2228,7 @@ class PopulateCommunityContributionStatsOneOffJobTests(
 
     def setUp(self):
         super(
-            PopulateCommunityContributionStatsOneOffJobTests,
+            PopulateContributionStatsOneOffJobTests,
             self).setUp()
 
         self.signup(self.AUTHOR_EMAIL, 'author')
