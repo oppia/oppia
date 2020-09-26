@@ -32,8 +32,8 @@ describe('Computation Data Model', () => {
         last_stopped_msec: null
       };
 
-      let computationData =
-        ComputationData.createFromBackendDict(backendDict);
+      let computationData = ComputationData.createFromBackendDict(
+        backendDict);
 
       expect(computationData.isStoppable).toEqual(false);
       expect(computationData.isStartable).toEqual(true);
