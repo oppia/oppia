@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,14 +21,13 @@ import { HttpService } from 'services/http.service';
 import { HttpTestingController, HttpClientTestingModule } from
   '@angular/common/http/testing';
 
-describe('HTML escaper service', () => {
+fdescribe('HTML service', () => {
   let httpTestingController: HttpTestingController;
   let service: HttpService;
-  const arbitraryTestUrl = 'abcdfg.com';
+  const ARBITRARY_TEST_URL = 'abcdfg.com';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [HttpService],
       imports: [HttpClientTestingModule]
     });
     httpTestingController = TestBed.get(HttpTestingController);
@@ -40,48 +39,48 @@ describe('HTML escaper service', () => {
   });
 
   it('should make an HTTP GET request', fakeAsync(async() => {
-    const getPromise = service.get(arbitraryTestUrl);
-    const expectedReq = httpTestingController.expectOne(arbitraryTestUrl);
-    expect(expectedReq.request.method).toEqual('GET');
-    expectedReq.flush('response');
+    const promise = service.get(ARBITRARY_TEST_URL);
+    const req = httpTestingController.expectOne(ARBITRARY_TEST_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush('response');
     flushMicrotasks();
-    expect(await getPromise).toEqual('response');
+    expect(await promise).toEqual('response');
   }));
 
   it('should make a HTTP PUT request', fakeAsync(async() => {
-    const getPromise = service.put(arbitraryTestUrl);
-    const expectedReq = httpTestingController.expectOne(arbitraryTestUrl);
-    expect(expectedReq.request.method).toEqual('PUT');
-    expectedReq.flush('response');
+    const promise = service.put(ARBITRARY_TEST_URL);
+    const req = httpTestingController.expectOne(ARBITRARY_TEST_URL);
+    expect(req.request.method).toEqual('PUT');
+    req.flush('response');
     flushMicrotasks();
-    expect(await getPromise).toEqual('response');
+    expect(await promise).toEqual('response');
   }));
 
   it('should make a HTTP PATCH request', fakeAsync(async() => {
-    const getPromise = service.patch(arbitraryTestUrl);
-    const expectedReq = httpTestingController.expectOne(arbitraryTestUrl);
-    expect(expectedReq.request.method).toEqual('PATCH');
-    expectedReq.flush('response');
+    const promise = service.patch(ARBITRARY_TEST_URL);
+    const req = httpTestingController.expectOne(ARBITRARY_TEST_URL);
+    expect(req.request.method).toEqual('PATCH');
+    req.flush('response');
     flushMicrotasks();
-    expect(await getPromise).toEqual('response');
+    expect(await promise).toEqual('response');
   }));
 
   it('should make a HTTP DELETE request', fakeAsync(async() => {
-    /* eslint-disable-next-line dot-notation */
-    const getPromise = service.delete(arbitraryTestUrl);
-    const expectedReq = httpTestingController.expectOne(arbitraryTestUrl);
-    expect(expectedReq.request.method).toEqual('DELETE');
-    expectedReq.flush('response');
+    // eslint-disable-next-line dot-notation
+    const promise = service.delete(ARBITRARY_TEST_URL);
+    const req = httpTestingController.expectOne(ARBITRARY_TEST_URL);
+    expect(req.request.method).toEqual('DELETE');
+    req.flush('response');
     flushMicrotasks();
-    expect(await getPromise).toEqual('response');
+    expect(await promise).toEqual('response');
   }));
 
   it('should make a HTTP POST request', fakeAsync(async() => {
-    const getPromise = service.post(arbitraryTestUrl);
-    const expectedReq = httpTestingController.expectOne(arbitraryTestUrl);
-    expect(expectedReq.request.method).toEqual('POST');
-    expectedReq.flush('response');
+    const promise = service.post(ARBITRARY_TEST_URL);
+    const req = httpTestingController.expectOne(ARBITRARY_TEST_URL);
+    expect(req.request.method).toEqual('POST');
+    req.flush('response');
     flushMicrotasks();
-    expect(await getPromise).toEqual('response');
+    expect(await promise).toEqual('response');
   }));
 });

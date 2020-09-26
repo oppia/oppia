@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,10 @@ import { HttpHeaders, HttpParams, HttpClient } from
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-interface HttpOptions { params: HttpParams, headers: HttpHeaders }
+interface HttpOptions {
+  params: HttpParams,
+  headers: HttpHeaders
+}
 
 @Injectable({
   providedIn: 'root'
@@ -29,12 +32,12 @@ interface HttpOptions { params: HttpParams, headers: HttpHeaders }
 export class HttpService {
   constructor(private httpClient: HttpClient) {}
 
-  /* Used when we want to exclusively read data; no modifications.*/
+  /* Used when we want to exclusively read data; no modifications. */
   get<T>(url: string, options?: HttpOptions): Promise<T> {
     return this.httpClient.get<T>(url, options).toPromise();
   }
 
-  /* Used when we want to fully replace the value of a resource.*/
+  /* Used when we want to fully replace the value of a resource. */
   put<T>(url: string, options?: HttpOptions): Promise<T> {
     return this.httpClient.put<T>(url, options).toPromise();
   }
@@ -47,9 +50,9 @@ export class HttpService {
     return this.httpClient.patch<T>(url, options).toPromise();
   }
 
-  /* Used when we want to trigger a logical delete of some data.*/
+  /* Used when we want to trigger a logical delete of some data. */
   delete<T>(url: string, options?: HttpOptions): Promise<T> {
-    /* eslint-disable-next-line dot-notation */
+    // eslint-disable-next-line dot-notation
     return this.httpClient.delete<T>(url, options).toPromise();
   }
 
