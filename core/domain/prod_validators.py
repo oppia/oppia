@@ -3164,9 +3164,12 @@ class CommunityContributionStatsModelValidator(
             language_code['id'] for language_code in
             constants.SUPPORTED_AUDIO_LANGUAGES
         ]
+        all_user_contribution_rights_models = (
+            user_models.UserContributionRightsModel.get_all()
+        )
         for language_code in supported_language_codes:
             expected_translation_reviewer_count = (
-                user_models.UserContributionRightsModel.query(
+                all_user_contribution_rights_models.filter(
                     (
                         user_models.UserContributionRightsModel
                         .can_review_translation_for_language_codes
@@ -3216,22 +3219,20 @@ class CommunityContributionStatsModelValidator(
             language_code['id'] for language_code in
             constants.SUPPORTED_AUDIO_LANGUAGES
         ]
+        all_translation_suggestion_models_in_review = (
+            suggestion_models.GeneralSuggestionModel.get_all()
+            .filter(suggestion_models.GeneralSuggestionModel.status == (
+                suggestion_models.STATUS_IN_REVIEW))
+            .filter(
+                    suggestion_models.GeneralSuggestionModel
+                    .suggestion_type
+            ) == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        )
         for language_code in supported_language_codes:
             expected_translation_suggestion_count = (
-                suggestion_models.GeneralSuggestionModel.get_all()
-                .filter(
-                    suggestion_models.GeneralSuggestionModel.status == (
-                        suggestion_models.STATUS_IN_REVIEW))
-                .filter(
-                    (
-                        suggestion_models.GeneralSuggestionModel
-                        .suggestion_type
-                    ) == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
-                .filter(
-                    (
-                        suggestion_models.GeneralSuggestionModel
-                        .language_code
-                    ) == language_code)
+                all_translation_suggestion_models_in_review.filter(
+                    suggestion_models.GeneralSuggestionModel.language_code == (
+                        language_code)
                 .count()
             )
             if language_code in item.translation_suggestion_counts_by_lang_code:
