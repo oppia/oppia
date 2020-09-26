@@ -288,7 +288,8 @@ class SkillSummaryModel(base_models.BaseModel):
                     this batch. If False, there are no further results
                     after this batch.
         """
-        cursor = datastore_services.make_cursor(urlsafe=urlsafe_start_cursor)
+        cursor = (
+            datastore_services.make_cursor(urlsafe_cursor=urlsafe_start_cursor))
         sort = -cls.skill_model_created_on
         if sort_by == (
                 constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[

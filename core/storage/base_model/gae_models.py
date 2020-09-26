@@ -366,8 +366,8 @@ class BaseModel(ndb.Model):
                     this batch.
         """
         if urlsafe_start_cursor:
-            start_cursor = (
-                datastore_services.make_cursor(urlsafe=urlsafe_start_cursor))
+            start_cursor = datastore_services.make_cursor(
+                urlsafe_cursor=urlsafe_start_cursor)
         else:
             start_cursor = None
 

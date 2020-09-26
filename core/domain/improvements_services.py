@@ -132,7 +132,7 @@ def fetch_exploration_task_history_page(exploration, urlsafe_start_cursor=None):
     """
     start_cursor = (
         urlsafe_start_cursor and
-        datastore_services.make_cursor(urlsafe=urlsafe_start_cursor))
+        datastore_services.make_cursor(urlsafe_cursor=urlsafe_start_cursor))
     results, cursor, more = (
         improvements_models.TaskEntryModel.query(
             improvements_models.TaskEntryModel.entity_type == (

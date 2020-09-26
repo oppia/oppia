@@ -116,8 +116,8 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                     this batch.
         """
         if urlsafe_start_cursor:
-            start_cursor = (
-                datastore_services.make_cursor(urlsafe=urlsafe_start_cursor))
+            start_cursor = datastore_services.make_cursor(
+                urlsafe_cursor=urlsafe_start_cursor)
         else:
             start_cursor = datastore_services.make_cursor()
 
@@ -156,8 +156,8 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                     this batch.
         """
         if urlsafe_start_cursor:
-            start_cursor = (
-                datastore_services.make_cursor(urlsafe=urlsafe_start_cursor))
+            start_cursor = datastore_services.make_cursor(
+                urlsafe_cursor=urlsafe_start_cursor)
         else:
             start_cursor = None
 
@@ -251,8 +251,8 @@ class SkillOpportunityModel(base_models.BaseModel):
                     this batch.
         """
         if urlsafe_start_cursor:
-            start_cursor = (
-                datastore_services.make_cursor(urlsafe=urlsafe_start_cursor))
+            start_cursor = datastore_services.make_cursor(
+                urlsafe_cursor=urlsafe_start_cursor)
         else:
             start_cursor = None
 

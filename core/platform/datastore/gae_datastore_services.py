@@ -23,7 +23,7 @@ from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 
-def make_cursor(urlsafe=None):
+def make_cursor(urlsafe_cursor=None):
     """Makes an immutable cursor that points to a relative position in a query.
 
     The position denoted by a Cursor is relative to the result of a query, even
@@ -38,14 +38,14 @@ def make_cursor(urlsafe=None):
     returned.
 
     Args:
-        urlsafe: str | None. The base64-encoded serialization of a cursor.
-            When None, the cursor returned will point to the first result of any
-            query.
+        urlsafe_cursor: str | None. The base64-encoded serialization of a
+            cursor. When None, the cursor returned will point to the first
+            result of any query.
 
     Returns:
         datastore_query.Cursor. A cursor into an arbitrary query.
     """
-    return datastore_query.Cursor(urlsafe=urlsafe)
+    return datastore_query.Cursor(urlsafe=urlsafe_cursor)
 
 
 def fetch_multiple_entities_by_ids_and_models(ids_and_models):
