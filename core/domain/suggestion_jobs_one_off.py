@@ -253,7 +253,6 @@ class PopulateCommunityContributionStatsOneOffJob(
     ITEM_CATEGORY_TRANSLATION = 'translation'
     KEY_DELIMITER = '.'
 
-
     @classmethod
     def entity_classes_to_map_over(cls):
         return [
