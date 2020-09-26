@@ -143,6 +143,9 @@ jobs:
       - attach_workspace:
           at: /home/circleci/
       - run:
+        name: Install dependencies
+        command: python -m scripts.install_third_party_libs
+      - run:
           name: Run e2e navigation test
           command: |
             python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
@@ -171,9 +174,12 @@ jobs:
       - attach_workspace:
           at: /home/circleci/
       - run:
+          name: Install dependencies
+          command: python -m scripts.install_third_party_libs
+      - run:
           name: Run e2e publication test
           command: |
-            python -m scripts.run_e2e_tests --skip-build --suite="publication" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="publication" --prod_env
       - run:
           name: Run e2e library test
           command: |
@@ -201,9 +207,12 @@ jobs:
       - attach_workspace:
           at: /home/circleci/
       - run:
+          name: Install dependencies
+          command: python -m scripts.install_third_party_libs
+      - run:
           name: Run e2e users test
           command: |
-            python -m scripts.run_e2e_tests --skip-build --suite="users" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env
       - run:
           name: Run e2e subscriptions test
           command: |
@@ -234,9 +243,12 @@ jobs:
       - attach_workspace:
           at: /home/circleci/
       - run:
+          name: Install dependencies
+          command: python -m scripts.install_third_party_libs
+      - run:
           name: Run e2e file upload features test
           command: |
-            python -m scripts.run_e2e_tests --suite="fileUploadFeatures"
+            python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
       - run:
           name: Run e2e play voiceovers test
           command: |
@@ -260,9 +272,12 @@ jobs:
       - attach_workspace:
           at: /home/circleci/
       - run:
+          name: Install dependencies
+          command: python -m scripts.install_third_party_libs
+      - run:
           name: Run e2e topics and skills dashboard test
           command: |
-            python -m scripts.run_e2e_tests --suite="topicsAndSkillsDashboard" --server_log_level=info
+            python -m scripts.run_e2e_tests --skip-install --suite="topicsAndSkillsDashboard" --server_log_level=info
       - run:
           name: Run e2e topics and story editor
           command: |
