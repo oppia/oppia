@@ -28,10 +28,12 @@ import json
 import logging
 
 from export import acl_decorators
+from core.platform import models
 
-from google.appengine.api import app_identity
 from google.appengine.api import urlfetch
 import webapp2
+
+app_identity_services = models.Registry.import_app_identity_services()
 
 APP_NAME_OPPIASERVER = 'oppiaserver'
 
@@ -52,9 +54,9 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
         """
         gcs_bucket_url_prefix = 'gs://'
 
-        access_token, _ = app_identity.get_access_token(
+        access_token, _ = app_identity_services.get_access_token(
             'https://www.googleapis.com/auth/datastore')
-        app_id = app_identity.get_application_id()
+        app_id = app_identity_services.get_application_id()
 
         if app_id != APP_NAME_OPPIASERVER:
             logging.error(
