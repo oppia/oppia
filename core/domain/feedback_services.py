@@ -35,6 +35,7 @@ import python_utils
 (feedback_models, email_models, suggestion_models) = (
     models.Registry.import_models(
         [models.NAMES.feedback, models.NAMES.email, models.NAMES.suggestion]))
+
 datastore_services = models.Registry.import_datastore_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()

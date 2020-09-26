@@ -43,6 +43,7 @@ import python_utils
     models.NAMES.skill, models.NAMES.story, models.NAMES.suggestion,
     models.NAMES.topic, models.NAMES.user
 ])
+
 current_user_services = models.Registry.import_current_user_services()
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()

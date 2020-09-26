@@ -26,10 +26,10 @@ import feconf
 import python_utils
 import utils
 
-datastore_services = models.Registry.import_datastore_services()
-
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class SentEmailModel(base_models.BaseModel):

@@ -21,9 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 
-datastore_services = models.Registry.import_datastore_services()
-
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+
 datastore_services = models.Registry.import_datastore_services()
 
 

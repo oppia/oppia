@@ -27,12 +27,12 @@ Model = ndb.Model
 Key = ndb.Key
 
 BooleanProperty = ndb.BooleanProperty
+DateTimeProperty = ndb.DateTimeProperty
 FloatProperty = ndb.FloatProperty
 IntegerProperty = ndb.IntegerProperty
+JsonProperty = ndb.JsonProperty
 StringProperty = ndb.StringProperty
 TextProperty = ndb.TextProperty
-JsonProperty = ndb.JsonProperty
-DateTimeProperty = ndb.DateTimeProperty
 UserProperty = ndb.UserProperty
 
 
@@ -75,6 +75,21 @@ def put_multi(models):
         list(str). A list with the stored keys.
     """
     return ndb.put_multi(models)
+
+
+def put_multi_async(models, update_last_updated_time=True):
+    """Stores a sequence of Model instances asynchronously.
+
+    Args:
+        models: datastore_services.Model. A sequence of Model instances.
+        update_last_updated_time: bool. Whether to update the last_updated field
+            of the entities.
+
+    Returns:
+        list(future). A list of futures.
+    """
+    return ndb.put_multi_async(
+        models, update_last_updated_time=update_last_updated_time)
 
 
 def delete_multi(keys):

@@ -25,9 +25,9 @@ from core.platform import models
 import python_utils
 import utils
 
-datastore_services = models.Registry.import_datastore_services()
-
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 # These are the possible status codes for a job.

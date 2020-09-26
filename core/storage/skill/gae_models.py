@@ -22,6 +22,7 @@ from core.platform import models
 
 (base_models, user_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
+
 datastore_services = models.Registry.import_datastore_services()
 
 

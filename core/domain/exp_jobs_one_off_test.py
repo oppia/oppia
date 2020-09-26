@@ -43,6 +43,7 @@ import utils
     models.Registry.import_models([
         models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
         models.NAMES.classifier]))
+
 datastore_services = models.Registry.import_datastore_services()
 search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()

@@ -40,6 +40,7 @@ from mapreduce import input_readers
     models.Registry.import_models([
         models.NAMES.base_model, models.NAMES.exploration,
         models.NAMES.statistics, models.NAMES.job]))
+
 datastore_services = models.Registry.import_datastore_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
