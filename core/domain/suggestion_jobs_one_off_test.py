@@ -32,14 +32,16 @@ from core.domain import question_domain
 from core.domain import suggestion_jobs_one_off
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
 import utils
 
-(suggestion_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.suggestion, models.NAMES.feedback])
+(suggestion_models, feedback_models, user_models,) = (
+    models.Registry.import_models([
+        models.NAMES.suggestion, models.NAMES.feedback, models.NAMES.user]))
 
 
 class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
@@ -2025,3 +2027,513 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         ]
 
         self._run_job_and_verify_output(expected_output)
+
+
+class PopulateContributionStatsOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    target_id = 'exp1'
+    target_version_at_submission = 1
+    sample_language_code = 'hi'
+    AUTHOR_EMAIL = 'author1@example.com'
+    REVIEWER_1_EMAIL = 'reviewer1@community.org'
+    REVIEWER_2_EMAIL = 'reviewer2@community.org'
+    COMMIT_MESSAGE = 'commit message'
+
+    class MockExploration(python_utils.OBJECT):
+        """Mocks an exploration. To be used only for testing."""
+
+        def __init__(self, exploration_id, states):
+            self.id = exploration_id
+            self.states = states
+            self.category = 'Algebra'
+
+        def get_content_html(self, unused_state_name, unused_content_id):
+            """Used to mock the get_content_html method for explorations."""
+            return '<p>This is html to translate.</p>'
+
+    # A mock exploration created for testing.
+    explorations = [
+        MockExploration('exp1', {'state_1': {}, 'state_2': {}})
+    ]
+
+    def mock_get_exploration_by_id(self, exp_id):
+        for exp in self.explorations:
+            if exp.id == exp_id:
+                return exp
+
+    def mock_update_exploration(
+            self, unused_user_id, unused_exploration_id, unused_change_list,
+            commit_message, is_suggestion):
+        self.assertTrue(is_suggestion)
+        self.assertEqual(
+            commit_message, 'Accepted suggestion by %s: %s' % (
+                'author', self.COMMIT_MESSAGE))
+
+    def mock_accept_suggestion(
+            self, suggestion_id, reviewer_id, commit_message, review_message):
+        """Sets up the appropriate mocks to successfully call
+        accept_suggestion.
+        """
+        with self.swap(
+            exp_services, 'update_exploration',
+            self.mock_update_exploration):
+            with self.swap(
+                exp_fetchers, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                with self.swap(
+                    exp_domain.Exploration, 'get_content_html',
+                    self.MockExploration.get_content_html):
+                    suggestion_services.accept_suggestion(
+                        suggestion_id, reviewer_id, commit_message,
+                        review_message
+                    )
+
+    def _create_edit_state_content_suggestion(self):
+        """Creates an "edit state content" suggestion."""
+
+        edit_state_content_change_dict = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': {
+                'content_id': 'content',
+                'html': 'new html content'
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': 'old html content'
+            }
+        }
+
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            edit_state_content_suggestion = (
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, edit_state_content_change_dict,
+                    'test description')
+            )
+
+        return edit_state_content_suggestion
+
+    def _create_translation_suggestion_with_language_code(self, language_code):
+        """Creates a translation suggestion in the given language_code."""
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'state_1',
+            'content_id': 'content',
+            'language_code': language_code,
+            'content_html': '<p>This is html to translate.</p>',
+            'translation_html': '<p>This is translated html.</p>'
+        }
+
+        with self.swap(
+            exp_fetchers, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            with self.swap(
+                exp_domain.Exploration, 'get_content_html',
+                self.MockExploration.get_content_html):
+                translation_suggestion = (
+                    suggestion_services.create_suggestion(
+                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                        suggestion_models.TARGET_TYPE_EXPLORATION,
+                        self.target_id, self.target_version_at_submission,
+                        self.author_id, add_translation_change_dict,
+                        'test description')
+                )
+
+        return translation_suggestion
+
+    def _create_question_suggestion_with_skill_id(self, skill_id):
+        """Creates a question suggestion with the given skill_id."""
+        add_question_change_dict = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+
+        question_suggestion = suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL,
+            skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, add_question_change_dict,
+            'test description')
+
+        return question_suggestion
+
+    def _assert_community_contribution_stats_is_in_default_state(self):
+        """Checks if the community contribution stats is in its default
+        state.
+        """
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_reviewer_counts_by_lang_code
+            ), {})
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_suggestion_counts_by_lang_code
+            ), {})
+        self.assertEqual(
+            community_contribution_stats.question_reviewer_count, 0)
+        self.assertEqual(
+            community_contribution_stats.question_suggestion_count, 0)
+
+    def _run_job_and_verify_output(self, expected_output):
+        """Runs the PopulateContributionStatsOneOffJob and verifies
+        that the output matches the expected output.
+
+        Args:
+            expected_output: list(str). The expected output from the one off
+                job.
+        """
+        job_id = (
+            suggestion_jobs_one_off
+            .PopulateContributionStatsOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off
+            .PopulateContributionStatsOneOffJob
+            .enqueue(job_id)
+        )
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            suggestion_jobs_one_off
+            .PopulateContributionStatsOneOffJob
+            .get_output(job_id)
+        )
+
+        self.assertEqual(len(actual_output), len(expected_output))
+        self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+    def setUp(self):
+        super(
+            PopulateContributionStatsOneOffJobTests,
+            self).setUp()
+
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
+        self.reviewer_1_id = self.get_user_id_from_email(
+            self.REVIEWER_1_EMAIL)
+        self.signup(self.REVIEWER_2_EMAIL, 'reviewer2')
+        self.reviewer_2_id = self.get_user_id_from_email(
+            self.REVIEWER_2_EMAIL)
+
+        self.process_and_flush_pending_tasks()
+
+    def test_no_action_is_performed_for_suggestions_that_are_marked_deleted(
+            self):
+        question_suggestion = self._create_question_suggestion_with_skill_id(
+            'skill_1')
+        self._assert_community_contribution_stats_is_in_default_state()
+        expected_output = []
+
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            question_suggestion.suggestion_id
+        )
+        suggestion_model.deleted = True
+        suggestion_model.put()
+
+        self._run_job_and_verify_output(expected_output)
+        self._assert_community_contribution_stats_is_in_default_state()
+
+    def test_no_action_is_performed_for_suggestion_that_has_been_deleted(self):
+        question_suggestion = self._create_question_suggestion_with_skill_id(
+            'skill_1')
+        self._assert_community_contribution_stats_is_in_default_state()
+        expected_output = []
+
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            question_suggestion.suggestion_id
+        )
+        suggestion_model.delete()
+
+        self._run_job_and_verify_output(expected_output)
+
+        self._assert_community_contribution_stats_is_in_default_state()
+
+    def test_no_action_is_performed_for_user_contribution_rights_marked_deleted(
+            self):
+        # Allowing the reviewer to review questions will create an associated
+        # user contribution rights model, if it doesn't already exist.
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        self._assert_community_contribution_stats_is_in_default_state()
+        expected_output = []
+
+        user_contribution_rights_model = (
+            user_models.UserContributionRightsModel.get_by_id(
+                self.reviewer_1_id)
+        )
+        user_contribution_rights_model.deleted = True
+        user_contribution_rights_model.put()
+
+        self._run_job_and_verify_output(expected_output)
+
+        self._assert_community_contribution_stats_is_in_default_state()
+
+    def test_no_action_is_performed_for_deleted_user_contribution_rights(self):
+        # Allowing the reviewer to review questions will create an associated
+        # user contribution rights model, if it doesn't already exist.
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        self._assert_community_contribution_stats_is_in_default_state()
+        expected_output = []
+
+        # Removing the contribution reviewer deletes their user contribution
+        # rights model.
+        user_services.remove_contribution_reviewer(self.reviewer_1_id)
+
+        self._run_job_and_verify_output(expected_output)
+
+        self._assert_community_contribution_stats_is_in_default_state()
+
+    def test_no_action_taken_for_suggestions_not_on_the_contributor_dashboard(
+            self):
+        self._create_edit_state_content_suggestion()
+        self._assert_community_contribution_stats_is_in_default_state()
+        expected_output = []
+
+        self._run_job_and_verify_output(expected_output)
+
+        self._assert_community_contribution_stats_is_in_default_state()
+
+    def test_no_action_is_performed_for_rejected_suggestions(self):
+        question_suggestion = self._create_question_suggestion_with_skill_id(
+            'skill_1'
+        )
+        self._assert_community_contribution_stats_is_in_default_state()
+        expected_output = []
+
+        suggestion_services.reject_suggestion(
+            question_suggestion.suggestion_id, self.reviewer_1_id,
+            'reject message'
+        )
+
+        self._run_job_and_verify_output(expected_output)
+
+        self._assert_community_contribution_stats_is_in_default_state()
+
+    def test_no_action_is_performed_for_accepted_suggestions(self):
+        translation_suggestion = (
+            self._create_translation_suggestion_with_language_code(
+                self.sample_language_code)
+        )
+        self._assert_community_contribution_stats_is_in_default_state()
+        expected_output = []
+
+        self.mock_accept_suggestion(
+            translation_suggestion.suggestion_id, self.reviewer_1_id,
+            'commit message', 'review message'
+        )
+
+        self._run_job_and_verify_output(expected_output)
+
+        self._assert_community_contribution_stats_is_in_default_state()
+
+    def test_job_updates_counts_for_translation_suggestions_in_same_lang_code(
+            self):
+        self._create_translation_suggestion_with_language_code(
+            self.sample_language_code)
+        self._create_translation_suggestion_with_language_code(
+            self.sample_language_code)
+        self._assert_community_contribution_stats_is_in_default_state()
+        expected_output = [
+            '[u\'suggestion.translate_content.%s\', 2]' % (
+                self.sample_language_code)
+        ]
+
+        self._run_job_and_verify_output(expected_output)
+
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_suggestion_counts_by_lang_code[
+                    self.sample_language_code]
+            ), 2)
+
+    def test_job_updates_counts_for_translation_suggestions_in_diff_lang_code(
+            self):
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('en')
+        expected_output = [
+            '[u\'suggestion.translate_content.hi\', 1]',
+            '[u\'suggestion.translate_content.en\', 1]'
+        ]
+
+        self._run_job_and_verify_output(expected_output)
+
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_suggestion_counts_by_lang_code['hi']
+            ), 1)
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_suggestion_counts_by_lang_code['en']
+            ), 1)
+
+    def test_job_updates_counts_for_translation_reviewers_in_same_lang_code(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, self.sample_language_code)
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_2_id, self.sample_language_code)
+        self._assert_community_contribution_stats_is_in_default_state()
+        expected_output = [
+            '[u\'reviewer.translation.%s\', 2]' % self.sample_language_code
+        ]
+
+        self._run_job_and_verify_output(expected_output)
+
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_reviewer_counts_by_lang_code[
+                    self.sample_language_code]
+            ), 2)
+
+    def test_job_updates_counts_for_translation_reviewers_in_diff_lang_code(
+            self):
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_2_id, 'en')
+        self._assert_community_contribution_stats_is_in_default_state()
+        expected_output = [
+            '[u\'reviewer.translation.hi\', 1]',
+            '[u\'reviewer.translation.en\', 1]'
+        ]
+
+        self._run_job_and_verify_output(expected_output)
+
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_reviewer_counts_by_lang_code['hi']
+            ), 1)
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_reviewer_counts_by_lang_code['en']
+            ), 1)
+
+    def test_job_updates_question_suggestion_count(self):
+        self._create_question_suggestion_with_skill_id('skill_1')
+        self._create_question_suggestion_with_skill_id('skill_2')
+        self._assert_community_contribution_stats_is_in_default_state()
+        expected_output = ['[u\'suggestion.add_question.en\', 2]']
+
+        self._run_job_and_verify_output(expected_output)
+
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        self.assertEqual(
+            community_contribution_stats.question_suggestion_count, 2
+        )
+
+    def test_job_updates_question_reviewer_count(
+            self):
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        user_services.allow_user_to_review_question(self.reviewer_2_id)
+        self._assert_community_contribution_stats_is_in_default_state()
+        expected_output = ['[u\'reviewer.question.en\', 2]']
+
+        self._run_job_and_verify_output(expected_output)
+
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        self.assertEqual(
+            community_contribution_stats.question_reviewer_count, 2)
+
+    def test_job_updates_both_reviewer_and_suggestion_counts(self):
+        # Create two question suggestions.
+        self._create_question_suggestion_with_skill_id('skill_1')
+        self._create_question_suggestion_with_skill_id('skill_2')
+        # Create three translation suggestions.
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('en')
+        self._create_translation_suggestion_with_language_code('en')
+        # Create question reviewers.
+        user_services.allow_user_to_review_question(self.reviewer_1_id)
+        user_services.allow_user_to_review_question(self.reviewer_2_id)
+        # Create translation reviewers.
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_1_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_2_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_2_id, 'en')
+        self._assert_community_contribution_stats_is_in_default_state()
+        expected_output = [
+            '[u\'reviewer.translation.en\', 1]',
+            '[u\'reviewer.translation.hi\', 2]',
+            '[u\'reviewer.question.en\', 2]',
+            '[u\'suggestion.add_question.en\', 2]',
+            '[u\'suggestion.translate_content.en\', 2]',
+            '[u\'suggestion.translate_content.hi\', 1]'
+        ]
+
+        self._run_job_and_verify_output(expected_output)
+
+        community_contribution_stats = (
+            suggestion_services.get_community_contribution_stats()
+        )
+        self.assertEqual(
+            community_contribution_stats.question_suggestion_count, 2)
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_suggestion_counts_by_lang_code['hi']
+            ), 1)
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_suggestion_counts_by_lang_code['en']
+            ), 2)
+        self.assertEqual(
+            community_contribution_stats.question_reviewer_count, 2)
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_reviewer_counts_by_lang_code['hi']
+            ), 2)
+        self.assertEqual(
+            (
+                community_contribution_stats
+                .translation_reviewer_counts_by_lang_code['en']
+            ), 1)
