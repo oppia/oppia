@@ -54,7 +54,7 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
         """
         gcs_bucket_url_prefix = 'gs://'
 
-        access_token, _ = app_identity_services.get_access_token(
+        access_token = app_identity_services.get_access_token(
             'https://www.googleapis.com/auth/datastore')
         app_id = app_identity_services.get_application_id()
 
