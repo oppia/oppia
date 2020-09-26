@@ -22,12 +22,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import contextlib
 import datetime
 
-from google.appengine.api import datastore_types
-from google.appengine.datastore import datastore_stub_util
-from google.appengine.datastore import datastore_query
-from google.appengine.ext import ndb
 import python_utils
 
+from google.appengine.api import datastore_types
+from google.appengine.datastore import datastore_query
+from google.appengine.datastore import datastore_stub_util
+from google.appengine.ext import ndb
 
 def make_cursor(urlsafe_cursor=None):
     """Makes an immutable cursor that points to a relative position in a query.
@@ -113,7 +113,7 @@ def mock_datetime_for_datastore(mocked_now):
         mocked_now = datetime.datetime.utcnow() - datetime.timedelta(days=1)
         with mock_datetime_for_datastore(mocked_now):
             self.assertEqual(datetime.datetime.utcnow(), mocked_now)
-        print(datetime.datetime.utcnow())  # prints actual time.
+        not_now = datetime.datetime.utcnow() # Returns actual time.
 
     Args:
         mocked_now: datetime.datetime. The datetime which will be used
