@@ -80,8 +80,7 @@ def delete_multi(keys):
 def transaction(callback):
     """Run a callback in a transaction.
 
-    Note:
-        To pass arguments to a callback function, use a lambda, e.g.
+    To pass arguments to a callback function, use a lambda, for example:
         def my_callback(key, inc):
             ...
         transaction(lambda: my_callback(Key(...), 1))
@@ -93,8 +92,8 @@ def transaction(callback):
         *. Whatever callback() returns.
 
     Raises:
-        *. Whatever callback() raises; datastore_errors.TransactionFailedError
-        if the transaction failed.
+        Exception. Whatever callback() raises;
+        datastore_errors.TransactionFailedError. When the transaction failed.
     """
     return ndb.transaction(
         callback, xg=True, propagation=ndb.TransactionOptions.ALLOWED)
