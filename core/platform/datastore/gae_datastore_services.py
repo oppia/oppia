@@ -92,8 +92,8 @@ def transaction(callback):
         *. Whatever callback() returns.
 
     Raises:
-        Exception. Whatever callback() raises;
-        datastore_errors.TransactionFailedError. When the transaction failed.
+        Exception. Whatever callback() raises, or
+        datastore_errors.TransactionFailedError when the transaction failed.
     """
     return ndb.transaction(
         callback, xg=True, propagation=ndb.TransactionOptions.ALLOWED)
