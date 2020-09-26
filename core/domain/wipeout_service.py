@@ -501,8 +501,7 @@ def _collect_activity_ids_from_snapshots_and_commit(
                 snapshot_model_class.committer_id == user_id,
                 snapshot_model_class.commit_cmds_user_ids == user_id,
                 snapshot_model_class.content_user_ids == user_id,
-            )).fetch()
-        )
+            )).fetch())
     snapshot_metadata_ids = set(
         model.get_unversioned_instance_id()
         for model in snapshot_metadata_models

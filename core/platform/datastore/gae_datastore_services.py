@@ -57,10 +57,10 @@ def put_multi(models):
     """Stores a sequence of Model instances.
 
     Args:
-        entities: datastore_services.Model. A sequence of Model instances.
+        models: datastore_services.Model. A sequence of Model instances.
 
     Returns:
-        A list with the stored keys.
+        list(str). A list with the stored keys.
     """
     return ndb.put_multi(models)
 
@@ -77,7 +77,7 @@ def delete_multi(keys):
     return ndb.delete_multi(keys)
 
 
-def transaction(callback, **context_options):
+def transaction(callback):
     """Run a callback in a transaction.
 
     Note:
@@ -87,13 +87,13 @@ def transaction(callback, **context_options):
         transaction(lambda: my_callback(Key(...), 1))
 
     Args:
-        callback: A function or tasklet to be called.
+        callback: callable. A function or tasklet to be called.
 
     Returns:
-        Whatever callback() returns.
+        *. Whatever callback() returns.
 
     Raises:
-        Whatever callback() raises; datastore_errors.TransactionFailedError
+        *. Whatever callback() raises; datastore_errors.TransactionFailedError
         if the transaction failed.
     """
     return ndb.transaction(
@@ -155,5 +155,3 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
         start_index = start_index + len(entity_ids)
 
     return all_models_grouped_by_model_type
-
-

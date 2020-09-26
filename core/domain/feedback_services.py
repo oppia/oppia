@@ -360,14 +360,17 @@ def delete_threads_for_multiple_entities(entity_type, entity_ids):
     for thread in threads:
         for message in get_messages(thread.id):
             model_keys.append(
-                datastore_services.Key(feedback_models.GeneralFeedbackMessageModel, message.id)
+                datastore_services.Key(
+                    feedback_models.GeneralFeedbackMessageModel, message.id)
             )
         model_keys.append(
-            datastore_services.Key(feedback_models.GeneralFeedbackThreadModel, thread.id)
+            datastore_services.Key(
+                feedback_models.GeneralFeedbackThreadModel, thread.id)
         )
         if thread.has_suggestion:
             model_keys.append(
-                datastore_services.Key(suggestion_models.GeneralSuggestionModel, thread.id)
+                datastore_services.Key(
+                    suggestion_models.GeneralSuggestionModel, thread.id)
             )
 
     model_keys += _get_threads_user_info_keys([thread.id for thread in threads])
@@ -375,7 +378,8 @@ def delete_threads_for_multiple_entities(entity_type, entity_ids):
     if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
         for entity_id in entity_ids:
             model_keys.append(
-                datastore_services.Key(feedback_models.FeedbackAnalyticsModel, entity_id)
+                datastore_services.Key(
+                    feedback_models.FeedbackAnalyticsModel, entity_id)
             )
 
     datastore_services.delete_multi(model_keys)
