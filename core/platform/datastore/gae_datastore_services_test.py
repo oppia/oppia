@@ -89,8 +89,7 @@ class MockDatetimeForDatastoreTests(test_utils.GenericTestBase):
     """Tests for mocking the datetime of an ndb.Model."""
 
     def test_exception_is_raised_when_passed_wrong_type(self):
-        with self.assertRaisesRegexp(
-                Exception, 'mocked_now must be a datetime'):
+        with self.assertRaisesRegexp(Exception, 'mocked_now must be datetime'):
             with gae_datastore_services.mock_datetime_for_datastore(2020):
                 pass
 

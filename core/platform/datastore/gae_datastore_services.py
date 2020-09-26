@@ -122,7 +122,7 @@ def mock_datetime_for_datastore(mocked_now):
     """
 
     if not isinstance(mocked_now, datetime.datetime):
-        raise Exception('mocked_now must be a datetime, got: %r' % mocked_now)
+        raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
 
     old_datetime_type = datetime.datetime
 
