@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import contextlib
 import datetime
 
-from google.appengine.api import datastore_errors
 from google.appengine.api import datastore_types
 from google.appengine.datastore import datastore_stub_util
 from google.appengine.datastore import datastore_query
@@ -105,7 +104,7 @@ def make_pseudo_random_hr_consistency_policy(probability=0.5, seed=0):
 
 
 @contextlib.contextmanager
-def mock_datetime_for_datastore(self, mocked_now):
+def mock_datetime_for_datastore(mocked_now):
     """Mocks parts of the datastore to accept a fake datetime type that always
     returns the same value for utcnow.
 
@@ -113,7 +112,7 @@ def mock_datetime_for_datastore(self, mocked_now):
         import datetime
         mocked_now = datetime.datetime.utcnow() - datetime.timedelta(days=1)
         with mock_datetime_for_datastore(mocked_now):
-            print(datetime.datetime.utcnow()) # prints time reduced by 1 day
+            self.assertEqual(datetime.datetime.utcnow(), mocked_now)
         print(datetime.datetime.utcnow())  # prints actual time.
 
     Args:

@@ -2348,7 +2348,6 @@ class AppEngineTestBase(TestBase):
         empty_environ()
         self.memory_cache_services_stub.flush_cache()
 
-        from google.appengine.datastore import datastore_stub_util
         from google.appengine.ext import testbed
 
         self.testbed = testbed.Testbed()
