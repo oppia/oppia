@@ -87,8 +87,9 @@ def get_default_gcs_bucket_name(deadline=None):
     """Gets the default Google Cloud Storage bucket name for the app.
 
     Args:
-        deadline: float. Optional deadline in seconds for the operation; the
-            default value is a system-specific deadline, typically 5 seconds.
+        deadline: float | None. Optional deadline in seconds for the operation;
+            the default value is a system-specific deadline, typically 5
+            seconds.
 
     Returns:
         str. Default bucket name for the app.
