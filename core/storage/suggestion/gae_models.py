@@ -201,8 +201,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.query(datastore_services.any_of(
-            cls.author_id == user_id, cls.final_reviewer_id == user_id)
-        ).get(keys_only=True) is not None
+            cls.author_id == user_id, cls.final_reviewer_id == user_id
+        )).get(keys_only=True) is not None
 
     @classmethod
     def create(
@@ -512,8 +512,8 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.query(datastore_services.any_of(
-            cls.author_id == user_id, cls.final_reviewer_id == user_id)
-        ).get(keys_only=True) is not None
+            cls.author_id == user_id, cls.final_reviewer_id == user_id
+        )).get(keys_only=True) is not None
 
     @classmethod
     def get_user_voiceover_applications(cls, author_id, status=None):

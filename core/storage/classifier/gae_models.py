@@ -44,11 +44,13 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     algorithm_id = datastore_services.StringProperty(
         required=True, choices=ALGORITHM_CHOICES, indexed=True)
     # The ID of the interaction to which the algorithm belongs.
-    interaction_id = datastore_services.StringProperty(required=True, indexed=True)
+    interaction_id = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The exploration_id of the exploration to whose state the model belongs.
     exp_id = datastore_services.StringProperty(required=True, indexed=True)
     # The exploration version at the time this training job was created.
-    exp_version = datastore_services.IntegerProperty(required=True, indexed=True)
+    exp_version = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
     # The name of the state to which the model belongs.
     state_name = datastore_services.StringProperty(required=True, indexed=True)
     # The status of the training job. It can be either NEW, COMPLETE or PENDING.
@@ -64,7 +66,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     next_scheduled_check_time = datastore_services.DateTimeProperty(
         required=True, indexed=True)
     # The schema version for the data that is being classified.
-    data_schema_version = datastore_services.IntegerProperty(required=True, indexed=True)
+    data_schema_version = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -226,7 +229,8 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
     exp_id = datastore_services.StringProperty(required=True, indexed=True)
     # The exploration version at the time the corresponding classifier's
     # training job was created.
-    exp_version = datastore_services.IntegerProperty(required=True, indexed=True)
+    exp_version = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
     # The name of the state to which the model belongs.
     state_name = datastore_services.StringProperty(required=True, indexed=True)
     # The ID of the training job corresponding to the exploration attributes.
