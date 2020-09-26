@@ -78,6 +78,19 @@ def get_gcs_resource_bucket_name():
         str. The bucket name for the application's GCS resources.
     """
     if constants.DEV_MODE:
-        return app_identity.get_default_gcs_bucket_name()
+        return get_default_gcs_bucket_name()
     else:
         return get_application_id() + _GCS_RESOURCE_BUCKET_NAME_SUFFIX
+
+
+def get_default_gcs_bucket_name(deadline=None):
+    """Gets the default Google Cloud Storage bucket name for the app.
+
+    Args:
+        deadline: float. Optional deadline in seconds for the operation; the
+            default value is a system-specific deadline, typically 5 seconds.
+
+    Returns:
+        str. Default bucket name for the app.
+    """
+    return app_identity.get_default_gcs_bucket_name(deadline=deadline)
