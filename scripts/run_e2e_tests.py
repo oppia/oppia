@@ -27,8 +27,6 @@ import subprocess
 import sys
 import time
 
-print(sys.path)
-
 import google
 import pkg_resources
 import python_utils
@@ -68,9 +66,9 @@ _PATHS_TO_INSERT = [
         common.GOOGLE_API_PYTHON_CLIENT_VERSION)
 ]
 for path in _PATHS_TO_INSERT:
-    google.__path__.insert(0, os.path.join(path, 'google'))
     sys.path.insert(0, path)
     pkg_resources.working_set.add_entry(path)
+    google.__path__.insert(0, os.path.join(path, 'google'))
 
 import simplecrypt # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import googleapiclient.discovery # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
