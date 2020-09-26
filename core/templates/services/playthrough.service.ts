@@ -35,6 +35,7 @@ import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
 import { ServicesConstants } from 'services/services.constants';
 import { Stopwatch } from 'domain/utilities/stopwatch.model';
+import { LoggerService } from './contextual/logger.service';
 
 class CyclicStateTransitionsTracker {
   /** A path of visited states without any repeats. */
@@ -213,7 +214,7 @@ export class PlaythroughService {
     this.cstTracker = new CyclicStateTransitionsTracker(initStateName);
 
     this.playthroughDurationInSecs = 0;
-    this.playthroughStopwatch = Stopwatch.create();
+    this.playthroughStopwatch = new Stopwatch(new LoggerService());
     this.playthroughStopwatch.reset();
   }
 

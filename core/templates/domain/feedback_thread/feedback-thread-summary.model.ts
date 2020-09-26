@@ -83,21 +83,6 @@ export class FeedbackThreadSummary {
     this.secondLastMessageIsRead = true;
   }
 
-  static create(
-      status: string, originalAuthorId: string, lastUpdatedMsecs: number,
-      lastMessageText: string, totalMessageCount: number,
-      lastMessageIsRead: boolean, secondLastMessageIsRead: boolean,
-      authorLastMessage: string, authorSecondLastMessage: string,
-      explorationTitle: string, explorationId: string,
-      threadId: string): FeedbackThreadSummary {
-    return new FeedbackThreadSummary(
-      status, originalAuthorId, lastUpdatedMsecs,
-      lastMessageText, totalMessageCount, lastMessageIsRead,
-      secondLastMessageIsRead, authorLastMessage, authorSecondLastMessage,
-      explorationTitle, explorationId, threadId
-    );
-  }
-
   static createFromBackendDict(
       feedbackThreadSummaryBackendDict: FeedbackThreadSummaryBackendDict):
       FeedbackThreadSummary {

@@ -628,19 +628,4 @@ export class Change {
   reverseChange(domainObject: BackendChangeObject): void {
     this._reverseChangeToObject(this._backendChangeObject, domainObject);
   }
-
-  // Static class methods. Note that "this" is not available in static
-  // contexts. The first parameter is a JSON representation of a backend
-  // python dict for the given change. The second parameter is a callback
-  // which will receive both the backend change object dictionary (as
-  // read-only) and the domain object in which to apply the change. The third
-  // parameter is a callback which behaves in the same way as the second
-  // parameter and takes the same inputs, except it should reverse the change
-  // for the provided domain object.
-  static create(
-      backendChangeObject: BackendChangeObject, applyChangeToObject: Function,
-      reverseChangeToObject: Function): Change {
-    return new Change(
-      backendChangeObject, applyChangeToObject, reverseChangeToObject);
-  }
 }

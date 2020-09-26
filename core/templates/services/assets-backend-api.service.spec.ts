@@ -151,7 +151,7 @@ describe('Assets Backend API Service', function() {
 
       AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
         function(cachedFile) {
-          expect(cachedFile).toEqual(AudioFile.createNew(
+          expect(cachedFile).toEqual(new AudioFile(
             'myfile.mp3',
             new Blob()
           ));
@@ -354,7 +354,7 @@ describe('Assets Backend API Service', function() {
       AssetsBackendApiService.loadImage(
         ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
         function(cachedFile) {
-          expect(cachedFile).toEqual(ImageFile.createNew(
+          expect(cachedFile).toEqual(new ImageFile(
             'myfile.png',
             new Blob()
           ));

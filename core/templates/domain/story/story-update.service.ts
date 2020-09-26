@@ -62,7 +62,7 @@ angular.module('oppia').factory('StoryUpdateService', [
     var _applyChange = function(story, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
-      var changeObj = Change.create(changeDict, apply, reverse);
+      var changeObj = new Change(changeDict, apply, reverse);
       try {
         UndoRedoService.applyChange(changeObj, story);
       } catch (err) {

@@ -47,7 +47,7 @@ angular.module('oppia').factory('CollectionUpdateService', [
     var _applyChange = function(collection, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
-      var changeObj = Change.create(changeDict, apply, reverse);
+      var changeObj = new Change(changeDict, apply, reverse);
       UndoRedoService.applyChange(changeObj, collection);
     };
 

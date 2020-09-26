@@ -21,7 +21,7 @@ describe('Prediction Result model', () => {
   it('should create a new result object', () => {
     const label = 1;
     const confidence = 1;
-    const predictionResult = PredictionResult.createNew(label, confidence);
+    const predictionResult = new PredictionResult(label, confidence);
 
     expect(predictionResult.getLabel()).toBe(label);
     expect(predictionResult.getConfidence()).toBe(confidence);

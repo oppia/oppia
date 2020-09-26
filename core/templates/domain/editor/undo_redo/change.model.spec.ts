@@ -30,7 +30,7 @@ describe('Change domain objects model', () => {
       new_value: 'newVal',
       old_value: 'oldVal'
     };
-    Change.create(backendChangeObject, applyFunc, reverseFunc);
+    new Change(backendChangeObject, applyFunc, reverseFunc);
 
     expect(applyFunc).not.toHaveBeenCalled();
     expect(reverseFunc).not.toHaveBeenCalled();
@@ -46,7 +46,7 @@ describe('Change domain objects model', () => {
       new_value: 'newVal',
       old_value: 'oldVal'
     };
-    const changeDomainObject = Change.create(
+    const changeDomainObject = new Change(
       backendChangeObject, applyFunc, reverseFunc);
 
     const fakeDomainObject: BackendChangeObject = {
@@ -72,7 +72,7 @@ describe('Change domain objects model', () => {
       new_value: 'newVal',
       old_value: 'oldVal'
     };
-    const changeDomainObject = Change.create(
+    const changeDomainObject = new Change(
       backendChangeObject, applyFunc, reverseFunc);
 
     const fakeDomainObject: BackendChangeObject = {
@@ -96,7 +96,7 @@ describe('Change domain objects model', () => {
         new_value: 'newVal',
         old_value: 'oldVal'
       };
-      const changeDomainObject = Change.create(
+      const changeDomainObject = new Change(
         backendChangeObject, () => {}, () => {});
 
       const returnedBackendObject = changeDomainObject.getBackendChangeObject();
@@ -112,7 +112,7 @@ describe('Change domain objects model', () => {
     });
 
   it('should set new backend change object when using specific method', () => {
-    const changeDomainObject = Change.create({
+    const changeDomainObject = new Change({
       cmd: 'update_question_property',
       property_name: 'language_code',
       new_value: 'newVal',

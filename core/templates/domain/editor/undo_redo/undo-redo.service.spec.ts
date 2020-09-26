@@ -45,7 +45,7 @@ describe('Undo/Redo Service', function() {
 
   var _createChangeDomainObject = function(
       backendObj, applyFunc = function() {}, reverseFunc = function() {}) {
-    return Change.create(backendObj, applyFunc, reverseFunc);
+    return new Change(backendObj, applyFunc, reverseFunc);
   };
 
   var _createNoOpChangeDomainObject = function(value) {

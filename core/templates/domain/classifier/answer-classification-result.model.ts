@@ -33,11 +33,4 @@ export class AnswerClassificationResult {
     this.ruleIndex = ruleIndex;
     this.classificationCategorization = classificationCategorization;
   }
-
-  static createNew(
-      outcome: Outcome, answerGroupIndex: number, ruleIndex: number,
-      classificationCategorization: string): AnswerClassificationResult {
-    return new AnswerClassificationResult(
-      outcome, answerGroupIndex, ruleIndex, classificationCategorization);
-  }
 }

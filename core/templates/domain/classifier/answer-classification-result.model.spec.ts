@@ -33,7 +33,7 @@ describe('Answer classification result model', () => {
   });
 
   it('should create a new result', () => {
-    var answerClassificationResult = AnswerClassificationResult.createNew(
+    var answerClassificationResult = new AnswerClassificationResult(
       oof.createNew('default', '', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
     );
 

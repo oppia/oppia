@@ -248,7 +248,7 @@ export class SVMPredictionService {
     }
 
     var predictedLabel = classes[maxProbIdx];
-    var prediction = PredictionResult.createNew(
+    var prediction = new PredictionResult(
       predictedLabel, probabilities[maxProbIdx]);
     return prediction;
   }

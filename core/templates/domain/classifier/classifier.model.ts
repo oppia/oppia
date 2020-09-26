@@ -29,10 +29,4 @@ export class Classifier {
     this.classifierData = classifierData;
     this.dataSchemaVersion = dataSchemaVersion;
   }
-
-  static create(
-      algorithmId: string, classifierData: ClassifierData,
-      dataSchemaVersion: number): Classifier {
-    return new Classifier(algorithmId, classifierData, dataSchemaVersion);
-  }
 }

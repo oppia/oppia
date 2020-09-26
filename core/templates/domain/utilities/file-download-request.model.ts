@@ -24,9 +24,4 @@ export class FileDownloadRequest {
     this.filename = filename;
     this.canceler = canceler;
   }
-
-  static createNew(
-      filename: string, canceler: Q.Deferred<Object>): FileDownloadRequest {
-    return new FileDownloadRequest(filename, canceler);
-  }
 }

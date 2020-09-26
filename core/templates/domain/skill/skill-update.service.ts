@@ -52,7 +52,7 @@ angular.module('oppia').factory('SkillUpdateService', [
     var _applyChange = function(skill, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
-      var changeObj = Change.create(changeDict, apply, reverse);
+      var changeObj = new Change(changeDict, apply, reverse);
       UndoRedoService.applyChange(changeObj, skill);
     };
 

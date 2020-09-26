@@ -42,8 +42,4 @@ export class PredictionResult {
   getConfidence(): number {
     return this.predictionConfidence;
   }
-
-  static createNew(label: number, confidence: number): PredictionResult {
-    return new PredictionResult(label, confidence);
-  }
 }

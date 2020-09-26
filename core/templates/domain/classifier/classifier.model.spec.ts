@@ -57,8 +57,7 @@ describe('Classifier model', () => {
 
   it('should create a new classifier', () => {
     var classifierObject = (
-      Classifier.create(
-        'TestClassifier', sampleClassifierData, 1));
+      new Classifier('TestClassifier', sampleClassifierData, 1));
 
     expect(classifierObject.algorithmId).toEqual('TestClassifier');
     expect(classifierObject.classifierData).toEqual(sampleClassifierData);

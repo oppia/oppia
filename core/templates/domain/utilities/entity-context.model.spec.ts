@@ -21,7 +21,7 @@ import { EntityContext } from 'domain/utilities/entity-context.model';
 describe('Entity context model', () => {
   describe('EntityContext', () => {
     it('should create a new entity context object', () => {
-      var entityContext = EntityContext.create(
+      var entityContext = new EntityContext(
         'entity_id', 'entity_type');
       expect(entityContext.getId()).toEqual('entity_id');
       expect(entityContext.getType()).toEqual('entity_type');

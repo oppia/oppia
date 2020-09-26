@@ -22,7 +22,7 @@ import { FeedbackThreadSummary } from
 describe('Feedback thread model', () => {
   it('should update the summary of the thread on addition of a ' +
      'message', () => {
-    var feedbackThreadSummary = FeedbackThreadSummary.create(
+    var feedbackThreadSummary = new FeedbackThreadSummary(
       'open', 'Test user 1', new Date().getTime(), 'last message', 2, false,
       false, 'Test user 2', 'Test user 2', 'Test exploration name', '0',
       'thread_id');

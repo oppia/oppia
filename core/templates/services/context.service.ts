@@ -159,7 +159,7 @@ export class ContextService {
   // correct context for some case. eg: Viewing a skill's concept card on
   // any page via the RTE.
   setCustomEntityContext(entityType: string, entityId: string): void {
-    this.customEntityContext = EntityContext.create(
+    this.customEntityContext = new EntityContext(
       entityId, entityType);
   }
 

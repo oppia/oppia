@@ -77,7 +77,7 @@ export class AnswerClassificationService {
       for (var j = 0; j < answerGroup.rules.length; ++j) {
         const rule = answerGroup.rules[j];
         if (interactionRulesService[rule.type](answer, rule.inputs)) {
-          return AnswerClassificationResult.createNew(
+          return new AnswerClassificationResult(
             answerGroup.outcome, i, j,
             ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION);
         }
@@ -87,7 +87,7 @@ export class AnswerClassificationService {
     // If no rule in any answer group returns true, the default 'group' is
     // returned. Throws an error if the default outcome is not defined.
     if (defaultOutcome) {
-      return AnswerClassificationResult.createNew(
+      return new AnswerClassificationResult(
         defaultOutcome, answerGroups.length, 0,
         ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION);
     } else {
@@ -145,7 +145,7 @@ export class AnswerClassificationService {
         }
         for (const trainingDatum of answerGroup.trainingData) {
           if (angular.equals(answer, trainingDatum)) {
-            return AnswerClassificationResult.createNew(
+            return new AnswerClassificationResult(
               answerGroup.outcome, i, null,
               ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION);
           }
@@ -166,12 +166,12 @@ export class AnswerClassificationService {
               classifier.classifierData, answer);
             if (predictedAnswerGroupIndex === -1) {
               answerClassificationResult = (
-                AnswerClassificationResult.createNew(
+                new AnswerClassificationResult(
                   defaultOutcome, answerGroups.length, 0,
                   ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
             }
             answerClassificationResult = (
-              AnswerClassificationResult.createNew(
+              new AnswerClassificationResult(
                 answerGroups[predictedAnswerGroupIndex].outcome,
                 predictedAnswerGroupIndex, null,
                 ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION));

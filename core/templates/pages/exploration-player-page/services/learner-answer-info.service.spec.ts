@@ -145,7 +145,7 @@ describe('Learner answer info service', function() {
     secondState = sof.createFromBackendDict('fake state', stateDict);
     thirdState = sof.createFromBackendDict('demo state', stateDict);
     spyOn(AnswerClassificationService, 'getMatchingClassificationResult')
-      .and.returnValue(AnswerClassificationResult.createNew(
+      .and.returnValue(new AnswerClassificationResult(
         oof.createNew('default', 'default_outcome', '', []), 2, 0,
         DEFAULT_OUTCOME_CLASSIFICATION));
     mockAnswer = 'This is my answer';

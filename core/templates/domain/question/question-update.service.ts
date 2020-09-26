@@ -39,7 +39,7 @@ angular.module('oppia').factory('QuestionUpdateService', [
     var _applyChange = function(question, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
-      var changeObj = Change.create(changeDict, apply, reverse);
+      var changeObj = new Change(changeDict, apply, reverse);
       QuestionUndoRedoService.applyChange(changeObj, question);
     };
 

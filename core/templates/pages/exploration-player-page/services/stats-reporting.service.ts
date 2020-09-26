@@ -26,6 +26,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { AggregatedStats, StatsReportingBackendApiService } from
   'domain/exploration/stats-reporting-backend-api.service';
 import { Stopwatch } from 'domain/utilities/stopwatch.model';
+import { LoggerService } from 'services/contextual/logger.service';
 
 @Injectable({
   providedIn: 'root'
@@ -129,7 +130,7 @@ export class StatsReportingService {
     StatsReportingService.explorationTitle = newExplorationTitle;
     StatsReportingService.explorationVersion = newExplorationVersion;
     StatsReportingService.sessionId = newSessionId;
-    StatsReportingService.stateStopwatch = Stopwatch.create();
+    StatsReportingService.stateStopwatch = new Stopwatch(new LoggerService());
     StatsReportingService.optionalCollectionId = collectionId;
     this.refreshAggregatedStats();
     this.startStatsTimer();

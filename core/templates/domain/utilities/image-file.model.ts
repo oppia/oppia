@@ -24,8 +24,4 @@ export class ImageFile {
     this.filename = filename;
     this.data = data;
   }
-
-  static createNew(filename: string, data: Blob): ImageFile {
-    return new ImageFile(filename, data);
-  }
 }

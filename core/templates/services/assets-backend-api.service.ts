@@ -77,10 +77,10 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       var canceler = $q.defer();
       if (assetType === ASSET_TYPE_AUDIO) {
         _audioFilesCurrentlyBeingRequested.push(
-          FileDownloadRequest.createNew(filename, canceler));
+          new FileDownloadRequest(filename, canceler));
       } else {
         _imageFilesCurrentlyBeingRequested.push(
-          FileDownloadRequest.createNew(filename, canceler));
+          new FileDownloadRequest(filename, canceler));
       }
 
       $http({
@@ -95,10 +95,10 @@ angular.module('oppia').factory('AssetsBackendApiService', [
         assetsCache[filename] = assetBlob;
         if (assetType === ASSET_TYPE_AUDIO) {
           successCallback(
-            AudioFile.createNew(filename, assetBlob));
+            new AudioFile(filename, assetBlob));
         } else {
           successCallback(
-            ImageFile.createNew(filename, assetBlob));
+            new ImageFile(filename, assetBlob));
         }
       })['catch'](function() {
         errorCallback(filename);
@@ -258,7 +258,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       loadAudio: function(explorationId, filename) {
         return $q(function(resolve, reject) {
           if (_isCached(filename)) {
-            resolve(AudioFile.createNew(
+            resolve(new AudioFile(
               filename, assetsCache[filename]));
           } else {
             _fetchFile(
@@ -270,7 +270,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       loadImage: function(entityType, entityId, filename) {
         return $q(function(resolve, reject) {
           if (_isCached(filename)) {
-            resolve(ImageFile.createNew(
+            resolve(new ImageFile(
               filename, assetsCache[filename]));
           } else {
             _fetchFile(

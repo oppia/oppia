@@ -33,8 +33,4 @@ export class EntityContext {
   getType(): string {
     return this._type;
   }
-
-  static create(id: string, type: string): EntityContext {
-    return new EntityContext(id, type);
-  }
 }

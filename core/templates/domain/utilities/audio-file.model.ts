@@ -24,8 +24,4 @@ export class AudioFile {
     this.filename = filename;
     this.data = data;
   }
-
-  static createNew(filename: string, data: Blob): AudioFile {
-    return new AudioFile(filename, data);
-  }
 }

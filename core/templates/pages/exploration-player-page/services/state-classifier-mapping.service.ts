@@ -53,7 +53,7 @@ export class StateClassifierMappingService {
         dataSchemaVersion = backendStateClassifierMapping[
           stateName].data_schema_version;
         this.stateClassifierMapping[stateName] =
-          Classifier.create(algorithmId, classifierData, dataSchemaVersion);
+          new Classifier(algorithmId, classifierData, dataSchemaVersion);
       }
     }
   }

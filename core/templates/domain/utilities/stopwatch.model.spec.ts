@@ -17,6 +17,7 @@
  */
 
 import { Stopwatch } from 'domain/utilities/stopwatch.model';
+import { LoggerService } from 'services/contextual/logger.service';
 
 describe('Stopwatch model', () => {
   let nowSpy = null;
@@ -30,7 +31,7 @@ describe('Stopwatch model', () => {
   };
 
   it('should correctly record time intervals', () => {
-    let stopwatch = Stopwatch.create();
+    let stopwatch = new Stopwatch(new LoggerService());
     changeCurrentTime(0);
     expect(stopwatch._getCurrentTime()).toBe(0);
     stopwatch.reset();
@@ -40,7 +41,7 @@ describe('Stopwatch model', () => {
   });
 
   it('should not reset stopwatch when current time is retrieved', () => {
-    let stopwatch = Stopwatch.create();
+    let stopwatch = new Stopwatch(new LoggerService());
     changeCurrentTime(0);
     expect(stopwatch._getCurrentTime()).toBe(0);
     stopwatch.reset();
@@ -51,7 +52,7 @@ describe('Stopwatch model', () => {
   });
 
   it('should correctly reset the stopwatch', () => {
-    let stopwatch = Stopwatch.create();
+    let stopwatch = new Stopwatch(new LoggerService());
     changeCurrentTime(0);
     expect(stopwatch._getCurrentTime()).toBe(0);
     stopwatch.reset();
@@ -69,7 +70,7 @@ describe('Stopwatch model', () => {
     // LoggerService is private, so to check if it's being called
     // console.error needs to be spied.
     const errorLog = spyOn(console, 'error').and.callThrough();
-    let stopwatch = Stopwatch.create();
+    let stopwatch = new Stopwatch(new LoggerService());
     changeCurrentTime(29);
     expect(stopwatch._getCurrentTime()).toBe(29);
     expect(stopwatch.getTimeInSecs()).toBeNull();
@@ -78,8 +79,8 @@ describe('Stopwatch model', () => {
   });
 
   it('should instantiate independent stopwatches', () => {
-    let stopwatch1 = Stopwatch.create();
-    let stopwatch2 = Stopwatch.create();
+    let stopwatch1 = new Stopwatch(new LoggerService());
+    let stopwatch2 = new Stopwatch(new LoggerService());
 
     changeCurrentTime(0);
     expect(stopwatch1._getCurrentTime()).toBe(0);
