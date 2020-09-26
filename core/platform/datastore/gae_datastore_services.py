@@ -24,25 +24,26 @@ from google.appengine.ext import ndb
 
 
 def make_cursor(urlsafe=None):
-    """Returns a database cursor that represents a relative position in a query.
+    """Makes an immutable cursor that points to a relative position in a query.
 
-    The position denoted by a Cursor is relative to a result in a query even
-    if the result has been removed from the given query. Usually to position
-    immediately after the last result returned by a batch.
+    The position denoted by a Cursor is relative to the result of a query, even
+    if the result is removed later on. Usually, the position points to whatever
+    immediately follows the last result of a batch.
 
     A cursor should only be used on a query with an identical signature to the
-    one that produced it or on a query with its sort order reversed.
+    one that produced it, or on a query with its sort order reversed.
 
-    A Cursor constructed with no arguments points the first result of any
-    query. If such a Cursor is used as an end_cursor no results will ever be
+    A Cursor constructed with no arguments points to the first result of any
+    query. If such a Cursor is used as an end_cursor, no results will be
     returned.
 
     Args:
-        urlsafe: str. A base64-encoded serialization of a cursor. If None, the
-            cursor returned will point to the first result of any query.
+        urlsafe: str | None. The base64-encoded serialization of a cursor.
+            When None, the cursor returned will point to the first result of any
+            query.
 
     Returns:
-        datastore_query.Cursor. A cursor into a query.
+        datastore_query.Cursor. A cursor into an arbitrary query.
     """
     return datastore_query.Cursor(urlsafe=urlsafe)
 
