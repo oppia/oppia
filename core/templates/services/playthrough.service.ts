@@ -214,7 +214,7 @@ export class PlaythroughService {
     this.cstTracker = new CyclicStateTransitionsTracker(initStateName);
 
     this.playthroughDurationInSecs = 0;
-    this.playthroughStopwatch = new Stopwatch(new LoggerService());
+    this.playthroughStopwatch = Stopwatch.create();
     this.playthroughStopwatch.reset();
   }
 

@@ -43,4 +43,8 @@ export class Stopwatch {
     }
     return (this._getCurrentTime() - this.startTime) / 1000;
   }
+
+  static create(): Stopwatch {
+    return new Stopwatch(new LoggerService());
+  }
 }

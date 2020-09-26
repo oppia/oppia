@@ -130,7 +130,7 @@ export class StatsReportingService {
     StatsReportingService.explorationTitle = newExplorationTitle;
     StatsReportingService.explorationVersion = newExplorationVersion;
     StatsReportingService.sessionId = newSessionId;
-    StatsReportingService.stateStopwatch = new Stopwatch(new LoggerService());
+    StatsReportingService.stateStopwatch = Stopwatch.create();
     StatsReportingService.optionalCollectionId = collectionId;
     this.refreshAggregatedStats();
     this.startStatsTimer();
