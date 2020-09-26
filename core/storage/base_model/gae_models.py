@@ -29,6 +29,7 @@ from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 transaction_services = models.Registry.import_transaction_services()
+datastore_services = models.Registry.import_datastore_services()
 
 # The delimiter used to separate the version number from the model instance
 # id. To get the instance id from a snapshot id, use Python's rfind()
@@ -366,7 +367,7 @@ class BaseModel(ndb.Model):
                     this batch.
         """
         if urlsafe_start_cursor:
-            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+            start_cursor = datastore_services.make_cursor(urlsafe=urlsafe_start_cursor)
         else:
             start_cursor = None
 
