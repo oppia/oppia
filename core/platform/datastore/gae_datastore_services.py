@@ -41,6 +41,18 @@ def query_everything():
     return ndb.Query()
 
 
+def all_of(*nodes):
+    """Returns a query node which performs a boolean AND on their conditions.
+
+    Args:
+        *nodes: ndb.Node. The nodes to combine.
+
+    Returns:
+        ndb.Node. A node combining the conditions using boolean AND.
+    """
+    return ndb.AND(*nodes)
+
+
 def any_of(*nodes):
     """Returns a query node which performs a boolean OR on their conditions.
 

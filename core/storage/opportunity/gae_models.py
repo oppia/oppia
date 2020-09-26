@@ -21,7 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 
-from google.appengine.ext import ndb
+datastore_services = models.Registry.import_datastore_services()
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 datastore_services = models.Registry.import_datastore_services()
@@ -33,18 +33,21 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     The id of each instance is the id of the corresponding exploration.
     """
 
-    topic_id = ndb.StringProperty(required=True, indexed=True)
-    topic_name = ndb.StringProperty(required=True, indexed=True)
-    story_id = ndb.StringProperty(required=True, indexed=True)
-    story_title = ndb.StringProperty(required=True, indexed=True)
-    chapter_title = ndb.StringProperty(required=True, indexed=True)
-    content_count = ndb.IntegerProperty(required=True, indexed=True)
-    incomplete_translation_language_codes = ndb.StringProperty(
+    topic_id = datastore_services.StringProperty(required=True, indexed=True)
+    topic_name = datastore_services.StringProperty(required=True, indexed=True)
+    story_id = datastore_services.StringProperty(required=True, indexed=True)
+    story_title = datastore_services.StringProperty(required=True, indexed=True)
+    chapter_title = (
+        datastore_services.StringProperty(required=True, indexed=True))
+    content_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
+    incomplete_translation_language_codes = datastore_services.StringProperty(
         repeated=True, indexed=True)
-    translation_counts = ndb.JsonProperty(default={}, indexed=False)
-    assigned_voice_artist_in_language_codes = ndb.StringProperty(
+    translation_counts = (
+        datastore_services.JsonProperty(default={}, indexed=False))
+    assigned_voice_artist_in_language_codes = datastore_services.StringProperty(
         repeated=True, indexed=True)
-    need_voice_artist_in_language_codes = ndb.StringProperty(
+    need_voice_artist_in_language_codes = datastore_services.StringProperty(
         repeated=True, indexed=True)
 
     @staticmethod
@@ -180,7 +183,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     def delete_all(cls):
         """Deletes all entities of this class."""
         keys = cls.query().fetch(keys_only=True)
-        ndb.delete_multi(keys)
+        datastore_services.delete_multi(keys)
 
 
 class SkillOpportunityModel(base_models.BaseModel):
@@ -194,9 +197,11 @@ class SkillOpportunityModel(base_models.BaseModel):
     """
 
     # The description of the opportunity's skill.
-    skill_description = ndb.StringProperty(required=True, indexed=True)
+    skill_description = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The number of questions associated with this opportunity's skill.
-    question_count = ndb.IntegerProperty(required=True, indexed=True)
+    question_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -264,4 +269,4 @@ class SkillOpportunityModel(base_models.BaseModel):
     def delete_all(cls):
         """Deletes all entities of this class."""
         keys = cls.query().fetch(keys_only=True)
-        ndb.delete_multi(keys)
+        datastore_services.delete_multi(keys)

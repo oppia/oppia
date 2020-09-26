@@ -25,7 +25,7 @@ from core.platform import models
 import python_utils
 import utils
 
-from google.appengine.ext import ndb
+datastore_services = models.Registry.import_datastore_services()
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -59,17 +59,17 @@ class JobModel(base_models.BaseModel):
         return '%s-%s-%s' % (job_type, current_time_str, random_int)
 
     # The job type.
-    job_type = ndb.StringProperty(indexed=True)
+    job_type = datastore_services.StringProperty(indexed=True)
     # The time at which the job was queued, in milliseconds since the epoch.
-    time_queued_msec = ndb.FloatProperty(indexed=True)
+    time_queued_msec = datastore_services.FloatProperty(indexed=True)
     # The time at which the job was started, in milliseconds since the epoch.
     # This is never set if the job was canceled before it was started.
-    time_started_msec = ndb.FloatProperty(indexed=True)
+    time_started_msec = datastore_services.FloatProperty(indexed=True)
     # The time at which the job was completed, failed or canceled, in
     # milliseconds since the epoch.
-    time_finished_msec = ndb.FloatProperty(indexed=True)
+    time_finished_msec = datastore_services.FloatProperty(indexed=True)
     # The current status code for the job.
-    status_code = ndb.StringProperty(
+    status_code = datastore_services.StringProperty(
         indexed=True,
         default=STATUS_CODE_NEW,
         choices=[
@@ -78,19 +78,20 @@ class JobModel(base_models.BaseModel):
         ])
     # Any metadata for the job, such as the root pipeline id for mapreduce
     # jobs.
-    metadata = ndb.JsonProperty(indexed=False)
+    metadata = datastore_services.JsonProperty(indexed=False)
     # The output of the job. This is only populated if the job has status code
     # STATUS_CODE_COMPLETED, and is None otherwise. If populated, this is
     # expected to be a list of strings.
-    output = ndb.JsonProperty(indexed=False)
+    output = datastore_services.JsonProperty(indexed=False)
     # The error message, if applicable. Only populated if the job has status
     # code STATUS_CODE_FAILED or STATUS_CODE_CANCELED; None otherwise.
-    error = ndb.TextProperty(indexed=False)
+    error = datastore_services.TextProperty(indexed=False)
     # Whether the datastore models associated with this job have been cleaned
     # up (i.e., deleted).
-    has_been_cleaned_up = ndb.BooleanProperty(default=False, indexed=True)
+    has_been_cleaned_up = (
+        datastore_services.BooleanProperty(default=False, indexed=True))
     # Store additional params passed with job.
-    additional_job_params = ndb.JsonProperty(default=None)
+    additional_job_params = datastore_services.JsonProperty(default=None)
 
     @staticmethod
     def get_deletion_policy():
@@ -195,7 +196,7 @@ class ContinuousComputationModel(base_models.BaseModel):
     """
 
     # The current status code for the computation.
-    status_code = ndb.StringProperty(
+    status_code = datastore_services.StringProperty(
         indexed=True,
         default=CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE,
         choices=[
@@ -206,19 +207,18 @@ class ContinuousComputationModel(base_models.BaseModel):
     # The realtime layer that is currently 'active' (i.e., the one that is
     # going to be cleared immediately after the current batch job run
     # completes).
-    active_realtime_layer_index = ndb.IntegerProperty(
-        default=0,
-        choices=[0, 1])
+    active_realtime_layer_index = datastore_services.IntegerProperty(
+        default=0, choices=[0, 1])
 
     # The time at which a batch job for this computation was last kicked off,
     # in milliseconds since the epoch.
-    last_started_msec = ndb.FloatProperty(indexed=True)
+    last_started_msec = datastore_services.FloatProperty(indexed=True)
     # The time at which a batch job for this computation was last completed or
     # failed, in milliseconds since the epoch.
-    last_finished_msec = ndb.FloatProperty(indexed=True)
+    last_finished_msec = datastore_services.FloatProperty(indexed=True)
     # The time at which a halt signal was last sent to this batch job, in
     # milliseconds since the epoch.
-    last_stopped_msec = ndb.FloatProperty(indexed=True)
+    last_stopped_msec = datastore_services.FloatProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy():

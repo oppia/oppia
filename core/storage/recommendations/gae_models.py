@@ -21,9 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 
-from google.appengine.ext import ndb
-
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+datastore_services = models.Registry.import_datastore_services()
 
 TOPIC_SIMILARITIES_ID = 'topics'
 
@@ -36,7 +35,7 @@ class ExplorationRecommendationsModel(
     """
 
     # Ids of recommended explorations.
-    recommended_exploration_ids = ndb.StringProperty(
+    recommended_exploration_ids = datastore_services.StringProperty(
         repeated=True, indexed=True)
 
     @staticmethod
@@ -82,7 +81,7 @@ class TopicSimilaritiesModel(base_models.BaseModel):
     change in the future.
     """
 
-    content = ndb.JsonProperty(required=True)
+    content = datastore_services.JsonProperty(required=True)
 
     @staticmethod
     def get_deletion_policy():
