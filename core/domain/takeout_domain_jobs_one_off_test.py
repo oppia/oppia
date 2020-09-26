@@ -30,7 +30,6 @@ from google.appengine.ext import ndb
 (base_models, config_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.config])
 
-datastore_services = models.Registry.import_datastore_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
