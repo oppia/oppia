@@ -87,21 +87,14 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
     return all_models_grouped_by_model_type
 
 
-def make_pseudo_random_hr_consistency_policy(probability=0.5, seed=0):
+def make_pseudo_random_hr_consistency_policy():
     """Returns a policy that always gives the same sequence of consistency
     decisions.
-
-    Args:
-        probability: float. A number between 0 and 1 that is the likelihood of a
-            transaction applying before a global query is executed.
-        seed: *. A hashable object to use as a seed. Use None to use the current
-            timestamp.
 
     Returns:
         datastore_stub_util.PseudoRandomHRConsistencyPolicy. The policy.
     """
-    return datastore_stub_util.PseudoRandomHRConsistencyPolicy(
-        probability=probability, seed=seed)
+    return datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1)
 
 
 @contextlib.contextmanager

@@ -2355,8 +2355,7 @@ class AppEngineTestBase(TestBase):
 
         # Configure datastore policy to emulate instantaneously and globally
         # consistent HRD.
-        policy = datastore_services.make_pseudo_random_hr_consistency_policy(
-            probability=1)
+        policy = datastore_services.make_pseudo_random_hr_consistency_policy()
 
         # Declare any relevant App Engine service stubs here.
         self.testbed.init_user_stub()
