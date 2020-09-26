@@ -26,12 +26,12 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models, skill_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.skill
 ])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -96,16 +96,17 @@ class QuestionModel(base_models.VersionedModel):
         })
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, unused_user_id):
         """Check whether QuestionModel snapshots references the given user.
 
         Args:
-            user_id: str. The ID of the user whose data should be checked.
+            unused_user_id: str. The ID of the user whose data should be
+                checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+        return False
 
     @classmethod
     def _get_new_id(cls):
@@ -330,7 +331,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         ) * question_count
 
         if not start_cursor == '':
-            cursor = datastore_query.Cursor(urlsafe=start_cursor)
+            cursor = datastore_services.make_cursor(urlsafe_cursor=start_cursor)
             question_skill_link_models, next_cursor, more = cls.query(
                 cls.skill_id.IN(skill_ids)
                 # Order by cls.key is needed alongside cls.last_updated so as to
