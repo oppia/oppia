@@ -21,7 +21,7 @@ import { HttpService } from 'services/http.service';
 import { HttpTestingController, HttpClientTestingModule } from
   '@angular/common/http/testing';
 
-fdescribe('HTML service', () => {
+describe('HTML service', () => {
   let httpTestingController: HttpTestingController;
   let service: HttpService;
   const ARBITRARY_TEST_URL = 'abcdfg.com';
