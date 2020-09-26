@@ -27,6 +27,8 @@ import subprocess
 import sys
 import time
 
+print(sys.path)
+
 import google
 import pkg_resources
 import python_utils
