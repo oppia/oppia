@@ -62,7 +62,6 @@ import utils
 
 from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map
-from google.appengine.api import datastore_types
 from google.appengine.api import mail
 import webtest
 
@@ -71,6 +70,7 @@ import webtest
         models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
         models.NAMES.story, models.NAMES.topic]))
 current_user_services = models.Registry.import_current_user_services()
+datastore_services = models.Registry.import_datastore_services()
 email_services = models.Registry.import_email_services()
 memory_cache_services = models.Registry.import_cache_services()
 
@@ -2356,7 +2356,7 @@ class AppEngineTestBase(TestBase):
 
         # Configure datastore policy to emulate instantaneously and globally
         # consistent HRD.
-        policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(
+        policy = datastore_services.make_pseudo_random_hr_consistency_policy(
             probability=1)
 
         # Declare any relevant App Engine service stubs here.
@@ -2645,70 +2645,6 @@ class LinterTestBase(GenericTestBase):
 
 class AuditJobsTestBase(GenericTestBase):
     """Base class for audit jobs tests."""
-
-    @contextlib.contextmanager
-    def mock_datetime_for_audit(self, mocked_datetime):
-        """Mocks response from datetime.datetime.utcnow method for audit jobs.
-
-        Example usage:
-            import datetime
-            mocked_datetime_utcnow = datetime.datetime.utcnow() -
-                datetime.timedelta(days=1)
-            with self.mock_datetime_utcnow(mocked_datetime_utcnow):
-                print datetime.datetime.utcnow() # prints time reduced by 1 day
-            print datetime.datetime.utcnow()  # prints current time.
-
-        Args:
-            mocked_datetime: datetime.datetime. The datetime which will be used
-                instead of the current UTC datetime.
-
-        Yields:
-            None. Empty yield statement.
-        """
-        from google.appengine.ext import ndb
-
-        if not isinstance(mocked_datetime, datetime.datetime):
-            raise utils.ValidationError(
-                'Expected mocked_datetime to be datetime.datetime, got %s' % (
-                    type(mocked_datetime)))
-
-        original_datetime_type = datetime.datetime
-
-        class PatchedDatetimeType(type):
-            """Validates the datetime instances."""
-
-            def __instancecheck__(cls, other):
-                """Validates whether the given instance is datetime
-                instance.
-                """
-                return isinstance(other, original_datetime_type)
-
-        class MockDatetime( # pylint: disable=inherit-non-class
-                python_utils.with_metaclass(
-                    PatchedDatetimeType, datetime.datetime)):
-            @classmethod
-            def utcnow(cls):
-                """Returns the mocked datetime."""
-
-                return mocked_datetime
-
-        setattr(datetime, 'datetime', MockDatetime)
-        setattr(ndb.DateTimeProperty, 'data_type', MockDatetime)
-
-        # Updates datastore types for MockDatetime to ensure that
-        # validation of ndb datetime properties does not fail.
-        datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime] = (  # pylint: disable=protected-access
-            datastore_types.ValidatePropertyNothing)
-        datastore_types._PACK_PROPERTY_VALUES[MockDatetime] = (  # pylint: disable=protected-access
-            datastore_types.PackDatetime)
-        datastore_types._PROPERTY_MEANINGS[MockDatetime] = (  # pylint: disable=protected-access
-            datastore_types.entity_pb.Property.GD_WHEN)
-
-        try:
-            yield
-        finally:
-            setattr(datetime, 'datetime', original_datetime_type)
-            setattr(ndb.DateTimeProperty, 'data_type', datetime.datetime)
 
     def run_job_and_check_output(
             self, expected_output, sort=False, literal_eval=False):

@@ -25,12 +25,12 @@ from core.domain import takeout_domain_jobs_one_off
 from core.platform import models
 from core.tests import test_utils
 
-import google.appengine.api.datastore_errors
 from google.appengine.ext import ndb
 
 (base_models, config_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.config])
 
+datastore_services = models.Registry.import_datastore_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
@@ -84,7 +84,7 @@ class SnapshotMetadataCommitMsgMigrationOneOffJobTests(
 
             # Try a query on the unindexed field and observe failure.
             with self.assertRaisesRegexp(
-                google.appengine.api.datastore_errors.BadFilterError,
+                datastore_services.BadFilterError,
                 'invalid filter: Cannot query for unindexed property None.'):
                 model_class.query(model_class.commit_message == 'test1')
 
