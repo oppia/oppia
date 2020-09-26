@@ -19,6 +19,15 @@
 // Individual value generator directives can be found in
 // extensions/value_generators/templates.
 
+interface ValueGeneratorEditorCustomScope extends ng.IScope {
+  objType?: string;
+  generatorId?: string;
+  getObjType?: (() => string);
+  getGeneratorId?: (() => string);
+  initArgs?: Object;
+  getInitArgs?: (() => Object);
+}
+
 angular.module('oppia').directive('valueGeneratorEditor', [
   '$compile', function($compile) {
     return {
@@ -29,7 +38,7 @@ angular.module('oppia').directive('valueGeneratorEditor', [
         initArgs: '=',
         objType: '='
       },
-      link: function(scope: ICustomScope, element) {
+      link: function(scope: ValueGeneratorEditorCustomScope, element) {
         scope.$watch('generatorId', function() {
           var directiveName = scope.generatorId.replace(
             /([a-z])([A-Z])/g, '$1-$2').toLowerCase();

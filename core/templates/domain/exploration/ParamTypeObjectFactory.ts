@@ -22,15 +22,19 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+interface TypeDefinitionObject {
+  'validate': (arg0: Object) => boolean;
+
+  // The default value is typed as Object because it's type could be anything.
+  // It depends on the arguments passed to the constructor.
+  'default_value': Object;
+}
+
 export class ParamType {
   _name: string;
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'valueIsValid' is a function with parameters dependent on the
-  // parameters passed to the constructor.
-  valueIsValid: (arg0: any) => Boolean;
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'defaultValue' can be be of any type.
-  defaultValue: any;
+  valueIsValid: (arg0: Object) => boolean;
+  defaultValue: Object;
+
   /**
    * @private @constructor
    * Defines a specific type that a parameter can take.
@@ -41,12 +45,11 @@ export class ParamType {
    *
    * @param {Function.<?, Boolean>} validateFunction - Returns true when a value
    *    is valid.
-   * @param {?} defaultValue - simple value any parameter of this type can take.
+   * @param {Object} defaultValue - simple value any parameter of this type can
+   * take.
    */
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'typeDefinitionObject' is a dict with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
-  constructor(typeDefinitionObject: any) {
+
+  constructor(typeDefinitionObject: TypeDefinitionObject) {
     if (!typeDefinitionObject.validate(typeDefinitionObject.default_value)) {
       throw new Error(
         'The default value is invalid according to validation function');
@@ -54,16 +57,14 @@ export class ParamType {
 
     /** @member {String} */
     this._name = null;
-    /** @member {Function.<?, Boolean>} */
+    /** @member {Function.<Object, Boolean>} */
     this.valueIsValid = typeDefinitionObject.validate;
-    /** @member {?} */
+    /** @member {Object} */
     this.defaultValue = typeDefinitionObject.default_value;
   }
 
-  /** @returns {?} - A valid default value for this particular type. */
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type can be be of any type.
-  createDefaultValue(): any {
+  /** @returns {Object} - A valid default value for this particular type. */
+  createDefaultValue(): Object {
     return cloneDeep(this.defaultValue);
   }
 
@@ -83,9 +84,8 @@ export class ParamTypeObjectFactory {
     Object.keys(this.registry).forEach((paramTypeName: string) => {
       // The bracket notation is needed since 'paramTypeName' is a dynamic
       // property and is not defined on 'registry'.
-      /* eslint-disable dot-notation */
+      /* eslint-disable-next-line dot-notation */
       var paramType = this.registry[paramTypeName];
-      /* eslint-enable dot-notation */
       paramType._name = paramTypeName;
       Object.freeze(paramType);
     });
@@ -98,9 +98,7 @@ export class ParamTypeObjectFactory {
   /** @type {Object.<String, ParamType>} */
   registry = {
     UnicodeString: new ParamType({
-      // TODO(#7165): Replace 'any' with the exact type. This has been
-      // kept as 'any' because the return type can be be of any type.
-      validate: (value: any) => {
+      validate: (value: Object) => {
         return (typeof value === 'string' || value instanceof String);
       },
       default_value: ''
@@ -121,11 +119,7 @@ export class ParamTypeObjectFactory {
     if (!this.registry.hasOwnProperty(backendName)) {
       throw new Error(backendName + ' is not a registered parameter type.');
     }
-    // The bracket notation is needed since 'backendName' is a dynamic property
-    // and is not defined on 'registry'.
-    /* eslint-disable dot-notation */
     return this.registry[backendName];
-    /* eslint-enable dot-notation */
   }
 }
 

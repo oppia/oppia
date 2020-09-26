@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
+import collections
 import contextlib
 import copy
 import datetime
@@ -29,11 +31,14 @@ import os
 import unittest
 
 from constants import constants
+from core.controllers import base
+from core.domain import caching_domain
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import interaction_registry
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
@@ -46,17 +51,19 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 import feconf
 import main
 import main_mail
 import main_taskqueue
 import python_utils
+import schema_utils
 import utils
 
 from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map
+from google.appengine.api import datastore_types
 from google.appengine.api import mail
-import jinja2
 import webtest
 
 (exp_models, question_models, skill_models, story_models, topic_models,) = (
@@ -64,6 +71,8 @@ import webtest
         models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
         models.NAMES.story, models.NAMES.topic]))
 current_user_services = models.Registry.import_current_user_services()
+email_services = models.Registry.import_email_services()
+memory_cache_services = models.Registry.import_cache_services()
 
 # Prefix to append to all lines printed by tests to the console.
 # We are using the b' prefix as all the stdouts are in bytes.
@@ -93,7 +102,7 @@ def get_filepath_from_filename(filename, rootdir):
     For example signup-page.mainpage.html is present in
     core/templates/pages/signup-page and error-page.mainpage.html is
     present in core/templates/pages/error-pages. So we walk through
-    core/templates/pages and a match for signup-page.directive.html
+    core/templates/pages and a match for signup-page.component.html
     is found in signup-page subdirectory and a match for
     error-page.directive.html is found in error-pages subdirectory.
 
@@ -103,7 +112,7 @@ def get_filepath_from_filename(filename, rootdir):
 
     Returns:
         str | None. The path of the file if file is found otherwise
-            None.
+        None.
     """
     # This is required since error files are served according to error status
     # code. The file served is error-page.mainpage.html but it is compiled
@@ -124,28 +133,118 @@ def get_filepath_from_filename(filename, rootdir):
     return filepath
 
 
-def mock_get_template(unused_self, filename):
-    """Mock for get_template function of jinja2 Environment. This mock is
-    required for backend tests since we do not have webpack compilation
-    before backend tests. The folder to search templates is webpack_bundles
-    which is generated after webpack compilation. Since this folder will be
-    missing, get_template function will return a TemplateNotFound error. So,
-    we use a mock for get_template which returns the html file from the source
-    directory instead.
+def mock_load_template(filename):
+    """Mock for load_template function. This mock is required for backend tests
+    since we do not have webpack compilation before backend tests. The folder
+    to search templates is webpack_bundles which is generated after webpack
+    compilation. Since this folder will be missing, load_template function will
+    return an error. So, we use a mock for load_template which returns the html
+    file from the source directory instead.
 
     Args:
-        unused_self: jinja2.environment.Environment. The Environment instance.
         filename: str. The name of the file for which template is
             to be returned.
 
     Returns:
-        jinja2.environment.Template. The template for the given file.
+        str. The contents of the given file.
     """
     filepath = get_filepath_from_filename(
         filename, os.path.join('core', 'templates', 'pages'))
     with python_utils.open_file(filepath, 'r') as f:
         file_content = f.read()
-    return jinja2.environment.Template(file_content)
+    return file_content
+
+
+def check_image_png_or_webp(image_string):
+    """Checks if the image is in png or webp format only.
+
+    Args:
+        image_string: str. Image url in base64 format.
+
+    Returns:
+        boolean. Returns true if image is in WebP format.
+    """
+    if (image_string.startswith('data:image/png') or
+            image_string.startswith('data:image/webp')):
+        return True
+    return False
+
+
+class MemoryCacheServicesStub(python_utils.OBJECT):
+    """The stub class that mocks the API functionality offered by the platform
+    layer, namely the platform.cache cache services API.
+    """
+
+    cache_dict = collections.defaultdict()
+
+    def get_memory_cache_stats(self):
+        """Returns a mock profile of the cache dictionary. This mock does not
+        have the functionality to test for peak memory usage and total memory
+        usage so the values for those attributes will be 0.
+
+        Returns:
+            MemoryCacheStats. MemoryCacheStats object containing the total
+            number of keys in the cache dictionary.
+        """
+        memory_stats = caching_domain.MemoryCacheStats(
+            0,
+            0,
+            len(self.cache_dict))
+
+        return memory_stats
+
+    def flush_cache(self):
+        """Wipes the cache dictionary clean."""
+        self.cache_dict = collections.defaultdict()
+
+    def get_multi(self, keys):
+        """Looks up a list of keys in cache dictionary.
+
+        Args:
+            keys: list(str). A list of keys (strings) to look up.
+
+        Returns:
+            list(str). A list of values in the cache dictionary corresponding to
+            the keys that are passed in.
+        """
+        assert isinstance(keys, list)
+        cache_list = [
+            (self.cache_dict[key] if key in self.cache_dict else None)
+            for key in keys]
+        return cache_list
+
+    def set_multi(self, key_value_mapping):
+        """Sets multiple keys' values at once in the cache dictionary.
+
+        Args:
+            key_value_mapping: dict(str, str). Both the key and value are
+                strings. The value can either be a primitive binary-safe string
+                or the JSON-encoded string version of the object.
+
+        Returns:
+            bool. Whether the set action succeeded.
+        """
+        assert isinstance(key_value_mapping, dict)
+        for key, value in key_value_mapping.items():
+            self.cache_dict[key] = value
+        return True
+
+    def delete_multi(self, keys):
+        """Deletes multiple keys in the cache dictionary.
+
+        Args:
+            keys: list(str). The keys (strings) to delete.
+
+        Returns:
+            int. Number of successfully deleted keys.
+        """
+        number_of_deleted_keys = 0
+        for key in keys:
+            assert isinstance(key, python_utils.BASESTRING)
+            if key in self.cache_dict:
+                del self.cache_dict[key]
+                number_of_deleted_keys += 1
+        return number_of_deleted_keys
 
 
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
@@ -206,6 +305,8 @@ class TestBase(unittest.TestCase):
 
     # A test unicode string.
     UNICODE_TEST_STRING = u'unicode ¡马!'
+
+    SUPER_ADMIN_EMAIL = 'tmpsuperadmin@example.com'
 
     # Dummy strings representing user attributes. Note that it is up to the
     # individual test to actually register these users as editors, admins, etc.
@@ -288,8 +389,8 @@ class TestBase(unittest.TestCase):
                 'labelled_as_correct': True
             },
             'customization_args': {
-                u'rows': 1,
-                u'placeholder': u'Enter text here'
+                u'rows': {u'value': 1},
+                u'placeholder': {u'value': u'Enter text here'}
             },
             'confirmed_unclassified_answers': [],
             'id': u'TextInput',
@@ -371,10 +472,12 @@ class TestBase(unittest.TestCase):
         }
     }
 
-
     VERSION_1_STORY_CONTENTS_DICT = {
         'nodes': [{
-            'outline': u'',
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-math ' +
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+                ';"></oppia-noninteractive-math>'),
             'exploration_id': None,
             'destination_node_ids': [],
             'outline_is_finalized': False,
@@ -386,8 +489,67 @@ class TestBase(unittest.TestCase):
         'next_node_id': 'node_2'
     }
 
+    VERSION_2_STORY_CONTENTS_DICT = {
+        'nodes': [{
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-math ' +
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+                ';"></oppia-noninteractive-math>'),
+            'exploration_id': None,
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None}],
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2'
+    }
+
+    VERSION_3_STORY_CONTENTS_DICT = {
+        'nodes': [{
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-math ' +
+                'raw_latex-with-value="&amp;quot;+,-,-,+&amp;quot' +
+                ';"></oppia-noninteractive-math>'),
+            'exploration_id': None,
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None}],
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2'
+    }
+    VERSION_4_STORY_CONTENTS_DICT = {
+        'nodes': [{
+            'outline': (
+                '<p>Value</p><oppia-noninteractive-'
+                'math math_content-with-value="{&amp;quot;raw_latex&amp;quot;'
+                ': &amp;quot;+,-,-,+&amp;quot;, &amp;quot;svg_filename&amp;'
+                'quot;: &amp;quot;&amp;quot;}"></oppia-noninteractive-math>'),
+            'exploration_id': None,
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None}],
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2'
+    }
+
     VERSION_1_SUBTOPIC_DICT = {
-        'skill_ids': [],
+        'skill_ids': ['skill_1'],
         'id': 1,
         'title': 'A subtitle'
     }
@@ -398,7 +560,8 @@ class TestBase(unittest.TestCase):
     # If evaluating differences in YAML, conversion to dict form via
     # utils.dict_from_yaml can isolate differences quickly.
 
-    SAMPLE_YAML_CONTENT = ("""author_notes: ''
+    SAMPLE_YAML_CONTENT = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -431,6 +594,7 @@ states:
       hints: []
       id: null
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -462,6 +626,7 @@ states:
       hints: []
       id: null
       solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -482,7 +647,8 @@ title: Title
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-    SAMPLE_UNTITLED_YAML_CONTENT = ("""author_notes: ''
+    SAMPLE_UNTITLED_YAML_CONTENT = (
+        """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
 init_state_name: %s
@@ -547,7 +713,7 @@ tags: []
 
         Returns:
             str. A string that contains unicode characters and ends with the
-                given suffix.
+            given suffix.
         """
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
@@ -560,7 +726,7 @@ tags: []
         """Signs up a superadmin user. Should be called at the end of
         setUp().
         """
-        self.signup('tmpsuperadmin@example.com', 'tmpsuperadm1n')
+        self.signup(self.SUPER_ADMIN_EMAIL, 'tmpsuperadm1n')
 
     def log_line(self, line):
         """Print the line with a prefix that can be identified by the
@@ -587,7 +753,6 @@ tags: []
         os.environ['USER_ID'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
 
-    # pylint: enable=invalid-name
     def shortDescription(self):
         """Additional information logged during unit test invocation."""
         # Suppress default logging of docstrings.
@@ -620,7 +785,7 @@ tags: []
         # is only produced after webpack compilation which is not performed
         # during backend tests.
         with self.swap(
-            jinja2.environment.Environment, 'get_template', mock_get_template):
+            base, 'load_template', mock_load_template):
             response = self.testapp.get(
                 url, params, expect_errors=expect_errors,
                 status=expected_status_int)
@@ -634,8 +799,8 @@ tags: []
         # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(response.status_int, expected_status_int)
         if not expect_errors:
-            self.assertTrue(response.status_int >= 200 and
-                            response.status_int < 400)
+            self.assertTrue(
+                response.status_int >= 200 and response.status_int < 400)
         else:
             self.assertTrue(response.status_int >= 400)
         self.assertEqual(
@@ -710,7 +875,7 @@ tags: []
         # is only produced after webpack compilation which is not performed
         # during backend tests.
         with self.swap(
-            jinja2.environment.Environment, 'get_template', mock_get_template):
+            base, 'load_template', mock_load_template):
             response = self.testapp.get(url, params, expect_errors=True)
 
         self.assertIn(response.status_int, expected_status_int_list)
@@ -754,8 +919,9 @@ tags: []
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
 
-    def post_json(self, url, payload, csrf_token=None,
-                  expected_status_int=200, upload_files=None):
+    def post_json(
+            self, url, payload, csrf_token=None,
+            expected_status_int=200, upload_files=None):
         """Post an object to the server by JSON; return the received object."""
         data = {'payload': json.dumps(payload)}
         if csrf_token:
@@ -766,7 +932,7 @@ tags: []
             expect_errors = True
         json_response = self._send_post_request(
             self.testapp, url, data,
-            expect_errors=expect_errors,
+            expect_errors,
             expected_status_int=expected_status_int,
             upload_files=upload_files)
         # Testapp takes in a status parameter which is the expected status of
@@ -827,7 +993,7 @@ tags: []
             headers: dict(str, *). Extra headers to send.
 
         Returns:
-            webtest.TestResponse: The response of the POST request.
+            webtest.TestResponse. The response of the POST request.
         """
         # Convert the files to bytes.
         if upload_files is not None:
@@ -872,8 +1038,8 @@ tags: []
         incoming_email_url = '/_ah/mail/%s' % recipient_email
 
         return self._send_post_request(
-            app, incoming_email_url, data, headers=headers,
-            expect_errors=expect_errors,
+            app, incoming_email_url, data,
+            expect_errors, headers=headers,
             expected_status_int=expected_status_int)
 
     def put_json(self, url, payload, csrf_token=None, expected_status_int=200):
@@ -937,8 +1103,7 @@ tags: []
         """Sets a given configuration object's value to the new value specified
         using a POST request.
         """
-        with self.login_context('tmpsuperadmin@example.com',
-                                is_super_admin=True):
+        with self.login_context(self.SUPER_ADMIN_EMAIL, is_super_admin=True):
             csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/adminhandler', {
@@ -955,8 +1120,7 @@ tags: []
             username: str. Username of the given user.
             user_role: str. Role of the given user.
         """
-        with self.login_context('tmpsuperadmin@example.com',
-                                is_super_admin=True):
+        with self.login_context(self.SUPER_ADMIN_EMAIL, is_super_admin=True):
             csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/adminrolehandler', {
@@ -1046,9 +1210,80 @@ tags: []
             Exploration. The exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title=title, category='A category')
+            exploration_id, title=title, category='Algebra')
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
+
+    def set_interaction_for_state(self, state, interaction_id):
+        """Sets the interaction_id, sets the fully populated default
+        interaction customization arguments, and increments
+        next_content_id_index as needed.
+
+        Args:
+            state: State. The state domain object to set the interaction for.
+            interaction_id: str. The interaction id to set. Also sets the
+                default customization args for the given interaction id.
+        """
+
+        # We wrap next_content_id_index in a dict so that modifying it in the
+        # inner function modifies the value.
+        next_content_id_index_dict = {
+            'value': state.next_content_id_index
+        }
+
+        def traverse_schema_and_assign_content_ids(value, schema, contentId):
+            """Generates content_id from recursively traversing the schema, and
+            assigning to the current value.
+
+            Args:
+                value: *. The current traversed value in customization
+                    arguments.
+                schema: dict. The current traversed schema.
+                contentId: str. The content_id generated so far.
+            """
+            is_subtitled_html_spec = (
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
+            is_subtitled_unicode_spec = (
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
+
+            if is_subtitled_html_spec or is_subtitled_unicode_spec:
+                value['content_id'] = '%s_%i' % (
+                    contentId, next_content_id_index_dict['value'])
+                next_content_id_index_dict['value'] += 1
+            elif schema['type'] == schema_utils.SCHEMA_TYPE_LIST:
+                for x in value:
+                    traverse_schema_and_assign_content_ids(
+                        x, schema['items'], contentId)
+            elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
+                for schema_property in schema['properties']:
+                    traverse_schema_and_assign_content_ids(
+                        x[schema_property.name],
+                        schema_property['schema'],
+                        '%s_%s' % (contentId, schema_property.name)
+                    )
+
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            interaction_id)
+        ca_specs = interaction.customization_arg_specs
+        customization_args = {}
+
+        for ca_spec in ca_specs:
+            ca_name = ca_spec.name
+            ca_value = ca_spec.default_value
+            traverse_schema_and_assign_content_ids(
+                ca_value,
+                ca_spec.schema,
+                'ca_%s' % ca_name
+            )
+            customization_args[ca_name] = {'value': ca_value}
+
+        state.update_interaction_id(interaction_id)
+        state.update_interaction_customization_args(customization_args)
+        state.update_next_content_id_index(next_content_id_index_dict['value'])
 
     def save_new_valid_exploration(
             self, exploration_id, owner_id, title='A title',
@@ -1074,15 +1309,16 @@ tags: []
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, category=category,
             language_code=language_code)
-        exploration.states[exploration.init_state_name].update_interaction_id(
-            interaction_id)
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], interaction_id)
+
         exploration.objective = objective
 
         # If an end state name is provided, add terminal node with that name.
         if end_state_name is not None:
             exploration.add_states([end_state_name])
             end_state = exploration.states[end_state_name]
-            end_state.update_interaction_id('EndExploration')
+            self.set_interaction_for_state(end_state, 'EndExploration')
             end_state.update_interaction_default_outcome(None)
 
             # Link first state to ending state (to maintain validity).
@@ -1131,10 +1367,11 @@ tags: []
         for from_state_name, dest_state_name in (
                 python_utils.ZIP(state_names[:-1], state_names[1:])):
             from_state = exploration.states[from_state_name]
-            from_state.update_interaction_id(python_utils.NEXT(interaction_ids))
+            self.set_interaction_for_state(
+                from_state, python_utils.NEXT(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
         end_state = exploration.states[state_names[-1]]
-        end_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)
 
         exp_services.save_new_exploration(owner_id, exploration)
@@ -1186,6 +1423,68 @@ tags: []
         exp_summary_model = exp_models.ExpSummaryModel(
             id=exp_id,
             title=title,
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids,
+            contributor_ids=[],
+            contributors_summary={},
+        )
+        exp_summary_model.put()
+
+    def save_new_exp_with_custom_states_schema_version(
+            self, exp_id, user_id, states_dict, version):
+        """Saves a new default exploration with the given version of states
+        dictionary.
+
+        This function should only be used for creating explorations in tests
+        involving migration of datastore explorations that use an old states
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating explorations. This is
+        because the latter approach would result in an exploration with the
+        *current* states schema version.
+
+        Args:
+            exp_id: str. The exploration ID.
+            user_id: str. The user_id of the creator.
+            states_dict: dict. The dict representation of all the states.
+            version: int. Custom states schema version.
+        """
+        exp_model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title='title',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            blurb='',
+            author_notes='',
+            states_schema_version=version,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states=states_dict,
+            param_specs={},
+            param_changes=[]
+        )
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
+
+        commit_message = 'New exploration created with title \'title\'.'
+        exp_model.commit(
+            user_id, commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exp_id,
+            title='title',
             category='category',
             objective='Old objective',
             language_code='en',
@@ -1315,7 +1614,7 @@ tags: []
 
         Returns:
             Collection. A newly-created collection containing the corresponding
-                exploration details.
+            exploration details.
         """
         collection = collection_domain.Collection.create_default_collection(
             collection_id,
@@ -1350,10 +1649,15 @@ tags: []
         rights_manager.publish_collection(committer, collection_id)
 
     def save_new_story(
-            self, story_id, owner_id, title, description, notes,
-            corresponding_topic_id,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            self, story_id, owner_id, corresponding_topic_id,
+            title='Title', description='Description', notes='Notes',
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            url_fragment='title', meta_tag_content='story meta tag content'):
         """Creates an Oppia Story and saves it.
+
+        NOTE: Callers are responsible for ensuring that the
+        'corresponding_topic_id' provided is valid, unless a test explicitly
+        requires it to be invalid.
 
         Args:
             story_id: str. ID for the story to be created.
@@ -1366,23 +1670,30 @@ tags: []
                 belongs.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
+            url_fragment: str. The url fragment of the story.
+            meta_tag_content: str. The meta tag content of the story.
 
         Returns:
             Story. A newly-created story.
         """
         story = story_domain.Story.create_default_story(
-            story_id, title, corresponding_topic_id)
+            story_id, title, description, corresponding_topic_id, url_fragment)
         story.title = title
         story.description = description
         story.notes = notes
         story.language_code = language_code
+        story.url_fragment = url_fragment
+        story.meta_tag_content = meta_tag_content
         story_services.save_new_story(owner_id, story)
         return story
 
     def save_new_story_with_story_contents_schema_v1(
-            self, story_id, owner_id, title, description, notes,
-            corresponding_topic_id,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            self, story_id, thumbnail_filename, thumbnail_bg_color,
+            owner_id, title, description,
+            notes, corresponding_topic_id,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            url_fragment='story-frag',
+            meta_tag_content='story meta tag content'):
         """Saves a new story with a default version 1 story contents
         data dictionary.
 
@@ -1397,6 +1708,9 @@ tags: []
 
         Args:
             story_id: str. ID for the story to be created.
+            thumbnail_filename: str|None. Thumbnail filename for the story.
+            thumbnail_bg_color: str|None. Thumbnail background color for the
+                story.
             owner_id: str. The user_id of the creator of the story.
             title: str. The title of the story.
             description: str. The high level description of the story.
@@ -1406,16 +1720,22 @@ tags: []
                 belongs.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
+            url_fragment: str. The URL fragment for the story.
+            meta_tag_content: str. The meta tag content of the story.
         """
         story_model = story_models.StoryModel(
             id=story_id,
+            thumbnail_filename=thumbnail_filename,
+            thumbnail_bg_color=thumbnail_bg_color,
             description=description,
             title=title,
             language_code=language_code,
             story_contents_schema_version=1,
             notes=notes,
             corresponding_topic_id=corresponding_topic_id,
-            story_contents=self.VERSION_1_STORY_CONTENTS_DICT
+            story_contents=self.VERSION_1_STORY_CONTENTS_DICT,
+            url_fragment=url_fragment,
+            meta_tag_content=meta_tag_content
         )
         commit_message = (
             'New story created with title \'%s\'.' % title)
@@ -1427,10 +1747,16 @@ tags: []
 
     def save_new_topic(
             self, topic_id, owner_id, name='topic', abbreviated_name='topic',
-            thumbnail_filename='topic.png', description='description',
-            canonical_story_ids=None, additional_story_ids=None,
-            uncategorized_skill_ids=None, subtopics=None, next_subtopic_id=0,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            url_fragment='topic',
+            thumbnail_filename='topic.svg',
+            thumbnail_bg_color=(
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
+            description='description', canonical_story_ids=None,
+            additional_story_ids=None, uncategorized_skill_ids=None,
+            subtopics=None, next_subtopic_id=0,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            meta_tag_content='topic meta tag content',
+            practice_tab_is_displayed=False):
         """Creates an Oppia Topic and saves it.
 
         Args:
@@ -1438,8 +1764,11 @@ tags: []
             owner_id: str. The user_id of the creator of the topic.
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated name of the topic.
+            url_fragment: str. The url fragment of the topic.
             thumbnail_filename: str|None. The thumbnail filename of the topic.
-            description: str. The desscription of the topic.
+            thumbnail_bg_color: str|None. The thumbnail background color of the
+                topic.
+            description: str. The description of the topic.
             canonical_story_ids: list(str). The list of ids of canonical stories
                 that are part of the topic.
             additional_story_ids: list(str). The list of ids of additional
@@ -1451,6 +1780,9 @@ tags: []
             next_subtopic_id: int. The id for the next subtopic.
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
+            meta_tag_content: str. The meta tag content for the topic.
+            practice_tab_is_displayed: bool. Whether the practice tab should be
+                displayed.
 
         Returns:
             Topic. A newly-created topic.
@@ -1466,21 +1798,26 @@ tags: []
         uncategorized_skill_ids = (uncategorized_skill_ids or [])
         subtopics = (subtopics or [])
         topic = topic_domain.Topic(
-            topic_id, name, abbreviated_name, thumbnail_filename,
+            topic_id, name, abbreviated_name, url_fragment,
+            thumbnail_filename, thumbnail_bg_color,
             description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
-            language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
+            meta_tag_content, practice_tab_is_displayed
         )
         topic_services.save_new_topic(owner_id, topic)
         return topic
 
     def save_new_topic_with_subtopic_schema_v1(
-            self, topic_id, owner_id, name, abbreviated_name,
-            canonical_name, description,
-            canonical_story_references, additional_story_references,
+            self, topic_id, owner_id, name, abbreviated_name, url_fragment,
+            canonical_name, description, thumbnail_filename,
+            thumbnail_bg_color, canonical_story_references,
+            additional_story_references,
             uncategorized_skill_ids, next_subtopic_id,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            meta_tag_content='topic meta tag content',
+            practice_tab_is_displayed=False):
         """Saves a new topic with a default version 1 subtopic
         data dictionary.
 
@@ -1498,8 +1835,12 @@ tags: []
             owner_id: str. The user_id of the creator of the topic.
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated name of the topic.
+            url_fragment: str. The url fragment of the topic.
             canonical_name: str. The canonical name (lowercase) of the topic.
-            description: str. The desscription of the topic.
+            description: str. The description of the topic.
+            thumbnail_filename: str. The thumbnail file name of the topic.
+            thumbnail_bg_color: str. The thumbnail background color of the
+                topic.
             canonical_story_references: list(StoryReference). A set of story
                 reference objects representing the canonical stories that are
                 part of this topic.
@@ -1511,6 +1852,9 @@ tags: []
             next_subtopic_id: int. The id for the next subtopic.
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
+            meta_tag_content: str. The meta tag content for the topic.
+            practice_tab_is_displayed: bool. Whether the practice tab should be
+                displayed.
         """
         topic_rights_model = topic_models.TopicRightsModel(
             id=topic_id,
@@ -1521,6 +1865,9 @@ tags: []
             id=topic_id,
             name=name,
             abbreviated_name=abbreviated_name,
+            url_fragment=url_fragment,
+            thumbnail_filename=thumbnail_filename,
+            thumbnail_bg_color=thumbnail_bg_color,
             canonical_name=canonical_name,
             description=description,
             language_code=language_code,
@@ -1531,7 +1878,9 @@ tags: []
             story_reference_schema_version=(
                 feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
             next_subtopic_id=next_subtopic_id,
-            subtopics=[self.VERSION_1_SUBTOPIC_DICT]
+            subtopics=[self.VERSION_1_SUBTOPIC_DICT],
+            meta_tag_content=meta_tag_content,
+            practice_tab_is_displayed=practice_tab_is_displayed
         )
         commit_message = (
             'New topic created with name \'%s\'.' % name)
@@ -1548,7 +1897,7 @@ tags: []
 
     def save_new_question(
             self, question_id, owner_id, question_state_data,
-            linked_skill_ids,
+            linked_skill_ids, inapplicable_skill_misconception_ids=None,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Question and saves it.
 
@@ -1558,22 +1907,30 @@ tags: []
             question_state_data: State. The state data for the question.
             linked_skill_ids: list(str). List of skill IDs linked to the
                 question.
+            inapplicable_skill_misconception_ids: list(str). List of
+                skill misconceptions ids that are not applicable to the
+                question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 
         Returns:
             Question. A newly-created question.
         """
+        # This needs to be done because default arguments can not be of list
+        # type.
+        if inapplicable_skill_misconception_ids is None:
+            inapplicable_skill_misconception_ids = []
         question = question_domain.Question(
             question_id, question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0,
-            linked_skill_ids)
+            linked_skill_ids, inapplicable_skill_misconception_ids)
         question_services.add_question(owner_id, question)
         return question
 
     def save_new_question_with_state_data_schema_v27(
             self, question_id, owner_id,
             linked_skill_ids,
+            inapplicable_skill_misconception_ids=None,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new default question with a default version 27 state
         data dictionary.
@@ -1591,16 +1948,25 @@ tags: []
             question_id: str. ID for the question to be created.
             owner_id: str. The id of the user creating the question.
             linked_skill_ids: list(str). The skill IDs linked to the question.
+            inapplicable_skill_misconception_ids: list(str). List of
+                skill misconceptions ids that are not applicable to the
+                question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
+        # This needs to be done because default arguments can not be of list
+        # type.
+        if inapplicable_skill_misconception_ids is None:
+            inapplicable_skill_misconception_ids = []
         question_model = question_models.QuestionModel(
             id=question_id,
             question_state_data=self.VERSION_27_STATE_DICT,
             language_code=language_code,
             version=1,
             question_state_data_schema_version=27,
-            linked_skill_ids=linked_skill_ids
+            linked_skill_ids=linked_skill_ids,
+            inapplicable_skill_misconception_ids=(
+                inapplicable_skill_misconception_ids)
         )
         question_model.commit(
             owner_id, 'New question created',
@@ -1645,11 +2011,11 @@ tags: []
         else:
             skill.rubrics = [
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                    constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                    constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                    constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skill.language_code = language_code
         skill.version = 0
         skill_services.save_new_skill(owner_id, skill)
@@ -1694,20 +2060,12 @@ tags: []
             language_code: str. The ISO 639-1 code for the language this
                 skill is written in.
         """
-        if rubrics is None:
-            rubrics = [
-                skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[0], '<p>Explanation 1</p>'),
-                skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[1], '<p>Explanation 2</p>'),
-                skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[2], '<p>Explanation 3</p>')]
         skill_model = skill_models.SkillModel(
             id=skill_id,
             description=description,
             language_code=language_code,
             misconceptions=misconceptions,
-            rubrics=[rubric.to_dict() for rubric in rubrics],
+            rubrics=rubrics,
             skill_contents=skill_contents,
             next_misconception_id=next_misconception_id,
             misconceptions_schema_version=misconceptions_schema_version,
@@ -1768,12 +2126,11 @@ tags: []
             print datetime.datetime.utcnow()  # prints current time.
 
         Args:
-            mocked_datetime: datetime.datetime.
-                The datetime which will be used instead of
-                the current UTC datetime.
+            mocked_datetime: datetime.datetime. The datetime which will be used
+                instead of the current UTC datetime.
 
         Yields:
-            nothing.
+            None. Empty yield statement.
         """
         if not isinstance(mocked_datetime, datetime.datetime):
             raise utils.ValidationError(
@@ -1784,6 +2141,7 @@ tags: []
 
         class PatchedDatetimeType(type):
             """Validates the datetime instances."""
+
             def __instancecheck__(cls, other):
                 """Validates whether the given instance is datetime
                 instance.
@@ -1796,6 +2154,7 @@ tags: []
             @classmethod
             def utcnow(cls):
                 """Returns the mocked datetime."""
+
                 return mocked_datetime
 
         setattr(datetime, 'datetime', MockDatetime)
@@ -1864,7 +2223,7 @@ tags: []
                     function_that_invokes_popen()
 
         Args:
-            obj: *. the Python object whose attribute you want to swap.
+            obj: *. The Python object whose attribute you want to swap.
             attr: str. The name of the function to be swapped.
             new_value: function. The new function you want to use.
             expected_args: None|list(tuple). The expected args that you
@@ -1880,7 +2239,7 @@ tags: []
                 will always be checked.
 
         Yields:
-            context: The context with function replaced.
+            context. The context with function replaced.
         """
         original = getattr(obj, attr)
         # The actual error message will also include detail assert error message
@@ -1895,11 +2254,11 @@ tags: []
             invoked.
 
             Args:
-                args: tuple. The args passed into `attr` function.
-                kwargs: dict. The key word args passed into `attr` function.
+                *args: list(*). The args passed into `attr` function.
+                **kwargs: dict. The key word args passed into `attr` function.
 
             Returns:
-                Result of `new_value`.
+                *. Result of `new_value`.
             """
             wrapper.called = True
             if expected_args is not None:
@@ -1954,9 +2313,31 @@ tags: []
             self.logout()
             os.environ.update(initial_user_env)
 
+    def assertRaises(self, exc, fun, *args, **kwds):
+        raise NotImplementedError(
+            'self.assertRaises should not be used in these tests. Please use '
+            'self.assertRaisesRegexp instead.')
+
+    def assertRaisesRegexp(  # pylint: disable=keyword-arg-before-vararg
+            self, expected_exception, expected_regexp, callable_obj=None,
+            *args, **kwargs):
+        if expected_regexp == '':
+            raise Exception(
+                'Please provide a sufficiently strong regexp string to '
+                'validate that the correct error is being raised.')
+
+        return super(TestBase, self).assertRaisesRegexp(
+            expected_exception, expected_regexp,
+            callable_obj=callable_obj, *args, **kwargs)
+
 
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
+
+    # We can't instantiate the stub in setUp because the overrided
+    # method run() executes before setUp() and run() requires the memory
+    # cache stub.
+    memory_cache_services_stub = MemoryCacheServicesStub()
 
     def _delete_all_models(self):
         """Deletes all models from the NDB datastore."""
@@ -1965,6 +2346,7 @@ class AppEngineTestBase(TestBase):
 
     def setUp(self):
         empty_environ()
+        self.memory_cache_services_stub.flush_cache()
 
         from google.appengine.datastore import datastore_stub_util
         from google.appengine.ext import testbed
@@ -1982,24 +2364,54 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_app_identity_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_datastore_v3_stub(consistency_policy=policy)
+        self.testbed.init_blobstore_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_files_stub()
-        self.testbed.init_blobstore_stub()
         self.testbed.init_search_stub()
-        self.testbed.init_images_stub()
 
         # The root path tells the testbed where to find the queue.yaml file.
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
         self.taskqueue_stub = self.testbed.get_stub(
             testbed.TASKQUEUE_SERVICE_NAME)
 
-        self.testbed.init_mail_stub()
-        self.mail_stub = self.testbed.get_stub(testbed.MAIL_SERVICE_NAME)
-
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
 
         self.signup_superadmin_user()
+
+    def run(self, result=None):
+        """Adds a context switch to all test classes. This context switch occurs
+        to allow all test classes to automatically have access to a mock version
+        of the cache services functionality. All test classes that inherit
+        AppEngineTestBase will use a mocked version of the platform.cache cache
+        services API that can be found in the MemoryCacheServicesStub class.
+
+        Args:
+            result: TestResult|None. Optional result object that, if provided,
+                will collect the results of the test and returned to the caller
+                of run(). If None is provided, a default result object is
+                created and used. More details can be found here:
+                https://docs.python.org/3/library/unittest.html#unittest.
+                TestCase.run.
+        """
+        swap_flush_cache = self.swap(
+            memory_cache_services, 'flush_cache',
+            self.memory_cache_services_stub.flush_cache)
+        swap_get_multi = self.swap(
+            memory_cache_services, 'get_multi',
+            self.memory_cache_services_stub.get_multi)
+        swap_set_multi = self.swap(
+            memory_cache_services, 'set_multi',
+            self.memory_cache_services_stub.set_multi)
+        swap_get_memory_cache_stats = self.swap(
+            memory_cache_services, 'get_memory_cache_stats',
+            self.memory_cache_services_stub.get_memory_cache_stats)
+        swap_delete_multi = self.swap(
+            memory_cache_services, 'delete_multi',
+            self.memory_cache_services_stub.delete_multi)
+        with swap_flush_cache, swap_get_multi, swap_set_multi:
+            with swap_get_memory_cache_stats, swap_delete_multi:
+                super(AppEngineTestBase, self).run(result=result)
 
     def tearDown(self):
         self.logout()
@@ -2033,7 +2445,7 @@ class AppEngineTestBase(TestBase):
                 that header.
 
         Yields:
-            None.
+            None. Yields nothing.
         """
         if headers is None:
             response_headers = {}
@@ -2070,8 +2482,8 @@ class AppEngineTestBase(TestBase):
         """Execute queued tasks.
 
         Args:
-            tasks: list(google.appengine.api.taskqueue.taskqueue.Task).
-                The queued tasks.
+            tasks: list(google.appengine.api.taskqueue.taskqueue.Task). The
+                queued tasks.
         """
         for task in tasks:
             if task.url == '/_ah/queue/deferred':
@@ -2143,7 +2555,7 @@ class AppEngineTestBase(TestBase):
         """
         state = state_domain.State.create_default_state(
             default_dest_state_name, is_initial_state=True)
-        state.interaction.id = 'TextInput'
+        state.update_interaction_id('TextInput')
         solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'Solution',
@@ -2157,18 +2569,340 @@ class AppEngineTestBase(TestBase):
                 state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
             )
         ]
-        state.update_interaction_solution(solution_dict)
+        solution = state_domain.Solution.from_dict(
+            state.interaction.id, solution_dict)
+        state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
-        state.interaction.customization_args = {
-            'placeholder': 'Enter text here',
-            'rows': 1
-        }
+        state.update_interaction_customization_args({
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder',
+                    'unicode_str': 'Enter text here'
+                }
+            },
+            'rows': {'value': 1}
+        })
+        state.update_next_content_id_index(2)
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
         return state
 
 
 GenericTestBase = AppEngineTestBase
+
+
+class LinterTestBase(GenericTestBase):
+    """Base class for linter tests."""
+
+    def setUp(self):
+        super(LinterTestBase, self).setUp()
+        self.linter_stdout = []
+
+        def mock_print(*args):
+            """Mock for python_utils.PRINT. Append the values to print to
+            linter_stdout list.
+
+            Args:
+                *args: list(*). Variable length argument list of values to print
+                    in the same line of output.
+            """
+            self.linter_stdout.append(
+                ' '.join(python_utils.UNICODE(arg) for arg in args))
+
+        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+
+    def assert_same_list_elements(self, phrases, stdout):
+        """Checks to see if all of the phrases appear in at least one of the
+        stdout outputs.
+
+        Args:
+            phrases: list(str). A list of phrases we are trying to find in
+                one of the stdout outputs. For example, python linting
+                outputs a success string that includes data we don't have easy
+                access to, like how long the test took, so we may want to search
+                for a substring of that success string in stdout.
+
+            stdout: list(str). A list of the output results from the
+                method's execution.
+        """
+        self.assertTrue(
+            any(
+                all(phrase in output for phrase in phrases) for
+                output in stdout))
+
+    def assert_failed_messages_count(self, stdout, expected_failed_count):
+        """Assert number of expected failed checks to actual number of failed
+        checks.
+
+        Args:
+            stdout: list(str). A list of linter output messages.
+
+            expected_failed_count: int. Expected number of failed messages.
+        """
+        failed_count = sum(msg.startswith('FAILED') for msg in stdout)
+        self.assertEqual(failed_count, expected_failed_count)
+
+
+class AuditJobsTestBase(GenericTestBase):
+    """Base class for audit jobs tests."""
+
+    @contextlib.contextmanager
+    def mock_datetime_for_audit(self, mocked_datetime):
+        """Mocks response from datetime.datetime.utcnow method for audit jobs.
+
+        Example usage:
+            import datetime
+            mocked_datetime_utcnow = datetime.datetime.utcnow() -
+                datetime.timedelta(days=1)
+            with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+                print datetime.datetime.utcnow() # prints time reduced by 1 day
+            print datetime.datetime.utcnow()  # prints current time.
+
+        Args:
+            mocked_datetime: datetime.datetime. The datetime which will be used
+                instead of the current UTC datetime.
+
+        Yields:
+            None. Empty yield statement.
+        """
+        from google.appengine.ext import ndb
+
+        if not isinstance(mocked_datetime, datetime.datetime):
+            raise utils.ValidationError(
+                'Expected mocked_datetime to be datetime.datetime, got %s' % (
+                    type(mocked_datetime)))
+
+        original_datetime_type = datetime.datetime
+
+        class PatchedDatetimeType(type):
+            """Validates the datetime instances."""
+
+            def __instancecheck__(cls, other):
+                """Validates whether the given instance is datetime
+                instance.
+                """
+                return isinstance(other, original_datetime_type)
+
+        class MockDatetime( # pylint: disable=inherit-non-class
+                python_utils.with_metaclass(
+                    PatchedDatetimeType, datetime.datetime)):
+            @classmethod
+            def utcnow(cls):
+                """Returns the mocked datetime."""
+
+                return mocked_datetime
+
+        setattr(datetime, 'datetime', MockDatetime)
+        setattr(ndb.DateTimeProperty, 'data_type', MockDatetime)
+
+        # Updates datastore types for MockDatetime to ensure that
+        # validation of ndb datetime properties does not fail.
+        datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime] = (  # pylint: disable=protected-access
+            datastore_types.ValidatePropertyNothing)
+        datastore_types._PACK_PROPERTY_VALUES[MockDatetime] = (  # pylint: disable=protected-access
+            datastore_types.PackDatetime)
+        datastore_types._PROPERTY_MEANINGS[MockDatetime] = (  # pylint: disable=protected-access
+            datastore_types.entity_pb.Property.GD_WHEN)
+
+        try:
+            yield
+        finally:
+            setattr(datetime, 'datetime', original_datetime_type)
+            setattr(ndb.DateTimeProperty, 'data_type', datetime.datetime)
+
+    def run_job_and_check_output(
+            self, expected_output, sort=False, literal_eval=False):
+        """Helper function to run job and compare output.
+
+        Args:
+            expected_output: list(*). The expected result of the job.
+            sort: bool. Whether to sort the outputs before comparison.
+            literal_eval: bool. Whether to use ast.literal_eval before
+                comparison.
+        """
+        self.process_and_flush_pending_tasks()
+        job_id = self.job_class.create_new()
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+        self.job_class.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        actual_output = self.job_class.get_output(job_id)
+        if literal_eval:
+            actual_output_dict = {}
+            expected_output_dict = {}
+
+            for item in [ast.literal_eval(value) for value in actual_output]:
+                value = item[1]
+                if isinstance(value, list):
+                    value = sorted(value)
+                actual_output_dict[item[0]] = value
+
+            for item in [ast.literal_eval(value) for value in expected_output]:
+                value = item[1]
+                if isinstance(value, list):
+                    value = sorted(value)
+                expected_output_dict[item[0]] = value
+            self.assertEqual(
+                sorted(actual_output_dict.keys()),
+                sorted(expected_output_dict.keys()))
+            for key in actual_output_dict:
+                self.assertEqual(
+                    actual_output_dict[key], expected_output_dict[key])
+        elif sort:
+            self.assertEqual(sorted(actual_output), sorted(expected_output))
+        else:
+            self.assertEqual(actual_output, expected_output)
+
+
+class EmailMessageMock(python_utils.OBJECT):
+    """Mock for core.platform.models email services messages."""
+
+    def __init__(
+            self, sender_email, recipient_email, subject, plaintext_body,
+            html_body, bcc=None, reply_to=None, recipient_variables=None):
+        """Inits a mock email message with all the necessary data.
+
+        Args:
+            sender_email: str. The email address of the sender. This should be
+                in the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
+                'SENDER_EMAIL_ADDRESS'. Must be utf-8.
+            recipient_email: str. The email address of the recipient.
+                Must be utf-8.
+            subject: str. The subject line of the email, Must be utf-8.
+            plaintext_body: str. The plaintext body of the email. Must be utf-8.
+            html_body: str. The HTML body of the email. Must fit in a datastore
+                entity. Must be utf-8.
+            bcc: list(str)|None. Optional argument. List of bcc emails.
+                Emails must be utf-8.
+            reply_to: str|None. Optional argument. Reply address formatted like
+                “reply+<reply_id>@<incoming_email_domain_name>
+                reply_id is the unique id of the sender.
+            recipient_variables: dict|None. Optional argument. If batch sending
+                requires differentiating each email based on the recipient, we
+                assign a unique id to each recipient, including info relevant to
+                that recipient so that we can reference it when composing the
+                email like so:
+                    recipient_variables =
+                        {"bob@example.com": {"first":"Bob", "id":1},
+                        "alice@example.com": {"first":"Alice", "id":2}}
+                    subject = 'Hey, %recipient.first%’
+                More info about this format at:
+                https://documentation.mailgun.com/en/
+                    latest/user_manual.html#batch-sending.
+        """
+        self.sender = sender_email
+        self.to = recipient_email
+        self.subject = subject
+        self.body = plaintext_body
+        self.html = html_body
+        self.bcc = bcc
+        self.reply_to = reply_to
+        self.recipient_variables = recipient_variables
+
+
+class GenericEmailTestBase(GenericTestBase):
+    """Base class for tests requiring email services."""
+
+    emails_dict = collections.defaultdict(list)
+
+    def run(self, result=None):
+        """Adds a context swap on top of the test_utils.run() method so that
+        test classes extending GenericEmailTestBase will automatically have
+        a mailgun api key, mailgun domain name and mocked version of
+        send_email_to_recipients().
+        """
+        with self.swap(
+            email_services, 'send_email_to_recipients',
+            self._send_email_to_recipients):
+            super(EmailTestBase, self).run(result=result)
+
+    def setUp(self):
+        super(GenericEmailTestBase, self).setUp()
+        self._wipe_emails_dict()
+
+    def _wipe_emails_dict(self):
+        """Reset email dictionary for a new test."""
+        self.emails_dict = collections.defaultdict(list)
+
+    def _send_email_to_recipients(
+            self, sender_email, recipient_emails, subject, plaintext_body,
+            html_body, bcc=None, reply_to=None, recipient_variables=None):
+        """Mocks sending an email to each email in recipient_emails.
+
+        Args:
+            sender_email: str. The email address of the sender. This should be
+                in the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>' or
+                'SENDER_EMAIL_ADDRESS'. Must be utf-8.
+            recipient_emails: list(str). The email addresses of the recipients.
+                Must be utf-8.
+            subject: str. The subject line of the email, Must be utf-8.
+            plaintext_body: str. The plaintext body of the email. Must be utf-8.
+            html_body: str. The HTML body of the email. Must fit in a datastore
+                entity. Must be utf-8.
+            bcc: list(str)|None. Optional argument. List of bcc emails.
+                Must be utf-8.
+            reply_to: str|None. Optional Argument. Reply address formatted like
+                “reply+<reply_id>@<incoming_email_domain_name>
+                reply_id is the unique id of the sender.
+            recipient_variables: dict|None. Optional Argument.
+                If batch sending requires differentiating each email based on
+                the recipient, we assign a unique id to each recipient,
+                including info relevant to that recipient so that we can
+                reference it when composing the email like so:
+                    recipient_variables =
+                        {"bob@example.com": {"first":"Bob", "id":1},
+                        "alice@example.com": {"first":"Alice", "id":2}}
+                    subject = 'Hey, %recipient.first%’
+                More info about this format at:
+                https://documentation.mailgun.com/en/
+                    latest/user_manual.html#batch-sending
+
+        Returns:
+            bool. Whether the emails are sent successfully.
+        """
+        bcc_emails = None
+
+        if bcc:
+            bcc_emails = bcc[0] if len(bcc) == 1 else bcc
+
+        new_email = EmailMessageMock(
+            sender_email, recipient_emails, subject, plaintext_body, html_body,
+            bcc=bcc_emails, reply_to=(reply_to if reply_to else None),
+            recipient_variables=(
+                recipient_variables if (recipient_variables) else None))
+        for recipient_email in recipient_emails:
+            self.emails_dict[recipient_email].append(new_email)
+        return True
+
+    def _get_sent_email_messages(self, to):
+        """Gets messages to a single recipient email.
+
+        Args:
+            to: str. The recipient email address.
+
+        Returns:
+            list(EmailMessageMock). The list of email messages corresponding to
+            that recipient email.
+        """
+        return self.emails_dict[to] if to in self.emails_dict else []
+
+    def _get_all_sent_email_messages(self):
+        """Gets the entire messages dictionary.
+
+        Returns:
+            dict(str, (list(EmailMessageMock))). The dict keyed by recipient
+            email. Each value contains a list of EmailMessageMock objects
+            corresponding to that recipient email; in other words, all
+            individual emails sent to that specific recipient email.
+        """
+        return self.emails_dict
+
+
+EmailTestBase = GenericEmailTestBase
 
 
 class FunctionWrapper(python_utils.OBJECT):

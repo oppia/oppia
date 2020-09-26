@@ -34,24 +34,42 @@ angular.module('oppia').factory('UserEmailPreferencesService', [
         this.feedbackNotificationsMuted = feedbackNotificationsMuted;
         this.suggestionNotificationsMuted = suggestionNotificationsMuted;
       },
+      /**
+       * @return {boolean} Whether the feedback notification is muted.
+       */
       areFeedbackNotificationsMuted: function() {
         return this.feedbackNotificationsMuted;
       },
+      /**
+       * @return {boolean} Whether the suggestion notification is muted.
+       */
       areSuggestionNotificationsMuted: function() {
         return this.suggestionNotificationsMuted;
       },
+      /**
+       * Set the message type to feedback and mute to true or false.
+       * @param {boolean} mute - Whether the feedback notification is muted.
+       */
       setFeedbackNotificationPreferences: function(mute) {
         this.saveChangeToBackend({
           message_type: MESSAGE_TYPE_FEEDBACK,
           mute: mute
         });
       },
+      /**
+       * Set the message type to suggestion and mute to true or false.
+       * @param {boolean} mute - Whether the suggestion notification is muted.
+       */
       setSuggestionNotificationPreferences: function(mute) {
         this.saveChangeToBackend({
           message_type: MESSAGE_TYPE_SUGGESTION,
           mute: mute
         });
       },
+      /**
+       * Save the change of message_type and mute to backend.
+       * @param {object} requestParams - Info about message_type and mute.
+       */
       saveChangeToBackend: function(requestParams) {
         var that = this;
         var emailPreferencesUrl = UrlInterpolationService.interpolateUrl(

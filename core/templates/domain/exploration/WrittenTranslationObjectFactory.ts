@@ -20,31 +20,67 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+export const WRITTEN_TRANSLATION_TYPE_HTML = 'html';
+export const WRITTEN_TRANSLATION_TYPE_UNICODE = 'unicode';
+
+export type WrittenTranslationDataFormat = (
+  typeof WRITTEN_TRANSLATION_TYPE_UNICODE |
+  typeof WRITTEN_TRANSLATION_TYPE_HTML);
+
+export interface TranslationBackendDict {
+  'data_format': WrittenTranslationDataFormat;
+  'translation': string;
+  'needs_update': boolean;
+}
+
 export class WrittenTranslation {
-  html: string;
-  needsUpdate: boolean;
-  constructor(html: string, needsUpdate: boolean) {
-    this.html = html;
-    this.needsUpdate = needsUpdate;
-  }
-  getHtml(): string {
-    return this.html;
-  }
-  setHtml(html: string): void {
-    this.html = html;
-  }
+  constructor(
+      public dataFormat: WrittenTranslationDataFormat,
+      public translation: string,
+      public needsUpdate: boolean
+  ) {}
+
   markAsNeedingUpdate(): void {
     this.needsUpdate = true;
   }
+
   toggleNeedsUpdateAttribute(): void {
     this.needsUpdate = !this.needsUpdate;
   }
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased keys which
-  // gives tslint errors against underscore_casing in favor of camelCasing.
-  toBackendDict(): any {
+
+  isHtml(): boolean {
+    return this.dataFormat === WRITTEN_TRANSLATION_TYPE_HTML;
+  }
+
+  isUnicode(): boolean {
+    return this.dataFormat === WRITTEN_TRANSLATION_TYPE_UNICODE;
+  }
+
+  getUnicode(): string {
+    if (this.dataFormat !== WRITTEN_TRANSLATION_TYPE_UNICODE) {
+      throw new Error('This translation is not of data format unicode');
+    }
+    return this.translation;
+  }
+
+  getHtml(): string {
+    if (this.dataFormat !== WRITTEN_TRANSLATION_TYPE_HTML) {
+      throw new Error('This translation is not of data format html');
+    }
+    return this.translation;
+  }
+
+  setHtml(html: string): void {
+    if (this.dataFormat !== WRITTEN_TRANSLATION_TYPE_HTML) {
+      throw new Error('This translation is not of data format html');
+    }
+    this.translation = html;
+  }
+
+  toBackendDict(): TranslationBackendDict {
     return {
-      html: this.html,
+      data_format: this.dataFormat,
+      translation: this.translation,
       needs_update: this.needsUpdate
     };
   }
@@ -54,16 +90,18 @@ export class WrittenTranslation {
   providedIn: 'root'
 })
 export class WrittenTranslationObjectFactory {
-  createNew(html: string): WrittenTranslation {
-    return new WrittenTranslation(html, false);
+  createNew(
+      type: WrittenTranslationDataFormat,
+      html: string
+  ): WrittenTranslation {
+    return new WrittenTranslation(type, html, false);
   }
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'translationBackendDict' is a dict with underscore_cased keys
-  // which gives tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(translationBackendDict: any) {
+
+  createFromBackendDict(
+      translationBackendDict: TranslationBackendDict): WrittenTranslation {
     return new WrittenTranslation(
-      translationBackendDict.html,
+      translationBackendDict.data_format,
+      translationBackendDict.translation,
       translationBackendDict.needs_update);
   }
 }

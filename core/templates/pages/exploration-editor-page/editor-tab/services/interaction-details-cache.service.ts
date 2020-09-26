@@ -25,11 +25,18 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { InteractionCustomizationArgs } from
+  'interactions/customization-args-defs';
+
+interface InteractionDetailsCache {
+  [interactionId: string]: InteractionCustomizationArgs;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class InteractionDetailsCacheService {
-  static _cache: {} = {};
+  static _cache: InteractionDetailsCache = {};
 
   reset(): void {
     InteractionDetailsCacheService._cache = {};
@@ -43,18 +50,15 @@ export class InteractionDetailsCacheService {
     delete InteractionDetailsCacheService._cache[interactionId];
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'interactionCustomizationArgs' is a dict with many keys
-  // some of which are underscore_cased which gives tslint errors against
-  // underscore_casing in favor of camelCasing. A thorough research needs to be
-  // done to ensure all the keys and the correct type.
-  set(interactionId: string, interactionCustomizationArgs: any): void {
+  set(
+      interactionId: string,
+      interactionCustomizationArgs: InteractionCustomizationArgs): void {
     InteractionDetailsCacheService._cache[interactionId] = {
       customization: cloneDeep(interactionCustomizationArgs)
     };
   }
 
-  get(interactionId: string): {} {
+  get(interactionId: string): InteractionCustomizationArgs {
     if (!InteractionDetailsCacheService._cache.hasOwnProperty(interactionId)) {
       return null;
     }

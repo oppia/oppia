@@ -17,44 +17,98 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
+require('domain/skill/skill-creation-backend-api.service.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-backend-api.service.ts');
 require('services/alerts.service.ts');
+require('services/image-local-storage.service.ts');
 
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'topics-and-skills-dashboard-page.constants.ajs.ts');
+
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'create-new-skill-modal.controller.ts');
 angular.module('oppia').factory('SkillCreationService', [
-  '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
-  'UrlInterpolationService',
+  '$timeout', '$uibModal', '$window', 'AlertsService',
+  'ImageLocalStorageService', 'SkillCreationBackendApiService',
+  'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
+  'SKILL_DESCRIPTION_STATUS_VALUES',
   function(
-      $http, $rootScope, $timeout, $window, AlertsService,
-      UrlInterpolationService) {
+      $timeout, $uibModal, $window, AlertsService,
+      ImageLocalStorageService, SkillCreationBackendApiService,
+      TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService,
+      SKILL_DESCRIPTION_STATUS_VALUES) {
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
       '/skill_editor/<skill_id>');
     var skillCreationInProgress = false;
+    var skillDescriptionStatusMarker = (
+      SKILL_DESCRIPTION_STATUS_VALUES.STATUS_UNCHANGED);
 
     return {
-      createNewSkill: function(
-          description, rubrics, explanation, linkedTopicIds) {
-        if (skillCreationInProgress) {
-          return;
-        }
-        for (var idx in rubrics) {
-          rubrics[idx] = rubrics[idx].toBackendDict();
-        }
-        skillCreationInProgress = true;
-        AlertsService.clearWarnings();
-        $rootScope.loadingMessage = 'Creating skill';
-        $http.post('/skill_editor_handler/create_new', {
-          description: description,
-          linked_topic_ids: linkedTopicIds,
-          explanation_dict: explanation,
-          rubrics: rubrics
-        }).then(function(response) {
-          $timeout(function() {
-            $window.location = UrlInterpolationService.interpolateUrl(
-              CREATE_NEW_SKILL_URL_TEMPLATE, {
-                skill_id: response.data.skillId
-              });
-          }, 150);
-        }, function() {
-          $rootScope.loadingMessage = '';
+      markChangeInSkillDescription: function() {
+        skillDescriptionStatusMarker = (
+          SKILL_DESCRIPTION_STATUS_VALUES.STATUS_CHANGED);
+      },
+
+      getSkillDescriptionStatus: function() {
+        return skillDescriptionStatusMarker;
+      },
+
+      disableSkillDescriptionStatusMarker: function() {
+        skillDescriptionStatusMarker = (
+          SKILL_DESCRIPTION_STATUS_VALUES.STATUS_DISABLED);
+      },
+
+      resetSkillDescriptionStatusMarker: function() {
+        skillDescriptionStatusMarker = (
+          SKILL_DESCRIPTION_STATUS_VALUES.STATUS_UNCHANGED);
+      },
+      createNewSkill: function(topicIds) {
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/topics-and-skills-dashboard-page/templates/' +
+            'create-new-skill-modal.template.html'),
+          backdrop: 'static',
+          windowClass: 'create-new-skill-modal',
+          controller: 'CreateNewSkillModalController'
+        }).result.then(function(result) {
+          if (skillCreationInProgress) {
+            return;
+          }
+          var rubrics = result.rubrics;
+          for (var idx in rubrics) {
+            rubrics[idx] = rubrics[idx].toBackendDict();
+          }
+          skillCreationInProgress = true;
+          AlertsService.clearWarnings();
+          // $window.open has to be initialized separately since if the 'open
+          // new tab' action does not directly result from a user input
+          // (which is not the case, if we wait for result from the backend
+          // before opening a new tab), some browsers block it as a popup.
+          // Here, the new tab is created as soon as the user clicks the
+          // 'Create' button and filled with URL once the details are
+          // fetched from the backend.
+          var newTab = $window.open();
+          var imagesData = ImageLocalStorageService.getStoredImagesData();
+          SkillCreationBackendApiService.createSkill(
+            result.description, rubrics, result.explanation,
+            topicIds || [], imagesData).then(function(response) {
+            $timeout(function() {
+              TopicsAndSkillsDashboardBackendApiService.
+                onTopicsAndSkillsDashboardReinitialized.emit(true);
+              skillCreationInProgress = false;
+              ImageLocalStorageService.flushStoredImagesData();
+              newTab.location.href = UrlInterpolationService.interpolateUrl(
+                CREATE_NEW_SKILL_URL_TEMPLATE, {
+                  skill_id: response.skillId
+                });
+            }, 150);
+          }, function(errorMessage) {
+            AlertsService.addWarning(errorMessage);
+          });
         });
       }
     };

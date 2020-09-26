@@ -23,42 +23,66 @@ import { Injectable } from '@angular/core';
 import { StatisticsDomainConstants } from
   'domain/statistics/statistics-domain.constants';
 
-export class LearnerAction {
-  actionType: string;
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'outcome' is an outcome domain object and this can be
-  // directly typed to 'Outcome' type once 'OutcomeObjectFactory' is upgraded.
-  actionCustomizationArgs: any;
-  schemaVersion: number;
-  /**
-   * @constructor
-   * @param {string} actionType - type of an action.
-   * @param {Object.<string, *>} actionCustomizationArgs - customization dict
-   *   for an action.
-   * @param {number} schemaVersion - schema version of the class instance.
-   */
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'outcome' is an outcome domain object and this can be
-  // directly typed to 'Outcome' type once 'OutcomeObjectFactory' is upgraded.
+export interface ExplorationStartCustomizationArgs {
+  'state_name': {value: string};
+}
+
+export interface AnswerSubmitCustomizationArgs {
+  'state_name': {value: string};
+  'dest_state_name': {value: string};
+  'interaction_id': {value: string};
+  'submitted_answer': {value: string};
+  'feedback': {value: string};
+  'time_spent_state_in_msecs': {value: number};
+}
+
+export interface ExplorationQuitCustomizationArgs {
+  'state_name': {value: string};
+  'time_spent_in_state_in_msecs': {value: number};
+}
+
+// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This type takes one of the values of the above customization args based
+// on the type of ActionType.
+type ActionCustomizationArgs<ActionType> = (
+  ActionType extends 'ExplorationStart' ?
+  ExplorationStartCustomizationArgs :
+  ActionType extends 'AnswerSubmit' ? AnswerSubmitCustomizationArgs :
+  ActionType extends 'ExplorationQuit' ?
+  ExplorationQuitCustomizationArgs : never);
+
+// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This interface takes the type of backend dict according to the ActionType
+// parameter.
+interface LearnerActionBackendDictBase<ActionType> {
+  'action_type': ActionType;
+  'action_customization_args': ActionCustomizationArgs<ActionType>;
+  'schema_version': number;
+}
+
+export type ExplorationStartLearnerActionBackendDict = (
+  LearnerActionBackendDictBase<'ExplorationStart'>);
+
+export type AnswerSubmitLearnerActionBackendDict = (
+  LearnerActionBackendDictBase<'AnswerSubmit'>);
+
+export type ExplorationQuitLearnerActionBackendDict = (
+  LearnerActionBackendDictBase<'ExplorationQuit'>);
+
+export type LearnerActionBackendDict = (
+  ExplorationStartLearnerActionBackendDict |
+  AnswerSubmitLearnerActionBackendDict |
+  ExplorationQuitLearnerActionBackendDict);
+
+// NOTE TO DEVELOPERS: Treat this as an implementation detail; do not export it.
+// This class takes the type according to the ActionType parameter.
+class LearnerActionBase<ActionType> {
   constructor(
-      actionType: string, actionCustomizationArgs: any, schemaVersion: number) {
-    if (schemaVersion < 1) {
-      throw new Error('given invalid schema version');
-    }
+      public readonly actionType: ActionType,
+      public actionCustomizationArgs: ActionCustomizationArgs<ActionType>,
+      public schemaVersion: number) {}
 
-    /** @type {string} */
-    this.actionType = actionType;
-    /** @type {Object.<string, *>} */
-    this.actionCustomizationArgs = actionCustomizationArgs;
-    /** @type {number} */
-    this.schemaVersion = schemaVersion;
-  }
-
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  toBackendDict(): any {
+  toBackendDict(): LearnerActionBackendDictBase<ActionType> {
     return {
       action_type: this.actionType,
       action_customization_args: this.actionCustomizationArgs,
@@ -67,25 +91,46 @@ export class LearnerAction {
   }
 }
 
+export class ExplorationStartLearnerAction extends
+  LearnerActionBase<'ExplorationStart'> {}
+
+export class AnswerSubmitLearnerAction extends
+  LearnerActionBase<'AnswerSubmit'> {}
+
+export class ExplorationQuitLearnerAction extends
+  LearnerActionBase<'ExplorationQuit'> {}
+
+export type LearnerAction = (
+  ExplorationStartLearnerAction |
+  AnswerSubmitLearnerAction |
+  ExplorationQuitLearnerAction);
+
 @Injectable({
   providedIn: 'root'
 })
 export class LearnerActionObjectFactory {
-  /**
-   * @property {string} actionType - type of an action
-   * @property {Object.<string, *>} actionCustomizationArgs - customization
-   *   dict for an action
-   * @property {number} [schemaVersion=LEARNER_ACTION_SCHEMA_LATEST_VERSION]
-   *   - schema version of the class instance.
-   * @returns {LearnerAction}
-   */
-  createNew(
-      actionType: string, actionCustomizationArgs: any,
-      schemaVersion: number): LearnerAction {
-    schemaVersion = schemaVersion ||
-      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
-    return new LearnerAction(
-      actionType, actionCustomizationArgs, schemaVersion);
+  createNewExplorationStartAction(
+      actionCustomizationArgs: ExplorationStartCustomizationArgs
+  ): ExplorationStartLearnerAction {
+    return new ExplorationStartLearnerAction(
+      'ExplorationStart', actionCustomizationArgs,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+  }
+
+  createNewAnswerSubmitAction(
+      actionCustomizationArgs: AnswerSubmitCustomizationArgs
+  ): AnswerSubmitLearnerAction {
+    return new AnswerSubmitLearnerAction(
+      'AnswerSubmit', actionCustomizationArgs,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+  }
+
+  createNewExplorationQuitAction(
+      actionCustomizationArgs: ExplorationQuitCustomizationArgs
+  ): ExplorationQuitLearnerAction {
+    return new ExplorationQuitLearnerAction(
+      'ExplorationQuit', actionCustomizationArgs,
+      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   }
 
   /**
@@ -101,15 +146,31 @@ export class LearnerActionObjectFactory {
    * @param {LearnerActionBackendDict} learnerActionBackendDict
    * @returns {LearnerAction}
    */
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'learnerActionBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(learnerActionBackendDict: any): LearnerAction {
-    return new LearnerAction(
-      learnerActionBackendDict.action_type,
-      learnerActionBackendDict.action_customization_args,
-      learnerActionBackendDict.schema_version);
+  createFromBackendDict(
+      learnerActionBackendDict: LearnerActionBackendDict): LearnerAction {
+    switch (learnerActionBackendDict.action_type) {
+      case 'ExplorationStart':
+        return new ExplorationStartLearnerAction(
+          learnerActionBackendDict.action_type,
+          learnerActionBackendDict.action_customization_args,
+          learnerActionBackendDict.schema_version);
+      case 'AnswerSubmit':
+        return new AnswerSubmitLearnerAction(
+          learnerActionBackendDict.action_type,
+          learnerActionBackendDict.action_customization_args,
+          learnerActionBackendDict.schema_version);
+      case 'ExplorationQuit':
+        return new ExplorationQuitLearnerAction(
+          learnerActionBackendDict.action_type,
+          learnerActionBackendDict.action_customization_args,
+          learnerActionBackendDict.schema_version);
+      default:
+        break;
+    }
+    const invalidBackendDict: never = learnerActionBackendDict;
+    throw new Error(
+      'Backend dict does not match any known action type: ' +
+      angular.toJson(invalidBackendDict));
   }
 }
 

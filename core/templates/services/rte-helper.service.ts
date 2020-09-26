@@ -16,20 +16,26 @@
  * @fileoverview A helper service for the Rich text editor(RTE).
  */
 
-require('services/services.constants.ajs.ts');
-
 require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 require('services/stateful/focus-manager.service.ts');
+require('services/rte-helper-modal.controller.ts');
+
+require('services/alerts.service.ts');
+require('services/assets-backend-api.service.ts');
+require('services/context.service.ts');
+require('services/image-local-storage.service.ts');
+require('services/image-upload-helper.service.ts');
+require('app.constants.ajs.ts');
+require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('RteHelperService', [
-  '$document', '$log', '$timeout', '$uibModal',
-  'FocusManagerService', 'HtmlEscaperService',
-  'UrlInterpolationService', 'INLINE_RTE_COMPONENTS', 'RTE_COMPONENT_SPECS',
-  function(
-      $document, $log, $timeout, $uibModal,
-      FocusManagerService, HtmlEscaperService,
-      UrlInterpolationService, INLINE_RTE_COMPONENTS, RTE_COMPONENT_SPECS) {
+  '$document', '$log', '$uibModal', 'HtmlEscaperService',
+  'UrlInterpolationService', 'INLINE_RTE_COMPONENTS',
+  'RTE_COMPONENT_SPECS', function(
+      $document, $log, $uibModal, HtmlEscaperService,
+      UrlInterpolationService, INLINE_RTE_COMPONENTS,
+      RTE_COMPONENT_SPECS) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
@@ -66,12 +72,6 @@ angular.module('oppia').factory('RteHelperService', [
       }
       return customizationArgsDict;
     };
-    var extractVideoIdFromVideoUrl = function(videoUrl) {
-      videoUrl = videoUrl.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
-      return ((videoUrl[2] !== undefined) ?
-               videoUrl[2].split(/[^0-9a-z_\-]/i)[0] : videoUrl[0]);
-    };
-
 
     return {
       createCustomizationArgDictFromAttrs: function(attrs) {
@@ -86,71 +86,25 @@ angular.module('oppia').factory('RteHelperService', [
       // The refocusFn arg is a function that restores focus to the text editor
       // after exiting the modal, and moves the cursor back to where it was
       // before the modal was opened.
-      _openCustomizationModal: function(
+      openCustomizationModal: function(
           customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
           onDismissCallback, refocusFn) {
         $document[0].execCommand('enableObjectResizing', false, false);
-        var modalDialog = $uibModal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/ck-editor-helpers/' +
             'customize-rte-component-modal.template.html'),
           backdrop: 'static',
-          resolve: {},
-          controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
-              $scope.customizationArgSpecs = customizationArgSpecs;
-
-              // Without this code, the focus will remain in the background RTE
-              // even after the modal loads. This switches the focus to a
-              // temporary field in the modal which is then removed from the
-              // DOM.
-              // TODO(sll): Make this switch to the first input field in the
-              // modal instead.
-              $scope.modalIsLoading = true;
-              FocusManagerService.setFocus('tmpFocusPoint');
-              $timeout(function() {
-                $scope.modalIsLoading = false;
-              });
-
-              $scope.tmpCustomizationArgs = [];
-              for (var i = 0; i < customizationArgSpecs.length; i++) {
-                var caName = customizationArgSpecs[i].name;
-                $scope.tmpCustomizationArgs.push({
-                  name: caName,
-                  value: (
-                    attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-                      angular.copy(attrsCustomizationArgsDict[caName]) :
-                      customizationArgSpecs[i].default_value)
-                });
-              }
-
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-              };
-
-              $scope.save = function() {
-                $scope.$broadcast('externalSave');
-
-                var customizationArgsDict = {};
-                for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
-                  var caName = $scope.tmpCustomizationArgs[i].name;
-                  if (caName === 'video_id') {
-                    var temp = $scope.tmpCustomizationArgs[i].value;
-                    customizationArgsDict[caName] = (
-                      extractVideoIdFromVideoUrl(temp.toString()));
-                  } else {
-                    customizationArgsDict[caName] = (
-                      $scope.tmpCustomizationArgs[i].value);
-                  }
-                }
-                $uibModalInstance.close(customizationArgsDict);
-              };
+          resolve: {
+            customizationArgSpecs: function() {
+              return customizationArgSpecs;
+            },
+            attrsCustomizationArgsDict: function() {
+              return attrsCustomizationArgsDict;
             }
-          ]
-        });
-
-        modalDialog.result.then(onSubmitCallback, onDismissCallback);
+          },
+          controller: 'RteHelperModalController'
+        }).result.then(onSubmitCallback)['catch'](onDismissCallback);
       }
 
     };

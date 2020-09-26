@@ -28,10 +28,11 @@ describe('Feedback thread object factory', () => {
   });
 
   it('should update the summary of the thread on addition of a ' +
-     ' message', () => {
+     'message', () => {
     var feedbackThreadSummary = feedbackThreadSummaryObjectFactory.create(
-      'open', 'Test user 1', new Date(), 'last message', 2, false, false,
-      'Test user 2', 'Test user 2', 'Test exploration name', '0', 'thread_id');
+      'open', 'Test user 1', new Date().getTime(), 'last message', 2, false,
+      false, 'Test user 2', 'Test user 2', 'Test exploration name', '0',
+      'thread_id');
 
     feedbackThreadSummary.appendNewMessage(
       'Looks good!', 'Test user 3');
@@ -45,7 +46,7 @@ describe('Feedback thread object factory', () => {
     var threadSummary = {
       status: 'open',
       original_author_id: 'Test user 1',
-      last_updated: 1000,
+      last_updated_msecs: 1000,
       last_message_text: 'last message',
       total_message_count: 2,
       last_message_is_read: false,
@@ -62,10 +63,9 @@ describe('Feedback thread object factory', () => {
 
     expect(feedbackThreadSummary.explorationTitle).toEqual(
       'Sample exploration 1');
-    expect(feedbackThreadSummary.originalAuthorId).toEqual(
-      'Test user 1');
-    expect(feedbackThreadSummary.lastMessageText).toEqual(
-      'last message');
+    expect(feedbackThreadSummary.originalAuthorId).toEqual('Test user 1');
+    expect(feedbackThreadSummary.lastMessageText).toEqual('last message');
+    expect(feedbackThreadSummary.lastUpdatedMsecs).toEqual(1000);
     expect(feedbackThreadSummary.totalMessageCount).toEqual(2);
   });
 });

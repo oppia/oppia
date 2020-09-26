@@ -32,25 +32,38 @@ var DEFAULT_CUSTOMIZATION_ARGS = {
   }
 };
 
+interface CopierCustomizationArgs {
+  'parse_with_jinja': boolean;
+  'value': string;
+}
+
+interface RandomSelectorCustomizationArgs {
+  'list_of_values': string[];
+}
+
+type ParamChangeCustomizationArgs = (
+  CopierCustomizationArgs | RandomSelectorCustomizationArgs);
+
+export interface ParamChangeBackendDict {
+  'customization_args': ParamChangeCustomizationArgs;
+  'generator_id': string;
+  'name': string;
+}
+
 export class ParamChange {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  customizationArgs: any;
+  customizationArgs: ParamChangeCustomizationArgs;
   generatorId: string;
   name: string;
 
-  constructor(customizationArgs: any, generatorId: string, name: string) {
+  constructor(
+      customizationArgs: ParamChangeCustomizationArgs, generatorId: string,
+      name: string) {
     this.customizationArgs = customizationArgs;
     this.generatorId = generatorId;
     this.name = name;
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased keys which
-  // give tslint errors against underscore_casing in favor of camelCasing.
-  toBackendDict(): any {
+  toBackendDict(): ParamChangeBackendDict {
     return {
       customization_args: this.customizationArgs,
       generator_id: this.generatorId,
@@ -67,11 +80,8 @@ export class ParamChange {
   providedIn: 'root'
 })
 export class ParamChangeObjectFactory {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'paramChangeBackendDict' is a dict with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
   createFromBackendDict(
-      paramChangeBackendDict: any): ParamChange {
+      paramChangeBackendDict: ParamChangeBackendDict): ParamChange {
     return new ParamChange(
       paramChangeBackendDict.customization_args,
       paramChangeBackendDict.generator_id,

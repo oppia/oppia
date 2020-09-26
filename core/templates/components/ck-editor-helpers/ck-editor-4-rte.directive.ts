@@ -16,39 +16,66 @@
  * @fileoverview Directive for CK Editor.
  */
 
+require('third-party-imports/ckeditor.import.ts');
+
+require('components/ck-editor-helpers/ck-editor-copy-content-service.ts');
 require('services/context.service.ts');
 require('services/rte-helper.service.ts');
 
+interface UiConfig {
+  (): UiConfig;
+  'hide_complex_extensions': boolean;
+  'startupFocusEnabled'?: boolean;
+}
+
+interface CkeditorCustomScope extends ng.IScope {
+  uiConfig: UiConfig;
+}
+
 angular.module('oppia').directive('ckEditor4Rte', [
-  'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
-  function(ContextService, RteHelperService, PAGE_CONTEXT) {
+  'CkEditorCopyContentService', 'ContextService', 'RteHelperService',
+  function(CkEditorCopyContentService, ContextService, RteHelperService) {
     return {
       restrict: 'E',
       scope: {
         uiConfig: '&'
       },
       template: '<div><div></div>' +
-                '<div contenteditable="true" class="oppia-rte">' +
+                '<div contenteditable="true" ' +
+                'class="oppia-rte-resizer oppia-rte">' +
                 '</div></div>',
       require: '?ngModel',
 
-      link: function(scope: ICustomScope, el, attr, ngModel) {
+      link: function(scope: CkeditorCustomScope, el, attr, ngModel) {
         var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
         var names = [];
         var icons = [];
-        var contextIsLessonRelated = (
-          ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
-          ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
+        var canReferToSkills = ContextService.canEntityReferToSkills();
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           if (!((scope.uiConfig() &&
             scope.uiConfig().hide_complex_extensions &&
             componentDefn.isComplex) ||
-            (!contextIsLessonRelated && componentDefn.isLessonRelated))) {
+            (!canReferToSkills && componentDefn.isLessonRelated))) {
             names.push(componentDefn.id);
             icons.push(componentDefn.iconDataUrl);
           }
         });
+
+        var editable = document.querySelectorAll('.oppia-rte-resizer');
+        var resize = function() {
+          $('.oppia-rte-resizer').css({
+            width: '100%'
+          });
+        };
+        for (var i in editable) {
+          (<HTMLElement>editable[i]).onchange = function() {
+            resize();
+          };
+          (<HTMLElement>editable[i]).onclick = function() {
+            resize();
+          };
+        }
 
         /**
          * Create rules to whitelist all the rich text components and
@@ -74,7 +101,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
                                        inlineWrapperRule +
                                        blockWrapperRule +
                                        blockOverlayRule;
-
         var pluginNames = names.map(function(name) {
           return 'oppia' + name;
         }).join(',');
@@ -86,9 +112,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
           });
         }
         buttonNames.pop();
-        // All icons on the toolbar except the Rich Text components.
-        var allIcons = ['undo', 'redo', 'bold', 'Italic', 'numberedList',
-          'bulletedList', 'pre', 'indent', 'outdent'];
 
         // Add external plugins.
         CKEDITOR.plugins.addExternal(
@@ -178,7 +201,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
           // Set the css and icons for each toolbar button.
           names.forEach(function(name, index) {
             var icon = icons[index];
-            var upperCasedName = name.charAt(0).toUpperCase() + name.slice(1);
             $('.cke_button__oppia' + name)
               .css('background-image', 'url("/extensions' + icon + '")')
               .css('background-position', 'center')
@@ -244,6 +266,8 @@ angular.module('oppia').directive('ckEditor4Rte', [
           // Clean up CKEditor instance when directive is removed.
           ck.destroy();
         });
+
+        CkEditorCopyContentService.bindPasteHandler(ck);
       }
     };
   }

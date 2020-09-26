@@ -33,16 +33,10 @@ for (var constantName in constants) {
 angular.module('oppia').constant(
   'DEFAULT_TRANSLATIONS', AppConstants.DEFAULT_TRANSLATIONS);
 
-angular.module('oppia').constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+angular.module('oppia').constant(
+  'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
   AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT);
 
-/* Called always when learner moves to a new card.
-   Also called when card is selected by clicking on progress dots */
-angular.module('oppia').constant(
-  'EVENT_ACTIVE_CARD_CHANGED', AppConstants.EVENT_ACTIVE_CARD_CHANGED);
-/* Called when the learner moves to a new card that they haven't seen before. */
-angular.module('oppia').constant(
-  'EVENT_NEW_CARD_OPENED', AppConstants.EVENT_NEW_CARD_OPENED);
 angular.module('oppia').constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   AppConstants.EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE);
@@ -55,11 +49,6 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
   AppConstants.EXPLORATION_VERSION_DATA_URL_TEMPLATE);
-/* New card is available but user hasn't gone to it yet (when oppia
-   gives a feedback and waits for user to press 'continue').
-   Not called when a card is selected by clicking progress dots */
-angular.module('oppia').constant(
-  'EVENT_NEW_CARD_AVAILABLE', AppConstants.EVENT_NEW_CARD_AVAILABLE);
 
 angular.module('oppia').constant('WARNING_TYPES', AppConstants.WARNING_TYPES);
 
@@ -112,11 +101,14 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'COMPONENT_NAME_CONTENT', AppConstants.COMPONENT_NAME_CONTENT);
 angular.module('oppia').constant(
+  'COMPONENT_NAME_FEEDBACK', AppConstants.COMPONENT_NAME_FEEDBACK);
+angular.module('oppia').constant(
   'COMPONENT_NAME_HINT', AppConstants.COMPONENT_NAME_HINT);
 angular.module('oppia').constant(
-  'COMPONENT_NAME_SOLUTION', AppConstants.COMPONENT_NAME_SOLUTION);
+  'COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS',
+  AppConstants.COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS);
 angular.module('oppia').constant(
-  'COMPONENT_NAME_FEEDBACK', AppConstants.COMPONENT_NAME_FEEDBACK);
+  'COMPONENT_NAME_SOLUTION', AppConstants.COMPONENT_NAME_SOLUTION);
 angular.module('oppia').constant(
   'COMPONENT_NAME_EXPLANATION', AppConstants.COMPONENT_NAME_EXPLANATION);
 angular.module('oppia').constant(
@@ -147,10 +139,6 @@ angular.module('oppia').constant(
 
 angular.module('oppia').constant('LOGOUT_URL', AppConstants.LOGOUT_URL);
 
-angular.module('oppia').constant(
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED',
-  AppConstants.EVENT_QUESTION_SUMMARIES_INITIALIZED);
-
 // TODO(vojtechjelinek): Move these to separate file later, after we establish
 // process to follow for Angular constants (#6731).
 angular.module('oppia').constant(
@@ -168,5 +156,11 @@ angular.module('oppia').constant(
   'COLLECTION_DATA_URL_TEMPLATE', AppConstants.COLLECTION_DATA_URL_TEMPLATE);
 
 angular.module('oppia').constant('ENTITY_TYPE', AppConstants.ENTITY_TYPE);
+
+angular.module('oppia').constant('IMAGE_CONTEXT', AppConstants.IMAGE_CONTEXT);
+
 angular.module('oppia').constant(
-  'MISCONCEPTION_NAME_CHAR_LIMIT', AppConstants.MISCONCEPTION_NAME_CHAR_LIMIT);
+  'IMAGE_SAVE_DESTINATION_SERVER', AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+angular.module('oppia').constant(
+  'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+  AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);

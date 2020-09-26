@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,29 @@
  *               the exploration editor.
  */
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import { ExplorationFeatures } from
+  'services/exploration-features-backend-api.service';
+
+export interface ExplorationDataDict {
+  'param_changes': ParamChanges[] | [];
+  states: {
+    [propsName : string]: {
+      'param_changes': ParamChanges[] | []
+    }
+  };
+}
+
+export interface ParamChanges {
+  name: string;
+  'generator_id': string;
+  'customization_args': {
+    'parse_with_jinja': boolean,
+    value: string
+  };
+}
 
 @Injectable({
   providedIn: 'root'
@@ -26,23 +47,18 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class ExplorationFeaturesService {
   static serviceIsInitialized = false;
   static settings = {
-    isImprovementsTabEnabled: false,
-    isPlaythroughRecordingEnabled: false,
-    areParametersEnabled: false
+    areParametersEnabled: false,
+    isPlaythroughRecordingEnabled: false
   };
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'explorationData' and 'featuresData' are dicts with
-  // underscore_cased keys which give tslint errors against underscore_casing
-  // in favor of camelCasing.
-  init(explorationData: any, featuresData: any): void {
+  init(
+      explorationData: ExplorationDataDict,
+      featuresData: ExplorationFeatures): void {
     if (ExplorationFeaturesService.serviceIsInitialized) {
       return;
     }
-    ExplorationFeaturesService.settings.isImprovementsTabEnabled =
-      featuresData.is_improvements_tab_enabled;
     ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled =
-      featuresData.is_exploration_whitelisted;
+      featuresData.isExplorationWhitelisted;
     if (explorationData.param_changes &&
         explorationData.param_changes.length > 0) {
       this.enableParameters();
@@ -63,10 +79,6 @@ export class ExplorationFeaturesService {
 
   areParametersEnabled(): boolean {
     return ExplorationFeaturesService.settings.areParametersEnabled;
-  }
-
-  isImprovementsTabEnabled(): boolean {
-    return ExplorationFeaturesService.settings.isImprovementsTabEnabled;
   }
 
   isPlaythroughRecordingEnabled(): boolean {

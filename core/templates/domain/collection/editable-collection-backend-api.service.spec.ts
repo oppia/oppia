@@ -15,140 +15,162 @@
 /**
  * @fileoverview Unit tests for EditableCollectionBackendApiService.
  */
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-require('domain/collection/editable-collection-backend-api.service.ts');
-require('domain/editor/undo_redo/undo-redo.service.ts');
-require('services/csrf-token.service.ts');
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { EditableCollectionBackendApiService } from
+  'domain/collection/editable-collection-backend-api.service';
+import { Collection, CollectionObjectFactory } from
+  'domain/collection/CollectionObjectFactory';
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
-
-describe('Editable collection backend API service', function() {
-  var EditableCollectionBackendApiService = null;
-  var sampleDataResults = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $httpBackend = null;
-  var UndoRedoService = null;
-  var CsrfService = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module(
-    'oppia', TranslatorProviderForTests));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
+describe('Editable collection backend API service', () => {
+  let editableCollectionBackendApiService:
+    EditableCollectionBackendApiService = null;
+  let httpTestingController: HttpTestingController;
+  let collectionObjectFactory: CollectionObjectFactory;
+  // Sample collection object returnable from the backend.
+  let sampleDataResults = {
+    collection: {
+      id: '0',
+      title: 'Collection Under Test',
+      category: 'Test',
+      objective: 'To pass',
+      version: 1,
+      nodes: [{
+        exploration_id: '0',
+        exploration_summary: {
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: 'Test Objective',
+          id: '44LKoKLlIbGe',
+          num_views: 0,
+          thumbnail_icon_url: '/subjects/Algebra.svg',
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          thumbnail_bg_color: '#cd672b',
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          status: 'public',
+          tags: [],
+          activity_type: 'exploration',
+          category: 'Algebra',
+          title: 'Test Title'
+        }
+      }],
+      playthrough_dict: {
+        next_exploration_id: 'expId',
+        completed_exploration_ids: ['expId2']
+      },
+      language_code: null,
+      tags: null,
+      schema_version: null
     }
-  }));
+  };
 
-  beforeEach(angular.mock.inject(function($injector, $q) {
-    EditableCollectionBackendApiService = $injector.get(
-      'EditableCollectionBackendApiService');
-    UndoRedoService = $injector.get('UndoRedoService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $httpBackend = $injector.get('$httpBackend');
-    CsrfService = $injector.get('CsrfTokenService');
-
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
     });
 
-    // Sample collection object returnable from the backend
-    sampleDataResults = {
-      collection: {
-        id: '0',
-        title: 'Collection Under Test',
-        category: 'Test',
-        objective: 'To pass',
-        version: '1',
-        nodes: [{
-          exploration_id: '0'
-        }],
-        next_exploration_ids: [],
-        completed_exploration_ids: []
-      }
-    };
-  }));
+    editableCollectionBackendApiService = TestBed.get(
+      EditableCollectionBackendApiService);
+    collectionObjectFactory = TestBed.get(CollectionObjectFactory);
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should successfully fetch an existing collection from the backend',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/collection_editor_handler/data/0').respond(
-        sampleDataResults);
-      EditableCollectionBackendApiService.fetchCollection('0').then(
+      editableCollectionBackendApiService.fetchCollection('0').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      var req = httpTestingController.expectOne(
+        '/collection_editor_handler/data/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
+      flushMicrotasks();
+
+      var collectionObject = collectionObjectFactory.create(
+        sampleDataResults.collection);
+
+      expect(successHandler).toHaveBeenCalledWith(collectionObject);
       expect(failHandler).not.toHaveBeenCalled();
-    }
+    })
   );
 
   it('should use the rejection handler if the backend request failed',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      // Loading a collection the first time should fetch it from the backend.
-      $httpBackend.expect('GET', '/collection_editor_handler/data/1').respond(
-        500, 'Error loading collection 1.');
-      EditableCollectionBackendApiService.fetchCollection('1').then(
+      editableCollectionBackendApiService.fetchCollection('1').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      var req = httpTestingController.expectOne(
+        '/collection_editor_handler/data/1');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Error loading collection 1'
+      }, {
+        status: 500, statusText: 'Invalid Request'
+      });
+
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Error loading collection 1.');
-    }
+      expect(failHandler).toHaveBeenCalledWith('Error loading collection 1');
+    })
   );
 
   it('should update a collection after fetching it from the backend',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-      var collection = null;
-
+      var collection: Collection = null;
+      var collectionDict = sampleDataResults;
       // Loading a collection the first time should fetch it from the backend.
-      $httpBackend.expect('GET', '/collection_editor_handler/data/0').respond(
-        sampleDataResults);
-
-      EditableCollectionBackendApiService.fetchCollection('0').then(
-        function(data) {
+      editableCollectionBackendApiService.fetchCollection('0').then(
+        (data) => {
           collection = data;
         });
-      $httpBackend.flush();
+      var req = httpTestingController.expectOne(
+        '/collection_editor_handler/data/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
 
-      collection.title = 'New Title';
-      collection.version = '2';
-      var collectionWrapper = {
-        collection: collection
-      };
+      flushMicrotasks();
 
-      $httpBackend.expect('PUT', '/collection_editor_handler/data/0').respond(
-        collectionWrapper);
+      collectionDict.collection.title = 'New Title';
+      collectionDict.collection.version = 2;
+      collection = collectionObjectFactory.create(collectionDict.collection);
 
-      // Send a request to update collection
-      EditableCollectionBackendApiService.updateCollection(
-        collection.id, collection.version, collection.title, []
+      // Send a request to update collection.
+      editableCollectionBackendApiService.updateCollection(
+        collectionDict.collection.id,
+        collectionDict.collection.version,
+        collectionDict.collection.title, []
       ).then(successHandler, failHandler);
-      $httpBackend.flush();
+      req = httpTestingController.expectOne(
+        '/collection_editor_handler/data/0');
+      expect(req.request.method).toEqual('PUT');
+      req.flush(collectionDict);
+
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(collection);
       expect(failHandler).not.toHaveBeenCalled();
-    }
+    })
   );
 });

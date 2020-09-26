@@ -111,10 +111,19 @@ class ThreadHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Suggestion thread status cannot be changed manually.')
 
-        feedback_services.create_message(
+        messages = feedback_services.get_messages(thread_id)
+        new_message = feedback_services.create_message(
             thread_id, self.user_id, updated_status,
             self.payload.get('updated_subject'), text)
-        self.render_json(self.values)
+
+        # Currently we are manually adding new message to the messages list as
+        # the feedback_services.get_messages is not returning a correct list of
+        # messages after adding new message model to the datastore because of an
+        # unknown reason.
+        messages.append(new_message)
+        self.render_json({
+            'messages': [message.to_dict() for message in messages]
+        })
 
 
 class RecentFeedbackMessagesHandler(base.BaseHandler):

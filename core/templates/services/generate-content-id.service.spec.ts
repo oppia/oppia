@@ -17,29 +17,34 @@
  */
 
 import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { StateNextContentIdIndexService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
 
 describe('GenerateContentIdService', () => {
   let gcis: GenerateContentIdService;
+  let fakeSnciis: {};
 
   beforeEach(() => {
-    gcis = new GenerateContentIdService();
+    fakeSnciis = { displayed: 0 };
+    gcis = new GenerateContentIdService(
+      fakeSnciis as StateNextContentIdIndexService);
   });
 
-  it('should generate content id for new feedbacks', () => {
-    expect(
-      gcis.getNextId(['feedback_1'], 'feedback')).toEqual(
-      'feedback_2');
-  });
-
-  it('should generate content id for new hint', () => {
-    expect(
-      gcis.getNextId(['hint_1'], 'hint')).toEqual(
-      'hint_2');
+  it('should generate content id for new feedbacks using next content' +
+     'id index', () => {
+    expect(gcis.getNextStateId('feedback')).toEqual('feedback_0');
+    expect(gcis.getNextStateId('feedback')).toEqual('feedback_1');
   });
 
   it('should generate content id for new worked example', () => {
-    expect(gcis.getNextId(['worked_example_1'], 'worked_example')).toEqual(
-      'worked_example_2');
+    expect(
+      gcis.getNextId(['worked_example_question_1'], 'worked_example_question')
+    ).toEqual('worked_example_question_2');
+    expect(
+      gcis.getNextId(
+        ['worked_example_explanation_1'], 'worked_example_explanation')
+    ).toEqual('worked_example_explanation_2');
   });
 
   it('should throw error for unknown content id', () => {

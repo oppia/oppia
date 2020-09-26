@@ -55,7 +55,7 @@ describe('Learner parameters service', () => {
       });
       expect(() => {
         learnerParamsService.getValue('b');
-      }).toThrow('Invalid parameter name: b');
+      }).toThrowError('Invalid parameter name: b');
     });
 
     it('should not set an invalid parameter', () => {
@@ -64,7 +64,7 @@ describe('Learner parameters service', () => {
       });
       expect(() => {
         learnerParamsService.setValue('b', 'c');
-      }).toThrow('Cannot set unknown parameter: b');
+      }).toThrowError('Cannot set unknown parameter: b');
     });
   });
 });

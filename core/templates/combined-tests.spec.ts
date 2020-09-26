@@ -39,24 +39,52 @@ import {
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
 
-declare const require: any;
+// NOTE - These types are defined by taking
+// https://webpack.js.org/guides/dependency-management/#context-module-api
+// as a reference.
+interface RequireContext {
+  context(
+      directory: string, useSubdirectories: boolean, regExp: RegExp): Context;
+}
+
+interface Context {
+  (request: Object): void;
+  resolve: () => string;
+  keys: () => Object[];
+  id: string;
+}
+
+declare const require: RequireContext;
 
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting()
 );
+
+jasmine.getEnv().addReporter({
+  specDone: function(result) {
+    // Specs that are being excluded when using fit or fdescribe will not
+    // be reported.
+    if (result.status !== 'excluded') {
+      // eslint-disable-next-line no-console
+      console.log('Spec: ' + result.fullName + ' has ' + result.status);
+    }
+  }
+});
+
 // Then we find all the tests, as well as any controller, directive,
 // service/factory files.
 // All files from the services_sources folder are exempted, because they
 // shouldn't be tested (those files are just intended as data files for backend
 // tests).
-// Note that known failing files are exempted.
-// corresponding issue -> https://github.com/oppia/oppia/issues/6960.
-// TODO(YashJipkate): Fix the tests that broke down after introduction of
-// Webpack due to templateCache.
-/* eslint-disable max-len */
-const context = require.context('../../', true, /((((\.s|S)pec)\.ts$)|(?<!services_sources)\/[A-Za-z0-9.-]*(controller|directive|service|Factory)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)(?<!state-name-editor\.directive\.spec\.ts)/);
-/* eslint-enable max-len */
+// Known failing files are exempted (#6960).
+// TODO(#6960): Fix the tests that broke down after introduction of Webpack due
+//              to templateCache.
+// The 'domhandler/src/index.spec.ts' is excluded from the tests since it is
+// coming from third party library.
+/* eslint-disable-next-line max-len */
+const context = require.context('../../', true, /((\.s|S)pec\.ts$|(?<!services_sources)\/[\w\d.\-]*(component|controller|directive|service|Factory)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)(?<!domhandler\/src\/index\.spec\.ts)(?<!(valid|invalid)(_|\-)[\w\d.\-]*\.ts)/);
+
 // And load the modules.
 context.keys().map(context);

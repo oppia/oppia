@@ -19,6 +19,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
+import { Hint } from 'domain/exploration/HintObjectFactory';
 import { StatePropertyService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-property.service';
@@ -27,7 +28,7 @@ import { UtilsService } from 'services/utils.service';
 @Injectable({
   providedIn: 'root'
 })
-export class StateHintsService extends StatePropertyService {
+export class StateHintsService extends StatePropertyService<Hint[]> {
   private activeHintIndex: number;
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
@@ -42,7 +43,7 @@ export class StateHintsService extends StatePropertyService {
     this.activeHintIndex = index;
   }
 
-  init(stateName: string, value: any): void {
+  init(stateName: string, value: Hint[]): void {
     super.init(stateName, value);
     this.setActiveHintIndex(null);
   }

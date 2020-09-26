@@ -19,31 +19,19 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TestBed } from '@angular/core/testing';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { InteractionObjectFactory } from
-  'domain/exploration/InteractionObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
+
+const constants = require('constants.ts');
 
 describe('State Object Factory', () => {
-  let sof, shof, iof, pcof, rvof, wtof;
+  let sof;
   let stateObject;
+  const oldNewStateTemplate = constants.NEW_STATE_TEMPLATE;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
     });
     sof = TestBed.get(StateObjectFactory);
-    shof = TestBed.get(SubtitledHtmlObjectFactory);
-    iof = TestBed.get(InteractionObjectFactory);
-    pcof = TestBed.get(ParamChangesObjectFactory);
-    rvof = TestBed.get(RecordedVoiceoversObjectFactory);
-    wtof = TestBed.get(WrittenTranslationsObjectFactory);
 
     stateObject = {
       classifier_model_id: null,
@@ -58,7 +46,10 @@ describe('State Object Factory', () => {
             value: 1
           },
           placeholder: {
-            value: 'Type your answer here.'
+            value: {
+              unicode_str: 'Type your answer here.',
+              content_id: ''
+            }
           }
         },
         answer_groups: [],
@@ -77,6 +68,7 @@ describe('State Object Factory', () => {
         hints: [],
         solution: null
       },
+      next_content_id_index: 0,
       param_changes: [],
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -92,6 +84,64 @@ describe('State Object Factory', () => {
         }
       }
     };
+  });
+
+  beforeAll(() => {
+    constants.NEW_STATE_TEMPLATE = {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: ''
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: 1
+          },
+          placeholder: {
+            value: {
+              unicode_str: 'Type your answer here.',
+              content_id: ''
+            }
+          }
+        },
+        default_outcome: {
+          dest: '(untitled state)',
+          feedback: {
+            content_id: 'default_outcome',
+            html: ''
+          },
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        hints: [],
+        solution: null,
+        id: 'TextInput'
+      },
+      next_content_id_index: 0,
+      param_changes: [],
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      }
+    };
+  });
+
+  afterAll(() => {
+    constants.NEW_STATE_TEMPLATE = oldNewStateTemplate;
   });
 
   it('should create a new state object from backend dict', () => {
@@ -116,7 +166,7 @@ describe('State Object Factory', () => {
 
     expect(stateObjectBackend.toBackendDict()).toEqual({
       ...stateObject,
-      // Overrides the param_changes from stateObject
+      // Overrides the param_changes from stateObject.
       param_changes: paramChanges
     });
   });

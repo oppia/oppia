@@ -12,7 +12,7 @@ cron:
   url: /cron/users/user_deletion
   schedule: every 12 hours
 - description: run user deletion verification job
-  url: /cron/users/verify_user_deletion
+  url: /cron/users/fully_complete_user_deletion
   schedule: every 12 hours
 - description: weekly exploration recommendations computation
   url: /cron/explorations/recommendations
@@ -20,13 +20,7 @@ cron:
 - description: weekly exploration search rank computation
   url: /cron/explorations/search_rank
   schedule: every wednesday 9:00
-- description: accept all stale suggestions every week
-  url: /cron/suggestions/accept_stale_suggestions
-  schedule: every thursday 9:00
-- description: notify reviewers about suggestions requiring review
-  url: /cron/suggestions/notify_reviewers
-  schedule: every day 9:00
 - description: "Weekly Cloud Datastore Export"
   url: /cloud_datastore_export?namespace_id=&output_url_prefix=gs://oppia-export-backups
   target: cloud-datastore-admin
-  schedule: every thursday 9:00
+  schedule: every monday 02:00

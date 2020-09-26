@@ -35,12 +35,10 @@ angular.module('oppia').directive('learnerDashboardIcons', [
         'learner-dashboard-icons.directive.html'),
       controller: [
         '$scope', 'LearnerDashboardIdsBackendApiService',
-        'LearnerDashboardActivityIdsObjectFactory',
         'LearnerPlaylistService', 'ACTIVITY_TYPE_COLLECTION',
         'ACTIVITY_TYPE_EXPLORATION',
         function(
             $scope, LearnerDashboardIdsBackendApiService,
-            LearnerDashboardActivityIdsObjectFactory,
             LearnerPlaylistService, ACTIVITY_TYPE_COLLECTION,
             ACTIVITY_TYPE_EXPLORATION) {
           $scope.activityIsCurrentlyHoveredOver = true;
@@ -58,10 +56,8 @@ angular.module('oppia').directive('learnerDashboardIcons', [
           });
 
           LearnerDashboardIdsBackendApiService.fetchLearnerDashboardIds().then(
-            function(response) {
-              $scope.learnerDashboardActivityIds = (
-                LearnerDashboardActivityIdsObjectFactory.createFromBackendDict(
-                  response.learner_dashboard_activity_ids));
+            function(learnerDashboardActivityIds) {
+              $scope.learnerDashboardActivityIds = learnerDashboardActivityIds;
             }
           );
 
@@ -87,51 +83,51 @@ angular.module('oppia').directive('learnerDashboardIcons', [
           $scope.belongsToLearnerPlaylist = function() {
             var activityType = $scope.getActivityType();
             if ($scope.learnerDashboardActivityIds) {
-              /* eslint-disable max-len */
               if (activityType === ACTIVITY_TYPE_EXPLORATION) {
                 return (
+                  /* eslint-disable-next-line max-len */
                   $scope.learnerDashboardActivityIds.belongsToExplorationPlaylist(
                     $scope.getActivityId()));
               } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
                 return (
+                  /* eslint-disable-next-line max-len */
                   $scope.learnerDashboardActivityIds.belongsToCollectionPlaylist(
                     $scope.getActivityId()));
               }
-              /* eslint-enable max-len */
             }
           };
 
           $scope.belongsToCompletedActivities = function() {
             var activityType = $scope.getActivityType();
             if ($scope.learnerDashboardActivityIds) {
-              /* eslint-disable max-len */
               if (activityType === ACTIVITY_TYPE_EXPLORATION) {
                 return (
+                  // eslint-disable-next-line max-len
                   $scope.learnerDashboardActivityIds.belongsToCompletedExplorations(
                     $scope.getActivityId()));
               } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
                 return (
+                  // eslint-disable-next-line max-len
                   $scope.learnerDashboardActivityIds.belongsToCompletedCollections(
                     $scope.getActivityId()));
               }
-              /* eslint-enable max-len */
             }
           };
 
           $scope.belongsToIncompleteActivities = function() {
             var activityType = $scope.getActivityType();
             if ($scope.learnerDashboardActivityIds) {
-              /* eslint-disable max-len */
               if (activityType === ACTIVITY_TYPE_EXPLORATION) {
                 return (
+                  // eslint-disable-next-line max-len
                   $scope.learnerDashboardActivityIds.belongsToIncompleteExplorations(
                     $scope.getActivityId()));
               } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
                 return (
+                  // eslint-disable-next-line max-len
                   $scope.learnerDashboardActivityIds.belongsToIncompleteCollections(
                     $scope.getActivityId()));
               }
-              /* eslint-enable max-len */
             }
           };
 
@@ -141,26 +137,16 @@ angular.module('oppia').directive('learnerDashboardIcons', [
                 activityId, activityType));
             if (isSuccessfullyAdded) {
               if (activityType === ACTIVITY_TYPE_EXPLORATION) {
-                /* eslint-disable max-len */
+                /* eslint-disable-next-line max-len */
                 $scope.learnerDashboardActivityIds.addToExplorationLearnerPlaylist(
                   activityId);
-                /* eslint-enable max-len */
               } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
-                /* eslint-disable max-len */
+                /* eslint-disable-next-line max-len */
                 $scope.learnerDashboardActivityIds.addToCollectionLearnerPlaylist(
                   activityId);
-                /* eslint-enable max-len */
               }
               $scope.disablePlaylistTooltip();
             }
-          };
-
-          $scope.removeFromLearnerPlaylist = function(
-              activityId, activityTitle, activityType) {
-            var isSuccessfullyRemoved = (
-              LearnerPlaylistService.removeFromLearnerPlaylist(
-                activityId, activityTitle, activityType,
-                $scope.learnerDashboardActivityIds));
           };
         }
       ]

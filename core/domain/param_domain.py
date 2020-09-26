@@ -44,18 +44,16 @@ class ParamSpec(python_utils.OBJECT):
         """
         self.obj_type = obj_type
 
-
     def to_dict(self):
         """Returns a dict representation of this ParamSpec.
 
         Returns:
             dict. A dict with a single key, whose value is the type
-                of the parameter represented by this ParamSpec.
+            of the parameter represented by this ParamSpec.
         """
         return {
             'obj_type': self.obj_type,
         }
-
 
     @classmethod
     def from_dict(cls, param_spec_dict):
@@ -68,10 +66,9 @@ class ParamSpec(python_utils.OBJECT):
 
         Returns:
             ParamSpec. A ParamSpec object created from the specified
-                object type.
+            object type.
         """
         return cls(param_spec_dict['obj_type'])
-
 
     def validate(self):
         """Validate the existence of the object class."""
@@ -82,8 +79,8 @@ class ParamSpec(python_utils.OBJECT):
         # Ensure the obj_type is among the supported ParamSpec types.
         if self.obj_type not in self.SUPPORTED_OBJ_TYPES:
             raise utils.ValidationError(
-                ('%s is not among the supported object types for parameters: '
-                 '{%s}.') %
+                '%s is not among the supported object types for parameters:'
+                ' {%s}.' %
                 (self.obj_type, ', '.join(sorted(self.SUPPORTED_OBJ_TYPES))))
 
 
@@ -178,8 +175,8 @@ class ParamChange(python_utils.OBJECT):
 
         Returns:
             ParamChange. The ParamChange object created from the
-                `param_change_dict` dict, which specifies the name,
-                customization arguments and the generator used.
+            `param_change_dict` dict, which specifies the name,
+            customization arguments and the generator used.
         """
         return cls(
             param_change_dict['name'], param_change_dict['generator_id'],

@@ -37,15 +37,16 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
   'ContextService', 'ExplorationHtmlFormatterService',
   'ExpressionInterpolationService', 'FocusManagerService',
   'QuestionObjectFactory', 'ReadOnlyExplorationBackendApiService',
-  'StateCardObjectFactory', 'UrlService', 'INTERACTION_DISPLAY_MODE_INLINE',
-  'INTERACTION_SPECS',
+  'StateCardObjectFactory', 'UrlService', 'ENTITY_TYPE',
+  'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
   function(
       AlertsService, AnswerClassificationService,
       ContextService, ExplorationHtmlFormatterService,
       ExpressionInterpolationService, FocusManagerService,
       QuestionObjectFactory, ReadOnlyExplorationBackendApiService,
-      StateCardObjectFactory, UrlService, INTERACTION_DISPLAY_MODE_INLINE,
-      INTERACTION_SPECS) {
+      StateCardObjectFactory, UrlService, ENTITY_TYPE,
+      INTERACTION_DISPLAY_MODE_INLINE, INTERACTION_SPECS) {
+    ContextService.setQuestionPlayerIsOpen();
     var _explorationId = ContextService.getExplorationId();
     var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var version = UrlService.getExplorationVersionFromUrl();
@@ -64,10 +65,6 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
 
     var currentIndex = null;
     var nextIndex = null;
-
-    var randomFromArray = function(arr) {
-      return arr[Math.floor(Math.random() * arr.length)];
-    };
 
     // Evaluate feedback.
     var makeFeedback = function(feedbackHtml, envs) {
@@ -96,7 +93,13 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
     };
 
     // This should only be called when 'exploration' is non-null.
-    var _loadInitialQuestion = function(successCallback) {
+    var _loadInitialQuestion = function(successCallback, errorCallback) {
+      if (!questions || questions.length === 0) {
+        errorCallback();
+        return;
+      }
+      ContextService.setCustomEntityContext(
+        ENTITY_TYPE.QUESTION, questions[0].getId());
       var initialState = questions[0].getStateData();
 
       var questionHtml = makeQuestion(initialState, []);
@@ -157,14 +160,14 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
        *   - initHtml {string}, an HTML string representing the content of the
        *       first state.
        */
-      init: function(questionDicts, successCallback) {
+      init: function(questionDicts, successCallback, errorCallback) {
         answerIsBeingProcessed = false;
         for (var i = 0; i < questionDicts.length; i++) {
           questions.push(
             QuestionObjectFactory.createFromBackendDict(questionDicts[i])
           );
         }
-        _loadInitialQuestion(successCallback);
+        _loadInitialQuestion(successCallback, errorCallback);
       },
       recordNewCardAdded: function() {
         currentIndex = nextIndex;
@@ -184,6 +187,9 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
       getExplorationVersion: function() {
         return version;
       },
+      clearQuestions: function() {
+        questions = [];
+      },
       getLanguageCode: function() {
         return questions[currentIndex].getLanguageCode();
       },
@@ -196,7 +202,6 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
         }
 
         answerIsBeingProcessed = true;
-        var oldIndex = currentIndex;
         var oldState = _getCurrentStateData();
         var recordedVoiceovers = oldState.recordedVoiceovers;
         var classificationResult = (
@@ -213,7 +218,7 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
 
         // Use angular.copy() to clone the object
         // since classificationResult.outcome points
-        // at oldState.interaction.default_outcome
+        // at oldState.interaction.default_outcome.
         var outcome = angular.copy(classificationResult.outcome);
         // Compute the data for the next state.
         var oldParams = {
@@ -266,13 +271,18 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
 
           questionHtml = questionHtml + _getRandomSuffix();
           nextInteractionHtml = nextInteractionHtml + _getRandomSuffix();
-
+          if (!onSameCard) {
+            ContextService.setCustomEntityContext(
+              ENTITY_TYPE.QUESTION, questions[nextIndex].getId());
+          }
           nextCard = StateCardObjectFactory.createNewCard(
             true, questionHtml, nextInteractionHtml,
             _getNextStateData().interaction,
             _getNextStateData().recordedVoiceovers,
             _getNextStateData().content.getContentId()
           );
+        } else if (!onSameCard) {
+          ContextService.removeCustomEntityContext();
         }
         successCallback(
           nextCard, refreshInteraction, feedbackHtml,

@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
@@ -53,6 +54,8 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.node_id = 'node_1'
         self.node_id_2 = 'node_2'
         self.exp_id = 'exp_id'
+        self.story_url_fragment_1 = 'public-story-title'
+        self.story_url_fragment_2 = 'private-story-title'
 
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
         self.publish_exploration(self.owner_id, self.exp_id)
@@ -60,6 +63,10 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.node_1 = {
             'id': self.node_id,
             'title': 'Title 1',
+            'description': 'Description 1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_id_1', 'skill_id_2'],
             'prerequisite_skill_ids': [],
@@ -72,7 +79,8 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.save_new_skill('skill_id_2', self.admin_id, description='Skill 2')
 
         self.story = story_domain.Story.create_default_story(
-            self.story_id_1, 'Public Story Title', self.topic_id)
+            self.story_id_1, 'Public Story Title', 'Description', self.topic_id,
+            self.story_url_fragment_1)
         self.story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(self.node_1)
         ]
@@ -81,15 +89,19 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, self.story)
 
         self.story_2 = story_domain.Story.create_default_story(
-            self.story_id_2, 'Private Story Title', self.topic_id)
+            self.story_id_2, 'Private Story Title', 'Description',
+            self.topic_id, self.story_url_fragment_2)
         story_services.save_new_story(self.admin_id, self.story_2)
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
             self.topic_id, 'user', name='Topic',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='A new topic',
             canonical_story_ids=[self.story_id_1, self.story_id_3],
             additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=0)
+            subtopics=[subtopic_1], next_subtopic_id=2)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id_1, self.admin_id)
@@ -99,75 +111,57 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
 
 class ReviewTestsPageTests(BaseReviewTestsControllerTests):
 
-    def test_get_fails_when_new_structures_not_enabled(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            self.get_html_response(
-                '%s/%s' % (
-                    feconf.REVIEW_TEST_URL_PREFIX,
-                    self.story_id_1),
-                expected_status_int=404)
-
     def test_any_user_can_access_review_tests_page(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_html_response(
-                '%s/%s' % (
-                    feconf.REVIEW_TEST_URL_PREFIX,
-                    self.story_id_1))
+        self.get_html_response(
+            '/learn/staging/topic/review-test/%s'
+            % self.story_url_fragment_1)
 
     def test_no_user_can_access_unpublished_story_review_sessions_page(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_html_response(
-                '%s/%s' % (
-                    feconf.REVIEW_TEST_URL_PREFIX, self.story_id_2),
-                expected_status_int=404)
+        self.get_html_response(
+            '/learn/staging/topic/review-test/%s'
+            % self.story_url_fragment_2,
+            expected_status_int=404)
 
     def test_get_fails_when_story_doesnt_exist(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_html_response(
-                '%s/%s' % (
-                    feconf.REVIEW_TEST_URL_PREFIX,
-                    'story_id_3'),
-                expected_status_int=404)
+        self.get_html_response(
+            '/learn/staging/topic/review-test/%s'
+            % 'non-existent-story-url-fragment',
+            expected_status_int=302)
 
 
 class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
 
-    def test_get_fails_when_new_structures_not_enabled(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            self.get_json(
-                '%s/%s' % (
-                    feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                    self.story_id_1),
-                expected_status_int=404)
-
     def test_any_user_can_access_review_tests_data(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            story_services.record_completed_node_in_story_context(
-                self.viewer_id, self.story_id_1, self.node_id)
-            json_response = self.get_json(
-                '%s/%s' % (
-                    feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                    self.story_id_1))
-            self.assertEqual(len(json_response['skill_descriptions']), 2)
-            self.assertEqual(
-                json_response['skill_descriptions']['skill_id_1'],
-                'Skill 1')
-            self.assertEqual(
-                json_response['skill_descriptions']['skill_id_2'],
-                'Skill 2')
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.story_id_1, self.node_id)
+        json_response = self.get_json(
+            '%s/staging/topic/%s' % (
+                feconf.REVIEW_TEST_DATA_URL_PREFIX,
+                self.story_url_fragment_1))
+        self.assertEqual(len(json_response['skill_descriptions']), 2)
+        self.assertEqual(
+            json_response['skill_descriptions']['skill_id_1'],
+            'Skill 1')
+        self.assertEqual(
+            json_response['skill_descriptions']['skill_id_2'],
+            'Skill 2')
 
     def test_no_user_can_access_unpublished_story_review_sessions_data(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_json(
-                '%s/%s' % (
-                    feconf.REVIEW_TEST_DATA_URL_PREFIX, self.story_id_2),
-                expected_status_int=404)
+        self.get_json(
+            '%s/staging/topic/%s' % (
+                feconf.REVIEW_TEST_DATA_URL_PREFIX,
+                self.story_url_fragment_2),
+            expected_status_int=404)
 
     def test_get_fails_when_acquired_skills_dont_exist(self):
         node_id = 'node_1'
         node = {
             'id': node_id,
             'title': 'Title 1',
+            'description': 'Description 1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_id_3'],
             'prerequisite_skill_ids': [],
@@ -176,7 +170,8 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             'exploration_id': self.exp_id
         }
         story = story_domain.Story.create_default_story(
-            self.story_id_3, 'Public Story Title', self.topic_id)
+            self.story_id_3, 'Public Story Title', 'Description', self.topic_id,
+            'public-story-title-two')
         story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(node)
         ]
@@ -187,26 +182,24 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
         topic_services.publish_story(
             self.topic_id, self.story_id_3, self.admin_id)
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            story_services.record_completed_node_in_story_context(
-                self.viewer_id, self.story_id_3, node_id)
-            self.get_json(
-                '%s/%s' % (
-                    feconf.REVIEW_TEST_DATA_URL_PREFIX, self.story_id_3),
-                expected_status_int=404)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.story_id_3, node_id)
+        self.get_json(
+            '%s/staging/topic/%s' % (
+                feconf.REVIEW_TEST_DATA_URL_PREFIX,
+                'public-story-title-two'),
+            expected_status_int=404)
 
     def test_get_fails_when_story_doesnt_exist(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_json(
-                '%s/%s' % (
-                    feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                    'story_id_3'),
-                expected_status_int=404)
+        self.get_json(
+            '%s/staging/topic/%s' % (
+                feconf.REVIEW_TEST_DATA_URL_PREFIX,
+                'non-existent-story-url-fragment'),
+            expected_status_int=404)
 
     def test_get_fails_when_no_completed_story_node(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_json(
-                '%s/%s' % (
-                    feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                    self.story_id_1),
-                expected_status_int=404)
+        self.get_json(
+            '%s/staging/topic/%s' % (
+                feconf.REVIEW_TEST_DATA_URL_PREFIX,
+                self.story_url_fragment_1),
+            expected_status_int=404)

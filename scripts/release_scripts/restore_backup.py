@@ -42,14 +42,9 @@ import python_utils
 import release_constants
 from scripts import common
 
-GCLOUD_PATH = os.path.join(
-    '..', 'oppia_tools', 'google-cloud-sdk-251.0.0', 'google-cloud-sdk',
-    'bin', 'gcloud')
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
-GAE_DIR = os.path.join(
-    OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine')
 LIST_OF_BUCKETS_URL = (
     'https://console.cloud.google.com/storage/browser/'
     'oppia-export-backups?project=oppiaserver')
@@ -69,7 +64,9 @@ def set_project(project_name):
     Args:
         project_name: str. The name of the project.
     """
-    common.run_cmd([GCLOUD_PATH, 'config', 'set', 'project', project_name])
+    common.run_cmd([
+        common.GCLOUD_PATH, 'config', 'set', 'project',
+        project_name])
 
 
 def initiate_backup_restoration_process():
@@ -83,21 +80,22 @@ def initiate_backup_restoration_process():
         '20200213-090001.overall_export_metadata". '
         'This is the file you want to import.\n'
         'Please copy and enter the full path of this file\n')
-    export_metadata_filepath = python_utils.INPUT()
+    export_metadata_filepath = python_utils.INPUT().strip()
     if not re.match(
             r'^oppia-export-backups/(\d{8}-\d{6})/\1\.overall_export_metadata$',
             export_metadata_filepath):
         raise Exception('Invalid export metadata filepath: %s' % (
             export_metadata_filepath))
     common.run_cmd([
-        GCLOUD_PATH, 'datastore', 'import',
+        common.GCLOUD_PATH, 'datastore', 'import',
         'gs://%s' % export_metadata_filepath, '--async'])
 
 
 def check_backup_restoration_status():
     """Checks the status of backup restoration process."""
     python_utils.PRINT(
-        common.run_cmd([GCLOUD_PATH, 'datastore', 'operations', 'list']))
+        common.run_cmd([
+            common.GCLOUD_PATH, 'datastore', 'operations', 'list']))
 
 
 def cancel_operation():
@@ -119,9 +117,10 @@ def cancel_operation():
         'The name of an operation is listed in the field called "name". '
         'Check the example here: https://stackoverflow.com/a/53630367 for '
         'details.\n')
-    operation_name = python_utils.INPUT()
+    operation_name = python_utils.INPUT().strip()
     common.run_cmd([
-        GCLOUD_PATH, 'datastore', 'operations', 'cancel', operation_name])
+        common.GCLOUD_PATH, 'datastore', 'operations', 'cancel',
+        operation_name])
 
 
 def main(args=None):
@@ -129,9 +128,10 @@ def main(args=None):
     backup restoration.
     """
     common.require_cwd_to_be_oppia()
-    if not os.path.exists(os.path.dirname(GAE_DIR)):
-        raise Exception('Directory %s does not exist.' % GAE_DIR)
-    sys.path.insert(0, GAE_DIR)
+    if not os.path.exists(os.path.dirname(common.GOOGLE_APP_ENGINE_SDK_HOME)):
+        raise Exception(
+            'Directory %s does not exist.' % common.GOOGLE_APP_ENGINE_SDK_HOME)
+    sys.path.insert(0, common.GOOGLE_APP_ENGINE_SDK_HOME)
 
     options = _PARSER.parse_args(args=args)
 
@@ -149,7 +149,8 @@ def main(args=None):
         python_utils.PRINT(
             'Backup restoration process initiated!\n'
             'To check the status of the project please run: '
-            'python -m scripts.restore_backup --check_status')
+            'python -m scripts.release_scripts.restore_backup '
+            '--check_status')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

@@ -16,11 +16,16 @@
  * @fileoverview Directive for the local navigation in the learner view.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
+  'pages/exploration-player-page/templates/' +
+  'flag-exploration-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
-require(
-  'pages/exploration-player-page/services/exploration-player-state.service.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
   'feedback-popup.directive.ts');
@@ -30,7 +35,6 @@ require(
   'suggestion-modal-for-exploration-player.service.ts');
 require('services/alerts.service.ts');
 require('services/user.service.ts');
-require('services/stateful/focus-manager.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
@@ -46,16 +50,14 @@ angular.module('oppia').directive('learnerLocalNav', [
         'learner-local-nav.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$rootScope', '$uibModal', 'AlertsService',
-        'ExplorationEngineService', 'ExplorationPlayerStateService',
-        'FocusManagerService', 'ReadOnlyExplorationBackendApiService',
+        '$http', '$uibModal', 'AlertsService', 'ExplorationEngineService',
+        'LoaderService', 'ReadOnlyExplorationBackendApiService',
         'SuggestionModalForExplorationPlayerService',
         'UrlInterpolationService', 'UserService', 'FEEDBACK_POPOVER_PATH',
         'FLAG_EXPLORATION_URL_TEMPLATE',
         function(
-            $http, $rootScope, $uibModal, AlertsService,
-            ExplorationEngineService, ExplorationPlayerStateService,
-            FocusManagerService, ReadOnlyExplorationBackendApiService,
+            $http, $uibModal, AlertsService, ExplorationEngineService,
+            LoaderService, ReadOnlyExplorationBackendApiService,
             SuggestionModalForExplorationPlayerService,
             UrlInterpolationService, UserService, FEEDBACK_POPOVER_PATH,
             FLAG_EXPLORATION_URL_TEMPLATE) {
@@ -75,34 +77,7 @@ angular.module('oppia').directive('learnerLocalNav', [
                 'pages/exploration-player-page/templates/' +
                 'flag-exploration-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', 'PlayerPositionService',
-                function($scope, $uibModalInstance, PlayerPositionService) {
-                  $scope.flagMessageTextareaIsShown = false;
-                  var stateName = PlayerPositionService.getCurrentStateName();
-
-                  $scope.showFlagMessageTextarea = function(value) {
-                    if (value) {
-                      $scope.flagMessageTextareaIsShown = true;
-                      FocusManagerService.setFocus('flagMessageTextarea');
-                    }
-                  };
-
-                  $scope.submitReport = function() {
-                    if ($scope.flagMessage) {
-                      $uibModalInstance.close({
-                        report_type: $scope.flag,
-                        report_text: $scope.flagMessage,
-                        state: stateName
-                      });
-                    }
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
+              controller: 'FlagExplorationModalController',
             }).result.then(function(result) {
               var flagExplorationUrl = UrlInterpolationService.interpolateUrl(
                 FLAG_EXPLORATION_URL_TEMPLATE, {
@@ -122,18 +97,11 @@ angular.module('oppia').directive('learnerLocalNav', [
                   'pages/exploration-player-page/templates/' +
                   'exploration-successfully-flagged-modal.template.html'),
                 backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
-                    $scope.close = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
+                controller: 'ConfirmOrCancelModalController'
               }).result.then(function() {}, function() {
                 // Note to developers:
-                // This callback is triggered when the Cancel button is
-                // clicked. No further action is needed.
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
             }, function() {
               // Note to developers:
@@ -149,10 +117,10 @@ angular.module('oppia').directive('learnerLocalNav', [
                 ctrl.canEdit = exploration.can_edit;
               });
             ctrl.username = '';
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.username = userInfo.getUsername();
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
             });
           };
         }

@@ -16,6 +16,10 @@
  * @fileoverview Directive for the skills mastery list.
  */
 
+require(
+  'components/skills-mastery-list/' +
+  'skills-mastery-list-concept-card-modal.controller.ts');
+
 require('components/concept-card/concept-card.directive.ts');
 require('components/skills-mastery-list/skills-mastery-list.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -34,11 +38,9 @@ angular.module('oppia').directive('skillsMasteryList', [
         '/components/skills-mastery-list/skills-mastery-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$uibModal', 'UserService',
-        'MASTERY_CUTOFF', 'MASTERY_COLORS',
+        '$uibModal', 'UserService', 'MASTERY_COLORS', 'MASTERY_CUTOFF',
         function(
-            $scope, $uibModal, UserService,
-            MASTERY_CUTOFF, MASTERY_COLORS) {
+            $uibModal, UserService, MASTERY_COLORS, MASTERY_CUTOFF) {
           var ctrl = this;
           ctrl.getMasteryPercentage = function(degreeOfMastery) {
             return Math.round(degreeOfMastery * 100);
@@ -70,22 +72,15 @@ angular.module('oppia').directive('skillsMasteryList', [
                 '/components/concept-card/concept-card-modal.template.html'
               ),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function(
-                    $scope, $uibModalInstance) {
-                  $scope.skillIds = [skillId];
-                  $scope.index = 0;
-                  $scope.currentSkill = skillDescription;
-
-                  $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
+              resolve: {
+                skillDescription: () => skillDescription,
+                skillId: () => skillId
+              },
+              controller: 'SkillsMasteryListConceptCardModal'
             }).result.then(function() {}, function() {
-              // This callback is triggered when the Cancel button is
-              // clicked. No further action is needed.
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
           ctrl.$onInit = function() {

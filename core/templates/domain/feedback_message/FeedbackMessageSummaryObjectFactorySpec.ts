@@ -42,12 +42,15 @@ describe('Feedback message object factory', () => {
   it('should fetch the feedback message domain object from the backend ' +
      'summary dict', () => {
     var messageSummary = {
-      messageId: 0,
+      message_id: 0,
       text: 'Sample text',
-      updatedStatus: null,
+      updated_status: null,
+      suggestion_html: 'html',
+      current_content_html: 'html',
+      description: 'desc',
       author_username: 'User 1',
       author_picture_data_url: 'sample_picture_url_1',
-      created_on: 1000
+      created_on_msecs: 1000
     };
 
     var feedbackMessageSummary = (
@@ -58,5 +61,6 @@ describe('Feedback message object factory', () => {
     expect(feedbackMessageSummary.authorUsername).toEqual('User 1');
     expect(feedbackMessageSummary.authorPictureDataUrl).toEqual(
       'sample_picture_url_1');
+    expect(feedbackMessageSummary.createdOnMsecs).toEqual(1000);
   });
 });

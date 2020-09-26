@@ -19,8 +19,8 @@
 import { TestBed } from '@angular/core/testing';
 
 import { CollectionNodeObjectFactory } from
-  'domain/collection/CollectionNodeObjectFactory';
-import { Collection, CollectionObjectFactory } from
+  'domain/collection/collection-node-object.factory';
+import { CollectionBackendDict, Collection, CollectionObjectFactory } from
   'domain/collection/CollectionObjectFactory';
 import { CollectionValidationService } from
   'domain/collection/collection-validation.service';
@@ -29,7 +29,7 @@ describe('Collection validation service', function() {
   let collectionValidationService: CollectionValidationService = null;
   let collectionObjectFactory: CollectionObjectFactory = null;
   let collectionNodeObjectFactory: CollectionNodeObjectFactory = null;
-  let sampleCollectionBackendObject: any = null;
+  let sampleCollectionBackendObject: CollectionBackendDict = null;
   let _sampleCollection: Collection = null;
 
   let EXISTS: boolean = true;
@@ -51,8 +51,15 @@ describe('Collection validation service', function() {
       title: 'a title',
       objective: 'an objective',
       category: 'a category',
-      version: '1',
-      nodes: []
+      version: 1,
+      nodes: [],
+      language_code: null,
+      schema_version: null,
+      tags: null,
+      playthrough_dict: {
+        next_exploration_id: 'expId',
+        completed_exploration_ids: ['expId2']
+      }
     };
     _sampleCollection = collectionObjectFactory.create(
       sampleCollectionBackendObject);
@@ -64,7 +71,28 @@ describe('Collection validation service', function() {
       explorationId);
     if (exists) {
       collectionNode.setExplorationSummaryObject({
-        status: isPublic ? 'public' : 'private'
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: isPublic ? 'public' : 'private',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
       });
     }
     return _sampleCollection.addCollectionNode(collectionNode);
@@ -101,8 +129,8 @@ describe('Collection validation service', function() {
   it('should detect nonexistent/inaccessible explorations', () => {
     expect(_addCollectionNode(
       'exp_id1', DOES_NOT_EXIST, PRIVATE_STATUS)).toBe(true);
-    var node0 = _getCollectionNode('exp_id0');
-    var node1 = _getCollectionNode('exp_id1');
+    _getCollectionNode('exp_id0');
+    _getCollectionNode('exp_id1');
 
     var issues = _findPrivateValidationIssues();
     expect(issues).toEqual([
@@ -115,9 +143,9 @@ describe('Collection validation service', function() {
     () => {
       expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBe(true);
       expect(_addCollectionNode('exp_id2', EXISTS, PUBLIC_STATUS)).toBe(true);
-      var node0 = _getCollectionNode('exp_id0');
-      var node1 = _getCollectionNode('exp_id1');
-      var node2 = _getCollectionNode('exp_id2');
+      _getCollectionNode('exp_id0');
+      _getCollectionNode('exp_id1');
+      _getCollectionNode('exp_id2');
 
       var issues = _findPrivateValidationIssues();
       expect(issues).toEqual([]);
@@ -127,8 +155,8 @@ describe('Collection validation service', function() {
   it('should not allow private explorations in a public collection',
     () => {
       expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
-      var node1 = _getCollectionNode('exp_id1');
-      var node0 = _getCollectionNode('exp_id0');
+      _getCollectionNode('exp_id1');
+      _getCollectionNode('exp_id0');
 
       var issues = _findPublicValidationIssues();
       expect(issues).toEqual([
@@ -145,9 +173,9 @@ describe('Collection validation service', function() {
     expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
     expect(_addCollectionNode('exp_id2', EXISTS, PRIVATE_STATUS)).toBe(true);
 
-    var node0 = _getCollectionNode('exp_id0');
-    var node1 = _getCollectionNode('exp_id1');
-    var node2 = _getCollectionNode('exp_id2');
+    _getCollectionNode('exp_id0');
+    _getCollectionNode('exp_id1');
+    _getCollectionNode('exp_id2');
 
     var issues = _findPublicValidationIssues();
     expect(issues).toEqual([

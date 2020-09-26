@@ -30,14 +30,15 @@ describe('Learner playlist service factory', function() {
   var LearnerPlaylistService = null;
   var $httpBackend = null;
   var $rootScope = null;
+  var $q = null;
   var activityType = null;
   var UrlInterpolationService = null;
   var activityId = '1';
   var addToLearnerPlaylistUrl = '';
   var AlertsService = null;
   var CsrfService = null;
-  var spyInfoMessage = null;
-  var spySuccessMessage = null;
+  var LearnerDashboardActivityIdsObjectFactory = null;
+  var $uibModal = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(
@@ -49,17 +50,21 @@ describe('Learner playlist service factory', function() {
     }
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $q) {
+  beforeEach(angular.mock.inject(function($injector, _$q_) {
     $httpBackend = $injector.get('$httpBackend');
     LearnerPlaylistService = $injector.get(
       'LearnerPlaylistService');
     $rootScope = $injector.get('$rootScope');
+    $q = _$q_;
     activityType = $injector.get('ACTIVITY_TYPE_EXPLORATION');
     UrlInterpolationService = $injector.get('UrlInterpolationService');
     AlertsService = $injector.get('AlertsService');
     spyOn(AlertsService, 'addInfoMessage').and.callThrough();
     spyOn(AlertsService, 'addSuccessMessage').and.callThrough();
     CsrfService = $injector.get('CsrfTokenService');
+    $uibModal = $injector.get('$uibModal');
+    LearnerDashboardActivityIdsObjectFactory = $injector.get(
+      'LearnerDashboardActivityIdsObjectFactory');
 
     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
       var deferred = $q.defer();
@@ -152,5 +157,93 @@ describe('Learner playlist service factory', function() {
       'complete some or you can head to the learner dashboard ' +
       'and remove some.');
     expect(AlertsService.addSuccessMessage).not.toHaveBeenCalled();
+  });
+
+  it('should open an $uibModal when removing from learner playlist',
+    function() {
+      var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+      LearnerPlaylistService.removeFromLearnerPlaylist(
+        '0', 'title', 'exploration', []);
+      expect(modalSpy).toHaveBeenCalled();
+    });
+
+  it('should remove an exploration from learner playlist', function() {
+    spyOn($uibModal, 'open').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve();
+      return {
+        result: deferred.promise
+      };
+    });
+
+    var learnerDashboardActivityIds = LearnerDashboardActivityIdsObjectFactory
+      .createFromBackendDict({
+        incomplete_exploration_ids: [],
+        incomplete_collection_ids: [],
+        completed_exploration_ids: [],
+        completed_collection_ids: [],
+        exploration_playlist_ids: ['0', '1', '2'],
+        collection_playlist_ids: []
+      });
+
+    LearnerPlaylistService.removeFromLearnerPlaylist(
+      '0', 'title', 'exploration', learnerDashboardActivityIds);
+    $rootScope.$apply();
+
+    expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual(
+      ['1', '2']);
+  });
+
+  it('should remove a collection from learner playlist', function() {
+    spyOn($uibModal, 'open').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve();
+      return {
+        result: deferred.promise
+      };
+    });
+    var learnerDashboardActivityIds = LearnerDashboardActivityIdsObjectFactory
+      .createFromBackendDict({
+        incomplete_exploration_ids: [],
+        incomplete_collection_ids: [],
+        completed_exploration_ids: [],
+        completed_collection_ids: [],
+        exploration_playlist_ids: [],
+        collection_playlist_ids: ['0', '1', '2']
+      });
+
+    LearnerPlaylistService.removeFromLearnerPlaylist(
+      '0', 'title', 'collection', learnerDashboardActivityIds);
+    $rootScope.$apply();
+
+    expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
+      ['1', '2']);
+  });
+
+  it('should not remove anything from learner playlist when cancel' +
+    ' button is clicked', function() {
+    spyOn($uibModal, 'open').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.reject();
+      return {
+        result: deferred.promise
+      };
+    });
+    var learnerDashboardActivityIds = LearnerDashboardActivityIdsObjectFactory
+      .createFromBackendDict({
+        incomplete_exploration_ids: [],
+        incomplete_collection_ids: [],
+        completed_exploration_ids: [],
+        completed_collection_ids: [],
+        exploration_playlist_ids: [],
+        collection_playlist_ids: ['0', '1', '2']
+      });
+
+    LearnerPlaylistService.removeFromLearnerPlaylist(
+      activityId, 'title', 'collection', learnerDashboardActivityIds);
+    $rootScope.$apply();
+
+    expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
+      ['0', '1', '2']);
   });
 });

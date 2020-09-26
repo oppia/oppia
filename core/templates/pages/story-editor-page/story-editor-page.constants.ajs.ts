@@ -23,11 +23,3 @@ import { StoryEditorPageConstants } from
 
 angular.module('oppia').constant(
   'NODE_ID_PREFIX', StoryEditorPageConstants.NODE_ID_PREFIX);
-angular.module('oppia').constant(
-  'EVENT_STORY_INITIALIZED', StoryEditorPageConstants.EVENT_STORY_INITIALIZED);
-angular.module('oppia').constant(
-  'EVENT_STORY_REINITIALIZED',
-  StoryEditorPageConstants.EVENT_STORY_REINITIALIZED);
-angular.module('oppia').constant(
-  'EVENT_VIEW_STORY_NODE_EDITOR',
-  StoryEditorPageConstants.EVENT_VIEW_STORY_NODE_EDITOR);

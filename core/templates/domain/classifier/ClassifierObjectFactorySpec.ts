@@ -21,6 +21,41 @@ import { ClassifierObjectFactory } from
 
 describe('Classifier Object Factory', () => {
   let classifierObjectFactory: ClassifierObjectFactory;
+  let sampleClassifierData = {
+    KNN: {
+      occurrence: 0,
+      K: 0,
+      T: 0,
+      top: 0,
+      fingerprint_data: {
+        0: {
+          'class': 0,
+          fingerprint: [[0]]
+        }
+      },
+      token_to_id: {
+        a: 0
+      }
+    },
+    SVM: {
+      classes: [0],
+      kernel_params: {
+        kernel: 'string',
+        coef0: 0,
+        degree: 0,
+        gamma: 0
+      },
+      intercept: [0],
+      n_support: [0],
+      probA: [0],
+      support_vectors: [[0]],
+      probB: [0],
+      dual_coef: [[0]]
+    },
+    cv_vocabulary: {
+      a: 0
+    }
+  };
 
   beforeEach(() => {
     classifierObjectFactory = new ClassifierObjectFactory();
@@ -28,10 +63,11 @@ describe('Classifier Object Factory', () => {
 
   it('should create a new classifier', () => {
     var classifierObject = (
-      classifierObjectFactory.create('TestClassifier', {}, 1));
+      classifierObjectFactory.create(
+        'TestClassifier', sampleClassifierData, 1));
 
     expect(classifierObject.algorithmId).toEqual('TestClassifier');
-    expect(classifierObject.classifierData).toEqual({});
+    expect(classifierObject.classifierData).toEqual(sampleClassifierData);
     expect(classifierObject.dataSchemaVersion).toEqual(1);
   });
 });

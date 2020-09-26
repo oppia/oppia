@@ -29,13 +29,13 @@ require('app.constants.ajs.ts');
 
 angular.module('oppia').controller('Base', [
   '$document', '$rootScope', '$scope', 'AlertsService', 'BackgroundMaskService',
-  'CsrfTokenService', 'DocumentAttributeCustomizationService',
+  'CsrfTokenService', 'DocumentAttributeCustomizationService', 'LoaderService',
   'MetaTagCustomizationService', 'SidebarStatusService',
   'UrlInterpolationService', 'UrlService', 'DEV_MODE',
   'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
   function(
       $document, $rootScope, $scope, AlertsService, BackgroundMaskService,
-      CsrfTokenService, DocumentAttributeCustomizationService,
+      CsrfTokenService, DocumentAttributeCustomizationService, LoaderService,
       MetaTagCustomizationService, SidebarStatusService,
       UrlInterpolationService, UrlService, DEV_MODE,
       SITE_FEEDBACK_FORM_URL, SITE_NAME) {
@@ -53,7 +53,7 @@ angular.module('oppia').controller('Base', [
         'oppia-main-content');
 
       if (!mainContentElement) {
-        throw Error('Variable mainContentElement is undefined.');
+        throw new Error('Variable mainContentElement is undefined.');
       }
       mainContentElement.tabIndex = -1;
       mainContentElement.scrollIntoView();
@@ -67,7 +67,7 @@ angular.module('oppia').controller('Base', [
       $scope.AlertsService = AlertsService;
       $rootScope.DEV_MODE = DEV_MODE;
       // If this is nonempty, the whole page goes into 'Loading...' mode.
-      $rootScope.loadingMessage = '';
+      LoaderService.hideLoadingScreen();
 
       CsrfTokenService.initializeToken();
       MetaTagCustomizationService.addMetaTags([
@@ -108,8 +108,8 @@ angular.module('oppia').controller('Base', [
         {
           propertyType: 'property',
           propertyValue: 'og:image',
-          content: $scope.getAssetUrl(
-            '/assets/images/logo/288x288_logo_mint.png')
+          content: UrlInterpolationService.getStaticImageUrl(
+            '/logo/288x288_logo_mint.webp')
         }
       ]);
 
@@ -120,7 +120,7 @@ angular.module('oppia').controller('Base', [
       $scope.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
       DocumentAttributeCustomizationService.addAttribute(
         'lang', $scope.currentLang);
-      // TODO(sll): use 'touchstart' for mobile.
+      // TODO(sll): Use 'touchstart' for mobile.
       $document.on('click', function() {
         SidebarStatusService.onDocumentClick();
       });

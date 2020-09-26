@@ -17,8 +17,8 @@
  */
 
 import { from, Observable } from 'rxjs';
-import { HttpClient, HttpParams, HttpRequest,
-  HttpInterceptor, HttpEvent, HttpHandler } from '@angular/common/http';
+import { HttpRequest, HttpInterceptor,
+  HttpEvent, HttpHandler } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { switchMap } from 'rxjs/operators';
 
@@ -26,9 +26,9 @@ import { switchMap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class MockCsrfTokenService {
-  tokenPromise = null;
+  tokenPromise: PromiseLike<string> = null;
 
-  initializeToken() {
+  initializeToken(): void {
     if (this.tokenPromise !== null) {
       throw new Error('Token request has already been made');
     }
@@ -40,17 +40,17 @@ export class MockCsrfTokenService {
       url: '/csrfhandler',
       type: 'GET',
       dataType: 'text',
-      dataFilter: function(data: any) {
+      dataFilter: function(data: string) {
         // Remove the protective XSSI (cross-site scripting inclusion) prefix.
         let actualData = data.substring(5);
         return JSON.parse(actualData);
       },
-    }).then(function(response: any) {
+    }).then(function(response: {token: string}) {
       return response.token;
     });
   }
 
-  getTokenAsync() {
+  getTokenAsync(): PromiseLike<string> {
     if (this.tokenPromise === null) {
       throw new Error('Token needs to be initialized');
     }
@@ -64,8 +64,8 @@ export class MockCsrfTokenService {
 export class RequestInterceptor implements HttpInterceptor {
   constructor(private csrf: MockCsrfTokenService) {}
   intercept(
-      request: HttpRequest<any>, next: HttpHandler
-  ): Observable<HttpEvent<any>> {
+      request: HttpRequest<FormData>, next: HttpHandler
+  ): Observable<HttpEvent<FormData>> {
     var csrf = this.csrf;
     try {
       csrf.initializeToken();
@@ -78,16 +78,27 @@ export class RequestInterceptor implements HttpInterceptor {
     if (request.body) {
       return from(this.csrf.getTokenAsync())
         .pipe(
-          switchMap(token => {
+          switchMap((token: string) => {
             if (request.method === 'POST' || request.method === 'PUT') {
-              var body = new HttpParams()
+              // If the body of the http request created is already in FormData
+              // form, no need to create the FormData object here.
+              if (!(request.body instanceof FormData)) {
+                var body = new FormData();
+                body.append('payload', JSON.stringify(request.body));
+                // This throws "Cannot assign to 'body' because it is
+                // a read-only property". We need to manually suprress this
+                // error because this is a request interceptor and we need to
+                // to modify the contents of the request.
                 // @ts-ignore
-                .set('csrf_token', token)
-                .set('source', document.URL)
-                .set('payload', JSON.stringify(request.body));
-              // @ts-ignore
-              request.body = body;
+                request.body = body;
+              }
+              request.body.append('csrf_token', token);
+              request.body.append('source', document.URL);
             } else {
+              // This throws "Cannot assign to 'body' because it is
+              // a read-only property". We need to manually suprress this
+              // error because this is a request interceptor and we need to
+              // to modify the contents of the request.
               // @ts-ignore
               request.body = {
                 csrf_token: token,

@@ -25,8 +25,11 @@ angular.module('oppia').directive('oppiaFooter', [
       bindToController: {},
       template: require('./oppia_footer_directive.html'),
       controllerAs: '$ctrl',
-      controller: [
-        function() {}
+      controller: ['SITE_FEEDBACK_FORM_URL',
+        function(SITE_FEEDBACK_FORM_URL) {
+          var ctrl = this;
+          ctrl.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
+        }
       ]
     };
   }

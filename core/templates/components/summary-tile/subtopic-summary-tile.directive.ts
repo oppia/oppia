@@ -18,6 +18,7 @@
 
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require('services/assets-backend-api.service.ts');
 
 angular.module('oppia').directive('subtopicSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -25,29 +26,64 @@ angular.module('oppia').directive('subtopicSummaryTile', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        getSkillCount: '&skillCount',
-        getSubtopicId: '&subtopicId',
-        getSubtopicTitle: '&subtopicTitle',
-        getTopicName: '&topicName'
+        classroomUrlFragment: '<',
+        subtopic: '<',
+        topicId: '<',
+        topicUrlFragment: '<'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary-tile/subtopic-summary-tile.directive.html'),
+      template: require('./subtopic-summary-tile.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['SUBTOPIC_VIEWER_URL_TEMPLATE',
-        function(SUBTOPIC_VIEWER_URL_TEMPLATE) {
+      controller: [
+        '$window', 'AssetsBackendApiService', 'ENTITY_TYPE',
+        'SUBTOPIC_VIEWER_URL_TEMPLATE',
+        function(
+            $window, AssetsBackendApiService, ENTITY_TYPE,
+            SUBTOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
-          ctrl.getSubtopicLink = function() {
-            return UrlInterpolationService.interpolateUrl(
-              SUBTOPIC_VIEWER_URL_TEMPLATE, {
-                topic_name: ctrl.getTopicName(),
-                subtopic_id: ctrl.getSubtopicId().toString()
-              });
+          ctrl.openSubtopicPage = function() {
+            // This component is being used in the topic editor as well and
+            // we want to disable the linking in this case.
+            if (!ctrl.classroomUrlFragment || !ctrl.topicUrlFragment) {
+              return;
+            }
+            $window.open(
+              UrlInterpolationService.interpolateUrl(
+                SUBTOPIC_VIEWER_URL_TEMPLATE, {
+                  classroom_url_fragment: ctrl.classroomUrlFragment,
+                  topic_url_fragment: ctrl.topicUrlFragment,
+                  subtopic_url_fragment: ctrl.subtopic.getUrlFragment()
+                }
+              ), '_self'
+            );
           };
 
-          ctrl.getStaticImageUrl = function(imagePath) {
-            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          ctrl.$onInit = function() {
+            if (ctrl.subtopic.getThumbnailFilename()) {
+              ctrl.thumbnailUrl = (
+                AssetsBackendApiService.getThumbnailUrlForPreview(
+                  ENTITY_TYPE.TOPIC, ctrl.topicId,
+                  ctrl.subtopic.getThumbnailFilename()));
+            } else {
+              ctrl.thumbnailUrl = null;
+            }
           };
         }
       ]
     };
   }]);
+
+import { Directive, ElementRef, Injector, Input } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'subtopic-summary-tile'
+})
+export class SubtopicSummaryTileDirective extends UpgradeComponent {
+  @Input() classroomUrlFragment;
+  @Input() subtopic;
+  @Input() topicId;
+  @Input() topicUrlFragment;
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('subtopicSummaryTile', elementRef, injector);
+  }
+}

@@ -79,7 +79,7 @@ describe('User Service', function() {
   });
 
   it('should return userInfo data', function() {
-    // creating a test user for checking profile picture of user.
+    // Creating a test user for checking profile picture of user.
     var sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
@@ -90,10 +90,8 @@ describe('User Service', function() {
       username: 'tester',
       user_is_logged_in: true
     };
-
     $httpBackend.expect('GET', '/userinfohandler').respond(
       200, sampleUserInfoBackendObject);
-
     var sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
       sampleUserInfoBackendObject);
 
@@ -134,7 +132,6 @@ describe('User Service', function() {
       username: 'tester',
       user_is_logged_in: true
     };
-
     $httpBackend.expect('GET', '/userinfohandler').respond(
       200, sampleUserInfoBackendObject);
     var sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
@@ -142,7 +139,7 @@ describe('User Service', function() {
 
     UserService.getUserInfoAsync().then(function(userInfo) {
       expect(userInfo).toEqual(sampleUserInfo);
-      // Fetch userInfo again
+      // Fetch userInfo again.
       UserService.getUserInfoAsync().then(function(sameUserInfo) {
         expect(sameUserInfo).toEqual(userInfo);
       });
@@ -161,7 +158,6 @@ describe('User Service', function() {
       username: 'tester',
       user_is_logged_in: false
     };
-
     $httpBackend.expect('GET', '/userinfohandler').respond(
       200, sampleUserInfoBackendObject);
     var sampleUserInfo = userInfoObjectFactory.createDefault();
@@ -169,7 +165,6 @@ describe('User Service', function() {
     UserService.getUserInfoAsync().then(function(userInfo) {
       expect(userInfo).toEqual(sampleUserInfo);
     });
-
     $httpBackend.flush();
   });
 
@@ -188,7 +183,6 @@ describe('User Service', function() {
     };
     $httpBackend.expect('GET', '/userinfohandler').respond(
       200, sampleUserInfoBackendObject);
-
     $httpBackend.expect('GET', requestUrl).respond(
       200, {profile_picture_data_url: 'image data'});
 
@@ -203,7 +197,7 @@ describe('User Service', function() {
 
     UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
       expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
-        '/avatar/user_blue_72px.png'));
+        '/avatar/user_blue_72px.webp'));
     });
     $httpBackend.flush();
   });
@@ -220,12 +214,12 @@ describe('User Service', function() {
         username: 'tester',
         user_is_logged_in: false
       };
-
       $httpBackend.expect('GET', '/userinfohandler').respond(
         200, sampleUserInfoBackendObject);
+
       UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
         expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
-          '/avatar/user_blue_72px.png'));
+          '/avatar/user_blue_72px.webp'));
       });
       $httpBackend.flush();
     });
@@ -233,9 +227,9 @@ describe('User Service', function() {
   it('should return the login url', function() {
     var loginUrl = '/login';
     var currentUrl = 'home';
-
     $httpBackend.expect('GET', '/url_handler?current_url=' + currentUrl)
       .respond({login_url: loginUrl});
+
     UserService.getLoginUrlAsync().then(function(dataUrl) {
       expect(dataUrl).toBe(loginUrl);
     });
@@ -263,11 +257,50 @@ describe('User Service', function() {
       .respond(500, errorMessage);
 
     UserService.setProfileImageDataUrlAsync(newProfileImageDataurl)
-      /* eslint-disable dot-notation */
+      /* eslint-disable-next-line dot-notation */
       .catch(function(error) {
-      /* eslint-enable dot-notation */
         expect(error.data).toEqual(errorMessage);
       });
     $httpBackend.flush();
   });
+
+  it('should return user contribution rights data', function() {
+    var sampleUserContributionRightsDict = {
+      translation: ['hi'],
+      voiceover: [],
+      question: true
+    };
+    $httpBackend.expect('GET', '/usercontributionrightsdatahandler').respond(
+      200, sampleUserContributionRightsDict);
+
+    UserService.getUserContributionRightsData().then(function(
+        userContributionRights) {
+      expect(userContributionRights).toEqual(sampleUserContributionRightsDict);
+    });
+    $httpBackend.flush();
+  });
+
+  it('should not fetch userContributionRights if it is was fetched before',
+    function() {
+      var sampleUserContributionRightsDict = {
+        translation: ['hi'],
+        voiceover: [],
+        question: true
+      };
+      $httpBackend.expect('GET', '/usercontributionrightsdatahandler').respond(
+        200, sampleUserContributionRightsDict);
+
+      UserService.getUserContributionRightsData().then(
+        function(userContributionRights) {
+          expect(userContributionRights).toEqual(
+            sampleUserContributionRightsDict);
+          // Fetch userContributionRightsInfo again.
+          UserService.getUserContributionRightsData().then(function(
+              sameUserContributionRights) {
+            expect(sameUserContributionRights).toEqual(
+              sampleUserContributionRightsDict);
+          });
+        });
+      $httpBackend.flush(1);
+    });
 });

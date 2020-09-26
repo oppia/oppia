@@ -22,7 +22,8 @@
 
 require('domain/collection/read-only-collection-backend-api.service.ts');
 require('services/context.service.ts');
-require('services/html-escaper.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
 require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveEndExploration', [
@@ -34,20 +35,26 @@ angular.module('oppia').directive('oppiaInteractiveEndExploration', [
       template: require('./end-exploration-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$attrs', '$q', 'UrlService',
-        'ContextService', 'ReadOnlyCollectionBackendApiService',
-        'PAGE_CONTEXT', 'EXPLORATION_EDITOR_TAB_CONTEXT',
-        'HtmlEscaperService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+        '$attrs', '$http', 'ContextService',
+        'InteractionAttributesExtractorService',
+        'ReadOnlyCollectionBackendApiService', 'UrlService',
+        'EXPLORATION_EDITOR_TAB_CONTEXT',
+        'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'PAGE_CONTEXT',
         function(
-            $http, $attrs, $q, UrlService,
-            ContextService, ReadOnlyCollectionBackendApiService,
-            PAGE_CONTEXT, EXPLORATION_EDITOR_TAB_CONTEXT,
-            HtmlEscaperService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
+            $attrs, $http, ContextService,
+            InteractionAttributesExtractorService,
+            ReadOnlyCollectionBackendApiService, UrlService,
+            EXPLORATION_EDITOR_TAB_CONTEXT,
+            EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, PAGE_CONTEXT) {
           var ctrl = this;
           ctrl.$onInit = function() {
-            var authorRecommendedExplorationIds = (
-              HtmlEscaperService.escapedJsonToObj(
-                $attrs.recommendedExplorationIdsWithValue));
+            const {
+              recommendedExplorationIds
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'EndExploration',
+              $attrs
+            );
+            var authorRecommendedExplorationIds = recommendedExplorationIds;
 
             ctrl.isIframed = UrlService.isIframed();
             ctrl.isInEditorPage = (
@@ -66,7 +73,7 @@ angular.module('oppia').directive('oppiaInteractiveEndExploration', [
                 .loadCollection(ctrl.collectionId)
                 .then(function(collection) {
                   ctrl.getCollectionTitle = function() {
-                    return collection.title;
+                    return collection.getTitle();
                   };
                 });
             }
@@ -76,7 +83,6 @@ angular.module('oppia').directive('oppiaInteractiveEndExploration', [
             if (ctrl.isInEditorPage) {
               // Display a message if any author-recommended explorations are
               // invalid.
-              var explorationId = ContextService.getExplorationId();
               $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
                 params: {
                   stringified_exp_ids: JSON.stringify(
@@ -102,7 +108,7 @@ angular.module('oppia').directive('oppiaInteractiveEndExploration', [
                   var listOfIds = missingExpIds.join('", "');
                   ctrl.errorMessage = (
                     'Warning: exploration(s) with the IDs "' + listOfIds +
-                    '" will ' + 'not be shown as recommendations because' +
+                    '" will not be shown as recommendations because ' +
                     'they either do not exist, or are not publicly viewable.');
                 }
               });

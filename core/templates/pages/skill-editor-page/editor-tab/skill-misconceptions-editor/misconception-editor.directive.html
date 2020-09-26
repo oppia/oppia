@@ -4,13 +4,13 @@
   }
 </style>
 
-<div style="height: 100%">
+<div class="h-100">
   <div class="oppia-misconception-editor-section">
 
     <div ng-if="!nameEditorIsOpen"
-         style="height: 100%"
+         class="h-100"
          title="Misconception Name">
-      <div class="oppia-readonly-rule-title"
+      <div class="oppia-readonly-rule-tile"
            ng-class="{'oppia-editable-section': isEditable()}">
         <div class="oppia-rule-preview">
           <div class="oppia-click-to-start-editing" ng-click="openNameEditor()">
@@ -31,9 +31,9 @@
     <div ng-if="isEditable() && nameEditorIsOpen">
       <div class="oppia-rule-details-header">
         <strong>Misconception Name</strong>
-        <input class="form-control" type="text" ng-model="container.misconceptionName" maxlength="<[MISCONCEPTION_NAME_CHAR_LIMIT]>">
-        <span ng-if="container.misconceptionName.length === MISCONCEPTION_NAME_CHAR_LIMIT" class="form-text" style="color: red; font-size: smaller">
-          <em>Please use at most <[MISCONCEPTION_NAME_CHAR_LIMIT]> characters.</em>
+        <input class="form-control" type="text" ng-model="container.misconceptionName" maxlength="<[MAX_CHARS_IN_MISCONCEPTION_NAME]>">
+        <span ng-if="container.misconceptionName.length === MAX_CHARS_IN_MISCONCEPTION_NAME" class="form-text oppia-form-error-text">
+          <em>Please use at most <[MAX_CHARS_IN_MISCONCEPTION_NAME]> characters.</em>
         </span>
       </div>
 
@@ -51,16 +51,16 @@
             Save
           </button>
         </div>
-        <div style="clear: both;"></div>
+        <div class="oppia-clear"></div>
       </div>
     </div>
   </div>
 
   <div class="oppia-misconception-editor-section">
     <div ng-if="!notesEditorIsOpen"
-         style="height: 100%"
+         class="h-100"
          title="Misconception Notes">
-      <div class="oppia-readonly-rule-title"
+      <div class="oppia-readonly-rule-tile"
            ng-class="{'oppia-editable-section': isEditable()}">
         <div class="oppia-rule-preview">
           <div class="oppia-click-to-start-editing" ng-click="openNotesEditor()">
@@ -104,16 +104,16 @@
             Save
           </button>
         </div>
-        <div style="clear: both;"></div>
+        <div class="oppia-clear"></div>
       </div>
     </div>
   </div>
 
   <div class="oppia-misconception-editor-section">
     <div ng-if="!feedbackEditorIsOpen"
-         style="height: 100%"
+         class="h-100"
          title="Misconception Feedback">
-      <div class="oppia-readonly-rule-title"
+      <div class="oppia-readonly-rule-tile"
            ng-class="{'oppia-editable-section': isEditable()}">
         <div class="oppia-rule-preview">
           <div class="oppia-click-to-start-editing" ng-click="openFeedbackEditor()">
@@ -151,7 +151,7 @@
             Save
           </button>
         </div>
-        <div style="clear: both;"></div>
+        <div class="oppia-clear"></div>
       </div>
     </div>
   </div>

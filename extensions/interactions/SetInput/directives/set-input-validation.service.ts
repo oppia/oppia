@@ -21,10 +21,21 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { AppConstants } from 'app.constants';
+import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
+import { SetInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
+import { Rule } from
+  'domain/exploration/RuleObjectFactory';
+
+interface PreviousRule {
+  answerGroupIndex: number;
+  ruleIndex: number;
+  rule: Rule;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -34,25 +45,157 @@ export class SetInputValidationService {
     private baseInteractionValidationServiceInstance:
       baseInteractionValidationService) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  getCustomizationArgsWarnings(customizationArgs: any): any[] {
-    // TODO(juansaba): Implement customization args validations.
-    return [];
+  /**
+   * Checks if the two sets are identical.
+   *
+   * @param {string[]} inputA first set.
+   * @param {string[]} inputB second set.
+   * @return {boolean} True if the two sets are identical.
+   */
+  private areSameSet(inputA: string[], inputB: string[]): boolean {
+    let setA = new Set(inputA);
+    let setB = new Set(inputB);
+    if (setA.size !== setB.size) {
+      return false;
+    }
+    return this.isSubset(inputA, inputB);
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'customizationArgs' is a dict with possible underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
+  /**
+   * Checks if the first set is a subset of the second set.
+   *
+   * @param {string[]} inputA first set.
+   * @param {string[]} inputB second set.
+   * @return {boolean} True if the first set is a subset of the second set.
+   */
+  private isSubset(inputA: string[], inputB: string[]): boolean {
+    let setB = new Set(inputB);
+    return inputA.every(val => setB.has(val));
+  }
+
+  /**
+   * Checks if the two rules are identical.
+   *
+   * @param {Rule} ruleA first rule.
+   * @param {Rule} ruleB second rule.
+   * @return {boolean} True if the two rules are identical.
+   */
+  private areSameRule(ruleA: Rule, ruleB: Rule): boolean {
+    return ruleA.type === ruleB.type &&
+      this.areSameSet(<string[]>ruleA.inputs.x, <string[]>ruleB.inputs.x);
+  }
+
+  getCustomizationArgsWarnings(
+      customizationArgs: SetInputCustomizationArgs): Warning[] {
+    let warningsList = [];
+
+    let buttonText = (
+      customizationArgs.buttonText && customizationArgs.buttonText.value);
+    if (!buttonText || !angular.isString(buttonText.getUnicode())) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'Button text must be a string.'
+      });
+    } else if (buttonText.getUnicode().length === 0) {
+      warningsList.push({
+        message: 'Label for this button should not be empty.',
+        type: AppConstants.WARNING_TYPES.ERROR
+      });
+    }
+
+    return warningsList;
+  }
+
+  /**
+   * Generate warnings for redundant rules in answer groups.
+   * A rule is considered redundant if it will never be matched.
+   *
+   * @param {AnswerGroup[]} answerGroups answer groups created from user input.
+   * @return {Warning[]} Array of warnings.
+   */
+  getRedundantRuleWarnings(answerGroups: AnswerGroup[]): Warning[] {
+    let warningsList: Warning[] = [];
+
+    let previousRules: PreviousRule[] = [];
+
+    for (let [answerGroupIndex, answerGroup] of answerGroups.entries()) {
+      for (let [ruleIndex, rule] of answerGroup.rules.entries()) {
+        for (let prevRule of previousRules) {
+          if (this.areSameRule(prevRule.rule, rule)) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: `Rule ${ruleIndex + 1} from answer group ` +
+                `${answerGroupIndex + 1} is the same as ` +
+                `rule ${prevRule.ruleIndex + 1} from ` +
+                `answer group ${prevRule.answerGroupIndex + 1}`
+            });
+          } else if (prevRule.rule.type === rule.type) {
+            /*
+            For setInput, a rule A is made redundant by rule B only when:
+              - rule B appears before rule A, and
+              - they are of the same type, and
+              - they are not 'Equals' rules, and
+              - A's input is the subset of B's input or vice versa,
+                depending on their rule types.
+            */
+            let isRuleCoveredByAnyPrevRule = false;
+            let ruleInput = <string[]>rule.inputs.x;
+            let prevRuleInput = <string[]>prevRule.rule.inputs.x;
+            switch (rule.type) {
+              case 'Equals':
+                // An 'Equals' rule is made redundant by another only when
+                // they are the same, which has been checked in the code above,
+                // using areSameRule method.
+                break;
+              case 'IsSubsetOf':
+              case 'HasElementsIn':
+              case 'IsDisjointFrom':
+                isRuleCoveredByAnyPrevRule = this.isSubset(
+                  ruleInput, prevRuleInput
+                );
+                break;
+              case 'IsSupersetOf':
+              case 'HasElementsNotIn':
+              case 'OmitsElementsIn':
+                isRuleCoveredByAnyPrevRule = this.isSubset(
+                  prevRuleInput, ruleInput
+                );
+                break;
+              default:
+            }
+
+            if (isRuleCoveredByAnyPrevRule) {
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: `Rule ${ruleIndex + 1} from answer group ` +
+                  `${answerGroupIndex + 1} will never be matched because it ` +
+                  `is made redundant by rule ${prevRule.ruleIndex + 1}` +
+                  ` from answer group ${prevRule.answerGroupIndex + 1}.`
+              });
+            }
+          }
+        }
+
+        previousRules.push({
+          rule,
+          ruleIndex,
+          answerGroupIndex
+        });
+      }
+    }
+
+    return warningsList;
+  }
+
   getAllWarnings(
-      stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
-      defaultOutcome: Outcome): IWarning[] {
-    return this.getCustomizationArgsWarnings(customizationArgs).concat(
-      this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
-        answerGroups, defaultOutcome, stateName));
+      stateName: string, customizationArgs: SetInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+    return [
+      ...this.getCustomizationArgsWarnings(customizationArgs),
+      ...this.getRedundantRuleWarnings(answerGroups),
+      ...this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
+        answerGroups, defaultOutcome, stateName)
+    ];
   }
 }
 

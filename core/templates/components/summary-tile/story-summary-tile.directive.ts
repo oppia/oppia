@@ -18,6 +18,8 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
+require('services/assets-backend-api.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('storySummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -25,27 +27,136 @@ angular.module('oppia').directive('storySummaryTile', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        getStoryId: '&storyId',
-        getStoryTitle: '&title',
-        getStoryDescription: '&description',
+        classroomUrlFragment: '<',
+        storySummary: '<',
+        topicUrlFragment: '<'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary-tile/story-summary-tile.directive.html'),
+      template: require('./story-summary-tile.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['STORY_VIEWER_URL_TEMPLATE',
-        function(STORY_VIEWER_URL_TEMPLATE) {
+      controller: [
+        'AssetsBackendApiService', 'WindowDimensionsService',
+        'ENTITY_TYPE', 'STORY_VIEWER_URL_TEMPLATE',
+        function(
+            AssetsBackendApiService, WindowDimensionsService,
+            ENTITY_TYPE, STORY_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
+          var circumference = (20 * 2 * Math.PI);
+          var gapLength = 5;
+
           ctrl.getStoryLink = function() {
+            // This component is being used in the topic editor as well and
+            // we want to disable the linking in this case.
+            if (!ctrl.classroomUrlFragment || !ctrl.topicUrlFragment) {
+              return '#';
+            }
             return UrlInterpolationService.interpolateUrl(
               STORY_VIEWER_URL_TEMPLATE, {
-                story_id: ctrl.getStoryId()
+                classroom_url_fragment: ctrl.classroomUrlFragment,
+                story_url_fragment: ctrl.storySummary.getUrlFragment(),
+                topic_url_fragment: ctrl.topicUrlFragment
               });
           };
 
-          ctrl.getStaticImageUrl = function(imagePath) {
-            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          ctrl.isChapterCompleted = function(title) {
+            return ctrl.storySummary.isNodeCompleted(title);
+          };
+
+          ctrl.isPreviousChapterCompleted = function(index) {
+            if (index === 0) {
+              return true;
+            }
+            var previousNodeTitle = (
+              ctrl.storySummary.getNodeTitles()[index - 1]);
+            return ctrl.storySummary.isNodeCompleted(previousNodeTitle);
+          };
+
+          ctrl.showAllChapters = function() {
+            ctrl.initialCount = ctrl.chaptersDisplayed;
+            ctrl.chaptersDisplayed = ctrl.nodeCount;
+          };
+
+          ctrl.hideExtraChapters = function() {
+            ctrl.chaptersDisplayed = ctrl.initialCount;
+          };
+
+          ctrl.getStrokeDashArrayValues = function() {
+            if (ctrl.nodeCount === 1) {
+              return '';
+            }
+            var segmentLength = (
+              (circumference - (ctrl.nodeCount * gapLength)) / ctrl.nodeCount);
+            return segmentLength.toString() + ' ' + gapLength.toString();
+          };
+
+          ctrl.getCompletedStrokeDashArrayValues = function() {
+            var completedStrokeValues = '';
+            var remainingCircumference = circumference;
+            if (ctrl.completedStoriesCount === 0) {
+              return '0 ' + circumference.toString();
+            }
+            if (ctrl.completedStoriesCount === 1 && ctrl.nodeCount === 1) {
+              return '';
+            }
+            var segmentLength = (
+              (circumference - (ctrl.nodeCount * gapLength)) / ctrl.nodeCount);
+            for (var i = 1; i <= ctrl.completedStoriesCount - 1; i++) {
+              completedStrokeValues += (
+                segmentLength.toString() + ' ' + gapLength.toString() + ' ');
+              remainingCircumference -= (segmentLength + gapLength);
+            }
+            completedStrokeValues += (
+              segmentLength.toString() + ' ' +
+              (remainingCircumference - segmentLength).toString());
+            return completedStrokeValues;
+          };
+
+          ctrl.$onInit = function() {
+            ctrl.nodeCount = ctrl.storySummary.getNodeTitles().length;
+            ctrl.completedStoriesCount = 0;
+            for (var idx in ctrl.storySummary.getNodeTitles()) {
+              if (
+                ctrl.storySummary.isNodeCompleted(
+                  ctrl.storySummary.getNodeTitles()[idx])) {
+                ctrl.completedStoriesCount++;
+              }
+            }
+            ctrl.storyProgress = Math.floor(
+              (ctrl.completedStoriesCount / ctrl.nodeCount) * 100);
+
+            ctrl.chaptersDisplayed = 3;
+            if (WindowDimensionsService.getWidth() <= 800) {
+              ctrl.chaptersDisplayed = 2;
+            }
+            ctrl.showButton = false;
+            if (ctrl.chaptersDisplayed !== ctrl.nodeCount) {
+              ctrl.showButton = true;
+            }
+
+            if (ctrl.storySummary.getThumbnailFilename()) {
+              ctrl.thumbnailUrl = (
+                AssetsBackendApiService.getThumbnailUrlForPreview(
+                  ENTITY_TYPE.STORY, ctrl.storySummary.getId(),
+                  ctrl.storySummary.getThumbnailFilename()));
+            } else {
+              ctrl.thumbnailUrl = null;
+            }
           };
         }
       ]
     };
   }]);
+
+import { Directive, ElementRef, Injector, Input } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'story-summary-tile'
+})
+export class StorySummaryTileDirective extends UpgradeComponent {
+  @Input() classroomUrlFragment;
+  @Input() storySummary;
+  @Input() topicUrlFragment;
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('storySummaryTile', elementRef, injector);
+  }
+}

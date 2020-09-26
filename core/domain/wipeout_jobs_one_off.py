@@ -27,44 +27,55 @@ datastore_services = models.Registry.import_datastore_services()
 
 class UserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for running the user deletion."""
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
         return [user_models.PendingDeletionRequestModel]
 
     @staticmethod
-    def map(model_instance):
+    def map(pending_deletion_request_model):
         """Implements the map function for this job."""
-        if model_instance.deletion_complete:
-            yield ('ALREADY DONE', model_instance.id)
-        else:
-            wipeout_service.delete_user(model_instance)
-            yield ('SUCCESS', model_instance.id)
+        pending_deletion_request = wipeout_service.get_pending_deletion_request(
+            pending_deletion_request_model.id)
+        # The final status of the deletion. Either 'SUCCESS' or 'ALREADY DONE'.
+        deletion_status = wipeout_service.run_user_deletion(
+            pending_deletion_request)
+        yield (deletion_status, pending_deletion_request.user_id)
 
     @staticmethod
     def reduce(key, values):
         yield (key, values)
 
 
-class VerifyUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for verifying the user deletion."""
+class FullyCompleteUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for verifying the user deletion. It checks if all models do
+    not contain the user ID of the deleted user in their fields. If any field
+    contains the user ID of the deleted user, the deletion_complete is set
+    to False, so that later the UserDeletionOneOffJob will be run on that
+    user again. If all the fields do not contain the user ID of the deleted
+    user, the final email announcing that the deletion was completed is sent,
+    and the deletion request is deleted.
+    """
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
         return [user_models.PendingDeletionRequestModel]
 
     @staticmethod
-    def map(model_instance):
+    def map(pending_deletion_request_model):
         """Implements the map function for this job."""
         # If deletion_complete is False the UserDeletionOneOffJob wasn't yet run
         # for the user. The verification will be done in the next run of
-        # VerifyUserDeletionOneOffJob.
-        if not model_instance.deletion_complete:
-            yield ('NOT DELETED', model_instance.id)
-        elif wipeout_service.verify_user_deleted(model_instance):
-            yield ('SUCCESS', model_instance.id)
-        else:
-            yield ('FAILURE', model_instance.id)
+        # FullyCompleteUserDeletionOneOffJob.
+        pending_deletion_request = wipeout_service.get_pending_deletion_request(
+            pending_deletion_request_model.id)
+        # The final status of the completion. Either 'NOT DELETED', 'SUCCESS',
+        # or 'FAILURE'.
+        completion_status = wipeout_service.run_user_deletion_completion(
+            pending_deletion_request)
+        yield (completion_status, pending_deletion_request.user_id)
 
     @staticmethod
     def reduce(key, values):

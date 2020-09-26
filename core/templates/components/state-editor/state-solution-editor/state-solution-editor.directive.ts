@@ -18,9 +18,15 @@
  */
 
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
   'components/state-directives/response-header/response-header.directive.ts');
 require(
   'components/state-directives/solution-editor/solution-editor.directive.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
+  'add-or-update-solution-modal.controller.ts');
 
 require('domain/exploration/SolutionObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -51,12 +57,12 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solution.service.ts');
 require('services/alerts.service.ts');
-require('services/context.service.ts');
 require('services/editability.service.ts');
 require('services/exploration-html-formatter.service.ts');
-require('services/generate-content-id.service.ts');
 
 require('components/state-editor/state-editor.constants.ajs.ts');
+require('services/contextual/window-dimensions.service');
+require('services/external-save.service.ts');
 
 angular.module('oppia').directive('stateSolutionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -71,25 +77,27 @@ angular.module('oppia').directive('stateSolutionEditor', [
         '/components/state-editor/state-solution-editor/' +
         'state-solution-editor.directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', '$filter', 'StateEditorService',
-        'AlertsService', 'INTERACTION_SPECS', 'StateSolutionService',
-        'SolutionVerificationService', 'SolutionValidityService',
-        'ExplorationHtmlFormatterService', 'StateInteractionIdService',
-        'StateHintsService', 'UrlInterpolationService', 'SolutionObjectFactory',
-        'ContextService', 'StateCustomizationArgsService',
-        'EditabilityService',
+        '$filter', '$scope', '$uibModal', 'AlertsService', 'EditabilityService',
+        'ExplorationHtmlFormatterService', 'ExternalSaveService',
+        'SolutionValidityService', 'SolutionVerificationService',
+        'StateCustomizationArgsService', 'StateEditorService',
+        'StateHintsService', 'StateInteractionIdService',
+        'StateSolutionService', 'UrlInterpolationService',
+        'WindowDimensionsService',
         'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
         'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
+        'INTERACTION_SPECS',
         function(
-            $scope, $rootScope, $uibModal, $filter, StateEditorService,
-            AlertsService, INTERACTION_SPECS, StateSolutionService,
-            SolutionVerificationService, SolutionValidityService,
-            ExplorationHtmlFormatterService, StateInteractionIdService,
-            StateHintsService, UrlInterpolationService, SolutionObjectFactory,
-            ContextService, StateCustomizationArgsService,
-            EditabilityService,
+            $filter, $scope, $uibModal, AlertsService, EditabilityService,
+            ExplorationHtmlFormatterService, ExternalSaveService,
+            SolutionValidityService, SolutionVerificationService,
+            StateCustomizationArgsService, StateEditorService,
+            StateHintsService, StateInteractionIdService,
+            StateSolutionService, UrlInterpolationService,
+            WindowDimensionsService,
             INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
-            INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION) {
+            INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION,
+            INTERACTION_SPECS) {
           var ctrl = this;
           $scope.getInvalidSolutionTooltip = function() {
             if (StateEditorService.isInQuestionMode()) {
@@ -140,93 +148,14 @@ angular.module('oppia').directive('stateSolutionEditor', [
 
           $scope.openAddOrUpdateSolutionModal = function() {
             AlertsService.clearWarnings();
-            $rootScope.$broadcast('externalSave');
+            ExternalSaveService.onExternalSave.emit();
             $scope.inlineSolutionEditorIsActive = false;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/add-or-update-solution-modal.template.html'),
               backdrop: 'static',
-              controller: [
-                '$scope', '$uibModalInstance', 'StateSolutionService',
-                'StateCustomizationArgsService',
-                'CurrentInteractionService', 'INTERACTION_SPECS',
-                'COMPONENT_NAME_SOLUTION', 'GenerateContentIdService', function(
-                    $scope, $uibModalInstance, StateSolutionService,
-                    StateCustomizationArgsService,
-                    CurrentInteractionService, INTERACTION_SPECS,
-                    COMPONENT_NAME_SOLUTION, GenerateContentIdService) {
-                  $scope.StateSolutionService = StateSolutionService;
-                  $scope.correctAnswerEditorHtml = (
-                    ExplorationHtmlFormatterService.getInteractionHtml(
-                      StateInteractionIdService.savedMemento,
-                      StateCustomizationArgsService.savedMemento,
-                      false,
-                      $scope.SOLUTION_EDITOR_FOCUS_LABEL));
-                  $scope.EXPLANATION_FORM_SCHEMA = {
-                    type: 'html',
-                    ui_config: {}
-                  };
-
-                  $scope.answerIsValid = false;
-
-                  var EMPTY_SOLUTION_DATA = {
-                    answerIsExclusive: false,
-                    correctAnswer: null,
-                    explanationHtml: '',
-                    explanationContentId: COMPONENT_NAME_SOLUTION
-                  };
-
-                  $scope.data = StateSolutionService.savedMemento ? {
-                    answerIsExclusive: (
-                      StateSolutionService.savedMemento.answerIsExclusive),
-                    correctAnswer: null,
-                    explanationHtml: (
-                      StateSolutionService.savedMemento.explanation.getHtml()),
-                    explanationContentId: (
-                      StateSolutionService.savedMemento.explanation
-                        .getContentId())
-                  } : angular.copy(EMPTY_SOLUTION_DATA);
-
-                  $scope.onSubmitFromSubmitButton = function() {
-                    CurrentInteractionService.submitAnswer();
-                  };
-
-                  $scope.isSubmitButtonDisabled = (
-                    CurrentInteractionService.isSubmitButtonDisabled);
-
-                  CurrentInteractionService.setOnSubmitFn(function(answer) {
-                    $scope.data.correctAnswer = answer;
-                  });
-
-                  $scope.shouldAdditionalSubmitButtonBeShown = function() {
-                    var interactionSpecs = INTERACTION_SPECS[
-                      StateInteractionIdService.savedMemento];
-                    return interactionSpecs.show_generic_submit_button;
-                  };
-
-                  $scope.saveSolution = function() {
-                    if (typeof $scope.data.answerIsExclusive === 'boolean' &&
-                        $scope.data.correctAnswer !== null &&
-                        $scope.data.explanation !== '') {
-                      $uibModalInstance.close({
-                        solution: SolutionObjectFactory.createNew(
-                          $scope.data.answerIsExclusive,
-                          $scope.data.correctAnswer,
-                          $scope.data.explanationHtml,
-                          $scope.data.explanationContentId)
-                      });
-                    } else {
-                      throw Error('Cannot save invalid solution');
-                    }
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
+              controller: 'AddOrUpdateSolutionModalController'
             }).result.then(function(result) {
               StateSolutionService.displayed = result.solution;
               StateSolutionService.saveDisplayedValue();
@@ -250,9 +179,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
                 }
               }
             }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
+              AlertsService.clearWarnings();
             });
           };
 
@@ -265,32 +192,25 @@ angular.module('oppia').directive('stateSolutionEditor', [
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-solution-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.reallyDelete = function() {
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               StateSolutionService.displayed = null;
               StateSolutionService.saveDisplayedValue();
               $scope.onSaveSolution(StateSolutionService.displayed);
               StateEditorService.deleteCurrentSolutionValidity();
             }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
+              AlertsService.clearWarnings();
             });
           };
+
+          $scope.toggleSolutionCard = function() {
+            $scope.solutionCardIsShown = !$scope.solutionCardIsShown;
+          };
+
           ctrl.$onInit = function() {
             $scope.EditabilityService = EditabilityService;
+            $scope.solutionCardIsShown = (
+              !WindowDimensionsService.isWindowNarrow());
             $scope.correctAnswer = null;
             $scope.correctAnswerEditorHtml = '';
             $scope.inlineSolutionEditorIsActive = false;

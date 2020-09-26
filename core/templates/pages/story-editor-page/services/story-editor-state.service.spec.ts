@@ -29,6 +29,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
+import { Subscription } from 'rxjs';
 
 require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
@@ -40,8 +41,11 @@ describe('Story editor state service', function() {
   var fakeEditableStoryBackendApiService = null;
   var secondBackendStoryObject = null;
   var $rootScope = null;
-  var $scope = null;
   var $q = null;
+  var testSubscriptions: Subscription;
+
+  const storyInitializedSpy = jasmine.createSpy('storyInitialized');
+  const storyReinitializedSpy = jasmine.createSpy('storyReinitialized');
 
   var FakeEditableStoryBackendApiService = function() {
     var self = {
@@ -132,7 +136,6 @@ describe('Story editor state service', function() {
     StoryUpdateService = $injector.get('StoryUpdateService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
 
     fakeEditableStoryBackendApiService.newBackendStoryObject = {
       id: 'storyId_0',
@@ -167,6 +170,19 @@ describe('Story editor state service', function() {
     };
   }));
 
+  beforeEach(() => {
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(StoryEditorStateService.onStoryInitialized.subscribe(
+      storyInitializedSpy));
+    testSubscriptions.add(
+      StoryEditorStateService.onStoryReinitialized.subscribe(
+        storyReinitializedSpy));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
+
   it('should request to load the story from the backend', function() {
     spyOn(
       fakeEditableStoryBackendApiService, 'fetchStory').and.callThrough();
@@ -178,12 +194,10 @@ describe('Story editor state service', function() {
   it(
     'should fire an init event and set the topic name after loading the ' +
     'first story', function() {
-      spyOn($rootScope, '$broadcast').and.callThrough();
-
       StoryEditorStateService.loadStory('storyId_0');
       $rootScope.$apply();
       expect(StoryEditorStateService.getTopicName()).toEqual('Topic Name');
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('storyInitialized');
+      expect(storyInitializedSpy).toHaveBeenCalled();
     }
   );
 
@@ -192,13 +206,10 @@ describe('Story editor state service', function() {
     StoryEditorStateService.loadStory('storyId_0');
     $rootScope.$apply();
 
-    spyOn($rootScope, '$broadcast').and.callThrough();
-
     // Load a second story.
     StoryEditorStateService.loadStory('storyId_1');
     $rootScope.$apply();
-
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('storyReinitialized');
+    expect(storyReinitializedSpy).toHaveBeenCalled();
   });
 
   it('should track whether it is currently loading the story', function() {
@@ -224,7 +235,7 @@ describe('Story editor state service', function() {
     }
   );
 
-  it('it should report that a story has loaded through loadStory()',
+  it('should report that a story has loaded through loadStory()',
     function() {
       expect(StoryEditorStateService.hasLoadedStory()).toBe(false);
 
@@ -236,7 +247,7 @@ describe('Story editor state service', function() {
     }
   );
 
-  it('it should report that a story has loaded through setStory()',
+  it('should report that a story has loaded through setStory()',
     function() {
       expect(StoryEditorStateService.hasLoadedStory()).toBe(false);
 
@@ -277,7 +288,7 @@ describe('Story editor state service', function() {
     function() {
       expect(function() {
         StoryEditorStateService.saveStory('Commit message');
-      }).toThrow();
+      }).toThrowError('Cannot save a story before one is loaded.');
     }
   );
 
@@ -286,10 +297,8 @@ describe('Story editor state service', function() {
       StoryEditorStateService.loadStory('storyId_0');
       $rootScope.$apply();
 
-      spyOn($rootScope, '$broadcast').and.callThrough();
       expect(StoryEditorStateService.saveStory(
         'Commit message')).toBe(false);
-      expect($rootScope.$broadcast).not.toHaveBeenCalled();
     }
   );
 
@@ -309,7 +318,6 @@ describe('Story editor state service', function() {
     $rootScope.$apply();
 
     var expectedId = 'storyId_0';
-    var expectedTopicId = 'topicId_1';
     var expectedVersion = '1';
     var expectedCommitMessage = 'Commit message';
     var updateStorySpy = (
@@ -347,12 +355,9 @@ describe('Story editor state service', function() {
       StoryEditorStateService.getStory(), 'New title');
     $rootScope.$apply();
 
-    spyOn($rootScope, '$broadcast').and.callThrough();
     StoryEditorStateService.saveStory('Commit message');
     $rootScope.$apply();
-
-    expect($rootScope.$broadcast).toHaveBeenCalledWith(
-      'storyReinitialized');
+    expect(storyReinitializedSpy).toHaveBeenCalled();
   });
 
   it('should track whether it is currently saving the story', function() {

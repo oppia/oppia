@@ -1,0 +1,44 @@
+<style>
+  .test-interaction-modal .submit-answer-btn {
+    margin-bottom: 20px;
+    text-align: right;
+  }
+  .test-interaction-modal table {
+    margin-bottom: 0;
+  }
+</style>
+
+<div class="form-inline test-interaction-modal">
+  <div ng-if="interactionIsInline">
+    <div class="preview-conversation-skin-inline-interaction">
+      <table class="preview-conversation-skin-card-row-container">
+        <tr class="preview-conversation-skin-card-row">
+          <td class="preview-conversation-skin-row-avatar" valign="top">
+            <img class="preview-conversation-skin-row-avatar-img rounded-circle" ng-src="<[userBlueImgUrl]>" >
+          </td>
+          <td class="preview-conversation-skin-learner-input">
+            <angular-html-bind html-data="$ctrl.getInputTemplate()"></angular-html-bind>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="preview-conversation-skin-supplemental-interaction" ng-if="!interactionIsInline">
+    <div>
+      <md-card class="preview-conversation-skin-supplemental-card">
+        <div>
+          <angular-html-bind html-data="$ctrl.getInputTemplate()">
+          </angular-html-bind>
+        </div>
+      </md-card>
+    </div>
+  </div>
+  <br>
+  <div class="submit-answer-btn">
+    <md-button class="oppia-learner-confirm-button protractor-test-submit-answer-button"
+               ng-disabled="isSubmitButtonDisabled()"
+               ng-click="onSubmitAnswerFromButton()"
+               translate="I18N_INTERACTIONS_SUBMIT">
+    </md-button>
+  </div>
+</div>

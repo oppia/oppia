@@ -22,24 +22,26 @@ import os
 import subprocess
 import sys
 
-GCLOUD_PATH = os.path.join(
-    '..', 'oppia_tools', 'google-cloud-sdk-251.0.0', 'google-cloud-sdk',
-    'bin', 'gcloud')
+from scripts import common
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
-GAE_DIR = os.path.join(
-    OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine')
 
-if not os.path.exists(os.path.dirname(GAE_DIR)):
-    raise Exception('Directory %s does not exist.' % GAE_DIR)
-sys.path.insert(0, GAE_DIR)
+if not os.path.exists(os.path.dirname(common.GOOGLE_APP_ENGINE_SDK_HOME)):
+    raise Exception(
+        'Directory %s does not exist.' % common.GOOGLE_APP_ENGINE_SDK_HOME)
+sys.path.insert(0, common.GOOGLE_APP_ENGINE_SDK_HOME)
 
 
 def require_gcloud_to_be_available():
     """Check whether gcloud is installed while undergoing deployment process."""
     try:
-        subprocess.check_output([GCLOUD_PATH, '--version'])
+        p = subprocess.Popen(
+            [common.GCLOUD_PATH, '--version'],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _, stderr = p.communicate()
+        if p.returncode != 0:
+            raise Exception(stderr)
     except Exception:
         raise Exception(
             'gcloud required, but could not be found. Please run python -m '
@@ -53,10 +55,10 @@ def update_indexes(index_yaml_path, app_name):
         index_yaml_path: str. The path to the index.yaml file.
         app_name: str. The name of the GCloud project.
     """
-    assert os.path.isfile(index_yaml_path)
+    assert os.path.isfile(index_yaml_path), 'Missing indexes file.'
     subprocess.check_output([
-        GCLOUD_PATH, '--quiet', 'datastore', 'indexes', 'create',
-        index_yaml_path, '--project=%s' % app_name])
+        common.GCLOUD_PATH, '--quiet', 'datastore', 'indexes',
+        'create', index_yaml_path, '--project=%s' % app_name])
 
 
 def get_all_index_descriptions(app_name):
@@ -69,7 +71,7 @@ def get_all_index_descriptions(app_name):
         list. A list of dict of uploaded indexes.
     """
     listed_indexes = subprocess.check_output([
-        GCLOUD_PATH, 'datastore', 'indexes', 'list',
+        common.GCLOUD_PATH, 'datastore', 'indexes', 'list',
         '--project=%s' % app_name, '--format=json'])
     return json.loads(listed_indexes)
 
@@ -117,13 +119,35 @@ def get_currently_served_version(app_name):
         str. The current serving version.
     """
     listed_versions = subprocess.check_output([
-        GCLOUD_PATH, 'app', 'versions', 'list', '--hide-no-traffic',
-        '--service=default', '--project=%s' % app_name])
+        common.GCLOUD_PATH, 'app', 'versions', 'list',
+        '--hide-no-traffic', '--service=default', '--project=%s' % app_name])
     default_version_line_start_str = 'default  '
     listed_versions = listed_versions[
         listed_versions.index(default_version_line_start_str) + len(
             default_version_line_start_str):]
     return listed_versions[:listed_versions.index(' ')]
+
+
+def get_latest_deployed_version(app_name, service_name):
+    """Retrieves the latest version being served on the specified App Engine
+    application and a specific service.
+
+    Args:
+        app_name: str. The name of the GCloud project.
+        service_name: str. The name of the service for which version is
+            to be fetched.
+
+    Returns:
+        str. The latest serving version.
+    """
+    listed_versions = json.loads(
+        subprocess.check_output([
+            common.GCLOUD_PATH, 'app', 'versions', 'list', '--format=json',
+            '--service=%s' % service_name, '--project=%s' % app_name]))
+    version_ids = [
+        listed_version.get('id') for listed_version in listed_versions]
+    version_ids.sort()
+    return version_ids[-1]
 
 
 def switch_version(app_name, version_to_switch_to):
@@ -134,8 +158,16 @@ def switch_version(app_name, version_to_switch_to):
         version_to_switch_to: str. The version to switch to.
     """
     subprocess.check_output([
-        GCLOUD_PATH, 'app', 'services', 'set-traffic', 'default',
-        '--splits', '%s=1' % version_to_switch_to, '--project=%s' % app_name])
+        common.GCLOUD_PATH, 'app', 'services', 'set-traffic',
+        'default', '--splits', '%s=1' % version_to_switch_to,
+        '--project=%s' % app_name])
+
+    latest_admin_version = get_latest_deployed_version(
+        app_name, 'cloud-datastore-admin')
+    subprocess.check_output([
+        common.GCLOUD_PATH, '--quiet', 'app', 'services', 'set-traffic',
+        'cloud-datastore-admin', '--splits', '%s=1' % latest_admin_version,
+        '--project=%s' % app_name])
 
 
 def deploy_application(app_yaml_path, app_name, version=None):
@@ -147,30 +179,9 @@ def deploy_application(app_yaml_path, app_name, version=None):
         version: str or None. If provided, the version to use.
     """
     args = [
-        GCLOUD_PATH, '--quiet', 'app', 'deploy', app_yaml_path,
-        '--no-promote', '--no-stop-previous-version',
+        common.GCLOUD_PATH, '--quiet', 'app', 'deploy',
+        app_yaml_path, '--no-promote', '--no-stop-previous-version',
         '--project=%s' % app_name]
     if version is not None:
         args.append('--version=%s' % version)
     subprocess.check_output(args)
-
-
-def flush_memcache(app_name):
-    """Flushes memcache for the server.
-
-    Args:
-        app_name: str. The name of the GCloud project.
-
-    Returns:
-        bool. True if memcache is flushed successfully, false otherwise.
-    """
-
-    import dev_appserver
-    dev_appserver.fix_sys_path()
-
-    from google.appengine.ext.remote_api import remote_api_stub
-    from google.appengine.api import memcache
-
-    remote_api_stub.ConfigureRemoteApiForOAuth(
-        '%s.appspot.com' % app_name, '/_ah/remote_api')
-    return memcache.flush_all()

@@ -17,6 +17,7 @@
  */
 
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import dayjs from 'dayjs';
 
 describe('datetimeformatter', () => {
   // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
@@ -27,15 +28,22 @@ describe('datetimeformatter', () => {
   beforeEach(() => {
     df = new DateTimeFormatService();
 
-    // Mock Date() to give a time of NOW_MILLIS in GMT. (Unfortunately, there
-    // doesn't seem to be a good way to set the timezone locale directly.)
-    spyOn(window, 'Date').and.callFake(function(millisSinceEpoch = 0) {
+    let MockDateContructor = function(millisSinceEpoch = 0) {
       if (millisSinceEpoch === 0) {
         return new OldDate(NOW_MILLIS);
       } else {
         return new OldDate(millisSinceEpoch);
       }
-    });
+    };
+
+    // Mock Date() to give a time of NOW_MILLIS in GMT. (Unfortunately, there
+    // doesn't seem to be a good way to set the timezone locale directly).
+    // This throws "Argument of type '(millisSinceEpoch?: number) => Date' is
+    // not assignable to parameter of type 'DateConstructor'." This is because
+    // the actual 'Date' has more properties than 'MockDateContructor'. We have
+    // only defined the properties we need in 'MockDateContructor'.
+    // @ts-expect-error
+    spyOn(window, 'Date').and.callFake(MockDateContructor);
   });
 
   it('should correctly indicate recency', () => {
@@ -61,6 +69,12 @@ describe('datetimeformatter', () => {
     expect(
       df.getLocaleAbbreviatedDatetimeString(
         NOW_MILLIS - 365 * 24 * 60 * 60 * 1000)).toBe('11/21/13');
+  });
+
+  it('should provide date time hour string', function() {
+    expect(df.getLocaleDateTimeHourString(NOW_MILLIS)).toBe(
+      dayjs(new Date(NOW_MILLIS)).format('MMM D hh:mm A')
+    );
   });
 
   it('should provide correct date format MM/DD/YYY string', () => {

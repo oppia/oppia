@@ -20,14 +20,40 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { ReadOnlyTopicObjectFactory } from
+  'domain/topic_viewer/read-only-topic-object.factory';
+import { ShortSkillSummaryObjectFactory } from
+  'domain/skill/ShortSkillSummaryObjectFactory';
+import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
+import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Topic viewer backend API service', () => {
   let topicViewerBackendApiService:
     TopicViewerBackendApiService = null;
   let httpTestingController: HttpTestingController;
   let sampleDataResults = null;
+  let sampleDataResultsObjects = null;
+  let readOnlyTopicObjectFactory = null;
+
+  beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'ShortSkillSummaryObjectFactory', new ShortSkillSummaryObjectFactory());
+    $provide.value(
+      'ReadOnlyObjectFactory', new ReadOnlyTopicObjectFactory(
+        new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
+        new ShortSkillSummaryObjectFactory()));
+  }));
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    let ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -35,20 +61,32 @@ describe('Topic viewer backend API service', () => {
     });
     httpTestingController = TestBed.get(HttpTestingController);
     topicViewerBackendApiService = TestBed.get(TopicViewerBackendApiService);
+    readOnlyTopicObjectFactory = TestBed.get(ReadOnlyTopicObjectFactory);
 
-    // Sample topic object returnable from the backend
+    // Sample topic object returnable from the backend.
     sampleDataResults = {
       topic_name: 'topic_name',
       topic_id: 'topic_id',
+      topic_description: 'Topic description',
       canonical_story_dicts: [{
         id: '0',
         title: 'Story Title',
         description: 'Story Description',
+        node_titles: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        published: true,
+        completed_node_titles: ['Chapter 1']
       }],
       additional_story_dicts: [{
         id: '1',
         title: 'Story Title',
         description: 'Story Description',
+        node_count: ['Chapter 1'],
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        published: true,
+        completed_node_titles: ['Chapter 1']
       }],
       uncategorized_skill_ids: ['skill_id_1'],
       subtopics: [{
@@ -62,8 +100,12 @@ describe('Topic viewer backend API service', () => {
       skill_descriptions: {
         skill_id_1: 'Skill Description 1',
         skill_id_2: 'Skill Description 2'
-      }
+      },
+      practice_tab_is_displayed: false
     };
+
+    sampleDataResultsObjects = readOnlyTopicObjectFactory.createFromBackendDict(
+      sampleDataResults);
   });
 
   afterEach(() => {
@@ -72,19 +114,42 @@ describe('Topic viewer backend API service', () => {
 
   it('should successfully fetch an existing topic from the backend',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      topicViewerBackendApiService.fetchTopicData('0').then(
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+      topicViewerBackendApiService.fetchTopicData('0', 'staging').then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne(
-        '/topic_data_handler/0');
+      const req = httpTestingController.expectOne(
+        '/topic_data_handler/staging/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResultsObjects);
       expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should use rejection handler if backend request failed',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+      topicViewerBackendApiService.fetchTopicData('0', 'staging').then(
+        successHandler, failHandler);
+      const req = httpTestingController.expectOne(
+        '/topic_data_handler/staging/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Error fetching topic 0.'
+      }, {
+        status: 500,
+        statusText: 'Error fetching topic 0.'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error fetching topic 0.');
     })
   );
 });

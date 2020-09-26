@@ -109,8 +109,8 @@ describe('Player transcript service', () => {
     pts.addNewCard(scof.createNewCard(
       'Third state', 'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>'));
-    // lastAnswer should be null as no answers were provided in the second
-    // state.
+    // Variable lastAnswer should be null as no answers were provided in the
+    // second state.
     lastAnswer = pts.getLastAnswerOnDisplayedCard(1);
     expect(lastAnswer).toEqual(null);
   });
@@ -122,10 +122,9 @@ describe('Player transcript service', () => {
     pts.addNewInput('first answer', false);
     expect(() => {
       pts.addNewInput('invalid answer');
-    }).toThrow(
-      new Error(
-        'Trying to add an input before the response for the previous ' +
-        'input has been received.'));
+    }).toThrowError(
+      'Trying to add an input before the response for the previous ' +
+      'input has been received.');
 
     pts.addNewResponse('feedback');
     pts.addNewInput('second answer', true);

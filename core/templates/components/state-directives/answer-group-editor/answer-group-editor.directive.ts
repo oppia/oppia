@@ -19,8 +19,14 @@
 require(
   'components/state-directives/outcome-editor/outcome-editor.directive.ts');
 require('components/state-directives/rule-editor/rule-editor.directive.ts');
+require(
+  'components/question-directives/question-misconception-editor/' +
+  'question-misconception-editor.component.ts');
 require('directives/angular-html-bind.directive.ts');
 require('filters/parameterize-rule-description.filter.ts');
+require(
+  'components/question-directives/question-misconception-editor/' +
+  'tag-misconception-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/RuleObjectFactory.ts');
@@ -36,7 +42,9 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/alerts.service.ts');
-require('services/context.service.ts');
+require('services/external-save.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('answerGroupEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -46,14 +54,14 @@ angular.module('oppia').directive('answerGroupEditor', [
       bindToController: {
         addState: '=',
         displayFeedback: '=',
-        getOnSaveTaggedMisconception: '&onSaveTaggedMisconception',
         getOnSaveAnswerGroupDestFn: '&onSaveAnswerGroupDest',
-        getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
         getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
         getOnSaveAnswerGroupCorrectnessLabelFn: (
           '&onSaveAnswerGroupCorrectnessLabel'),
-        getTaggedSkillMisconceptionId: '&taggedSkillMisconceptionId',
+        taggedSkillMisconceptionId: '=',
         isEditable: '=',
+        getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
+        onSaveTaggedMisconception: '=',
         outcome: '=',
         rules: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',
@@ -64,112 +72,20 @@ angular.module('oppia').directive('answerGroupEditor', [
         'answer-group-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
-        'AlertsService', 'ContextService', 'INTERACTION_SPECS',
-        'StateEditorService', 'RuleObjectFactory',
+        'AlertsService', 'ExternalSaveService', 'ResponsesService',
+        'RuleObjectFactory', 'StateEditorService', 'StateInteractionIdService',
         'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
-        'ResponsesService',
+        'INTERACTION_SPECS',
         function(
-            $scope, $rootScope, $uibModal, StateInteractionIdService,
-            AlertsService, ContextService, INTERACTION_SPECS,
-            StateEditorService, RuleObjectFactory,
+            AlertsService, ExternalSaveService, ResponsesService,
+            RuleObjectFactory, StateEditorService, StateInteractionIdService,
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
-            ResponsesService) {
+            INTERACTION_SPECS) {
           var ctrl = this;
-          var _getTaggedMisconceptionName = function(skillMisconceptionId) {
-            if (skillMisconceptionId !== null) {
-              if (typeof skillMisconceptionId === 'string' &&
-                  skillMisconceptionId.split('-').length === 2) {
-                var skillId = skillMisconceptionId.split('-')[0];
-                var misconceptionId = skillMisconceptionId.split('-')[1];
-                var misconceptions = ctrl.misconceptionsBySkill[skillId];
+          ctrl.directiveSubscriptions = new Subscription();
 
-                for (var i = 0; i < misconceptions.length; i++) {
-                  if (misconceptions[i].getId().toString() ===
-                    misconceptionId) {
-                    ctrl.misconceptionName = misconceptions[i].getName();
-                  }
-                }
-              } else {
-                throw Error('Expected skillMisconceptionId to be ' +
-                  '<skillId>-<misconceptionId>.');
-              }
-            }
-          };
           ctrl.isInQuestionMode = function() {
             return StateEditorService.isInQuestionMode();
-          };
-
-          ctrl.containsMisconceptions = function() {
-            var containsMisconceptions = false;
-            Object.keys(ctrl.misconceptionsBySkill).forEach(function(skillId) {
-              if (ctrl.misconceptionsBySkill[skillId].length > 0) {
-                containsMisconceptions = true;
-              }
-            });
-            return containsMisconceptions;
-          };
-
-          ctrl.tagAnswerGroupWithMisconception = function() {
-            var modalInstance = $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/modal-templates/' +
-                'tag-misconception-modal.template.html'),
-              backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', 'StateEditorService',
-                function($scope, $uibModalInstance, StateEditorService) {
-                  $scope.misconceptionsBySkill =
-                    StateEditorService.getMisconceptionsBySkill();
-                  $scope.selectedMisconception = null;
-                  $scope.selectedMisconceptionSkillId = null;
-                  $scope.misconceptionFeedbackIsUsed = false;
-
-                  $scope.selectMisconception = function(
-                      misconception, skillId) {
-                    $scope.selectedMisconception = angular.copy(misconception);
-                    $scope.selectedMisconceptionSkillId = skillId;
-                  };
-
-                  $scope.toggleMisconceptionFeedbackUsage = function() {
-                    $scope.misconceptionFeedbackIsUsed =
-                      !$scope.misconceptionFeedbackIsUsed;
-                  };
-
-                  $scope.done = function() {
-                    $uibModalInstance.close({
-                      misconception: $scope.selectedMisconception,
-                      misconceptionSkillId: $scope.selectedMisconceptionSkillId,
-                      feedbackIsUsed: $scope.misconceptionFeedbackIsUsed
-                    });
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            });
-
-            modalInstance.result.then(function(returnObject) {
-              var misconception = returnObject.misconception;
-              var misconceptionSkillId = returnObject.misconceptionSkillId;
-              var feedbackIsUsed = returnObject.feedbackIsUsed;
-              var outcome = angular.copy(ctrl.outcome);
-              if (feedbackIsUsed) {
-                outcome.feedback.setHtml(misconception.getFeedback());
-                ctrl.getOnSaveAnswerGroupFeedbackFn()(outcome);
-                $rootScope.$broadcast('externalSave');
-              }
-              ctrl.getOnSaveTaggedMisconception()(
-                misconception.getId(), misconceptionSkillId);
-              _getTaggedMisconceptionName(
-                misconceptionSkillId + '-' + misconception.getId());
-            }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
-            });
           };
 
           ctrl.getAnswerChoices = function() {
@@ -196,7 +112,7 @@ angular.module('oppia').directive('answerGroupEditor', [
               case 'CodeString':
               case 'UnicodeString':
               case 'NormalizedString':
-              case 'MathLatexString':
+              case 'MathExpressionContent':
               case 'Html':
               case 'SanitizedUrl':
               case 'Filepath':
@@ -215,6 +131,7 @@ angular.module('oppia').directive('answerGroupEditor', [
                   getDefaultInputValue('Real')];
               case 'ListOfSetsOfHtmlStrings':
               case 'ListOfUnicodeString':
+              case 'SetOfAlgebraicIdentifier':
               case 'SetOfUnicodeString':
               case 'SetOfHtmlString':
                 return [];
@@ -348,18 +265,10 @@ angular.module('oppia').directive('answerGroupEditor', [
 
           ctrl.isCurrentInteractionTrainable = function() {
             var interactionId = ctrl.getCurrentInteractionId();
-            try {
-              return INTERACTION_SPECS[interactionId].is_trainable;
-            } catch (e) {
-              var additionalInfo = (
-                '\nUndefined interaction spec error debug logs:' +
-                '\nInteraction ID: ' + interactionId +
-                '\nExploration ID: ' + ContextService.getExplorationId() +
-                '\nState Name: ' + StateEditorService.getActiveStateName()
-              );
-              e.message += additionalInfo;
-              throw e;
+            if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
+              throw new Error('Invalid interaction id');
             }
+            return INTERACTION_SPECS[interactionId].is_trainable;
           };
 
           ctrl.openTrainingDataEditor = function() {
@@ -376,30 +285,45 @@ angular.module('oppia').directive('answerGroupEditor', [
             // choice interaction's customization arguments.
             // TODO(sll): Remove the need for this watcher, or make it less
             // ad hoc.
-            $scope.$on('updateAnswerChoices', function() {
-              ctrl.answerChoices = ctrl.getAnswerChoices();
-            });
-            $scope.$on('externalSave', function() {
-              if (ctrl.isRuleEditorOpen()) {
-                ctrl.saveRules();
-              }
-            });
-            $scope.$on('onInteractionIdChanged', function() {
-              if (ctrl.isRuleEditorOpen()) {
-                ctrl.saveRules();
-              }
-              $scope.$broadcast('updateAnswerGroupInteractionId');
-              ctrl.answerChoices = ctrl.getAnswerChoices();
-            });
+            ctrl.directiveSubscriptions.add(
+              ExternalSaveService.onExternalSave.subscribe(() => {
+                if (ctrl.isRuleEditorOpen()) {
+                  if (StateEditorService.checkCurrentRuleInputIsValid()) {
+                    ctrl.saveRules();
+                  } else {
+                    var messageContent = (
+                      'There was an unsaved rule input which was invalid and ' +
+                      'has been discarded.');
+                    if (!AlertsService.messages.some(messageObject => (
+                      messageObject.content === messageContent))) {
+                      AlertsService.addInfoMessage(messageContent);
+                    }
+                  }
+                }
+              })
+            );
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onUpdateAnswerChoices.subscribe(() => {
+                ctrl.answerChoices = ctrl.getAnswerChoices();
+              })
+            );
+            ctrl.directiveSubscriptions.add(
+              StateInteractionIdService.onInteractionIdChanged.subscribe(
+                () => {
+                  if (ctrl.isRuleEditorOpen()) {
+                    ctrl.saveRules();
+                  }
+                  ctrl.answerChoices = ctrl.getAnswerChoices();
+                }
+              )
+            );
             ctrl.rulesMemento = null;
             ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
             ctrl.editAnswerGroupForm = {};
-            ctrl.misconceptionName = null;
-            ctrl.misconceptionsBySkill =
-              StateEditorService.getMisconceptionsBySkill();
             ctrl.answerChoices = ctrl.getAnswerChoices();
-
-            _getTaggedMisconceptionName(ctrl.getTaggedSkillMisconceptionId());
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

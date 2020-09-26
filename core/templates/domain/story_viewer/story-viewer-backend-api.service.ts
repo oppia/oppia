@@ -18,76 +18,132 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 
-import cloneDeep from 'lodash/cloneDeep';
-
+import {
+  LearnerExplorationSummaryBackendDict,
+  LearnerExplorationSummary,
+  LearnerExplorationSummaryObjectFactory
+} from 'domain/summary/learner-exploration-summary-object.factory';
+import {
+  StoryPlaythroughBackendDict,
+  StoryPlaythrough,
+  StoryPlaythroughObjectFactory
+} from 'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { StoryViewerDomainConstants } from
   'domain/story_viewer/story-viewer-domain.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
+interface StoryChapterCompletionBackendResponse {
+  'next_node_id': string;
+  'ready_for_review_test': boolean;
+  'summaries': LearnerExplorationSummaryBackendDict[];
+}
+
+interface StoryChapterCompletionResponse {
+  nextNodeId: string;
+  readyForReviewTest: boolean;
+  summaries: LearnerExplorationSummary[];
+}
+
+interface StoryDataDict {
+  topicName: string;
+  storyTitle: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class StoryViewerBackendApiService {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'storyDataDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  storyDataDict: any = null;
-
   constructor(
-    private urlInterpolationService: UrlInterpolationService,
-    private http: HttpClient
+    private learnerExplorationSummaryObjectFactory:
+    LearnerExplorationSummaryObjectFactory,
+    private http: HttpClient,
+    private storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  _fetchStoryData(storyId: string,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+  private _storyDataEventEmitter = new EventEmitter<StoryDataDict>();
+
+  _fetchStoryData(
+      topicUrlFragment: string,
+      classroomUrlFragment: string,
+      storyUrlFragment: string,
+      successCallback: (value: StoryPlaythrough) => void,
+      errorCallback: (reason: string) => void): void {
     let storyDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_DATA_URL_TEMPLATE, {
-        story_id: storyId
+        topic_url_fragment: topicUrlFragment,
+        classroom_url_fragment: classroomUrlFragment,
+        story_url_fragment: storyUrlFragment
       });
 
-    this.http.get(storyDataUrl).toPromise().then((data) => {
-      this.storyDataDict = cloneDeep(data);
+    this.http.get<StoryPlaythroughBackendDict>(
+      storyDataUrl).toPromise().then(data => {
       if (successCallback) {
-        successCallback(this.storyDataDict);
+        let storyPlaythrough = this.storyPlaythroughObjectFactory
+          .createFromBackendDict(data);
+        successCallback(storyPlaythrough);
       }
-    }, (error) => {
+    }, errorResponse => {
       if (errorCallback) {
-        errorCallback(error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }
 
-  _recordChapterCompletion(storyId: string, nodeId: string,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+  _recordChapterCompletion(
+      topicUrlFragment: string, classroomUrlFragment: string,
+      storyUrlFragment: string, nodeId: string,
+      successCallback: (value: StoryChapterCompletionResponse) => void,
+      errorCallback: (reason: string) => void): void {
     let chapterCompletionUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE, {
-        story_id: storyId,
+        topic_url_fragment: topicUrlFragment,
+        classroom_url_fragment: classroomUrlFragment,
+        story_url_fragment: storyUrlFragment,
         node_id: nodeId
       });
-    this.http.post(chapterCompletionUrl, {}).toPromise().then((data: any) => {
+    this.http.post<StoryChapterCompletionBackendResponse>(
+      chapterCompletionUrl, {}
+    ).toPromise().then(data => {
       successCallback({
-        summaries: data.summaries,
+        summaries: data.summaries.map(
+          expSummary => this.learnerExplorationSummaryObjectFactory
+            .createFromBackendDict(expSummary)),
         nextNodeId: data.next_node_id,
         readyForReviewTest: data.ready_for_review_test});
+    }, errorResponse => {
+      errorCallback(errorResponse.error.error);
     });
   }
 
-  fetchStoryData(storyId: string): Promise<Object> {
+  fetchStoryData(
+      topicUrlFragment:string,
+      classroomUrlFragment: string,
+      storyUrlFragment: string): Promise<StoryPlaythrough> {
     return new Promise((resolve, reject) => {
-      this._fetchStoryData(storyId, resolve, reject);
+      this._fetchStoryData(
+        topicUrlFragment, classroomUrlFragment, storyUrlFragment,
+        resolve, reject);
     });
   }
 
-  recordChapterCompletion(storyId: string, nodeId: string): Promise<Object> {
+  recordChapterCompletion(
+      topicUrlFragment: string,
+      classroomUrlFragment: string,
+      storyUrlFragment: string,
+      nodeId: string): Promise<StoryChapterCompletionResponse> {
     return new Promise((resolve, reject) => {
-      this._recordChapterCompletion(storyId, nodeId, resolve, reject);
+      this._recordChapterCompletion(
+        topicUrlFragment, classroomUrlFragment, storyUrlFragment,
+        nodeId, resolve, reject);
     });
+  }
+
+  get onSendStoryData(): EventEmitter<StoryDataDict> {
+    return this._storyDataEventEmitter;
   }
 }
 

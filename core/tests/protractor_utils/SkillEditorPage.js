@@ -17,7 +17,8 @@
  * in Protractor tests.
  */
 
-var forms = require('./forms.js');
+var action = require('./action.js');
+var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
 var SkillEditorPage = function() {
@@ -37,6 +38,16 @@ var SkillEditorPage = function() {
   var workedExampleSummary = function(index) {
     return element(by.css('.protractor-test-worked-example-' + index));
   };
+  var workedExampleQuestion = element(
+    by.css('.protractor-test-worked-example-question')
+  ).all(by.tagName('p')).last();
+  var workedExampleExplanation = element(
+    by.css('.protractor-test-worked-example-explanation')
+  ).all(by.tagName('p')).last();
+  var workedExampleQuestionField = element(
+    by.css('.protractor-test-worked-example-question-field'));
+  var workedExampleExplanationField = element(
+    by.css('.protractor-test-worked-example-explanation-field'));
   var deleteWorkedExampleButton = function(index) {
     return element(
       by.css('.protractor-test-worked-example-' + index))
@@ -83,200 +94,274 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-question-list-item'));
   var questionItem = element(by.css('.protractor-test-question-list-item'));
 
-  var editRubricExplanationButtons = element.all(
-    by.css('.protractor-test-edit-rubric-explanation'));
   var saveRubricExplanationButton = element(
     by.css('.protractor-test-save-rubric-explanation-button'));
-  var rubricExplanations = element.all(
-    by.css('.protractor-test-rubric-explanation'));
+  var deleteRubricExplanationButton = element(
+    by.css('.protractor-test-delete-rubric-explanation-button'));
+  var easyRubricDifficulty = element(
+    by.css('.protractor-test-skill-difficulty-easy'));
 
-  this.get = function(skillId) {
-    browser.get(EDITOR_URL_PREFIX + skillId);
-    return waitFor.pageToFullyLoad();
+  this.get = async function(skillId) {
+    await browser.get(EDITOR_URL_PREFIX + skillId);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.editRubricExplanationWithIndex = function(index, explanation) {
-    editRubricExplanationButtons.then(function(buttons) {
-      buttons[index].click();
-      var editor = element(
-        by.css('.protractor-test-rubric-explanation-text'));
-      waitFor.visibilityOf(
-        editor, 'Rubric explanation editor takes too long to appear');
-      browser.switchTo().activeElement().sendKeys(explanation);
-      waitFor.elementToBeClickable(
-        saveRubricExplanationButton,
-        'Save Rubric Explanation button takes too long to be clickable');
-      saveRubricExplanationButton.click();
-    });
+  this.selectDifficultyForRubric = async function(difficulty) {
+    await element(by.css('.protractor-test-select-rubric-difficulty'))
+      .element(by.cssContainingText('option', difficulty)).click();
   };
 
-  this.expectRubricExplanationToMatch = function(index, explanation) {
-    rubricExplanations.then(function(explanations) {
-      explanations[index].getText().then(function(text) {
-        expect(text).toMatch(explanation);
-      });
-    });
+  this.addRubricExplanationForDifficulty = async function(
+      difficulty, explanation) {
+    await this.selectDifficultyForRubric(difficulty);
+    var addRubricExplanationButton = element(
+      by.css('.protractor-test-add-explanation-button-' + difficulty));
+    await waitFor.elementToBeClickable(
+      addRubricExplanationButton,
+      'Add Rubric Explanation button takes too long to be clickable');
+    await addRubricExplanationButton.click();
+    var editor = element(
+      by.css('.protractor-test-rubric-explanation-text'));
+    await waitFor.visibilityOf(
+      editor, 'Rubric explanation editor takes too long to appear');
+    await (await browser.switchTo().activeElement()).sendKeys(explanation);
+    await waitFor.elementToBeClickable(
+      saveRubricExplanationButton,
+      'Save Rubric Explanation button takes too long to be clickable');
+    await saveRubricExplanationButton.click();
+    await waitFor.invisibilityOf(
+      saveRubricExplanationButton,
+      'Save Rubric Explanation editor takes too long to close.');
   };
 
-  this.expectNumberOfQuestionsToBe = function(count) {
-    waitFor.visibilityOf(
+  this.deleteRubricExplanationWithIndex = async function(
+      difficulty, explIndex) {
+    // The edit explanation buttons for all explanations of a difficulty have
+    // the same class name and each explanation in it are identified by its
+    // index.
+    await this.selectDifficultyForRubric(difficulty);
+    var editRubricExplanationButtons = element.all(
+      by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
+    var button = await editRubricExplanationButtons.get(explIndex);
+    await waitFor.elementToBeClickable(
+      button, 'Edit Rubric Explanation button takes too long to be clickable');
+    await button.click();
+    var editor = element(
+      by.css('.protractor-test-rubric-explanation-text'));
+    await waitFor.visibilityOf(
+      editor, 'Rubric explanation editor takes too long to appear');
+    await deleteRubricExplanationButton.click();
+  };
+
+  this.editRubricExplanationWithIndex = async function(
+      difficulty, explIndex, explanation) {
+    // The edit explanation buttons for all explanations of a difficulty have
+    // the same class name and each explanation in it are identified by its
+    // index.
+    await this.selectDifficultyForRubric(difficulty);
+    var editRubricExplanationButtons = element.all(
+      by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
+    await waitFor.elementToBeClickable(
+      await editRubricExplanationButtons.get(explIndex),
+      'Edit Rubric Explanation button takes too long to be clickable');
+    await editRubricExplanationButtons.get(explIndex).click();
+    var editor = element(
+      by.css('.protractor-test-rubric-explanation-text'));
+    await waitFor.visibilityOf(
+      editor, 'Rubric explanation editor takes too long to appear');
+    await (await browser.switchTo().activeElement()).sendKeys(explanation);
+    await waitFor.elementToBeClickable(
+      saveRubricExplanationButton,
+      'Save Rubric Explanation button takes too long to be clickable');
+    await saveRubricExplanationButton.click();
+  };
+
+  this.expectRubricExplanationsToMatch = async function(
+      difficulty, explanations) {
+    await this.selectDifficultyForRubric(difficulty);
+    var rubricExplanationsForDifficulty = element.all(
+      by.css('.protractor-test-rubric-explanation-' + difficulty));
+    var explanationCount = await rubricExplanationsForDifficulty.count();
+    for (var i = 0; i < explanationCount; i++) {
+      var text = await (await rubricExplanationsForDifficulty.get(i)).getText();
+      expect(text).toMatch(explanations[i]);
+    }
+  };
+
+  this.expectNumberOfQuestionsToBe = async function(count) {
+    await waitFor.visibilityOf(
       questionItem, 'Question takes too long to appear');
-    questionItems.then(function(items) {
-      expect(items.length).toEqual(count);
-    });
+    expect(await questionItems.count()).toEqual(count);
   };
 
-  this.saveQuestion = function() {
-    saveQuestionButton.click();
-    return waitFor.pageToFullyLoad();
+  this.saveQuestion = async function() {
+    await general.scrollToTop();
+    await saveQuestionButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.moveToQuestionsTab = function() {
-    waitFor.elementToBeClickable(
+  this.moveToQuestionsTab = async function() {
+    await waitFor.elementToBeClickable(
       questionsTab,
       'Questions tab button takes too long to be clickable');
-    questionsTab.click();
+    await questionsTab.click();
   };
 
-  this.clickCreateQuestionButton = function() {
-    createQuestionButton.click();
+  this.clickCreateQuestionButton = async function() {
+    await createQuestionButton.click();
+    await action.click('Easy difficulty for skill', easyRubricDifficulty);
   };
 
-  this.confirmSkillDifficulty = function() {
-    confirmSkillDifficultyButton.click();
+  this.confirmSkillDifficulty = async function() {
+    await confirmSkillDifficultyButton.click();
   };
 
-  this.changeSkillDescription = function(description) {
-    skillDescriptionField.clear();
-    skillDescriptionField.sendKeys(description);
+  this.changeSkillDescription = async function(description) {
+    await skillDescriptionField.clear();
+    await skillDescriptionField.sendKeys(description);
   };
 
-  this.expectSkillDescriptionToBe = function(description) {
-    expect(skillDescriptionField.getAttribute('value')).toEqual(description);
+  this.expectSkillDescriptionToBe = async function(description) {
+    var description = await skillDescriptionField.getAttribute('value');
+    expect(description).toEqual(description);
   };
 
-  this.saveOrPublishSkill = function(commitMessage) {
-    saveOrPublishSkillButton.click();
+  this.saveOrPublishSkill = async function(commitMessage) {
+    await saveOrPublishSkillButton.click();
 
-    commitMessageField.sendKeys(commitMessage);
-    waitFor.elementToBeClickable(
+    await commitMessageField.sendKeys(commitMessage);
+    await waitFor.elementToBeClickable(
       closeSaveModalButton,
       'Close save modal button takes too long to be clickable');
-    closeSaveModalButton.click();
-    waitFor.pageToFullyLoad();
+    await closeSaveModalButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.editConceptCard = function(explanation) {
-    editConceptCardExplanationButton.click();
+  this.editConceptCard = async function(explanation) {
+    await editConceptCardExplanationButton.click();
 
     var editor = element(by.css('.protractor-test-concept-card-text'));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
 
-    browser.switchTo().activeElement().sendKeys(explanation);
+    await (await browser.switchTo().activeElement()).sendKeys(explanation);
 
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       saveConceptCardExplanationButton,
       'Save Concept Card Explanation button takes too long to be clickable');
-    saveConceptCardExplanationButton.click();
-    waitFor.invisibilityOf(
+    await saveConceptCardExplanationButton.click();
+    await waitFor.invisibilityOf(
       editor, 'Explanation Editor takes too long to close');
   };
 
-  this.expectConceptCardExplanationToMatch = function(explanation) {
-    conceptCardExplanationText.getText().then(function(text) {
-      expect(text).toMatch(explanation);
-    });
+  this.expectConceptCardExplanationToMatch = async function(explanation) {
+    var text = await conceptCardExplanationText.getText();
+    expect(text).toMatch(explanation);
   };
 
-  this.addWorkedExample = function(example) {
-    addWorkedExampleButton.click();
+  this.addWorkedExample = async function(question, explanation) {
+    await addWorkedExampleButton.click();
 
-    var addWorkedExampleModal =
-      element(by.css('.protractor-test-add-worked-example-modal'));
-    waitFor.visibilityOf(
+    var addWorkedExampleModal = (
+      element(by.css('.protractor-test-add-worked-example-modal')));
+    await waitFor.visibilityOf(
       addWorkedExampleModal,
       'Add Worked Example Modal takes too long to appear');
 
-    browser.switchTo().activeElement().sendKeys(example);
+    await workedExampleQuestion.click();
+    await browser.switchTo().activeElement().sendKeys(question);
 
-    waitFor.elementToBeClickable(
+    await workedExampleExplanation.click();
+    await browser.switchTo().activeElement().sendKeys(explanation);
+
+    await waitFor.elementToBeClickable(
       saveWorkedExampleButton,
       'Save Worked Example button takes too long to be clickable');
-    saveWorkedExampleButton.click();
-    waitFor.invisibilityOf(
+    await saveWorkedExampleButton.click();
+    await waitFor.invisibilityOf(
       addWorkedExampleModal,
       'Add Worked Example Modal takes too long to close');
   };
 
-  this.deleteWorkedExampleWithIndex = function(index) {
-    deleteWorkedExampleButton(index).click();
+  this.deleteWorkedExampleWithIndex = async function(index) {
+    await deleteWorkedExampleButton(index).click();
 
-    var deleteWorkedExampleModal =
-      element(by.css('.protractor-test-delete-worked-example-modal'));
-    waitFor.visibilityOf(
+    var deleteWorkedExampleModal = (
+      element(by.css('.protractor-test-delete-worked-example-modal')));
+    await waitFor.visibilityOf(
       deleteWorkedExampleModal,
       'Delete Worked Example Modal takes too long to appear');
 
-    confirmDeleteWorkedExample.click();
+    await confirmDeleteWorkedExample.click();
 
-    waitFor.invisibilityOf(
+    await waitFor.invisibilityOf(
       deleteWorkedExampleModal,
       'Delete Worked Example Modal takes too long to close');
   };
 
-  this.expectWorkedExampleSummariesToMatch = function(examples) {
-    for (var index in examples) {
-      expect(workedExampleSummary(index).getText()).toMatch(examples[index]);
+  this.expectWorkedExampleSummariesToMatch = async function(
+      questions, explanations) {
+    // This is declared separately since the expect() statements are in an async
+    // callback and so 'index' gets incremented before the check is done. So, we
+    // need another variable to track the correct index to check.
+    var questionIndexToCheck = 0;
+    var explanationIndexToCheck = 0;
+    for (var index in questions) {
+      await workedExampleSummary(index).click();
+      var text = await workedExampleQuestionField.getText();
+      expect(text).toMatch(questions[questionIndexToCheck]);
+      questionIndexToCheck++;
+      var text = await workedExampleExplanationField.getText();
+      expect(text).toMatch(explanations[explanationIndexToCheck]);
+      explanationIndexToCheck++;
+      await workedExampleSummary(index).click();
     }
   };
 
-  this.addMisconception = function(name, notes, feedback) {
-    addMisconceptionButton.click();
+  this.addMisconception = async function(name, notes, feedback) {
+    await addMisconceptionButton.click();
 
-    var addMisconceptionModal =
-      element(by.css('.protractor-test-add-misconception-modal'));
-    waitFor.visibilityOf(
+    var addMisconceptionModal = (
+      element(by.css('.protractor-test-add-misconception-modal')));
+    await waitFor.visibilityOf(
       addMisconceptionModal,
       'Add Misconception Modal takes too long to appear');
 
-    misconceptionNameField.click();
-    browser.switchTo().activeElement().sendKeys(name);
+    await misconceptionNameField.click();
+    await browser.switchTo().activeElement().sendKeys(name);
 
-    misconceptionNotesField.click();
-    browser.switchTo().activeElement().sendKeys(notes);
+    await misconceptionNotesField.click();
+    await browser.switchTo().activeElement().sendKeys(notes);
 
-    misconceptionFeedbackField.click();
-    browser.switchTo().activeElement().sendKeys(feedback);
+    await misconceptionFeedbackField.click();
+    await browser.switchTo().activeElement().sendKeys(feedback);
 
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       confirmAddMisconception,
       'Save Misconception button takes too long to be clickable');
-    confirmAddMisconception.click();
+    await confirmAddMisconception.click();
 
-    waitFor.invisibilityOf(
+    await waitFor.invisibilityOf(
       addMisconceptionModal,
       'Add Misconception Modal takes too long to close');
   };
 
-  this.expectNumberOfMisconceptionsToBe = function(number) {
-    misconceptionListItems.then(function(elems) {
-      expect(elems.length).toBe(number);
-    });
+  this.expectNumberOfMisconceptionsToBe = async function(number) {
+    expect(await misconceptionListItems.count()).toBe(number);
   };
 
-  this.deleteMisconception = function(index) {
-    deleteMisconceptionButton(index).click();
+  this.deleteMisconception = async function(index) {
+    await deleteMisconceptionButton(index).click();
 
-    var deleteMisconceptionModal =
-      element(by.css('.protractor-test-delete-misconception-modal'));
-    waitFor.visibilityOf(
+    var deleteMisconceptionModal = (
+      element(by.css('.protractor-test-delete-misconception-modal')));
+    await waitFor.visibilityOf(
       deleteMisconceptionModal,
       'Delete Misconception Modal takes too long to appear');
 
-    confirmDeleteMisconception.click();
+    await confirmDeleteMisconception.click();
 
-    waitFor.invisibilityOf(
+    await waitFor.invisibilityOf(
       deleteMisconceptionModal,
       'Delete Misconception Modal takes too long to close');
   };

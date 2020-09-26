@@ -17,8 +17,16 @@
  * misconceptions.
  */
 
-import { Injectable } from '@angular/core';
+export interface MisconceptionBackendDict {
+  'feedback': string;
+  'id': string;
+  'must_be_addressed': boolean;
+  'name': string;
+  'notes': string;
+}
+
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
 export class Misconception {
   _id: string;
@@ -37,7 +45,7 @@ export class Misconception {
     this._mustBeAddressed = mustBeAddressed;
   }
 
-  toBackendDict(): any {
+  toBackendDict(): MisconceptionBackendDict {
     return {
       id: this._id,
       name: this._name,
@@ -88,7 +96,9 @@ export class Misconception {
   providedIn: 'root'
 })
 export class MisconceptionObjectFactory {
-  createFromBackendDict(misconceptionBackendDict: any): Misconception {
+  createFromBackendDict(
+      misconceptionBackendDict: MisconceptionBackendDict)
+      : Misconception {
     return new Misconception(
       misconceptionBackendDict.id,
       misconceptionBackendDict.name,

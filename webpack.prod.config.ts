@@ -16,7 +16,7 @@
  * @fileoverview Production environment config file for Webpack.
  */
 
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const common = require('./webpack.common.config.ts');
 const path = require('path');
 
@@ -25,6 +25,5 @@ module.exports = merge(common, {
   output: {
     filename: '[name].[contenthash].bundle.js',
     path: path.resolve(__dirname, 'backend_prod_files/webpack_bundles')
-  },
-  devtool: 'source-map'
+  }
 });

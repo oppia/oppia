@@ -18,7 +18,19 @@
 
 require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
 
-/* eslint-disable angular/directive-restrict */
+interface InteractionValidator {
+  'id': string;
+  'min_value': number;
+  'max_value': number;
+}
+
+interface ApplyValidationCustomScope extends ng.IScope {
+  $ctrl: {
+    validators: () => InteractionValidator[];
+  }
+}
+
+/* eslint-disable-next-line angular/directive-restrict */
 angular.module('oppia').directive('applyValidation', [
   '$filter', function($filter) {
     return {
@@ -30,7 +42,7 @@ angular.module('oppia').directive('applyValidation', [
       },
       controllerAs: '$ctrl',
       controller: [function() {}],
-      link: function(scope: ICustomScope, elm, attrs, ctrl) {
+      link: function(scope: ApplyValidationCustomScope, elm, attrs, ctrl) {
         // Add validators in reverse order.
         if (scope.$ctrl.validators()) {
           scope.$ctrl.validators().forEach(function(validatorSpec) {
@@ -55,8 +67,7 @@ angular.module('oppia').directive('applyValidation', [
 
             var customValidator = function(viewValue) {
               ctrl.$setValidity(
-                frontendName, $filter(frontendName)(viewValue,
-                  filterArgs));
+                frontendName, $filter(frontendName)(viewValue, filterArgs));
               return viewValue;
             };
 
@@ -67,4 +78,3 @@ angular.module('oppia').directive('applyValidation', [
       }
     };
   }]);
-/* eslint-enable angular/directive-restrict */

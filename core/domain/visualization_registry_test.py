@@ -44,38 +44,53 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
                 'invalid_visualization_id')
 
     def test_visualization_class_with_invalid_option_names(self):
-        bar_chart = visualization_registry.Registry.get_visualization_class(
-            'BarChart')
-        bar_chart_instance = bar_chart('AnswerFrequencies', {}, True)
+        sorted_tiles = visualization_registry.Registry.get_visualization_class(
+            'SortedTiles')
+        sorted_tiles_instance = sorted_tiles('AnswerFrequencies', {}, True)
 
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
-                'For visualization BarChart, expected option names '
-                '[\'x_axis_label\', \'y_axis_label\']; received names []')):
-            bar_chart_instance.validate()
+                'For visualization SortedTiles, expected option names '
+                '[\'header\', \'use_percentages\']; received names []')):
+            sorted_tiles_instance.validate()
 
-    def test_visualization_class_with_invalid_addressed_info_is_supported(self):
-        bar_chart = visualization_registry.Registry.get_visualization_class(
-            'BarChart')
+    def test_visualization_class_with_invalid_option_value(self):
+        sorted_tiles = visualization_registry.Registry.get_visualization_class(
+            'SortedTiles')
         option_names = {
-            'x_axis_label': 'Answer',
-            'y_axis_label': 'Count'
+            'header': 'Pretty Tiles!',
+            'use_percentages': 'invalid_value'
         }
-        bar_chart_instance = bar_chart(
+        sorted_tiles_instance = sorted_tiles(
+            'AnswerFrequencies', option_names, True)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected bool, received invalid_value'):
+            sorted_tiles_instance.validate()
+
+    def test_visualization_class_with_invalid_addressed_info_is_supported_value(
+            self):
+        sorted_tiles = visualization_registry.Registry.get_visualization_class(
+            'SortedTiles')
+        option_names = {
+            'header': 'Pretty Tiles!',
+            'use_percentages': True
+        }
+        sorted_tiles_instance = sorted_tiles(
             'AnswerFrequencies', option_names, 'invalid_value')
 
         with self.assertRaisesRegexp(
             Exception,
-            'For visualization BarChart, expected a bool value for '
+            'For visualization SortedTiles, expected a bool value for '
             'addressed_info_is_supported; received invalid_value'):
-            bar_chart_instance.validate()
+            sorted_tiles_instance.validate()
 
     def test_get_all_visualization_ids(self):
         visualization_ids = (
             visualization_registry.Registry.get_all_visualization_ids())
-        expected_visualizations = ['FrequencyTable', 'BarChart',
-                                   'EnumeratedFrequencyTable']
+        expected_visualizations = ['FrequencyTable', 'ClickHexbins',
+                                   'EnumeratedFrequencyTable', 'SortedTiles']
 
         self.assertEqual(
             sorted(visualization_ids), sorted(expected_visualizations))
@@ -88,7 +103,7 @@ class VisualizationsNameTests(test_utils.GenericTestBase):
         directory.
 
         Returns:
-            a list of Python files.
+            list(str). A list of Python files.
         """
         current_dir = os.getcwd()
         files_in_directory = []
@@ -120,7 +135,8 @@ class VisualizationsNameTests(test_utils.GenericTestBase):
                     all_visualizations.append(name)
 
         expected_visualizations = ['BaseVisualization', 'FrequencyTable',
-                                   'BarChart', 'EnumeratedFrequencyTable']
+                                   'EnumeratedFrequencyTable', 'ClickHexbins',
+                                   'SortedTiles']
 
         self.assertEqual(
             sorted(all_visualizations), sorted(expected_visualizations))

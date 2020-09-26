@@ -1,11 +1,18 @@
 <audio-bar ng-if="showAudioBar()"></audio-bar>
 <div class="oppia-learner-view-card"
-     ng-class="{'animate-card-width': startCardChangeAnimation}">
+     ng-class="{'animate-card-width': startCardChangeAnimation}"
+     ng-style="isAudioBarExpandedOnMobileDevice() ? {'margin-top': '60px'} : {'margin-top': '30px'}">
   <div class="oppia-learner-view-card-content conversation-skin-animate-tutor-card-content"
        ng-class="{'animate-card-change': startCardChangeAnimation}">
     <div class="oppia-learner-view-card-top-section">
-      <img class="conversation-skin-oppia-avatar"
-           ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
+      <a ng-class="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
+         ng-href="<[OPPIA_AVATAR_LINK_URL]>"
+         target="_blank"
+         rel="noopener">
+        <img class="conversation-skin-oppia-avatar"
+             ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt=""
+             ng-if="isAvatarImageShown()">
+      </a>
       <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
            ng-class="getContentAudioHighlightClass()"
            focus-on="<[getContentFocusLabel($index)]>">
@@ -82,17 +89,17 @@
     </div>
 
     <div ng-if="!isInteractionInline() && !conceptCardIsBeingShown"
-         class="conversation-skin-inline-interaction" style="opacity: 0.8;">
-      <div style="padding: 6px 12px;">
+         class="conversation-skin-inline-interaction">
+      <div class="oppia-conversation-skin-instruction-container">
         <span ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}"> <[interactionInstructions]> </span>
-        <i ng-if="canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
-        <i ng-if="!canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18" style="position: relative;">&#xE5DB;</i>
+        <i ng-if="canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5C8;</i>
+        <i ng-if="!canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18 position-relative">&#xE5DB;</i>
       </div>
     </div>
 
     <div ng-if="!getDisplayedCard().getInteractionId() && !isOnTerminalCard() && !conceptCardIsBeingShown">
       <div class="conversation-skin-inline-interaction">
-        <span style="color: red;">
+        <span class="oppia-no-interaction-text">
           <strong>Error</strong>: No interaction specified for '<[getDisplayedCard().getStateName()]>'.
         </span>
       </div>
@@ -102,8 +109,8 @@
 
 <style>
   .oppia-learner-view-card-content .oppia-learner-confirm-button {
-    margin-left: 10px;
     margin-bottom: 10px;
+    margin-left: 10px;
   }
   .oppia-learner-view-card {
     max-width: 100vw;
@@ -150,9 +157,9 @@
   .conversation-skin-future-tutor-card {
     background: #fff;
     border-radius: 2px;
+    margin-left: 87px;
     padding-top: 20px;
     text-align: left;
-    margin-left: 87px;
   }
 
   .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {
@@ -189,11 +196,11 @@
   }
 
   .conversation-skin-responses-dropdown-icon {
+    font-size: 20px;
+    margin-bottom: -2px;
     -moz-transition: all 0.2s;
     -o-transition: all 0.2s;
     -webkit-transition: all 0.2s;
-    font-size: 20px;
-    margin-bottom: -2px;
   }
 
   .conversation-skin-responses-dropdown-icon-rotated {
@@ -217,6 +224,17 @@
     top: 14px;
   }
 
+  tutor-card .oppia-conversation-skin-inline-interaction {
+    opacity: 0.8;
+  }
+
+  tutor-card .oppia-conversation-skin-instruction-container {
+    padding: 6px 12px;
+  }
+  tutor-card .oppia-no-interaction-text {
+    color: #FF0000;
+  }
+
   /* When the size of the browser is reduced, and the answer submitted is
      correct, the continue button (in the tutor card) hides under the
      Correctness footer and the page cannot be scrolled down further.
@@ -238,6 +256,11 @@
     .oppia-learner-view-card button.md-button.md-default-theme.instructions-button:focus,
     .oppia-learner-view-card button.md-button.md-default-theme.instructions-button:hover {
       background-color: #115FD4;
+    }
+    @media screen and (max-width: 768px) {
+      .oppia-learner-view-card {
+        margin-top: 30px;
+      }
     }
   }
 </style>

@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
 
@@ -84,7 +85,7 @@ def _should_index_exploration(exp_summary):
         search queries.
     """
     rights = rights_manager.get_exploration_rights(exp_summary.id)
-    return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
+    return rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
 
 
 def get_search_rank_from_exp_summary(exp_summary):
@@ -154,13 +155,13 @@ def _should_index_collection(collection):
     """Checks if a particular collection should be indexed.
 
     Args:
-        collection: CollectionSummaryModel.
+        collection: CollectionSummaryModel. The collection summary model object.
 
     Returns:
         bool. Whether a particular collection should be indexed.
     """
     rights = rights_manager.get_collection_rights(collection.id)
-    return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
+    return rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
 
 
 def search_explorations(query, limit, sort=None, cursor=None):
@@ -214,8 +215,8 @@ def search_collections(query, limit, sort=None, cursor=None):
     """Searches through the available collections.
 
     Args:
-        query: str or None. the query string to search for.
-        limit: int. the maximum number of results to return.
+        query: str or None. The query string to search for.
+        limit: int. The maximum number of results to return.
         sort: str. This indicates how to sort results. This should be a string
             of space separated values. Each value should start with a '+' or a
             '-' character indicating whether to sort in ascending or descending
@@ -228,7 +229,7 @@ def search_collections(query, limit, sort=None, cursor=None):
             function will return a cursor to get the next page.
 
     Returns:
-        A 2-tuple with the following elements:
+        2-tuple of (collection_ids, cursor). Where:
             - A list of collection ids that match the query.
             - A cursor if there are more matching collections to fetch, None
               otherwise. If a cursor is returned, it will be a web-safe string

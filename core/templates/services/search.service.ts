@@ -18,14 +18,19 @@
 
 require('services/services.constants.ajs.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('SearchService', [
-  '$http', '$log', '$rootScope', '$translate', 'SEARCH_DATA_URL',
-  function($http, $log, $rootScope, $translate, SEARCH_DATA_URL) {
+  '$http', '$log', '$translate', 'SEARCH_DATA_URL',
+  function($http, $log, $translate, SEARCH_DATA_URL) {
     var _lastQuery = null;
     var _lastSelectedCategories = {};
     var _lastSelectedLanguageCodes = {};
     var _searchCursor = null;
-
+    var _isCurrentlyFetchingResults = false;
+    var numSearchesInProgress = 0;
+    var _searchBarLoadedEventEmitter = new EventEmitter();
+    var _initialSearchResultsLoadedEventEmitter = new EventEmitter();
     // Appends a suffix to the query describing allowed category and language
     // codes to filter on.
     var _getSuffixForQuery =
@@ -77,8 +82,9 @@ angular.module('oppia').factory('SearchService', [
           itemCodes.indexOf(EXPECTED_PREFIX) !== 0 ||
           itemCodes.lastIndexOf(EXPECTED_SUFFIX) !==
             itemCodes.length - EXPECTED_SUFFIX.length) {
-        throw Error('Invalid search query url fragment for ' +
-                    itemsType + ': ' + urlComponent);
+        throw new Error(
+          'Invalid search query url fragment for ' +
+          itemsType + ': ' + urlComponent);
       }
 
       var items = itemCodes.substring(
@@ -91,16 +97,13 @@ angular.module('oppia').factory('SearchService', [
       }
     };
 
-    var _isCurrentlyFetchingResults = false;
-    var numSearchesInProgress = 0;
-
     var getQueryUrl = function(searchUrlQueryString) {
       return SEARCH_DATA_URL + '?q=' + searchUrlQueryString;
     };
 
     return {
-      getSearchUrlQueryString: function(searchQuery, selectedCategories,
-          selectedLanguageCodes) {
+      getSearchUrlQueryString: function(
+          searchQuery, selectedCategories, selectedLanguageCodes) {
         return encodeURIComponent(searchQuery) +
           _getSuffixForQuery(selectedCategories, selectedLanguageCodes);
       },
@@ -122,12 +125,11 @@ angular.module('oppia').factory('SearchService', [
           _searchCursor = data.search_cursor;
           numSearchesInProgress--;
 
-          $rootScope.$broadcast(
-            'initialSearchResultsLoaded', data.activity_list);
+          _initialSearchResultsLoadedEventEmitter.emit(data.activity_list);
           _isCurrentlyFetchingResults = false;
           var checkMismatch = function(searchQuery) {
             var isMismatch = true;
-            $('.oppia-search-bar-input').each(function(index) {
+            $('.oppia-search-bar-input').each(function() {
               if ((<string>$(this).val()).trim() === searchQuery) {
                 isMismatch = false;
               }
@@ -138,9 +140,9 @@ angular.module('oppia').factory('SearchService', [
             $log.error('Mismatch');
             $log.error('SearchQuery: ' + searchQuery);
             $log.error('Input: ' + (
-              <string><any>$('.oppia-search-bar-input').val()).trim());
+              <string>$('.oppia-search-bar-input').val()).trim());
           }
-        }, function() {
+        })['catch'](function() {
           numSearchesInProgress--;
         });
 
@@ -164,7 +166,7 @@ angular.module('oppia').factory('SearchService', [
         // The following will split the urlQuery into 3 components:
         // 1. query
         // 2. categories (optional)
-        // 3. language codes (default to 'en')
+        // 3. language codes (default to 'en').
         var querySegments = urlQuery.split('&');
 
         for (var i = 1; i < querySegments.length; i++) {
@@ -215,6 +217,13 @@ angular.module('oppia').factory('SearchService', [
             successCallback(response.data, hasReachedEndOfPage());
           }
         });
+      },
+
+      get onSearchBarLoaded() {
+        return _searchBarLoadedEventEmitter;
+      },
+      get onInitialSearchResultsLoaded() {
+        return _initialSearchResultsLoadedEventEmitter;
       }
     };
   }

@@ -20,10 +20,18 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {
+  ReadOnlyTopic,
+  ReadOnlyTopicBackendDict,
+  ReadOnlyTopicObjectFactory
+} from 'domain/topic_viewer/read-only-topic-object.factory';
+import { ShortSkillSummaryObjectFactory } from
+  'domain/skill/ShortSkillSummaryObjectFactory';
+import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { TopicViewerDomainConstants } from
   'domain/topic_viewer/topic-viewer-domain.constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 @Injectable({
   providedIn: 'root'
@@ -33,31 +41,41 @@ export class TopicViewerBackendApiService {
     private http: HttpClient,
     private urlInterpolation: UrlInterpolationService) {}
 
-  private topicDataDict = null;
   private _fetchTopicData(
-      topicName: string, successCallback: any, errorCallback: any): any {
-    var topicDataUrl = this.urlInterpolation.interpolateUrl(
+      topicUrlFragment: string,
+      classroomUrlFragment: string,
+      successCallback: (value: ReadOnlyTopic) => void,
+      errorCallback: (reason: string) => void
+  ): void {
+    const topicDataUrl = this.urlInterpolation.interpolateUrl(
       TopicViewerDomainConstants.TOPIC_DATA_URL_TEMPLATE, {
-        topic_name: topicName
+        topic_url_fragment: topicUrlFragment,
+        classroom_url_fragment: classroomUrlFragment,
       });
-
-    this.http.get(
-      topicDataUrl, { observe: 'response' }).toPromise().then(
+    var readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory(
+      new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
+      new ShortSkillSummaryObjectFactory());
+    this.http.get<ReadOnlyTopicBackendDict>(topicDataUrl).toPromise().then(
       (response) => {
-        this.topicDataDict = Object.assign({}, response.body);
+        let readOnlyTopic = readOnlyTopicObjectFactory.createFromBackendDict(
+          response);
         if (successCallback) {
-          successCallback(this.topicDataDict);
+          successCallback(readOnlyTopic);
         }
       }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse.body);
+          errorCallback(errorResponse.error.error);
         }
       });
   }
 
-  fetchTopicData(topicName: string): Promise<object> {
+  fetchTopicData(
+      topicUrlFragment: string,
+      classroomUrlFragment: string
+  ): Promise<ReadOnlyTopic> {
     return new Promise((resolve, reject) => {
-      this._fetchTopicData(topicName, resolve, reject);
+      this._fetchTopicData(
+        topicUrlFragment, classroomUrlFragment, resolve, reject);
     });
   }
 }

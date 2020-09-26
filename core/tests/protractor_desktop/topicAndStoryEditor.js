@@ -22,7 +22,7 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
+var Constants = require('../protractor_utils/ProtractorConstants.js');
 var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
@@ -30,6 +30,8 @@ var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 
 describe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
@@ -40,187 +42,186 @@ describe('Topic editor functionality', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
 
-  beforeAll(function() {
-    topicsAndSkillsDashboardPage =
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
+  beforeAll(async function() {
+    topicsAndSkillsDashboardPage = (
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
-    browser.getCurrentUrl().then(function(url) {
-      topicId = url.split('/')[4];
-    }, function() {
-      // Note to developers:
-      // Promise is returned by getCurrentUrl which is handled here.
-      // No further action is needed.
-    });
+    var handle = await browser.getWindowHandle();
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(
+      'Topic 1', 'unique-topic', 'Description', false);
+    var url = await browser.getCurrentUrl();
+    topicId = url.split('/')[4];
+    await general.closeCurrentTabAndSwitchTo(handle);
   });
 
-  beforeEach(function() {
-    users.login('creator@topicEditor.com');
-    topicEditorPage.get(topicId);
+  beforeEach(async function() {
+    await users.login('creator@topicEditor.com');
+    await topicEditorPage.get(topicId);
   });
 
-  it('should add and delete subtopics correctly', function() {
-    topicEditorPage.moveToSubtopicsTab();
-    topicEditorPage.addSubtopic('Subtopic 1');
-    topicEditorPage.expectNumberOfSubtopicsToBe(1);
-    topicEditorPage.saveTopic('Added subtopic.');
+  it('should add and delete subtopics correctly', async function() {
+    await topicEditorPage.addSubtopic(
+      'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
+      'Subtopic content');
+    await topicEditorPage.saveTopic('Added subtopic.');
 
-    topicEditorPage.get(topicId);
-    topicEditorPage.moveToSubtopicsTab();
-    topicEditorPage.expectNumberOfSubtopicsToBe(1);
-    topicEditorPage.deleteSubtopicWithIndex(0);
-    topicEditorPage.expectNumberOfSubtopicsToBe(0);
+    await topicEditorPage.get(topicId);
+    await topicEditorPage.expectNumberOfSubtopicsToBe(1);
+    await topicEditorPage.deleteSubtopicWithIndex(0);
+    await topicEditorPage.saveTopic('Deleted subtopic.');
+    await topicEditorPage.expectNumberOfSubtopicsToBe(0);
   });
 
-  it('should edit subtopic page contents correctly', function() {
-    topicEditorPage.moveToSubtopicsTab();
-    topicEditorPage.editSubtopicWithIndex(0);
-    topicEditorPage.changeSubtopicTitle('Modified Title');
-    topicEditorPage.changeSubtopicPageContents(
-      forms.toRichText('Subtopic Contents'));
-    topicEditorPage.saveSubtopic();
-    topicEditorPage.saveTopic('Edited subtopic.');
-
-    topicEditorPage.get(topicId);
-    topicEditorPage.moveToSubtopicsTab();
-    topicEditorPage.expectTitleOfSubtopicWithIndexToMatch('Modified Title', 0);
-    topicEditorPage.editSubtopicWithIndex(0);
-    topicEditorPage.expectSubtopicPageContentsToMatch('Subtopic Contents');
-  });
-
-  it('should create a question for a skill in the topic', function() {
+  it('should create a question for a skill in the topic', async function() {
     var skillId = null;
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 1', 'Concept card explanation');
-    browser.getCurrentUrl().then(function(url) {
-      skillId = url.split('/')[4];
-      topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-      topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+    var handle = await browser.getWindowHandle();
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage
+      .createSkillWithDescriptionAndExplanation(
+        'Skill 1', 'Concept card explanation', false);
+    var url = await browser.getCurrentUrl();
+    skillId = url.split('/')[4];
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+      Constants.SKILL_STATUS_UNASSIGNED);
+    await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
 
-      topicEditorPage.get(topicId);
-      topicEditorPage.moveToQuestionsTab();
-      topicEditorPage.createQuestionForSkillWithIndex(0);
-      explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
-      explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
-      explorationEditorMainTab.addResponse(
-        'TextInput', forms.toRichText('Correct Answer'), null, false,
-        'FuzzyEquals', 'correct');
-      explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
-      explorationEditorMainTab.addHint('Hint 1');
-      explorationEditorMainTab.addSolution('TextInput', {
-        correctAnswer: 'correct',
-        explanation: 'It is correct'
-      });
-      topicEditorPage.saveQuestion();
-
-      topicEditorPage.get(topicId);
-      topicEditorPage.moveToQuestionsTab();
-      topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
-        1, 'Skill 1');
-
-      skillEditorPage.get(skillId);
-      skillEditorPage.moveToQuestionsTab();
-      skillEditorPage.expectNumberOfQuestionsToBe(1);
-    }, function() {
-      // Note to developers:
-      // Promise is returned by getCurrentUrl which is handled here.
-      // No further action is needed.
+    await topicEditorPage.get(topicId);
+    await topicEditorPage.moveToQuestionsTab();
+    await topicEditorPage.createQuestionForSkillWithName('Skill 1');
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Question 1'));
+    await explorationEditorMainTab.setInteraction(
+      'TextInput', 'Placeholder', 5);
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('Correct Answer'), null, false,
+      'FuzzyEquals', 'correct');
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.markAsCorrect();
+    await explorationEditorMainTab.addHint('Hint 1');
+    await explorationEditorMainTab.addSolution('TextInput', {
+      correctAnswer: 'correct',
+      explanation: 'It is correct'
     });
+    await topicEditorPage.saveQuestion();
+
+    await topicEditorPage.get(topicId);
+    await topicEditorPage.moveToQuestionsTab();
+    await topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
+      1, 'Skill 1');
+
+    await skillEditorPage.get(skillId);
+    await skillEditorPage.moveToQuestionsTab();
+    await skillEditorPage.expectNumberOfQuestionsToBe(1);
   });
 
-  it('should add a canonical story to topic correctly', function() {
-    topicEditorPage.expectNumberOfStoriesToBe(0);
-    topicEditorPage.createStory('Story Title');
-    storyEditorPage.returnToTopic();
+  it('should add a canonical story to topic correctly', async function() {
+    await topicEditorPage.expectNumberOfStoriesToBe(0);
+    await topicEditorPage.createStory(
+      'Story Title', 'topic-and-story-editor-one', 'Story description',
+      Constants.TEST_SVG_PATH);
+    await storyEditorPage.returnToTopic();
 
-    topicEditorPage.expectNumberOfStoriesToBe(1);
+    await topicEditorPage.expectNumberOfStoriesToBe(1);
   });
 
-  it('should edit story title, description and notes correctly', function() {
-    topicEditorPage.navigateToStoryWithIndex(0);
-    storyEditorPage.changeStoryNotes(forms.toRichText('Story notes'));
-    storyEditorPage.changeStoryTitle('Story Title Edited');
-    storyEditorPage.changeStoryDescription('Story Description');
-    storyEditorPage.saveStory('Changed story title, description and notes');
+  it('should edit story title, description and notes correctly',
+    async function() {
+      await topicEditorPage.navigateToStoryWithIndex(0);
+      await storyEditorPage.changeStoryNotes(
+        await forms.toRichText('Story notes'));
+      await storyEditorPage.changeStoryTitle('Story Title Edited');
+      await storyEditorPage.changeStoryDescription('Story Description');
+      await storyEditorPage.saveStory(
+        'Changed story title, description and notes');
 
-    storyEditorPage.returnToTopic();
-    topicEditorPage.expectStoryTitleToBe('Story Title Edited', 0);
-    topicEditorPage.navigateToStoryWithIndex(0);
+      await storyEditorPage.returnToTopic();
+      await topicEditorPage.expectStoryTitleToBe('Story Title Edited', 0);
+      await topicEditorPage.navigateToStoryWithIndex(0);
 
-    storyEditorPage.expectTitleToBe('Story Title Edited');
-    storyEditorPage.expectDescriptionToBe('Story Description');
-    storyEditorPage.expectNotesToBe(forms.toRichText('Story notes'));
-  });
+      await storyEditorPage.expectTitleToBe('Story Title Edited');
+      await storyEditorPage.expectDescriptionToBe('Story Description');
+      await storyEditorPage.expectNotesToBe(
+        await forms.toRichText('Story notes'));
+    });
 
-  it('should add and remove nodes (chapters) from a story', function() {
-    topicEditorPage.navigateToStoryWithIndex(0);
-    storyEditorPage.expectNumberOfChaptersToBe(0);
-    storyEditorPage.createInitialChapter('Chapter 1');
-    storyEditorPage.expectNumberOfChaptersToBe(1);
+  it('should assign a skill to, and from subtopics',
+    async function() {
+      await topicsAndSkillsDashboardPage.get();
+      await (
+        topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+          'Skill 2', 'Concept card explanation', true));
+      await topicsAndSkillsDashboardPage.get();
+      await (
+        topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+          'Skill 3', 'Concept card explanation', true));
+      var TOPIC_NAME = 'TASE2';
+      var TOPIC_URL_FRAGMENT_NAME = 'tase-two';
+      var TOPIC_DESCRIPTION = 'TASE2 description';
+      await topicsAndSkillsDashboardPage.get();
+      await topicsAndSkillsDashboardPage.createTopic(
+        TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, TOPIC_DESCRIPTION, false);
+      await topicsAndSkillsDashboardPage.get();
+      await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+      await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+        Constants.SKILL_STATUS_UNASSIGNED);
+      await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
+        0, TOPIC_NAME);
 
-    storyEditorPage.createNewDestinationChapter('Chapter 2');
-    storyEditorPage.expectNumberOfChaptersToBe(2);
-    storyEditorPage.deleteChapterWithIndex(1);
-    storyEditorPage.expectNumberOfChaptersToBe(1);
-  });
+      await topicsAndSkillsDashboardPage.get();
+      await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+      await topicsAndSkillsDashboardPage.filterSkillsByStatus(
+        Constants.SKILL_STATUS_UNASSIGNED);
+      await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
+        0, TOPIC_NAME);
 
-  it('should publish and unpublish a story correctly', function() {
-    topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
-    topicEditorPage.navigateToStoryWithIndex(0);
-    storyEditorPage.publishStory();
-    storyEditorPage.returnToTopic();
+      await topicsAndSkillsDashboardPage.get();
+      await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
 
-    topicEditorPage.expectStoryPublicationStatusToBe('Yes', 0);
-    topicEditorPage.navigateToStoryWithIndex(0);
-    storyEditorPage.unpublishStory();
-    storyEditorPage.returnToTopic();
+      await topicEditorPage.addSubtopic(
+        'Subtopic 1', 'subtopic-two', '../data/test2_svg.svg',
+        'Subtopic1 Content');
+      await topicEditorPage.saveTopic('Added subtopic.');
 
-    topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
-  });
+      await topicEditorPage.navigateToTopicEditorTab();
+      await topicEditorPage.addSubtopic(
+        'Subtopic 2', 'subtopic-three', '../data/test2_svg.svg',
+        'Subtopic2 Content');
+      await topicEditorPage.saveTopic('Added subtopics.');
 
-  it('should assign a skill to, between, and from subtopics', function() {
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 2', 'Concept card explanation');
+      await topicEditorPage.navigateToTopicEditorTab();
+      await topicEditorPage.navigateToReassignModal();
+      await topicEditorPage.expectUncategorizedSkillsToBe(
+        ['Skill 3', 'Skill 2']);
+      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(0, []);
+      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(1, []);
 
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+      await topicEditorPage.dragSkillToSubtopic('Skill 2', 0);
+      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(0, ['Skill 2']);
+      await topicEditorPage.dragSkillToSubtopic('Skill 3', 1);
+      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(1, ['Skill 3']);
+      await topicEditorPage.dragSkillFromSubtopicToSubtopic(1, 0, 'Skill 3');
+      await topicEditorPage.expectSubtopicWithIndexToHaveSkills(
+        0, ['Skill 2', 'Skill 3']);
+      await topicEditorPage.dragSkillFromSubtopicToUncategorized(0, 'Skill 2');
+      await topicEditorPage.expectUncategorizedSkillsToBe(
+        ['Skill 2']);
+      await topicEditorPage.saveRearrangedSkills();
+      await topicEditorPage.saveTopic('Rearranged skills');
+    });
 
-    topicEditorPage.get(topicId);
-    topicEditorPage.moveToSubtopicsTab();
-    topicEditorPage.addSubtopic('Subtopic 1');
-    topicEditorPage.addSubtopic('Subtopic 2');
-    topicEditorPage.saveTopic('Added subtopics.');
-
-    topicEditorPage.expectSubtopicToHaveSkills(0, []);
-    topicEditorPage.expectSubtopicToHaveSkills(1, []);
-
-    topicEditorPage.dragSkillToSubtopic(1, 0);
-    topicEditorPage.expectSubtopicToHaveSkills(0, ['Skill 2']);
-    topicEditorPage.expectSubtopicToHaveSkills(1, []);
-
-    topicEditorPage.dragSkillBetweenSubtopics(0, 0, 1);
-    topicEditorPage.expectSubtopicToHaveSkills(0, []);
-    topicEditorPage.expectSubtopicToHaveSkills(1, ['Skill 2']);
-
-    topicEditorPage.dragSkillFromSubtopicToUncategorized(1, 0);
-    topicEditorPage.expectSubtopicToHaveSkills(0, []);
-    topicEditorPage.expectSubtopicToHaveSkills(1, []);
-  });
-
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
-    users.logout();
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
+    await users.logout();
   });
 });
 
@@ -236,155 +237,197 @@ describe('Chapter editor functionality', function() {
   var dummySkills = [];
   var allowedErrors = [];
   var topicName = 'Topic 0';
+  var topicUrlFragment = 'topic-zero';
   var userEmail = 'creator@chapterTest.com';
 
-  var createDummyExplorations = function(numExplorations) {
+  var createDummyExplorations = async function(numExplorations) {
     var ids = [];
     for (var i = 0; i < numExplorations; i++) {
       var info = dummyExplorationInfo.slice();
       info[0] += i.toString();
-      workflow.createAndPublishExploration.apply(workflow, info);
-      browser.getCurrentUrl().then(function(url) {
-        var id = url.split('/')[4].replace('#', '');
-        ids.push(id);
-      });
+      await workflow.createAndPublishExploration.apply(workflow, info);
+      var url = await browser.getCurrentUrl();
+      var id = url.split('/')[4].replace('#', '');
+      ids.push(id);
     }
     return ids;
   };
 
-  var createDummySkills = function(numSkills) {
+  var createDummySkills = async function(numSkills) {
     var skills = [];
     for (var i = 0; i < numSkills; i++) {
       var skillName = 'skillFromChapterEditor' + i.toString();
-      var material = 'material' + i.toString();
-      workflow.createSkillAndAssignTopic(skillName, material, topicName);
+      var material = 'reviewMaterial' + i.toString();
+      await workflow.createSkillAndAssignTopic(skillName, material, topicName);
       skills.push(skillName);
     }
     return skills;
   };
 
-  beforeAll(function() {
+  beforeAll(async function() {
     topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       userEmail, 'creatorChapterTest');
-    dummyExplorationIds = createDummyExplorations(3);
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic(topicName, 'abbrev');
-    topicEditorPage.createStory('Story 0');
-    browser.getCurrentUrl().then(function(url) {
-      storyId = url.split('/')[4];
-      dummySkills = createDummySkills(2);
+    var handle = await browser.getWindowHandle();
+    dummyExplorationIds = await createDummyExplorations(3);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(
+      topicName, topicUrlFragment, 'Description', false);
+    await topicEditorPage.createStory(
+      'Story 0', 'topic-and-story-editor-two', 'Story description',
+      Constants.TEST_SVG_PATH);
+    var url = await browser.getCurrentUrl();
+    storyId = url.split('/')[4];
+    await general.closeCurrentTabAndSwitchTo(handle);
+    dummySkills = await createDummySkills(2);
+  });
+
+  beforeEach(async function() {
+    await users.login(userEmail);
+    await storyEditorPage.get(storyId);
+  });
+
+  it('should create a basic chapter.', async function() {
+    await storyEditorPage.createNewChapter(
+      'Chapter 1', dummyExplorationIds[0], Constants.TEST_SVG_PATH);
+    await storyEditorPage.navigateToChapterWithName('Chapter 1');
+    await storyEditorPage.changeNodeDescription('Chapter description 1');
+    await storyEditorPage.changeNodeOutline(
+      await forms.toRichText('First outline'));
+    await storyEditorPage.saveStory('First save');
+    await users.logout();
+    await users.login(userEmail);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.editTopic(topicName);
+    await topicEditorPage.navigateToStoryWithIndex(0);
+    await storyEditorPage.navigateToChapterWithName('Chapter 1');
+    await storyEditorPage.expectNodeDescription('Chapter description 1');
+  });
+
+  it(
+    'should check presence of skillreview RTE element in exploration ' +
+    'linked to story', async function() {
+      await browser.get('/create/' + dummyExplorationIds[0]);
+      await waitFor.pageToFullyLoad();
+      await explorationEditorMainTab.setContent(
+        async function(richTextEditor) {
+          await richTextEditor.addRteComponent(
+            'Skillreview', 'Description', 'skillFromChapterEditor0');
+        });
+      await explorationEditorPage.navigateToPreviewTab();
+      await explorationPlayerPage.expectContentToMatch(
+        async function(richTextChecker) {
+          await richTextChecker.readRteComponent(
+            'Skillreview', 'Description',
+            await forms.toRichText('reviewMaterial0'));
+        });
     });
-  });
 
-  beforeEach(function() {
-    users.login(userEmail);
-    storyEditorPage.get(storyId);
-  });
-
-  it('should create a basic chapter.', function() {
-    storyEditorPage.createInitialChapter('Chapter 1');
-    storyEditorPage.setChapterExplorationId(dummyExplorationIds[0]);
-    storyEditorPage.changeNodeOutline(forms.toRichText('First outline'));
-    storyEditorPage.saveStory('First save');
-  });
-
-  it('should add one more chapter to the story', function() {
-    storyEditorPage.createNewDestinationChapter('Chapter 2');
-    storyEditorPage.navigateToChapterByIndex(1);
-    storyEditorPage.changeNodeOutline(forms.toRichText('Second outline'));
-    storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
-    storyEditorPage.saveStory('Second save');
+  it('should add one more chapter to the story', async function() {
+    await storyEditorPage.createNewChapter(
+      'Chapter 2', dummyExplorationIds[1], Constants.TEST_SVG_PATH);
+    await storyEditorPage.navigateToChapterWithName('Chapter 2');
+    await storyEditorPage.changeNodeDescription('Chapter description 2');
+    await storyEditorPage.changeNodeOutline(
+      await forms.toRichText('Second outline'));
+    await storyEditorPage.saveStory('Second save');
+    await users.logout();
+    await users.login(userEmail);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.editTopic(topicName);
+    await topicEditorPage.navigateToStoryWithIndex(0);
+    await storyEditorPage.navigateToChapterWithName('Chapter 2');
+    await storyEditorPage.expectNodeDescription('Chapter description 2');
   });
 
   it('should fail to add one more chapter with existing exploration',
-    function() {
-      storyEditorPage.navigateToChapterByIndex(1);
-      storyEditorPage.createNewDestinationChapter('Chapter 3');
-      storyEditorPage.navigateToChapterByIndex(2);
-      storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
-      storyEditorPage.expectExplorationIdAlreadyExistWarningAndCloseIt();
-      allowedErrors.push('The given exploration already exists in the story.');
+    async function() {
+      await storyEditorPage.createNewChapter(
+        'Chapter 3', dummyExplorationIds[1], Constants.TEST_SVG_PATH);
+      await storyEditorPage.expectExplorationIdAlreadyExistWarning();
+      await storyEditorPage.cancelChapterCreation();
+      await storyEditorPage.discardStoryChanges();
     }
   );
 
   it('should add one more chapter and change the chapters sequences',
-    function() {
-      storyEditorPage.navigateToChapterByIndex(1);
-      storyEditorPage.createNewDestinationChapter('Chapter 3');
-      storyEditorPage.navigateToChapterByIndex(2);
-      storyEditorPage.setChapterExplorationId(dummyExplorationIds[2]);
-      storyEditorPage.selectInitialChapterByName('Chapter 2');
+    async function() {
+      await storyEditorPage.createNewChapter(
+        'Chapter 3', dummyExplorationIds[2], Constants.TEST_SVG_PATH);
+      await storyEditorPage.navigateToChapterWithName('Chapter 3');
+      await storyEditorPage.navigateToStoryEditorTab();
+      await storyEditorPage.expectChaptersListToBe(
+        ['Chapter 1', 'Chapter 2', 'Chapter 3']);
 
-      // Now Chapter 2 is the initial chapter and its destination is
-      // Chapter 3. Make Chapter 2's destination to be Chapter 1
-      storyEditorPage.navigateToChapterByIndex(0);
-      storyEditorPage.removeDestination();
-      storyEditorPage.selectDestinationChapterByName('Chapter 1');
-      storyEditorPage.expectDestinationToBe('Chapter 1');
+      await storyEditorPage.dragChapterToAnotherChapter(
+        'Chapter 3', 'Chapter 1');
+      await storyEditorPage.expectChaptersListToBe(
+        ['Chapter 3', 'Chapter 1', 'Chapter 2']);
 
-      // Make chapter 1's destination to be Chapter 3
-      storyEditorPage.navigateToChapterByIndex(1);
-      storyEditorPage.selectDestinationChapterByName('Chapter 3');
-      storyEditorPage.expectDestinationToBe('Chapter 3');
+      await storyEditorPage.dragChapterToAnotherChapter(
+        'Chapter 2', 'Chapter 1');
+      await storyEditorPage.saveStory('Saving chapters');
+      await storyEditorPage.expectChaptersListToBe(
+        ['Chapter 3', 'Chapter 2', 'Chapter 1']);
     }
   );
 
-  it('should add one prerequisite and acquired skill to chapter 1', function() {
-    storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
-    storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
-    storyEditorPage.addAcquiredSkill(dummySkills[0]);
-    storyEditorPage.expectAcquiredSkillDescriptionCardCount(1);
-    storyEditorPage.addPrerequisiteSkill(dummySkills[1]);
-    storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(1);
-    storyEditorPage.saveStory('Save');
-  });
+  it('should add one prerequisite and acquired skill to chapter 1',
+    async function() {
+      await storyEditorPage.navigateToChapterWithName('Chapter 1');
+      await storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
+      await storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
+      await storyEditorPage.addAcquiredSkill(dummySkills[0]);
+      await storyEditorPage.expectAcquiredSkillDescriptionCardCount(1);
+      await storyEditorPage.addPrerequisiteSkill(dummySkills[1]);
+      await storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(1);
+      await storyEditorPage.saveStory('Save');
+    });
 
   it('should fail to add one prerequisite skill which is already added as' +
-    ' acquired skill', function() {
-    storyEditorPage.addAcquiredSkill(dummySkills[1]);
-    storyEditorPage.expectSaveStoryDisabled();
+    ' acquired skill', async function() {
+    await storyEditorPage.navigateToChapterWithName('Chapter 1');
+    await storyEditorPage.addAcquiredSkill(dummySkills[1]);
+    await storyEditorPage.expectSaveStoryDisabled();
     var warningRegex = new RegExp(
       'The skill with id [a-zA-Z0-9]+ is common to both the acquired and ' +
       'prerequisite skill id ' +
       'list in .*');
-    storyEditorPage.expectWarningInIndicator(warningRegex);
+    await storyEditorPage.expectWarningInIndicator(warningRegex);
+    await storyEditorPage.discardStoryChanges();
   });
 
-  it('should delete prerequisite skill and acquired skill', function() {
-    storyEditorPage.deleteAcquiredSkillByIndex(0);
-    storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
-    storyEditorPage.deletePrerequisiteSkillByIndex(0);
-    storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
+  it('should delete prerequisite skill and acquired skill', async function() {
+    await storyEditorPage.navigateToChapterWithName('Chapter 1');
+    await storyEditorPage.deleteAcquiredSkillByIndex(0);
+    await storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
+    await storyEditorPage.deletePrerequisiteSkillByIndex(0);
+    await storyEditorPage.saveStory('Deleted skill');
+    await storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
   });
 
-  it('should select the "Chapter 2" as initial chapter and get unreachable' +
-    ' error', function() {
-    storyEditorPage.selectInitialChapterByName('Chapter 2');
-    storyEditorPage.expectDisplayUnreachableChapterWarning();
+  it('should delete one chapter and save', async function() {
+    await storyEditorPage.expectNumberOfChaptersToBe(3);
+    await storyEditorPage.deleteChapterWithIndex(1);
+    await storyEditorPage.expectNumberOfChaptersToBe(2);
+    await storyEditorPage.saveStory('Last');
   });
 
-  it('should delete one chapter and save', function() {
-    storyEditorPage.expectNumberOfChaptersToBe(2);
-    storyEditorPage.deleteChapterWithIndex(1);
-    storyEditorPage.expectNumberOfChaptersToBe(1);
-    storyEditorPage.saveStory('Last');
-  });
-
-  afterEach(function() {
-    general.checkForConsoleErrors(allowedErrors);
+  afterEach(async function() {
+    await general.checkForConsoleErrors(allowedErrors);
     while (allowedErrors.length !== 0) {
       allowedErrors.pop();
     }
   });
 
-  afterAll(function() {
-    users.logout();
+  afterAll(async function() {
+    await users.logout();
   });
 });

@@ -24,7 +24,11 @@ require('domain/utilities/url-interpolation.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
+require('services/context.service.ts');
 require('services/editability.service.ts');
+require('services/external-save.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('hintEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -41,9 +45,13 @@ angular.module('oppia').directive('hintEditor', [
         '/components/state-directives/hint-editor/hint-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'EditabilityService', 'StateHintsService',
-        function($scope, EditabilityService, StateHintsService) {
+        'ContextService', 'EditabilityService',
+        'ExternalSaveService', 'StateHintsService',
+        function(
+            ContextService, EditabilityService,
+            ExternalSaveService, StateHintsService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           ctrl.openHintEditor = function() {
             if (ctrl.isEditable) {
               ctrl.hintMemento = angular.copy(ctrl.hint);
@@ -60,7 +68,7 @@ angular.module('oppia').directive('hintEditor', [
             if (contentHasChanged) {
               var hintContentId = ctrl.hint.hintContent.getContentId();
               ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
-                hintContentId);
+                [hintContentId]);
             }
             ctrl.getOnSaveFn()();
           };
@@ -73,12 +81,13 @@ angular.module('oppia').directive('hintEditor', [
           };
 
           ctrl.$onInit = function() {
-            $scope.$on('externalSave', function() {
-              if (ctrl.hintEditorIsOpen &&
-                  ctrl.editHintForm.$valid) {
-                ctrl.saveThisHint();
-              }
-            });
+            ctrl.directiveSubscriptions.add(
+              ExternalSaveService.onExternalSave.subscribe(() => {
+                if (ctrl.hintEditorIsOpen &&
+                      ctrl.editHintForm.$valid) {
+                  ctrl.saveThisHint();
+                }
+              }));
             ctrl.isEditable = EditabilityService.isEditable();
             ctrl.StateHintsService = StateHintsService;
             ctrl.editHintForm = {};
@@ -86,10 +95,16 @@ angular.module('oppia').directive('hintEditor', [
 
             ctrl.HINT_FORM_SCHEMA = {
               type: 'html',
-              ui_config: {}
+              ui_config: {
+                hide_complex_extensions: (
+                  ContextService.getEntityType() === 'question')
+              }
             };
 
             ctrl.hintMemento = null;
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

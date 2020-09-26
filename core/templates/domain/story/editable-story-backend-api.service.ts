@@ -22,8 +22,13 @@ require('domain/story/story-domain.constants.ajs.ts');
 angular.module('oppia').factory('EditableStoryBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'EDITABLE_STORY_DATA_URL_TEMPLATE', 'STORY_PUBLISH_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService,
-      EDITABLE_STORY_DATA_URL_TEMPLATE, STORY_PUBLISH_URL_TEMPLATE) {
+  'STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE',
+  'VALIDATE_EXPLORATIONS_URL_TEMPLATE',
+  function(
+      $http, $q, UrlInterpolationService,
+      EDITABLE_STORY_DATA_URL_TEMPLATE, STORY_PUBLISH_URL_TEMPLATE,
+      STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE,
+      VALIDATE_EXPLORATIONS_URL_TEMPLATE) {
     var _fetchStory = function(storyId, successCallback, errorCallback) {
       var storyDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_STORY_DATA_URL_TEMPLATE, {
@@ -35,12 +40,16 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
         var topicName = angular.copy(response.data.topic_name);
         var storyIsPublished = response.data.story_is_published;
         var skillSummaries = angular.copy(response.data.skill_summaries);
+        var topicUrlFragment = response.data.topic_url_fragment;
+        var classroomUrlFragment = response.data.classroom_url_fragment;
         if (successCallback) {
           successCallback({
             story: story,
             topicName: topicName,
             storyIsPublished: storyIsPublished,
-            skillSummaries: skillSummaries
+            skillSummaries: skillSummaries,
+            topicUrlFragment: topicUrlFragment,
+            classroomUrlFragment: classroomUrlFragment
           });
         }
       }, function(errorResponse) {
@@ -98,6 +107,28 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
       });
     };
 
+    var _validateExplorations = function(
+        storyId, expIds, successCallback, errorCallback) {
+      var validateExplorationsUrl = UrlInterpolationService.interpolateUrl(
+        VALIDATE_EXPLORATIONS_URL_TEMPLATE, {
+          story_id: storyId
+        });
+
+      $http.get(validateExplorationsUrl, {
+        params: {
+          comma_separated_exp_ids: expIds.join(',')
+        }
+      }).then(function(response) {
+        if (successCallback) {
+          successCallback(response.data.validation_error_messages);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
     var _deleteStory = function(
         storyId, successCallback, errorCallback) {
       var storyDataUrl = UrlInterpolationService.interpolateUrl(
@@ -107,6 +138,23 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
       $http['delete'](storyDataUrl).then(function(response) {
         if (successCallback) {
           successCallback(response.status);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _doesStoryWithUrlFragmentExist = function(
+        storyUrlFragment, successCallback, errorCallback) {
+      var storyUrlFragmentUrl = UrlInterpolationService.interpolateUrl(
+        STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
+          story_url_fragment: storyUrlFragment
+        });
+      $http.get(storyUrlFragmentUrl).then(function(response) {
+        if (successCallback) {
+          successCallback(response.data.story_url_fragment_exists);
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -141,6 +189,12 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
         });
       },
 
+      validateExplorations: function(storyId, expIds) {
+        return $q(function(resolve, reject) {
+          _validateExplorations(storyId, expIds, resolve, reject);
+        });
+      },
+
       changeStoryPublicationStatus: function(storyId, newStoryStatusIsPublic) {
         return $q(function(resolve, reject) {
           _changeStoryPublicationStatus(
@@ -151,6 +205,12 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
       deleteStory: function(storyId) {
         return $q(function(resolve, reject) {
           _deleteStory(storyId, resolve, reject);
+        });
+      },
+
+      doesStoryWithUrlFragmentExistAsync: async function(storyUrlFragment) {
+        return $q(function(resolve, reject) {
+          _doesStoryWithUrlFragmentExist(storyUrlFragment, resolve, reject);
         });
       }
     };

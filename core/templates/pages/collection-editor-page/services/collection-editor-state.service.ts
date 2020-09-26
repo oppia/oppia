@@ -27,42 +27,38 @@ require('services/alerts.service.ts');
 
 require('pages/collection-editor-page/collection-editor-page.constants.ajs.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('CollectionEditorStateService', [
   '$rootScope', 'AlertsService', 'CollectionObjectFactory',
   'CollectionRightsBackendApiService', 'CollectionRightsObjectFactory',
   'EditableCollectionBackendApiService', 'UndoRedoService',
-  'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
   function(
       $rootScope, AlertsService, CollectionObjectFactory,
       CollectionRightsBackendApiService, CollectionRightsObjectFactory,
-      EditableCollectionBackendApiService, UndoRedoService,
-      EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED) {
+      EditableCollectionBackendApiService, UndoRedoService) {
     var _collection = CollectionObjectFactory.createEmptyCollection();
     var _collectionRights = (
       CollectionRightsObjectFactory.createEmptyCollectionRights());
     var _collectionIsInitialized = false;
     var _collectionIsLoading = false;
     var _collectionIsBeingSaved = false;
+    var _collectionInitializedEventEmitter = new EventEmitter();
 
     var _setCollection = function(collection) {
       _collection.copyFromCollection(collection);
       if (_collectionIsInitialized) {
-        $rootScope.$broadcast(EVENT_COLLECTION_REINITIALIZED);
+        _collectionInitializedEventEmitter.emit();
       } else {
-        $rootScope.$broadcast(EVENT_COLLECTION_INITIALIZED);
+        _collectionInitializedEventEmitter.emit();
         _collectionIsInitialized = true;
       }
     };
-    var _updateCollection = function(newBackendCollectionObject) {
-      _setCollection(CollectionObjectFactory.create(
-        newBackendCollectionObject));
+    var _updateCollection = function(newCollectionObject) {
+      _setCollection(newCollectionObject);
     };
     var _setCollectionRights = function(collectionRights) {
       _collectionRights.copyFromCollectionRights(collectionRights);
-    };
-    var _updateCollectionRights = function(newBackendCollectionRightsObject) {
-      _setCollectionRights(CollectionRightsObjectFactory.create(
-        newBackendCollectionRightsObject));
     };
 
     return {
@@ -75,8 +71,11 @@ angular.module('oppia').factory('CollectionEditorStateService', [
         _collectionIsLoading = true;
         EditableCollectionBackendApiService.fetchCollection(
           collectionId).then(
-          function(newBackendCollectionObject) {
-            _updateCollection(newBackendCollectionObject);
+          function(newCollectionObject) {
+            _updateCollection(newCollectionObject);
+            // TODO(#8521): Remove the use of $rootScope.$applyAsync()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
           },
           function(error) {
             AlertsService.addWarning(
@@ -85,8 +84,11 @@ angular.module('oppia').factory('CollectionEditorStateService', [
           });
         CollectionRightsBackendApiService.fetchCollectionRights(
           collectionId).then(function(newBackendCollectionRightsObject) {
-          _updateCollectionRights(newBackendCollectionRightsObject);
+          _setCollectionRights(newBackendCollectionRightsObject);
           _collectionIsLoading = false;
+          // TODO(#8521): Remove the use of $rootScope.$applyAsync()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         }, function(error) {
           AlertsService.addWarning(
             error ||
@@ -139,8 +141,9 @@ angular.module('oppia').factory('CollectionEditorStateService', [
        * Sets the collection stored within this service, propogating changes to
        * all bindings to the collection returned by getCollection(). The first
        * time this is called it will fire a global event based on the
-       * EVENT_COLLECTION_INITIALIZED constant. All subsequent
-       * calls will similarly fire a EVENT_COLLECTION_REINITIALIZED event.
+       * _collectionInitializedEventEmitter. All subsequent
+       * calls will similarly fire a event based on
+       * _collectionInitializedEventEmitter
        */
       setCollection: function(collection) {
         _setCollection(collection);
@@ -180,13 +183,16 @@ angular.module('oppia').factory('CollectionEditorStateService', [
         EditableCollectionBackendApiService.updateCollection(
           _collection.getId(), _collection.getVersion(),
           commitMessage, UndoRedoService.getCommittableChangeList()).then(
-          function(collectionBackendObject) {
-            _updateCollection(collectionBackendObject);
+          function(collectionObject) {
+            _updateCollection(collectionObject);
             UndoRedoService.clearChanges();
             _collectionIsBeingSaved = false;
             if (successCallback) {
               successCallback();
             }
+            // TODO(#8521): Remove the use of $rootScope.$applyAsync()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
           }, function(error) {
             AlertsService.addWarning(
               error || 'There was an error when saving the collection.');
@@ -201,6 +207,10 @@ angular.module('oppia').factory('CollectionEditorStateService', [
        */
       isSavingCollection: function() {
         return _collectionIsBeingSaved;
+      },
+
+      get onCollectionInitialized() {
+        return _collectionInitializedEventEmitter;
       }
     };
   }

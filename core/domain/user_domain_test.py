@@ -22,6 +22,64 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import user_domain
 from core.tests import test_utils
 import feconf
+import utils
+
+
+# This mock class will not be needed once the schema version is >=2 for the
+# original class ModifiableUserData. Tests below using this class should also
+# be modified then.
+class MockModifiableUserData(user_domain.ModifiableUserData):
+    """A mock ModifiableUserData class that adds a new attribute to the original
+    class to create a new version of the schema for testing migration of old
+    schema user data dict to latest one.
+    """
+
+    def __init__(
+            self, display_alias, pin, preferred_language_codes,
+            preferred_site_language_code, preferred_audio_language_code,
+            version, user_id=None, fake_field=None):
+        super(MockModifiableUserData, self).__init__(
+            display_alias, pin, preferred_language_codes,
+            preferred_site_language_code, preferred_audio_language_code,
+            version, user_id=None)
+        self.fake_field = fake_field
+
+    CURRENT_SCHEMA_VERSION = 2
+
+    # Overriding method to add a new attribute added names 'fake_field'.
+    @classmethod
+    def from_dict(cls, modifiable_user_data_dict):
+        return MockModifiableUserData(
+            modifiable_user_data_dict['display_alias'],
+            modifiable_user_data_dict['pin'],
+            modifiable_user_data_dict['preferred_language_codes'],
+            modifiable_user_data_dict['preferred_site_language_code'],
+            modifiable_user_data_dict['preferred_audio_language_code'],
+            modifiable_user_data_dict['schema_version'],
+            modifiable_user_data_dict['user_id'],
+            modifiable_user_data_dict['fake_field']
+        )
+
+    # Adding a new method to convert v1 schema data dict to v2.
+    @classmethod
+    def _convert_v1_dict_to_v2_dict(cls, user_data_dict):
+        """Mock function to convert v1 dict to v2."""
+        user_data_dict['schema_version'] = 2
+        user_data_dict['fake_field'] = 'default_value'
+        return user_data_dict
+
+    # Overiding method to first convert raw user data dict to latest version
+    # then returning a ModifiableUserData domain object.
+    @classmethod
+    def from_raw_dict(cls, raw_user_data_dict):
+        intial_schema_version = raw_user_data_dict['schema_version']
+        data_schema_version = intial_schema_version
+        user_data_dict = raw_user_data_dict
+
+        if data_schema_version == 1:
+            user_data_dict = cls._convert_v1_dict_to_v2_dict(user_data_dict)
+
+        return MockModifiableUserData.from_dict(user_data_dict)
 
 
 class UserGlobalPrefsTests(test_utils.GenericTestBase):
@@ -346,7 +404,6 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         learner_playlist.insert_collection_id_at_given_position(
             'collect_id2', 1)
 
-
         self.assertListEqual(
             learner_playlist.collection_ids,
             ['collect_id0', 'collect_id2', 'collect_id1'])
@@ -392,15 +449,255 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             learner_playlist.collection_ids, [])
 
 
-class UserContributionScoringTests(test_utils.GenericTestBase):
+class UserContributionProficiencyTests(test_utils.GenericTestBase):
     """Testing domain object for user contribution scoring model."""
+
+    def setUp(self):
+        super(UserContributionProficiencyTests, self).setUp()
+        self.user_proficiency = user_domain.UserContributionProficiency(
+            'user_id0', 'category0', 0, False)
 
     def test_initialization(self):
         """Testing init method."""
-        user_contribution_scoring = (user_domain.UserContributionScoring(
-            'user_id0', 'category0', 5, True))
+        self.assertEqual(self.user_proficiency.user_id, 'user_id0')
+        self.assertEqual(
+            self.user_proficiency.score_category, 'category0')
+        self.assertEqual(self.user_proficiency.score, 0)
+        self.assertEqual(
+            self.user_proficiency.onboarding_email_sent, False)
 
-        self.assertEqual(user_contribution_scoring.user_id, 'user_id0')
-        self.assertEqual(user_contribution_scoring.score_category, 'category0')
-        self.assertEqual(user_contribution_scoring.score, 5)
-        self.assertEqual(user_contribution_scoring.has_email_been_sent, True)
+    def test_increment_score(self):
+        self.assertEqual(self.user_proficiency.score, 0)
+
+        self.user_proficiency.increment_score(4)
+        self.assertEqual(self.user_proficiency.score, 4)
+
+        self.user_proficiency.increment_score(-3)
+        self.assertEqual(self.user_proficiency.score, 1)
+
+    def test_can_user_review_category(self):
+        self.assertEqual(self.user_proficiency.score, 0)
+        self.assertFalse(self.user_proficiency.can_user_review_category())
+
+        self.user_proficiency.increment_score(
+            feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW)
+
+        self.assertTrue(self.user_proficiency.can_user_review_category())
+
+    def test_mark_onboarding_email_as_sent(self):
+        self.assertFalse(self.user_proficiency.onboarding_email_sent)
+
+        self.user_proficiency.mark_onboarding_email_as_sent()
+
+        self.assertTrue(self.user_proficiency.onboarding_email_sent)
+
+
+class UserContributionRightsTests(test_utils.GenericTestBase):
+    """Testing UserContributionRights domain object."""
+
+    def setUp(self):
+        super(UserContributionRightsTests, self).setUp()
+        self.user_contribution_rights = user_domain.UserContributionRights(
+            'user_id', ['hi'], [], True)
+
+    def test_initialization(self):
+        """Testing init method."""
+
+        self.assertEqual(self.user_contribution_rights.id, 'user_id')
+        self.assertEqual(
+            self.user_contribution_rights
+            .can_review_translation_for_language_codes, ['hi'])
+        self.assertEqual(
+            self.user_contribution_rights
+            .can_review_voiceover_for_language_codes,
+            [])
+        self.assertEqual(
+            self.user_contribution_rights.can_review_questions, True)
+
+    def test_can_review_translation_for_language_codes_incorrect_type(self):
+        self.user_contribution_rights.can_review_translation_for_language_codes = 5 # pylint: disable=line-too-long
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected can_review_translation_for_language_codes to be a list'):
+            self.user_contribution_rights.validate()
+
+    def test_can_review_voiceover_for_language_codes_incorrect_type(self):
+        self.user_contribution_rights.can_review_voiceover_for_language_codes = 5 # pylint: disable=line-too-long
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected can_review_voiceover_for_language_codes to be a list'):
+            self.user_contribution_rights.validate()
+
+    def test_incorrect_language_code_for_voiceover_raise_error(self):
+        self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
+            'invalid_lang_code']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid language_code: invalid_lang_code'):
+            self.user_contribution_rights.validate()
+
+    def test_incorrect_language_code_for_translation_raise_error(self):
+        self.user_contribution_rights.can_review_translation_for_language_codes = [ # pylint: disable=line-too-long
+            'invalid_lang_code']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid language_code: invalid_lang_code'):
+            self.user_contribution_rights.validate()
+
+    def test_can_review_voiceover_for_language_codes_with_duplicate_values(
+            self):
+        self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
+            'hi']
+        self.user_contribution_rights.validate()
+
+        self.user_contribution_rights.can_review_voiceover_for_language_codes = [ # pylint: disable=line-too-long
+            'hi', 'hi']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected can_review_voiceover_for_language_codes list not to have '
+            'duplicate values'):
+            self.user_contribution_rights.validate()
+
+    def test_can_review_translation_for_language_codes_with_duplicate_values(
+            self):
+        self.user_contribution_rights.can_review_translation_for_language_codes = [ # pylint: disable=line-too-long
+            'hi']
+        self.user_contribution_rights.validate()
+
+        self.user_contribution_rights.can_review_translation_for_language_codes = [ # pylint: disable=line-too-long
+            'hi', 'hi']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected can_review_translation_for_language_codes list not to '
+            'have duplicate values'):
+            self.user_contribution_rights.validate()
+
+    def test_incorrect_type_for_can_review_questions_raise_error(self):
+        self.user_contribution_rights.can_review_questions = 5
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected can_review_questions to be a boolean value'):
+            self.user_contribution_rights.validate()
+
+
+class ModifiableUserDataTests(test_utils.GenericTestBase):
+    """Testing domain object for modifiable user data."""
+
+    def test_initialization_with_none_user_id_is_successful(self):
+        """Testing init method user id set None."""
+        schema_version = 1
+        user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias',
+            'pin': '123',
+            'preferred_language_codes': 'preferred_language_codes',
+            'preferred_site_language_code': 'preferred_site_language_code',
+            'preferred_audio_language_code': 'preferred_audio_language_code',
+            'user_id': None,
+        }
+        modifiable_user_data = (
+            user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
+        )
+
+        self.assertEqual(
+            modifiable_user_data.display_alias, 'display_alias')
+        self.assertEqual(modifiable_user_data.pin, '123')
+        self.assertEqual(
+            modifiable_user_data.preferred_language_codes,
+            'preferred_language_codes'
+        )
+        self.assertEqual(
+            modifiable_user_data.preferred_site_language_code,
+            'preferred_site_language_code'
+        )
+        self.assertEqual(
+            modifiable_user_data.preferred_audio_language_code,
+            'preferred_audio_language_code'
+        )
+        self.assertIsNone(modifiable_user_data.user_id)
+        self.assertEqual(modifiable_user_data.version, schema_version)
+
+    def test_initialization_with_valid_user_id_is_successful(self):
+        """Testing init method with a valid user id set."""
+        schema_version = 1
+        user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias',
+            'pin': '123',
+            'preferred_language_codes': 'preferred_language_codes',
+            'preferred_site_language_code': 'preferred_site_language_code',
+            'preferred_audio_language_code': 'preferred_audio_language_code',
+            'user_id': 'user_id',
+        }
+        modifiable_user_data = (
+            user_domain.ModifiableUserData.from_raw_dict(user_data_dict)
+        )
+
+        self.assertEqual(
+            modifiable_user_data.display_alias, 'display_alias')
+        self.assertEqual(modifiable_user_data.pin, '123')
+        self.assertEqual(
+            modifiable_user_data.preferred_language_codes,
+            'preferred_language_codes'
+        )
+        self.assertEqual(
+            modifiable_user_data.preferred_site_language_code,
+            'preferred_site_language_code'
+        )
+        self.assertEqual(
+            modifiable_user_data.preferred_audio_language_code,
+            'preferred_audio_language_code'
+        )
+        self.assertEqual(modifiable_user_data.user_id, 'user_id')
+        self.assertEqual(modifiable_user_data.version, schema_version)
+
+    # This test should be modified to use the original class ModifiableUserData
+    # itself when the CURRENT_SCHEMA_VERSION has been updated to 2 or higher.
+    def test_mock_modifiable_user_data_class_with_all_attributes_given(self):
+        user_data_dict = {
+            'schema_version': 2,
+            'display_alias': 'name',
+            'pin': '123',
+            'preferred_language_codes': ['en', 'es'],
+            'preferred_site_language_code': 'es',
+            'preferred_audio_language_code': 'en',
+            'user_id': None,
+            'fake_field': 'set_value'
+        }
+        modifiable_user_data = (
+            MockModifiableUserData.from_raw_dict(user_data_dict))
+        self.assertEqual(modifiable_user_data.display_alias, 'name')
+        self.assertEqual(modifiable_user_data.pin, '123')
+        self.assertEqual(
+            modifiable_user_data.preferred_language_codes, ['en', 'es'])
+        self.assertEqual(
+            modifiable_user_data.preferred_site_language_code, 'es')
+        self.assertEqual(
+            modifiable_user_data.preferred_audio_language_code, 'en')
+        self.assertEqual(modifiable_user_data.fake_field, 'set_value')
+        self.assertEqual(modifiable_user_data.user_id, None)
+        self.assertEqual(modifiable_user_data.version, 2)
+
+    # This test should be modified to use the original class ModifiableUserData
+    # itself when the CURRENT_SCHEMA_VERSION has been updated to 2 or higher.
+    def test_mock_migration_from_old_version_to_new_works_correctly(self):
+        user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'name',
+            'pin': '123',
+            'preferred_language_codes': ['en', 'es'],
+            'preferred_site_language_code': 'es',
+            'preferred_audio_language_code': 'en',
+            'user_id': None
+        }
+        modifiable_user_data = MockModifiableUserData.from_raw_dict(
+            user_data_dict)
+        self.assertEqual(modifiable_user_data.display_alias, 'name')
+        self.assertEqual(modifiable_user_data.pin, '123')
+        self.assertEqual(
+            modifiable_user_data.preferred_language_codes, ['en', 'es'])
+        self.assertEqual(
+            modifiable_user_data.preferred_site_language_code, 'es')
+        self.assertEqual(
+            modifiable_user_data.preferred_audio_language_code, 'en')
+        self.assertEqual(modifiable_user_data.fake_field, 'default_value')
+        self.assertEqual(modifiable_user_data.user_id, None)
+        self.assertEqual(modifiable_user_data.version, 2)

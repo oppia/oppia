@@ -18,6 +18,7 @@
 
 require('domain/objects/FractionObjectFactory.ts');
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
+require('domain/objects/RatioObjectFactory.ts');
 require('filters/format-rte-preview.filter.ts');
 
 // Filter that changes {{...}} tags into the corresponding parameter input
@@ -25,8 +26,12 @@ require('filters/format-rte-preview.filter.ts');
 // multiple-choice input and image-click input.
 angular.module('oppia').filter('parameterizeRuleDescription', [
   '$filter', 'INTERACTION_SPECS', 'FractionObjectFactory',
-  'NumberWithUnitsObjectFactory', function( $filter, INTERACTION_SPECS,
-      FractionObjectFactory, NumberWithUnitsObjectFactory) {
+  'NumberWithUnitsObjectFactory', 'POSITION_OF_TERMS_MAPPING',
+  'RatioObjectFactory',
+  function(
+      $filter, INTERACTION_SPECS, FractionObjectFactory,
+      NumberWithUnitsObjectFactory, POSITION_OF_TERMS_MAPPING,
+      RatioObjectFactory) {
     return function(rule, interactionId, choices) {
       if (!rule) {
         return '';
@@ -142,6 +147,7 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
           replacementText = NumberWithUnitsObjectFactory
             .fromDict(inputs[varName]).toString();
         } else if (
+          varType === 'SetOfAlgebraicIdentifier' ||
           varType === 'SetOfUnicodeString' ||
           varType === 'SetOfNormalizedString') {
           replacementText = '[';
@@ -158,8 +164,16 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
           replacementText = inputs[varName] + '';
         } else if (
           varType === 'CodeString' || varType === 'UnicodeString' ||
-          varType === 'LogicErrorCategory' || varType === 'NormalizedString') {
+          varType === 'LogicErrorCategory' || varType === 'NormalizedString' ||
+          varType === 'AlgebraicExpression' || varType === 'MathEquation' ||
+          varType === 'NumericExpression') {
           replacementText = inputs[varName];
+        } else if (varType === 'PositionOfTerms') {
+          for (var i = 0; i < POSITION_OF_TERMS_MAPPING.length; i++) {
+            if (POSITION_OF_TERMS_MAPPING[i].name === inputs[varName]) {
+              replacementText = POSITION_OF_TERMS_MAPPING[i].humanReadableName;
+            }
+          }
         } else if (varType === 'ListOfCodeEvaluation') {
           replacementText = '[';
           for (var i = 0; i < inputs[varName].length; i++) {
@@ -169,8 +183,11 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
             replacementText += inputs[varName][i].code;
           }
           replacementText += ']';
+        } else if (varType === 'RatioExpression') {
+          replacementText = RatioObjectFactory
+            .fromList(inputs[varName]).toAnswerString();
         } else {
-          throw Error('Unknown variable type in rule description');
+          throw new Error('Unknown variable type in rule description');
         }
 
         // Replaces all occurances of $ with $$.

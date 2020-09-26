@@ -20,22 +20,22 @@ require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/suggestion-modal.service.ts');
+require(
+  'pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
+  'suggestion-modal-for-creator-view.controller');
 
 angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
-  '$http', '$log',
-  '$uibModal', 'UrlInterpolationService',
-  function($http, $log,
-      $uibModal, UrlInterpolationService) {
-    var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
-      'suggestion-modal-for-creator-view.directive.html'
-    );
-
+  '$http', '$log', '$uibModal', 'UrlInterpolationService',
+  function(
+      $http, $log, $uibModal, UrlInterpolationService) {
     var _showEditStateContentSuggestionModal = function(
         activeThread, suggestionsToReviewList, clearActiveThread,
         canReviewActiveThread) {
       $uibModal.open({
-        templateUrl: _templateUrl,
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
+          'suggestion-modal-for-creator-view.directive.html'
+        ),
         backdrop: true,
         size: 'lg',
         resolve: {
@@ -64,104 +64,7 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
             return activeThread.suggestion.suggestionType;
           }
         },
-        controller: [
-          '$log', '$scope', '$uibModalInstance', 'SuggestionModalService',
-          'canReviewActiveThread', 'description', 'newContent', 'oldContent',
-          'stateName', 'suggestionIsHandled', 'suggestionStatus',
-          'suggestionType',
-          function(
-              $log, $scope, $uibModalInstance, SuggestionModalService,
-              canReviewActiveThread, description, newContent, oldContent,
-              stateName, suggestionIsHandled, suggestionStatus,
-              suggestionType
-          ) {
-            $scope.isNotHandled = !suggestionIsHandled;
-            $scope.canReject = $scope.isNotHandled;
-            $scope.canAccept = $scope.isNotHandled;
-            if (!$scope.isNotHandled) {
-              if (suggestionStatus === (
-                SuggestionModalService.SUGGESTION_ACCEPTED)) {
-                $scope.errorMessage = SuggestionModalService
-                  .SUGGESTION_ACCEPTED_MSG;
-                $scope.isSuggestionRejected = false;
-              } else {
-                $scope.errorMessage = SuggestionModalService
-                  .SUGGESTION_REJECTED_MSG;
-                $scope.isSuggestionRejected = true;
-              }
-            } else {
-              $scope.errorMessage = '';
-            }
-
-            $scope.oldContent = oldContent;
-            $scope.newContent = newContent;
-            $scope.stateName = stateName;
-            $scope.suggestionType = suggestionType;
-            $scope.commitMessage = description;
-            $scope.reviewMessage = null;
-            $scope.summaryMessage = null;
-            $scope.canReviewActiveThread = canReviewActiveThread;
-            // ng-model needs to bind to a property of an object on
-            // the scope (the property cannot sit directly on the scope)
-            // Reference https://stackoverflow.com/q/12618342
-            $scope.suggestionData = {newSuggestionHtml: newContent.html};
-            $scope.suggestionEditorIsShown = false;
-            $scope.acceptSuggestion = function() {
-              SuggestionModalService.acceptSuggestion(
-                $uibModalInstance,
-                {
-                  action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
-                  commitMessage: $scope.commitMessage,
-                  reviewMessage: $scope.reviewMessage,
-                });
-            };
-
-            $scope.rejectSuggestion = function() {
-              SuggestionModalService.rejectSuggestion(
-                $uibModalInstance,
-                {
-                  action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
-                  commitMessage: null,
-                  reviewMessage: $scope.reviewMessage
-                });
-            };
-            $scope.editSuggestion = function() {
-              $scope.suggestionEditorIsShown = true;
-            };
-            $scope.cancel = function() {
-              SuggestionModalService.cancelSuggestion($uibModalInstance);
-            };
-            $scope.isEditButtonShown = function() {
-              return (
-                !$scope.isNotHandled && $scope.isSuggestionRejected &&
-                !$scope.suggestionEditorIsShown);
-            };
-            $scope.isResubmitButtonShown = function() {
-              return (
-                !$scope.isNotHandled && $scope.isSuggestionRejected &&
-                $scope.suggestionEditorIsShown);
-            };
-            $scope.isResubmitButtonDisabled = function() {
-              return !(
-                $scope.summaryMessage &&
-                ($scope.suggestionData.newSuggestionHtml.trim() !==
-                  newContent.html.trim()));
-            };
-            $scope.cancelEditMode = function() {
-              $scope.suggestionEditorIsShown = false;
-            };
-            $scope.resubmitChanges = function() {
-              $uibModalInstance.close({
-                action: SuggestionModalService.ACTION_RESUBMIT_SUGGESTION,
-                newSuggestionHtml: $scope.suggestionData.newSuggestionHtml,
-                summaryMessage: $scope.summaryMessage,
-                stateName: $scope.stateName,
-                suggestionType: $scope.suggestionType,
-                oldContent: $scope.oldContent
-              });
-            };
-          }
-        ]
+        controller: 'SuggestionModalForCreatorViewController'
       }).result.then(function(result) {
         var RESUBMIT_SUGGESTION_URL_TEMPLATE = (
           '/suggestionactionhandler/resubmit/<suggestion_id>');
@@ -213,13 +116,9 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
             }
           }
           clearActiveThread();
-        }, function() {
+        })['catch'](function() {
           $log.error('Error resolving suggestion');
         });
-      }, function() {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
       });
     };
 

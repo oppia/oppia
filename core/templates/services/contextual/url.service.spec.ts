@@ -110,59 +110,129 @@ describe('Url Service', () => {
     mockLocation.pathname = '/topic_editor/abcdefgij';
     expect(function() {
       urlService.getTopicIdFromUrl();
-    }).toThrow();
+    }).toThrowError('Invalid topic id url');
 
     mockLocation.pathname = '/topiceditor/abcdefgijklm';
     expect(function() {
       urlService.getTopicIdFromUrl();
-    }).toThrow();
+    }).toThrowError('Invalid topic id url');
 
     mockLocation.pathname = '/topic_editor';
     expect(function() {
       urlService.getTopicIdFromUrl();
-    }).toThrow();
+    }).toThrowError('Invalid topic id url');
   });
 
-  it('should correctly retrieve topic name from url', () => {
-    mockLocation.pathname = '/topic/abcdefgijklm';
+  it('should correctly retrieve story url fragment from url', () => {
+    mockLocation.pathname = '/learn/math/abcdefgijklm/story/bakery';
     expect(
-      urlService.getTopicNameFromLearnerUrl()
+      urlService.getStoryUrlFragmentFromLearnerUrl()
+    ).toBe('bakery');
+    mockLocation.pathname = '/learn/math/topic-name/review-test/bakery';
+    expect(
+      urlService.getStoryUrlFragmentFromLearnerUrl()
+    ).toBe('bakery');
+    mockLocation.pathname = '/topc/abcdefgijklm';
+    expect(
+      urlService.getStoryUrlFragmentFromLearnerUrl()
+    ).toBe(null);
+
+    mockLocation.pathname = '/explore/16';
+    mockLocation.search = (
+      '?topic_url_fragment=topic&story_url_fragment=story-one');
+    expect(
+      urlService.getStoryUrlFragmentFromLearnerUrl()
+    ).toBe('story-one');
+    mockLocation.search = (
+      '?topic_url_fragment=topic&story_url_fragment=story_one');
+    expect(
+      urlService.getStoryUrlFragmentFromLearnerUrl()
+    ).toBe(null);
+  });
+
+  it('should correctly retrieve subtopic url fragment from url', () => {
+    mockLocation.pathname = '/learn/math/fractions/revision/xyz';
+    expect(
+      urlService.getSubtopicUrlFragmentFromLearnerUrl()
+    ).toBe('xyz');
+    mockLocation.pathname = '/learn/math/topic-name/revision/negative-numbers';
+    expect(
+      urlService.getSubtopicUrlFragmentFromLearnerUrl()
+    ).toBe('negative-numbers');
+    mockLocation.pathname = '/sub/abcdefgijklm';
+    expect(function() {
+      urlService.getSubtopicUrlFragmentFromLearnerUrl();
+    }).toThrowError('Invalid URL for subtopic');
+  });
+
+  it('should correctly retrieve topic url fragment from url', () => {
+    mockLocation.pathname = '/learn/math/abcdefgijklm';
+    expect(
+      urlService.getTopicUrlFragmentFromLearnerUrl()
     ).toBe('abcdefgijklm');
-    mockLocation.pathname = '/topic/topic%20name';
+    mockLocation.pathname = '/learn/math/topic-name';
     expect(
-      urlService.getTopicNameFromLearnerUrl()
-    ).toBe('topic name');
-    mockLocation.pathname = '/practice_session/topic%20name';
+      urlService.getTopicUrlFragmentFromLearnerUrl()
+    ).toBe('topic-name');
+    mockLocation.pathname = '/learn/math/topic-name/practice';
     expect(
-      urlService.getTopicNameFromLearnerUrl()
-    ).toBe('topic name');
+      urlService.getTopicUrlFragmentFromLearnerUrl()
+    ).toBe('topic-name');
     mockLocation.pathname = '/topc/abcdefgijklm';
     expect(function() {
-      urlService.getTopicNameFromLearnerUrl();
+      urlService.getTopicUrlFragmentFromLearnerUrl();
     }).toThrowError('Invalid URL for topic');
   });
 
   it('should correctly retrieve classroom name from url', () => {
-    mockLocation.pathname = '/classroom/abcdefgijklm';
+    mockLocation.pathname = '/learn/math/abcdefgijklm';
     expect(
-      urlService.getClassroomNameFromUrl()
+      urlService.getClassroomUrlFragmentFromLearnerUrl()
+    ).toBe('math');
+    mockLocation.pathname = '/english/topic-name';
+    expect(function() {
+      urlService.getClassroomUrlFragmentFromLearnerUrl();
+    }).toThrowError('Invalid URL for classroom');
+  });
+
+  it('should correctly retrieve selected subtopics from url', () => {
+    mockLocation.pathname = '/practice_session/topicName';
+    mockLocation.search = '?selected_subtopic_ids=abcdefgijklm';
+    expect(
+      urlService.getSelectedSubtopicsFromUrl()
     ).toBe('abcdefgijklm');
-    mockLocation.pathname = '/classroom/class%20name';
+    mockLocation.pathname = '/topic/abcdefgijklm';
+    expect(function() {
+      urlService.getSelectedSubtopicsFromUrl();
+    }).toThrowError('Invalid URL for practice session');
+    mockLocation.pathname = '/practice_session/topicName';
+    mockLocation.search = '?selected_subtopic_idsabcdefgijklm';
+    expect(function() {
+      urlService.getSelectedSubtopicsFromUrl();
+    }).toThrowError('Invalid URL for practice session');
+  });
+
+  it('should correctly retrieve classroom url fragment from url', () => {
+    mockLocation.pathname = '/learn/abcdefgijklm';
     expect(
-      urlService.getClassroomNameFromUrl()
+      urlService.getClassroomUrlFragmentFromUrl()
+    ).toBe('abcdefgijklm');
+    mockLocation.pathname = '/learn/class%20name';
+    expect(
+      urlService.getClassroomUrlFragmentFromUrl()
     ).toBe('class name');
     mockLocation.pathname = '/invalid/abcdefgijklm';
     expect(function() {
-      urlService.getClassroomNameFromUrl();
+      urlService.getClassroomUrlFragmentFromUrl();
     }).toThrowError('Invalid URL for classroom');
   });
 
   it('should correctly retrieve subtopic id from url', () => {
-    mockLocation.pathname = '/subtopic/abcdefgijklm/1';
+    mockLocation.pathname = '/learn/math/abcdefgijklm/revision/1';
     expect(
       urlService.getSubtopicIdFromUrl()
     ).toBe('1');
-    mockLocation.pathname = '/subtopic/topic%20name/20';
+    mockLocation.pathname = '/learn/math/topic%20name/revision/20';
     expect(
       urlService.getSubtopicIdFromUrl()
     ).toBe('20');
@@ -184,31 +254,31 @@ describe('Url Service', () => {
     mockLocation.pathname = '/story_editor/abcdefgij';
     expect(function() {
       urlService.getStoryIdFromUrl();
-    }).toThrow();
+    }).toThrowError('Invalid story id url');
 
     mockLocation.pathname = '/storyeditor/abcdefgijklm';
     expect(function() {
       urlService.getStoryIdFromUrl();
-    }).toThrow();
+    }).toThrowError('Invalid story id url');
 
     mockLocation.pathname = '/story_editor';
     expect(function() {
       urlService.getStoryIdFromUrl();
-    }).toThrow();
+    }).toThrowError('Invalid story id url');
   });
 
   it('should correctly retrieve story id from story viewer url', () => {
     mockLocation.pathname = '/story_viewer/abcdefgijklm';
     expect(function() {
       urlService.getStoryIdFromViewerUrl();
-    }).toThrow();
+    }).toThrowError('Invalid story id url');
 
-    mockLocation.pathname = '/story/abcdefg';
+    mockLocation.pathname = '/learn/math/abcdefgijklm/story/abcdefg';
     expect(function() {
       urlService.getStoryIdFromViewerUrl();
-    }).toThrow();
+    }).toThrowError('Invalid story id url');
 
-    mockLocation.pathname = '/story/abcdefgijklm';
+    mockLocation.pathname = '/learn/math/abcdefgijklm/story/abcdefgijklm';
     expect(
       urlService.getStoryIdFromViewerUrl()
     ).toEqual('abcdefgijklm');
@@ -222,18 +292,7 @@ describe('Url Service', () => {
     mockLocation.pathname = '/skill_editor/abcdefghijk';
     expect(function() {
       urlService.getSkillIdFromUrl();
-    }).toThrow();
-  });
-
-  it('should correctly retrieve story id from url in player', () => {
-    mockLocation.search = '?story_id=mnopqrstuvwx';
-    expect(
-      urlService.getStoryIdInPlayer()
-    ).toBe('mnopqrstuvwx');
-    mockLocation.search = '?story=mnopqrstuvwx';
-    expect(
-      urlService.getStoryIdInPlayer()
-    ).toBe(null);
+    }).toThrowError('Invalid Skill Id');
   });
 
   it('should correctly retrieve collection id from url in exploration player',

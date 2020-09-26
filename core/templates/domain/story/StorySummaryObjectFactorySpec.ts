@@ -18,10 +18,8 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import {
-  StorySummaryObjectFactory,
-  StorySummary
-} from 'domain/story/StorySummaryObjectFactory';
+import { StorySummary, StorySummaryObjectFactory } from
+  'domain/story/StorySummaryObjectFactory';
 
 describe('Story summary object factory', () => {
   let factory: StorySummaryObjectFactory;
@@ -33,8 +31,13 @@ describe('Story summary object factory', () => {
     const sampleStorySummaryBackendDict = {
       id: 'sample_story_id',
       title: 'Story title',
-      node_count: 5,
-      story_is_published: true
+      node_titles: ['Chapter 1', 'Chapter 2'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#F8BF74',
+      description: 'Description',
+      story_is_published: true,
+      completed_node_titles: ['Chapter 1'],
+      url_fragment: 'story-url-fragment'
     };
     _sampleStorySummary = factory.createFromBackendDict(
       sampleStorySummaryBackendDict
@@ -44,7 +47,14 @@ describe('Story summary object factory', () => {
   it('should be able to get all the values', () => {
     expect(_sampleStorySummary.getId()).toEqual('sample_story_id');
     expect(_sampleStorySummary.getTitle()).toEqual('Story title');
-    expect(_sampleStorySummary.getNodeCount()).toEqual(5);
+    expect(_sampleStorySummary.getUrlFragment()).toEqual('story-url-fragment');
+    expect(_sampleStorySummary.getNodeTitles()).toEqual([
+      'Chapter 1', 'Chapter 2']);
+    expect(_sampleStorySummary.getThumbnailFilename()).toEqual('image.svg');
+    expect(_sampleStorySummary.getThumbnailBgColor()).toEqual('#F8BF74');
+    expect(_sampleStorySummary.getDescription()).toEqual('Description');
     expect(_sampleStorySummary.isStoryPublished()).toBe(true);
+    expect(_sampleStorySummary.isNodeCompleted('Chapter 1')).toBe(true);
+    expect(_sampleStorySummary.isNodeCompleted('Chapter 2')).toBe(false);
   });
 });

@@ -16,417 +16,431 @@
  * @fileoverview Expression syntax tree service.
  */
 
-require('expressions/expression-parser.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('ExpressionSyntaxTreeService', [
-  'ExpressionParserService', 'PARAMETER_TYPES',
-  function(ExpressionParserService, PARAMETER_TYPES) {
-    // Exceptions that can be thrown from the evaluation of expressions.
-    const ExpressionError = function() {};
-    ExpressionError.prototype = new Error();
-    ExpressionError.prototype.constructor = ExpressionError;
+import { AppConstants } from 'app.constants';
+import { ExpressionParserService } from
+  'expressions/expression-parser.service.ts';
 
-    var ExprUndefinedVarError = function(varname, envs) {
-      this.varname = varname;
-      this.envs = envs;
-    };
-    ExprUndefinedVarError.prototype = new ExpressionError();
-    ExprUndefinedVarError.prototype.constructor = ExprUndefinedVarError;
-    ExprUndefinedVarError.prototype.name = 'ExprUndefinedVarError';
-    ExprUndefinedVarError.prototype.toString = function() {
-      return this.name + ': ' + this.varname + ' not found in ' + this.envs;
-    };
+export type Expr = string | number | boolean;
 
-    var ExprWrongNumArgsError = function(args, expectedMin, expectedMax) {
-      this.args = args;
-      this.expectedMin = expectedMin;
-      this.expectedMax = expectedMax;
-    };
-    ExprWrongNumArgsError.prototype = new ExpressionError();
-    ExprWrongNumArgsError.prototype.constructor = ExprWrongNumArgsError;
-    ExprWrongNumArgsError.prototype.name = 'ExprWrongNumArgsError';
-    ExprWrongNumArgsError.prototype.toString = function() {
-      return this.name + ': {' + this.args + '} not in range [' +
-        this.expectedMin + ',' + this.expectedMax + ']';
-    };
+export interface SystemEnv {
+  eval: (args: Expr[]) => Expr;
+  getType: (args: string[]) => string;
+}
 
-    var ExprWrongArgTypeError = function(arg, actualType, expectedType) {
-      this.arg = arg;
-      this.actualType = actualType;
-      this.expectedType = expectedType;
-    };
-    ExprWrongArgTypeError.prototype = new ExpressionError();
-    ExprWrongArgTypeError.prototype.constructor = ExprWrongArgTypeError;
-    ExprWrongArgTypeError.prototype.name = 'ExprWrongArgTypeError';
-    ExprWrongArgTypeError.prototype.toString = function() {
-      if (this.arg === null) {
-        return this.name + ': Type ' + this.actualType +
-        ' does not match expected type ' + this.expectedType;
+export type Env = SystemEnv | Expr;
+
+export interface EnvDict {
+  [param: string]: Env;
+}
+
+export class ExpressionError extends Error {
+  // 'message' is optional beacuse it is optional in the actual 'Error'
+  // constructor object. Also, we may not want a custom error message
+  // while throwing 'ExpressionError'.
+  constructor(message?: string) {
+    super(message);
+    // NOTE TO DEVELOPERS: In order to properly extend Error, we must manually
+    // rebuild the prototype chain because it is broken by the call to `super`.
+    // For details, please see: https://stackoverflow.com/a/58417721/4859885.
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.name = new.target.name;
+  }
+}
+
+export class ExprUndefinedVarError extends ExpressionError {
+  constructor(public varname: string, public envs: EnvDict[]) {
+    super(varname + ' not found in ' + angular.toJson(envs));
+  }
+}
+
+export class ExprWrongNumArgsError extends ExpressionError {
+  constructor(
+      public args: (number|string)[],
+      public expectedMin: number, public expectedMax: number) {
+    super(
+      '{' + args + '} not in range [' + expectedMin + ', ' + expectedMax + ']');
+  }
+}
+
+export class ExprWrongArgTypeError extends ExpressionError {
+  constructor(
+      public arg: number|string,
+      public actualType: string, public expectedType: string) {
+    super(
+      (
+        arg !== null ?
+        (arg + ' has type ' + actualType + ' which') : ('Type ' + actualType)) +
+      ' does not match expected type ' + expectedType);
+  }
+}
+
+@Injectable({ providedIn: 'root' })
+export class ExpressionSyntaxTreeService {
+  constructor(private expressionParserService: ExpressionParserService) {}
+
+  public ExpressionError = ExpressionError;
+  public ExprUndefinedVarError = ExprUndefinedVarError;
+  public ExprWrongNumArgsError = ExprWrongNumArgsError;
+  public ExprWrongArgTypeError = ExprWrongArgTypeError;
+
+  public getParamsUsedInExpression(expression: string): string[] {
+    const parsedExpression = this.expressionParserService.parse(expression);
+    return [...this.findParams(parsedExpression)].sort();
+  }
+
+  public applyFunctionToParseTree(
+      parsed: Expr | Expr[], envs: EnvDict[],
+      func: (parsed: Expr | Expr[], envs: EnvDict[]) => Expr): Expr {
+    return func(parsed, envs.concat(this.system));
+  }
+
+  // Looks up a variable of the given name in the env. Here the variable can be
+  // system or user-defined functions or parameters, including system operators.
+  public lookupEnvs(name: string, envs: EnvDict[]): Env {
+    for (const env of envs) {
+      if (env.hasOwnProperty(name)) {
+        return env[name];
       }
-      return this.name + ': ' + this.arg + ' has type ' + this.actualType +
-        ' which does not match expected type ' + this.expectedType;
-    };
+    }
+    throw new ExprUndefinedVarError(name, envs);
+  }
 
-    var getParamsUsedInExpression = function(expression) {
-      var _findParams = function(parseTree) {
-        var paramsFound = [];
-
-        if (parseTree instanceof Array) {
-          if (parseTree[0] === '#') {
-            paramsFound.push(parseTree[1]);
-          } else {
-            for (var i = 1; i < parseTree.length; i++) {
-              paramsFound = paramsFound.concat(_findParams(parseTree[i]));
-            }
-          }
-        }
-
-        var uniqueParams = [];
-        for (var i = 0; i < paramsFound.length; i++) {
-          if (uniqueParams.indexOf(paramsFound[i]) === -1) {
-            uniqueParams.push(paramsFound[i]);
-          }
-        }
-
-        return uniqueParams.sort();
-      };
-
-      var parsed = ExpressionParserService.parse(expression);
-      return _findParams(parsed);
-    };
-
-    // Checks if the args array has the expectedNum number of elements and
-    // throws an error if not. If optional expectedMax is specified, it
-    // verifies the number of args is in [expectedNum, expectedMax] range
-    // inclusive.
-    var verifyNumArgs = function(args, expectedNum, expectedMax = expectedNum) {
-      if (expectedMax === undefined) {
-        expectedMax = expectedNum;
-      }
-      if (args.length >= expectedNum && args.length <= expectedMax) {
-        return;
-      }
-      throw new ExprWrongNumArgsError(args, expectedNum, expectedMax);
-    };
-
-    var _verifyArgTypesMatchExpectedType = function(argTypes, expectedType) {
-      for (var i = 0; i < argTypes.length; i++) {
-        if (argTypes[i] !== expectedType) {
-          throw new ExprWrongArgTypeError(null, argTypes[i], expectedType);
-        }
-      }
-      return true;
-    };
-
-    var _verifyArgTypesMatch = function(argType1, argType2) {
-      if (argType1 !== argType2) {
-        throw new ExprWrongArgTypeError(null, argType1, argType2);
-      }
-      return true;
-    };
-
-    var applyFunctionToParseTree = function(parsed, envs, func) {
-      return func(parsed, envs.concat(system));
-    };
-
-    /**
-     * Looks up a variable of the given name in the env. Here the variable
-     * can be system or user defined functions and parameters, as well as
-     * system operators.
-     * @param {string} name The name to look up.
-     * @param {!Array.<!object>} envs Represents a nested name space
-     *     environment to look up the name in. The first element is looked up
-     *     first (i.e. has higher precedence).
-     * @throws {ExprUndefinedVarError} The named variable was not found in
-     *     the given environment.
-     */
-    const lookupEnvs = (name: string, envs: object[]) => {
-      for (const env of envs) {
-        if (env.hasOwnProperty(name)) {
-          return env[name];
+  private findParams(parseTree: string | string[]): Set<string> {
+    const paramsFound = new Set<string>();
+    if (parseTree instanceof Array) {
+      if (parseTree[0] === '#') {
+        paramsFound.add(parseTree[1]);
+      } else {
+        for (let i = 1; i < parseTree.length; ++i) {
+          this.findParams(parseTree[i]).forEach(p => paramsFound.add(p));
         }
       }
+    }
+    return paramsFound;
+  }
 
-      throw new ExprUndefinedVarError(name, envs);
-    };
+  // Checks if the args array has the expectedMin number of elements and throws
+  // an error if not. If optional expectedMax is specified, it verifies the
+  // number of args is in the inclusive range: [expectedMin, expectedMax].
+  private verifyNumArgs(
+      args: string[],
+      expectedMin: number, expectedMax: number = expectedMin): void {
+    if (args.length < expectedMin || args.length > expectedMax) {
+      throw new ExprWrongNumArgsError(args, expectedMin, expectedMax);
+    }
+  }
 
-    // Coerces the argument to a Number, and throws an error if the result
-    // is NaN.
-    var _coerceToNumber = function(originalValue) {
-      var coercedValue = (+originalValue);
-      if (!isNaN(coercedValue)) {
-        return coercedValue;
+  private verifyArgTypesMatchExpectedType(
+      argTypes: string[], expectedType: string): void {
+    for (const argType of argTypes) {
+      if (argType !== expectedType) {
+        throw new ExprWrongArgTypeError(null, argType, expectedType);
       }
+    }
+  }
+
+  private verifyArgTypesMatch(argType1: string, argType2: string): void {
+    if (argType1 !== argType2) {
+      throw new ExprWrongArgTypeError(null, argType1, argType2);
+    }
+  }
+
+  // Coerces the argument to a Number, and throws an error if the result is NaN.
+  private coerceToNumber(originalValue: string|number): number {
+    const coercedValue = +originalValue;
+    if (isNaN(coercedValue)) {
       throw new ExprWrongArgTypeError(
         originalValue, typeof originalValue, 'Number');
-    };
-
-    // Coerces all values in the given argument array to Number, and throws
-    // an error if the result is NaN.
-    var _coerceAllArgsToNumber = function(args) {
-      for (var i = 0; i < args.length; i++) {
-        args[i] = _coerceToNumber(args[i]);
-      }
-      return args;
-    };
-
-    // NOTE TO DEVELOPERS: When adding a new reserved word to this object,
-    //   please first ensure that existing explorations do not use this
-    //   parameter name. Also, to prevent future explorations using it,
-    //   modify constants.INVALID_PARAMETER_NAMES accordingly.
-    // TODO(kashida): Document all operators input and output contracts.
-    // Arguments:
-    // args: for eval(): list of values of the evaluated sub-expression
-    //       for getType(): list of types of the evaluated sub-expression
-
-    var system = {
-      '+': {
-        eval: function(args) {
-          verifyNumArgs(args, 1, 2);
-          var numericArgs = _coerceAllArgsToNumber(args);
-          return numericArgs.length === 1 ? numericArgs[0] :
-            numericArgs[0] + numericArgs[1];
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 1, 2);
-          _verifyArgTypesMatchExpectedType(args, PARAMETER_TYPES.REAL);
-          return PARAMETER_TYPES.REAL;
-        }
-      },
-      '-': {
-        eval: function(args) {
-          verifyNumArgs(args, 1, 2);
-          var numericArgs = _coerceAllArgsToNumber(args);
-          return numericArgs.length === 1 ? -numericArgs[0] :
-            numericArgs[0] - numericArgs[1];
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 1, 2);
-          _verifyArgTypesMatchExpectedType(args, PARAMETER_TYPES.REAL);
-          return PARAMETER_TYPES.REAL;
-        }
-      },
-      '*': {
-        eval: function(args) {
-          verifyNumArgs(args, 2);
-          var numericArgs = _coerceAllArgsToNumber(args);
-          return numericArgs[0] * numericArgs[1];
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 2);
-          _verifyArgTypesMatchExpectedType(args, PARAMETER_TYPES.REAL);
-          return PARAMETER_TYPES.REAL;
-        }
-      },
-      '/': {
-        eval: function(args) {
-          verifyNumArgs(args, 2);
-          var numericArgs = _coerceAllArgsToNumber(args);
-          return numericArgs[0] / numericArgs[1];
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 2);
-          _verifyArgTypesMatchExpectedType(args, PARAMETER_TYPES.REAL);
-          return PARAMETER_TYPES.REAL;
-        }
-      },
-      '%': {
-        eval: function(args) {
-          verifyNumArgs(args, 2);
-          var numericArgs = _coerceAllArgsToNumber(args);
-          return numericArgs[0] % numericArgs[1];
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 2);
-          _verifyArgTypesMatchExpectedType(args, PARAMETER_TYPES.REAL);
-          return PARAMETER_TYPES.REAL;
-        }
-      },
-      '<=': {
-        eval: function(args) {
-          verifyNumArgs(args, 2);
-          var numericArgs = _coerceAllArgsToNumber(args);
-          return numericArgs[0] <= numericArgs[1];
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 2);
-          _verifyArgTypesMatchExpectedType(args, PARAMETER_TYPES.REAL);
-          return PARAMETER_TYPES.UNICODE_STRING;
-        }
-      },
-      '>=': {
-        eval: function(args) {
-          verifyNumArgs(args, 2);
-          var numericArgs = _coerceAllArgsToNumber(args);
-          return numericArgs[0] >= numericArgs[1];
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 2);
-          _verifyArgTypesMatchExpectedType(args, PARAMETER_TYPES.REAL);
-          return PARAMETER_TYPES.UNICODE_STRING;
-        }
-      },
-      '<': {
-        eval: function(args) {
-          verifyNumArgs(args, 2);
-          var numericArgs = _coerceAllArgsToNumber(args);
-          return numericArgs[0] < numericArgs[1];
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 2);
-          _verifyArgTypesMatchExpectedType(args, PARAMETER_TYPES.REAL);
-          return PARAMETER_TYPES.UNICODE_STRING;
-        }
-      },
-      '>': {
-        eval: function(args) {
-          verifyNumArgs(args, 2);
-          var numericArgs = _coerceAllArgsToNumber(args);
-          return numericArgs[0] > numericArgs[1];
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 2);
-          _verifyArgTypesMatchExpectedType(args, PARAMETER_TYPES.REAL);
-          return PARAMETER_TYPES.UNICODE_STRING;
-        }
-      },
-      '!': {
-        eval: function(args) {
-          verifyNumArgs(args, 1);
-          return !args[0];
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 1);
-          _verifyArgTypesMatchExpectedType(
-            args, PARAMETER_TYPES.UNICODE_STRING);
-          return PARAMETER_TYPES.UNICODE_STRING;
-        }
-      },
-      '==': {
-        eval: function(args) {
-          verifyNumArgs(args, 2);
-          return args[0] === args[1];
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 2);
-          return PARAMETER_TYPES.UNICODE_STRING;
-        }
-      },
-      '!=': {
-        eval: function(args) {
-          verifyNumArgs(args, 2);
-          return args[0] !== args[1];
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 2);
-          return PARAMETER_TYPES.UNICODE_STRING;
-        }
-      },
-      '&&': {
-        eval: function(args) {
-          // TODO(kashida): Make this short-circuit.
-          verifyNumArgs(args, 2);
-          return Boolean(args[0] && args[1]);
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 2);
-          _verifyArgTypesMatchExpectedType(
-            args, PARAMETER_TYPES.UNICODE_STRING);
-          return PARAMETER_TYPES.UNICODE_STRING;
-        }
-      },
-      '||': {
-        eval: function(args) {
-          // TODO(kashida): Make this short-circuit.
-          verifyNumArgs(args, 2);
-          return Boolean(args[0] || args[1]);
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 2);
-          _verifyArgTypesMatchExpectedType(
-            args, PARAMETER_TYPES.UNICODE_STRING);
-          return PARAMETER_TYPES.UNICODE_STRING;
-        }
-      },
-      // Note that removing quotation marks from this key causes issues with
-      // minification (when running the deployment scripts).
-      /* eslint-disable quote-props */
-      'if': {
-        eval: function(args) {
-          // TODO(kashida): Make this short-circuit.
-          verifyNumArgs(args, 3);
-          return args[0] ? args[1] : args[2];
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 3);
-          _verifyArgTypesMatchExpectedType(
-            [args[0]], PARAMETER_TYPES.UNICODE_STRING);
-          _verifyArgTypesMatch(args[1], args[2]);
-          return args[1];
-        }
-      },
-      'floor': {
-        eval: function(args) {
-          verifyNumArgs(args, 1);
-          var numericArgs = _coerceAllArgsToNumber(args);
-          return Math.floor(numericArgs[0]);
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 1);
-          _verifyArgTypesMatchExpectedType(args, PARAMETER_TYPES.REAL);
-          return PARAMETER_TYPES.REAL;
-        }
-      },
-      'pow': {
-        eval: function(args) {
-          verifyNumArgs(args, 2);
-          var numericArgs = _coerceAllArgsToNumber(args);
-          return Math.pow(args[0], args[1]);
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 2);
-          _verifyArgTypesMatchExpectedType(args, PARAMETER_TYPES.REAL);
-          return PARAMETER_TYPES.REAL;
-        }
-      },
-      'log': {
-        eval: function(args) {
-          verifyNumArgs(args, 2);
-          var numericArgs = _coerceAllArgsToNumber(args);
-          var preciseAns = Math.log(numericArgs[0]) / Math.log(numericArgs[1]);
-          // We round answers to 9 decimal places, so that we don't run into
-          // issues like log(9, 3) = 2.0000000000004.
-          return Math.round(preciseAns * Math.pow(10, 9)) / Math.pow(10, 9);
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 2);
-          _verifyArgTypesMatchExpectedType(args, PARAMETER_TYPES.REAL);
-          return PARAMETER_TYPES.REAL;
-        }
-      },
-      'abs': {
-        eval: function(args) {
-          verifyNumArgs(args, 1);
-          var numericArgs = _coerceAllArgsToNumber(args);
-          return Math.abs(numericArgs[0]);
-        },
-        getType: function(args) {
-          verifyNumArgs(args, 1);
-          _verifyArgTypesMatchExpectedType(args, PARAMETER_TYPES.REAL);
-          return PARAMETER_TYPES.REAL;
-        }
-      }
-      /* eslint-enable quote-props */
-    };
-
-    return {
-      ExpressionError: ExpressionError,
-      ExprUndefinedVarError: ExprUndefinedVarError,
-      ExprWrongNumArgsError: ExprWrongNumArgsError,
-      ExprWrongArgTypeError: ExprWrongArgTypeError,
-      applyFunctionToParseTree: applyFunctionToParseTree,
-      getParamsUsedInExpression: getParamsUsedInExpression,
-      lookupEnvs: lookupEnvs
-    };
+    }
+    return coercedValue;
   }
-]);
+
+  private coerceAllArgsToNumber(args: (number|string)[]): number[] {
+    return args.map(this.coerceToNumber);
+  }
+
+  // NOTE TO DEVELOPERS: When adding a new reserved word to this object, please
+  // first ensure that existing explorations do not use this parameter name.
+  // Also, to prevent future explorations using it, modify
+  // constants.INVALID_PARAMETER_NAMES accordingly.
+  //
+  // TODO(kashida): Document each operator's input and output contracts.
+  //
+  // Arguments:
+  //    for eval(): list of values of the evaluated sub-expression.
+  //    for getType(): list of types of the evaluated sub-expression.
+  private system: {[name: string]: SystemEnv} = {
+    '+': {
+      eval: (args: string[]): number => {
+        this.verifyNumArgs(args, 1, 2);
+        const numericArgs = this.coerceAllArgsToNumber(args);
+        return numericArgs.length === 1 ?
+          numericArgs[0] :
+          numericArgs[0] + numericArgs[1];
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 1, 2);
+        this.verifyArgTypesMatchExpectedType(
+          args, AppConstants.PARAMETER_TYPES.REAL);
+        return AppConstants.PARAMETER_TYPES.REAL;
+      }
+    },
+
+    '-': {
+      eval: (args: string[]): number => {
+        this.verifyNumArgs(args, 1, 2);
+        const numericArgs = this.coerceAllArgsToNumber(args);
+        return numericArgs.length === 1 ?
+          -numericArgs[0] :
+          numericArgs[0] - numericArgs[1];
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 1, 2);
+        this.verifyArgTypesMatchExpectedType(
+          args, AppConstants.PARAMETER_TYPES.REAL);
+        return AppConstants.PARAMETER_TYPES.REAL;
+      }
+    },
+
+    '*': {
+      eval: (args: string[]): number => {
+        this.verifyNumArgs(args, 2);
+        const numericArgs = this.coerceAllArgsToNumber(args);
+        return numericArgs[0] * numericArgs[1];
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 2);
+        this.verifyArgTypesMatchExpectedType(
+          args, AppConstants.PARAMETER_TYPES.REAL);
+        return AppConstants.PARAMETER_TYPES.REAL;
+      }
+    },
+
+    '/': {
+      eval: (args: string[]): number => {
+        this.verifyNumArgs(args, 2);
+        const numericArgs = this.coerceAllArgsToNumber(args);
+        return numericArgs[0] / numericArgs[1];
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 2);
+        this.verifyArgTypesMatchExpectedType(
+          args, AppConstants.PARAMETER_TYPES.REAL);
+        return AppConstants.PARAMETER_TYPES.REAL;
+      }
+    },
+
+    '%': {
+      eval: (args: string[]): number => {
+        this.verifyNumArgs(args, 2);
+        const numericArgs = this.coerceAllArgsToNumber(args);
+        return numericArgs[0] % numericArgs[1];
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 2);
+        this.verifyArgTypesMatchExpectedType(
+          args, AppConstants.PARAMETER_TYPES.REAL);
+        return AppConstants.PARAMETER_TYPES.REAL;
+      }
+    },
+
+    '<=': {
+      eval: (args: string[]): boolean => {
+        this.verifyNumArgs(args, 2);
+        const numericArgs = this.coerceAllArgsToNumber(args);
+        return numericArgs[0] <= numericArgs[1];
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 2);
+        this.verifyArgTypesMatchExpectedType(
+          args, AppConstants.PARAMETER_TYPES.REAL);
+        return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
+      }
+    },
+
+    '>=': {
+      eval: (args: string[]): boolean => {
+        this.verifyNumArgs(args, 2);
+        const numericArgs = this.coerceAllArgsToNumber(args);
+        return numericArgs[0] >= numericArgs[1];
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 2);
+        this.verifyArgTypesMatchExpectedType(
+          args, AppConstants.PARAMETER_TYPES.REAL);
+        return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
+      }
+    },
+
+    '<': {
+      eval: (args: string[]): boolean => {
+        this.verifyNumArgs(args, 2);
+        const numericArgs = this.coerceAllArgsToNumber(args);
+        return numericArgs[0] < numericArgs[1];
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 2);
+        this.verifyArgTypesMatchExpectedType(
+          args, AppConstants.PARAMETER_TYPES.REAL);
+        return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
+      }
+    },
+
+    '>': {
+      eval: (args: string[]): boolean => {
+        this.verifyNumArgs(args, 2);
+        const numericArgs = this.coerceAllArgsToNumber(args);
+        return numericArgs[0] > numericArgs[1];
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 2);
+        this.verifyArgTypesMatchExpectedType(
+          args, AppConstants.PARAMETER_TYPES.REAL);
+        return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
+      }
+    },
+
+    '!': {
+      eval: (args: string[]): boolean => {
+        this.verifyNumArgs(args, 1);
+        return !args[0];
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 1);
+        this.verifyArgTypesMatchExpectedType(
+          args, AppConstants.PARAMETER_TYPES.UNICODE_STRING);
+        return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
+      }
+    },
+
+    '==': {
+      eval: (args: string[]): boolean => {
+        this.verifyNumArgs(args, 2);
+        return args[0] === args[1];
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 2);
+        return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
+      }
+    },
+
+    '!=': {
+      eval: (args: string[]): boolean => {
+        this.verifyNumArgs(args, 2);
+        return args[0] !== args[1];
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 2);
+        return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
+      }
+    },
+
+    '&&': {
+      eval: (args: string[]): boolean => {
+        this.verifyNumArgs(args, 2);
+        return Boolean(args[0] && args[1]);
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 2);
+        this.verifyArgTypesMatchExpectedType(
+          args, AppConstants.PARAMETER_TYPES.UNICODE_STRING);
+        return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
+      }
+    },
+
+    '||': {
+      eval: (args: string[]): boolean => {
+        this.verifyNumArgs(args, 2);
+        return Boolean(args[0] || args[1]);
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 2);
+        this.verifyArgTypesMatchExpectedType(
+          args, AppConstants.PARAMETER_TYPES.UNICODE_STRING);
+        return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
+      }
+    },
+
+    // NOTE TO DEVELOPERS: Removing the quotation marks from the following keys
+    // causes issues with minification when running the deployment scripts.
+    'if': { // eslint-disable-line quote-props
+      eval: (args: string[]): string => {
+        this.verifyNumArgs(args, 3);
+        return args[0] ? args[1] : args[2];
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 3);
+        this.verifyArgTypesMatchExpectedType(
+          [args[0]], AppConstants.PARAMETER_TYPES.UNICODE_STRING);
+        this.verifyArgTypesMatch(args[1], args[2]);
+        return args[1];
+      }
+    },
+
+    'floor': { // eslint-disable-line quote-props
+      eval: (args: string[]): number => {
+        this.verifyNumArgs(args, 1);
+        const numericArgs = this.coerceAllArgsToNumber(args);
+        return Math.floor(numericArgs[0]);
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 1);
+        this.verifyArgTypesMatchExpectedType(
+          args, AppConstants.PARAMETER_TYPES.REAL);
+        return AppConstants.PARAMETER_TYPES.REAL;
+      }
+    },
+
+    'pow': { // eslint-disable-line quote-props
+      eval: (args: string[]): number => {
+        this.verifyNumArgs(args, 2);
+        const numericArgs = this.coerceAllArgsToNumber(args);
+        return Math.pow(numericArgs[0], numericArgs[1]);
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 2);
+        this.verifyArgTypesMatchExpectedType(
+          args, AppConstants.PARAMETER_TYPES.REAL);
+        return AppConstants.PARAMETER_TYPES.REAL;
+      }
+    },
+
+    'log': { // eslint-disable-line quote-props
+      eval: (args: string[]): number => {
+        this.verifyNumArgs(args, 2);
+        const numericArgs = this.coerceAllArgsToNumber(args);
+        const preciseAns = Math.log(numericArgs[0]) / Math.log(numericArgs[1]);
+        // We round answers to 9 decimal places, so that we don't run into
+        // issues like log(9, 3) = 2.0000000000004.
+        return Math.round(preciseAns * Math.pow(10, 9)) / Math.pow(10, 9);
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 2);
+        this.verifyArgTypesMatchExpectedType(
+          args, AppConstants.PARAMETER_TYPES.REAL);
+        return AppConstants.PARAMETER_TYPES.REAL;
+      }
+    },
+
+    'abs': { // eslint-disable-line quote-props
+      eval: (args: string[]): number => {
+        this.verifyNumArgs(args, 1);
+        const numericArgs = this.coerceAllArgsToNumber(args);
+        return Math.abs(numericArgs[0]);
+      },
+      getType: (args: string[]): string => {
+        this.verifyNumArgs(args, 1);
+        this.verifyArgTypesMatchExpectedType(
+          args, AppConstants.PARAMETER_TYPES.REAL);
+        return AppConstants.PARAMETER_TYPES.REAL;
+      }
+    }
+  };
+}
+
+angular.module('oppia').factory(
+  'ExpressionSyntaxTreeService',
+  downgradeInjectable(ExpressionSyntaxTreeService));

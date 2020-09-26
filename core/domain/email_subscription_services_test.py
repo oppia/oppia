@@ -29,7 +29,7 @@ import feconf
     models.NAMES.email, models.NAMES.user])
 
 
-class InformSubscribersTest(test_utils.GenericTestBase):
+class InformSubscribersTest(test_utils.EmailTestBase):
     """Test for informing subscribers when an exploration is published by the
     creator.
     """
@@ -83,11 +83,14 @@ class InformSubscribersTest(test_utils.GenericTestBase):
 
             # Make sure correct number of emails is sent and no email is sent
             # to the person who has unsubscribed from subscription emails.
-            messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)
+            messages = (
+                self._get_sent_email_messages(self.NEW_USER_EMAIL))
             self.assertEqual(len(messages), 1)
-            messages = self.mail_stub.get_sent_messages(to=self.USER_EMAIL)
+            messages = (
+                self._get_sent_email_messages(self.NEW_USER_EMAIL))
             self.assertEqual(len(messages), 1)
-            messages = self.mail_stub.get_sent_messages(to=self.USER_EMAIL_2)
+            messages = (
+                self._get_sent_email_messages(self.USER_EMAIL_2))
             self.assertEqual(len(messages), 0)
 
             # Make sure correct email models are stored.

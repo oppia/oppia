@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 })
 export class WindowRef {
   _window(): Window {
-    // return the global native browser window object
+    // Return the global native browser window object.
     return window;
   }
 
@@ -31,4 +31,3 @@ export class WindowRef {
     return this._window();
   }
 }
-

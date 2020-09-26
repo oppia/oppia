@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -54,11 +55,11 @@ class UserGlobalPrefs(python_utils.OBJECT):
             can_receive_feedback_message_email: bool. Whether the user can
                 receive emails when users submit feedback to their explorations.
             can_receive_subscription_email: bool. Whether the user can receive
-                 subscription emails notifying them about new explorations.
+                subscription emails notifying them about new explorations.
         """
         self.can_receive_email_updates = can_receive_email_updates
         self.can_receive_editor_role_email = can_receive_editor_role_email
-        self.can_receive_feedback_message_email = ( #pylint: disable=invalid-name
+        self.can_receive_feedback_message_email = ( # pylint: disable=invalid-name
             can_receive_feedback_message_email)
         self.can_receive_subscription_email = can_receive_subscription_email
 
@@ -105,7 +106,7 @@ class UserExplorationPrefs(python_utils.OBJECT):
     def to_dict(self):
         """Return dictionary representation of UserExplorationPrefs.
 
-        Return:
+        Returns:
             dict. The keys of the dict are:
                 'mute_feedback_notifications': bool. Whether the given user has
                     muted feedback emails.
@@ -272,11 +273,179 @@ class LearnerPlaylist(python_utils.OBJECT):
         self.collection_ids.remove(collection_id)
 
 
-class UserContributionScoring(python_utils.OBJECT):
-    """Domain object for UserContributionScoringModel."""
+class UserContributionProficiency(python_utils.OBJECT):
+    """Domain object for UserContributionProficiencyModel."""
 
-    def __init__(self, user_id, score_category, score, has_email_been_sent):
+    def __init__(self, user_id, score_category, score, onboarding_email_sent):
         self.user_id = user_id
         self.score_category = score_category
         self.score = score
-        self.has_email_been_sent = has_email_been_sent
+        self.onboarding_email_sent = onboarding_email_sent
+
+    def increment_score(self, increment_by):
+        """Increments the score of the user in the category by the given amount.
+
+        In the first version of the scoring system, the increment_by quantity
+        will be +1, i.e, each user gains a point for a successful contribution
+        and doesn't lose score in any way.
+
+        Args:
+            increment_by: float. The amount to increase the score of the user
+                by.
+        """
+        self.score += increment_by
+
+    def can_user_review_category(self):
+        """Checks if user can review suggestions in category score_category.
+        If the user has score above the minimum required score, then the user
+        is allowed to review.
+
+        Returns:
+            bool. Whether the user can review suggestions under category
+            score_category.
+        """
+        return self.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+
+    def mark_onboarding_email_as_sent(self):
+        """Marks the email as sent."""
+        self.onboarding_email_sent = True
+
+
+class UserContributionRights(python_utils.OBJECT):
+    """Domain object for the UserContributionRightsModel."""
+
+    def __init__(
+            self, user_id, can_review_translation_for_language_codes,
+            can_review_voiceover_for_language_codes, can_review_questions):
+        self.id = user_id
+        self.can_review_translation_for_language_codes = (
+            can_review_translation_for_language_codes)
+        self.can_review_voiceover_for_language_codes = (
+            can_review_voiceover_for_language_codes)
+        self.can_review_questions = can_review_questions
+
+    def can_review_at_least_one_item(self):
+        """Checks whether user has rights to review at least one item.
+
+        Returns:
+            boolean. Whether user has rights to review at east one item.
+        """
+        return (
+            self.can_review_translation_for_language_codes or
+            self.can_review_voiceover_for_language_codes or
+            self.can_review_questions)
+
+    def validate(self):
+        """Validates different attributes of the class."""
+        if not isinstance(self.can_review_translation_for_language_codes, list):
+            raise utils.ValidationError(
+                'Expected can_review_translation_for_language_codes to be a '
+                'list, found: %s' % type(
+                    self.can_review_translation_for_language_codes))
+        for language_code in self.can_review_translation_for_language_codes:
+            if not utils.is_supported_audio_language_code(language_code):
+                raise utils.ValidationError('Invalid language_code: %s' % (
+                    language_code))
+        if len(self.can_review_translation_for_language_codes) != len(set(
+                self.can_review_translation_for_language_codes)):
+            raise utils.ValidationError(
+                'Expected can_review_translation_for_language_codes list not '
+                'to have duplicate values, found: %s' % (
+                    self.can_review_translation_for_language_codes))
+
+        if not isinstance(self.can_review_voiceover_for_language_codes, list):
+            raise utils.ValidationError(
+                'Expected can_review_voiceover_for_language_codes to be a '
+                'list, found: %s' % type(
+                    self.can_review_voiceover_for_language_codes))
+        for language_code in self.can_review_voiceover_for_language_codes:
+            if not utils.is_supported_audio_language_code(language_code):
+                raise utils.ValidationError('Invalid language_code: %s' % (
+                    language_code))
+        if len(self.can_review_voiceover_for_language_codes) != len(set(
+                self.can_review_voiceover_for_language_codes)):
+            raise utils.ValidationError(
+                'Expected can_review_voiceover_for_language_codes list not to '
+                'have duplicate values, found: %s' % (
+                    self.can_review_voiceover_for_language_codes))
+
+        if not isinstance(self.can_review_questions, bool):
+            raise utils.ValidationError(
+                'Expected can_review_questions to be a boolean value, '
+                'found: %s' % type(self.can_review_questions))
+
+
+class ModifiableUserData(python_utils.OBJECT):
+    """Domain object to represent the new values in a UserSettingsModel change
+    submitted by the Android client.
+    """
+
+    def __init__(
+            self, display_alias, pin, preferred_language_codes,
+            preferred_site_language_code, preferred_audio_language_code,
+            version, user_id=None):
+        """Constructs a ModifiableUserData domain object.
+
+        Args:
+            display_alias: str. Display alias of the user shown on Android.
+            pin: str or None. PIN of the user used for PIN based authentication
+                on Android. None if it hasn't been set till now.
+            preferred_language_codes: list(str) or None. Exploration language
+                preferences specified by the user.
+            preferred_site_language_code: str or None. System language
+                preference.
+            preferred_audio_language_code: str or None. Audio language
+                preference.
+            version: int. The version of modifiable user data schema.
+            user_id: str or None. User ID of the user whose data is being
+                updated. None if request did not have a user_id for the user
+                yet and expects the backend to create a new user entry for it.
+        """
+        self.display_alias = display_alias
+        self.pin = pin
+        self.preferred_language_codes = preferred_language_codes
+        self.preferred_site_language_code = preferred_site_language_code
+        self.preferred_audio_language_code = preferred_audio_language_code
+        # The user_id is not intended to be a modifiable attribute, it is just
+        # needed to identify the object.
+        self.user_id = user_id
+        self.version = version
+
+    @classmethod
+    def from_dict(cls, modifiable_user_data_dict):
+        """Return a ModifiableUserData domain object from a dict.
+
+        Args:
+            modifiable_user_data_dict: dict. The dict representation of
+                ModifiableUserData object.
+
+        Returns:
+            ModifiableUserData. The corresponding ModifiableUserData domain
+            object.
+        """
+        return ModifiableUserData(
+            modifiable_user_data_dict['display_alias'],
+            modifiable_user_data_dict['pin'],
+            modifiable_user_data_dict['preferred_language_codes'],
+            modifiable_user_data_dict['preferred_site_language_code'],
+            modifiable_user_data_dict['preferred_audio_language_code'],
+            modifiable_user_data_dict['schema_version'],
+            modifiable_user_data_dict['user_id'],
+        )
+
+    CURRENT_SCHEMA_VERSION = 1
+
+    @classmethod
+    def from_raw_dict(cls, raw_user_data_dict):
+        """Converts the raw_user_data_dict into a ModifiableUserData domain
+        object by converting it according to the latest schema format.
+
+        Args:
+            raw_user_data_dict: dict. The input raw form of user_data dict
+                coming from the controller layer, which has to be converted.
+
+        Returns:
+            ModifiableUserData. The domain object representing the user data
+            dict transformed according to the latest schema version.
+        """
+        return ModifiableUserData.from_dict(raw_user_data_dict)

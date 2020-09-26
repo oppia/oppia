@@ -20,6 +20,18 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { State } from 'domain/state/StateObjectFactory';
+import {
+  DragAndDropSortInputCustomizationArgs,
+  ImageClickInputCustomizationArgs,
+  ItemSelectionInputCustomizationArgs,
+  MultipleChoiceInputCustomizationArgs
+} from 'interactions/customization-args-defs';
+
+type CustomizationArgsWithChoices = (
+  DragAndDropSortInputCustomizationArgs |
+  ItemSelectionInputCustomizationArgs |
+  MultipleChoiceInputCustomizationArgs);
 
 @Injectable({
   providedIn: 'root'
@@ -39,8 +51,7 @@ export class ExtractImageFilenamesFromStateService {
      * @param {object} state - The state from which the html of the content
      *                         should be returned.
      */
-    // TODO(#7165): Replace any with exact type.
-    _getStateContentHtml(state: any): string {
+    _getStateContentHtml(state: State): string {
       return state.content.getHtml();
     }
 
@@ -50,8 +61,7 @@ export class ExtractImageFilenamesFromStateService {
      * @param {object} state - The state from which the html of the outcomes of
      *                         the answer groups should be returned.
      */
-    // TODO(#7165): Replace any with exact type.
-    _getOutcomesHtml(state: any): string {
+    _getOutcomesHtml(state: State): string {
       let outcomesHtml = '';
       state.interaction.answerGroups.forEach(function(answerGroup) {
         let answerGroupHtml = answerGroup.outcome.feedback.getHtml();
@@ -68,8 +78,7 @@ export class ExtractImageFilenamesFromStateService {
      * Gets the html from the hints in the state.
      * @param {object} state - The state whose hints' html should be returned.
      */
-    // TODO(#7165): Replace any with exact type.
-    _getHintsHtml(state: any): string {
+    _getHintsHtml(state: State): string {
       let hintsHtml = '';
       state.interaction.hints.forEach(function(hint) {
         let hintHtml = hint.hintContent.getHtml();
@@ -83,8 +92,7 @@ export class ExtractImageFilenamesFromStateService {
      * @param {object} state - The state whose solution's html should be
      *                         returned.
      */
-    // TODO(#7165): Replace any with exact type.
-    _getSolutionHtml(state: any): string {
+    _getSolutionHtml(state: State): string {
       return state.interaction.solution.explanation.getHtml();
     }
 
@@ -92,8 +100,7 @@ export class ExtractImageFilenamesFromStateService {
      * Gets all the html in a state.
      * @param {object} state - The state whose html is to be fetched.
      */
-    // TODO(#7165): Replace any with exact type.
-    _getAllHtmlOfState(state: any): Array<string> {
+    _getAllHtmlOfState(state: State): string[] {
       let _allHtmlInTheState = [];
       // The order of the extracted image names is same as they appear in a
       // state. The images should be preloaded in the following order ---
@@ -106,9 +113,10 @@ export class ExtractImageFilenamesFromStateService {
           state.interaction.id === this.INTERACTION_TYPE_ITEM_SELECTION ||
           state.interaction.id === this.INTERACTION_TYPE_DRAG_AND_DROP_SORT) {
         let customizationArgsHtml = '';
-        state.interaction.customizationArgs.choices.value.forEach(
-          function(value) {
-            customizationArgsHtml = customizationArgsHtml.concat(value);
+        (<CustomizationArgsWithChoices> state.interaction.customizationArgs)
+          .choices.value.forEach(function(value) {
+            customizationArgsHtml = (
+              customizationArgsHtml.concat(value.getHtml()));
           });
         _allHtmlInTheState.push(customizationArgsHtml);
       }
@@ -125,19 +133,19 @@ export class ExtractImageFilenamesFromStateService {
 
     /**
      * Extracts the filepath object from the filepath-value attribute of the
-     * oppia-noninteractive-image tags in the strHtml(given string).
-     * @param {string} strHtml - The string from which the object of
+     * oppia-noninteractive-image tags in the htmlString(given string).
+     * @param {string} htmlString - The string from which the object of
      *                           filepath should be extracted.
      */
-    // TODO(#7165): Replace any with exact type.
     _extractFilepathValueFromOppiaNonInteractiveImageTag(
-        strHtml: string): Array<any> {
+        htmlString: string): string[] {
       let filenames = [];
-      let dummyElement = document.createElement('div');
-      dummyElement.innerHTML = (
-        this.htmlEscaperService.escapedStrToUnescapedStr(strHtml));
+      let unescapedHtmlString = (
+        this.htmlEscaperService.escapedStrToUnescapedStr(htmlString));
+      let dummyDocument = (
+        new DOMParser().parseFromString(unescapedHtmlString, 'text/html'));
 
-      let imageTagList = dummyElement.getElementsByTagName(
+      let imageTagList = dummyDocument.getElementsByTagName(
         'oppia-noninteractive-image');
       for (let i = 0; i < imageTagList.length; i++) {
         // We have the attribute of filepath in oppia-noninteractive-image tag.
@@ -152,25 +160,51 @@ export class ExtractImageFilenamesFromStateService {
     }
 
     /**
+     * Extracts the SVG filename from the math-content attribute of the
+     * oppia-noninteractive-math tags in the htmlString(given string).
+     * @param {string} htmlString - The string from which the object of
+     *                           filepath should be extracted.
+     */
+    _extractSvgFilenameFromOppiaNonInteractiveMathTag(
+        htmlString: string): string[] {
+      let filenames = [];
+      let unescapedHtmlString = (
+        this.htmlEscaperService.escapedStrToUnescapedStr(htmlString));
+      let dummyDocument = (
+        new DOMParser().parseFromString(unescapedHtmlString, 'text/html'));
+
+      let mathTagList = dummyDocument.getElementsByTagName(
+        'oppia-noninteractive-math');
+      for (let i = 0; i < mathTagList.length; i++) {
+        let mathContentWithValue = JSON.parse(
+          mathTagList[i].getAttribute('math_content-with-value'));
+        filenames.push(mathContentWithValue.svg_filename);
+      }
+      return filenames;
+    }
+
+    /**
      * Gets the filenames of all the images that are a part of the state.
      * @param {object} state - The state from which the filenames of the image
      *                         should be extracted.
      */
-    // TODO(#7165): Replace any with exact type.
-    _getImageFilenamesInState(state: any): Array<string> {
+    _getImageFilenamesInState(state: State): string[] {
       let filenamesInState = [];
       // The Image Click Input interaction has an image whose filename is
       // directly stored in the customizationArgs.imageAndRegion.value
-      // .imagePath
+      // .imagePath.
       if (state.interaction.id === this.INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
-        let filename = (
-          state.interaction.customizationArgs.imageAndRegions.value.imagePath);
+        let filename = ((
+          <ImageClickInputCustomizationArgs> state.interaction
+            .customizationArgs).imageAndRegions.value.imagePath);
         filenamesInState.push(filename);
       }
       let allHtmlOfState = this._getAllHtmlOfState(state);
       allHtmlOfState.forEach((htmlStr) => {
         filenamesInState = filenamesInState.concat(
           this._extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
+        filenamesInState = filenamesInState.concat(
+          this._extractSvgFilenameFromOppiaNonInteractiveMathTag(htmlStr));
       });
       return filenamesInState;
     }

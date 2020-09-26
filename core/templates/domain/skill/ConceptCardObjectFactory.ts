@@ -19,39 +19,56 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-
 import { AppConstants } from 'app.constants';
-import { RecordedVoiceovers, RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SubtitledHtml, SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import {
+  RecordedVoiceovers,
+  RecordedVoiceOverBackendDict,
+  RecordedVoiceoversObjectFactory
+} from 'domain/exploration/RecordedVoiceoversObjectFactory';
+import {
+  SubtitledHtml,
+  SubtitledHtmlBackendDict,
+  SubtitledHtmlObjectFactory
+} from 'domain/exploration/SubtitledHtmlObjectFactory';
+import {
+  WorkedExample,
+  WorkedExampleBackendDict,
+  WorkedExampleObjectFactory
+} from 'domain/skill/WorkedExampleObjectFactory';
+
+export interface ConceptCardBackendDict {
+  'explanation': SubtitledHtmlBackendDict;
+  'worked_examples': WorkedExampleBackendDict[];
+  'recorded_voiceovers': RecordedVoiceOverBackendDict;
+}
 
 export class ConceptCard {
   _explanation: SubtitledHtml;
-  _workedExamples: Array<SubtitledHtml>;
+  _workedExamples: WorkedExample[];
   _recordedVoiceovers: RecordedVoiceovers;
 
   constructor(
-      explanation: SubtitledHtml, workedExamples: Array<SubtitledHtml>,
+      explanation: SubtitledHtml, workedExamples: WorkedExample[],
       recordedVoiceovers: RecordedVoiceovers) {
     this._explanation = explanation;
     this._workedExamples = workedExamples;
     this._recordedVoiceovers = recordedVoiceovers;
   }
-  // TODO(#7165): Replace 'any' with the exact type.
-  toBackendDict(): any {
+
+  toBackendDict(): ConceptCardBackendDict {
     return {
       explanation: this._explanation.toBackendDict(),
       worked_examples: this._workedExamples.map(
-        (workedExample: SubtitledHtml) => {
+        (workedExample: WorkedExample) => {
           return workedExample.toBackendDict();
         }),
       recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
     };
   }
 
-  _getElementsInFirstSetButNotInSecond(setA: Set<string>,
-      setB: Set<string>): Array<string> {
+  _getElementsInFirstSetButNotInSecond(
+      setA: Set<string>,
+      setB: Set<string>): string[] {
     let diffList = Array.from(setA).filter((element) => {
       return !setB.has(element);
     });
@@ -59,10 +76,11 @@ export class ConceptCard {
   }
 
   _extractAvailableContentIdsFromWorkedExamples(
-      workedExamples: Array<SubtitledHtml>): Set<string> {
+      workedExamples: WorkedExample[]): Set<string> {
     let contentIds: Set<string> = new Set();
-    workedExamples.forEach((workedExample: SubtitledHtml) => {
-      contentIds.add(workedExample.getContentId());
+    workedExamples.forEach((workedExample: WorkedExample) => {
+      contentIds.add(workedExample.getQuestion().getContentId());
+      contentIds.add(workedExample.getExplanation().getContentId());
     });
     return contentIds;
   }
@@ -75,11 +93,11 @@ export class ConceptCard {
     this._explanation = explanation;
   }
 
-  getWorkedExamples(): Array<SubtitledHtml> {
+  getWorkedExamples(): WorkedExample[] {
     return this._workedExamples.slice();
   }
 
-  setWorkedExamples(workedExamples: Array<SubtitledHtml>): void {
+  setWorkedExamples(workedExamples: WorkedExample[]): void {
     let oldContentIds = this._extractAvailableContentIdsFromWorkedExamples(
       this._workedExamples);
 
@@ -113,14 +131,13 @@ export class ConceptCardObjectFactory {
   constructor(
       private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
       private recordedVoiceoversObjectFactory:
-          RecordedVoiceoversObjectFactory) {}
+          RecordedVoiceoversObjectFactory,
+      private workedExampleObjectFactory: WorkedExampleObjectFactory) {}
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'workedExampleDicts' is a dict having underscore keys.
   _generateWorkedExamplesFromBackendDict(
-      workedExampleDicts: any): Array<SubtitledHtml> {
-    return workedExampleDicts.map((workedExampleDict: any) => {
-      return this.subtitledHtmlObjectFactory.createFromBackendDict(
+      workedExampleDicts: WorkedExampleBackendDict[]): WorkedExample[] {
+    return workedExampleDicts.map(workedExampleDict=> {
+      return this.workedExampleObjectFactory.createFromBackendDict(
         workedExampleDict);
     });
   }
@@ -141,9 +158,8 @@ export class ConceptCardObjectFactory {
     );
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'conceptCardBackendDict' is a dict having underscore keys.
-  createFromBackendDict(conceptCardBackendDict: any): ConceptCard {
+  createFromBackendDict(
+      conceptCardBackendDict: ConceptCardBackendDict): ConceptCard {
     return new ConceptCard(
       this.subtitledHtmlObjectFactory.createFromBackendDict(
         conceptCardBackendDict.explanation),

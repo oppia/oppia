@@ -19,51 +19,73 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { Component, NgModule, StaticProvider } from '@angular/core';
+import 'angular-ui-sortable';
+import uiValidate from 'angular-ui-validate';
+
+angular.module('oppia', [
+  require('angular-cookies'), 'headroom', 'ngAnimate',
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
+]);
+
+import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { RequestInterceptor } from 'services/request-interceptor.service';
+import { SharedComponentsModule } from 'components/shared-component.module';
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
 
-// This component is needed to force-bootstrap Angular at the beginning of the
-// app.
-@Component({
-  selector: 'service-bootstrap',
-  template: ''
-})
-export class ServiceBootstrapComponent {}
-
-import { AppConstants } from 'app.constants';
-import { CollectionDomainConstants } from
-  'domain/collection/collection-domain.constants';
-import { EditorDomainConstants } from
-  'domain/editor/editor-domain.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { ServicesConstants } from 'services/services.constants';
-import { CollectionEditorPageConstants } from
-  'pages/collection-editor-page/collection-editor-page.constants';
+import { CollectionHistoryTabComponent } from
+  'pages/collection-editor-page/history-tab/collection-history-tab.component';
+import { CollectionDetailsEditor } from
+  // eslint-disable-next-line max-len
+  'pages/collection-editor-page/settings-tab/collection-details-editor.directive';
+import { CollectionPermissionsCard } from
+  // eslint-disable-next-line max-len
+  'pages/collection-editor-page/settings-tab/collection-permissions-card.directive';
+import { CollectionSettingsTabComponent } from
+  'pages/collection-editor-page/settings-tab/collection-settings-tab.component';
+import { CollectionStatisticsTabComponent } from
+  // eslint-disable-next-line max-len
+  'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
+import { platformFeatureInitFactory, PlatformFeatureService } from
+  'services/platform-feature.service';
 
 @NgModule({
   imports: [
     BrowserModule,
-    HttpClientModule
+    HttpClientModule,
+    SharedComponentsModule
   ],
   declarations: [
-    ServiceBootstrapComponent
+    OppiaAngularRootComponent,
+    CollectionHistoryTabComponent,
+    CollectionSettingsTabComponent,
+    CollectionStatisticsTabComponent,
+    CollectionDetailsEditor,
+    CollectionPermissionsCard
   ],
   entryComponents: [
-    ServiceBootstrapComponent
+    OppiaAngularRootComponent,
+    CollectionHistoryTabComponent,
+    CollectionSettingsTabComponent,
+    CollectionStatisticsTabComponent,
   ],
   providers: [
-    AppConstants,
-    CollectionDomainConstants,
-    EditorDomainConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
-    ServicesConstants,
-    CollectionEditorPageConstants
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RequestInterceptor,
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: platformFeatureInitFactory,
+      deps: [PlatformFeatureService],
+      multi: true
+    }
   ]
 })
 class CollectionEditorPageModule {
@@ -80,19 +102,14 @@ const bootstrapFn = (extraProviders: StaticProvider[]) => {
 };
 const downgradedModule = downgradeModule(bootstrapFn);
 
-declare var angular: any;
+declare var angular: ng.IAngularStatic;
 
-angular.module('oppia', [
-  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', require('angular-cookies'), 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
-  'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
-  downgradedModule
-])
+angular.module('oppia').requires.push(downgradedModule);
+
+angular.module('oppia').directive(
   // This directive is the downgraded version of the Angular component to
   // bootstrap the Angular 8.
-  .directive(
-    'serviceBootstrap',
-    downgradeComponent({
-      component: ServiceBootstrapComponent
-    }) as angular.IDirectiveFactory);
+  'oppiaAngularRoot',
+  downgradeComponent({
+    component: OppiaAngularRootComponent
+  }) as angular.IDirectiveFactory);

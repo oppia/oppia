@@ -17,6 +17,10 @@
  * modal.
  */
 
+require(
+  'pages/creator-dashboard-page/modal-templates/' +
+  'upload-activity-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/csrf-token.service.ts');
@@ -24,12 +28,12 @@ require('services/site-analytics.service.ts');
 
 angular.module('oppia').factory('ExplorationCreationService', [
   '$http', '$rootScope', '$timeout', '$uibModal', '$window',
-  'AlertsService', 'CsrfTokenService', 'SiteAnalyticsService',
-  'UrlInterpolationService',
+  'AlertsService', 'CsrfTokenService', 'LoaderService',
+  'SiteAnalyticsService', 'UrlInterpolationService',
   function(
       $http, $rootScope, $timeout, $uibModal, $window,
-      AlertsService, CsrfTokenService, SiteAnalyticsService,
-      UrlInterpolationService) {
+      AlertsService, CsrfTokenService, LoaderService,
+      SiteAnalyticsService, UrlInterpolationService) {
     var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
 
     var explorationCreationInProgress = false;
@@ -42,22 +46,22 @@ angular.module('oppia').factory('ExplorationCreationService', [
 
         explorationCreationInProgress = true;
         AlertsService.clearWarnings();
-        $rootScope.loadingMessage = 'Creating exploration';
+        LoaderService.showLoadingScreen('Creating exploration');
 
         $http.post('/contributehandler/create_new', {
         }).then(function(response) {
           SiteAnalyticsService.registerCreateNewExplorationEvent(
-            response.data.explorationId);
+            response.data.exploration_id);
           $timeout(function() {
             $window.location = UrlInterpolationService.interpolateUrl(
               CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                exploration_id: response.data.explorationId
+                exploration_id: response.data.exploration_id
               }
             );
           }, 150);
           return false;
         }, function() {
-          $rootScope.loadingMessage = '';
+          LoaderService.hideLoadingScreen();
           explorationCreationInProgress = false;
         });
       },
@@ -69,34 +73,11 @@ angular.module('oppia').factory('ExplorationCreationService', [
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/creator-dashboard-page/modal-templates/' +
             'upload-activity-modal.directive.html'),
-          controller: [
-            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-              $scope.save = function() {
-                var returnObj = {
-                  yamlFile: null
-                };
-                var file = (
-                  <HTMLInputElement>document.getElementById('newFileInput')
-                ).files[0];
-                if (!file || !file.size) {
-                  AlertsService.addWarning('Empty file detected.');
-                  return;
-                }
-                returnObj.yamlFile = file;
-
-                $uibModalInstance.close(returnObj);
-              };
-
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-                AlertsService.clearWarnings();
-              };
-            }
-          ]
+          controller: 'UploadActivityModalController'
         }).result.then(function(result) {
           var yamlFile = result.yamlFile;
 
-          $rootScope.loadingMessage = 'Creating exploration';
+          LoaderService.showLoadingScreen('Creating exploration');
 
           var form = new FormData();
           form.append('yaml_file', yamlFile);
@@ -117,7 +98,7 @@ angular.module('oppia').factory('ExplorationCreationService', [
             }).done(function(data) {
               $window.location = UrlInterpolationService.interpolateUrl(
                 CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                  exploration_id: data.explorationId
+                  exploration_id: data.exploration_id
                 }
               );
             }).fail(function(data) {
@@ -125,10 +106,15 @@ angular.module('oppia').factory('ExplorationCreationService', [
               var parsedResponse = JSON.parse(transformedData);
               AlertsService.addWarning(
                 parsedResponse.error || 'Error communicating with server.');
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
               $rootScope.$apply();
             });
           });
+        }, function() {
+          AlertsService.clearWarnings();
+          // Note to developers:
+          // This callback is triggered when the Cancel button is
+          // clicked. No further action is needed.
         });
       }
     };

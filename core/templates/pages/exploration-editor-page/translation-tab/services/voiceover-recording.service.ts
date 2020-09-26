@@ -41,7 +41,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
         var config = {sampleRate: 44100, bitRate: 128};
         mp3Worker = new Worker(lameWorkerFileUrl);
         mp3Worker.onmessage = function(e) {
-          // Async data flow
+          // Async data flow.
           defer.resolve(e.data.buf);
         };
         mp3Worker.postMessage({cmd: 'init', config: config});
@@ -147,8 +147,8 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
           microphoneStream = stream;
           _processMicAudio(stream);
         }, function() {
-          $log.warn('Microphone was not started because of' +
-          'user denied permission.');
+          $log.warn(
+            'Microphone was not started because ofuser denied permission.');
           isRecording = false;
         });
 

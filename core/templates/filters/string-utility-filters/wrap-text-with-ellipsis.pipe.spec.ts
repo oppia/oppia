@@ -58,5 +58,3 @@ describe('Testing filters', function() {
       'With space before...');
   });
 });
-
-

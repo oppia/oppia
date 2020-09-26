@@ -20,10 +20,18 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+export interface SubtitledHtmlBackendDict {
+  'content_id': string;
+  'html': string;
+}
+
 export class SubtitledHtml {
   _html: string;
-  _contentId: string;
-  constructor(html: string, contentId: string) {
+  // A null content_id indicates that the SubtitledHtml has been created
+  // but not saved. Before the SubtitledHtml object is saved into a State,
+  // the content_id should be set to a string.
+  _contentId: string | null;
+  constructor(html: string, contentId: string | null) {
     this._html = html;
     this._contentId = contentId;
   }
@@ -40,15 +48,11 @@ export class SubtitledHtml {
     this._html = newHtml;
   }
 
-  hasNoHtml(): boolean {
-    return !this._html;
+  setContentId(newContentId: string): void {
+    this._contentId = newContentId;
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  toBackendDict(): any {
+  toBackendDict(): SubtitledHtmlBackendDict {
     return {
       html: this._html,
       content_id: this._contentId
@@ -56,7 +60,7 @@ export class SubtitledHtml {
   }
 
   isEmpty(): boolean {
-    return this.hasNoHtml();
+    return !this._html;
   }
 }
 
@@ -64,11 +68,8 @@ export class SubtitledHtml {
   providedIn: 'root'
 })
 export class SubtitledHtmlObjectFactory {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'subtitledHtmlBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(subtitledHtmlBackendDict: any): SubtitledHtml {
+  createFromBackendDict(
+      subtitledHtmlBackendDict: SubtitledHtmlBackendDict): SubtitledHtml {
     return new SubtitledHtml(
       subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
   }

@@ -242,7 +242,5 @@
 	"I18N_PREFERENCES_CHANGE_PICTURE": "החלפת תמונת פרופיל",
 	"I18N_PREFERENCES_EMAIL": "דוא״ל",
 	"I18N_START_HERE": "התחל כאן!",
-	"I18N_STORY_VIEWER_COMPLETED_CHAPTER": "<[title]> - הושלם!",
-	"I18N_TOPIC_VIEWER_PLAY": "הפעלה",
-	"I18N_TOPIC_VIEWER_REVIEW": "סקירה"
+	"I18N_STORY_VIEWER_COMPLETED_CHAPTER": "<[title]> - הושלם!"
 }

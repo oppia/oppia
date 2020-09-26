@@ -19,17 +19,17 @@
 
     <div ng-if="!upcomingInlineInteractionHtml"
          class="conversation-skin-inline-interaction">
-      <div style="padding: 6px 12px;">
+      <div class="oppia-conversation-skin-instructions">
         <[upcomingInteractionInstructions]>
-        <i ng-if="canWindowShowTwoCards()" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
-        <i ng-if="!canWindowShowTwoCards()" class="material-icons md-18" style="position: relative;">&#xE5DB;</i>
+        <i ng-if="canWindowShowTwoCards()" class="material-icons md-18 position-relative">&#xE5C8;</i>
+        <i ng-if="!canWindowShowTwoCards()" class="material-icons md-18 position-relative">&#xE5DB;</i>
       </div>
     </div>
   </div>
 </div>
 
-<div role="main" style="margin: 0 auto; position: relative;" ng-if="hasFullyLoaded">
-  <div class="conversation-skin-cards-container conversation-skin-animate-cards"
+<div role="main" class="oppia-conversation-skin-animate-cards-container position-relative" ng-if="hasFullyLoaded">
+  <div class="conversation-skin-cards-container conversation-skin-animate-cards protractor-test-conversation-skin-cards-container"
        ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
 
     <div class="conversation-skin-tutor-card-container"
@@ -39,6 +39,7 @@
                       !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty()}">
       <tutor-card displayed-card="displayedCard"
                   is-learn-again-button="isLearnAgainButton()"
+                  avatar-image-is-shown="true"
                   start-card-change-animation="startCardChangeAnimation">
       </tutor-card>
       <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
@@ -59,6 +60,19 @@
                       submit-button-is-shown="!answerIsBeingProcessed"
                       on-click-continue-button="showUpcomingCard()">
         </progress-nav>
+      </div>
+      <div ng-if="recommendedExplorationSummaries.length > 0 && (inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
+        <div class="oppia-conversation-skin-next-lession-text-container">
+          <span class="conversation-skin-next-lesson-text">Next Lesson</span>
+          <span><[recommendedExplorationSummaries[0].title]></span>
+        </div>
+        <div>
+          <a href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
+            <md-button class="md-raised oppia-button-raised">
+              <i class="material-icons oppia-vcenter oppia-button-icon" aria-hidden="true">&#xE5C8;</i>
+            </md-button>
+          </a>
+        </div>
       </div>
     </div>
 
@@ -94,12 +108,9 @@
     </div>
   </div>
 
-  <div ng-if="recommendedExplorationSummaries !== null && (collectionSummary || recommendedExplorationSummaries.length > 0)"
+  <div ng-if="!collectionSummary && !inStoryMode && recommendedExplorationSummaries !== null && recommendedExplorationSummaries.length > 0"
        class="conversation-skin-final-recommendations">
     <div ng-if="recommendedExplorationSummaries.length > 0">
-      <span ng-if="collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
-            translate="I18N_PLAYER_NEXT_LESSON">
-      </span>
       <span ng-if="!collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
             translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS">
       </span>
@@ -111,39 +122,18 @@
                                   exploration-title="exp.title"
                                   node-id="nextNodeId"
                                   parent-exploration-ids="parentExplorationIds"
-                                  last-updated-msec="exp.last_updated_msec"
+                                  last-updated-msec="exp.lastUpdatedMsec"
                                   objective="exp.objective"
                                   category="exp.category"
                                   ratings="exp.ratings"
-                                  thumbnail-icon-url="exp.thumbnail_icon_url"
-                                  thumbnail-bg-color="exp.thumbnail_bg_color"
-                                  num-views="exp.num_views"
-                                  is-community-owned="exp.community_owned"
-                                  style="margin-left: 10px;">
+                                  thumbnail-icon-url="exp.thumbnailIconUrl"
+                                  thumbnail-bg-color="exp.thumbnailBgColor"
+                                  num-views="exp.numViews"
+                                  is-community-owned="exp.communityOwned"
+                                  class="oppia-exploration-summary-tile">
         </exploration-summary-tile>
       </div>
 
-      <div ng-if="collectionSummary && !isRefresherExploration" class="conversation-skin-back-to-collection-container">
-        <a ng-href="/collection/<[collectionId]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
-      </div>
-    </div>
-
-    <div ng-if="collectionSummary && recommendedExplorationSummaries.length === 0">
-      <span class="conversation-skin-final-recommendations-header"
-            translate="I18N_PLAYER_RETURN_TO_COLLECTION"
-            translate-values="{collectionTitle: collectionSummary.title}">
-      </span>
-      <div class="oppia-exp-summary-tiles-container conversation-skin-recommended-activities-container">
-        <collection-summary-tile collection-id="collectionSummary.id"
-                                 collection-title="collectionSummary.title"
-                                 last-updated-msec="collectionSummary.last_updated_msec"
-                                 node-count="collectionSummary.node_count"
-                                 objective="collectionSummary.objective"
-                                 thumbnail-icon-url="collectionSummary.thumbnail_icon_url"
-                                 thumbnail-bg-color="collectionSummary.thumbnail_bg_color"
-                                 style="margin-left: 10px;">
-        </collection-summary-tile>
-      </div>
     </div>
   </div>
 
@@ -151,7 +141,10 @@
     <a ng-href="<[storyViewerUrl]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_STORY"></a>
   </div>
   <div ng-if="!collectionSummary && !isRefresherExploration && !inStoryMode" class="conversation-skin-back-to-collection-container">
-    <a ng-href="/library" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_LIBRARY"></a>
+    <a ng-href="/community-library" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_LIBRARY"></a>
+  </div>
+  <div ng-if="collectionSummary && !isRefresherExploration" class="conversation-skin-back-to-collection-container">
+    <a ng-href="/collection/<[collectionId]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
   </div>
 </div>
 
@@ -179,6 +172,25 @@ otherwise they will interfere with the iframed conversation skin directive.
     position: fixed;
     width: 100%;
     z-index: 16;
+  }
+
+  .conversation-skin-next-lesson-wrapper {
+    align-items: center;
+    background-color: white;
+    bottom: 0;
+    display: flex;
+    margin: 0 6px 6px 0;
+    position: absolute;
+    right: 0;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .conversation-skin-next-lesson-text {
+    color: #0D48A1;
+    display: block;
+    font-size: 14px;
+    font-weight: 800;
+    height: 14px;
   }
 
   .conversation-skin-back-to-collection-container {
@@ -211,9 +223,9 @@ otherwise they will interfere with the iframed conversation skin directive.
     display: -webkit-flex;
     display: flex;
     justify-content: center;
-    margin: 0 auto 40px;
+    margin: 0 auto 150px;
     max-width: 1400px;
-    padding: 56px 14px;
+    padding: 56px 14px 0;
     width: 100%;
   }
 
@@ -223,7 +235,8 @@ otherwise they will interfere with the iframed conversation skin directive.
     /* NOTE TO DEVELOPERS: If min-width is changed, max-width in media query
        below should be changed to match. */
     min-width: 360px;
-    width: 100%;
+    position: relative;
+    width: 42%;
     z-index: 3;
   }
 
@@ -246,16 +259,16 @@ otherwise they will interfere with the iframed conversation skin directive.
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
     flex-shrink: 1;
     margin-left: 12px;
-    width: 650px;
     position: relative;
+    width: 650px;
     z-index: 2;
   }
 
   .conversation-skin-oppia-feedback-content,
   .conversation-skin-learner-answer-content {
     margin-bottom: 12px;
-    padding: 8px 12px;
     overflow: auto;
+    padding: 8px 12px;
     word-wrap: break-word;
   }
 
@@ -295,42 +308,45 @@ otherwise they will interfere with the iframed conversation skin directive.
   }
 
   .conversation-skin-feedback-dot-one {
-    -moz-animation: dot 1.0s infinite;
-    -moz-animation-delay: 0.0s;
     -webkit-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.0s;
+    -moz-animation: dot 1.0s infinite;
     animation: dot 1.0s infinite;
+    -webkit-animation-delay: 0.0s;
+    -moz-animation-delay: 0.0s;
     animation-delay: 0.0s;
     opacity: 0;
   }
 
   .conversation-skin-feedback-dot-two {
-    -moz-animation: dot 1.0s infinite;
-    -moz-animation-delay: 0.2s;
     -webkit-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.2s;
+    -moz-animation: dot 1.0s infinite;
     animation: dot 1.0s infinite;
+    -webkit-animation-delay: 0.2s;
+    -moz-animation-delay: 0.2s;
     animation-delay: 0.2s;
     opacity: 0;
   }
 
   .conversation-skin-feedback-dot-three {
-    -moz-animation: dot 1.0s infinite;
-    -moz-animation-delay: 0.4s;
     -webkit-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.4s;
+    -moz-animation: dot 1.0s infinite;
     animation: dot 1.0s infinite;
+    -webkit-animation-delay: 0.4s;
+    -moz-animation-delay: 0.4s;
     animation-delay: 0.4s;
     opacity: 0;
   }
 
   .conversation-skin-final-ratings {
+    background-color: white;
+    margin: 0 auto 60px;
+    padding: 11px;
     text-align: center;
-    margin-bottom: 60px;
+    width: 38%;
   }
   .conversation-skin-final-ratings-header {
     color: #064b46;
-    margin: 20px 0;
+    margin: 20px 0 0;
   }
   .conversation-skin-final-ratings-display {
     color: #064b46;
@@ -357,6 +373,7 @@ otherwise they will interfere with the iframed conversation skin directive.
 
   .conversation-skin-final-summary {
     margin-bottom: 25px;
+    margin-top: 20px;
   }
 
   .conversation-skin-recommended-activities-container {
@@ -374,6 +391,30 @@ otherwise they will interfere with the iframed conversation skin directive.
     position: absolute;
     right: 8px;
     top: -10px;
+  }
+
+  conversation-skin .oppia-conversation-skin-instructions {
+    padding: 6px 12px;
+  }
+
+  conversation-skin .oppia-conversation-skin-animate-cards-container {
+    margin: 0 auto;
+  }
+
+  conversation-skin .oppia-conversation-skin-next-lession-text-container {
+    cursor: default;
+  }
+
+  conversation-skin .oppia-button-raised {
+    background-color: #0D48A1
+  }
+
+  conversation-skin .oppia-button-icon {
+    color: #fff;
+  }
+
+  conversation-skin .oppia-exploration-summary-tile {
+    margin-left: 10px;
   }
 
   @media screen and (max-width: 959px) {
@@ -429,9 +470,19 @@ otherwise they will interfere with the iframed conversation skin directive.
     }
 
     .oppia-learner-view-card {
+      margin-left: 0;
       padding-bottom: 0;
       padding-left: 0;
-      margin-left: 0;
+    }
+
+    .conversation-skin-final-summary {
+      margin: 0 auto;
+      max-width: 650px;
+      width: 100%;
+    }
+    .conversation-skin-final-ratings {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+      width: 100%;
     }
   }
 </style>

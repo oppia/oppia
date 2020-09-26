@@ -115,7 +115,8 @@ def cut_release_branch():
         'Otherwise, increment the third version number '
         '(e.g. 2.5.3 -> 2.5.4)\n')
     release_version = python_utils.INPUT()
-    assert re.match(r'\d+\.\d+\.\d+$', release_version)
+    assert re.match(r'\d+\.\d+\.\d+$', release_version), (
+        'The release version entered is invalid.')
     cut_release_or_hotfix_branch.main(
         args=['--release_version=%s' % release_version])
 
@@ -163,9 +164,7 @@ def main():
             'run them after deployment:\n%s' % '\n'.join(extra_jobs_to_run))
 
     common.open_new_tab_in_browser_if_possible(
-        release_constants.REPEATABLE_JOBS_SPREADSHEETS_URL)
-    common.open_new_tab_in_browser_if_possible(
-        release_constants.ONE_TIME_JOBS_SPREADSHEET_URL)
+        release_constants.JOBS_SPREADSHEETS_URL)
     common.ask_user_to_confirm(
         'Please copy the names of the jobs to be run for this release along '
         'with author names, author mail ids & instruction docs.\n'

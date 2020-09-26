@@ -35,8 +35,9 @@ describe('Build line templates', function() {
       }
     };
   };
-  var buildThenDisplay = function(nameString, readerViewString,
-      antecedentsString, resultsString, variablesString, errorStrings) {
+  var buildThenDisplay = function(
+      nameString, readerViewString, antecedentsString, resultsString,
+      variablesString, errorStrings) {
     return logicProofTeacher2.displayLineTemplate(
       logicProofTeacher2.buildLineTemplate(
         nameString, readerViewString, antecedentsString, resultsString,
@@ -99,7 +100,7 @@ describe('Build line templates', function() {
       'It will not be possible to uniquely identify p from a line of this ' +
       'form.');
 
-    // FUTURE: render this test passable
+    // FUTURE: render this test passable.
     expect(
       errorWrapper2(
         buildThenDisplay, 'exists_introduce',
@@ -276,7 +277,8 @@ describe('Build line templates', function() {
       });
 
       expect(
-        buildThenDisplay('is_scope_creator(n)',
+        buildThenDisplay(
+          'is_scope_creator(n)',
           'template(n)=\'given\' \u2228 template(n)=\'assumption\'', '')
       ).toEqual({
         LHS: 'is_scope_creator(n)',

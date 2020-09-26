@@ -30,6 +30,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rating_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_jobs_continuous
@@ -40,6 +41,8 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
+from google.appengine.ext import ndb
+
 (user_models, feedback_models, exp_models) = models.Registry.import_models(
     [models.NAMES.user, models.NAMES.feedback, models.NAMES.exploration])
 taskqueue_services = models.Registry.import_taskqueue_services()
@@ -48,6 +51,7 @@ search_services = models.Registry.import_search_services()
 
 class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard subscriptions job."""
+
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     USER_A_EMAIL = 'a@example.com'
@@ -195,8 +199,168 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
             ['exp_id'])
 
 
+class PopulateUserAuthDetailsModelOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off PopulateUserAuthDetailsModel migration job."""
+
+    USER_A_EMAIL = 'a@example.com'
+    USER_A_ID = 'uid_voxecidnxaqdvhmoilhxxgeixffkauxc'
+    USER_A_GAE_ID = 'user_a_gae_id'
+    USER_B_EMAIL = 'b@example.com'
+    USER_B_ID = 'uid_mjmohemylmjjdqredntquhfvcyuindem'
+    USER_B_GAE_ID = 'user_b_gae_id'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.PopulateUserAuthDetailsModelOneOffJob.
+            create_new()
+        )
+        user_jobs_one_off.PopulateUserAuthDetailsModelOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        stringified_output = (
+            user_jobs_one_off.PopulateUserAuthDetailsModelOneOffJob.get_output(
+                job_id))
+        output = {}
+        for stringified_distribution in stringified_output:
+            message_list = ast.literal_eval(stringified_distribution)
+            # The following is output:
+            # ['SUCCESS - Created UserAuthDetails model'] = number of users.
+            output[message_list[0]] = int(message_list[1])
+        return output
+
+    def setUp(self):
+        super(PopulateUserAuthDetailsModelOneOffJobTests, self).setUp()
+        user_models.UserSettingsModel.get_by_id(
+            self.get_user_id_from_email('tmpsuperadmin@example.com')).delete()
+        self.user_a_model = user_models.UserSettingsModel(
+            id=self.USER_A_ID,
+            gae_id=self.USER_A_GAE_ID,
+            email=self.USER_A_EMAIL,
+        )
+        self.user_b_model = user_models.UserSettingsModel(
+            id=self.USER_B_ID,
+            gae_id=self.USER_B_GAE_ID,
+            email=self.USER_B_EMAIL
+        )
+        self.user_a_model.put()
+        self.user_b_model.put()
+
+    def test_before_migration_old_users_do_not_exist_in_user_auth_model(self):
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.USER_A_ID))
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.USER_B_ID))
+
+    def test_one_off_job_migrates_old_users_successfully(self):
+
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.USER_A_ID))
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.USER_B_ID))
+
+        output = self._run_one_off_job()
+        expected_output = {
+            'SUCCESS - Created UserAuthDetails model': 2
+        }
+        self.assertEqual(output, expected_output)
+
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        )
+        self.assertEqual(user_auth_details_model.id, self.USER_A_ID)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_B_GAE_ID)
+        )
+        self.assertEqual(user_auth_details_model.id, self.USER_B_ID)
+
+    def test_one_off_job_migrates_old_and_new_users_combined_successfully(self):
+        new_gae_id = 'new_gae_id'
+        new_email = 'new@example.com'
+        user_services.create_new_user(new_gae_id, new_email)
+        new_user_id = user_services.get_user_settings_by_gae_id(
+            new_gae_id).user_id
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, new_gae_id)
+        )
+        # To ensure that UserAuthDetailsModel was created for newly registered
+        # user.
+        self.assertEqual(user_auth_details_model.id, new_user_id)
+
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.USER_A_ID))
+        self.assertIsNone(user_models.UserAuthDetailsModel.get_by_id(
+            self.USER_B_ID))
+
+        output = self._run_one_off_job()
+        expected_output = {
+            'SUCCESS - Created UserAuthDetails model': 3
+        }
+        self.assertEqual(output, expected_output)
+
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        )
+        self.assertEqual(user_auth_details_model.id, self.USER_A_ID)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_B_GAE_ID)
+        )
+        self.assertEqual(user_auth_details_model.id, self.USER_B_ID)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, new_gae_id)
+        )
+        self.assertEqual(user_auth_details_model.id, new_user_id)
+
+    def test_one_off_job_run_multiple_times_fills_auth_model_correctly(self):
+        expected_output = {
+            'SUCCESS - Created UserAuthDetails model': 2
+        }
+        output = self._run_one_off_job()
+        self.assertEqual(output, expected_output)
+        output = self._run_one_off_job()
+        self.assertEqual(output, expected_output)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        )
+        self.assertEqual(user_auth_details_model.id, self.USER_A_ID)
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_B_GAE_ID)
+        )
+        self.assertEqual(user_auth_details_model.id, self.USER_B_ID)
+
+    def test_mark_user_for_deletion_for_migrated_old_users_is_correct(self):
+        self._run_one_off_job()
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        )
+        self.assertEqual(user_auth_details_model.id, self.USER_A_ID)
+        self.assertFalse(user_auth_details_model.deleted)
+        user_services.mark_user_for_deletion(self.USER_A_ID)
+
+        self._run_one_off_job()
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, self.USER_A_GAE_ID)
+        )
+        self.assertEqual(user_auth_details_model.id, self.USER_A_ID)
+        self.assertTrue(user_auth_details_model.deleted)
+
+
 class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off username length distribution job."""
+
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_B_EMAIL = 'ab@example.com'
@@ -218,7 +382,6 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         stringified_output = (
             user_jobs_one_off.UsernameLengthDistributionOneOffJob.get_output(
                 job_id))
-
         output = {}
         for stringified_distribution in stringified_output:
             value = re.findall(r'\d+', stringified_distribution)
@@ -271,8 +434,48 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(output['1'], 1)
 
 
+class UsernameLengthAuditOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off username length limit job."""
+
+    USER_1_EMAIL = '1@example.com'
+    USER_1_USERNAME = '123456789123456789123'
+    USER_2_EMAIL = '2@example.com'
+    USER_2_USERNAME = '123456789123456789124'
+    USER_3_EMAIL = '3@example.com'
+    USER_3_USERNAME = 'a' * 30
+    USER_4_EMAIL = '4@example.com'
+    # Username 4 length is 20, so it shouldn't be in the output.
+    USER_4_USERNAME = '12345678912345678912'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.UsernameLengthAuditOneOffJob.create_new())
+        user_jobs_one_off.UsernameLengthAuditOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        return user_jobs_one_off.UsernameLengthAuditOneOffJob.get_output(job_id)
+
+    def test_username_length_limit(self):
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.signup(self.USER_3_EMAIL, self.USER_3_USERNAME)
+
+        expected_output = [u'[u\'Length: 21\', u"Usernames: [\'%s\', \'%s\']"]'
+                           % (self.USER_1_USERNAME, self.USER_2_USERNAME),
+                           u'[u\'Length: 30\', u"Usernames: [\'%s\']"]'
+                           % self.USER_3_USERNAME]
+
+        actual_output = self._run_one_off_job()
+
+        self.assertEqual(actual_output, expected_output)
+
+
 class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off long userbio length job."""
+
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_A_BIO = 'I am less than 500'
@@ -369,6 +572,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard subscriptions job."""
+
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     COLLECTION_ID_1 = 'col_id_1'
@@ -475,11 +679,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
+                rights_domain.ROLE_EDITOR)
             # User A adds user C as a viewer of the exploration.
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID_1, self.user_c_id,
-                rights_manager.ROLE_VIEWER)
+                rights_domain.ROLE_VIEWER)
 
         self._run_one_off_job()
 
@@ -527,7 +731,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             # User A adds user B as an editor to the exploration.
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
+                rights_domain.ROLE_EDITOR)
             # The exploration becomes community-owned.
             rights_manager.publish_exploration(self.user_a, self.EXP_ID_1)
             rights_manager.release_ownership_of_exploration(
@@ -586,11 +790,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             # User A adds user B as an editor to the collection.
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
+                rights_domain.ROLE_EDITOR)
             # User A adds user C as a viewer of the collection.
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID_1, self.user_c_id,
-                rights_manager.ROLE_VIEWER)
+                rights_domain.ROLE_VIEWER)
 
         self._run_one_off_job()
 
@@ -730,7 +934,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             # User A adds user B as an editor to the collection.
             rights_manager.assign_role_for_collection(
                 self.user_a, self.COLLECTION_ID_1, self.user_b_id,
-                rights_manager.ROLE_EDITOR)
+                rights_domain.ROLE_EDITOR)
 
             # The collection becomes community-owned.
             rights_manager.publish_collection(self.user_a, self.COLLECTION_ID_1)
@@ -768,6 +972,7 @@ class MockUserStatsAggregator(
     """A modified UserStatsAggregator that does not start a new
      batch job when the previous one has finished.
     """
+
     @classmethod
     def _get_batch_job_manager_class(cls):
         return MockUserStatsMRJobManager
@@ -1086,6 +1291,19 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
+            }), exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': init_state_name,
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [{
+                            'content_id': 'ca_choices_0',
+                            'html': '<p>Choice 1</p>'
+                        }]
+                    },
+                    'showChoicesInShuffledOrder': {'value': True}
+                }
             })], 'commit')
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
@@ -1139,64 +1357,6 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertIsNone(user_services.get_user_settings(
             self.owner_id).first_contribution_msec)
-
-
-class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
-
-    FETCHED_GRAVATAR = 'fetched_gravatar'
-
-    def setUp(self):
-        super(UserProfilePictureOneOffJobTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-    def _mock_fetch_gravatar(self, unused_email):
-        """Mocks user_services.fetch_gravatar()."""
-        return self.FETCHED_GRAVATAR
-
-    def test_new_profile_picture_is_generated_if_it_does_not_exist(self):
-        user_services.update_profile_picture_data_url(self.owner_id, None)
-
-        # Before the job runs, the data URL is None.
-        user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertIsNone(user_settings.profile_picture_data_url)
-
-        job_id = (
-            user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
-        user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
-
-        with self.swap(
-            user_services, 'fetch_gravatar', self._mock_fetch_gravatar):
-            self.process_and_flush_pending_tasks()
-
-        # After the job runs, the data URL has been updated.
-        new_user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertEqual(
-            new_user_settings.profile_picture_data_url, self.FETCHED_GRAVATAR)
-
-    def test_profile_picture_is_not_regenerated_if_it_already_exists(self):
-        user_services.update_profile_picture_data_url(
-            self.owner_id, 'manually_added_data_url')
-
-        # Before the job runs, the data URL is the manually-added one.
-        user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertEqual(
-            user_settings.profile_picture_data_url, 'manually_added_data_url')
-
-        job_id = (
-            user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
-        user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
-
-        with self.swap(
-            user_services, 'fetch_gravatar', self._mock_fetch_gravatar):
-            self.process_and_flush_pending_tasks()
-
-        # After the job runs, the data URL is still the manually-added one.
-        new_user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertEqual(
-            new_user_settings.profile_picture_data_url,
-            'manually_added_data_url')
 
 
 class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
@@ -1380,12 +1540,13 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
             exp_models.ExplorationModel.get('%s' % exp_id).delete(
                 self.owner_id, 'deleted exploration')
 
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.owner_id)
-                .activity_ids), 3)
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.user_id)
-                .activity_ids), 3)
+        owner_subscription_model = user_models.UserSubscriptionsModel.get(
+            self.owner_id)
+        self.assertEqual(len(owner_subscription_model.activity_ids), 3)
+
+        user_subscription_model = user_models.UserSubscriptionsModel.get(
+            self.user_id)
+        self.assertEqual(len(user_subscription_model.activity_ids), 3)
 
         job = user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob # pylint: disable=line-too-long
         job_id = job.create_new()
@@ -1395,12 +1556,13 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.owner_id)
-                .activity_ids), 0)
-        self.assertEqual(
-            len(user_models.UserSubscriptionsModel.get(self.user_id)
-                .activity_ids), 0)
+        owner_subscription_model = user_models.UserSubscriptionsModel.get(
+            self.owner_id)
+        self.assertEqual(len(owner_subscription_model.activity_ids), 0)
+
+        user_subscription_model = user_models.UserSubscriptionsModel.get(
+            self.user_id)
+        self.assertEqual(len(user_subscription_model.activity_ids), 0)
         actual_output = job.get_output(job_id)
         expected_output = [
             u'[u\'Successfully cleaned up UserSubscriptionsModel %s and '
@@ -1410,3 +1572,83 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
             'removed explorations 0, 1, 2\', 1]' %
             self.user_id]
         self.assertEqual(sorted(actual_output), sorted(expected_output))
+
+
+class MockUserSettingsModel(user_models.UserSettingsModel):
+    """Mock UserSettingsModel so that it allows to set `gae_user_id`."""
+
+    gae_user_id = ndb.StringProperty(indexed=False, required=False)
+
+
+class RemoveGaeUserIdOneOffJobTests(test_utils.GenericTestBase):
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.RemoveGaeUserIdOneOffJob.create_new())
+        user_jobs_one_off.RemoveGaeUserIdOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            user_jobs_one_off.RemoveGaeUserIdOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def test_one_setting_model_with_gae_user_id(self):
+        with self.swap(user_models, 'UserSettingsModel', MockUserSettingsModel):
+            original_setting_model = (
+                user_models.UserSettingsModel(
+                    id='id',
+                    gae_id='gae_id',
+                    email='test@email.com',
+                    gae_user_id='gae_user_id'
+                )
+            )
+            original_setting_model.put()
+
+            self.assertIsNotNone(original_setting_model.gae_user_id)
+            self.assertIn('gae_user_id', original_setting_model._values)  # pylint: disable=protected-access
+            self.assertIn('gae_user_id', original_setting_model._properties)  # pylint: disable=protected-access
+
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_REMOVED - UserSettingsModel', 1]], output)
+
+            migrated_setting_model = (
+                user_models.UserSettingsModel.get_by_id('id'))
+
+            self.assertNotIn('gae_user_id', migrated_setting_model._values)  # pylint: disable=protected-access
+            self.assertNotIn('gae_user_id', migrated_setting_model._properties)  # pylint: disable=protected-access
+            self.assertEqual(
+                original_setting_model.last_updated,
+                migrated_setting_model.last_updated)
+
+    def test_one_setting_model_without_gae_user_id(self):
+        original_setting_model = (
+            user_models.UserSettingsModel(
+                id='id',
+                gae_id='gae_id',
+                email='test@email.com',
+            )
+        )
+        original_setting_model.put()
+
+        self.assertNotIn('gae_user_id', original_setting_model._values)  # pylint: disable=protected-access
+        self.assertNotIn('gae_user_id', original_setting_model._properties)  # pylint: disable=protected-access
+
+        output = self._run_one_off_job()
+        # There already exists a userSetting because it is being created
+        # test_utils. So 2 is used here.
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - UserSettingsModel', 2]], output)
+
+        migrated_setting_model = user_models.UserSettingsModel.get_by_id('id')
+        self.assertNotIn('gae_user_id', migrated_setting_model._values)  # pylint: disable=protected-access
+        self.assertNotIn('gae_user_id', migrated_setting_model._properties)  # pylint: disable=protected-access
+        self.assertEqual(
+            original_setting_model.last_updated,
+            migrated_setting_model.last_updated)

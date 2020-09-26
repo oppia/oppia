@@ -26,23 +26,26 @@ from constants import constants
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
-from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
-
-USER_ID_LENGTH = 32
 
 
 class UserSettingsModel(base_models.BaseModel):
     """Settings and preferences for a particular user.
-
     Instances of this class are keyed by the user id.
     """
+
+    # Attributes used for both full users and profile users.
+
     # User id used to identify user by GAE. Is not required for now because we
     # need to perform migration to fill this for existing users.
+    # TODO(#10178): Deprecate gae_id for UserSettingsModel once we have verified
+    # that UserAuthDetailsModels exists for every user.
     gae_id = ndb.StringProperty(required=True, indexed=True)
     # Email address of the user.
     email = ndb.StringProperty(required=True, indexed=True)
@@ -52,48 +55,27 @@ class UserSettingsModel(base_models.BaseModel):
     # migration (to give role to all users) is run.
     role = ndb.StringProperty(
         required=True, indexed=True, default=feconf.ROLE_ID_EXPLORATION_EDITOR)
-    # Identifiable username to display in the UI. May be None.
-    username = ndb.StringProperty(indexed=True)
-    # Normalized username to use for duplicate-username queries. May be None.
-    normalized_username = ndb.StringProperty(indexed=True)
     # When the user last agreed to the terms of the site. May be None.
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
-    # When the user last started the state editor tutorial. May be None.
-    last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)
-    # When the user last started the state translation tutorial. May be None.
-    last_started_state_translation_tutorial = ndb.DateTimeProperty(default=None)
     # When the user last logged in. This may be out-of-date by up to
     # feconf.PROXIMAL_TIMEDELTA_SECS seconds.
     last_logged_in = ndb.DateTimeProperty(default=None)
-    # When the user last edited an exploration.
-    last_edited_an_exploration = ndb.DateTimeProperty(default=None)
-    # When the user last created an exploration.
-    last_created_an_exploration = ndb.DateTimeProperty(default=None)
-    # User uploaded profile picture as a dataURI string. May be None.
-    profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
-    # The preferred dashboard of the user.
-    default_dashboard = ndb.StringProperty(
-        default=constants.DASHBOARD_TYPE_LEARNER,
-        indexed=True,
-        choices=[
-            constants.DASHBOARD_TYPE_LEARNER,
-            constants.DASHBOARD_TYPE_CREATOR])
-    # The preferred dashboard display preference.
-    creator_dashboard_display_pref = ndb.StringProperty(
-        default=constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'],
-        indexed=True,
-        choices=list(
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()))
+    # A code associated with profile and full user on Android to provide a PIN
+    # based authentication within the account.
+    pin = ndb.StringProperty(default=None)
+    # Name of a user displayed in Android UI. Unlike username, it can be
+    # edited and is unique only among the profiles of the corresponding
+    # regular user account.
+    display_alias = ndb.StringProperty(default=None)
     # User specified biography (to be shown on their profile page).
     user_bio = ndb.TextProperty(indexed=False)
+    # User uploaded profile picture as a dataURI string. May be None.
+    profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
     # Subject interests specified by the user.
     subject_interests = ndb.StringProperty(repeated=True, indexed=True)
-    # The time, in milliseconds, when the user first contributed to Oppia.
-    # May be None.
-    first_contribution_msec = ndb.FloatProperty(default=None)
+    # When the user last edited an exploration.
     # Exploration language preferences specified by the user.
-    # TODO(sll): Add another field for the language that the user wants the
-    # site to display in. These language preferences are mainly for the purpose
+    # These language preferences are mainly for the purpose
     # of figuring out what to show by default in the library index page.
     preferred_language_codes = ndb.StringProperty(
         repeated=True,
@@ -108,6 +90,41 @@ class UserSettingsModel(base_models.BaseModel):
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
 
+    # Attributes used for full users only.
+
+    # Identifiable username to display in the UI. May be None.
+    username = ndb.StringProperty(indexed=True)
+    # Normalized username to use for duplicate-username queries. May be None.
+    normalized_username = ndb.StringProperty(indexed=True)
+    # When the user last started the state editor tutorial. May be None.
+    last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)
+    # When the user last started the state translation tutorial. May be None.
+    last_started_state_translation_tutorial = ndb.DateTimeProperty(default=None)
+    last_edited_an_exploration = ndb.DateTimeProperty(default=None)
+    # When the user last created an exploration.
+    last_created_an_exploration = ndb.DateTimeProperty(default=None)
+    # The preferred dashboard of the user.
+    default_dashboard = ndb.StringProperty(
+        default=constants.DASHBOARD_TYPE_LEARNER,
+        indexed=True,
+        choices=[
+            constants.DASHBOARD_TYPE_LEARNER,
+            constants.DASHBOARD_TYPE_CREATOR])
+    # The preferred dashboard display preference.
+    creator_dashboard_display_pref = ndb.StringProperty(
+        default=constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'],
+        indexed=True,
+        choices=list(
+            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()))
+    # The time, in milliseconds, when the user first contributed to Oppia.
+    # May be None.
+    first_contribution_msec = ndb.FloatProperty(default=None)
+
+    @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
+
     @staticmethod
     def get_deletion_policy():
         """UserSettingsModel can be deleted since it only contains information
@@ -115,10 +132,43 @@ class UserSettingsModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'email': base_models.EXPORT_POLICY.EXPORTED,
+            'role': base_models.EXPORT_POLICY.EXPORTED,
+            'last_agreed_to_terms': base_models.EXPORT_POLICY.EXPORTED,
+            'last_logged_in': base_models.EXPORT_POLICY.EXPORTED,
+            'display_alias': base_models.EXPORT_POLICY.EXPORTED,
+            'user_bio': base_models.EXPORT_POLICY.EXPORTED,
+            'profile_picture_data_url':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'subject_interests': base_models.EXPORT_POLICY.EXPORTED,
+            'preferred_language_codes':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'preferred_site_language_code':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'preferred_audio_language_code':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'username': base_models.EXPORT_POLICY.EXPORTED,
+            'normalized_username': base_models.EXPORT_POLICY.EXPORTED,
+            'last_started_state_editor_tutorial':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_started_state_translation_tutorial':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_edited_an_exploration':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_created_an_exploration':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'default_dashboard': base_models.EXPORT_POLICY.EXPORTED,
+            'creator_dashboard_display_pref':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'first_contribution_msec':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -142,13 +192,6 @@ class UserSettingsModel(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @staticmethod
-    def get_user_id_migration_policy():
-        """UserSettingsModel has ID that contains user ID and needs to be
-        replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
-
-    @staticmethod
     def export_data(user_id):
         """Exports the data from UserSettingsModel into dict format for Takeout.
 
@@ -164,13 +207,33 @@ class UserSettingsModel(base_models.BaseModel):
             'role': user.role,
             'username': user.username,
             'normalized_username': user.normalized_username,
-            'last_agreed_to_terms': user.last_agreed_to_terms,
+            'last_agreed_to_terms': (
+                utils.get_time_in_millisecs(user.last_agreed_to_terms)
+                if user.last_agreed_to_terms
+                else None
+            ),
             'last_started_state_editor_tutorial': (
-                user.last_started_state_editor_tutorial),
+                utils.get_time_in_millisecs(
+                    user.last_started_state_editor_tutorial)
+                if user.last_started_state_editor_tutorial
+                else None
+            ),
             'last_started_state_translation_tutorial': (
-                user.last_started_state_translation_tutorial),
-            'last_logged_in': user.last_logged_in,
-            'last_edited_an_exploration': user.last_edited_an_exploration,
+                utils.get_time_in_millisecs(
+                    user.last_started_state_translation_tutorial)
+                if user.last_started_state_translation_tutorial
+                else None
+            ),
+            'last_logged_in': (
+                utils.get_time_in_millisecs(user.last_logged_in)
+                if user.last_logged_in
+                else None
+            ),
+            'last_edited_an_exploration': (
+                utils.get_time_in_millisecs(user.last_edited_an_exploration)
+                if user.last_edited_an_exploration
+                else None
+            ),
             'profile_picture_data_url': user.profile_picture_data_url,
             'default_dashboard': user.default_dashboard,
             'creator_dashboard_display_pref': (
@@ -180,13 +243,14 @@ class UserSettingsModel(base_models.BaseModel):
             'first_contribution_msec': user.first_contribution_msec,
             'preferred_language_codes': user.preferred_language_codes,
             'preferred_site_language_code': user.preferred_site_language_code,
-            'preferred_audio_language_code': user.preferred_audio_language_code
+            'preferred_audio_language_code': user.preferred_audio_language_code,
+            'display_alias': user.display_alias,
+            'pin': user.pin
         }
 
     @classmethod
-    def get_new_id(cls, unused_entity_name):
+    def get_new_id(cls, unused_entity_name=''):
         """Gets a new id for an entity, based on its name.
-
         The returned id is guaranteed to be unique among all instances of this
         entity.
 
@@ -198,13 +262,13 @@ class UserSettingsModel(base_models.BaseModel):
             str. New unique id for this entity class.
 
         Raises:
-            Exception: An ID cannot be generated within a reasonable number
+            Exception. An ID cannot be generated within a reasonable number
                 of attempts.
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
-            new_id = ''.join(
+            new_id = 'uid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
-                for _ in python_utils.RANGE(USER_ID_LENGTH))
+                for _ in python_utils.RANGE(feconf.USER_ID_RANDOM_PART_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
 
@@ -222,19 +286,6 @@ class UserSettingsModel(base_models.BaseModel):
          """
         return bool(cls.get_all().filter(
             cls.normalized_username == normalized_username).get())
-
-    @classmethod
-    def get_by_gae_id(cls, gae_id):
-        """Returns a user model with given GAE user ID.
-
-        Args:
-            gae_id: str. The GAE user ID that is being queried for.
-
-        Returns:
-            UserSettingsModel. The UserSettingsModel instance which has the same
-            GAE user ID.
-        """
-        return cls.query(cls.gae_id == gae_id).get()
 
     @classmethod
     def get_by_normalized_username(cls, normalized_username):
@@ -270,10 +321,16 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     # IDs of all the explorations completed by the user.
     exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of all the collections completed by the user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+    @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():
@@ -282,10 +339,13 @@ class CompletedActivitiesModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'collection_ids': base_models.EXPORT_POLICY.EXPORTED
+        })
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -307,13 +367,6 @@ class CompletedActivitiesModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """CompletedActivitiesModel has ID that contains user ID and needs to be
-        replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
     @staticmethod
     def export_data(user_id):
@@ -345,10 +398,16 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     # The ids of the explorations partially completed by the user.
     exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # The ids of the collections partially completed by the user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+    @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():
@@ -357,10 +416,13 @@ class IncompleteActivitiesModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'collection_ids': base_models.EXPORT_POLICY.EXPORTED
+        })
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -382,13 +444,6 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """IncompleteActivitiesModel has ID that contains user ID and needs to
-        be replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
     @staticmethod
     def export_data(user_id):
@@ -418,9 +473,9 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     """Stores the "last playthrough" information for partially-completed
     explorations.
 
-    Instances of this class have keys of the form
-    [user_id].[exploration_id]
+    ID for this model is of format '[user_id].[exploration_id]'.
     """
+
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration id.
@@ -432,16 +487,27 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     last_played_state_name = ndb.StringProperty(default=None)
 
     @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
+
+    @staticmethod
     def get_deletion_policy():
         """ExpUserLastPlaythroughModel can be deleted since it only contains
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.EXPORTED,
+            'last_played_exp_version':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'last_played_state_name': base_models.EXPORT_POLICY.EXPORTED
+        })
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -465,13 +531,6 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExpUserLastPlaythroughModel has ID that contains user ID and
-        one other field that contains user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
-
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
         """Generates key for the instance of ExpUserLastPlaythroughModel
@@ -482,8 +541,8 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
             exploration_id: str. The id of the exploration.
 
         Returns:
-            str. The generated key using user_id and exploration_id
-                of the form [user_id].[exploration_id].
+            str. The generated id using user_id and exploration_id
+            of the form '[user_id].[exploration_id]'.
         """
         return '%s.%s' % (user_id, exploration_id)
 
@@ -514,8 +573,8 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
         Returns:
             ExpUserLastPlaythroughModel. The ExpUserLastPlaythroughModel
-                instance which matches with the given user_id and
-                exploration_id.
+            instance which matches with the given user_id and
+            exploration_id.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return super(ExpUserLastPlaythroughModel, cls).get(
@@ -552,10 +611,16 @@ class LearnerPlaylistModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     # IDs of all the explorations in the playlist of the user.
     exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of all the collections in the playlist of the user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+    @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():
@@ -564,10 +629,13 @@ class LearnerPlaylistModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'collection_ids': base_models.EXPORT_POLICY.EXPORTED
+        })
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -589,13 +657,6 @@ class LearnerPlaylistModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """LearnerPlaylistModel has ID that contains user ID and needs to be
-        replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
     @staticmethod
     def export_data(user_id):
@@ -626,6 +687,7 @@ class UserContributionsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     # IDs of explorations that this user has created
     # Includes subsequently deleted and private explorations.
     created_exploration_ids = ndb.StringProperty(
@@ -643,10 +705,15 @@ class UserContributionsModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'created_exploration_ids':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'edited_exploration_ids':
+                base_models.EXPORT_POLICY.EXPORTED
+        })
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -668,13 +735,6 @@ class UserContributionsModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserContributionsModel has ID that contains user ID and needs to be
-        replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
     @staticmethod
     def export_data(user_id):
@@ -703,6 +763,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     # The user's preference for receiving general site updates. This is set to
     # None if the user has never set a preference.
     site_updates = ndb.BooleanProperty(indexed=True)
@@ -747,17 +808,18 @@ class UserEmailPreferencesModel(base_models.BaseModel):
         """
         return cls.get_by_id(user_id) is not None
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserEmailPreferencesModel has ID that contains user ID and needs to
-        be replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
+        return dict(super(cls, cls).get_export_policy(), **{
+            'site_updates': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'editor_role_notifications':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'feedback_message_notifications':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'subscription_notifications':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class UserSubscriptionsModel(base_models.BaseModel):
@@ -765,13 +827,12 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     # IDs of activities (e.g., explorations) that this user subscribes to.
-    # TODO(bhenning): Rename this to exploration_ids and perform a migration.
+    # TODO(#10727): Rename this to exploration_ids and perform a migration.
     activity_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of collections that this user subscribes to.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
-    # DEPRECATED. DO NOT USE. Use general_feedback_thread_ids instead.
-    feedback_thread_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of feedback thread ids that this user subscribes to.
     general_feedback_thread_ids = ndb.StringProperty(
         repeated=True, indexed=True)
@@ -780,6 +841,9 @@ class UserSubscriptionsModel(base_models.BaseModel):
     # When the user last checked notifications. May be None.
     last_checked = ndb.DateTimeProperty(default=None)
 
+    # DEPRECATED in v2.6.8. Do not use. Use general_feedback_thread_ids instead.
+    feedback_thread_ids = ndb.StringProperty(repeated=True, indexed=True)
+
     @staticmethod
     def get_deletion_policy():
         """UserSubscriptionsModel can be deleted since it only contains
@@ -787,10 +851,18 @@ class UserSubscriptionsModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'activity_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'general_feedback_thread_ids':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'creator_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'last_checked': base_models.EXPORT_POLICY.EXPORTED,
+            'feedback_thread_ids': base_models.EXPORT_POLICY.EXPORTED
+        })
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -799,11 +871,14 @@ class UserSubscriptionsModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
+        ndb.delete_multi(
+            cls.query(cls.creator_ids == user_id).fetch(keys_only=True))
         cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether UserSubscriptionsModel exists for user.
+        """Check whether UserSubscriptionsModel exists for user or references
+        user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -811,14 +886,10 @@ class UserSubscriptionsModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.get_by_id(user_id) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserSubscriptionsModel has ID that contains user ID and needs to be
-        replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
+        return (
+            cls.query(
+                cls.creator_ids == user_id).get(keys_only=True) is not None or
+            cls.get_by_id(user_id) is not None)
 
     @staticmethod
     def export_data(user_id):
@@ -833,15 +904,22 @@ class UserSubscriptionsModel(base_models.BaseModel):
         user_model = UserSubscriptionsModel.get(user_id, strict=False)
 
         if user_model is None:
-            raise Exception('UserSubscriptionsModel does not exist.')
+            return {}
+
+        creator_user_models = UserSettingsModel.get_multi(
+            user_model.creator_ids)
+        creator_usernames = [
+            creator.username for creator in creator_user_models]
 
         user_data = {
             'activity_ids': user_model.activity_ids,
             'collection_ids': user_model.collection_ids,
             'general_feedback_thread_ids': (
                 user_model.general_feedback_thread_ids),
-            'creator_ids': user_model.creator_ids,
-            'last_checked': user_model.last_checked
+            'creator_usernames': creator_usernames,
+            'last_checked':
+                None if user_model.last_checked is None else
+                utils.get_time_in_millisecs(user_model.last_checked)
         }
 
         return user_data
@@ -870,11 +948,14 @@ class UserSubscribersModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
+        ndb.delete_multi(
+            cls.query(cls.subscriber_ids == user_id).fetch(keys_only=True))
         cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether UserSubscribersModel exists for user.
+        """Check whether UserSubscribersModel exists for user or references
+        user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -882,21 +963,20 @@ class UserSubscribersModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.get_by_id(user_id) is not None
+        return (
+            cls.query(
+                cls.subscriber_ids == user_id
+            ).get(keys_only=True) is not None or
+            cls.get_by_id(user_id) is not None)
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """This model is not included because it contains data about other
         users.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserSubscribersModel has ID that contains user ID and needs to be
-        replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
+        return dict(super(cls, cls).get_export_policy(), **{
+            'subscriber_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
@@ -905,6 +985,7 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     This is computed using a MapReduce batch job and may not be up to date.
     Instances of this class are keyed by the user id.
     """
+
     # The output of the batch job.
     output = ndb.JsonProperty(indexed=False)
     # The time, in milliseconds since the epoch, when the job that computed
@@ -939,17 +1020,13 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
         """
         return cls.get_by_id(user_id) is not None
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserRecentChangesBatchModel has ID that contains user ID and needs to
-        be replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
+        return dict(super(cls, cls).get_export_policy(), **{
+            'output': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'job_queued_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
@@ -969,6 +1046,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     The impact score is 0 for an exploration with 0 playthroughs or with an
     average rating of less than 2.5.
     """
+
     # The impact score.
     impact_score = ndb.FloatProperty(indexed=True)
     # The total plays of all the explorations.
@@ -1009,10 +1087,17 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'impact_score': base_models.EXPORT_POLICY.EXPORTED,
+            'total_plays': base_models.EXPORT_POLICY.EXPORTED,
+            'average_ratings': base_models.EXPORT_POLICY.EXPORTED,
+            'num_ratings': base_models.EXPORT_POLICY.EXPORTED,
+            'weekly_creator_stats_list': base_models.EXPORT_POLICY.EXPORTED,
+            'schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -1035,13 +1120,6 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
         """
         return cls.get_by_id(user_id) is not None
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserStatsModel has ID that contains user ID and needs to be
-        replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
-
     @classmethod
     def get_or_create(cls, user_id):
         """Creates a new UserStatsModel instance, if it does not already exist.
@@ -1051,8 +1129,8 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
         Returns:
             UserStatsModel. Either an existing one which matches the
-                given user_id, or the newly created one if it did not already
-                exist.
+            given user_id, or the newly created one if it did not already
+            exist.
         """
         entity = cls.get(user_id, strict=False)
         if not entity:
@@ -1069,7 +1147,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
         Returns:
             dict. The user-relevant properties of UserStatsModel in a python
-                dict format.
+            dict format.
         """
         user_model = UserStatsModel.get(user_id, strict=False)
         if user_model is None:
@@ -1102,9 +1180,9 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 class ExplorationUserDataModel(base_models.BaseModel):
     """User-specific data pertaining to a specific exploration.
 
-    Instances of this class have keys of the form
-    [USER_ID].[EXPLORATION_ID]
+    ID for this model is of format '[user_id].[exploration_id]'.
     """
+
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The exploration id.
@@ -1150,10 +1228,25 @@ class ExplorationUserDataModel(base_models.BaseModel):
         ndb.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.EXPORTED,
+            'rating': base_models.EXPORT_POLICY.EXPORTED,
+            'rated_on': base_models.EXPORT_POLICY.EXPORTED,
+            'draft_change_list': base_models.EXPORT_POLICY.EXPORTED,
+            'draft_change_list_last_updated':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'draft_change_list_exp_version':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'draft_change_list_id': base_models.EXPORT_POLICY.EXPORTED,
+            'mute_suggestion_notifications':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'mute_feedback_notifications':
+                base_models.EXPORT_POLICY.EXPORTED
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1167,13 +1260,6 @@ class ExplorationUserDataModel(base_models.BaseModel):
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationUserDataModel has ID that contains user id and one other
-        field that contains user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
-
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
         """Generates key for the instance of ExplorationUserDataModel class in
@@ -1184,8 +1270,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
             exploration_id: str. The id of the exploration.
 
         Returns:
-            str. The generated key using user_id and exploration_id
-                of the form [user_id].[exploration_id].
+            str. The generated id using user_id and exploration_id
+            of the form '[user_id].[exploration_id]'.
         """
         return '%s.%s' % (user_id, exploration_id)
 
@@ -1202,7 +1288,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
         Returns:
             ExplorationUserDataModel. The newly created
-                ExplorationUserDataModel instance.
+            ExplorationUserDataModel instance.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return cls(
@@ -1219,7 +1305,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
         Returns:
             ExplorationUserDataModel. The ExplorationUserDataModel instance
-                which matches with the given user_id and exploration_id.
+            which matches with the given user_id and exploration_id.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
         return super(ExplorationUserDataModel, cls).get(
@@ -1236,7 +1322,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
         Returns:
             ExplorationUserDataModel. The ExplorationUserDataModel instance
-                which matches with the given user_ids and exploration_id.
+            which matches with the given user_ids and exploration_id.
         """
         instance_ids = (
             cls._generate_id(user_id, exploration_id) for user_id in user_ids)
@@ -1260,10 +1346,18 @@ class ExplorationUserDataModel(base_models.BaseModel):
         for user_model in found_models:
             user_data[user_model.exploration_id] = {
                 'rating': user_model.rating,
-                'rated_on': user_model.rated_on,
+                'rated_on': (
+                    utils.get_time_in_millisecs(user_model.rated_on)
+                    if user_model.rated_on
+                    else None
+                ),
                 'draft_change_list': user_model.draft_change_list,
                 'draft_change_list_last_updated': (
-                    user_model.draft_change_list_last_updated),
+                    utils.get_time_in_millisecs(
+                        user_model.draft_change_list_last_updated)
+                    if user_model.draft_change_list_last_updated
+                    else None
+                ),
                 'draft_change_list_exp_version': (
                     user_model.draft_change_list_exp_version),
                 'draft_change_list_id': user_model.draft_change_list_id,
@@ -1289,6 +1383,7 @@ class CollectionProgressModel(base_models.BaseModel):
     the data store, otherwise it should remove the instance of the completion
     model.
     """
+
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The collection id.
@@ -1298,16 +1393,25 @@ class CollectionProgressModel(base_models.BaseModel):
     completed_explorations = ndb.StringProperty(repeated=True)
 
     @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
+
+    @staticmethod
     def get_deletion_policy():
         """CollectionProgressModel can be deleted since it only contains
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'collection_id': base_models.EXPORT_POLICY.EXPORTED,
+            'completed_explorations': base_models.EXPORT_POLICY.EXPORTED
+        })
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -1331,13 +1435,6 @@ class CollectionProgressModel(base_models.BaseModel):
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """CollectionProgressModel has ID that contains user id and one other
-        field that contains user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
-
     @classmethod
     def _generate_id(cls, user_id, collection_id):
         """Generates key for the instance of CollectionProgressModel class in
@@ -1348,8 +1445,8 @@ class CollectionProgressModel(base_models.BaseModel):
             collection_id: str. The id of the exploration.
 
         Returns:
-            str. The generated key using user_id and exploration_id
-                of the form [user_id].[collection_id].
+            str. The generated id using user_id and exploration_id
+            of the form '[user_id].[collection_id]'.
         """
         return '%s.%s' % (user_id, collection_id)
 
@@ -1366,7 +1463,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Returns:
             CollectionProgressModel. The newly created CollectionProgressModel
-                instance.
+            instance.
         """
         instance_id = cls._generate_id(user_id, collection_id)
         return cls(
@@ -1383,7 +1480,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Returns:
             CollectionProgressModel. The CollectionProgressModel instance which
-                matches the given user_id and collection_id.
+            matches the given user_id and collection_id.
         """
         instance_id = cls._generate_id(user_id, collection_id)
         return super(CollectionProgressModel, cls).get(
@@ -1420,8 +1517,8 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Returns:
             CollectionProgressModel. Either an existing one which
-                matches the given user_id and collection_id, or the newly
-                created one if it does not already exist.
+            matches the given user_id and collection_id, or the newly
+            created one if it does not already exist.
         """
         instance_model = cls.get(user_id, collection_id)
         if instance_model:
@@ -1458,8 +1555,9 @@ class StoryProgressModel(base_models.BaseModel):
     Please note instances of this progress model will persist even after a
     story is deleted.
 
-    ID for this model is of format "{{USER_ID}}.{{STORY_ID}}".
+    ID for this model is of format '[user_id].[story_id]'.
     """
+
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The story id.
@@ -1469,16 +1567,25 @@ class StoryProgressModel(base_models.BaseModel):
     completed_node_ids = ndb.StringProperty(repeated=True)
 
     @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
+
+    @staticmethod
     def get_deletion_policy():
         """StoryProgressModel can be deleted since it only contains information
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'story_id': base_models.EXPORT_POLICY.EXPORTED,
+            'completed_node_ids': base_models.EXPORT_POLICY.EXPORTED
+        })
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -1501,13 +1608,6 @@ class StoryProgressModel(base_models.BaseModel):
             bool. Whether the models for user_id exists.
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """StoryProgressModel has ID that contains user id and one other field
-        that contains user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def _generate_id(cls, user_id, story_id):
@@ -1535,7 +1635,7 @@ class StoryProgressModel(base_models.BaseModel):
 
         Returns:
             StoryProgressModel. The newly created StoryProgressModel
-                instance.
+            instance.
         """
         instance_id = cls._generate_id(user_id, story_id)
         return cls(
@@ -1554,7 +1654,7 @@ class StoryProgressModel(base_models.BaseModel):
 
         Returns:
             StoryProgressModel. The StoryProgressModel instance which
-                matches the given user_id and story_id.
+            matches the given user_id and story_id.
         """
         instance_id = cls._generate_id(user_id, story_id)
         return super(StoryProgressModel, cls).get(
@@ -1571,7 +1671,7 @@ class StoryProgressModel(base_models.BaseModel):
 
         Returns:
             list(StoryProgressModel). The list of StoryProgressModel
-                instances which matches the given user_id and story_ids.
+            instances which matches the given user_id and story_ids.
         """
         instance_ids = [cls._generate_id(user_id, story_id)
                         for story_id in story_ids]
@@ -1594,8 +1694,8 @@ class StoryProgressModel(base_models.BaseModel):
 
         Returns:
             StoryProgressModel. Either an existing one which
-                matches the given user_id and story_id, or the newly created
-                one if it does not already exist.
+            matches the given user_id and story_id, or the newly created
+            one if it does not already exist.
         """
         instance_model = cls.get(user_id, story_id, strict=False)
         if instance_model is not None:
@@ -1628,6 +1728,7 @@ class UserQueryModel(base_models.BaseModel):
     The id of each instance of this model is alphanumeric id of length 12
     unique to each model instance.
     """
+
     # Options for a query specified by query submitter.
     # Query option to specify whether user has created or edited one or more
     # explorations in last n days. This only returns users who have ever
@@ -1672,12 +1773,26 @@ class UserQueryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model is not exported since this is a computed model
         and the information already exists in other exported models.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'inactive_in_last_n_days': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'has_not_logged_in_for_n_days':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_at_least_n_exps': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_fewer_than_n_exps':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'edited_at_least_n_exps': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'edited_fewer_than_n_exps':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'submitter_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sent_email_model_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'query_status': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -1702,16 +1817,6 @@ class UserQueryModel(base_models.BaseModel):
         return cls.query(cls.submitter_id == user_id).get(
             keys_only=True) is not None
 
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserQueryModel has two fields that contain user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.submitter_id
-
     @classmethod
     def fetch_page(cls, page_size, cursor):
         """Fetches a list of all query_models sorted by creation date.
@@ -1722,8 +1827,8 @@ class UserQueryModel(base_models.BaseModel):
                 datastore cursor.
 
         Returns:
-            3-tuple of (query_models, cursor, more) as described in fetch_page()
-            at:
+            3-tuple of (query_models, cursor, more). As described in
+            fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
                 query_models: List of UserQueryModel instances.
@@ -1734,7 +1839,7 @@ class UserQueryModel(base_models.BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        cursor = datastore_query.Cursor(urlsafe=cursor)
+        cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
         query_models, next_cursor, more = (
             cls.query().order(-cls.created_on).
             fetch_page(page_size, start_cursor=cursor))
@@ -1747,6 +1852,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     # IDs of all BulkEmailModels that correspond to bulk emails sent to this
     # user.
     sent_email_model_ids = ndb.StringProperty(indexed=True, repeated=True)
@@ -1768,17 +1874,12 @@ class UserBulkEmailsModel(base_models.BaseModel):
         """
         return cls.get_by_id(user_id) is not None
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserBulkEmailsModel has ID that contains user ID and needs to be
-        replaced.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
+        return dict(super(cls, cls).get_export_policy(), **{
+            'sent_email_model_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 
 class UserSkillMasteryModel(base_models.BaseModel):
@@ -1786,7 +1887,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     This model stores the degree of mastery of each skill for a given user.
 
-    The id for this model is of form '{{USER_ID}}.{{SKILL_ID}}'.
+    ID for this model is of format '[user_id].[skill_id]'.
     """
 
     # The user id of the user.
@@ -1797,16 +1898,25 @@ class UserSkillMasteryModel(base_models.BaseModel):
     degree_of_mastery = ndb.FloatProperty(required=True, indexed=True)
 
     @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
+
+    @staticmethod
     def get_deletion_policy():
         """UserSkillMasteryModel can be deleted since it only contains
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_id': base_models.EXPORT_POLICY.EXPORTED,
+            'degree_of_mastery': base_models.EXPORT_POLICY.EXPORTED
+        })
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -1829,13 +1939,6 @@ class UserSkillMasteryModel(base_models.BaseModel):
             bool. Whether the models for user_id exists.
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserSkillMasteryModel has ID that contains user id and one other
-        field that contains user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def construct_model_id(cls, user_id, skill_id):
@@ -1872,12 +1975,12 @@ class UserSkillMasteryModel(base_models.BaseModel):
         return user_data
 
 
-class UserContributionScoringModel(base_models.BaseModel):
+class UserContributionProficiencyModel(base_models.BaseModel):
     """Model for storing the scores of a user for various suggestions created by
     the user. Users having scores above a particular threshold for a category
     can review suggestions for that category.
 
-    The id for this model is of the form '{{score_category}}.{{user_id}}'.
+    ID for this model is of format '[score_category].[user_id]'.
     """
 
     # The user id of the user.
@@ -1887,43 +1990,48 @@ class UserContributionScoringModel(base_models.BaseModel):
     # The score of the user for the above category of suggestions.
     score = ndb.FloatProperty(required=True, indexed=True)
     # Flag to check if email to onboard reviewer has been sent for the category.
-    has_email_been_sent = ndb.BooleanProperty(required=True, default=False)
+    onboarding_email_sent = ndb.BooleanProperty(required=True, default=False)
 
     @staticmethod
     def get_deletion_policy():
-        """UserContributionScoringModel can be deleted since it only contains
-        information relevant to the one user.
+        """UserContributionProficiencyModel can be deleted since it only
+        contains information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return dict(super(cls, cls).get_export_policy(), **{
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'score_category': base_models.EXPORT_POLICY.EXPORTED,
+            'score': base_models.EXPORT_POLICY.EXPORTED,
+            'onboarding_email_sent': base_models.EXPORT_POLICY.EXPORTED
+        })
 
     @classmethod
     def export_data(cls, user_id):
-        """(Takeout) Exports the data from UserContributionScoringModel
+        """(Takeout) Exports the data from UserContributionProficiencyModel
         into dict format.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. Dictionary of the data from UserContributionScoringModel.
+            dict. Dictionary of the data from UserContributionProficiencyModel.
         """
         user_data = dict()
         scoring_models = cls.query(cls.user_id == user_id).fetch()
         for scoring_model in scoring_models:
             user_data[scoring_model.score_category] = {
                 'score': scoring_model.score,
-                'has_email_been_sent': scoring_model.has_email_been_sent
+                'onboarding_email_sent': scoring_model.onboarding_email_sent
             }
         return user_data
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
-        """Delete instances of UserContributionScoringModel for the user.
+        """Delete instances of UserContributionProficiencyModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
@@ -1933,7 +2041,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether UserContributionScoringModels exist for user.
+        """Check whether UserContributionProficiencyModels exist for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -1942,13 +2050,6 @@ class UserContributionScoringModel(base_models.BaseModel):
             bool. Whether the models for user_id exists.
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """UserContributionScoringModel has ID that contains user id and one
-        other field that contains user ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def get_all_categories_where_user_can_review(cls, user_id):
@@ -1960,7 +2061,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
         Returns:
             list(str). A list of score_categories where the user has score above
-                the threshold.
+            the threshold.
         """
         scoring_models = cls.get_all().filter(cls.user_id == user_id).filter(
             cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
@@ -1976,7 +2077,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
         Returns:
             list(UserContributionsScoringModel). All instances for the given
-                user.
+            user.
         """
         return cls.get_all().filter(cls.user_id == user_id).fetch()
 
@@ -1991,7 +2092,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
         Returns:
             list(UserContributionsScoringModel). All instances for the given
-                category with scores above MINIMUM_SCORE_REQUIRED_TO_REVIEW.
+            category with scores above MINIMUM_SCORE_REQUIRED_TO_REVIEW.
         """
         return cls.get_all().filter(
             cls.score_category == score_category).filter(
@@ -1999,7 +2100,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
     @classmethod
     def _get_instance_id(cls, user_id, score_category):
-        """Generates the instance id in the form {{score_category}}.{{user_id}}.
+        """Generates the instance id in the form '[score_category].[user_id]'.
 
         Args:
             user_id: str. The ID of the user.
@@ -2007,65 +2108,183 @@ class UserContributionScoringModel(base_models.BaseModel):
                 on.
 
         Returns:
-            str. The instance ID for UserContributionScoringModel.
+            str. The instance ID for UserContributionProficiencyModel.
         """
         return '.'.join([score_category, user_id])
 
     @classmethod
-    def get_score_of_user_for_category(cls, user_id, score_category):
-        """Gets the score of the user for the given score category.
+    def get(cls, user_id, score_category):
+        """Gets the user's scoring model corresponding to the score category.
 
         Args:
-            user_id: str. The ID of the user.
-            score_category: str. The category of suggestion to score the user
-                on.
+            user_id: str. The id of the user.
+            score_category: str. The score category of the suggestion.
 
         Returns:
-            float|None. The score of the user in the given category.
+            UserContributionProficiencyModel|None. A
+            UserContributionProficiencyModel corresponding to the user score
+            identifier or None if none exist.
         """
         instance_id = cls._get_instance_id(user_id, score_category)
-        model = cls.get_by_id(instance_id)
-
-        return model.score if model else None
+        return cls.get_by_id(instance_id)
 
     @classmethod
-    def create(cls, user_id, score_category, score):
-        """Creates a new UserContributionScoringModel entry.
+    def create(
+            cls, user_id, score_category, score, onboarding_email_sent=False):
+        """Creates a new UserContributionProficiencyModel entry.
 
         Args:
             user_id: str. The ID of the user.
-            score_category: str. The category of the suggestion.
+            score_category: str. The score category of the suggestion.
             score: float. The score of the user.
+            onboarding_email_sent: bool. Whether the email to onboard the
+                user as a reviewer has been sent.
+
+        Returns:
+            UserContributionProficiencyModel. The user proficiency model that
+            was created.
 
         Raises:
-            Exception: There is already an entry with the given id.
+            Exception. There is already an entry with the given id.
         """
         instance_id = cls._get_instance_id(user_id, score_category)
 
         if cls.get_by_id(instance_id):
-            raise Exception('There is already an entry with the given id: %s' %
-                            instance_id)
+            raise Exception(
+                'There is already a UserContributionProficiencyModel entry with'
+                ' the given id: %s' % instance_id
+            )
 
-        cls(id=instance_id, user_id=user_id, score_category=score_category,
-            score=score).put()
+        user_proficiency_model = cls(
+            id=instance_id, user_id=user_id, score_category=score_category,
+            score=score,
+            onboarding_email_sent=onboarding_email_sent)
+        user_proficiency_model.put()
+        return user_proficiency_model
+
+
+class UserContributionRightsModel(base_models.BaseModel):
+    """Model for storing user's rights in the contributor dashboard.
+
+    Instances of this class are keyed by the user id.
+    """
+
+    can_review_translation_for_language_codes = ndb.StringProperty(
+        repeated=True, indexed=True)
+    can_review_voiceover_for_language_codes = ndb.StringProperty(
+        repeated=True, indexed=True)
+    can_review_questions = ndb.BooleanProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """The model can be deleted since it only contains information relevant
+        to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
 
     @classmethod
-    def increment_score_for_user(cls, user_id, score_category, increment_by):
-        """Increment the score of the user in the category by the given amount.
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserContributionRightsModel exists for the given user.
 
         Args:
-            user_id: str. The id of the user.
-            score_category: str. The category of the suggestion.
-            increment_by: float. The amount to increase the score of the user
-                by. May be negative, in which case the score is reduced.
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
         """
-        instance_id = cls._get_instance_id(user_id, score_category)
-        model = cls.get_by_id(instance_id)
-        if not model:
-            cls.create(user_id, score_category, increment_by)
-        else:
-            model.score += increment_by
-            model.put()
+        return cls.get_by_id(user_id) is not None
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of UserContributionRightsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
+
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Exports the data from UserContributionRightsModel
+        into dict format.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from UserContributionRightsModel.
+        """
+        rights_model = cls.get_by_id(user_id)
+
+        if rights_model is None:
+            return {}
+
+        return {
+            'can_review_translation_for_language_codes': (
+                rights_model.can_review_translation_for_language_codes),
+            'can_review_voiceover_for_language_codes': (
+                rights_model.can_review_voiceover_for_language_codes),
+            'can_review_questions': rights_model.can_review_questions
+        }
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains user data."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'can_review_translation_for_language_codes':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'can_review_voiceover_for_language_codes':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'can_review_questions': base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def get_translation_reviewer_user_ids(cls, language_code):
+        """Returns the IDs of the users who have rights to review translations
+        in the given language code.
+
+        Args:
+            language_code: str. The code of the language.
+
+        Returns:
+            list(str). A list of IDs of users who have rights to review
+            translations in the given language code.
+        """
+        reviewer_keys = (
+            cls.query(
+                cls.can_review_translation_for_language_codes == language_code)
+            .fetch(keys_only=True))
+        return [reviewer_key.id() for reviewer_key in reviewer_keys]
+
+    @classmethod
+    def get_voiceover_reviewer_user_ids(cls, language_code):
+        """Returns the IDs of the users who have rights to review voiceovers in
+        the given language code.
+
+        Args:
+            language_code: str. The code of the language.
+
+        Returns:
+            list(str). A list of IDs of users who have rights to review
+            voiceovers in the given language code.
+        """
+        reviewer_keys = (
+            cls.query(
+                cls.can_review_voiceover_for_language_codes == language_code)
+            .fetch(keys_only=True))
+        return [reviewer_key.id() for reviewer_key in reviewer_keys]
+
+    @classmethod
+    def get_question_reviewer_user_ids(cls):
+        """Returns the IDs of the users who have rights to review questions.
+
+        Returns:
+            list(str). A list of IDs of users who have rights to review
+            questions.
+        """
+        reviewer_keys = cls.query(cls.can_review_questions == True).fetch( # pylint: disable=singleton-comparison
+            keys_only=True)
+        return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
 
 class PendingDeletionRequestModel(base_models.BaseModel):
@@ -2076,14 +2295,38 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
+
     # The email of the user.
-    email = ndb.StringProperty(required=True)
+    email = ndb.StringProperty(required=True, indexed=True)
+    # Role of the user. Needed to decide which storage models have to be deleted
+    # for it.
+    role = ndb.StringProperty(required=True, indexed=True)
     # Whether the deletion is completed.
     deletion_complete = ndb.BooleanProperty(default=False, indexed=True)
+
     # IDs of all the private explorations created by this user.
     exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of all the private collections created by this user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+    # A dict mapping model IDs to pseudonymous user IDs. Each type of entity
+    # is grouped under different key (e.g. config, feedback, story, skill,
+    # question), the keys need to be from the core.platform.models.NAMES enum.
+    # For each entity, we use a different pseudonymous user ID. Note that all
+    # these pseudonymous user IDs originate from the same about-to-be-deleted
+    # user. If a key is absent from the pseudonymizable_entity_mappings dict,
+    # this means that for this activity type the mappings are not yet generated.
+    # Example structure: {
+    #     'config': {'some_config': 'pseudo_user_id_1'},
+    #     'skill': {'skill_id': 'pseudo_user_id_2'},
+    #     'story': {
+    #         'story_1_id': 'pseudo_user_id_3',
+    #         'story_2_id': 'pseudo_user_id_4',
+    #         'story_3_id': 'pseudo_user_id_5'
+    #     },
+    #     'question': {}
+    # }
+    pseudonymizable_entity_mappings = ndb.JsonProperty(default={})
 
     @staticmethod
     def get_deletion_policy():
@@ -2092,13 +2335,21 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not need to exported as it temporarily holds user
         requests for data deletion, and does not contain any information
         relevant to the user for data export.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deletion_complete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'collection_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'pseudonymizable_entity_mappings': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'role': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -2112,9 +2363,137 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         """
         return cls.get_by_id(user_id) is not None
 
+
+class PseudonymizedUserModel(base_models.BaseModel):
+    """Model for storing pseudonymized user IDs."""
+
     @staticmethod
-    def get_user_id_migration_policy():
-        """PendingDeletionRequestModel is going to be used later and only as
-        a temporary model, so it doesn't need to be migrated.
+    def get_deletion_policy():
+        """PseudonymizedUserModel contains only pseudonymous ids."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def get_export_policy(cls):
+        """PseudonymizedUserModel contains only pseudonymous ids."""
+        return dict(super(cls, cls).get_export_policy(), **{})
+
+    @classmethod
+    def get_new_id(cls, unused_entity_name):
+        """Gets a new id for an entity, based on its name.
+
+        The returned id is guaranteed to be unique among all instances of this
+        entity.
+
+        Args:
+            unused_entity_name: The name of the entity. Coerced to a utf-8
+                encoded string. Defaults to ''.
+
+        Returns:
+            str. New unique id for this entity class.
+
+        Raises:
+            Exception. An ID cannot be generated within a reasonable number
+                of attempts.
         """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+            new_id = 'pid_%s' % ''.join(
+                random.choice(string.ascii_lowercase)
+                for _ in python_utils.RANGE(feconf.USER_ID_RANDOM_PART_LENGTH))
+
+            if not cls.get_by_id(new_id):
+                return new_id
+
+        raise Exception('New id generator is producing too many collisions.')
+
+
+class UserAuthDetailsModel(base_models.BaseModel):
+    """Stores the authentication details for a particular user.
+
+    Instances of this class are keyed by user id.
+    """
+
+    # Authentication detail for sign-in using google id (GAE). Exists only
+    # for full users. None for profile users.
+    gae_id = ndb.StringProperty(indexed=True)
+    # For profile users, the user ID of the full user associated with that
+    # profile. None for full users. Required for profiles because gae_id
+    # attribute is None for them, hence this attribute stores their association
+    # with a full user who do have a gae_id.
+    parent_user_id = ndb.StringProperty(indexed=True, default=None)
+
+    @staticmethod
+    def get_lowest_supported_role():
+        """The lowest supported role here should be Learner."""
+        return feconf.ROLE_ID_LEARNER
+
+    @staticmethod
+    def get_deletion_policy():
+        """The model can be deleted since it only contains information
+        relevant to one user account.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def get_export_policy(cls):
+        """Currently, the model holds authentication details relevant only for
+        backend, and no exportable user data. It may contain user data in
+        the future.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'parent_user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of UserAuthDetailsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserAuthDetailsModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any UserAuthDetailsModel refers to the given user ID.
+        """
+        return cls.get_by_id(user_id) is not None
+
+    @classmethod
+    def get_by_auth_id(cls, auth_service, auth_id):
+        """Fetch a user entry by auth_id of a particular auth service.
+
+        Args:
+            auth_service: str. Name of the auth service.
+            auth_id: str. Authentication detail corresponding to the
+                authentication service.
+
+        Returns:
+            UserAuthDetailsModel. The UserAuthDetailsModel instance having a
+            particular user mapped to the given auth_id and the auth service
+            if there exists one, else None.
+        """
+
+        if auth_service == feconf.AUTH_METHOD_GAE:
+            return cls.query(cls.gae_id == auth_id).get()
+        return None
+
+    @classmethod
+    def get_all_profiles_by_parent_user_id(cls, parent_user_id):
+        """Fetch all user entries with the given parent_user_id.
+
+        Args:
+            parent_user_id: str. User id of the parent_user whose associated
+                profiles we are querying for.
+
+        Returns:
+            list(UserAuthDetailsModel). List of UserAuthDetailsModel instances
+            mapped to the queried parent_user_id.
+        """
+        return cls.query(cls.parent_user_id == parent_user_id).fetch()

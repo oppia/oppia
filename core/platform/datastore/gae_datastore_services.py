@@ -19,7 +19,33 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
+
+
+def make_cursor(urlsafe_cursor=None):
+    """Makes an immutable cursor that points to a relative position in a query.
+
+    The position denoted by a Cursor is relative to the result of a query, even
+    if the result is removed later on. Usually, the position points to whatever
+    immediately follows the last result of a batch.
+
+    A cursor should only be used on a query with an identical signature to the
+    one that produced it, or on a query with its sort order reversed.
+
+    A Cursor constructed with no arguments points to the first result of any
+    query. If such a Cursor is used as an end_cursor, no results will be
+    returned.
+
+    Args:
+        urlsafe_cursor: str | None. The base64-encoded serialization of a
+            cursor. When None, the cursor returned will point to the first
+            result of any query.
+
+    Returns:
+        datastore_query.Cursor. A cursor into an arbitrary query.
+    """
+    return datastore_query.Cursor(urlsafe=urlsafe_cursor)
 
 
 def fetch_multiple_entities_by_ids_and_models(ids_and_models):
@@ -32,8 +58,8 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
 
     Returns:
         list(list(ndb.Model)). The model instances corresponding to the ids and
-            models. The models corresponding to the same tuple in the input are
-            grouped together.
+        models. The models corresponding to the same tuple in the input are
+        grouped together.
     """
     entity_keys = []
     for (model_name, entity_ids) in ids_and_models:

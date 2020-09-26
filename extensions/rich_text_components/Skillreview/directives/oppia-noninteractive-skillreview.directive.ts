@@ -16,7 +16,14 @@
  * @fileoverview Directive for the concept card rich-text component.
  */
 
+require(
+  'rich_text_components/Skillreview/directives/' +
+  'oppia-noninteractive-skillreview-concept-card-modal.controller.ts');
+
 require('components/concept-card/concept-card.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 
@@ -33,37 +40,45 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
         '$attrs', '$uibModal', 'ContextService', 'ENTITY_TYPE',
         function($attrs, $uibModal, ContextService, ENTITY_TYPE) {
           var ctrl = this;
-          var skillSummary = HtmlEscaperService.escapedJsonToObj(
-            $attrs.skillSummaryWithValue);
-          ctrl.openConceptCard = function() {
-            var skillId = skillSummary.id;
-            var skillDescription = ctrl.skillDescription;
-            var removeCustomEntityContext =
-              ContextService.removeCustomEntityContext;
+          var skillId = HtmlEscaperService.escapedJsonToObj(
+            $attrs.skillIdWithValue);
+          ctrl.linkText = HtmlEscaperService.escapedJsonToObj(
+            $attrs.textWithValue);
+          ctrl.openConceptCard = function(event) {
+            // The default onclick behaviour for an element inside CKEditor
+            // is to open the customize RTE modal. Since this RTE has a custom
+            // onclick listener attached, the default behaviour is to open the
+            // concept card modal. To correct this, check if the element is
+            // inside the context of a CKEditor instance. If so, prevent
+            // the opening of the concept card and allow the customize RTE
+            // modal to get triggered. If the element is not inside a CKEditor
+            // instance, then open the concept card modal. To determine if the
+            // RTE is inside a CKEditor instance, check if the offsetParent
+            // element contains the data attribute ckeWidgetId.
+            if (event.currentTarget.offsetParent.dataset.ckeWidgetId) {
+              return;
+            }
             ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
+            // The catch at the end was needed according to this thread:
+            // https://github.com/angular-ui/bootstrap/issues/6501, where in
+            // AngularJS 1.6.3, $uibModalInstance.cancel() throws console error.
+            // The catch prevents that when clicking outside as well as for
+            // cancel.
             $uibModal.open({
               template: require(
                 'components/concept-card/concept-card-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function(
-                    $scope, $uibModalInstance) {
-                  $scope.skillIds = [skillId];
-                  $scope.index = 0;
-                  $scope.currentSkill = skillDescription;
-                  $scope.isInTestMode = false;
-
-                  $scope.closeModal = function() {
-                    removeCustomEntityContext();
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
+              resolve: {
+                skillId: () => skillId
+              },
+              controller: (
+                'OppiaNoninteractiveSkillreviewConceptCardModalController')
+            }).result.then(function() {}, function(res) {
+              ContextService.removeCustomEntityContext();
+              if (!(res === 'cancel' || res === 'escape key press')) {
+                throw new Error(res);
+              }
             });
-          };
-          ctrl.$onInit = function() {
-            ctrl.skillDescription = skillSummary.description;
           };
         }
       ]

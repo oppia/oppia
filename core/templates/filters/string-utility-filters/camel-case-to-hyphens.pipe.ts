@@ -16,8 +16,11 @@
  * @fileoverview CamelCaseToHyphens pipe for Oppia.
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
+import { Injectable, Pipe, PipeTransform } from '@angular/core';
 
+@Injectable({
+  providedIn: 'root'
+})
 @Pipe({name: 'camelCaseToHyphens'})
 export class CamelCaseToHyphensPipe implements PipeTransform {
   transform(input: string): string {

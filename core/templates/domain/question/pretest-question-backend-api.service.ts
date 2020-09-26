@@ -24,24 +24,33 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { QuestionBackendDict } from
+  'domain/question/QuestionObjectFactory';
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
+
+const constants = require('constants.ts');
+
+interface PretestQuestionsBackendResponse {
+  'pretest_question_dicts': QuestionBackendDict[];
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class PretestQuestionBackendApiService {
-  _cursor: string = '';
-
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient
   ) {}
 
-  _fetchPretestQuestions(explorationId: string, storyId: string,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
-    if (!storyId || !storyId.match(/^[a-zA-Z0-9]+$/i)) {
+  _fetchPretestQuestions(
+      explorationId: string, storyUrlFragment: string,
+      successCallback: (value: QuestionBackendDict[]) => void,
+      errorCallback: (reason: string) => void): void {
+    if (
+      !storyUrlFragment ||
+      !storyUrlFragment.match(constants.VALID_URL_FRAGMENT_REGEX)) {
       successCallback([]);
       return;
     }
@@ -49,28 +58,30 @@ export class PretestQuestionBackendApiService {
     var pretestDataUrl = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.PRETEST_QUESTIONS_URL_TEMPLATE, {
         exploration_id: explorationId,
-        story_id: storyId,
-        cursor: this._cursor
+        story_url_fragment: storyUrlFragment,
       });
 
-    this.http.get(pretestDataUrl).toPromise().then((data: any) => {
+    this.http.get<PretestQuestionsBackendResponse>(
+      pretestDataUrl
+    ).toPromise().then(data => {
       var pretestQuestionDicts = (
         cloneDeep(data.pretest_question_dicts));
-      this._cursor = data.next_start_cursor;
       if (successCallback) {
         successCallback(pretestQuestionDicts);
       }
-    }, (error) => {
+    }, errorResponse => {
       if (errorCallback) {
-        errorCallback(error);
+        errorCallback(errorResponse.error.error);
       }
     });
   }
 
-  fetchPretestQuestions(explorationId: string,
-      storyId: string): Promise<Object> {
+  fetchPretestQuestions(
+      explorationId: string,
+      storyUrlFragment: string): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {
-      this._fetchPretestQuestions(explorationId, storyId, resolve, reject);
+      this._fetchPretestQuestions(
+        explorationId, storyUrlFragment, resolve, reject);
     });
   }
 }

@@ -18,6 +18,7 @@
  * the editor pages).
  */
 
+require('domain/classroom/classroom-backend-api.service');
 require('domain/sidebar/sidebar-status.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/debouncer.service.ts');
@@ -26,26 +27,40 @@ require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 require('services/contextual/device-info.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/search.service.ts');
+require('constants.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('topNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./top-navigation-bar.directive.html'),
+      scope: {
+        headerText: '=',
+        subheaderText: '='
+      },
+      bindToController: {
+        backButtonShown: '<'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/common-layout-directives/navigation-bars/top-navigation' +
+        '-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$http', '$window', '$timeout', '$translate',
-        'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
-        'SiteAnalyticsService', 'NavigationService', 'WindowDimensionsService',
-        'DebouncerService', 'DeviceInfoService', 'LOGOUT_URL',
+        '$http', '$scope', '$timeout', '$translate', '$window',
+        'ClassroomBackendApiService', 'DebouncerService', 'DeviceInfoService',
+        'I18nLanguageCodeService', 'NavigationService', 'SearchService',
+        'SidebarStatusService', 'SiteAnalyticsService', 'UserService',
+        'WindowDimensionsService', 'LABEL_FOR_CLEARING_FOCUS', 'LOGOUT_URL',
         function(
-            $scope, $http, $window, $timeout, $translate,
-            SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
-            SiteAnalyticsService, NavigationService, WindowDimensionsService,
-            DebouncerService, DeviceInfoService, LOGOUT_URL) {
+            $http, $scope, $timeout, $translate, $window,
+            ClassroomBackendApiService, DebouncerService, DeviceInfoService,
+            I18nLanguageCodeService, NavigationService, SearchService,
+            SidebarStatusService, SiteAnalyticsService, UserService,
+            WindowDimensionsService, LABEL_FOR_CLEARING_FOCUS, LOGOUT_URL) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection', 'collection_editor',
@@ -55,24 +70,24 @@ angular.module('oppia').directive('topNavigationBar', [
           // The order of the elements in this array specifies the order in
           // which they will be hidden. Earlier elements will be hidden first.
           var NAV_ELEMENTS_ORDER = [
-            'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_ABOUT',
+            'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_CLASSROOM', 'I18N_TOPNAV_ABOUT',
             'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
-          var truncateNavbarDebounced =
-            DebouncerService.debounce(truncateNavbar, 500);
+
+          ctrl.CLASSROOM_PROMOS_ARE_ENABLED = false;
 
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
           ctrl.onLoginButtonClicked = function() {
-            SiteAnalyticsService.registerStartLoginEvent('loginButton');
             UserService.getLoginUrlAsync().then(
               function(loginUrl) {
                 if (loginUrl) {
+                  SiteAnalyticsService.registerStartLoginEvent('loginButton');
                   $timeout(function() {
                     $window.location = loginUrl;
                   }, 150);
                 } else {
-                  throw Error('Login url not found.');
+                  $window.location.reload();
                 }
               }
             );
@@ -217,6 +232,12 @@ angular.module('oppia').directive('topNavigationBar', [
             ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
             ctrl.navElementsVisibilityStatus = {};
 
+            let service = ClassroomBackendApiService;
+            service.fetchClassroomPromosAreEnabledStatusAsync().then(
+              function(classroomPromosAreEnabled) {
+                ctrl.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
+              });
+
             // Close the submenu if focus or click occurs anywhere outside of
             // the menu or outside of its parent (which opens submenu on hover).
             angular.element(document).on('click', function(evt) {
@@ -226,13 +247,19 @@ angular.module('oppia').directive('topNavigationBar', [
               }
             });
 
-            $scope.$on('searchBarLoaded', function() {
-              $timeout(truncateNavbar, 100);
-            });
+            ctrl.directiveSubscriptions.add(
+              SearchService.onSearchBarLoaded.subscribe(
+                () => {
+                  $timeout(truncateNavbar, 100);
+                }
+              )
+            );
 
             UserService.getUserInfoAsync().then(function(userInfo) {
               if (userInfo.getPreferredSiteLanguageCode()) {
                 $translate.use(userInfo.getPreferredSiteLanguageCode());
+                I18nLanguageCodeService.setI18nLanguageCode(
+                  userInfo.getPreferredSiteLanguageCode());
               }
               ctrl.isModerator = userInfo.isModerator();
               ctrl.isAdmin = userInfo.isAdmin();
@@ -271,34 +298,44 @@ angular.module('oppia').directive('topNavigationBar', [
               ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;
             }
 
-            WindowDimensionsService.registerOnResizeHook(function() {
-              ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
-              $scope.$applyAsync();
-              // If window is resized larger, try displaying the hidden
-              // elements.
-              if (
-                currentWindowWidth < WindowDimensionsService.getWidth()) {
-                for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
-                  if (
-                    !ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]]) {
-                    ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] =
-                      true;
+            ctrl.directiveSubscriptions.add(
+              WindowDimensionsService.getResizeEvent().subscribe(evt => {
+                ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
+                // If window is resized larger, try displaying the hidden
+                // elements.
+                if (
+                  currentWindowWidth < WindowDimensionsService.getWidth()) {
+                  for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
+                    if (
+                      !ctrl.navElementsVisibilityStatus[
+                        NAV_ELEMENTS_ORDER[i]]) {
+                      ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] =
+                        true;
+                    }
                   }
                 }
-              }
 
-              // Close the sidebar, if necessary.
-              SidebarStatusService.closeSidebar();
-              ctrl.sidebarIsShown = SidebarStatusService.isSidebarShown();
-              currentWindowWidth = WindowDimensionsService.getWidth();
-              truncateNavbarDebounced();
-            });
+                // Close the sidebar, if necessary.
+                SidebarStatusService.closeSidebar();
+                ctrl.sidebarIsShown = SidebarStatusService.isSidebarShown();
+                currentWindowWidth = WindowDimensionsService.getWidth();
+                DebouncerService.debounce(truncateNavbar, 500);
+
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular.
+                $scope.$applyAsync();
+              })
+            );
             // The function needs to be run after i18n. A timeout of 0 appears
             // to run after i18n in Chrome, but not other browsers. The function
             // will check if i18n is complete and set a new timeout if it is
             // not. Since a timeout of 0 works for at least one browser,
             // it is used here.
             $timeout(truncateNavbar, 0);
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

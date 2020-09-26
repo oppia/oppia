@@ -1,4 +1,21 @@
 {
+  "AlgebraicExpressionInput": {
+    "MatchesExactlyWith": {
+      "description": "matches exactly with {{x|AlgebraicExpression}}"
+    },
+    "IsEquivalentTo": {
+      "description": "is equivalent to {{x|AlgebraicExpression}}"
+    },
+    "ContainsSomeOf": {
+      "description": "contains at least one of the terms present in {{x|AlgebraicExpression}}"
+    },
+    "OmitsSomeOf": {
+      "description": "omits at least one of the terms present in {{x|AlgebraicExpression}}"
+    },
+    "MatchesWithGeneralForm": {
+      "description": "matches the form of {{x|AlgebraicExpression}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
+    }
+  },
   "CodeRepl": {
     "CodeEquals": {
       "description": "has code equal to {{x|CodeString}}"
@@ -113,9 +130,21 @@
       "description": "is not correct due to {{c|LogicErrorCategory}}"
     }
   },
-  "MathExpressionInput": {
-    "IsMathematicallyEquivalentTo": {
-      "description": "is mathematically equivalent to (LaTeX) {{x|UnicodeString}}"
+  "MathEquationInput": {
+    "MatchesExactlyWith": {
+      "description": "matches exactly with {{x|MathEquation}} {{y|PositionOfTerms}}"
+    },
+    "IsEquivalentTo": {
+      "description": "is equivalent to {{x|MathEquation}}"
+    },
+    "ContainsSomeOf": {
+      "description": "contains at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}"
+    },
+    "OmitsSomeOf": {
+      "description": "omits at least one of the terms present in {{x|MathEquation}} {{y|PositionOfTerms}}"
+    },
+    "MatchesWithGeneralForm": {
+      "description": "matches the form of {{x|MathEquation}} with placeholders {{y|SetOfAlgebraicIdentifier}}"
     }
   },
   "MultipleChoiceInput": {
@@ -149,6 +178,20 @@
     },
     "IsEquivalentTo": {
         "description": "is equivalent to {{f|NumberWithUnits}}"
+    }
+  },
+  "NumericExpressionInput": {
+    "MatchesExactlyWith": {
+      "description": "matches exactly with {{x|NumericExpression}}"
+    },
+    "IsEquivalentTo": {
+      "description": "is equivalent to {{x|NumericExpression}}"
+    },
+    "ContainsSomeOf": {
+      "description": "contains at least one of the terms present in {{x|NumericExpression}}"
+    },
+    "OmitsSomeOf": {
+      "description": "omits at least one of the terms present in {{x|NumericExpression}}"
     }
   },
   "NumericInput": {
@@ -222,10 +265,7 @@
   },
   "TextInput": {
     "Equals": {
-      "description": "is equal to {{x|NormalizedString}}"
-    },
-    "CaseSensitiveEquals": {
-      "description": "is equal to {{x|NormalizedString}}, taking case into account"
+      "description": "is equal to {{x|NormalizedString}}, without taking case into account"
     },
     "StartsWith": {
       "description": "starts with {{x|NormalizedString}}"
@@ -235,6 +275,17 @@
     },
     "FuzzyEquals": {
       "description": "is equal to {{x|NormalizedString}}, misspelled by at most one character"
+    }
+  },
+  "RatioExpressionInput": {
+    "Equals": {
+      "description": "is equal to {{x|RatioExpression}}"
+    },
+    "IsEquivalent": {
+      "description": "is equivalent to {{x|RatioExpression}}"
+    },
+    "HasNumberOfTermsEqualTo": {
+      "description": "has number of terms equal to {{y|NonnegativeInt}}"
     }
   }
 }

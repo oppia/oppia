@@ -19,53 +19,47 @@
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/question-backend-api.service.ts');
-require('domain/skill/editable-skill-backend-api.service.ts');
 require('domain/skill/SkillObjectFactory.ts');
-require('domain/skill/skill-rights-backend-api.service.ts');
 require('domain/skill/SkillRightsObjectFactory.ts');
+require('domain/skill/skill-backend-api.service.ts');
+require('domain/skill/skill-rights-backend-api.service.ts');
+require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 require('services/alerts.service.ts');
 require('services/questions-list.service.ts');
-
-require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
+import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('SkillEditorStateService', [
-  '$rootScope', 'AlertsService', 'EditableSkillBackendApiService',
-  'QuestionsListService', 'SkillObjectFactory', 'SkillRightsBackendApiService',
-  'SkillRightsObjectFactory', 'UndoRedoService',
-  'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
+  '$rootScope', 'AlertsService', 'QuestionsListService',
+  'SkillBackendApiService', 'SkillObjectFactory',
+  'SkillRightsBackendApiService', 'SkillRightsObjectFactory', 'UndoRedoService',
   function(
-      $rootScope, AlertsService, EditableSkillBackendApiService,
-      QuestionsListService, SkillObjectFactory, SkillRightsBackendApiService,
-      SkillRightsObjectFactory, UndoRedoService,
-      EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED) {
+      $rootScope, AlertsService, QuestionsListService,
+      SkillBackendApiService, SkillObjectFactory,
+      SkillRightsBackendApiService, SkillRightsObjectFactory, UndoRedoService) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
-    var _skillRights = SkillRightsObjectFactory.createInterstitialSkillRights();
+    var _skillRights = (
+      SkillRightsObjectFactory.createInterstitialSkillRights());
     var _skillIsInitialized = false;
+    var assignedSkillTopicData = null;
     var _skillIsBeingLoaded = false;
     var _skillIsBeingSaved = false;
     var _groupedSkillSummaries = {
       current: [],
       others: []
     };
-
+    var _skillChangedEventEmitter = new EventEmitter();
     var _setSkill = function(skill) {
       _skill.copyFromSkill(skill);
-      if (_skillIsInitialized) {
-        $rootScope.$broadcast(EVENT_SKILL_REINITIALIZED);
-      } else {
-        $rootScope.$broadcast(EVENT_SKILL_INITIALIZED);
-      }
+      _skillChangedEventEmitter.emit();
       _skillIsInitialized = true;
     };
 
-    var _updateSkill = function(newBackendSkillObject) {
-      _setSkill(SkillObjectFactory.createFromBackendDict(
-        newBackendSkillObject));
+    var _updateSkill = function(skill) {
+      _setSkill(skill);
     };
 
     var _updateGroupedSkillSummaries = function(groupedSkillSummaries) {
       var topicName = null;
-      var sortedSkillSummaries = [];
       _groupedSkillSummaries.current = [];
       _groupedSkillSummaries.others = [];
 
@@ -100,16 +94,22 @@ angular.module('oppia').factory('SkillEditorStateService', [
       _skillRights.copyFromSkillRights(skillRights);
     };
 
-    var _updateSkillRights = function(newBackendSkillRightsObject) {
-      _setSkillRights(SkillRightsObjectFactory.createFromBackendDict(
-        newBackendSkillRightsObject));
+    var _updateSkillRights = function(newSkillRightsObject) {
+      _setSkillRights(newSkillRightsObject);
     };
     return {
+      /**
+       * Loads, or reloads, the skill stored by this service given a
+       * specified collection ID. See setSkill() for more information on
+       * additional behavior of this function.
+       */
       loadSkill: function(skillId) {
         _skillIsBeingLoaded = true;
-        EditableSkillBackendApiService.fetchSkill(
+        SkillBackendApiService.fetchSkill(
           skillId).then(
           function(newBackendSkillObject) {
+            assignedSkillTopicData = (
+              newBackendSkillObject.assignedSkillTopicData);
             _updateSkill(newBackendSkillObject.skill);
             _updateGroupedSkillSummaries(
               newBackendSkillObject.groupedSkillSummaries);
@@ -117,13 +117,14 @@ angular.module('oppia').factory('SkillEditorStateService', [
               [skillId], true, false
             );
             _skillIsBeingLoaded = false;
+            $rootScope.$apply();
           }, function(error) {
             AlertsService.addWarning();
             _skillIsBeingLoaded = false;
           });
         SkillRightsBackendApiService.fetchSkillRights(
-          skillId).then(function(newBackendSkillRightsObject) {
-          _updateSkillRights(newBackendSkillRightsObject);
+          skillId).then(function(newSkillRightsObject) {
+          _updateSkillRights(newSkillRightsObject);
           _skillIsBeingLoaded = false;
         }, function(error) {
           AlertsService.addWarning(
@@ -132,49 +133,78 @@ angular.module('oppia').factory('SkillEditorStateService', [
           _skillIsBeingLoaded = false;
         });
       },
-
+      /**
+       * Returns whether this service is currently attempting to load the
+       * skill maintained by this service.
+       */
       isLoadingSkill: function() {
         return _skillIsBeingLoaded;
+      },
+
+      getAssignedSkillTopicData: function() {
+        return assignedSkillTopicData;
       },
 
       getGroupedSkillSummaries: function() {
         return angular.copy(_groupedSkillSummaries);
       },
-
+      /**
+       * Returns whether a skill has yet been loaded using either
+       * loadSkill().
+       */
       hasLoadedSkill: function() {
         return _skillIsInitialized;
       },
-
+      /**
+       * Returns the current skill to be shared among the skill
+       * editor. Please note any changes to this skill will be propogated
+       * to all bindings to it. This skill object will be retained for the
+       * lifetime of the editor. This function never returns null, though it may
+       * return an empty skill object if the skill has not yet been
+       * loaded for this editor instance.
+       */
       getSkill: function() {
         return _skill;
       },
-
+      /**
+       * Attempts to save the current skill given a commit message. This
+       * function cannot be called until after a skill has been initialized
+       * in this service. Returns false if a save is not performed due to no
+       * changes pending, or true if otherwise. This function, upon success,
+       * will clear the UndoRedoService of pending changes. This function also
+       * shares behavior with setSkill(), when it succeeds.
+       */
       saveSkill: function(commitMessage, successCallback) {
         if (!_skillIsInitialized) {
           AlertsService.fatalWarning(
             'Cannot save a skill before one is loaded.');
         }
-
+        // Don't attempt to save the skill if there are no changes pending.
         if (!UndoRedoService.hasChanges()) {
           return false;
         }
         _skillIsBeingSaved = true;
-        EditableSkillBackendApiService.updateSkill(
+        SkillBackendApiService.updateSkill(
           _skill.getId(), _skill.getVersion(), commitMessage,
           UndoRedoService.getCommittableChangeList()).then(
-          function(skillBackendObject) {
-            _updateSkill(skillBackendObject);
+          function(skill) {
+            _updateSkill(skill);
             UndoRedoService.clearChanges();
             _skillIsBeingSaved = false;
             if (successCallback) {
               successCallback();
             }
+            $rootScope.$apply();
           }, function(error) {
             AlertsService.addWarning(
               error || 'There was an error when saving the skill');
             _skillIsBeingSaved = false;
           });
         return true;
+      },
+
+      get onSkillChange() {
+        return _skillChangedEventEmitter;
       },
 
       getSkillRights: function() {

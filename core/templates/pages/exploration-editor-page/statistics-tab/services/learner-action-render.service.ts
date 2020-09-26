@@ -26,13 +26,15 @@
  * learner actions and then returns a giant HTML string.
  */
 
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
-  'answer-submit-action.directive.ts');
+  'answer-submit-action.component.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
-  'multiple-incorrect-submissions-issue.directive.ts');
+  'multiple-incorrect-submissions-issue.component.ts');
 require('services/exploration-html-formatter.service.ts');
 
 angular.module('oppia').factory('LearnerActionRenderService', [
@@ -50,18 +52,19 @@ angular.module('oppia').factory('LearnerActionRenderService', [
     };
 
     var renderExplorationQuitActionHTML = function(
-        stateName, timeSpentInStateSecs, actionIndex) {
-      var statement =
+        stateName, timeSpentInStateMsecs, actionIndex) {
+      var statement = (
         actionIndex + '. Left the exploration after spending a total of ' +
-        timeSpentInStateSecs + ' seconds on card "' + stateName + '".';
+        (timeSpentInStateMsecs / 1000) + ' seconds on card "' + stateName +
+        '".');
       return ($('<span>').text(statement)).html();
     };
 
     var renderContinueButtonSubmitActionHTML = function(
-        stateName, timeSpentInStateSecs, actionIndex) {
+        stateName, timeSpentInStateMsecs, actionIndex) {
       var statement =
         actionIndex + '. Pressed "Continue" to move to card "' + stateName +
-        '" after ' + timeSpentInStateSecs + ' seconds.';
+        '" after ' + (timeSpentInStateMsecs / 1000) + ' seconds.';
       return ($('<span>').text(statement)).html();
     };
 
@@ -70,25 +73,29 @@ angular.module('oppia').factory('LearnerActionRenderService', [
      * change in state.
      * @param {string} answer.
      * @param {string} destStateName.
-     * @param {int} timeSpentInStateSecs.
+     * @param {int} timeSpentInStateMsecs.
      * @param {string} currentStateName.
      * @param {int} actionIndex.
      * @param {Interaction} interaction.
      * @returns {string}
      */
     var renderAnswerSubmitActionHTML = function(
-        answer, destStateName, timeSpentInStateSecs, currentStateName,
+        answer, destStateName, timeSpentInStateMsecs, currentStateName,
         actionIndex, interaction) {
       var el = $('<answer-submit-action>');
       el.attr('answer', HtmlEscaperService.objToEscapedJson(answer));
       el.attr('dest-state-name', destStateName);
-      el.attr('time-spent-in-state-secs', timeSpentInStateSecs);
+      el.attr('time-spent-in-state-secs', timeSpentInStateMsecs / 1000);
       el.attr('current-state-name', currentStateName);
       el.attr('action-index', actionIndex);
       el.attr('interaction-id', interaction.id);
       el.attr(
         'interaction-customization-args',
-        HtmlEscaperService.objToEscapedJson(interaction.customizationArgs));
+        HtmlEscaperService.objToEscapedJson(
+          Interaction.convertCustomizationArgsToBackendDict(
+            interaction.customizationArgs)
+        )
+      );
       return ($('<span>').append(el)).html();
     };
 

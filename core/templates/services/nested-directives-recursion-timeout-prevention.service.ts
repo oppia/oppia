@@ -29,14 +29,14 @@ angular.module('oppia').factory(
          * @return {object} An object containing the linking functions.
          */
         compile: function(element, link) {
-          // Normalize the link parameter
+          // Normalize the link parameter.
           if (angular.isFunction(link)) {
             link = {
               post: link
             };
           }
 
-          // Break the recursion loop by removing the contents,
+          // Break the recursion loop by removing the contents.
           var contents = element.contents().remove();
           var compiledContents;
           return {

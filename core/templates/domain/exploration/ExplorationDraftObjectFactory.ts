@@ -20,24 +20,75 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface IExplorationDraftDict {
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'draftChanges' is an array of dicts with possible
-  // underscore_cased keys. A thorough check needs to be done to assure of
-  // its exact type.
-  draftChanges: any;
+export interface AddStateNameChangeList {
+  'cmd': 'add_state';
+  'state_name': string;
+}
+
+export interface DeleteStateChangeList {
+  'cmd': 'delete_state';
+  'state_name': string;
+}
+
+export interface EditExplorationPropertyChangeList {
+  'cmd': 'edit_exploration_property';
+  'new_value': Object;
+  'old_value': Object;
+  'property_name': string;
+}
+
+export interface EditStatePropertyChangeList {
+  'cmd': 'edit_state_property';
+  'new_value': Object;
+  'old_value': Object;
+  'property_name': string;
+  'state_name': string;
+}
+
+export interface RenameStateChangeList {
+  'cmd': 'rename_state';
+  'new_state_name': string;
+  'old_state_name': string;
+}
+
+export interface RevertChangeList {
+  'cmd': 'AUTO_revert_version_number';
+  'version_number': number;
+}
+
+export interface CreateChangeList {
+  cmd: 'create_new';
+  category: string;
+  title: string;
+}
+
+export interface MigrateStatesVersionChangeList {
+  'cmd': 'migrate_states_schema_to_latest_version';
+  'from_version': number;
+  'to_version': number;
+}
+
+export type ExplorationChangeList = (
+  AddStateNameChangeList |
+  DeleteStateChangeList |
+  EditExplorationPropertyChangeList |
+  EditStatePropertyChangeList |
+  RenameStateChangeList |
+  RevertChangeList |
+  CreateChangeList |
+  MigrateStatesVersionChangeList);
+
+export interface ExplorationDraftDict {
+  draftChanges: ExplorationChangeList[];
   draftChangeListId: number
 }
 
 export class ExplorationDraft {
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'draftChanges' is an array of dicts with possible
-  // underscore_cased keys. A thorough check needs to be done to assure of
-  // its exact type.
-  draftChanges: any;
+  draftChanges: ExplorationChangeList[];
   draftChangeListId: number;
 
-  constructor(draftChanges: any, draftChangeListId: number) {
+  constructor(
+      draftChanges: ExplorationChangeList[], draftChangeListId: number) {
     this.draftChanges = draftChanges;
     this.draftChangeListId = draftChangeListId;
   }
@@ -54,11 +105,8 @@ export class ExplorationDraft {
   isValid(currentDraftId: number): boolean {
     return (currentDraftId === this.draftChangeListId);
   }
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'draftChanges' is an array of dicts with possible
-  // underscore_cased keys. A thorough check needs to be done to assure of
-  // its exact type.
-  getChanges(): any {
+
+  getChanges(): ExplorationChangeList[] {
     return this.draftChanges;
   }
 }
@@ -68,17 +116,14 @@ export class ExplorationDraft {
 })
 export class ExplorationDraftObjectFactory {
   createFromLocalStorageDict(
-      explorationDraftDict: IExplorationDraftDict): ExplorationDraft {
+      explorationDraftDict: ExplorationDraftDict): ExplorationDraft {
     return new ExplorationDraft(
       explorationDraftDict.draftChanges,
       explorationDraftDict.draftChangeListId);
   }
   toLocalStorageDict(
-      // TODO(#7165): Replace 'any' with the exact type. This has been typed
-      // as 'any' since 'changeList' is an array of dicts with possible
-      // underscore_cased keys. A thorough check needs to be done to assure of
-      // its exact type.
-      changeList: any, draftChangeListId: number): IExplorationDraftDict {
+      changeList: ExplorationChangeList[],
+      draftChangeListId: number): ExplorationDraftDict {
     return {
       draftChanges: changeList,
       draftChangeListId: draftChangeListId

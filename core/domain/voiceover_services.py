@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import suggestion_registry
 from core.domain import user_services
@@ -39,7 +40,7 @@ def _get_voiceover_application_class(target_type):
         class. The voiceover application class for the given target type.
 
     Raises:
-        Exception: The voiceover application target type is invalid.
+        Exception. The voiceover application target type is invalid.
     """
     target_type_to_classes = (
         suggestion_registry.VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES)
@@ -199,7 +200,7 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
     if voiceover_application.target_type == feconf.ENTITY_TYPE_EXPLORATION:
         rights_manager.assign_role_for_exploration(
             reviewer, voiceover_application.target_id,
-            voiceover_application.author_id, rights_manager.ROLE_VOICE_ARTIST)
+            voiceover_application.author_id, rights_domain.ROLE_VOICE_ARTIST)
         opportunity_services.update_exploration_voiceover_opportunities(
             voiceover_application.target_id,
             voiceover_application.language_code)

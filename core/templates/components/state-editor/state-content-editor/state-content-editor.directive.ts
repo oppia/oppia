@@ -26,7 +26,11 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
+require('services/context.service.ts');
 require('services/editability.service.ts');
+require('services/external-save.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('stateContentEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -41,6 +45,8 @@ angular.module('oppia').directive('stateContentEditor', [
       },
       scope: {
         getStateContentPlaceholder: '&stateContentPlaceholder',
+        getStateContentSaveButtonPlaceholder: (
+          '&stateContentSaveButtonPlaceholder'),
         onSaveStateContent: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
@@ -48,12 +54,15 @@ angular.module('oppia').directive('stateContentEditor', [
         '/components/state-editor/state-content-editor/' +
         'state-content-editor.directive.html'),
       controller: [
-        '$scope', 'EditabilityService', 'EditorFirstTimeEventsService',
+        '$scope', 'ContextService', 'EditabilityService',
+        'EditorFirstTimeEventsService', 'ExternalSaveService',
         'StateContentService', 'StateEditorService',
         function(
-            $scope, EditabilityService, EditorFirstTimeEventsService,
+            $scope, ContextService, EditabilityService,
+            EditorFirstTimeEventsService, ExternalSaveService,
             StateContentService, StateEditorService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           $scope.isCardHeightLimitReached = function() {
             var shadowPreviewCard = $(
               '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'
@@ -87,7 +96,8 @@ angular.module('oppia').directive('stateContentEditor', [
               StateContentService.displayed.getHtml());
             if (contentHasChanged) {
               var contentId = StateContentService.displayed.getContentId();
-              $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(contentId);
+              $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+                [contentId]);
             }
             saveContent();
           };
@@ -98,7 +108,11 @@ angular.module('oppia').directive('stateContentEditor', [
           };
           ctrl.$onInit = function() {
             $scope.HTML_SCHEMA = {
-              type: 'html'
+              type: 'html',
+              ui_config: {
+                hide_complex_extensions: (
+                  ContextService.getEntityType() === 'question')
+              }
             };
             $scope.contentId = null;
             $scope.StateContentService = StateContentService;
@@ -109,12 +123,19 @@ angular.module('oppia').directive('stateContentEditor', [
             $scope.contentEditorIsOpen = false;
             $scope.isEditable = EditabilityService.isEditable;
             $scope.cardHeightLimitWarningIsShown = true;
-            $scope.$on('externalSave', function() {
-              if ($scope.contentEditorIsOpen) {
-                saveContent();
-              }
-            });
+            ctrl.directiveSubscriptions.add(
+              ExternalSaveService.onExternalSave.subscribe(
+                () => {
+                  if ($scope.contentEditorIsOpen) {
+                    saveContent();
+                  }
+                }
+              )
+            );
             StateEditorService.updateStateContentEditorInitialised();
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

@@ -70,17 +70,17 @@ describe('MusicNotesInput interaction', function() {
       $httpBackend.verifyNoOutstandingRequest();
     });
 
-    it('loads the music staff template', function() {
+    it('should load the music staff template', function() {
       expect(elt.html()).toContain('oppia-music-input-valid-note-area');
       expect(elt.html()).toContain('I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE');
       expect(elt.html()).toContain('playCurrentSequence()');
     });
 
-    it('loads the palette when initialized', function() {
+    it('should load the palette when initialized', function() {
       expect(elt.html()).toContain('oppia-music-input-natural-note');
     });
 
-    it('adds notes to note sequence in the correct order', function() {
+    it('should add notes to note sequence in the correct order', function() {
       expect(ctrlScope.noteSequence).toEqual([]);
 
       ctrlScope._addNoteToNoteSequence({
@@ -136,7 +136,7 @@ describe('MusicNotesInput interaction', function() {
       }]);
     });
 
-    it('clears the sequence', function() {
+    it('should clear the sequence', function() {
       expect(ctrlScope.noteSequence).toEqual([]);
 
       ctrlScope._addNoteToNoteSequence({
@@ -156,7 +156,7 @@ describe('MusicNotesInput interaction', function() {
       expect(ctrlScope.noteSequence).toEqual([]);
     });
 
-    it('removes notes with particular ids', function() {
+    it('should remove notes with particular ids', function() {
       expect(ctrlScope.noteSequence).toEqual([]);
 
       ctrlScope._addNoteToNoteSequence({
@@ -187,7 +187,7 @@ describe('MusicNotesInput interaction', function() {
       }]);
     });
 
-    it('does not do anything when asked to remove a note that does not exist',
+    it('should not do anything when asked to remove a note that does not exist',
       function() {
         expect(ctrlScope.noteSequence).toEqual([]);
 
@@ -215,7 +215,7 @@ describe('MusicNotesInput interaction', function() {
       }
     );
 
-    it('correctly handles duplicate removals', function() {
+    it('should correctly handles duplicate removals', function() {
       expect(ctrlScope.noteSequence).toEqual([]);
 
       ctrlScope._addNoteToNoteSequence({
@@ -241,7 +241,7 @@ describe('Music phrase player service', function() {
       // to include MIDI in the future, we will remember to swap
       // it out with a dummy MIDI and back again after the test.
       if ($window.MIDI) {
-        throw 'Expected MIDI library not to show up in tests.';
+        throw new Error('Expected MIDI library not to show up in tests.');
       }
 
       $window.MIDI = {

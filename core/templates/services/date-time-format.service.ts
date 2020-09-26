@@ -19,7 +19,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 @Injectable({
   providedIn: 'root'
@@ -38,14 +38,18 @@ export class DateTimeFormatService {
         hour12: true
       });
     } else if (date.getFullYear() === new Date().getFullYear()) {
-      // moment will return Oct 10
-      return moment(date).format('MMM D');
+      // Moment will return Oct 10.
+      return dayjs(date).format('MMM D');
     } else {
-      // moment will return 10/22/35(shortDate)
-      return moment(date).format('MM/DD/YY');
+      // Moment will return 10/22/35(shortDate).
+      return dayjs(date).format('MM/DD/YY');
     }
   }
-
+  // Returns date along with time.
+  getLocaleDateTimeHourString(millisSinceEpoch: number): string {
+    let date = new Date(millisSinceEpoch);
+    return dayjs(date).format('MMM D hh:mm A');
+  }
   // Returns just the date.
   getLocaleDateString(millisSinceEpoch: number): string {
     let date = new Date(millisSinceEpoch);

@@ -25,7 +25,7 @@ import logicProofParser from
   'interactions/LogicProof/static/js/generatedParser.ts';
 
 var logicProofTeacher2 = (function() {
-  // LINE TEMPLATES
+  // ---- LINE TEMPLATES ----
 
   // Ensures that lineTemplate has all its operators of a matchable kind
   // occuring in a non-substituted instance so that matching a line against
@@ -36,7 +36,7 @@ var logicProofTeacher2 = (function() {
     var expressionTemplates = [];
 
     // Counts the number of expressionTemplates for which values are actually
-    // provided by the student (i.e. those in the 'reader_view' entry.)
+    // provided by the student (i.e. those in the 'reader_view' entry).
     var numAccessible = 0;
     for (var i = 0; i < lineTemplate.reader_view.length; i++) {
       if (lineTemplate.reader_view[i].format === 'expression') {
@@ -110,15 +110,15 @@ var logicProofTeacher2 = (function() {
       invisible.push(lineTemplate.variables[i]);
     }
 
-    // 1. Vocab checking
+    // 1. Vocab checking.
     requireNoWordsUsed(checkees, language.operators, vocabulary);
-    // 2. Type checking
+    // 2. Type checking.
     var typeCheck = logicProofShared.assignTypesToExpressionArray(
       checkees, types, language, ['variable', 'atom'], true);
     if (typeCheck.length > 1) {
       throw new logicProofShared.UserError('ambiguous_typing', {});
     }
-    // 3. Matchability checking
+    // 3. Matchability checking.
     var visibleOperators = logicProofShared.getOperatorsFromExpressionArray(
       visible);
     var hiddenOperators = logicProofShared.getOperatorsFromExpressionArray(
@@ -161,9 +161,9 @@ var logicProofTeacher2 = (function() {
    *         antecendents or variables) that it will not be possible to deduce
    *         from what the student is required to write.
    */
-  var buildLineTemplate = function(nameString, readerViewString,
-      antecedentsString, resultsString, variablesString, errorStrings,
-      language, vocabulary) {
+  var buildLineTemplate = function(
+      nameString, readerViewString, antecedentsString, resultsString,
+      variablesString, errorStrings, language, vocabulary) {
     var possibleReaderViews = logicProofShared.parseLineString(
       readerViewString, language.operators, vocabulary, true);
     if (possibleReaderViews.length > 1) {
@@ -234,7 +234,7 @@ var logicProofTeacher2 = (function() {
     return displayedArray.join(', ');
   };
 
-  // The template as seen by the teacher
+  // The template as seen by the teacher.
   var displayLineFragmentTemplate = function(template, operators, vocabulary) {
     if (template.format === 'phrase') {
       return vocabulary[template.content][0];
@@ -250,7 +250,7 @@ var logicProofTeacher2 = (function() {
   };
 
   // Just gives the 'reader_view' part of the template, not the other
-  // parameters like antecedents
+  // parameters like antecedents.
   var displayLineTemplateReaderView = function(
       readerView, operators, vocabulary) {
     var displayedFragments = [];
@@ -261,13 +261,14 @@ var logicProofTeacher2 = (function() {
     return displayedFragments.join(' ');
   };
 
-  // The message as seen by the teacher
+  // The message as seen by the teacher.
   var displayMessage = function(message, operators) {
     var output = '';
     for (var i = 0; i < message.length; i++) {
       if (message[i].format === 'expression') {
         if (message[i].content.type === 'element') {
-          output += (message[i].content.hasOwnProperty('kind') ?
+          output += (
+            message[i].content.hasOwnProperty('kind') ?
             '{{' + displayExpressionTemplate(message[i].content, operators) +
               '|variable}}' :
             '{{' + displayExpressionTemplate(message[i].content, operators) +
@@ -358,7 +359,7 @@ var logicProofTeacher2 = (function() {
     return output;
   };
 
-  // MISTAKE TABLE
+  // ---- MISTAKE TABLE ----
 
   /**
    * @param {MistakeEntry variation} mistakeEntry - a MistakeEntry object (but
@@ -371,7 +372,7 @@ var logicProofTeacher2 = (function() {
    */
   var validateAndTypeMistakeEntry = function(mistakeEntry, language) {
     var availableOperators = {
-      // This is available to refer to the line number
+      // This is available to refer to the line number.
       n: {
         kind: 'variable',
         typing: [{
@@ -552,7 +553,7 @@ var logicProofTeacher2 = (function() {
     return displayedSections;
   };
 
-  // CONTROL FUNCTIONS
+  // ---- CONTROL FUNCTIONS ----
 
   /**
    * @param {Expression} formulaLHS - an Expression representing the
@@ -631,7 +632,8 @@ var logicProofTeacher2 = (function() {
         };
       }
     }
-    // The RHS cannot use any operator not found on the LHS or in the given list
+    // The RHS cannot use any operator not found on the LHS or in the given
+    // list.
     var typeCheck = logicProofShared.assignTypesToExpression(formulaRHS, [
       'boolean', 'integer', 'string', 'formula', 'set_of_formulas'
     ], {
@@ -642,7 +644,7 @@ var logicProofTeacher2 = (function() {
     if (typeCheck.length > 1) {
       throw new logicProofShared.UserError('ambiguous_typing', {});
     }
-    // Now we can work out what the typing of the formula actually is
+    // Now we can work out what the typing of the formula actually is.
     var argumentTypes = [];
     for (var i = 0; i < formulaLHS.arguments.length; i++) {
       argumentTypes.push({
@@ -798,7 +800,7 @@ var logicProofTeacher2 = (function() {
     return displayedEntries;
   };
 
-  // UTILITIES
+  // ---- UTILITIES ----
 
   var parseMessageStringFragment = function(fragmentString, typeOfMessage) {
     return (typeOfMessage === 'general') ? {

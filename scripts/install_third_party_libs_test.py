@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import subprocess
-import sys
 import tempfile
 
 from core.tests import test_utils
@@ -29,6 +28,7 @@ from core.tests import test_utils
 import python_utils
 
 from . import common
+from . import install_backend_python_libs
 from . import install_third_party
 from . import install_third_party_libs
 from . import pre_commit_hook
@@ -49,29 +49,29 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'check_call_is_called': False,
         }
         self.print_arr = []
-        # pylint: disable=unused-argument
-        def mock_check_call(unused_cmd_tokens, *args, **kwargs):
+        def mock_check_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             self.check_function_calls['check_call_is_called'] = True
             class Ret(python_utils.OBJECT):
                 """Return object with required attributes."""
+
                 def __init__(self):
                     self.returncode = 0
                 def communicate(self):
                     """Return required meathod."""
                     return '', ''
             return Ret()
-        def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs):
+        def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             class Ret(python_utils.OBJECT):
                 """Return object that gives user-prefix error."""
+
                 def __init__(self):
                     self.returncode = 1
                 def communicate(self):
                     """Return user-prefix error as stderr."""
                     return '', 'can\'t combine user with prefix'
             return Ret()
-        def mock_print(msg, end=''):
+        def mock_print(msg, end=''):  # pylint: disable=unused-argument
             self.print_arr.append(msg)
-        # pylint: enable=unused-argument
 
         self.check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call)
@@ -113,72 +113,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             command = install_third_party_libs.get_yarn_command()
             self.assertEqual(command, 'yarn')
 
-    def test_pip_install_without_import_error(self):
-        with self.Popen_swap:
-            install_third_party_libs.pip_install('package', 'version', 'path')
-        self.assertTrue(self.check_function_calls['check_call_is_called'])
-
-    def test_pip_install_with_user_prefix_error(self):
-        with self.Popen_error_swap:
-            with self.check_call_swap:
-                install_third_party_libs.pip_install('pkg', 'ver', 'path')
-        self.assertTrue(self.check_function_calls['check_call_is_called'])
-
-    def test_pip_install_exception_handling(self):
-        with self.assertRaises(Exception) as context:
-            install_third_party_libs.pip_install('package', 'version', 'path')
-        self.assertTrue('Error installing package' in context.exception)
-
-    def test_pip_install_with_import_error_and_darwin_os(self):
-        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
-
-        import pip
-        try:
-            sys.modules['pip'] = None
-            with os_name_swap, self.print_swap, self.check_call_swap:
-                with self.assertRaises(Exception):
-                    install_third_party_libs.pip_install(
-                        'package', 'version', 'path')
-        finally:
-            sys.modules['pip'] = pip
-        self.assertTrue(
-            'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
-            'OS%29' in self.print_arr)
-        self.assertFalse(self.check_function_calls['check_call_is_called'])
-
-    def test_pip_install_with_import_error_and_linux_os(self):
-        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
-
-        import pip
-        try:
-            sys.modules['pip'] = None
-            with os_name_swap, self.print_swap, self.check_call_swap:
-                with self.assertRaises(Exception):
-                    install_third_party_libs.pip_install(
-                        'package', 'version', 'path')
-        finally:
-            sys.modules['pip'] = pip
-        self.assertTrue(
-            'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
-            '%29' in self.print_arr)
-        self.assertFalse(self.check_function_calls['check_call_is_called'])
-
-    def test_pip_install_with_import_error_and_windows_os(self):
-        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
-        import pip
-        try:
-            sys.modules['pip'] = None
-            with os_name_swap, self.print_swap, self.check_call_swap:
-                with self.assertRaises(Exception):
-                    install_third_party_libs.pip_install(
-                        'package', 'version', 'path')
-        finally:
-            sys.modules['pip'] = pip
-        self.assertTrue(
-            'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
-            'Windows%29' in self.print_arr)
-        self.assertFalse(self.check_function_calls['check_call_is_called'])
-
     def test_ensure_pip_library_is_installed(self):
         check_function_calls = {
             'pip_install_is_called': False
@@ -190,7 +124,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         pip_install_swap = self.swap(
-            install_third_party_libs, 'pip_install', mock_pip_install)
+            install_backend_python_libs, 'pip_install', mock_pip_install)
 
         with exists_swap, pip_install_swap:
             install_third_party_libs.ensure_pip_library_is_installed(
@@ -222,18 +156,16 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 'ensure_pip_library_is_installed_is_called'] = True
         def mock_check_call(unused_cmd_tokens):
             pass
-        # pylint: disable=unused-argument
-        def mock_main_for_install_third_party(args):
+        def mock_main_for_install_third_party(args):  # pylint: disable=unused-argument
             check_function_calls['install_third_party_main_is_called'] = True
-        def mock_main_for_setup(args):
+        def mock_main_for_setup(args):  # pylint: disable=unused-argument
             check_function_calls['setup_main_is_called'] = True
-        def mock_main_for_setup_gae(args):
+        def mock_main_for_setup_gae(args):  # pylint: disable=unused-argument
             check_function_calls['setup_gae_main_is_called'] = True
-        def mock_main_for_pre_commit_hook(args):
+        def mock_main_for_pre_commit_hook(args):  # pylint: disable=unused-argument
             check_function_calls['pre_commit_hook_main_is_called'] = True
-        def mock_main_for_pre_push_hook(args):
+        def mock_main_for_pre_push_hook(args):  # pylint: disable=unused-argument
             check_function_calls['pre_push_hook_main_is_called'] = True
-        # pylint: enable=unused-argument
         def mock_tweak_yarn_executable():
             check_function_calls['tweak_yarn_executable_is_called'] = True
 
@@ -288,7 +220,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         with python_utils.open_file(temp_pq_config_file, 'r') as f:
             self.assertEqual(f.read(), pq_expected_text)
 
-
     def test_function_calls_on_windows(self):
         check_function_calls = {
             'ensure_pip_library_is_installed_is_called': False,
@@ -314,18 +245,16 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 'ensure_pip_library_is_installed_is_called'] = True
         def mock_check_call(unused_cmd_tokens):
             pass
-        # pylint: disable=unused-argument
-        def mock_main_for_install_third_party(args):
+        def mock_main_for_install_third_party(args):  # pylint: disable=unused-argument
             check_function_calls['install_third_party_main_is_called'] = True
-        def mock_main_for_setup(args):
+        def mock_main_for_setup(args):  # pylint: disable=unused-argument
             check_function_calls['setup_main_is_called'] = True
-        def mock_main_for_setup_gae(args):
+        def mock_main_for_setup_gae(args):  # pylint: disable=unused-argument
             check_function_calls['setup_gae_main_is_called'] = True
-        def mock_main_for_pre_commit_hook(args):
+        def mock_main_for_pre_commit_hook(args):  # pylint: disable=unused-argument
             check_function_calls['pre_commit_hook_main_is_called'] = True
-        def mock_main_for_pre_push_hook(args):
+        def mock_main_for_pre_push_hook(args):  # pylint: disable=unused-argument
             check_function_calls['pre_push_hook_main_is_called'] = True
-        # pylint: enable=unused-argument
         def mock_tweak_yarn_executable():
             check_function_calls['tweak_yarn_executable_is_called'] = True
 

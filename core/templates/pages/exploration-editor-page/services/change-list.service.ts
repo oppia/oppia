@@ -23,11 +23,11 @@ require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').factory('ChangeListService', [
-  '$log', '$rootScope', 'AlertsService', 'AutosaveInfoModalsService',
-  'ExplorationDataService',
+  '$log', 'AlertsService', 'AutosaveInfoModalsService',
+  'ExplorationDataService', 'LoaderService',
   function(
-      $log, $rootScope, AlertsService, AutosaveInfoModalsService,
-      ExplorationDataService) {
+      $log, AlertsService, AutosaveInfoModalsService,
+      ExplorationDataService, LoaderService) {
     // TODO(sll): Implement undo, redo functionality. Show a message on each
     // step saying what the step is doing.
     // TODO(sll): Allow the user to view the list of changes made so far, as
@@ -38,7 +38,10 @@ angular.module('oppia').factory('ChangeListService', [
     // Stack for storing undone changes. The last element is the most recently
     // undone change.
     var undoneChangeStack = [];
-
+    var loadingMessage = '';
+    LoaderService.onLoadingMessageChange.subscribe(
+      (message: string) => loadingMessage = message
+    );
     // All these constants should correspond to those in exp_domain.py.
     // TODO(sll): Enforce this in code.
     var CMD_ADD_STATE = 'add_state';
@@ -67,6 +70,7 @@ angular.module('oppia').factory('ChangeListService', [
       recorded_voiceovers: true,
       default_outcome: true,
       hints: true,
+      next_content_id_index: true,
       param_changes: true,
       param_specs: true,
       solicit_answer_details: true,
@@ -108,7 +112,7 @@ angular.module('oppia').factory('ChangeListService', [
     };
 
     var addChange = function(changeDict) {
-      if ($rootScope.loadingMessage) {
+      if (loadingMessage) {
         return;
       }
       explorationChangeList.push(changeDict);

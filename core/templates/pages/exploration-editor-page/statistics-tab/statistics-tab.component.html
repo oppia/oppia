@@ -1,0 +1,38 @@
+<div ng-cloak>
+  <md-card class="oppia-editor-card" ng-if="!loadingMessage">
+    <div ng-if="explorationHasBeenVisited">
+      <div class="oppia-statistics-display">
+        <h3>Exploration Completion Rate</h3>
+        <pie-chart data="pieChartData" options="pieChartOptions">
+        </pie-chart>
+        <p class="text-center">
+          <span ng-if="numPassersby"
+                class="protractor-test-num-passersby font-weight-bold">
+            <[numPassersby]> learners browsed this exploration. They left before reaching the second card.
+          </span>
+          <span ng-if="!numPassersby" class="font-weight-bold">
+            No learners have browsed this exploration yet.
+          </span>
+        </p>
+
+        <h3>Card statistics</h3>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <div state-graph-visualization
+                   graph-data="statsGraphData"
+                   node-fill="darkseagreen"
+                   on-click-function="onClickStateInStatsGraph">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div ng-if="!explorationHasBeenVisited">
+      <em>
+        This exploration has not been visited by anyone yet, so there are no statistics to display.
+      </em>
+    </div>
+  </md-card>
+</div>

@@ -27,18 +27,24 @@ require(
 require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
-require('services/html-escaper.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
   'AssetsBackendApiService', 'ContextService',
-  'HtmlEscaperService', 'ImageClickInputRulesService', 'ImagePreloaderService',
-  'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
-  'EXPLORATION_EDITOR_TAB_CONTEXT', 'LOADING_INDICATOR_URL',
+  'ImageClickInputRulesService', 'ImagePreloaderService',
+  'InteractionAttributesExtractorService', 'PlayerPositionService',
+  'UrlInterpolationService', 'EXPLORATION_EDITOR_TAB_CONTEXT',
+  'LOADING_INDICATOR_URL',
   function(
       AssetsBackendApiService, ContextService,
-      HtmlEscaperService, ImageClickInputRulesService, ImagePreloaderService,
-      UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE,
-      EXPLORATION_EDITOR_TAB_CONTEXT, LOADING_INDICATOR_URL) {
+      ImageClickInputRulesService, ImagePreloaderService,
+      InteractionAttributesExtractorService, PlayerPositionService,
+      UrlInterpolationService, EXPLORATION_EDITOR_TAB_CONTEXT,
+      LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {},
@@ -48,11 +54,17 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
       template: require('./image-click-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$element', '$attrs', '$scope', 'CurrentInteractionService',
-        function($element, $attrs, $scope, CurrentInteractionService) {
+        '$attrs', '$element', 'CurrentInteractionService',
+        function($attrs, $element, CurrentInteractionService) {
           var ctrl = this;
-          var imageAndRegions = HtmlEscaperService.escapedJsonToObj(
-            $attrs.imageAndRegionsWithValue);
+          ctrl.directiveSubscriptions = new Subscription();
+          const {
+            imageAndRegions,
+            highlightRegionsOnHover
+          } = InteractionAttributesExtractorService.getValuesFromAttributes(
+            'ImageClickInput',
+            $attrs
+          );
           ctrl.updateCurrentlyHoveredRegions = function() {
             for (var i = 0; i < imageAndRegions.labeledRegions.length; i++) {
               var labeledRegion = imageAndRegions.labeledRegions[i];
@@ -131,26 +143,32 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
               answer, ImageClickInputRulesService);
           };
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-              ctrl.interactionIsActive = false;
-              ctrl.lastAnswer = {
-                clickPosition: [ctrl.mouseX, ctrl.mouseY]
-              };
-            });
-            ctrl.highlightRegionsOnHover =
-              ($attrs.highlightRegionsOnHoverWithValue === 'true');
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onNewCardAvailable.subscribe(
+                () => {
+                  ctrl.interactionIsActive = false;
+                  ctrl.lastAnswer = {
+                    clickPosition: [ctrl.mouseX, ctrl.mouseY]
+                  };
+                }
+              )
+            );
+            ctrl.highlightRegionsOnHover = highlightRegionsOnHover;
             ctrl.filepath = imageAndRegions.imagePath;
             ctrl.imageUrl = '';
             ctrl.loadingIndicatorUrl = UrlInterpolationService
               .getStaticImageUrl(LOADING_INDICATOR_URL);
             ctrl.isLoadingIndicatorShown = false;
             ctrl.isTryAgainShown = false;
-
+            ctrl.dimensions = (
+              ImagePreloaderService.getDimensionsOfImage(ctrl.filepath));
+            ctrl.imageContainerStyle = {
+              height: ctrl.dimensions.height + 'px',
+              width: ctrl.dimensions.width + 'px'
+            };
             if (ImagePreloaderService.inExplorationPlayer()) {
               ctrl.isLoadingIndicatorShown = true;
-              ctrl.dimensions = (
-                ImagePreloaderService.getDimensionsOfImage(ctrl.filepath));
-              // For aligning the gif to the center of it's container
+              // For aligning the gif to the center of it's container.
               var loadingIndicatorSize = (
                 (ctrl.dimensions.height < 124) ? 24 : 120);
               ctrl.imageContainerStyle = {
@@ -195,7 +213,7 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
             if (!ctrl.interactionIsActive) {
               /* The following lines highlight the learner's last answer for
                 this card. This need only be done at the beginning as if he
-                submits an answer, based on EVENT_NEW_CARD_AVAILABLE, the image
+                submits an answer, based on newCardAvailable, the image
                 is made inactive, so his last selection would be higlighted.*/
               ctrl.mouseX = ctrl.getLastAnswer().clickPosition[0];
               ctrl.mouseY = ctrl.getLastAnswer().clickPosition[1];
@@ -203,6 +221,9 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
             }
 
             CurrentInteractionService.registerCurrentInteraction(null, null);
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

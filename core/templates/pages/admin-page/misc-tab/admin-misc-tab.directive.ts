@@ -17,16 +17,20 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
+require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
+require('constants.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
-  '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',
-  'ADMIN_HANDLER_URL', 'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL',
+  '$http', '$window',
+  'AdminTaskManagerService', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
+  'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', 'MAX_USERNAME_LENGTH',
   function(
-      $http, $window, AdminTaskManagerService, UrlInterpolationService,
-      ADMIN_HANDLER_URL, ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL) {
+      $http, $window,
+      AdminTaskManagerService, UrlInterpolationService, ADMIN_HANDLER_URL,
+      ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, MAX_USERNAME_LENGTH) {
     return {
       restrict: 'E',
       scope: {},
@@ -37,14 +41,19 @@ angular.module('oppia').directive('adminMiscTab', [
         '/pages/admin-page/misc-tab/admin-misc-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
-        var ctrl = this;
-        var DATA_EXTRACTION_QUERY_HANDLER_URL = (
+        const ctrl = this;
+        const DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
-        var SEND_DUMMY_MAIL_HANDLER_URL = (
-          '/sendDummyMailToAdminHandler');
-
-        var irreversibleActionMessage = (
+        const SEND_DUMMY_MAIL_HANDLER_URL = (
+          '/senddummymailtoadminhandler');
+        const MEMORY_CACHE_HANDLER_URL = '/memorycacheadminhandler';
+        const UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
+        const NUMBER_OF_DELETION_REQUEST_HANDLER_URL = (
+          '/numberofdeletionrequestshandler');
+        const irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
+
+        ctrl.MAX_USERNAME_LENGTH = MAX_USERNAME_LENGTH;
 
         ctrl.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -144,7 +153,6 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.dataExtractionQueryStatusMessage = message;
         };
 
-
         ctrl.sendDummyMailToAdmin = function() {
           $http.post(SEND_DUMMY_MAIL_HANDLER_URL)
             .then(function(response) {
@@ -155,11 +163,69 @@ angular.module('oppia').directive('adminMiscTab', [
             });
         };
 
+        ctrl.flushMemoryCache = function() {
+          $http.post(MEMORY_CACHE_HANDLER_URL)
+            .then(function(response) {
+              ctrl.setStatusMessage('Success! Memory Cache Flushed.');
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            });
+        };
+
+        ctrl.getMemoryCacheProfile = function() {
+          $http.get(MEMORY_CACHE_HANDLER_URL)
+            .then(function(response) {
+              ctrl.result = {
+                totalAllocatedInBytes: response.data.total_allocation,
+                peakAllocatedInBytes: response.data.peak_allocation,
+                totalKeysStored: response.data.total_keys_stored
+              };
+              ctrl.memoryCacheDataFetched = true;
+              ctrl.setStatusMessage('Success!');
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            });
+        };
+
+        ctrl.updateUsername = function() {
+          ctrl.setStatusMessage('Updating username...');
+          $http.put(
+            UPDATE_USERNAME_HANDLER_URL, {
+              old_username: ctrl.oldUsername,
+              new_username: ctrl.newUsername
+            }).then(
+            function(response) {
+              ctrl.setStatusMessage(
+                'Successfully renamed ' + ctrl.oldUsername + ' to ' +
+                  ctrl.newUsername + '!');
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            }
+          );
+        };
+
+        ctrl.getNumberOfPendingDeletionRequestModels = function() {
+          ctrl.setStatusMessage(
+            'Getting the number of users that are being deleted...');
+          $http.get(NUMBER_OF_DELETION_REQUEST_HANDLER_URL).then(
+            function(response) {
+              ctrl.setStatusMessage(
+                'The number of users that are being deleted is: ' +
+                response.data.number_of_pending_deletion_models);
+            },
+            function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            }
+          );
+        };
+
         ctrl.submitQuery = function() {
           var STATUS_PENDING = (
             'Data extraction query has been submitted. Please wait.');
-          var STATUS_FINISHED = 'Loading the extracted data ...';
-          var STATUS_FAILED = 'Error, ';
 
           setDataExtractionQueryStatusMessage(STATUS_PENDING);
 
@@ -186,6 +252,8 @@ angular.module('oppia').directive('adminMiscTab', [
         ctrl.$onInit = function() {
           ctrl.topicIdForRegeneratingOpportunities = null;
           ctrl.regenerationMessage = null;
+          ctrl.oldUsername = null;
+          ctrl.newUsername = null;
         };
       }]
     };

@@ -16,187 +16,247 @@
  * @fileoverview Unit tests for ReadOnlyCollectionBackendApiService.
  */
 
-require('domain/collection/read-only-collection-backend-api.service.ts');
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
+import { Subscription } from 'rxjs';
 
-describe('Read only collection backend API service', function() {
-  var ReadOnlyCollectionBackendApiService = null;
-  var sampleDataResults = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $httpBackend = null;
+import { ReadOnlyCollectionBackendApiService } from
+  'domain/collection/read-only-collection-backend-api.service';
+import { CollectionObjectFactory } from
+  'domain/collection/CollectionObjectFactory';
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module(
-    'oppia', TranslatorProviderForTests));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
+describe('Read only collection backend API service', () => {
+  let readOnlyCollectionBackendApiService:
+    ReadOnlyCollectionBackendApiService = null;
+  let httpTestingController: HttpTestingController;
+  let collectionObjectFactory: CollectionObjectFactory = null;
+  let sampleDataResults = {
+    collection: {
+      id: '0',
+      title: 'Collection Under Test',
+      category: 'Test',
+      objective: 'To pass',
+      schema_version: 1,
+      nodes: [{
+        exploration_id: '0',
+        exploration_summary: {
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: 'Test Objective',
+          id: '44LKoKLlIbGe',
+          num_views: 0,
+          thumbnail_icon_url: '/subjects/Algebra.svg',
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          thumbnail_bg_color: '#cd672b',
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          status: 'public',
+          tags: [],
+          activity_type: 'exploration',
+          category: 'Algebra',
+          title: 'Test Title'
+        }
+      }],
+      playthrough_dict: {
+        next_exploration_id: 'expId',
+        completed_exploration_ids: ['expId2']
+      },
+      language_code: null,
+      tags: [],
+      version: null
     }
-  }));
+  };
+  let onCollectionLoadSpy: jasmine.Spy;
+  let subscriptions: Subscription;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    ReadOnlyCollectionBackendApiService = $injector.get(
-      'ReadOnlyCollectionBackendApiService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $httpBackend = $injector.get('$httpBackend');
+    readOnlyCollectionBackendApiService = TestBed.get(
+      ReadOnlyCollectionBackendApiService);
+    collectionObjectFactory = TestBed.get(CollectionObjectFactory);
+    httpTestingController = TestBed.get(HttpTestingController);
+    onCollectionLoadSpy = jasmine.createSpy('onCollectionLoadSpy');
+    subscriptions = new Subscription();
+    subscriptions.add(
+      readOnlyCollectionBackendApiService.onCollectionLoad.subscribe(
+        onCollectionLoadSpy
+      )
+    );
+  });
 
-    // Sample collection object returnable from the backend
-    sampleDataResults = {
-      collection: {
-        id: '0',
-        title: 'Collection Under Test',
-        category: 'Test',
-        objective: 'To pass',
-        schema_version: '1',
-        nodes: [{
-          exploration_id: '0'
-        }],
-        next_exploration_ids: [],
-        completed_exploration_ids: []
-      }
-    };
-  }));
-
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  afterEach(() => {
+    subscriptions.unsubscribe();
+    httpTestingController.verify();
   });
 
   it('should successfully fetch an existing collection from the backend',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/collection_handler/data/0').respond(
-        sampleDataResults);
-      ReadOnlyCollectionBackendApiService.fetchCollection('0').then(
+      readOnlyCollectionBackendApiService.fetchCollection('0').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      var req = httpTestingController.expectOne('/collection_handler/data/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
+      flushMicrotasks();
+
+      var collectionObject = collectionObjectFactory.create(
+        sampleDataResults.collection);
+
+      expect(successHandler).toHaveBeenCalledWith(collectionObject);
       expect(failHandler).not.toHaveBeenCalled();
-    }
+    })
   );
 
   it('should load a cached collection after fetching it from the backend',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      // Loading a collection the first time should fetch it from the backend.
-      $httpBackend.expect('GET', '/collection_handler/data/0').respond(
-        sampleDataResults);
-      ReadOnlyCollectionBackendApiService.loadCollection('0').then(
+      readOnlyCollectionBackendApiService.loadCollection('0').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      var req = httpTestingController.expectOne('/collection_handler/data/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
+      flushMicrotasks();
+
+      var collectionObject = collectionObjectFactory.create(
+        sampleDataResults.collection);
+
+      expect(successHandler).toHaveBeenCalledWith(collectionObject);
       expect(failHandler).not.toHaveBeenCalled();
+      expect(onCollectionLoadSpy).toHaveBeenCalled();
 
       // Loading a collection the second time should not fetch it.
-      ReadOnlyCollectionBackendApiService.loadCollection('0').then(
+      readOnlyCollectionBackendApiService.loadCollection('0').then(
         successHandler, failHandler);
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
+      expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-    }
+      expect(onCollectionLoadSpy).toHaveBeenCalled();
+    })
   );
 
   it('should use the rejection handler if the backend request failed',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      // Loading a collection the first time should fetch it from the backend.
-      $httpBackend.expect('GET', '/collection_handler/data/0').respond(
-        500, 'Error loading collection 0.');
-      ReadOnlyCollectionBackendApiService.loadCollection('0').then(
+      readOnlyCollectionBackendApiService.loadCollection('0').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      var req = httpTestingController.expectOne('/collection_handler/data/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Error loading collection 0'
+      }, {
+        status: 500, statusText: 'Invalid Request'
+      });
+
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Error loading collection 0.');
-    }
+      expect(failHandler).toHaveBeenCalledWith('Error loading collection 0');
+    })
   );
 
-  it('should report caching and support clearing the cache', function() {
+  it('should report caching and support clearing the cache', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
     // The collection should not currently be cached.
-    expect(ReadOnlyCollectionBackendApiService.isCached('0')).toBeFalsy();
+    expect(readOnlyCollectionBackendApiService.isCached('0')).toBeFalsy();
 
     // Loading a collection the first time should fetch it from the backend.
-    $httpBackend.expect('GET', '/collection_handler/data/0').respond(
-      sampleDataResults);
-    ReadOnlyCollectionBackendApiService.loadCollection('0').then(
+    readOnlyCollectionBackendApiService.loadCollection('0').then(
       successHandler, failHandler);
-    $httpBackend.flush();
+    var req = httpTestingController.expectOne('/collection_handler/data/0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
 
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
+    flushMicrotasks();
+
+    var collectionObject = collectionObjectFactory.create(
+      sampleDataResults.collection);
+
+    expect(successHandler).toHaveBeenCalledWith(collectionObject);
     expect(failHandler).not.toHaveBeenCalled();
 
     // The collection should now be cached.
-    expect(ReadOnlyCollectionBackendApiService.isCached('0')).toBeTruthy();
+    expect(readOnlyCollectionBackendApiService.isCached('0')).toBeTruthy();
 
     // The collection should be loadable from the cache.
-    ReadOnlyCollectionBackendApiService.loadCollection('0').then(
+    readOnlyCollectionBackendApiService.loadCollection('0').then(
       successHandler, failHandler);
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
+
+    expect(onCollectionLoadSpy).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
 
     // Resetting the cache will cause another fetch from the backend.
-    ReadOnlyCollectionBackendApiService.clearCollectionCache();
-    expect(ReadOnlyCollectionBackendApiService.isCached('0')).toBeFalsy();
-
-    $httpBackend.expect('GET', '/collection_handler/data/0').respond(
-      sampleDataResults);
-    ReadOnlyCollectionBackendApiService.loadCollection('0').then(
+    readOnlyCollectionBackendApiService.clearCollectionCache();
+    readOnlyCollectionBackendApiService.loadCollection('0').then(
       successHandler, failHandler);
-    $httpBackend.flush();
+    req = httpTestingController.expectOne('/collection_handler/data/0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
 
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(collectionObject);
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
-  it('should report a cached collection after caching it', function() {
+  it('should report a cached collection after caching it', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
     // The collection should not currently be cached.
-    expect(ReadOnlyCollectionBackendApiService.isCached('0')).toBeFalsy();
+    expect(readOnlyCollectionBackendApiService.isCached('0')).toBeFalsy();
 
-    // Cache a collection.
-    ReadOnlyCollectionBackendApiService.cacheCollection('0', {
+    var collection = collectionObjectFactory.create({
       id: '0',
-      nodes: []
+      nodes: [],
+      title: null,
+      objective: null,
+      tags: null,
+      language_code: null,
+      schema_version: null,
+      playthrough_dict: {
+        next_exploration_id: 'expId',
+        completed_exploration_ids: ['expId2']
+      },
+      category: null,
+      version: null
     });
 
-    // It should now be cached.
-    expect(ReadOnlyCollectionBackendApiService.isCached('0')).toBeTruthy();
+    // Cache a collection.
+    readOnlyCollectionBackendApiService.cacheCollection('0', collection);
+
+    // It should now be cached.CollectionPlaythroughObjectFactory.
+    expect(readOnlyCollectionBackendApiService.isCached('0')).toBeTruthy();
 
     // A new collection should not have been fetched from the backend. Also,
     // the returned collection should match the expected collection object.
-    ReadOnlyCollectionBackendApiService.loadCollection('0').then(
+    readOnlyCollectionBackendApiService.loadCollection('0').then(
       successHandler, failHandler);
 
-    // http://brianmcd.com/2014/03/27/
-    // a-tip-for-angular-unit-tests-with-promises.html
-    $rootScope.$digest();
+    flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith({
-      id: '0',
-      nodes: []
-    });
+    expect(successHandler).toHaveBeenCalledWith(collection);
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 });

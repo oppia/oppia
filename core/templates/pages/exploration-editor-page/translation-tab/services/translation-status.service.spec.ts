@@ -39,16 +39,11 @@ import { ParamChangesObjectFactory } from
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-/* eslint-disable max-len */
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-/* eslint-enable max-len */
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
-/* eslint-disable max-len */
-import { StateEditorService } from
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-/* eslint-enable max-len */
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -189,13 +184,15 @@ describe('Translation status service', function() {
               default_outcome: {},
               feedback_2: {
                 hi: {
-                  html: '<p>This is feedback 1.</p>',
+                  data_format: 'html',
+                  translation: '<p>This is feedback 1.</p>',
                   needs_update: false
                 }
               },
               feedback_1: {
                 hi: {
-                  html: '<p>This is first card.</p>',
+                  data_format: 'html',
+                  translation: '<p>This is first card.</p>',
                   needs_update: false
                 }
               }
@@ -231,10 +228,8 @@ describe('Translation status service', function() {
                 dest: 'Second'
               },
               rule_specs: [{
-                inputs: {
-                  x: 0
-                },
-                rule_type: 'Equals'
+                rule_type: 'Equals',
+                inputs: {x: 0}
               }],
               training_data: []
             },
@@ -252,10 +247,8 @@ describe('Translation status service', function() {
                 dest: 'First'
               },
               rule_specs: [{
-                inputs: {
-                  x: 1
-                },
-                rule_type: 'Equals'
+                rule_type: 'Equals',
+                inputs: {x: 1}
               }],
               training_data: []
             }],
@@ -265,7 +258,8 @@ describe('Translation status service', function() {
             customization_args: {
               choices: {
                 value: ['<p>1</p>', '<p>2</p>']
-              }
+              },
+              showChoicesInShuffledOrder: {value: false}
             },
             default_outcome: {
               refresher_exploration_id: null,
@@ -318,10 +312,8 @@ describe('Translation status service', function() {
                 dest: 'Third'
               },
               rule_specs: [{
-                inputs: {
-                  x: 0
-                },
-                rule_type: 'Equals'
+                rule_type: 'Equals',
+                inputs: {x: 0}
               }],
               training_data: []
             }],
@@ -330,8 +322,9 @@ describe('Translation status service', function() {
             id: 'MultipleChoiceInput',
             customization_args: {
               choices: {
-                value: ['<p>1</p>']
-              }
+                value: ['<p>1</p>'],
+              },
+              showChoicesInShuffledOrder: {value: false}
             },
             default_outcome: {
               refresher_exploration_id: null,
@@ -532,7 +525,7 @@ describe('Translation status service', function() {
       expect(stateWiseStatusColor.Second).toBe(NO_ASSETS_AVAILABLE_COLOR);
       expect(stateWiseStatusColor.Third).toBe(NO_ASSETS_AVAILABLE_COLOR);
 
-      swts.displayed.addWrittenTranslation('content', 'hi', 'content');
+      swts.displayed.addWrittenTranslation('content', 'hi', 'html', 'content');
       ess.saveWrittenTranslations('Second', swts.displayed);
 
       tss.refresh();
@@ -585,7 +578,7 @@ describe('Translation status service', function() {
         tss.getActiveStateComponentStatusColor('feedback'));
       expect(activeStateComponentStatus).toBe(FEW_ASSETS_AVAILABLE_COLOR);
 
-      swts.displayed.addWrittenTranslation('content', 'hi', 'Content');
+      swts.displayed.addWrittenTranslation('content', 'hi', 'html', 'Content');
 
       activeStateComponentStatus = (
         tss.getActiveStateComponentStatusColor('content'));
@@ -686,7 +679,8 @@ describe('Translation status service', function() {
       expect(activeStateContentIdStatusColor).toBe(
         ALL_ASSETS_AVAILABLE_COLOR);
 
-      swts.displayed.addWrittenTranslation('content', 'hi', '<p>Content</p>');
+      swts.displayed.addWrittenTranslation(
+        'content', 'hi', 'html', '<p>Content</p>');
 
       activeStateContentIdStatusColor = (
         tss.getActiveStateContentIdStatusColor('content'));

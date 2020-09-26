@@ -18,9 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
-import fileinput
 import os
-import re
 import subprocess
 
 import python_utils
@@ -28,7 +26,8 @@ import python_utils
 from . import common
 from . import setup
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Run this script from the oppia root folder:
     python -m scripts.create_expression_parser
 The root folder MUST be named 'oppia'.

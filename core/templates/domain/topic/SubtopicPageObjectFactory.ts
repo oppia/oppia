@@ -22,68 +22,60 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { SubtopicPageContentsObjectFactory } from
-  'domain/topic/SubtopicPageContentsObjectFactory';
+import {
+  SubtopicPageContentsBackendDict,
+  SubtopicPageContents,
+  SubtopicPageContentsObjectFactory
+} from 'domain/topic/SubtopicPageContentsObjectFactory';
 
-export interface ISubtopicPage {
-  getId: () => string;
-  getTopicId: () => string;
-  getPageContents: () => void;
-  getLanguageCode: () => string;
+interface SubtopicPageBackendDict {
+  'id': string;
+  'topic_id': string;
+  'page_contents': SubtopicPageContentsBackendDict;
+  'language_code': string;
 }
 
 export class SubtopicPage {
-  _id: string;
-  _topicId: string;
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because '_pageContents' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  _pageContents: any;
-  _languageCode: string;
   constructor(
-      subtopicPageId: string, topicId: string, pageContents: any,
-      languageCode: string) {
-    this._id = subtopicPageId;
-    this._topicId = topicId;
-    this._pageContents = pageContents;
-    this._languageCode = languageCode;
-  }
+    private id: string,
+    private topicId: string,
+    private pageContents: SubtopicPageContents,
+    private languageCode: string) {}
 
   // Returns the id of the subtopic page.
   getId(): string {
-    return this._id;
+    return this.id;
   }
 
   setId(id: string): void {
-    this._id = id;
+    this.id = id;
   }
 
   // Returns the topic id that the subtopic page is linked to.
   getTopicId(): string {
-    return this._topicId;
+    return this.topicId;
   }
 
   // Returns the page data for the subtopic page.
-  getPageContents(): any {
-    return this._pageContents;
+  getPageContents(): SubtopicPageContents {
+    return this.pageContents;
   }
 
   // Sets the page data for the subtopic page.
-  setPageContents(pageContents: any): void {
-    this._pageContents = cloneDeep(pageContents);
+  setPageContents(pageContents: SubtopicPageContents): void {
+    this.pageContents = cloneDeep(pageContents);
   }
 
   // Returns the language code for the subtopic page.
   getLanguageCode(): string {
-    return this._languageCode;
+    return this.languageCode;
   }
 
-  copyFromSubtopicPage(otherSubtopicPage: ISubtopicPage): void {
-    this._id = otherSubtopicPage.getId();
-    this._topicId = otherSubtopicPage.getTopicId();
-    this._pageContents = cloneDeep(otherSubtopicPage.getPageContents());
-    this._languageCode = otherSubtopicPage.getLanguageCode();
+  copyFromSubtopicPage(otherSubtopicPage: SubtopicPage): void {
+    this.id = otherSubtopicPage.getId();
+    this.topicId = otherSubtopicPage.getTopicId();
+    this.pageContents = cloneDeep(otherSubtopicPage.getPageContents());
+    this.languageCode = otherSubtopicPage.getLanguageCode();
   }
 }
 
@@ -95,11 +87,8 @@ export class SubtopicPageObjectFactory {
     private subtopicPageContentsObjectFactory:
       SubtopicPageContentsObjectFactory) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'subtopicPageBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(subtopicPageBackendDict: any): SubtopicPage {
+  createFromBackendDict(
+      subtopicPageBackendDict: SubtopicPageBackendDict): SubtopicPage {
     return new SubtopicPage(
       subtopicPageBackendDict.id, subtopicPageBackendDict.topic_id,
       this.subtopicPageContentsObjectFactory.createFromBackendDict(

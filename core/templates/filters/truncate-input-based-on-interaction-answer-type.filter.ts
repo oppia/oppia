@@ -34,7 +34,7 @@ angular.module('oppia').filter('truncateInputBasedOnInteractionAnswerType', [
       } else if (answerType === 'CodeEvaluation') {
         actualInputToTruncate = input.code;
       } else {
-        throw Error('Unknown interaction answer type');
+        throw new Error('Unknown interaction answer type');
       }
       return $filter('truncate')(actualInputToTruncate, length);
     };

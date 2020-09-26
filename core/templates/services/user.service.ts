@@ -22,11 +22,14 @@ require('services/contextual/url.service.ts');
 angular.module('oppia').factory('UserService', [
   '$http', '$q', '$window', 'UrlInterpolationService', 'UrlService',
   'UserInfoObjectFactory', 'DEFAULT_PROFILE_IMAGE_PATH',
-  function($http, $q, $window, UrlInterpolationService, UrlService,
+  function(
+      $http, $q, $window, UrlInterpolationService, UrlService,
       UserInfoObjectFactory, DEFAULT_PROFILE_IMAGE_PATH) {
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
+    var USER_CONTRIBUTION_RIGHTS_DATA_URL = '/usercontributionrightsdatahandler'; // eslint-disable-line max-len
 
     var userInfo = null;
+    var userContributionRightsInfo = null;
 
     var getUserInfoAsync = function() {
       if (UrlService.getPathname() === '/signup') {
@@ -82,6 +85,18 @@ angular.module('oppia').factory('UserService', [
             return response.data.login_url;
           }
         );
+      },
+      getUserContributionRightsData: function() {
+        if (userContributionRightsInfo) {
+          return $q.resolve(userContributionRightsInfo);
+        } else {
+          return $http.get(USER_CONTRIBUTION_RIGHTS_DATA_URL).then(
+            function(response) {
+              userContributionRightsInfo = response.data;
+              return $q.resolve(userContributionRightsInfo);
+            }
+          );
+        }
       },
       getUserInfoAsync: getUserInfoAsync
     };

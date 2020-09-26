@@ -16,22 +16,33 @@
  * @fileoverview Factory for creating new frontend instances of
  * RecordedVoiceovers domain objects.
  */
+export interface RecordedVoiceOverBackendDict {
+  'voiceovers_mapping': {
+    [propName: string]: {
+      [propName: string]: VoiceoverBackendDict
+    }
+  }
+}
 
-import { Injectable } from '@angular/core';
+export interface VoiceoverMapping {
+  [propName: string]: BindableVoiceovers;
+}
+
+export interface BindableVoiceovers {
+  [propName: string]: Voiceover;
+}
+
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-import { VoiceoverObjectFactory } from
+import { VoiceoverObjectFactory, VoiceoverBackendDict, Voiceover } from
   'domain/exploration/VoiceoverObjectFactory';
-
 export class RecordedVoiceovers {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'voiceoversMapping' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  voiceoversMapping: any;
+  voiceoversMapping: VoiceoverMapping;
   _voiceoverObjectFactory: VoiceoverObjectFactory;
   constructor(
-      voiceoversMapping: any, voiceoverObjectFactory: VoiceoverObjectFactory) {
+      voiceoversMapping: VoiceoverMapping,
+      voiceoverObjectFactory: VoiceoverObjectFactory) {
     this.voiceoversMapping = voiceoversMapping;
     this._voiceoverObjectFactory = voiceoverObjectFactory;
   }
@@ -40,18 +51,11 @@ export class RecordedVoiceovers {
     return Object.keys(this.voiceoversMapping);
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with varying keys and the correct
-  // type needs to be found.
-  getBindableVoiceovers(contentId: string): any {
+  getBindableVoiceovers(contentId: string): BindableVoiceovers {
     return this.voiceoversMapping[contentId];
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  getVoiceover(contentId: string, langCode: string): any {
+  getVoiceover(contentId: string, langCode: string): Voiceover {
     return this.voiceoversMapping[contentId][langCode];
   }
 
@@ -82,14 +86,14 @@ export class RecordedVoiceovers {
 
   addContentId(contentId: string): void {
     if (this.voiceoversMapping.hasOwnProperty(contentId)) {
-      throw Error('Trying to add duplicate content id.');
+      throw new Error('Trying to add duplicate content id.');
     }
     this.voiceoversMapping[contentId] = {};
   }
 
   deleteContentId(contentId: string): void {
     if (!this.voiceoversMapping.hasOwnProperty(contentId)) {
-      throw Error('Unable to find the given content id.');
+      throw new Error('Unable to find the given content id.');
     }
     delete this.voiceoversMapping[contentId];
   }
@@ -99,17 +103,17 @@ export class RecordedVoiceovers {
       fileSizeBytes: number, durationSecs: number): void {
     var languageCodeToVoiceover = this.voiceoversMapping[contentId];
     if (languageCodeToVoiceover.hasOwnProperty(languageCode)) {
-      throw Error('Trying to add duplicate language code.');
+      throw new Error('Trying to add duplicate language code.');
     }
     languageCodeToVoiceover[languageCode] =
-      this._voiceoverObjectFactory.createNew(filename,
-        fileSizeBytes, durationSecs);
+      this._voiceoverObjectFactory.createNew(
+        filename, fileSizeBytes, durationSecs);
   }
 
   deleteVoiceover(contentId: string, languageCode: string): void {
     var languageCodeToVoiceover = this.voiceoversMapping[contentId];
     if (!languageCodeToVoiceover.hasOwnProperty(languageCode)) {
-      throw Error(
+      throw new Error(
         'Trying to remove non-existing translation for language code ' +
         languageCode);
     }
@@ -121,11 +125,8 @@ export class RecordedVoiceovers {
     languageCodeToVoiceover[languageCode].toggleNeedsUpdateAttribute();
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  toBackendDict(): any {
+
+  toBackendDict(): RecordedVoiceOverBackendDict {
     var voiceoversMappingDict = {};
     for (var contentId in this.voiceoversMapping) {
       var languageCodeToVoiceover = this.voiceoversMapping[contentId];
@@ -148,11 +149,9 @@ export class RecordedVoiceovers {
 export class RecordedVoiceoversObjectFactory {
   constructor(private voiceoverObjectFactory: VoiceoverObjectFactory) {}
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'recordedVoiceoversDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(recordedVoiceoversDict: any): RecordedVoiceovers {
+  createFromBackendDict(
+      recordedVoiceoversDict: RecordedVoiceOverBackendDict):
+        RecordedVoiceovers {
     var voiceoversMapping = {};
     var voiceoversMappingDict = recordedVoiceoversDict.voiceovers_mapping;
     Object.keys(voiceoversMappingDict).forEach((contentId) => {

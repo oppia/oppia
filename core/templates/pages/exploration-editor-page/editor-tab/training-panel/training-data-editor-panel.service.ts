@@ -20,7 +20,7 @@
 require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
 require(
   'pages/exploration-editor-page/editor-tab/test-interaction-panel/' +
-  'test-interaction-panel.directive.ts');
+  'test-interaction-panel.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/angular-name.service.ts');
@@ -47,10 +47,17 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/exploration-html-formatter.service.ts');
 require('services/stateful/focus-manager.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/training-panel/' +
+  'training-data-editor-panel-modal.controller.ts');
+require('services/external-save.service.ts');
 
 angular.module('oppia').factory('TrainingDataEditorPanelService', [
-  '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',
-  function($rootScope, $uibModal, AlertsService, UrlInterpolationService) {
+  '$uibModal', 'AlertsService', 'ExternalSaveService',
+  'UrlInterpolationService',
+  function(
+      $uibModal, AlertsService, ExternalSaveService,
+      UrlInterpolationService) {
     return {
       /**
       * Opens training data editor for currently selected answer group.
@@ -62,164 +69,10 @@ angular.module('oppia').factory('TrainingDataEditorPanelService', [
             '/pages/exploration-editor-page/editor-tab/templates/' +
             'training-data-editor.template.html'),
           backdrop: true,
-          controller: [
-            '$scope', '$injector', '$uibModalInstance', '$filter',
-            'ExplorationStatesService', 'StateEditorService', 'AlertsService',
-            'AnswerClassificationService', 'ContextService',
-            'StateInteractionIdService', 'AngularNameService',
-            'EXPLICIT_CLASSIFICATION', 'TRAINING_DATA_CLASSIFICATION',
-            'ExplorationHtmlFormatterService', 'ResponsesService',
-            'StateCustomizationArgsService', 'TrainingDataService',
-            'TrainingModalService', 'FocusManagerService',
-            'CurrentInteractionService',
-            function($scope, $injector, $uibModalInstance, $filter,
-                ExplorationStatesService, StateEditorService, AlertsService,
-                AnswerClassificationService, ContextService,
-                StateInteractionIdService, AngularNameService,
-                EXPLICIT_CLASSIFICATION, TRAINING_DATA_CLASSIFICATION,
-                ExplorationHtmlFormatterService, ResponsesService,
-                StateCustomizationArgsService, TrainingDataService,
-                TrainingModalService, FocusManagerService,
-                CurrentInteractionService) {
-              var _explorationId = ContextService.getExplorationId();
-              var _stateName = StateEditorService.getActiveStateName();
-              $scope.stateName = _stateName;
-              var _state = ExplorationStatesService.getState(_stateName);
-              var answerGroupIndex = (
-                ResponsesService.getActiveAnswerGroupIndex());
-
-              var FOCUS_LABEL_TEST_INTERACTION_INPUT = 'testInteractionInput';
-              $scope.stateContent = _state.content.getHtml();
-              $scope.trainingData = [];
-              $scope.answerGroupHasNonEmptyRules = (
-                ResponsesService.getAnswerGroup(
-                  answerGroupIndex).rules.length > 0);
-              $scope.inputTemplate = (
-                ExplorationHtmlFormatterService.getInteractionHtml(
-                  StateInteractionIdService.savedMemento,
-                  StateCustomizationArgsService.savedMemento,
-                  false, FOCUS_LABEL_TEST_INTERACTION_INPUT));
-
-              var _rebuildTrainingData = function() {
-                $scope.trainingData = [];
-                TrainingDataService.getTrainingDataOfAnswerGroup(
-                  answerGroupIndex).forEach(function(answer) {
-                  var answerTemplate = (
-                    ExplorationHtmlFormatterService.getAnswerHtml(
-                      answer, StateInteractionIdService.savedMemento,
-                      StateCustomizationArgsService.savedMemento));
-                  $scope.trainingData.push({
-                    answer: answer,
-                    answerTemplate: answerTemplate
-                  });
-                });
-              };
-
-              $scope.init = function() {
-                _rebuildTrainingData();
-                $scope.newAnswerIsAlreadyResolved = false;
-                $scope.answerSuccessfullyAdded = false;
-                FocusManagerService.setFocus(
-                  FOCUS_LABEL_TEST_INTERACTION_INPUT);
-              };
-
-              $scope.removeAnswerFromTrainingData = function(answerIndex) {
-                var answer = $scope.trainingData[answerIndex].answer;
-                TrainingDataService.removeAnswerFromAnswerGroupTrainingData(
-                  answer, answerGroupIndex);
-                $scope.trainingData.splice(answerIndex, 1);
-              };
-
-              $scope.exit = function() {
-                $uibModalInstance.close();
-              };
-
-              $scope.submitAnswer = function(newAnswer) {
-                $scope.newAnswerIsAlreadyResolved = false;
-
-                var interactionId = StateInteractionIdService.savedMemento;
-
-                var rulesServiceName =
-                  AngularNameService.getNameOfInteractionRulesService(
-                    interactionId);
-
-                // Inject RulesService dynamically.
-                var rulesService = $injector.get(rulesServiceName);
-
-                var newAnswerTemplate = (
-                  ExplorationHtmlFormatterService.getAnswerHtml(
-                    newAnswer, StateInteractionIdService.savedMemento,
-                    StateCustomizationArgsService.savedMemento));
-
-                var classificationResult = (
-                  AnswerClassificationService.getMatchingClassificationResult(
-                    _stateName, _state.interaction, newAnswer, rulesService));
-                var newAnswerOutcomeDest = classificationResult.outcome.dest;
-                var newAnswerFeedback = classificationResult.outcome.feedback;
-                if (newAnswerOutcomeDest === _stateName) {
-                  newAnswerOutcomeDest = '(try again)';
-                }
-
-                $scope.newAnswerTemplate = newAnswerTemplate;
-                $scope.newAnswerFeedback = newAnswerFeedback;
-                $scope.newAnswerOutcomeDest = newAnswerOutcomeDest;
-
-                var classificationType = (
-                  classificationResult.classificationCategorization);
-
-                // If answer is explicitly classified then show the
-                // classification results to the creator.
-                if (classificationType === EXPLICIT_CLASSIFICATION ||
-                    classificationType === TRAINING_DATA_CLASSIFICATION) {
-                  $scope.newAnswerIsAlreadyResolved = true;
-                } else {
-                  TrainingDataService.associateWithAnswerGroup(
-                    answerGroupIndex, newAnswer);
-                  var truncatedAnswer = $filter(
-                    'truncateInputBasedOnInteractionAnswerType')(
-                    newAnswer, interactionId, 12);
-                  var successToast = (
-                    'The answer ' + truncatedAnswer +
-                    ' has been successfully trained.');
-                  AlertsService.addSuccessMessage(
-                    successToast, 1000);
-                  _rebuildTrainingData();
-                }
-              };
-
-              CurrentInteractionService.setOnSubmitFn($scope.submitAnswer);
-
-              $scope.openTrainUnresolvedAnswerModal = function(answerIndex) {
-                // An answer group must have either a rule or at least one
-                // answer in training data. Don't allow modification of training
-                // data answers if there are no rules and only one training data
-                // answer is present.
-                if (($scope.answerGroupHasNonEmptyRules &&
-                    $scope.trainingData.length > 0) ||
-                    $scope.trainingData.length > 1) {
-                  var answer = $scope.trainingData[answerIndex].answer;
-                  var interactionId = StateInteractionIdService.savedMemento;
-                  return TrainingModalService.openTrainUnresolvedAnswerModal(
-                    answer, function() {
-                      var truncatedAnswer = $filter(
-                        'truncateInputBasedOnInteractionAnswerType')(
-                        answer, interactionId, 12);
-                      var successToast = (
-                        'The answer ' + truncatedAnswer +
-                        ' has been successfully trained.');
-                      AlertsService.addSuccessMessage(
-                        successToast, 1000);
-                      _rebuildTrainingData();
-                    });
-                }
-                return;
-              };
-
-              $scope.init();
-            }]
+          controller: 'TrainingDataEditorPanelServiceModalController'
         });
         // Save the modified training data externally in state content.
-        $rootScope.$broadcast('externalSave');
+        ExternalSaveService.onExternalSave.emit();
       }
     };
   }

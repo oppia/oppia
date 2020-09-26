@@ -20,18 +20,23 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { StoryPlaythroughObjectFactory } from
+  'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 
 describe('Story viewer backend API service', () => {
   let storyViewerBackendApiService: StoryViewerBackendApiService = null;
+  let storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory = null;
   let httpTestingController: HttpTestingController;
 
   let sampleDataResults = {
+    story_id: 'qwerty',
     story_title: 'Story title',
     story_description: 'Story description',
-    completed_nodes: [],
-    pending_nodes: []
+    story_nodes: [],
+    topic_name: 'Topic name',
+    meta_tag_content: 'Story meta tag content'
   };
 
   beforeEach(() => {
@@ -40,6 +45,7 @@ describe('Story viewer backend API service', () => {
     });
 
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
+    storyPlaythroughObjectFactory = TestBed.get(StoryPlaythroughObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -52,16 +58,19 @@ describe('Story viewer backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      storyViewerBackendApiService.fetchStoryData('0').then(
-        successHandler, failHandler);
+      storyViewerBackendApiService.fetchStoryData(
+        'abbrev', 'staging', '0').then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/story_data_handler/0');
+      let req = httpTestingController.expectOne(
+        '/story_data_handler/staging/abbrev/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(successHandler).toHaveBeenCalledWith(
+        storyPlaythroughObjectFactory.createFromBackendDict(
+          sampleDataResults));
       expect(failHandler).not.toHaveBeenCalled();
     })
   );

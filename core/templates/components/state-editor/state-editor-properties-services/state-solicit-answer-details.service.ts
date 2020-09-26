@@ -27,7 +27,8 @@ import { UtilsService } from 'services/utils.service';
 @Injectable({
   providedIn: 'root'
 })
-export class StateSolicitAnswerDetailsService extends StatePropertyService {
+export class StateSolicitAnswerDetailsService extends
+  StatePropertyService<boolean> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveSolicitAnswerDetails';

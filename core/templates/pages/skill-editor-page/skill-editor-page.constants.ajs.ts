@@ -24,8 +24,3 @@ import { SkillEditorPageConstants } from
 angular.module('oppia').constant(
   'SKILL_RIGHTS_URL_TEMPLATE',
   SkillEditorPageConstants.SKILL_RIGHTS_URL_TEMPLATE);
-angular.module('oppia').constant(
-  'EVENT_SKILL_INITIALIZED', SkillEditorPageConstants.EVENT_SKILL_INITIALIZED);
-angular.module('oppia').constant(
-  'EVENT_SKILL_REINITIALIZED',
-  SkillEditorPageConstants.EVENT_SKILL_REINITIALIZED);

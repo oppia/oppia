@@ -54,6 +54,16 @@ describe('Context service', () => {
     it('should affirm that the page forbids editing of RTE components', () => {
       expect(ecs.canAddOrEditComponents()).toBe(false);
     });
+
+    it('should correctly return if question player is manually set', () => {
+      expect(ecs.isInQuestionPlayerMode()).toEqual(false);
+      ecs.setQuestionPlayerIsOpen();
+      expect(ecs.getQuestionPlayerIsManuallySet()).toEqual(true);
+      expect(ecs.isInQuestionPlayerMode()).toEqual(true);
+      ecs.clearQuestionPlayerIsOpen();
+      expect(ecs.getQuestionPlayerIsManuallySet()).toEqual(false);
+      expect(ecs.isInQuestionPlayerMode()).toEqual(false);
+    });
   });
 
   describe('behavior in the exploration learner embed view', () => {
@@ -175,22 +185,6 @@ describe('Context service', () => {
     });
   });
 
-  describe('behavior in the subtopic viewer view', () => {
-    beforeEach(() => {
-      ecs = TestBed.get(ContextService);
-      urlService = TestBed.get(UrlService);
-      spyOn(urlService, 'getPathname').and.returnValue('/subtopic/topic_id/1');
-    });
-
-    it('should correctly retrieve the topic id', () => {
-      expect(ecs.getEntityId()).toBe('topic_id');
-    });
-
-    it('should correctly retrieve the entity type', () => {
-      expect(ecs.getEntityType()).toBe('subtopic');
-    });
-  });
-
   describe('behavior in the story editor view', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
@@ -262,7 +256,9 @@ describe('Context service', () => {
 
     it('should throw an error when trying to retrieve the exploration id',
       () => {
-        expect(ecs.getExplorationId).toThrow();
+        expect(() => ecs.getExplorationId()).toThrowError(
+          'ContextService should not be used outside the ' +
+          'context of an exploration or a question.');
       }
     );
 

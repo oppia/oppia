@@ -16,69 +16,161 @@
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+/**
+ * Angular Material (v8) requires hammerjs for gesture recognition.
+ * You can look at point 2 here:
+ * https://v8.material.angular.io/guide/getting-started#install-angular-material
+ * It won't be required in Angular 9.
+ * TODO(#9172): Remove the import when upgraded to Angular 9.
+ */
+import 'hammerjs';
+require('app.constants.ajs.ts');
 
-require('directives/focus-on.directive.ts');
-
-require('pages/Base.ts');
-
-require('services/context.service.ts');
-require('services/csrf-token.service.ts');
-require('services/navigation.service.ts');
-require('services/debouncer.service.ts');
-require('services/date-time-format.service.ts');
-require('services/id-generation.service.ts');
-require('services/html-escaper.service.ts');
-require('services/translation-file-hash-loader.service.ts');
-require('services/rte-helper.service.ts');
-require('services/state-rules-stats.service.ts');
-require('services/construct-translation-ids.service.ts');
-require('services/user.service.ts');
-require('services/promo-bar.service.ts');
-require('services/contextual/device-info.service.ts');
-require('services/contextual/url.service.ts');
-require('services/stateful/focus-manager.service.ts');
-require('services/site-analytics.service.ts');
-
+require('components/button-directives/create-activity-button.directive.ts');
+require('components/button-directives/social-buttons.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'alert-message.directive.ts');
-require('components/button-directives/create-activity-button.directive.ts');
-
-require('components/forms/custom-forms-directives/object-editor.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'promo-bar.directive.ts');
 require(
   'components/common-layout-directives/navigation-bars/' +
   'side-navigation-bar.directive.ts');
-require('components/button-directives/social-buttons.directive.ts');
 require(
   'components/common-layout-directives/navigation-bars/' +
   'top-navigation-bar.directive.ts');
+require('components/forms/custom-forms-directives/object-editor.directive.ts');
+
+require('directives/focus-on.directive.ts');
 
 require('domain/user/UserInfoObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
-require('app.constants.ajs.ts');
+require('pages/Base.ts');
+
+require('services/bottom-navbar-status.service.ts');
+require('services/construct-translation-ids.service.ts');
+require('services/context.service.ts');
+require('services/contextual/device-info.service.ts');
+require('services/contextual/url.service.ts');
+require('services/csrf-token.service.ts');
+require('services/date-time-format.service.ts');
+require('services/debouncer.service.ts');
+require('services/html-escaper.service.ts');
+require('services/id-generation.service.ts');
+require('services/interaction-rules-registry.service.ts');
+require('services/navigation.service.ts');
+require('services/promo-bar.service.ts');
+require('services/rte-helper.service.ts');
+require('services/site-analytics.service.ts');
+require('services/state-interaction-stats.service.ts');
+require('services/stateful/focus-manager.service.ts');
+require('services/translation-file-hash-loader.service.ts');
+require('services/user.service.ts');
 
 require('google-analytics.initializer.ts');
 
 // The following file uses constants in app.constants.ts and hence needs to be
-// loaded after app.constants.ts
+// loaded *after* app.constants.ts.
 require('I18nFooter.ts');
+
+require('Polyfills.ts');
+
+// Default to passive event listeners.
+require('default-passive-events');
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
 
 const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
 angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
-  '$interpolateProvider', '$locationProvider', '$provide',
+  '$interpolateProvider', '$locationProvider', '$provide', '$sanitizeProvider',
   function(
       $compileProvider, $cookiesProvider, $httpProvider,
-      $interpolateProvider, $locationProvider, $provide) {
+      $interpolateProvider, $locationProvider, $provide, $sanitizeProvider) {
+    var ugs = new UpgradedServices();
+    // We need to provide these services and pipes separately since they are
+    // used in the directives imported in this file and cannot be
+    // injected before bootstrapping of oppia module.
+    var servicesToProvide = [
+      'AlertsService', 'AngularNameService',
+      'AnswerClassificationResultObjectFactory', 'AnswerClassificationService',
+      'AnswerGroupObjectFactory', 'AnswerStatsObjectFactory',
+      'AudioFileObjectFactory', 'AudioTranslationLanguageService',
+      'AudioTranslationManagerService', 'AutogeneratedAudioPlayerService',
+      'BackgroundMaskService', 'BottomNavbarStatusService',
+      'BrowserCheckerService', 'CkEditorCopyContentService',
+      'ClassroomBackendApiService', 'CodeReplRulesService',
+      'CollectionCreationBackendService', 'ComputeGraphService',
+      'ConceptCardObjectFactory', 'ContextService',
+      'CreatorDashboardBackendApiService', 'CsrfTokenService',
+      'CurrentInteractionService', 'DateTimeFormatService', 'DebouncerService',
+      'DeviceInfoService', 'DocumentAttributeCustomizationService',
+      'EditabilityService', 'EditorFirstTimeEventsService',
+      'EmailDashboardDataService', 'ExplorationFeaturesBackendApiService',
+      'ExplorationFeaturesService', 'ExplorationHtmlFormatterService',
+      'ExplorationImprovementsBackendApiService',
+      'ExplorationImprovementsService', 'ExplorationObjectFactory',
+      'ExplorationRecommendationsService', 'ExpressionEvaluatorService',
+      'ExpressionParserService', 'ExpressionSyntaxTreeService',
+      'ExtensionTagAssemblerService', 'ExtractImageFilenamesFromStateService',
+      'FeedbackMessageSummaryObjectFactory', 'FeedbackThreadObjectFactory',
+      'FeedbackThreadSummaryObjectFactory', 'FileDownloadRequestObjectFactory',
+      'FocusManagerService', 'GuestCollectionProgressObjectFactory',
+      'GuestCollectionProgressService', 'HtmlEscaperService',
+      'I18nLanguageCodeService', 'IdGenerationService',
+      'ImageFileObjectFactory', 'ImprovementsService',
+      'InteractionObjectFactory', 'InteractionRulesRegistryService',
+      'LanguageUtilService', 'LearnerAnswerDetailsBackendApiService',
+      'LearnerDashboardBackendApiService', 'LearnerParamsService',
+      'LoaderService', 'LocalStorageService', 'LoggerService',
+      'LostChangeObjectFactory', 'MessengerService',
+      'MetaTagCustomizationService', 'NormalizeWhitespacePipe',
+      'NormalizeWhitespacePunctuationAndCasePipe', 'NumberAttemptsService',
+      'PageTitleService', 'ParamChangesObjectFactory',
+      'ParamMetadataObjectFactory', 'ParamSpecsObjectFactory',
+      'PencilCodeEditorRulesService', 'PlayerCorrectnessFeedbackEnabledService',
+      'PlayerPositionService', 'PlayerTranscriptService',
+      'PlaythroughIssuesBackendApiService',
+      'PredictionAlgorithmRegistryService', 'PretestQuestionBackendApiService',
+      'ProfilePageBackendApiService', 'QuestionBackendApiService',
+      'QuestionSummaryForOneSkillObjectFactory', 'QuestionSummaryObjectFactory',
+      'RatingComputationService', 'ReadOnlyCollectionBackendApiService',
+      'ReadOnlySubtopicPageObjectFactory', 'ReviewTestBackendApiService',
+      'RubricObjectFactory', 'SchemaDefaultValueService',
+      'SchemaUndefinedLastElementService', 'SidebarStatusService',
+      'SiteAnalyticsService', 'SkillObjectFactory',
+      'SkillRightsBackendApiService', 'SkillRightsObjectFactory',
+      'SolutionObjectFactory', 'SolutionValidityService',
+      'SpeechSynthesisChunkerService', 'StateCardObjectFactory',
+      'StateClassifierMappingService', 'StateEditorService',
+      'StateInteractionStatsService', 'StateObjectFactory',
+      'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
+      'StatesObjectFactory', 'StopwatchObjectFactory',
+      'StoryContentsObjectFactory', 'StoryObjectFactory',
+      'StorySummaryObjectFactory', 'StoryViewerBackendApiService',
+      'SubtopicObjectFactory', 'SubtopicPageContentsObjectFactory',
+      'SubtopicPageObjectFactory', 'SubtopicViewerBackendApiService',
+      'SuggestionThreadObjectFactory', 'SuggestionsService',
+      'TextInputRulesService', 'ThreadMessageObjectFactory',
+      'ThreadMessageSummaryObjectFactory', 'ThreadStatusDisplayService',
+      'TopicObjectFactory', 'TopicRightsObjectFactory',
+      'TopicViewerBackendApiService', 'TranslationLanguageService',
+      'UrlInterpolationService', 'UrlService',
+      'UserExplorationPermissionsService', 'UserInfoObjectFactory',
+      'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
+      'WindowRef',
+    ];
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      if (servicesToProvide.includes(key)) {
+        $provide.value(key, value);
+      }
+    }
     // Refer: https://docs.angularjs.org/guide/migration
     // #migrate1.5to1.6-ng-services-$location
     // The default hash-prefix used for URLs has changed from
@@ -87,11 +179,6 @@ angular.module('oppia').config([
     // the URL will become mydomain.com/#!/a/b/c.  So, the line
     // here is to change the prefix back to empty string.
     $locationProvider.hashPrefix('');
-
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
     // This improves performance by disabling debug data. For more details,
     // see https://code.angularjs.org/1.5.5/docs/guide/production
     $compileProvider.debugInfoEnabled(false);
@@ -105,6 +192,8 @@ angular.module('oppia').config([
     if (window.location.pathname === '/search/find') {
       $locationProvider.html5Mode(true);
     }
+
+    $sanitizeProvider.enableSvg(true);
 
     // Prevent storing duplicate cookies for translation language.
     $cookiesProvider.defaults.path = '/';
@@ -127,11 +216,30 @@ angular.module('oppia').config([
               return $q(function(resolve, reject) {
                 // Get CSRF token before sending the request.
                 CsrfTokenService.getTokenAsync().then(function(token) {
-                  config.data = $.param({
-                    csrf_token: token,
-                    payload: JSON.stringify(config.data),
-                    source: document.URL
-                  }, true);
+                  if ((config.data instanceof FormData)) {
+                    var hasPayload = false;
+                    // Check whether the FormData has payload in it.
+                    for (var key of config.data.keys()) {
+                      if (key === 'payload') {
+                        hasPayload = true;
+                        break;
+                      }
+                    }
+                    // If the payload is not created, create it and append it
+                    // to the request data.
+                    if (!hasPayload) {
+                      config.data.append(
+                        'payload', JSON.stringify(config.data));
+                    }
+                    config.data.append('csrf_token', token);
+                    config.data.append('source', document.URL);
+                  } else {
+                    config.data = $.param({
+                      csrf_token: token,
+                      payload: JSON.stringify(config.data),
+                      source: document.URL
+                    }, true);
+                  }
                   resolve(config);
                 });
               });
@@ -151,7 +259,7 @@ angular.module('oppia').config([
                 warningMessage = rejection.data.error;
               }
               AlertsService.addWarning(warningMessage);
-              // rejection.config is an optional parameter.
+              // The rejection.config is an optional parameter.
               // see https://docs.angularjs.org/api/ng/service/$http
               var rejectionUrl = typeof rejection.config !== 'undefined' ? (
                 rejection.config.url) : '';
@@ -173,27 +281,28 @@ angular.module('oppia').config([
 ]);
 
 angular.module('oppia').config(['$provide', function($provide) {
-  $provide.decorator('$log', ['$delegate', 'DEV_MODE',
-    function($delegate, DEV_MODE) {
-      var _originalError = $delegate.error;
+  $provide.decorator(
+    '$log', ['$delegate', 'DEV_MODE',
+      function($delegate, DEV_MODE) {
+        var _originalError = $delegate.error;
 
-      if (!DEV_MODE) {
-        $delegate.log = function() {};
-        $delegate.info = function() {};
-        // TODO(sll): Send errors (and maybe warnings) to the backend.
-        $delegate.warn = function() { };
-        $delegate.error = function(message) {
-          if (String(message).indexOf('$digest already in progress') === -1) {
-            _originalError(message);
-          }
-        };
-        // This keeps angular-mocks happy (in tests).
-        $delegate.error.logs = [];
+        if (!DEV_MODE) {
+          $delegate.log = function() {};
+          $delegate.info = function() {};
+          // TODO(sll): Send errors (and maybe warnings) to the backend.
+          $delegate.warn = function() { };
+          $delegate.error = function(message) {
+            if (String(message).indexOf('$digest already in progress') === -1) {
+              _originalError(message);
+            }
+          };
+          // This keeps angular-mocks happy (in tests).
+          $delegate.error.logs = [];
+        }
+
+        return $delegate;
       }
-
-      return $delegate;
-    }
-  ]);
+    ]);
 }]);
 
 angular.module('oppia').config(['toastrConfig', function(toastrConfig) {
@@ -221,7 +330,8 @@ angular.module('oppia').config(['toastrConfig', function(toastrConfig) {
 // spread over multiple lines. The errored file may be viewed on the
 // browser console where the line number should match.
 angular.module('oppia').factory('$exceptionHandler', [
-  '$log', 'CsrfTokenService', function($log, CsrfTokenService) {
+  '$log', 'CsrfTokenService', 'UtilsService', 'DEV_MODE',
+  function($log, CsrfTokenService, UtilsService, DEV_MODE) {
     var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
     // Refer: https://docs.angularjs.org/guide/migration#-templaterequest-
     // The tpload error namespace has changed in Angular v1.7.
@@ -241,13 +351,34 @@ angular.module('oppia').factory('$exceptionHandler', [
       if (UNHANDLED_REJECTION_STATUS_CODE_REGEX.test(exception)) {
         return;
       }
-      // Exceptions are expected to be of Error type. If an error is thrown
-      // with a primitive data type, it must be converted to an Error object
-      // so that the error gets logged correctly.
-      // This check can be removed once all the manually thrown exceptions
-      // are converted to Error objects (see #8456).
-      if (!(exception instanceof Error)) {
-        exception = new Error(exception);
+      // According to AngularJS breaking change commit:
+      // eslint-disable-next-line max-len
+      // https://github.com/angular/angular.js/commit/c9dffde1cb167660120753181cb6d01dc1d1b3d0
+      // Unhandled rejected promises will be logged to $exceptionHandler.
+      // If an unhandled rejected promise is encountered by $q, the data
+      // type of the rejection value is checked. If the value is an Error,
+      // $exceptionHandler is called with the Error as the first argument
+      // and a message string as the second argument.
+      // If the rejection value is not an Error, $exceptionHandler is called
+      // with the rejection value as the argument. In order to log the error
+      // correctly on StackDriver and to preserve the original stacktrace, we
+      // wrap such exceptions in an error object.
+      // eslint-disable-next-line max-len
+      // see: https://github.com/angular/angular.js/blob/2dfb6b4af62d750032c91fd86dc1f8d684d179c6/src/ng/q.js#L388
+      if (!UtilsService.isError(exception)) {
+        // The Error.stack property provides a meaningful stacktrace of the
+        // exception. Different browsers set this value at different times.
+        // Modern browsers such as Chrome, Firefox, Edge set this value when
+        // an Error object is created. Older browsers like IE 10 & 11 set this
+        // value only when the Error is thrown. To ensure that the stack
+        // property is populated we use try/catch.
+        // eslint-disable-next-line max-len
+        // see: https://web.archive.org/web/20140210004225/http://msdn.microsoft.com/en-us/library/windows/apps/hh699850.aspx
+        try {
+          throw new Error(exception);
+        } catch (error) {
+          exception = error;
+        }
       }
       var tploadStatusCode = exception.message.match(TPLOAD_STATUS_CODE_REGEX);
       // Suppress tpload errors which occur with p1 of -1 in the error URL
@@ -255,179 +386,50 @@ angular.module('oppia').factory('$exceptionHandler', [
       if (tploadStatusCode !== null && tploadStatusCode[1] === '-1') {
         return;
       }
-      sourceMappedStackTrace.mapStackTrace(
-        exception.stack, function(mappedStack) {
-          var messageAndSourceAndStackTrace = [
-            '',
-            'Cause: ' + cause,
-            exception.message,
-            mappedStack.join('\n'),
-            '    at URL: ' + window.location.href
-          ].join('\n');
-          // To prevent an overdose of errors, throttle to at most 1 error every
-          // MIN_TIME_BETWEEN_ERRORS_MSEC.
-          if (
-            Date.now() - timeOfLastPostedError > MIN_TIME_BETWEEN_ERRORS_MSEC) {
-            // Catch all errors, to guard against infinite recursive loops.
-            try {
-              // We use jQuery here instead of Angular's $http, since the latter
-              // creates a circular dependency.
-              CsrfTokenService.getTokenAsync().then(function(token) {
-                $.ajax({
-                  type: 'POST',
-                  url: '/frontend_errors',
-                  data: $.param({
-                    csrf_token: token,
-                    payload: JSON.stringify({
-                      error: messageAndSourceAndStackTrace
-                    }),
-                    source: document.URL
-                  }, true),
-                  contentType: 'application/x-www-form-urlencoded',
-                  dataType: 'text',
-                  async: true
-                });
+      if (!DEV_MODE) {
+        sourceMappedStackTrace.mapStackTrace(
+          exception.stack, function(mappedStack) {
+            var messageAndSourceAndStackTrace = [
+              '',
+              'Cause: ' + cause,
+              exception.message,
+              mappedStack.join('\n'),
+              '    at URL: ' + window.location.href
+            ].join('\n');
+            var timeDifference = Date.now() - timeOfLastPostedError;
+            // To prevent an overdose of errors, throttle to at most 1 error
+            // every MIN_TIME_BETWEEN_ERRORS_MSEC.
+            if (timeDifference > MIN_TIME_BETWEEN_ERRORS_MSEC) {
+              // Catch all errors, to guard against infinite recursive loops.
+              try {
+                // We use jQuery here instead of Angular's $http, since the
+                // latter creates a circular dependency.
+                CsrfTokenService.getTokenAsync().then(function(token) {
+                  $.ajax({
+                    type: 'POST',
+                    url: '/frontend_errors',
+                    data: $.param({
+                      csrf_token: token,
+                      payload: JSON.stringify({
+                        error: messageAndSourceAndStackTrace
+                      }),
+                      source: document.URL
+                    }, true),
+                    contentType: 'application/x-www-form-urlencoded',
+                    dataType: 'text',
+                    async: true
+                  });
 
-                timeOfLastPostedError = Date.now();
-              });
-            } catch (loggingError) {
-              $log.warn('Error logging failed.');
+                  timeOfLastPostedError = Date.now();
+                });
+              } catch (loggingError) {
+                $log.warn('Error logging failed.');
+              }
             }
           }
-        });
+        );
+      }
       $log.error.apply($log, arguments);
     };
   }
 ]);
-
-// Add a String.prototype.trim() polyfill for IE8.
-if (typeof String.prototype.trim !== 'function') {
-  String.prototype.trim = function() {
-    return this.replace(/^\s+|\s+$/g, '');
-  };
-}
-
-// Add an Object.create() polyfill for IE8.
-if (typeof Object.create !== 'function') {
-  (function() {
-    var F = function() {};
-    Object.create = function(o) {
-      if (arguments.length > 1) {
-        throw Error('Second argument for Object.create() is not supported');
-      }
-      if (o === null) {
-        throw Error('Cannot set a null [[Prototype]]');
-      }
-      if (typeof o !== 'object') {
-        throw TypeError('Argument must be an object');
-      }
-      F.prototype = o;
-      return new F();
-    };
-  })();
-}
-
-// Add a Number.isInteger() polyfill for IE.
-Number.isInteger = Number.isInteger || function(value) {
-  return (
-    typeof value === 'number' && isFinite(value) &&
-    Math.floor(value) === value);
-};
-
-
-// Add Array.fill() polyfill for IE.
-if (!Array.prototype.fill) {
-  Object.defineProperty(Array.prototype, 'fill', {
-    value: function(value) {
-      // Steps 1-2.
-      if (this === null) {
-        throw new TypeError('this is null or not defined');
-      }
-
-      var O = Object(this);
-
-      // Steps 3-5.
-      var len = O.length >>> 0;
-
-      // Steps 6-7.
-      var start = arguments[1];
-      var relativeStart = start >> 0;
-
-      // Step 8.
-      var k = relativeStart < 0 ?
-        Math.max(len + relativeStart, 0) :
-        Math.min(relativeStart, len);
-
-      // Steps 9-10.
-      var end = arguments[2];
-      var relativeEnd = end === undefined ?
-        len : end >> 0;
-
-      // Step 11.
-      var final = relativeEnd < 0 ?
-        Math.max(len + relativeEnd, 0) :
-        Math.min(relativeEnd, len);
-
-      // Step 12.
-      while (k < final) {
-        O[k] = value;
-        k++;
-      }
-
-      // Step 13.
-      return O;
-    }
-  });
-}
-
-
-// Add SVGElement.prototype.outerHTML polyfill for IE
-if (!('outerHTML' in SVGElement.prototype)) {
-  Object.defineProperty(SVGElement.prototype, 'outerHTML', {
-    get: function() {
-      var $node, $temp;
-      $temp = document.createElement('div');
-      $node = this.cloneNode(true);
-      $temp.appendChild($node);
-      return $temp.innerHTML;
-    },
-    enumerable: false,
-    configurable: true
-  });
-}
-
-
-// Older browsers might not implement mediaDevices at all,
-// so we set an empty object first.
-if (navigator.mediaDevices === undefined) {
-  // @ts-ignore: mediaDevices is read-only error.
-  navigator.mediaDevices = {};
-}
-
-// Some browsers partially implement mediaDevices.
-// We can't just assign an object with getUserMedia
-// as it would overwrite existing properties.
-// Here, we will just add the getUserMedia property
-// if it's missing.
-if (navigator.mediaDevices.getUserMedia === undefined) {
-  navigator.mediaDevices.getUserMedia = function(constraints) {
-    // First get ahold of the legacy getUserMedia, if present.
-    var getUserMedia = (
-      // @ts-ignore: 'webkitGetUserMedia' and 'mozGetUserMedia'
-      // property does not exist error.
-      navigator.webkitGetUserMedia || navigator.mozGetUserMedia);
-
-    // If getUserMedia is not implemented, return a rejected promise
-    // with an error to keep a consistent interface.
-    if (!getUserMedia) {
-      return Promise.reject(
-        new Error('getUserMedia is not implemented in this browser'));
-    }
-
-    // Otherwise, wrap the call to the old navigator.getUserMedia
-    // with a Promise.
-    return new Promise(function(resolve, reject) {
-      getUserMedia.call(navigator, constraints, resolve, reject);
-    });
-  };
-}

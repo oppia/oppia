@@ -20,6 +20,18 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+interface FeedbackMessageSummaryBackendDict {
+  'message_id': number;
+  'text': string;
+  'updated_status': string;
+  'suggestion_html': string;
+  'current_content_html': string;
+  'description': string;
+  'author_username': string;
+  'author_picture_data_url': string;
+  'created_on_msecs': number;
+}
+
 export class FeedbackMessageSummary {
   messageId: number;
   text: string;
@@ -29,12 +41,13 @@ export class FeedbackMessageSummary {
   description: string;
   authorUsername: string;
   authorPictureDataUrl: string;
-  createdOn: Date;
+  createdOnMsecs: number;
 
   constructor(
       messageId: number, text: string, updatedStatus: string,
       suggestionHtml: string, currentContentHtml: string, description: string,
-      authorUsername: string, authorPictureDataUrl: string, createdOn: Date) {
+      authorUsername: string, authorPictureDataUrl: string,
+      createdOnMsecs: number) {
     this.messageId = messageId;
     this.text = text;
     this.updatedStatus = updatedStatus;
@@ -43,7 +56,7 @@ export class FeedbackMessageSummary {
     this.description = description;
     this.authorUsername = authorUsername;
     this.authorPictureDataUrl = authorPictureDataUrl;
-    this.createdOn = createdOn;
+    this.createdOnMsecs = createdOnMsecs;
   }
 }
 
@@ -54,16 +67,16 @@ export class FeedbackMessageSummaryObjectFactory {
   createNewMessage(
       newMessageId: number, newMessageText: string, authorUsername: string,
       authorPictureDataUrl: string): FeedbackMessageSummary {
+    // Date.now() returns number of milliseconds since 1970-01-01 UTC.
+    let createdOnMsecs: number = new Date().getTime();
     return new FeedbackMessageSummary(
       newMessageId, newMessageText, null, null, null, null, authorUsername,
-      authorPictureDataUrl, new Date());
+      authorPictureDataUrl, createdOnMsecs);
   }
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'feedbackMessageSummaryBackendDict' is a dict with
-  // underscore_cased keys which give tslint errors against underscore_casing
-  // in favor of camelCasing.
+
   createFromBackendDict(
-      feedbackMessageSummaryBackendDict: any): FeedbackMessageSummary {
+      feedbackMessageSummaryBackendDict: FeedbackMessageSummaryBackendDict):
+      FeedbackMessageSummary {
     return new FeedbackMessageSummary(
       feedbackMessageSummaryBackendDict.message_id,
       feedbackMessageSummaryBackendDict.text,
@@ -73,7 +86,7 @@ export class FeedbackMessageSummaryObjectFactory {
       feedbackMessageSummaryBackendDict.description,
       feedbackMessageSummaryBackendDict.author_username,
       feedbackMessageSummaryBackendDict.author_picture_data_url,
-      feedbackMessageSummaryBackendDict.created_on);
+      feedbackMessageSummaryBackendDict.created_on_msecs);
   }
 }
 

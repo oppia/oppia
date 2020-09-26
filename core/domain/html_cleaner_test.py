@@ -41,7 +41,8 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         self.assertTrue(
             html_cleaner.filter_a('a', 'title', 'http://www.oppia.com'))
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception, 'The filter_a method should only be used for a tags.'):
             html_cleaner.filter_a('link', 'href', 'http://www.oppia.com')
 
     def test_good_tags_allowed(self):
@@ -158,10 +159,14 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
         test_data = (
             '<p>Test text&nbsp;'
             '<oppia-noninteractive-math '
-            'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">'
+            'math_content-with-value="{&amp;quot;raw_latex&amp;quot;:&amp;qu'
+            'ot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:'
+            '&amp;quot;&amp;quot;}">'
             '</oppia-noninteractive-math></p><p>&nbsp;'
             '<oppia-noninteractive-link '
-            'text-with-value="&amp;quot;Link&amp;quot;" '
+            'text-with-value='
+            '"&amp;quot;Link\\&amp;quot;quoted text\\&amp;quot;'
+            '&amp;#39;singlequotes&amp;#39;&amp;quot;" '
             'url-with-value="&amp;quot;https://www.example.com&amp;quot;">'
             '</oppia-noninteractive-link>.</p>'
             '<p>Video</p>'
@@ -175,7 +180,7 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
         expected_components = [
             {
                 'customization_args': {
-                    'text-with-value': u'Link',
+                    'text-with-value': u'Link"quoted text"\'singlequotes\'',
                     'url-with-value': u'https://www.example.com'},
                 'id': 'oppia-noninteractive-link'
             },
@@ -192,7 +197,10 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
             },
             {
                 'customization_args': {
-                    'raw_latex-with-value': u'\\frac{x}{y}'
+                    'math_content-with-value': {
+                        u'raw_latex': u'\\frac{x}{y}',
+                        u'svg_filename': u''
+                    }
                 },
                 'id': 'oppia-noninteractive-math'
             }
@@ -203,3 +211,49 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(components), len(expected_components))
         for component in components:
             self.assertIn(component, expected_components)
+
+    def test_get_image_filenames_from_html_strings(self):
+        html_strings = [
+            '<oppia-noninteractive-image '
+            'filepath-with-value="&quot;img.svg&quot;" caption-with-value='
+            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image><oppia-noninteractive-image '
+            'filepath-with-value="&quot;img2.svg&quot;" caption-with-value='
+            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>',
+            '<oppia-noninteractive-image '
+            'filepath-with-value="&quot;img3.svg&quot;" caption-with-value='
+            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image><oppia-noninteractive-image '
+            'filepath-with-value="&quot;img4.svg&quot;" caption-with-value='
+            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>',
+            '<oppia-noninteractive-svgdiagram '
+            'svg_filename-with-value="&quot;img5.svg&quot;"'
+            ' alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-svgdiagram><oppia-noninteractive-svgdiag'
+            'ram svg_filename-with-value="&quot;img6.svg&quot;"'
+            ' alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-svgdiagram><oppia-noninteractive-image '
+            'filepath-with-value="&quot;img7.svg&quot;" caption-with-value='
+            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;quo'
+            't;raw_latex&amp;quot;:&amp;quot;+,-,-,+&amp;quot;,&amp;quot;sv'
+            'g_filename&amp;quot;:&amp;quot;math1.svg&amp;quot;}"></oppia-n'
+            'oninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;quo'
+            't;raw_latex&amp;quot;:&amp;quot;x^2&amp;quot;,&amp;quot;sv'
+            'g_filename&amp;quot;:&amp;quot;math2.svg&amp;quot;}"></oppia-n'
+            'oninteractive-math>'
+            '<oppia-noninteractive-math math_content-with-value="{&amp;quo'
+            't;raw_latex&amp;quot;:&amp;quot;(x-1)(x-2)^2&amp;quot;,&amp;quot'
+            ';svg_filename&amp;quot;:&amp;quot;math3.svg&amp;quot;}"></oppia-n'
+            'oninteractive-math>'
+        ]
+        self.assertItemsEqual(
+            [
+                'img.svg', 'img2.svg', 'img3.svg', 'img4.svg',
+                'img5.svg', 'img6.svg', 'img7.svg', 'math1.svg',
+                'math2.svg', 'math3.svg'],
+            html_cleaner.get_image_filenames_from_html_strings(html_strings))

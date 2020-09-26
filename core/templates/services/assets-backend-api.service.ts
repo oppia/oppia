@@ -36,7 +36,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       UrlInterpolationService, DEV_MODE, ENTITY_TYPE,
       GCS_RESOURCE_BUCKET_NAME) {
     if (!DEV_MODE && !GCS_RESOURCE_BUCKET_NAME) {
-      throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
+      throw new Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
 
     // List of filenames that have been requested for but have
@@ -48,8 +48,8 @@ angular.module('oppia').factory('AssetsBackendApiService', [
     var ASSET_TYPE_IMAGE = 'image';
     var ASSET_TYPE_THUMBNAIL = 'thumbnail';
 
-    var GCS_PREFIX = ('https://storage.googleapis.com/' +
-      GCS_RESOURCE_BUCKET_NAME);
+    var GCS_PREFIX = (
+      'https://storage.googleapis.com/' + GCS_RESOURCE_BUCKET_NAME);
     var AUDIO_DOWNLOAD_URL_TEMPLATE = (
       (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
       '/<entity_type>/<entity_id>/assets/audio/<filename>');
@@ -91,37 +91,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       }).then(function(response) {
         var assetBlob = null;
         var data = response.data;
-        try {
-          assetBlob = new Blob([data], {type: data.type});
-        } catch (exception) {
-          window.BlobBuilder = window.BlobBuilder ||
-                         window.WebKitBlobBuilder ||
-                         window.MozBlobBuilder ||
-                         window.MSBlobBuilder;
-          if (exception.name === 'TypeError' && window.BlobBuilder) {
-            try {
-              var blobBuilder = new BlobBuilder();
-              blobBuilder.append(data);
-              assetBlob = blobBuilder.getBlob(assetType.concat('/*'));
-            } catch (e) {
-              var additionalInfo = (
-                '\nBlobBuilder construction error debug logs:' +
-                '\nAsset type: ' + assetType +
-                '\nData: ' + data
-              );
-              e.message += additionalInfo;
-              throw e;
-            }
-          } else {
-            var additionalInfo = (
-              '\nBlob construction error debug logs:' +
-              '\nAsset type: ' + assetType +
-              '\nData: ' + data
-            );
-            exception.message += additionalInfo;
-            throw exception;
-          }
-        }
+        assetBlob = new Blob([data], {type: data.type});
         assetsCache[filename] = assetBlob;
         if (assetType === ASSET_TYPE_AUDIO) {
           successCallback(
@@ -157,8 +127,8 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       }
     };
 
-    var _removeFromFilesCurrentlyBeingRequested = function(filename,
-        assetType) {
+    var _removeFromFilesCurrentlyBeingRequested = function(
+        filename, assetType) {
       if (_isAssetCurrentlyBeingRequested(filename, ASSET_TYPE_AUDIO)) {
         for (var index = 0; index <
              _audioFilesCurrentlyBeingRequested.length; index++) {
@@ -211,6 +181,46 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       });
     };
 
+    var _saveMathExpresionImage = function(
+        resampledFile, filename, entityType, entityId, successCallback,
+        errorCallback) {
+      let form = new FormData();
+      form.append('image', resampledFile);
+      form.append('payload', JSON.stringify({
+        filename: filename,
+        filename_prefix: 'image'
+      }));
+      var imageUploadUrlTemplate = (
+        '/createhandler/imageupload/<entity_type>/<entity_id>'
+      );
+      CsrfTokenService.getTokenAsync().then(function(token) {
+        form.append('csrf_token', token);
+        $.ajax({
+          url: UrlInterpolationService.interpolateUrl(
+            imageUploadUrlTemplate, {
+              entity_type: entityType,
+              entity_id: entityId
+            }
+          ),
+          data: form,
+          processData: false,
+          contentType: false,
+          type: 'POST',
+          dataFilter: removeXSSIPrefix,
+          dataType: 'text'
+        }).done(function(data) {
+          if (successCallback) {
+            successCallback(data);
+          }
+        }).fail(function(data) {
+          // Remove the XSSI prefix.
+          var parsedResponse = removeXSSIPrefix(data.responseText);
+          if (errorCallback) {
+            errorCallback(parsedResponse);
+          }
+        });
+      });
+    };
     var _getDownloadUrl = function(entityType, entityId, filename, assetType) {
       var urlTemplate = null;
       urlTemplate = ASSET_TYPE_TO_DOWNLOAD_URL_TEMPLATE[assetType];
@@ -263,14 +273,22 @@ angular.module('oppia').factory('AssetsBackendApiService', [
             resolve(ImageFileObjectFactory.createNew(
               filename, assetsCache[filename]));
           } else {
-            _fetchFile(entityType, entityId, filename, ASSET_TYPE_IMAGE,
-              resolve, reject);
+            _fetchFile(
+              entityType, entityId, filename, ASSET_TYPE_IMAGE, resolve,
+              reject);
           }
         });
       },
       saveAudio: function(explorationId, filename, rawAssetData) {
         return $q(function(resolve, reject) {
           _saveAudio(explorationId, filename, rawAssetData, resolve, reject);
+        });
+      },
+      saveMathExpresionImage: function(
+          resampledFile, filename, entityType, entityId) {
+        return $q(function(resolve, reject) {
+          _saveMathExpresionImage(
+            resampledFile, filename, entityType, entityId, resolve, reject);
         });
       },
       isCached: function(filename) {

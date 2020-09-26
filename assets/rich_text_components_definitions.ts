@@ -56,7 +56,7 @@ export = {
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "filepath",
-      "description": "The image (Allowed extensions: gif, jpeg, jpg, png)",
+      "description": "The image (Allowed extensions: gif, jpeg, jpg, png, svg)",
       "schema": {
         "type": "custom",
         "obj_type": "Filepath"
@@ -124,13 +124,16 @@ export = {
     "is_lesson_related": false,
     "is_block_element": false,
     "customization_arg_specs": [{
-      "name": "raw_latex",
-      "description": "The raw string to be displayed as LaTeX.",
+      "name": "math_content",
+      "description": "The Math Expression to be displayed.",
       "schema": {
         "type": "custom",
-        "obj_type": "MathLatexString"
+        "obj_type": "MathExpressionContent"
       },
-      "default_value": ""
+      "default_value": {
+        "raw_latex": "",
+        "svg_filename": ""
+      }
     }]
   },
   "Skillreview": {
@@ -145,11 +148,52 @@ export = {
     "is_lesson_related": true,
     "is_block_element": false,
     "customization_arg_specs": [{
-      "name": "skill_summary",
-      "description": "Click on skill to view concept card.",
+      "name": "text",
+      "description": "The text to be displayed",
+      "schema": {
+        "type": "unicode"
+      },
+      "default_value": "concept card"
+    }, {
+      "name": "skill_id",
+      "description": "The skill that this link refers to",
       "schema": {
         "type": "custom",
         "obj_type": "SkillSelector"
+      },
+      "default_value": ""
+    }]
+  },
+  "Svgdiagram": {
+    "backend_id": "svgdiagram",
+    "category": "Basic Input",
+    "description": "A custom SVG diagram.",
+    "frontend_id": "svgdiagram",
+    "tooltip": "Insert diagram",
+    "icon_data_url": "/rich_text_components/Svgdiagram/Svgdiagram.png",
+    "is_complex": false,
+    "requires_fs": true,
+    "is_lesson_related": false,
+    "is_block_element": true,
+    "customization_arg_specs": [{
+      "name": "svg_filename",
+      "description": "The SVG Diagram Editor",
+      "schema": {
+        "type": "custom",
+        "obj_type": "SvgFilename"
+      },
+      "default_value": ""
+    }, {
+      "name": "alt",
+      "description": "Briefly explain this diagram to a visually impaired learner",
+      "schema": {
+        "type": "unicode",
+        "validators": [{
+          "id": "is_nonempty"
+        }],
+        "ui_config": {
+          "placeholder": "Description of the diagram"
+        }
       },
       "default_value": ""
     }]

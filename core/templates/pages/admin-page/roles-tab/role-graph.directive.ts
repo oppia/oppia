@@ -28,12 +28,12 @@ angular.module('oppia').directive('roleGraph', [
       bindToController: {
         // An object with these keys:
         //  - 'nodes': An object whose keys are node ids and whose values are
-        //             node labels
+        //             node labels.
         //  - 'links': A list of objects with keys:
-        //            'source': id of source node
-        //            'target': id of target node
-        //  - 'initStateId': The initial state id
-        //  - 'finalStateIds': The list of ids corresponding to terminal states
+        //            'source': id of source node.
+        //            'target': id of target node.
+        //  - 'initStateId': The initial state id.
+        //  - 'finalStateIds': The list of ids corresponding to terminal states.
         graphData: '=',
         // A boolean value to signify whether graphData is completely loaded.
         graphDataLoaded: '='
@@ -42,18 +42,12 @@ angular.module('oppia').directive('roleGraph', [
         '/pages/admin-page/roles-tab/admin-roles-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$element', '$filter', 'StateGraphLayoutService',
+        '$filter', 'StateGraphLayoutService',
         'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
         function(
-            $element, $filter, StateGraphLayoutService,
+            $filter, StateGraphLayoutService,
             MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
           var ctrl = this;
-          var getElementDimensions = function() {
-            return {
-              h: $element.height(),
-              w: $element.width()
-            };
-          };
 
           ctrl.getGraphHeightInPixels = function() {
             return Math.max(ctrl.GRAPH_HEIGHT, 300);
@@ -86,7 +80,7 @@ angular.module('oppia').directive('roleGraph', [
               return $filter('truncate')(nodeLabel, MAX_NODE_LABEL_LENGTH);
             };
 
-            // creating list of nodes to display.
+            // Creating list of nodes to display.
             ctrl.nodeList = [];
             for (var nodeId in nodeData) {
               ctrl.nodeList.push(nodeData[nodeId]);

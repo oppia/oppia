@@ -23,19 +23,25 @@ import { Injectable } from '@angular/core';
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UtilsService } from 'services/utils.service';
-import { LoggerService } from 'services/contextual/logger.service';
 
 
 const Constants = require('constants.ts');
 const hashes = require('hashes.json');
 
+// This makes the InterpolationValuesType like a dict whose keys and values both
+// are string.
+export interface InterpolationValuesType {
+  [param: string]: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class UrlInterpolationService {
-  constructor(private alertsService: AlertsService,
-              private urlService: UrlService,
-              private utilsService: UtilsService) {}
+  constructor(
+    private alertsService: AlertsService,
+    private urlService: UrlService,
+    private utilsService: UtilsService) {}
 
   validateResourcePath(resourcePath: string): void {
     if (!resourcePath) {
@@ -58,8 +64,9 @@ export class UrlInterpolationService {
     if (!Constants.DEV_MODE) {
       if (hashes[resourcePath]) {
         let index = resourcePath.lastIndexOf('.');
-        return (resourcePath.slice(0, index) + '.' + hashes[resourcePath] +
-            resourcePath.slice(index));
+        return (
+          resourcePath.slice(0, index) + '.' + hashes[resourcePath] +
+          resourcePath.slice(index));
       }
     }
     return resourcePath;
@@ -103,7 +110,9 @@ export class UrlInterpolationService {
    * If a URL requires a value which is not keyed within the
    * interpolationValues object, this will return null.
    */
-  interpolateUrl(urlTemplate: string, interpolationValues: any): string {
+  interpolateUrl(
+      urlTemplate: string,
+      interpolationValues: InterpolationValuesType): string {
     if (!urlTemplate) {
       this.alertsService.fatalWarning(
         'Invalid or empty URL template passed in: \'' + urlTemplate + '\'');
@@ -134,15 +143,18 @@ export class UrlInterpolationService {
       return null;
     }
 
+    let nonStringParams = Object.entries(interpolationValues).filter(
+      ([key, val]) => !this.utilsService.isString(val));
+    if (nonStringParams.length > 0) {
+      this.alertsService.fatalWarning(
+        'Every parameter passed into interpolateUrl must have string values, ' +
+        'but received: {' + nonStringParams.map(
+          ([key, val]) => key + ': ' + angular.toJson(val)).join(', ') + '}');
+    }
+
     let escapedInterpolationValues = {};
     for (let varName in interpolationValues) {
       let value = interpolationValues[varName];
-      if (!this.utilsService.isString(value)) {
-        this.alertsService.fatalWarning(
-          'Parameters passed into interpolateUrl must be strings.');
-        return null;
-      }
-
       escapedInterpolationValues[varName] = encodeURIComponent(value);
     }
 
@@ -153,8 +165,9 @@ export class UrlInterpolationService {
     while (match) {
       let currentVarName = match[1];
       if (!escapedInterpolationValues.hasOwnProperty(currentVarName)) {
-        this.alertsService.fatalWarning('Expected variable \'' +
-            currentVarName + '\' when interpolating URL.');
+        this.alertsService.fatalWarning(
+          'Expected variable \'' + currentVarName +
+          '\' when interpolating URL.');
         return null;
       }
       filledUrl = filledUrl.replace(
@@ -210,8 +223,8 @@ export class UrlInterpolationService {
       this.alertsService.fatalWarning(
         'Empty interactionId passed in getInteractionThumbnailImageUrl.');
     }
-    return this.getExtensionResourceUrl('/interactions/' + interactionId +
-        '/static/' + interactionId + '.png');
+    return this.getExtensionResourceUrl(
+      '/interactions/' + interactionId + '/static/' + interactionId + '.png');
   }
 
   /**

@@ -23,17 +23,20 @@ require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-status.service.ts');
 
-/* eslint-disable angular/directive-restrict */
+import { Subscription } from 'rxjs';
+
+/* eslint-disable-next-line angular/directive-restrict */
 angular.module('oppia').directive('stateGraphVisualization', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       // Note: This directive is used as attribute because pannability does not
       //    work when directive is used as element. (Convention in the codebase
-      //    is to use directive as element.)
+      //    is to use directive as element).
       restrict: 'A',
       scope: {
         allowPanning: '@',
@@ -53,17 +56,15 @@ angular.module('oppia').directive('stateGraphVisualization', [
         //  - 'finalStateIds': The list of ids corresponding to terminal states
         //             (i.e., those whose interactions are terminal).
         graphData: '&',
-        // Object whose keys are ids of nodes to display a warning tooltip over
-        highlightStates: '=',
         // Id of a second initial state, which will be styled as an initial
-        // state
+        // state.
         initStateId2: '=',
         isEditable: '=',
-        // Object which maps linkProperty to a style
+        // Object which maps linkProperty to a style.
         linkPropertyMapping: '=',
-        // Object whose keys are node ids and whose values are node colors
+        // Object whose keys are node ids and whose values are node colors.
         getNodeColors: '&nodeColors',
-        // A value which is the color of all nodes
+        // A value which is the color of all nodes.
         nodeFill: '@',
         // Object whose keys are node ids with secondary labels and whose
         // values are secondary labels. If this is undefined, it means no nodes
@@ -85,15 +86,16 @@ angular.module('oppia').directive('stateGraphVisualization', [
         'state-graph-visualization.directive.html'),
       controller: [
         '$element', '$filter', '$scope', '$timeout',
-        'ExplorationWarningsService', 'StateGraphLayoutService',
-        'TranslationStatusService', 'MAX_NODES_PER_ROW',
-        'MAX_NODE_LABEL_LENGTH',
+        'ExplorationWarningsService', 'RouterService',
+        'StateGraphLayoutService', 'TranslationStatusService',
+        'WindowDimensionsService', 'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
         function(
             $element, $filter, $scope, $timeout,
-            ExplorationWarningsService, StateGraphLayoutService,
-            TranslationStatusService, MAX_NODES_PER_ROW,
-            MAX_NODE_LABEL_LENGTH) {
+            ExplorationWarningsService, RouterService,
+            StateGraphLayoutService, TranslationStatusService,
+            WindowDimensionsService, MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var graphBounds = {
             bottom: 0,
             left: 0,
@@ -125,8 +127,8 @@ angular.module('oppia').directive('stateGraphVisualization', [
               var dimensions = getElementDimensions();
 
               d3.select($element.find('rect.pannable-rect')[0])
-                .call(d3.zoom().scaleExtent([1, 1])
-                  .on('zoom', function() {
+                .call(
+                  d3.zoom().scaleExtent([1, 1]).on('zoom', function() {
                     if (graphBounds.right - graphBounds.left < dimensions.w) {
                       (d3.event).transform.x = 0;
                     } else {
@@ -160,7 +162,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
           };
 
           var centerGraph = function() {
-            if ($scope.graphLoaded && $scope.centerAtCurrentState) {
+            if ($scope.graphData() && $scope.centerAtCurrentState) {
               if ($scope.allowPanning) {
                 makeGraphPannable();
               }
@@ -257,7 +259,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
 
             for (var i = 0; i < $scope.augmentedLinks.length; i++) {
               // Style links if link properties and style mappings are
-              // provided
+              // provided.
               if (links[i].hasOwnProperty('linkProperty') &&
                   $scope.linkPropertyMapping) {
                 if ($scope.linkPropertyMapping.hasOwnProperty(
@@ -279,11 +281,6 @@ angular.module('oppia').directive('stateGraphVisualization', [
 
             var getNodeFillOpacity = function(nodeId) {
               return $scope.opacityMap ? $scope.opacityMap[nodeId] : 0.5;
-            };
-
-            $scope.isStateFlagged = function(nodeId) {
-              return $scope.highlightStates &&
-                $scope.highlightStates.hasOwnProperty(nodeId);
             };
 
             $scope.getNodeTitle = function(node) {
@@ -341,14 +338,14 @@ angular.module('oppia').directive('stateGraphVisualization', [
                 nodeData[nodeId].style += ('fill: ' + $scope.nodeFill + '; ');
               }
 
-              // Color nodes
+              // ---- Color nodes ----
               var nodeColors = $scope.getNodeColors();
               if (nodeColors) {
                 nodeData[nodeId].style += (
                   'fill: ' + nodeColors[nodeId] + '; ');
               }
 
-              // Add secondary label if it exists
+              // Add secondary label if it exists.
               if ($scope.nodeSecondaryLabels) {
                 if ($scope.nodeSecondaryLabels.hasOwnProperty(nodeId)) {
                   nodeData[nodeId].secondaryLabel = (
@@ -363,10 +360,10 @@ angular.module('oppia').directive('stateGraphVisualization', [
               nodeData[nodeId].nodeClass = (
                 currentNodeIsTerminal ? 'terminal-node' :
                 nodeId === $scope.currentStateId() ? 'current-node' :
-                nodeId === initStateId ? 'init-node' :
-                !(nodeData[nodeId].reachable &&
+                nodeId === initStateId ? 'init-node' : !(
+                  nodeData[nodeId].reachable &&
                   nodeData[nodeId].reachableFromEnd) ? 'bad-node' :
-                'normal-node');
+                  'normal-node');
 
               nodeData[nodeId].canDelete = (nodeId !== initStateId);
               $scope.nodeList.push(nodeData[nodeId]);
@@ -398,13 +395,11 @@ angular.module('oppia').directive('stateGraphVisualization', [
             }
           };
           ctrl.$onInit = function() {
-            $scope.$on('redrawGraph', function() {
-              redrawGraph();
-            });
-
-            $scope.$on('centerGraph', function() {
-              centerGraph();
-            });
+            ctrl.directiveSubscriptions.add(
+              RouterService.onCenterGraph.subscribe(() => {
+                centerGraph();
+              })
+            );
 
             $scope.$watch('graphData()', redrawGraph, true);
             $scope.$watch('currentStateId()', redrawGraph);
@@ -412,10 +407,19 @@ angular.module('oppia').directive('stateGraphVisualization', [
             // If statistics for a different version of the exploration are
             // loaded, this may change the opacities of the nodes.
             $scope.$watch('opacityMap', redrawGraph);
-            $(window).resize(redrawGraph);
+
+            ctrl.directiveSubscriptions.add(
+              WindowDimensionsService.getResizeEvent().subscribe(evt => {
+                redrawGraph();
+                $scope.$applyAsync();
+              })
+            );
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]
     };
   }]);
-/* eslint-enable angular/directive-restrict */

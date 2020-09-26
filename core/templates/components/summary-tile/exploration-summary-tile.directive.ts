@@ -68,24 +68,25 @@ angular.module('oppia').directive('explorationSummaryTile', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary-tile/exploration-summary-tile.directive.html'),
       link: function(scope, element) {
-        element.find('.exploration-summary-avatars').on('mouseenter',
+        element.find('.exploration-summary-avatars').on(
+          'mouseenter',
           function() {
-            element.find('.mask').attr('class',
-              'exploration-summary-tile-mask mask');
+            element.find('.mask').attr(
+              'class', 'exploration-summary-tile-mask mask');
             // As animation duration time may be 400ms, .stop(true) is used to
             // prevent the effects queue falling behind the mouse movement.
             // .hide(1) and .show(1) used to place the animation in the effects
             // queue.
-            element.find('.avatars-num-minus-one').stop(true).hide(1,
-              function() {
+            element.find('.avatars-num-minus-one').stop(true).hide(
+              1, function() {
                 element.find('.all-avatars').stop(true).slideDown();
               }
             );
           }
         );
 
-        element.find('.exploration-summary-avatars').on('mouseleave',
-          function() {
+        element.find('.exploration-summary-avatars').on(
+          'mouseleave', function() {
             element.find('.mask').attr('class', 'top-section-mask mask');
             element.find('.all-avatars').stop(true).slideUp(400, function() {
               element.find('.avatars-num-minus-one').stop(true).show(1);
@@ -94,11 +95,11 @@ angular.module('oppia').directive('explorationSummaryTile', [
         );
       },
       controller: [
-        '$scope', '$http', '$window', 'DateTimeFormatService',
+        '$scope', '$window', 'DateTimeFormatService',
         'RatingComputationService', 'UrlService', 'UserService',
         'WindowDimensionsService', 'ACTIVITY_TYPE_EXPLORATION',
         function(
-            $scope, $http, $window, DateTimeFormatService,
+            $scope, $window, DateTimeFormatService,
             RatingComputationService, UrlService, UserService,
             WindowDimensionsService, ACTIVITY_TYPE_EXPLORATION) {
           var ctrl = this;
@@ -210,13 +211,31 @@ angular.module('oppia').directive('explorationSummaryTile', [
             $scope.isWindowLarge = (
               WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
 
-            WindowDimensionsService.registerOnResizeHook(function() {
-              $scope.isWindowLarge = (
-                WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
-              $scope.$apply();
-            });
+            ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
+              subscribe(evt => {
+                $scope.isWindowLarge = (
+                  WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
+                $scope.$applyAsync();
+              });
+          };
+
+          ctrl.$onDestroy = function() {
+            if (ctrl.resizeSubscription) {
+              ctrl.resizeSubscription.unsubscribe();
+            }
           };
         }
       ]
     };
   }]);
+
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+@Directive({
+  selector: 'exploration-summary-tile'
+})
+export class ExplorationSummaryTileDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('explorationSummaryTile', elementRef, injector);
+  }
+}

@@ -17,12 +17,12 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import skill_services
+from core.domain import skill_fetchers
 from core.domain import topic_fetchers
 import feconf
+import python_utils
 
 
 class PracticeSessionsPage(base.BaseHandler):
@@ -31,9 +31,6 @@ class PracticeSessionsPage(base.BaseHandler):
     @acl_decorators.can_access_topic_viewer_page
     def get(self, _):
         """Handles GET requests."""
-
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
 
         self.render_template('practice-session-page.mainpage.html')
 
@@ -46,24 +43,30 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
     @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name):
 
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
-
         # Topic cannot be None as an exception will be thrown from its decorator
         # if so.
         topic = topic_fetchers.get_topic_by_name(topic_name)
+        comma_separated_subtopic_ids = self.request.get('selected_subtopic_ids')
+        selected_subtopic_ids = comma_separated_subtopic_ids.split(',')
+
+        selected_skill_ids = []
+        for subtopic in topic.subtopics:
+            # An error is not thrown here, since it's fine to just ignore the
+            # passed in subtopic IDs, if they don't exist, which would be the
+            # case if the creator deletes subtopics after the learner has
+            # loaded the topic viewer page.
+            if python_utils.UNICODE(subtopic.id) in selected_subtopic_ids:
+                selected_skill_ids.extend(subtopic.skill_ids)
         try:
-            skills = skill_services.get_multi_skills(topic.get_all_skill_ids())
+            skills = skill_fetchers.get_multi_skills(selected_skill_ids)
         except Exception as e:
             raise self.PageNotFoundException(e)
-        skill_descriptions = {}
+        skill_ids_to_descriptions_map = {}
         for skill in skills:
-            skill_descriptions[skill.id] = skill.description
-
-        topic_name = topic.name
+            skill_ids_to_descriptions_map[skill.id] = skill.description
 
         self.values.update({
             'topic_name': topic.name,
-            'skill_descriptions': skill_descriptions
+            'skill_ids_to_descriptions_map': skill_ids_to_descriptions_map
         })
         self.render_json(self.values)

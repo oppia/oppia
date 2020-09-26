@@ -10,5 +10,35 @@
 
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-success protractor-test-confirm-move-button" ng-click="done()">Save</button>
+  <button class="btn btn-success protractor-test-confirm-move-button" ng-click="confirm(selectedTopicIds)">Save</button>
 </div>
+
+<style>
+  @media screen and (max-width: 768px) {
+    .assign-skill-to-topic-modal .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0 auto;
+      padding: 0;
+    }
+    .assign-skill-to-topic-modal .modal-header {
+      background-color: #00609C;
+      padding: 12px 10px;
+    }
+    .assign-skill-to-topic-modal .modal-header h3 {
+      color: #FFFFFF;
+    }
+    .assign-skill-to-topic-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+    }
+    .assign-skill-to-topic-modal .modal-body {
+      padding: 0;
+    }
+    .assign-skill-to-topic-modal .modal-close-button {
+      color: #FFFFFF;
+      display: block;
+      font-size: 20px;
+    }
+  }
+</style>

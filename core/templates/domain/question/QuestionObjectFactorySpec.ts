@@ -46,11 +46,13 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/question/QuestionObjectFactory.ts');
+require('domain/state/StateObjectFactory.ts');
 
 describe('Question object factory', function() {
   var QuestionObjectFactory = null;
-  var _sampleQuestion = null;
-  var _sampleQuestionBackendDict = null;
+  var StateObjectFactory = null;
+  var sampleQuestion = null;
+  var sampleQuestionBackendDict = null;
   var misconceptionObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -107,6 +109,7 @@ describe('Question object factory', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
+    StateObjectFactory = $injector.get('StateObjectFactory');
     // The injector is required because this service is directly used in this
     // spec, therefore even though MisconceptionObjectFactory is upgraded to
     // Angular, it cannot be used just by instantiating it by its class but
@@ -116,7 +119,7 @@ describe('Question object factory', function() {
     // the specs.
     misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
-    _sampleQuestionBackendDict = {
+    sampleQuestionBackendDict = {
       id: 'question_id',
       question_state_data: {
         content: {
@@ -136,14 +139,20 @@ describe('Question object factory', function() {
               refresher_exploration_id: null
             },
             rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
+              rule_type: 'Equals',
+              inputs: {x: 10}
             }],
           }],
           confirmed_unclassified_answers: [],
-          customization_args: {},
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: null,
             feedback: {
@@ -192,17 +201,29 @@ describe('Question object factory', function() {
         },
         solicit_answer_details: false
       },
+      inapplicable_skill_misconception_ids: ['a-1', 'b-2'],
       language_code: 'en',
       version: 1
     };
-    _sampleQuestion = QuestionObjectFactory.createFromBackendDict(
-      _sampleQuestionBackendDict);
+    sampleQuestion = QuestionObjectFactory.createFromBackendDict(
+      sampleQuestionBackendDict);
   }));
 
   it('should correctly get various fields of the question', function() {
-    expect(_sampleQuestion.getId()).toEqual('question_id');
-    expect(_sampleQuestion.getLanguageCode()).toEqual('en');
-    var stateData = _sampleQuestion.getStateData();
+    expect(sampleQuestion.getId()).toEqual('question_id');
+    expect(sampleQuestion.getLanguageCode()).toEqual('en');
+    sampleQuestion.setLanguageCode('cn');
+    expect(sampleQuestion.getLanguageCode()).toEqual('cn');
+    expect(sampleQuestion.getVersion()).toEqual(1);
+    sampleQuestion.setLinkedSkillIds(['skill_id1', 'skill_id2']);
+    expect(sampleQuestion.getLinkedSkillIds()).toEqual(
+      ['skill_id1', 'skill_id2']);
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds()).toEqual(
+      ['a-1', 'b-2']);
+    sampleQuestion.setInapplicableSkillMisconceptionIds(['abc-123']);
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds()).toEqual(
+      ['abc-123']);
+    var stateData = sampleQuestion.getStateData();
     expect(stateData.name).toEqual('question');
     expect(stateData.content.getHtml()).toEqual('Question 1');
     var interaction = stateData.interaction;
@@ -218,15 +239,17 @@ describe('Question object factory', function() {
   });
 
   it('should correctly get backend dict', function() {
-    var newQuestionBackendDict = _sampleQuestion.toBackendDict(true);
+    var newQuestionBackendDict = sampleQuestion.toBackendDict(true);
     expect(newQuestionBackendDict.id).toEqual(null);
     expect(newQuestionBackendDict.linked_skill_ids).not.toBeDefined();
-    expect(newQuestionBackendDict.version).toEqual(1);
-    expect(_sampleQuestion.toBackendDict(false).id).toEqual('question_id');
+    expect(newQuestionBackendDict.inapplicable_skill_misconception_ids).toEqual(
+      ['a-1', 'b-2']);
+    expect(newQuestionBackendDict.version).toEqual(0);
+    expect(sampleQuestion.toBackendDict(false).id).toEqual('question_id');
   });
 
-  it('should correctly validate question', function() {
-    var interaction = _sampleQuestion.getStateData().interaction;
+  it('should correctly report unaddressed misconceptions', function() {
+    var interaction = sampleQuestion.getStateData().interaction;
     var misconception1 = misconceptionObjectFactory.create(
       'id', 'name', 'notes', 'feedback', true);
     var misconception2 = misconceptionObjectFactory.create(
@@ -237,23 +260,46 @@ describe('Question object factory', function() {
       skillId1: [misconception1],
       skillId2: [misconception2, misconception3]
     };
-    expect(
-      _sampleQuestion.validate(misconceptionsDict)).toEqual(
-      'Click on (or create) an answer ' +
-      'that is neither marked correct nor is a default answer (marked ' +
-      'above as [All other answers]) and tag the following misconceptions ' +
-      'to that answer group: name, name_2');
+    interaction.answerGroups[0].outcome.labelledAsCorrect = false;
+    interaction.answerGroups[0].taggedSkillMisconceptionId = 'skillId1-id';
+    expect(sampleQuestion.getUnaddressedMisconceptionNames(
+      misconceptionsDict)).toEqual(['name_2', 'name_3']);
+  });
+
+  it('should correctly validate question', function() {
+    var interaction = sampleQuestion.getStateData().interaction;
+
+    expect(sampleQuestion.getValidationErrorMessage()).toBeNull();
 
     interaction.answerGroups[0].outcome.labelledAsCorrect = false;
-    expect(_sampleQuestion.validate([])).toEqual(
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
       'At least one answer should be marked correct');
 
     interaction.solution = null;
-    expect(_sampleQuestion.validate([])).toEqual(
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
       'A solution must be specified');
 
     interaction.hints = [];
-    expect(_sampleQuestion.validate([])).toEqual(
-      'At least 1 hint should be specfied');
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
+      'At least 1 hint should be specified');
+
+    interaction.id = null;
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
+      'An interaction must be specified');
+  });
+
+  it('should correctly create a Default Question', function() {
+    var sampleQuestion1 = QuestionObjectFactory.createDefaultQuestion(
+      ['skill_id3', 'skill_id4']);
+    var state = StateObjectFactory.createDefaultState(null);
+
+    expect(sampleQuestion1.getId()).toEqual(null);
+    expect(sampleQuestion1.getLanguageCode()).toEqual('en');
+    expect(sampleQuestion1.getVersion()).toEqual(1);
+    expect(sampleQuestion1.getStateData()).toEqual(state);
+    expect(sampleQuestion1.getLinkedSkillIds()).toEqual(
+      ['skill_id3', 'skill_id4']);
+    expect(sampleQuestion.getInapplicableSkillMisconceptionIds()).toEqual(
+      ['a-1', 'b-2']);
   });
 });

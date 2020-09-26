@@ -46,6 +46,7 @@ class RecentUpdatesRealtimeModel(
     jobs.BaseRealtimeDatastoreClassForContinuousComputations class for more
     details.
     """
+
     pass
 
 
@@ -58,6 +59,7 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
     propagating new updates to the dashboard; the length of the delay will be
     approximately the time it takes a batch job to run.
     """
+
     @classmethod
     def get_event_types_listened_to(cls):
         """Returns a list of event types that this class subscribes to."""
@@ -80,7 +82,7 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
             user_id: str. The unique id of the user.
 
         Returns:
-            tuple(job_queued_msec, recent_user_changes), where:
+            tuple(job_queued_msec, recent_user_changes). Where:
                 job_queued_msec: float or None. The time when the job was
                     queued in milliseconds since the epoch, or None if the job
                     does not exist.
@@ -111,6 +113,7 @@ class RecentUpdatesMRJobManager(
     """Manager for a MapReduce job that computes a list of recent notifications
     for explorations, collections, and feedback threads watched by a user.
     """
+
     @classmethod
     def _get_continuous_computation_class(cls):
         return DashboardRecentUpdatesAggregator
@@ -140,7 +143,7 @@ class RecentUpdatesMRJobManager(
                 feconf.COMMIT_MESSAGE_EXPLORATION_DELETED.
 
         Returns:
-            tuple(most_recent_commits, tracked_models_for_feedback), where:
+            tuple(most_recent_commits, tracked_models_for_feedback). Where:
                 most_recent_commits: list(dict). Each dict has the keys:
                     type: str. The value of the commit_type argument.
                     activity_id: str. The id of the activity for this commit.
@@ -216,7 +219,7 @@ class RecentUpdatesMRJobManager(
             item: UserSubscriptionsModel. An instance of UserSubscriptionsModel.
 
         Yields:
-            tuple(key, recent_activity_commits), where:
+            tuple(key, recent_activity_commits). Where:
                 key: str. Uses the form 'user_id@job_queued_msec'.
                 recent_activity_commits: dict. Has the keys:
                     type: str. Either feconf.UPDATE_TYPE_EXPLORATION_COMMIT or
@@ -322,6 +325,7 @@ class UserStatsRealtimeModel(
     jobs.BaseRealtimeDatastoreClassForContinuousComputations class for more
     details.
     """
+
     total_plays = ndb.IntegerProperty(default=0)
     num_ratings = ndb.IntegerProperty(default=0)
     average_ratings = ndb.FloatProperty(indexed=True)
@@ -336,6 +340,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
     new updates to the view; the length of the delay will be approximately the
     time it takes a batch job to run.
     """
+
     @classmethod
     def get_event_types_listened_to(cls):
         """Returns a list of event types that this class subscribes to."""
@@ -363,11 +368,11 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 triggered and the total play count is incremented. If he/she
                 rates an exploration, an event of type `rate` is triggered and
                 average rating of the realtime model is refreshed.
-            *args: tuple(*). If event_type is 'start', then this is a 1-element
-                tuple containing:
+            *args: list(*). If event_type is 'start', then this is a 1-element
+                list containing:
                     str. The id of the exploration currently being played.
                 If event_type is 'rate_exploration', then this is a 3-element
-                tuple containing:
+                list containing:
                     str. The id of the exploration currently being played.
                     float. The rating given by user to the exploration.
                     float. The old rating of the exploration, before it is
@@ -512,6 +517,7 @@ class UserStatsMRJobManager(
             reach: sum(card.answers_given for card in all_cards) ^ (2 / 3).
             fractional_contribution: percent of commits by this user.
     """
+
     @classmethod
     def _get_continuous_computation_class(cls):
         return UserStatsAggregator
@@ -531,7 +537,7 @@ class UserStatsMRJobManager(
             item: ExpSummaryModel. An instance of ExpSummaryModel.
 
         Yields:
-            tuple(owner_id, exploration_data), where:
+            tuple(owner_id, exploration_data). Where:
                 owner_id: str. The unique id of the user.
                 exploration_data: dict. Has the keys:
                     exploration_impact_score: float. The impact score of all the

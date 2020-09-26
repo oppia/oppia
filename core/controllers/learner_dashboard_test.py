@@ -34,6 +34,21 @@ import utils
     models.NAMES.suggestion, models.NAMES.feedback])
 
 
+class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
+    """Test for redirecting the old learner dashboard page URL
+    to the new one.
+    """
+
+    def test_old_learner_dashboard_page_url(self):
+        """Test to validate that the old learner dashboard page url redirects
+        to the new one.
+        """
+        response = self.get_html_response(
+            '/learner_dashboard', expected_status_int=301)
+        self.assertEqual(
+            'http://localhost/learner-dashboard', response.headers['location'])
+
+
 class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
 
     OWNER_EMAIL = 'owner@example.com'
@@ -285,7 +300,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
-        self.assertIn('{"title": "Learner Dashboard - Oppia"})', response.body)
+        self.assertIn('{"title": "Learner Dashboard | Oppia"})', response.body)
 
         self.logout()
 
@@ -399,9 +414,8 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             messages_summary['author_username'], self.EDITOR_USERNAME)
-        self.assertTrue(
-            messages_summary['author_picture_data_url'].startswith(
-                'data:image/png;'))
+        self.assertTrue(test_utils.check_image_png_or_webp(
+            messages_summary['author_picture_data_url']))
         self.assertFalse(messages_summary.get('suggestion_html'))
         self.assertFalse(messages_summary.get('current_content_html'))
         self.assertFalse(messages_summary.get('description'))
@@ -419,7 +433,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID_1, 1,
             suggestion_models.STATUS_IN_REVIEW, self.editor_id, None,
-            change_cmd, 'score category', thread_id)
+            change_cmd, 'score category', thread_id, None)
 
         suggestion_thread = feedback_services.get_thread(thread_id)
         suggestion = suggestion_services.get_suggestion_by_id(thread_id)
@@ -433,12 +447,11 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             messages_summary['author_username'], self.EDITOR_USERNAME)
-        self.assertTrue(
-            messages_summary['author_picture_data_url'].startswith(
-                'data:image/png;'))
+        self.assertTrue(test_utils.check_image_png_or_webp(
+            messages_summary['author_picture_data_url']))
         self.assertEqual(
             utils.get_time_in_millisecs(first_suggestion.created_on),
-            messages_summary['created_on'])
+            messages_summary['created_on_msecs'])
         self.assertEqual(
             messages_summary['suggestion_html'], '<p>new content html</p>')
         self.assertEqual(

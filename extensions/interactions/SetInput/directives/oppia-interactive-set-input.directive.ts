@@ -23,11 +23,12 @@
 require('interactions/SetInput/directives/set-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-require('services/contextual/window-dimensions.service.ts');
-require('services/html-escaper.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveSetInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'InteractionAttributesExtractorService',
+  function(InteractionAttributesExtractorService) {
     return {
       restrict: 'E',
       scope: {},
@@ -35,11 +36,11 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
       template: require('./set-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', '$translate', 'SetInputRulesService',
-        'WindowDimensionsService', 'CurrentInteractionService',
+        '$attrs', '$translate', 'CurrentInteractionService',
+        'SetInputRulesService',
         function(
-            $attrs, $translate, SetInputRulesService,
-            WindowDimensionsService, CurrentInteractionService) {
+            $attrs, $translate, CurrentInteractionService,
+            SetInputRulesService) {
           var ctrl = this;
           var hasDuplicates = function(answer) {
             for (var i = 0; i < answer.length; i++) {
@@ -70,16 +71,21 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
           };
 
           ctrl.isAnswerValid = function() {
-            return (ctrl.answer.length > 0 &&
-              !hasBlankOption(ctrl.answer));
+            return (
+              ctrl.answer.length > 0 && !hasBlankOption(ctrl.answer));
           };
 
           var submitAnswerFn = function() {
             ctrl.submitAnswer(ctrl.answer);
           };
           ctrl.$onInit = function() {
-            ctrl.buttonText = HtmlEscaperService.escapedJsonToObj(
-              $attrs.buttonTextWithValue);
+            const {
+              buttonText
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'SetInput',
+              $attrs
+            );
+            ctrl.buttonText = buttonText.getUnicode();
             ctrl.schema = {
               type: 'list',
               items: {
@@ -95,7 +101,7 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
               ctrl.schema.ui_config.add_element_text = ctrl.buttonText;
             }
 
-            // Adds an input field by default
+            // Adds an input field by default.
             ctrl.answer = [''];
 
             CurrentInteractionService.registerCurrentInteraction(

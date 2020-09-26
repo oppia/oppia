@@ -19,6 +19,13 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('services/id-generation.service.ts');
 
+interface ImageUploaderCustomScope extends ng.IScope {
+  errorMessage?: string;
+  onFileChanged?: (file: File, fileName?: string) => void;
+  fileInputClassName?: string;
+  getAllowedImageFormats?: () => string[];
+}
+
 angular.module('oppia').directive('imageUploader', [
   'IdGenerationService', 'UrlInterpolationService',
   function(IdGenerationService, UrlInterpolationService) {
@@ -28,12 +35,13 @@ angular.module('oppia').directive('imageUploader', [
         height: '@',
         onFileChanged: '=',
         errorMessage: '@',
-        width: '@'
+        width: '@',
+        getAllowedImageFormats: '&allowedImageFormats'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/custom-forms-directives/' +
         'image-uploader.directive.html'),
-      link: function(scope: ICustomScope, elt) {
+      link: function(scope: ImageUploaderCustomScope, elt) {
         var onDragEnd = function(e) {
           e.preventDefault();
           $('.image-uploader-drop-area').removeClass(
@@ -45,24 +53,55 @@ angular.module('oppia').directive('imageUploader', [
             return 'This file is not recognized as an image.';
           }
 
-          if (!file.type.match('image.jpeg') &&
-            !file.type.match('image.gif') &&
-            !file.type.match('image.jpg') &&
-            !file.type.match('image.png')) {
+          var imageTypeMapping = {
+            jpeg: {
+              format: 'image/jpeg',
+              fileExtension: /\.jp(e?)g$/,
+            },
+            jpg: {
+              format: 'image/jpg',
+              fileExtension: /\.jp(e?)g$/,
+            },
+            gif: {
+              format: 'image/gif',
+              fileExtension: /\.gif$/,
+            },
+            png: {
+              format: 'image/png',
+              fileExtension: /\.png$/,
+            },
+            svg: {
+              format: 'image/svg\\+xml',
+              fileExtension: /\.svg$/,
+            }
+          };
+          var imageHasInvalidFormat = true;
+          for (var i = 0; i < scope.getAllowedImageFormats().length; i++) {
+            var imageType = scope.getAllowedImageFormats()[i];
+            if (!imageTypeMapping.hasOwnProperty(imageType)) {
+              return (
+                imageType + ' is not in the list of allowed image formats.');
+            }
+            if (file.type.match(imageTypeMapping[imageType].format)) {
+              imageHasInvalidFormat = false;
+              if (
+                !file.name.match(imageTypeMapping[imageType].fileExtension)) {
+                return (
+                  'This image format does not match the filename extension.');
+              }
+            }
+          }
+
+          if (imageHasInvalidFormat) {
             return 'This image format is not supported.';
           }
 
-          if ((file.type.match(/jp(e?)g$/) && !file.name.match(/\.jp(e?)g$/)) ||
-            (file.type.match(/gif$/) && !file.name.match(/\.gif$/)) ||
-            (file.type.match(/png$/) && !file.name.match(/\.png$/))) {
-            return 'This image format does not match the filename extension.';
-          }
-
-          var ONE_MB_IN_BYTES = 1048576;
-          if (file.size > ONE_MB_IN_BYTES) {
-            var currentSize = (file.size / ONE_MB_IN_BYTES).toFixed(1) + ' MB';
-            return 'The maximum allowed file size is 1 MB' +
-              ' (' + currentSize + ' given).';
+          const HUNDRED_KB_IN_BYTES = 100 * 1024;
+          if (file.size > HUNDRED_KB_IN_BYTES) {
+            var currentSizeInKb = (
+              (file.size * 100 / HUNDRED_KB_IN_BYTES).toFixed(1) + '  KB');
+            return 'The maximum allowed file size is 100 KB' +
+              ' (' + currentSizeInKb + ' given).';
           }
 
           return null;

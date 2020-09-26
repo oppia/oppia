@@ -40,16 +40,16 @@ import release_constants
 from . import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+_PY_GITHUB_PATH = os.path.join(
+    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
 sys.path.insert(0, _PY_GITHUB_PATH)
 
-# pylint: disable=wrong-import-position
-import github # isort:skip
-# pylint: enable=wrong-import-position
+import github # isort:skip  pylint: disable=wrong-import-position
 
 
 class MockPsutilProcess(python_utils.OBJECT):
     """A mock class for Process class in Psutil."""
+
     cmdlines = [
         ['dev_appserver.py', '--host', '0.0.0.0', '--port', '9001'],
         ['downloads']
@@ -57,6 +57,7 @@ class MockPsutilProcess(python_utils.OBJECT):
 
     def __init__(self, index):
         """Constructor for this mock object.
+
         Args:
             index: int. The index of process to be checked.
         """
@@ -144,51 +145,92 @@ class CommonTests(test_utils.GenericTestBase):
         with getcwd_swap, basename_swap, isdir_swap:
             common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
+    def test_open_new_tab_in_browser_if_possible_with_user_manually_opening_url(
+            self):
+        try:
+            check_function_calls = {
+                'input_gets_called': 0,
+                'check_call_gets_called': False
+            }
+            expected_check_function_calls = {
+                'input_gets_called': 1,
+                'check_call_gets_called': False
+            }
+            def mock_call(unused_cmd_tokens):
+                return 0
+            def mock_check_call(unused_cmd_tokens):
+                check_function_calls['check_call_gets_called'] = True
+            def mock_input():
+                check_function_calls['input_gets_called'] += 1
+                return 'n'
+            call_swap = self.swap(subprocess, 'call', mock_call)
+            check_call_swap = self.swap(
+                subprocess, 'check_call', mock_check_call)
+            input_swap = self.swap(python_utils, 'INPUT', mock_input)
+            with call_swap, check_call_swap, input_swap:
+                common.open_new_tab_in_browser_if_possible('test-url')
+            self.assertEqual(
+                check_function_calls, expected_check_function_calls)
+        finally:
+            common.USER_PREFERENCES['open_new_tab_in_browser'] = None
+
     def test_open_new_tab_in_browser_if_possible_with_url_opening_correctly(
             self):
-        check_function_calls = {
-            'input_gets_called': False,
-            'check_call_gets_called': False
-        }
-        expected_check_function_calls = {
-            'input_gets_called': False,
-            'check_call_gets_called': True
-        }
-        def mock_call(unused_cmd_tokens):
-            return 0
-        def mock_check_call(unused_cmd_tokens):
-            check_function_calls['check_call_gets_called'] = True
-        def mock_input():
-            check_function_calls['input_gets_called'] = True
-        call_swap = self.swap(subprocess, 'call', mock_call)
-        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
-        input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        with call_swap, check_call_swap, input_swap:
-            common.open_new_tab_in_browser_if_possible('test-url')
-        self.assertEqual(check_function_calls, expected_check_function_calls)
+        try:
+            check_function_calls = {
+                'input_gets_called': 0,
+                'check_call_gets_called': False
+            }
+            expected_check_function_calls = {
+                'input_gets_called': 1,
+                'check_call_gets_called': True
+            }
+            def mock_call(unused_cmd_tokens):
+                return 0
+            def mock_check_call(unused_cmd_tokens):
+                check_function_calls['check_call_gets_called'] = True
+            def mock_input():
+                check_function_calls['input_gets_called'] += 1
+                return 'y'
+            call_swap = self.swap(subprocess, 'call', mock_call)
+            check_call_swap = self.swap(
+                subprocess, 'check_call', mock_check_call)
+            input_swap = self.swap(python_utils, 'INPUT', mock_input)
+            with call_swap, check_call_swap, input_swap:
+                common.open_new_tab_in_browser_if_possible('test-url')
+            self.assertEqual(
+                check_function_calls, expected_check_function_calls)
+        finally:
+            common.USER_PREFERENCES['open_new_tab_in_browser'] = None
 
     def test_open_new_tab_in_browser_if_possible_with_url_not_opening_correctly(
             self):
-        check_function_calls = {
-            'input_gets_called': False,
-            'check_call_gets_called': False
-        }
-        expected_check_function_calls = {
-            'input_gets_called': True,
-            'check_call_gets_called': False
-        }
-        def mock_call(unused_cmd_tokens):
-            return 1
-        def mock_check_call(unused_cmd_tokens):
-            check_function_calls['check_call_gets_called'] = True
-        def mock_input():
-            check_function_calls['input_gets_called'] = True
-        call_swap = self.swap(subprocess, 'call', mock_call)
-        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
-        input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        with call_swap, check_call_swap, input_swap:
-            common.open_new_tab_in_browser_if_possible('test-url')
-        self.assertEqual(check_function_calls, expected_check_function_calls)
+        try:
+            check_function_calls = {
+                'input_gets_called': 0,
+                'check_call_gets_called': False
+            }
+            expected_check_function_calls = {
+                'input_gets_called': 2,
+                'check_call_gets_called': False
+            }
+            def mock_call(unused_cmd_tokens):
+                return 1
+            def mock_check_call(unused_cmd_tokens):
+                check_function_calls['check_call_gets_called'] = True
+            def mock_input():
+                check_function_calls['input_gets_called'] += 1
+                return 'y'
+            call_swap = self.swap(subprocess, 'call', mock_call)
+            check_call_swap = self.swap(
+                subprocess, 'check_call', mock_check_call)
+            input_swap = self.swap(python_utils, 'INPUT', mock_input)
+            with call_swap, check_call_swap, input_swap:
+                common.open_new_tab_in_browser_if_possible('test-url')
+            self.assertEqual(
+                check_function_calls, expected_check_function_calls)
+        finally:
+            common.USER_PREFERENCES['open_new_tab_in_browser'] = None
 
     def test_get_remote_alias_with_correct_alias(self):
         def mock_check_output(unused_cmd_tokens):
@@ -248,6 +290,20 @@ class CommonTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Invalid branch name: invalid-branch.'):
             common.get_current_release_version_number('invalid-branch')
+
+    def test_is_current_branch_a_hotfix_branch_with_non_hotfix_branch(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'On branch release-1.2.3'
+        with self.swap(
+            subprocess, 'check_output', mock_check_output):
+            self.assertEqual(common.is_current_branch_a_hotfix_branch(), False)
+
+    def test_is_current_branch_a_hotfix_branch_with_hotfix_branch(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'On branch release-1.2.3-hotfix-1'
+        with self.swap(
+            subprocess, 'check_output', mock_check_output):
+            self.assertEqual(common.is_current_branch_a_hotfix_branch(), True)
 
     def test_is_current_branch_a_release_branch_with_release_branch(self):
         def mock_check_output(unused_cmd_tokens):
@@ -314,10 +370,8 @@ class CommonTests(test_utils.GenericTestBase):
             return False
         def mock_chdir(unused_dirpath):
             pass
-        # pylint: disable=unused-argument
-        def mock_popen(unused_cmd, stdin, stdout, stderr):
+        def mock_popen(unused_cmd, stdin, stdout, stderr):  # pylint: disable=unused-argument
             return process
-        # pylint: enable=unused-argument
         def mock_communicate(unused_self):
             return ('Output', 'Invalid')
         isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
@@ -341,10 +395,8 @@ class CommonTests(test_utils.GenericTestBase):
             return False
         def mock_chdir(unused_dirpath):
             pass
-        # pylint: disable=unused-argument
-        def mock_popen(unused_cmd, stdin, stdout, stderr):
+        def mock_popen(unused_cmd, stdin, stdout, stderr):  # pylint: disable=unused-argument
             return process
-        # pylint: enable=unused-argument
         def mock_communicate(unused_self):
             return ('Output', 'You\'ve successfully authenticated!')
         def mock_check_call(unused_cmd_tokens):
@@ -355,6 +407,8 @@ class CommonTests(test_utils.GenericTestBase):
             pass
         def mock_get_remote_alias(unused_url):
             return 'remote'
+        def mock_ask_user_to_confirm(unused_msg):
+            pass
         isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
         chdir_swap = self.swap(os, 'chdir', mock_chdir)
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
@@ -370,8 +424,10 @@ class CommonTests(test_utils.GenericTestBase):
             mock_verify_current_branch_name)
         get_remote_alias_swap = self.swap(
             common, 'get_remote_alias', mock_get_remote_alias)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
         with isdir_swap, chdir_swap, popen_swap, communicate_swap:
-            with check_call_swap, verify_local_repo_swap:
+            with check_call_swap, verify_local_repo_swap, ask_user_swap:
                 with verify_current_branch_name_swap, get_remote_alias_swap:
                     (
                         common
@@ -424,7 +480,7 @@ class CommonTests(test_utils.GenericTestBase):
 
             Args:
                 new_target: TextIOWrapper. The new target to which stdout is
-                redirected.
+                    redirected.
 
             Yields:
                 TextIOWrapper. The new target.
@@ -470,18 +526,14 @@ class CommonTests(test_utils.GenericTestBase):
             common.ask_user_to_confirm('Testing')
 
     def test_get_personal_access_token_with_valid_token(self):
-        # pylint: disable=unused-argument
-        def mock_getpass(prompt):
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
             return 'token'
-        # pylint: enable=unused-argument
         with self.swap(getpass, 'getpass', mock_getpass):
             self.assertEqual(common.get_personal_access_token(), 'token')
 
     def test_get_personal_access_token_with_token_as_none(self):
-        # pylint: disable=unused-argument
-        def mock_getpass(prompt):
+        def mock_getpass(prompt):  # pylint: disable=unused-argument
             return None
-        # pylint: enable=unused-argument
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
         with getpass_swap, self.assertRaisesRegexp(
             Exception,
@@ -493,12 +545,10 @@ class CommonTests(test_utils.GenericTestBase):
     def test_closed_blocking_bugs_milestone_results_in_exception(self):
         mock_repo = github.Repository.Repository(
             requester='', headers='', attributes={}, completed='')
-        # pylint: disable=unused-argument
-        def mock_get_milestone(unused_self, number):
+        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
             return github.Milestone.Milestone(
                 requester='', headers='',
                 attributes={'state': 'closed'}, completed='')
-        # pylint: enable=unused-argument
         get_milestone_swap = self.swap(
             github.Repository.Repository, 'get_milestone', mock_get_milestone)
         with get_milestone_swap, self.assertRaisesRegexp(
@@ -510,12 +560,10 @@ class CommonTests(test_utils.GenericTestBase):
             requester='', headers='', attributes={}, completed='')
         def mock_open_tab(unused_url):
             pass
-        # pylint: disable=unused-argument
-        def mock_get_milestone(unused_self, number):
+        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
             return github.Milestone.Milestone(
                 requester='', headers='',
                 attributes={'open_issues': 10, 'state': 'open'}, completed='')
-        # pylint: enable=unused-argument
         get_milestone_swap = self.swap(
             github.Repository.Repository, 'get_milestone', mock_get_milestone)
         open_tab_swap = self.swap(
@@ -530,12 +578,10 @@ class CommonTests(test_utils.GenericTestBase):
     def test_zero_blocking_bug_issue_count_results_in_no_exception(self):
         mock_repo = github.Repository.Repository(
             requester='', headers='', attributes={}, completed='')
-        # pylint: disable=unused-argument
-        def mock_get_milestone(unused_self, number):
+        def mock_get_milestone(unused_self, number):  # pylint: disable=unused-argument
             return github.Milestone.Milestone(
                 requester='', headers='',
                 attributes={'open_issues': 0, 'state': 'open'}, completed='')
-        # pylint: enable=unused-argument
         with self.swap(
             github.Repository.Repository, 'get_milestone', mock_get_milestone):
             common.check_blocking_bug_issue_count(mock_repo)
@@ -563,10 +609,8 @@ class CommonTests(test_utils.GenericTestBase):
             attributes={
                 'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
             completed='')
-        # pylint: disable=unused-argument
-        def mock_get_issues(unused_self, state, labels):
+        def mock_get_issues(unused_self, state, labels):  # pylint: disable=unused-argument
             return [pull1, pull2]
-        # pylint: enable=unused-argument
         def mock_get_label(unused_self, unused_name):
             return [label]
 
@@ -601,10 +645,8 @@ class CommonTests(test_utils.GenericTestBase):
             attributes={
                 'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
             completed='')
-        # pylint: disable=unused-argument
-        def mock_get_issues(unused_self, state, labels):
+        def mock_get_issues(unused_self, state, labels):  # pylint: disable=unused-argument
             return [pull1, pull2]
-        # pylint: enable=unused-argument
         def mock_get_label(unused_self, unused_name):
             return [label]
 
@@ -712,10 +754,11 @@ class CommonTests(test_utils.GenericTestBase):
             origin_content = f.readlines()
 
         def mock_compile(unused_arg):
-            raise ValueError
+            raise ValueError('Exception raised from compile()')
 
         compile_swap = self.swap_with_checks(re, 'compile', mock_compile)
-        with self.assertRaises(ValueError), compile_swap:
+        with self.assertRaisesRegexp(
+            ValueError, r'Exception raised from compile\(\)'), compile_swap:
             common.inplace_replace_file(
                 origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
         self.assertFalse(os.path.isfile(backup_file))
@@ -752,3 +795,112 @@ class CommonTests(test_utils.GenericTestBase):
         finally:
             if os.path.exists('readme_test_dir'):
                 shutil.rmtree('readme_test_dir')
+
+    def test_windows_os_throws_exception_when_starting_redis_server(self):
+        def mock_is_windows_os():
+            return True
+        windows_not_supported_exception = self.assertRaisesRegexp(
+            Exception,
+            'The redis command line interface is not installed because your '
+            'machine is on the Windows operating system. The redis server '
+            'cannot start.')
+        swap_os_check = self.swap(common, 'is_windows_os', mock_is_windows_os)
+        with swap_os_check, windows_not_supported_exception:
+            common.start_redis_server()
+
+    def test_windows_os_throws_exception_when_stopping_redis_server(self):
+        def mock_is_windows_os():
+            return True
+        windows_not_supported_exception = self.assertRaisesRegexp(
+            Exception,
+            'The redis command line interface is not installed because your '
+            'machine is on the Windows operating system. There is no redis '
+            'server to shutdown.')
+        swap_os_check = self.swap(common, 'is_windows_os', mock_is_windows_os)
+
+        with swap_os_check, windows_not_supported_exception:
+            common.stop_redis_server()
+
+    def test_start_and_stop_server_calls_are_called(self):
+        # Test that starting the server calls subprocess.call().
+        check_function_calls = {
+            'subprocess_call_is_called': False
+        }
+        expected_check_function_calls = {
+            'subprocess_call_is_called': True
+        }
+
+        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            check_function_calls['subprocess_call_is_called'] = True
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
+
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    """Return required method."""
+                    return '', ''
+            return Ret()
+
+        def mock_wait_for_port_to_be_open(port): # pylint: disable=unused-argument
+            return
+
+        swap_call = self.swap(subprocess, 'call', mock_call)
+        swap_wait_for_port_to_be_open = self.swap(
+            common, 'wait_for_port_to_be_open',
+            mock_wait_for_port_to_be_open)
+        with swap_call, swap_wait_for_port_to_be_open:
+            common.start_redis_server()
+
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+        # Test that stopping the server calls subprocess.call().
+        check_function_calls = {
+            'subprocess_call_is_called': False
+        }
+        expected_check_function_calls = {
+            'subprocess_call_is_called': True
+        }
+
+        swap_call = self.swap(subprocess, 'call', mock_call)
+        with swap_call:
+            common.stop_redis_server()
+
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_start_server_removes_redis_dump(self):
+        check_function_calls = {
+            'os_remove_is_called': False
+        }
+
+        def mock_os_remove_file(file_path): # pylint: disable=unused-argument
+            check_function_calls['os_remove_is_called'] = True
+
+        def mock_os_path_exists(file_path): # pylint: disable=unused-argument
+            return True
+
+        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
+
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    """Return required method."""
+                    return '', ''
+            return Ret()
+
+        def mock_wait_for_port_to_be_open(port): # pylint: disable=unused-argument
+            return
+
+        swap_call = self.swap(subprocess, 'call', mock_call)
+        swap_wait_for_port_to_be_open = self.swap(
+            common, 'wait_for_port_to_be_open',
+            mock_wait_for_port_to_be_open)
+        swap_os_remove = self.swap(os, 'remove', mock_os_remove_file)
+        swap_os_path_exists = self.swap(os.path, 'exists', mock_os_path_exists)
+        with swap_call, swap_wait_for_port_to_be_open, swap_os_remove, (
+            swap_os_path_exists):
+            common.start_redis_server()
+
+        self.assertTrue(check_function_calls['os_remove_is_called'])

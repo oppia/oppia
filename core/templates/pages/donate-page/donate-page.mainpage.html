@@ -6,23 +6,24 @@
   </head>
 
   <body>
-    <service-bootstrap></service-bootstrap>
-    <div ng-controller="Base">
-      <base-content>
-        <navbar-breadcrumb>
-          <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-            <li>
-              <span class="oppia-navbar-breadcrumb-separator"></span>
-              Donate
-            </li>
-          </ul>
-        </navbar-breadcrumb>
+    <oppia-root>
+      <div ng-controller="Base">
+        <base-content>
+          <navbar-breadcrumb>
+            <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+              <li>
+                <span class="oppia-navbar-breadcrumb-separator"></span>
+                Donate
+              </li>
+            </ul>
+          </navbar-breadcrumb>
 
-        <content>
-          <donate-page></donate-page>
-        </content>
-      </base-content>
-    </div>
+          <content>
+            <donate-page></donate-page>
+          </content>
+        </base-content>
+      </div>
+    </oppia-root>
     @load('pages/footer_js_libs.html')
   </body>
 </html>

@@ -17,7 +17,6 @@
  */
 
 require('domain/skill/concept-card-backend-api.service.ts');
-require('domain/skill/ConceptCardObjectFactory.ts');
 require('directives/angular-html-bind.directive.ts');
 require('filters/format-rte-preview.filter.ts');
 
@@ -34,11 +33,9 @@ angular.module('oppia').directive('conceptCard', [
         '/components/concept-card/concept-card.template.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$rootScope',
-        'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
+        '$rootScope', '$scope', 'ConceptCardBackendApiService',
         function(
-            $scope, $filter, $rootScope,
-            ConceptCardBackendApiService, ConceptCardObjectFactory) {
+            $rootScope, $scope, ConceptCardBackendApiService) {
           var ctrl = this;
           ctrl.isLastWorkedExample = function() {
             return ctrl.numberOfWorkedExamplesShown ===
@@ -46,6 +43,7 @@ angular.module('oppia').directive('conceptCard', [
           };
 
           ctrl.showMoreWorkedExamples = function() {
+            ctrl.explanationIsShown = false;
             ctrl.numberOfWorkedExamplesShown++;
           };
 
@@ -56,18 +54,27 @@ angular.module('oppia').directive('conceptCard', [
             ctrl.loadingMessage = 'Loading';
             $scope.$watch('$ctrl.index', function(newIndex) {
               ctrl.currentConceptCard = ctrl.conceptCards[newIndex];
-              ctrl.numberOfWorkedExamplesShown = 0;
+              if (ctrl.currentConceptCard) {
+                ctrl.numberOfWorkedExamplesShown = 0;
+                if (ctrl.currentConceptCard.getWorkedExamples().length > 0) {
+                  ctrl.numberOfWorkedExamplesShown = 1;
+                }
+              }
             });
             ConceptCardBackendApiService.loadConceptCards(
               ctrl.getSkillIds()
-            ).then(function(conceptCardBackendDicts) {
-              conceptCardBackendDicts.forEach(function(conceptCardBackendDict) {
-                ctrl.conceptCards.push(
-                  ConceptCardObjectFactory.createFromBackendDict(
-                    conceptCardBackendDict));
+            ).then(function(conceptCardObjects) {
+              conceptCardObjects.forEach(function(conceptCardObject) {
+                ctrl.conceptCards.push(conceptCardObject);
               });
               ctrl.loadingMessage = '';
               ctrl.currentConceptCard = ctrl.conceptCards[ctrl.index];
+              ctrl.numberOfWorkedExamplesShown = 0;
+              if (ctrl.currentConceptCard.getWorkedExamples().length > 0) {
+                ctrl.numberOfWorkedExamplesShown = 1;
+              }
+              // TODO(#8521): Remove when this directive is migrated to Angular.
+              $rootScope.$apply();
             });
           };
         }

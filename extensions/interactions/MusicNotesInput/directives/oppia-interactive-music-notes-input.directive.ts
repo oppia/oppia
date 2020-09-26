@@ -31,17 +31,62 @@ require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('services/html-escaper.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
+
+import { Subscription } from 'rxjs';
+
+interface MusicNote {
+  baseNoteMidiNumber: number;
+  offset: number;
+  noteId: string;
+  noteStart: {
+    num: number;
+    den: number;
+  };
+}
+
+interface InteractiveMusicNotesInputCustomScope extends ng.IScope {
+  CONTAINER_HEIGHT?: number;
+  CONTAINER_WIDTH?: number;
+  HORIZONTAL_GRID_SPACING?: number;
+  SOUNDFONT_URL?: string;
+  VERTICAL_GRID_SPACING?: number;
+  _addNoteToNoteSequence?: ((note: MusicNote) => void);
+  _currentNoteId?: number;
+  _removeNotesFromNoteSequenceWithId?: ((noteId: string) => void);
+  _sortNoteSequence?: (() => void);
+  clearSequence?: (() => void);
+  directiveSubscriptions?: Subscription;
+  generateNoteId?: (() => string);
+  getLastAnswer?: (() => string);
+  init?: (() => void);
+  initialSequence?: string;
+  interactionIsActive?: boolean;
+  noteSequence?: {
+    note: MusicNote
+  }[];
+  playCurrentSequence?: (() => void);
+  playSequenceToGuess?: (() => void);
+  reinitStaff?: (() => void);
+  sequenceToGuess?: Object[];
+  staffBottom?: number;
+  staffTop?: number;
+  submitAnswer?: (() => void);
+  topPositionForCenterOfTopStaffLine?: number;
+}
+
 
 angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
   '$timeout', 'AlertsService', 'CurrentInteractionService',
-  'HtmlEscaperService', 'MusicNotesInputRulesService',
-  'MusicPhrasePlayerService', 'EVENT_NEW_CARD_AVAILABLE',
+  'InteractionAttributesExtractorService', 'MusicNotesInputRulesService',
+  'MusicPhrasePlayerService', 'PlayerPositionService',
   'NOTE_NAMES_TO_MIDI_VALUES',
   function(
       $timeout, AlertsService, CurrentInteractionService,
-      HtmlEscaperService, MusicNotesInputRulesService,
-      MusicPhrasePlayerService, EVENT_NEW_CARD_AVAILABLE,
+      InteractionAttributesExtractorService, MusicNotesInputRulesService,
+      MusicPhrasePlayerService, PlayerPositionService,
       NOTE_NAMES_TO_MIDI_VALUES) {
     return {
       restrict: 'E',
@@ -49,7 +94,8 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         getLastAnswer: '&lastAnswer',
       },
       template: require('./music-notes-input-interaction.directive.html'),
-      link: function(scope: ICustomScope, element, attrs) {
+      link: function(
+          scope: InteractiveMusicNotesInputCustomScope, element, attrs) {
         // This is needed in order for the scope to be retrievable during Karma
         // unit testing. See http://stackoverflow.com/a/29833832 for more
         // details.
@@ -58,21 +104,31 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         };
 
         scope.SOUNDFONT_URL =
-        '/third_party/static/midi-js-a8a842/examples/soundfont/';
-        scope.sequenceToGuess = HtmlEscaperService.escapedJsonToObj(
-          attrs.sequenceToGuessWithValue);
+        '/third_party/static/midi-js-c26ebb/examples/soundfont/';
+
+        const {
+          sequenceToGuess,
+          initialSequence
+        } = InteractionAttributesExtractorService.getValuesFromAttributes(
+          'MusicNotesInput', attrs);
+
+        scope.sequenceToGuess = sequenceToGuess;
 
         scope.interactionIsActive = (scope.getLastAnswer() === null);
 
         scope.initialSequence = scope.interactionIsActive ?
-          HtmlEscaperService.escapedJsonToObj(attrs.initialSequenceWithValue) :
+          initialSequence :
           scope.getLastAnswer();
 
-        scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-          scope.interactionIsActive = false;
-          scope.initialSequence = scope.getLastAnswer();
-          scope.reinitStaff();
-        });
+        scope.directiveSubscriptions = new Subscription();
+
+        scope.directiveSubscriptions.add(
+          PlayerPositionService.onNewCardAvailable.subscribe(() => {
+            scope.interactionIsActive = false;
+            scope.initialSequence = scope.getLastAnswer();
+            scope.reinitStaff();
+          })
+        );
 
         /**
          * A note Object has a baseNoteMidiNumber and an offset property. For
@@ -133,7 +189,6 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         // Highest number of notes that can fit on the staff at any given time.
         var MAXIMUM_NOTES_POSSIBLE = 8;
 
-        var noteChoicesElt = element.find('.oppia-music-input-note-choices');
         var staffContainerElt = element.find('.oppia-music-input-staff');
 
         // Staff has to be reinitialized every time that the staff is resized or
@@ -148,13 +203,6 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           }, 20);
         };
 
-        // When page is in the smaller one card format, reinitialize staff after
-        // the user navigates to the Interaction Panel. Otherwise the dimensions
-        // for the staff will be incorrectly calculated.
-        scope.$on('showInteraction', function() {
-          scope.reinitStaff();
-        });
-
         // Creates draggable notes and droppable staff.
         scope.init = function() {
           scope.CONTAINER_WIDTH = staffContainerElt.width();
@@ -167,14 +215,6 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
 
           scope.VERTICAL_GRID_SPACING = scope.CONTAINER_HEIGHT /
             verticalGridKeys.length;
-
-          var staffTop = computeStaffTop();
-          var staffBottom = computeStaffBottom();
-
-          // The farthest edge of the staff. If a note is placed beyond this
-          // position, it will be discarded.
-          var RIGHT_EDGE_OF_STAFF_POSITION =
-            element.find('.oppia-music-input-valid-note-area').width();
 
           clearNotesFromStaff();
           initPalette();
@@ -189,32 +229,19 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         // start of the exploration and can be removed by the learner.
         var initializeNoteSequence = function(initialNotesToAdd) {
           for (var i = 0; i < initialNotesToAdd.length; i++) {
-            var initialNote = _convertReadableNoteToNote(initialNotesToAdd[i]);
-            initialNote = Object.assign(initialNote, {
+            var { baseNoteMidiNumber, offset } = (
+              _convertReadableNoteToNote(initialNotesToAdd[i]));
+            var initialNote = {
+              baseNoteMidiNumber: baseNoteMidiNumber,
+              offset: offset,
               noteId: scope.generateNoteId(),
               noteStart: {
                 num: i,
                 den: 1
               }
-            });
+            };
             scope._addNoteToNoteSequence(initialNote);
           }
-        };
-
-        // Gets the staff top by getting the first staff line's position and
-        // subtracting one vertical grid space from it.
-        var computeStaffTop = function() {
-          return (
-            getStaffLinePositions()[verticalGridKeys[0]] -
-            scope.VERTICAL_GRID_SPACING
-          );
-        };
-
-        // Gets the staff bottom position by adding the staff top position value
-        // with the total sum of all the vertical grid spaces (staff lines).
-        var computeStaffBottom = function() {
-          return computeStaffTop() + (
-            scope.VERTICAL_GRID_SPACING * verticalGridKeys.length);
         };
 
         // Removes all notes from staff.
@@ -250,7 +277,6 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           var validNoteArea = element.find(
             '.oppia-music-input-valid-note-area');
           for (var i = 0; i < NOTE_TYPES.length; i++) {
-            var className = 'oppia-music-input-natural-note';
             var innerDiv = $('<div></div>')
               .data('noteType', NOTE_TYPES[i])
               .addClass(function(index, currentClassName) {
@@ -272,7 +298,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
                 stop: function(evt, ui) {
                   if (!isCloneOffStaff($(ui.helper))) {
                     // This makes the helper clone a new draggable note.
-                    var helperClone = $(ui.helper)
+                    $(ui.helper)
                     // Retains original note type (e.g. natural, flat, sharp).
                       .data('noteType', $(this).data('noteType'))
                       .draggable({
@@ -403,7 +429,6 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
 
                   // Position of current dropped note.
                   var leftPos = ui.helper.position().left;
-                  var leftPosBeforeMove = leftPos;
                   var topPos = $(evt.target).position().top;
 
                   // The staff line's value.
@@ -512,14 +537,15 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         //   than b.
         var compareNoteStarts = function(a, b) {
           if (a.note.noteStart && b.note.noteStart) {
-            return (a.note.noteStart.num * b.note.noteStart.den -
-                    a.note.noteStart.den * b.note.noteStart.num) /
-                   (a.note.noteStart.den * b.note.noteStart.den);
+            return (
+              a.note.noteStart.num * b.note.noteStart.den -
+              a.note.noteStart.den * b.note.noteStart.num) /
+              (a.note.noteStart.den * b.note.noteStart.den);
           }
         };
 
         // If a note position is taken, return true,
-        // otherwise the position is available
+        // otherwise the position is available.
         var checkIfNotePositionTaken = function(leftPos) {
           if (getNoteStartFromLeftPos(leftPos)) {
             var newNoteToCheck = getNoteStartFromLeftPos(leftPos);
@@ -591,15 +617,16 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           var lastHorizontalPositionOffset = element.find(
             '.oppia-music-input-note-choices div:first-child').position().left;
           var leftOffset =
-            lastHorizontalPositionOffset - ((MAXIMUM_NOTES_POSSIBLE - 1) *
-                            scope.HORIZONTAL_GRID_SPACING);
+            lastHorizontalPositionOffset - (
+              (MAXIMUM_NOTES_POSSIBLE - 1) * scope.HORIZONTAL_GRID_SPACING);
           return leftOffset + (
             noteStartAsFloat * scope.HORIZONTAL_GRID_SPACING);
         };
 
         var isCloneOffStaff = function(helperClone) {
-          return (!(helperClone.position().top > scope.staffTop &&
-                  helperClone.position().top < scope.staffBottom));
+          return (!(
+            helperClone.position().top > scope.staffTop &&
+            helperClone.position().top < scope.staffBottom));
         };
 
         var isLedgerLineNote = function(lineValue) {
@@ -674,8 +701,8 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           var correspondingNoteName =
             _getCorrespondingNoteName(note.baseNoteMidiNumber);
 
-          var accidental = (note.offset === 1 ? '#' :
-            note.offset === 0 ? '' : 'b');
+          var accidental = (
+            note.offset === 1 ? '#' : note.offset === 0 ? '' : 'b');
 
           return {
             readableNoteName:
@@ -718,7 +745,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // For each note in a sequence, add a noteDuration property.
-        // TODO(wagnerdmike): - add more options for note durations.
+        // TODO(wagnerdmike): - Add more options for note durations.
         var _makeAllNotesHaveDurationOne = function(noteArray) {
           for (var i = 0; i < noteArray.length; i++) {
             noteArray[i].noteDuration = {
@@ -805,7 +832,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // Return the MIDI value for each note in the sequence.
-        // TODO(wagnerdmike): - add chord functionality.
+        // TODO(wagnerdmike): - Add chord functionality.
         var convertSequenceToGuessToMidiSequence = function(sequence) {
           var midiSequence = [];
           for (var i = 0; i < sequence.length; i++) {
@@ -819,7 +846,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         };
 
         // Return the MIDI value for each note in the sequence.
-        // TODO(wagnerdmike): - add chord functionality.
+        // TODO(wagnerdmike): - Add chord functionality.
         var convertNoteSequenceToMidiSequence = function(sequence) {
           var midiSequence = [];
           for (var i = 0; i < sequence.length; i++) {
@@ -842,6 +869,10 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         // and then initializes the view after staff has loaded.
         $(document).ready(function() {
           scope.reinitStaff();
+        });
+
+        scope.$on('$destroy', function() {
+          scope.directiveSubscriptions.unsubscribe();
         });
       }
     };

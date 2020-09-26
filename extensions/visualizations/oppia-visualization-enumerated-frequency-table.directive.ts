@@ -16,46 +16,23 @@
  * @fileoverview Directive for "enumerated frequency table" visualization.
  */
 
-require('directives/angular-html-bind.directive.ts');
-
-require('domain/utilities/url-interpolation.service.ts');
-require('services/html-escaper.service.ts');
-
-// Each visualization receives three variables: 'data', 'options', and
-// 'isAddressed'. The exact format for each of these is specific to the
-// particular visualization.
 angular.module('oppia').directive(
-  'oppiaVisualizationEnumeratedFrequencyTable', [
-    'UrlInterpolationService', function(UrlInterpolationService) {
-      return {
-        restrict: 'E',
-        scope: {},
-        bindToController: {},
-        templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-          '/visualizations/enumerated-frequency-table.directive.html'),
-        controllerAs: '$ctrl',
-        controller: [
-          '$attrs', 'HtmlEscaperService',
-          function($attrs, HtmlEscaperService) {
-            var ctrl = this;
-            ctrl.toggleAnswerVisibility = function(i) {
-              ctrl.answerVisible[i] = !ctrl.answerVisible[i];
-            };
-            ctrl.$onInit = function() {
-              ctrl.data = HtmlEscaperService.escapedJsonToObj(
-                $attrs.escapedData);
-              ctrl.options =
-                HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
-              ctrl.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
+  'oppiaVisualizationEnumeratedFrequencyTable', () => ({
+    restrict: 'E',
+    scope: { data: '<', options: '<', addressedInfoIsSupported: '<' },
+    template: require(
+      './oppia-visualization-enumerated-frequency-table.directive.html'),
+    style: require(
+      './oppia-visualization-enumerated-frequency-table.directive.css'),
+    controller: function($scope) {
+      this.$onInit = () => {
+        // By default only the first element is shown, the rest are hidden.
+        $scope.answerVisible = $scope.data.map((_, i) => i === 0);
 
-              ctrl.answerVisible = ctrl.data.map(function(_, i) {
-                // First element is shown while all others are hidden by
-                // default.
-                return i === 0;
-              });
-            };
-          }
-        ]
+        $scope.toggleAnswerVisibility = (i: number) => {
+          $scope.answerVisible[i] = !$scope.answerVisible[i];
+        };
       };
     }
-  ]);
+  })
+);

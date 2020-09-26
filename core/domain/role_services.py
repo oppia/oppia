@@ -66,7 +66,7 @@ ACTION_EDIT_SKILL_DESCRIPTION = 'EDIT_SKILL_DESCRIPTION'
 ACTION_EDIT_SKILLS = 'EDIT_SKILLS'
 ACTION_FLAG_EXPLORATION = 'FLAG_EXPLORATION'
 ACTION_MANAGE_EMAIL_DASHBOARD = 'MANAGE_EMAIL_DASHBOARD'
-ACTION_MANAGE_PROFILE = 'MANAGE_PROFILE'
+ACTION_MANAGE_ACCOUNT = 'MANAGE_ACCOUNT'
 ACTION_MANAGE_QUESTION_RIGHTS = 'MANAGE_QUESTION_RIGHTS'
 ACTION_MANAGE_TOPIC_RIGHTS = 'MANAGE_TOPIC_RIGHTS'
 ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY = 'MODIFY_ROLES_FOR_ANY_ACTIVITY'
@@ -86,6 +86,9 @@ ACTION_VISIT_ANY_QUESTION_EDITOR = 'VISIT_ANY_QUESTION_EDITOR'
 ACTION_VISIT_ANY_TOPIC_EDITOR = 'VISIT_ANY_TOPIC_EDITOR'
 
 # Users can be updated to the following list of role IDs via admin interface.
+#
+# NOTE: LEARNER role should not be updated to any other role, hence do not
+#   add it to the following list.
 UPDATABLE_ROLES = [
     feconf.ROLE_ID_ADMIN,
     feconf.ROLE_ID_BANNED_USER,
@@ -96,6 +99,9 @@ UPDATABLE_ROLES = [
 ]
 
 # Users can be viewed by following list of role IDs via admin interface.
+#
+# NOTE: Do not include LEARNER role in this list as it does not represent
+#   role for a separate user account, but rather a profile within the account.
 VIEWABLE_ROLES = [
     feconf.ROLE_ID_ADMIN,
     feconf.ROLE_ID_BANNED_USER,
@@ -111,6 +117,7 @@ HUMAN_READABLE_ROLES = {
     feconf.ROLE_ID_COLLECTION_EDITOR: 'collection editor',
     feconf.ROLE_ID_EXPLORATION_EDITOR: 'exploration editor',
     feconf.ROLE_ID_GUEST: 'guest',
+    feconf.ROLE_ID_LEARNER: 'learner',
     feconf.ROLE_ID_MODERATOR: 'moderator',
     feconf.ROLE_ID_TOPIC_MANAGER: 'topic manager'
 }
@@ -136,8 +143,9 @@ PARENT_ROLES = {
     feconf.ROLE_ID_ADMIN: [feconf.ROLE_ID_MODERATOR],
     feconf.ROLE_ID_BANNED_USER: [feconf.ROLE_ID_GUEST],
     feconf.ROLE_ID_COLLECTION_EDITOR: [feconf.ROLE_ID_EXPLORATION_EDITOR],
-    feconf.ROLE_ID_EXPLORATION_EDITOR: [feconf.ROLE_ID_GUEST],
+    feconf.ROLE_ID_EXPLORATION_EDITOR: [feconf.ROLE_ID_LEARNER],
     feconf.ROLE_ID_GUEST: [],
+    feconf.ROLE_ID_LEARNER: [feconf.ROLE_ID_GUEST],
     feconf.ROLE_ID_MODERATOR: [feconf.ROLE_ID_TOPIC_MANAGER],
     feconf.ROLE_ID_TOPIC_MANAGER: [feconf.ROLE_ID_COLLECTION_EDITOR]
 }
@@ -181,13 +189,11 @@ ROLE_ACTIONS = {
     ],
     feconf.ROLE_ID_EXPLORATION_EDITOR: [
         ACTION_ACCESS_CREATOR_DASHBOARD,
-        ACTION_ACCESS_LEARNER_DASHBOARD,
         ACTION_CREATE_EXPLORATION,
         ACTION_DELETE_OWNED_PRIVATE_ACTIVITY,
         ACTION_EDIT_OWNED_ACTIVITY,
-        ACTION_FLAG_EXPLORATION,
         ACTION_SUBSCRIBE_TO_USERS,
-        ACTION_MANAGE_PROFILE,
+        ACTION_MANAGE_ACCOUNT,
         ACTION_MODIFY_ROLES_FOR_OWNED_ACTIVITY,
         ACTION_PUBLISH_OWNED_ACTIVITY,
         ACTION_RATE_ANY_PUBLIC_EXPLORATION,
@@ -196,6 +202,10 @@ ROLE_ACTIONS = {
     ],
     feconf.ROLE_ID_GUEST: [
         ACTION_PLAY_ANY_PUBLIC_ACTIVITY,
+    ],
+    feconf.ROLE_ID_LEARNER: [
+        ACTION_FLAG_EXPLORATION,
+        ACTION_ACCESS_LEARNER_DASHBOARD,
     ],
     feconf.ROLE_ID_MODERATOR: [
         ACTION_ACCESS_MODERATOR_PAGE,
@@ -232,7 +242,7 @@ def get_all_actions(role):
         list(str). A list of actions accessible to the role.
 
     Raises:
-        Exception: The given role does not exist.
+        Exception. The given role does not exist.
     """
     if role not in PARENT_ROLES:
         raise Exception('Role %s does not exist.' % role)
@@ -269,6 +279,54 @@ def get_role_graph_data():
         for parent in PARENT_ROLES[role]:
             role_graph['links'].append({'source': parent, 'target': role})
     return role_graph
+
+
+def check_if_path_exists_in_roles_graph(source_node, destination_node):
+    """Breadth-first-search approach to check if a path from source
+    role node to destination role node exists in the roles based hierarchy
+    graph.
+
+    Args:
+        source_node: str. A string defining the role of the source node. It
+            should be a key of PARENT_ROLES.
+        destination_node: str. A string defining the role of the destination
+            node. It should be a key of PARENT_ROLES.
+
+    Returns:
+        Bool. Whether a path from source node role to the destination node role
+        exists in the roles based hierarchy graph or not.
+
+    Raises:
+        Exception. The given role for source node does not exist.
+        Exception. The given role for destination node does not exist.
+    """
+
+    if source_node not in PARENT_ROLES:
+        raise Exception(
+            'Role %s defined by the source node does not exist.' % source_node)
+
+    if destination_node not in PARENT_ROLES:
+        raise Exception(
+            'Role %s defined by the destination node does not exist.'
+            % destination_node)
+
+    graph = get_role_graph_data()
+    adjacency_list = {}
+    for node in graph['nodes']:
+        adjacency_list[node] = []
+    for edges in graph['links']:
+        adjacency_list[edges['source']].append(edges['target'])
+    bfs_queue = [source_node]
+    is_path_found = False
+    while len(bfs_queue) > 0:
+        node = bfs_queue.pop(0)
+        if node == destination_node:
+            is_path_found = True
+            break
+        else:
+            for target_node in adjacency_list[node]:
+                bfs_queue.append(target_node)
+    return is_path_found
 
 
 def log_role_query(user_id, intent, role=None, username=None):

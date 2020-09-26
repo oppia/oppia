@@ -19,26 +19,37 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
 import datetime
+import re
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import customization_args_util
+from core.domain import exp_domain
+from core.domain import expression_parser
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
+from extensions import domain
 import feconf
 import python_utils
+import schema_utils
 import utils
 
-(question_models,) = models.Registry.import_models([models.NAMES.question])
+from pylatexenc import latex2text
 
+(question_models,) = models.Registry.import_models([models.NAMES.question])
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
 QUESTION_PROPERTY_LANGUAGE_CODE = 'language_code'
 QUESTION_PROPERTY_QUESTION_STATE_DATA = 'question_state_data'
 QUESTION_PROPERTY_LINKED_SKILL_IDS = 'linked_skill_ids'
+QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS = (
+    'inapplicable_skill_misconception_ids')
 
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
@@ -73,26 +84,50 @@ class QuestionChange(change_domain.BaseChange):
     QUESTION_PROPERTIES = (
         QUESTION_PROPERTY_QUESTION_STATE_DATA,
         QUESTION_PROPERTY_LANGUAGE_CODE,
-        QUESTION_PROPERTY_LINKED_SKILL_IDS)
+        QUESTION_PROPERTY_LINKED_SKILL_IDS,
+        QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS)
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': [],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_UPDATE_QUESTION_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
+        'user_id_attribute_names': [],
         'allowed_values': {'property_name': QUESTION_PROPERTIES}
     }, {
         'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
         'required_attribute_names': ['question_dict', 'skill_id'],
-        'optional_attribute_names': ['topic_name']
+        'optional_attribute_names': ['topic_name'],
+        'user_id_attribute_names': []
     }, {
         'name': CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
+
+
+class QuestionSuggestionChange(change_domain.BaseChange):
+    """Domain object for changes made to question suggestion object.
+
+    The allowed commands, together with the attributes:
+        - 'create_new_fully_specified_question' (with question_dict,
+        skill_id, skill_difficulty)
+    """
+
+    ALLOWED_COMMANDS = [
+        {
+            'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'required_attribute_names': [
+                'question_dict', 'skill_id', 'skill_difficulty'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': []
+        }
+    ]
 
 
 class Question(python_utils.OBJECT):
@@ -101,7 +136,8 @@ class Question(python_utils.OBJECT):
     def __init__(
             self, question_id, question_state_data,
             question_state_data_schema_version, language_code, version,
-            linked_skill_ids, created_on=None, last_updated=None):
+            linked_skill_ids, inapplicable_skill_misconception_ids,
+            created_on=None, last_updated=None):
         """Constructs a Question domain object.
 
         Args:
@@ -116,6 +152,9 @@ class Question(python_utils.OBJECT):
             version: int. The version of the question.
             linked_skill_ids: list(str). Skill ids linked to the question.
                 Note: Do not update this field manually.
+            inapplicable_skill_misconception_ids: list(str). Optional
+                misconception ids that are marked as not relevant to the
+                question.
             created_on: datetime.datetime. Date and time when the question was
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -128,6 +167,8 @@ class Question(python_utils.OBJECT):
             question_state_data_schema_version)
         self.version = version
         self.linked_skill_ids = linked_skill_ids
+        self.inapplicable_skill_misconception_ids = (
+            inapplicable_skill_misconception_ids)
         self.created_on = created_on
         self.last_updated = last_updated
 
@@ -144,7 +185,9 @@ class Question(python_utils.OBJECT):
                 self.question_state_data_schema_version),
             'language_code': self.language_code,
             'version': self.version,
-            'linked_skill_ids': self.linked_skill_ids
+            'linked_skill_ids': self.linked_skill_ids,
+            'inapplicable_skill_misconception_ids': (
+                self.inapplicable_skill_misconception_ids)
         }
 
     @classmethod
@@ -163,7 +206,7 @@ class Question(python_utils.OBJECT):
         """Converts from version 27 to 28. Version 28 replaces
         content_ids_to_audio_translations with recorded_voiceovers.
 
-         Args:
+        Args:
             question_state_dict: dict. The dict representation of
                 question_state_data.
 
@@ -183,7 +226,7 @@ class Question(python_utils.OBJECT):
         allows the creator to ask for answer details from the learner
         about why they landed on a particular answer.
 
-         Args:
+        Args:
             question_state_dict: dict. The dict representation of
                 question_state_data.
 
@@ -202,7 +245,7 @@ class Question(python_utils.OBJECT):
         Args:
             question_state_dict: dict. A dict where each key-value pair
                 represents respectively, a state name and a dict used to
-                initalize a State domain object.
+                initialize a State domain object.
 
         Returns:
             dict. The converted question_state_dict.
@@ -222,14 +265,14 @@ class Question(python_utils.OBJECT):
         Args:
             question_state_dict: dict. A dict where each key-value pair
                 represents respectively, a state name and a dict used to
-                initalize a State domain object.
+                initialize a State domain object.
 
         Returns:
             dict. The converted question_state_dict.
         """
         # Get the voiceovers_mapping metadata.
-        voiceovers_mapping = (question_state_dict['recorded_voiceovers']
-                              ['voiceovers_mapping'])
+        voiceovers_mapping = (
+            question_state_dict['recorded_voiceovers']['voiceovers_mapping'])
         language_codes_to_audio_metadata = voiceovers_mapping.values()
         for language_codes in language_codes_to_audio_metadata:
             for audio_metadata in language_codes.values():
@@ -265,6 +308,428 @@ class Question(python_utils.OBJECT):
 
         return question_state_dict
 
+    @classmethod
+    def _convert_state_v32_dict_to_v33_dict(cls, question_state_dict):
+        """Converts from version 32 to 33. Version 33 adds a new
+        customization arg to MultipleChoiceInput Interaction which allows
+        answer choices to be shuffled.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'MultipleChoiceInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'showChoicesInShuffledOrder': {
+                    'value': True
+                }
+            })
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v33_dict_to_v34_dict(cls, question_state_dict):
+        """Converts from version 33 to 34. Version 34 adds a new
+        attribute for math components. The new attribute has an additional field
+        to for storing SVG filenames.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        question_state_dict = state_domain.State.convert_html_fields_in_state(
+            question_state_dict,
+            html_validation_service.add_math_content_to_math_rte_components,
+            state_uses_old_interaction_cust_args_schema=True)
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v34_dict_to_v35_dict(cls, question_state_dict):
+        """Converts from version 34 to 35. Version 35 upgrades all explorations
+        that use the MathExpressionInput interaction to use one of
+        AlgebraicExpressionInput, NumericExpressionInput, or MathEquationInput
+        interactions.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        is_valid_algebraic_expression = schema_utils.get_validator(
+            'is_valid_algebraic_expression')
+        is_valid_numeric_expression = schema_utils.get_validator(
+            'is_valid_numeric_expression')
+        is_valid_math_equation = schema_utils.get_validator(
+            'is_valid_math_equation')
+        ltt = latex2text.LatexNodes2Text()
+
+        if question_state_dict['interaction']['id'] == 'MathExpressionInput':
+            new_answer_groups = []
+            types_of_inputs = set()
+            for group in question_state_dict['interaction']['answer_groups']:
+                new_answer_group = copy.deepcopy(group)
+                for rule_spec in new_answer_group['rule_specs']:
+                    rule_input = ltt.latex_to_text(rule_spec['inputs']['x'])
+
+                    rule_input = exp_domain.clean_math_expression(
+                        rule_input)
+
+                    type_of_input = exp_domain.TYPE_INVALID_EXPRESSION
+                    if is_valid_algebraic_expression(rule_input):
+                        type_of_input = (
+                            exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION)
+                    elif is_valid_numeric_expression(rule_input):
+                        type_of_input = exp_domain.TYPE_VALID_NUMERIC_EXPRESSION
+                    elif is_valid_math_equation(rule_input):
+                        type_of_input = exp_domain.TYPE_VALID_MATH_EQUATION
+
+                    types_of_inputs.add(type_of_input)
+
+                    if type_of_input != exp_domain.TYPE_INVALID_EXPRESSION:
+                        rule_spec['inputs']['x'] = rule_input
+                        if type_of_input == exp_domain.TYPE_VALID_MATH_EQUATION:
+                            rule_spec['inputs']['y'] = 'both'
+                        rule_spec['rule_type'] = 'MatchesExactlyWith'
+
+                new_answer_groups.append(new_answer_group)
+
+            if exp_domain.TYPE_INVALID_EXPRESSION not in types_of_inputs:
+                # If at least one rule input is an equation, we remove
+                # all other rule inputs that are expressions.
+                if exp_domain.TYPE_VALID_MATH_EQUATION in types_of_inputs:
+                    new_interaction_id = exp_domain.TYPE_VALID_MATH_EQUATION
+                    for group in new_answer_groups:
+                        new_rule_specs = []
+                        for rule_spec in group['rule_specs']:
+                            if is_valid_math_equation(
+                                    rule_spec['inputs']['x']):
+                                new_rule_specs.append(rule_spec)
+                        group['rule_specs'] = new_rule_specs
+                # Otherwise, if at least one rule_input is an algebraic
+                # expression, we remove all other rule inputs that are
+                # numeric expressions.
+                elif exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION in (
+                        types_of_inputs):
+                    new_interaction_id = (
+                        exp_domain.TYPE_VALID_ALGEBRAIC_EXPRESSION)
+                    for group in new_answer_groups:
+                        new_rule_specs = []
+                        for rule_spec in group['rule_specs']:
+                            if is_valid_algebraic_expression(
+                                    rule_spec['inputs']['x']):
+                                new_rule_specs.append(rule_spec)
+                        group['rule_specs'] = new_rule_specs
+                else:
+                    new_interaction_id = (
+                        exp_domain.TYPE_VALID_NUMERIC_EXPRESSION)
+
+                # Removing answer groups that have no rule specs left after
+                # the filtration done above.
+                new_answer_groups = [
+                    answer_group for answer_group in new_answer_groups if (
+                        len(answer_group['rule_specs']) != 0)]
+
+                # Removing feedback keys, from voiceovers_mapping and
+                # translations_mapping, that correspond to the rules that
+                # got deleted.
+                old_answer_groups_feedback_keys = [
+                    answer_group['outcome'][
+                        'feedback']['content_id'] for answer_group in (
+                            question_state_dict[
+                                'interaction']['answer_groups'])]
+                new_answer_groups_feedback_keys = [
+                    answer_group['outcome'][
+                        'feedback']['content_id'] for answer_group in (
+                            new_answer_groups)]
+                content_ids_to_delete = set(
+                    old_answer_groups_feedback_keys) - set(
+                        new_answer_groups_feedback_keys)
+                for content_id in content_ids_to_delete:
+                    if content_id in question_state_dict['recorded_voiceovers'][
+                            'voiceovers_mapping']:
+                        del question_state_dict['recorded_voiceovers'][
+                            'voiceovers_mapping'][content_id]
+                    if content_id in question_state_dict[
+                            'written_translations']['translations_mapping']:
+                        del question_state_dict['written_translations'][
+                            'translations_mapping'][content_id]
+
+                question_state_dict['interaction']['id'] = new_interaction_id
+                question_state_dict['interaction']['answer_groups'] = (
+                    new_answer_groups)
+                if question_state_dict['interaction']['solution']:
+                    correct_answer = question_state_dict['interaction'][
+                        'solution']['correct_answer']['ascii']
+                    correct_answer = exp_domain.clean_math_expression(
+                        correct_answer)
+                    question_state_dict['interaction'][
+                        'solution']['correct_answer'] = correct_answer
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v35_dict_to_v36_dict(cls, question_state_dict):
+        """Converts from version 35 to 36. Version 35 adds translation support
+        for interaction customization arguments. This migration converts
+        customization arguments whose schemas have been changed from unicode to
+        SubtitledUnicode or html to SubtitledHtml. It also populates missing
+        customization argument keys on all interactions, removes extra
+        customization arguments, normalizes customization arguments against
+        its schema, and changes PencilCodeEditor's customization argument
+        name from initial_code to initialCode.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        max_existing_content_id_index = -1
+        translations_mapping = question_state_dict[
+            'written_translations']['translations_mapping']
+        for content_id in translations_mapping:
+            # Find maximum existing content_id index.
+            content_id_suffix = content_id.split('_')[-1]
+
+            # Possible values of content_id_suffix are a digit, or from
+            # a 'outcome' (from 'default_outcome'). If the content_id_suffix
+            # is not a digit, we disregard it here.
+            if content_id_suffix.isdigit():
+                max_existing_content_id_index = max(
+                    max_existing_content_id_index,
+                    int(content_id_suffix)
+                )
+
+            # Move 'html' field to 'translation' field and set 'data_format'
+            # to 'html' for all WrittenTranslations.
+            for lang_code in translations_mapping[content_id]:
+                translations_mapping[
+                    content_id][lang_code]['data_format'] = 'html'
+                translations_mapping[
+                    content_id][lang_code]['translation'] = (
+                        translations_mapping[content_id][lang_code]['html'])
+                del translations_mapping[content_id][lang_code]['html']
+
+        interaction_id = question_state_dict['interaction']['id']
+        if interaction_id is None:
+            question_state_dict['next_content_id_index'] = (
+                max_existing_content_id_index + 1)
+            return question_state_dict
+
+        class ContentIdCounter(python_utils.OBJECT):
+            """This helper class is used to keep track of
+            next_content_id_index and new_content_ids, and provides a
+            function to generate new content_ids.
+            """
+
+            new_content_ids = []
+
+            def __init__(self, next_content_id_index):
+                """Initializes a ContentIdCounter object.
+
+                Args:
+                    next_content_id_index: int. The next content id index.
+                """
+                self.next_content_id_index = next_content_id_index
+
+            def generate_content_id(self, content_id_prefix):
+                """Generate a new content_id from the prefix provided and
+                the next content id index.
+
+                Args:
+                    content_id_prefix: str. The prefix of the content_id.
+
+                Returns:
+                    str. The generated content_id.
+                """
+                content_id = '%s%i' % (
+                    content_id_prefix,
+                    self.next_content_id_index)
+                self.next_content_id_index += 1
+                self.new_content_ids.append(content_id)
+                return content_id
+
+        content_id_counter = (
+            ContentIdCounter(max_existing_content_id_index + 1))
+
+        ca_dict = question_state_dict['interaction']['customization_args']
+        if (interaction_id == 'PencilCodeEditor' and
+                'initial_code' in ca_dict):
+            ca_dict['initialCode'] = ca_dict['initial_code']
+            del ca_dict['initial_code']
+
+        # Retrieve a cached version (state schema v35) of
+        # interaction_specs.json to ensure that this migration remains
+        # stable even when interaction_specs.json is changed.
+        ca_specs = [
+            domain.CustomizationArgSpec(
+                ca_spec_dict['name'],
+                ca_spec_dict['description'],
+                ca_spec_dict['schema'],
+                ca_spec_dict['default_value']
+            ) for ca_spec_dict in (
+                interaction_registry.Registry
+                .get_all_specs_for_state_schema_version(36)[
+                    interaction_id]['customization_arg_specs']
+            )
+        ]
+
+        for ca_spec in ca_specs:
+            schema = ca_spec.schema
+            ca_name = ca_spec.name
+            content_id_prefix = 'ca_%s_' % ca_name
+
+            # We only have to migrate unicode to SubtitledUnicode or
+            # list of html to list of SubtitledHtml. No interactions
+            # were changed from html to SubtitledHtml.
+            is_subtitled_unicode_spec = (
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['obj_type'] ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE)
+            is_subtitled_html_list_spec = (
+                schema['type'] == schema_utils.SCHEMA_TYPE_LIST and
+                schema['items']['type'] ==
+                schema_utils.SCHEMA_TYPE_CUSTOM and
+                schema['items']['obj_type'] ==
+                schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML)
+
+            if is_subtitled_unicode_spec:
+                # Default is a SubtitledHtml dict or SubtitleUnicode dict.
+                new_value = copy.deepcopy(ca_spec.default_value)
+
+                # If available, assign value to html or unicode_str.
+                if ca_name in ca_dict:
+                    new_value['unicode_str'] = ca_dict[ca_name]['value']
+
+                # Assign content_id.
+                new_value['content_id'] = (
+                    content_id_counter
+                    .generate_content_id(content_id_prefix)
+                )
+
+                ca_dict[ca_name] = {'value': new_value}
+            elif is_subtitled_html_list_spec:
+                new_value = []
+
+                if ca_name in ca_dict:
+                    # Assign values to html fields.
+                    for html in ca_dict[ca_name]['value']:
+                        new_value.append({
+                            'html': html, 'content_id': None
+                        })
+                else:
+                    # Default is a list of SubtitledHtml dict.
+                    new_value.extend(copy.deepcopy(ca_spec.default_value))
+
+                # Assign content_ids.
+                for subtitled_html_dict in new_value:
+                    subtitled_html_dict['content_id'] = (
+                        content_id_counter
+                        .generate_content_id(content_id_prefix)
+                    )
+
+                ca_dict[ca_name] = {'value': new_value}
+            elif ca_name not in ca_dict:
+                ca_dict[ca_name] = {'value': ca_spec.default_value}
+
+        (
+            customization_args_util
+            .validate_customization_args_and_values(
+                'interaction',
+                interaction_id,
+                ca_dict,
+                ca_specs)
+        )
+
+        question_state_dict['next_content_id_index'] = (
+            content_id_counter.next_content_id_index)
+        for new_content_id in content_id_counter.new_content_ids:
+            question_state_dict[
+                'written_translations'][
+                    'translations_mapping'][new_content_id] = {}
+            question_state_dict[
+                'recorded_voiceovers'][
+                    'voiceovers_mapping'][new_content_id] = {}
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v36_dict_to_v37_dict(cls, question_state_dict):
+        """Converts from version 36 to 37. Version 37 changes all rules with
+        type CaseSensitiveEquals to Equals.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] != 'TextInput':
+            return question_state_dict
+        answer_group_dicts = question_state_dict['interaction']['answer_groups']
+        for answer_group_dict in answer_group_dicts:
+            for rule_spec_dict in answer_group_dict['rule_specs']:
+                if rule_spec_dict['rule_type'] == 'CaseSensitiveEquals':
+                    rule_spec_dict['rule_type'] = 'Equals'
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v37_dict_to_v38_dict(cls, question_state_dict):
+        """Converts from version 37 to 38. Version 38 adds a customization arg
+        for the Math interactions that allows creators to specify the letters
+        that would be displayed to the learner.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] in (
+                'AlgebraicExpressionInput', 'MathEquationInput'):
+            variables = set()
+            for group in question_state_dict[
+                    'interaction']['answer_groups']:
+                for rule_spec in group['rule_specs']:
+                    rule_input = rule_spec['inputs']['x']
+                    for variable in expression_parser.get_variables(
+                            rule_input):
+                        # Replacing greek letter names with greek symbols.
+                        if len(variable) > 1:
+                            variable = (
+                                constants.GREEK_LETTER_NAMES_TO_SYMBOLS[
+                                    variable])
+                        variables.add(variable)
+
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'customOskLetters': {
+                    'value': sorted(variables)
+                }
+            })
+
+        return question_state_dict
 
     @classmethod
     def update_state_from_model(
@@ -319,6 +784,30 @@ class Question(python_utils.OBJECT):
         if len(set(self.linked_skill_ids)) != len(self.linked_skill_ids):
             raise utils.ValidationError(
                 'linked_skill_ids has duplicate skill ids')
+        inapplicable_skill_misconception_ids_is_list = isinstance(
+            self.inapplicable_skill_misconception_ids, list)
+        if not (inapplicable_skill_misconception_ids_is_list and (
+                all(isinstance(
+                    elem, python_utils.BASESTRING) for elem in (
+                        self.inapplicable_skill_misconception_ids)))):
+            raise utils.ValidationError(
+                'Expected inapplicable_skill_misconception_ids to be a list '
+                'of strings, received %s'
+                % self.inapplicable_skill_misconception_ids)
+
+        if not (all(
+                re.match(
+                    constants.VALID_SKILL_MISCONCEPTION_ID_REGEX, elem
+                ) for elem in self.inapplicable_skill_misconception_ids)):
+            raise utils.ValidationError(
+                'Expected inapplicable_skill_misconception_ids to be a list '
+                'of strings of the format <skill_id>-<misconception_id>, '
+                'received %s' % self.inapplicable_skill_misconception_ids)
+
+        if len(set(self.inapplicable_skill_misconception_ids)) != len(
+                self.inapplicable_skill_misconception_ids):
+            raise utils.ValidationError(
+                'inapplicable_skill_misconception_ids has duplicate values')
 
         if not isinstance(self.question_state_data_schema_version, int):
             raise utils.ValidationError(
@@ -399,7 +888,8 @@ class Question(python_utils.OBJECT):
             state_domain.State.from_dict(question_dict['question_state_data']),
             question_dict['question_state_data_schema_version'],
             question_dict['language_code'], question_dict['version'],
-            question_dict['linked_skill_ids'])
+            question_dict['linked_skill_ids'],
+            question_dict['inapplicable_skill_misconception_ids'])
 
         return question
 
@@ -419,7 +909,7 @@ class Question(python_utils.OBJECT):
         return cls(
             question_id, default_question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, skill_ids)
+            constants.DEFAULT_LANGUAGE_CODE, 0, skill_ids, [])
 
     def update_language_code(self, language_code):
         """Updates the language code of the question.
@@ -438,6 +928,19 @@ class Question(python_utils.OBJECT):
         """
         self.linked_skill_ids = list(set(linked_skill_ids))
 
+    def update_inapplicable_skill_misconception_ids(
+            self, inapplicable_skill_misconception_ids):
+        """Updates the optional misconception ids marked as not applicable
+        to the question.
+
+        Args:
+            inapplicable_skill_misconception_ids: list(str). The optional
+                skill misconception ids marked as not applicable to the
+                question.
+        """
+        self.inapplicable_skill_misconception_ids = list(
+            set(inapplicable_skill_misconception_ids))
+
     def update_question_state_data(self, question_state_data):
         """Updates the question data of the question.
 
@@ -450,15 +953,21 @@ class Question(python_utils.OBJECT):
 
 class QuestionSummary(python_utils.OBJECT):
     """Domain object for Question Summary."""
+
     def __init__(
-            self, question_id, question_content,
-            question_model_created_on=None, question_model_last_updated=None):
+            self, question_id, question_content, misconception_ids,
+            interaction_id, question_model_created_on=None,
+            question_model_last_updated=None):
         """Constructs a Question Summary domain object.
 
         Args:
             question_id: str. The ID of the question.
             question_content: str. The static HTML of the question shown to
                 the learner.
+            misconception_ids: str. The misconception ids addressed in
+                the question. This includes tagged misconceptions ids as well
+                as inapplicable misconception ids in the question.
+            interaction_id: str. The ID of the interaction.
             question_model_created_on: datetime.datetime. Date and time when
                 the question model is created.
             question_model_last_updated: datetime.datetime. Date and time
@@ -466,6 +975,8 @@ class QuestionSummary(python_utils.OBJECT):
         """
         self.id = question_id
         self.question_content = html_cleaner.clean(question_content)
+        self.misconception_ids = misconception_ids
+        self.interaction_id = interaction_id
         self.created_on = question_model_created_on
         self.last_updated = question_model_last_updated
 
@@ -478,15 +989,17 @@ class QuestionSummary(python_utils.OBJECT):
         return {
             'id': self.id,
             'question_content': self.question_content,
+            'interaction_id': self.interaction_id,
             'last_updated_msec': utils.get_time_in_millisecs(self.last_updated),
-            'created_on_msec': utils.get_time_in_millisecs(self.created_on)
+            'created_on_msec': utils.get_time_in_millisecs(self.created_on),
+            'misconception_ids': self.misconception_ids
         }
 
     def validate(self):
         """Validates the Question summary domain object before it is saved.
 
         Raises:
-            ValidationError: One or more attributes of question summary are
+            ValidationError. One or more attributes of question summary are
                 invalid.
         """
         if not isinstance(self.id, python_utils.BASESTRING):
@@ -498,6 +1011,11 @@ class QuestionSummary(python_utils.OBJECT):
                 'Expected question content to be a string, received %s' %
                 self.question_content)
 
+        if not isinstance(self.interaction_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected interaction id to be a string, received %s' %
+                self.interaction_id)
+
         if not isinstance(self.created_on, datetime.datetime):
             raise utils.ValidationError(
                 'Expected created on to be a datetime, received %s' %
@@ -507,6 +1025,13 @@ class QuestionSummary(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected last updated to be a datetime, received %s' %
                 self.last_updated)
+
+        if not (isinstance(self.misconception_ids, list) and (
+                all(isinstance(elem, python_utils.BASESTRING) for elem in (
+                    self.misconception_ids)))):
+            raise utils.ValidationError(
+                'Expected misconception ids to be a list of '
+                'strings, received %s' % self.misconception_ids)
 
 
 class QuestionSkillLink(python_utils.OBJECT):

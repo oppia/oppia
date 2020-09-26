@@ -39,18 +39,14 @@ angular.module('oppia').directive('adminConfigTab', [
       controller: [function() {
         var ctrl = this;
         ctrl.isNonemptyObject = function(object) {
-          var hasAtLeastOneElement = false;
-          for (var property in object) {
-            hasAtLeastOneElement = true;
-          }
-          return hasAtLeastOneElement;
+          return Object.keys(object).length !== 0;
         };
 
         ctrl.reloadConfigProperties = function() {
-          AdminDataService.getDataAsync().then(function(response) {
-            ctrl.configProperties = response.config_properties;
+          AdminDataService.getDataAsync().then(function(adminDataObject) {
+            ctrl.configProperties = adminDataObject.configProperties;
             // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the directive is migrated to angular
+            // once the directive is migrated to angular.
             $rootScope.$apply();
           });
         };

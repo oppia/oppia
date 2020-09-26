@@ -17,7 +17,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
 import re
+import zipfile
 
 from constants import constants
 from core.domain import exp_domain
@@ -25,9 +27,13 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
+
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 class ProfilePageTests(test_utils.GenericTestBase):
@@ -46,7 +52,7 @@ class ProfilePageTests(test_utils.GenericTestBase):
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
 
     def test_preference_page_updates(self):
-        self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         original_preferences = self.get_json('/preferenceshandler/data')
@@ -73,7 +79,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
             new_preferences['preferred_audio_language_code'], 'hi-en')
 
     def test_profile_data_is_independent_of_currently_logged_in_user(self):
-        self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
@@ -86,7 +92,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
             csrf_token=csrf_token)
         self.logout()
 
-        self.signup(self.VIEWER_EMAIL, username=self.VIEWER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
@@ -122,11 +128,11 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response['subject_interests'], ['editor', 'editing'])
 
     def test_preferences_page(self):
-        self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
 
         response = self.get_html_response(feconf.PREFERENCES_URL)
-        self.assertIn('{"title": "Preferences - Oppia"})', response.body)
+        self.assertIn('{"title": "Preferences | Oppia"})', response.body)
 
         self.logout()
 
@@ -285,13 +291,13 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         user_settings = user_services.get_user_settings(self.owner_id)
-        self.assertTrue(
-            user_settings.profile_picture_data_url.startswith(
-                'data:image/png;'))
+        self.assertTrue(test_utils.check_image_png_or_webp(
+            user_settings.profile_picture_data_url))
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
-            payload={'update_type': 'profile_picture_data_url',
-                     'data': 'new_profile_picture_data_url'},
+            {
+                'update_type': 'profile_picture_data_url',
+                'data': 'new_profile_picture_data_url'},
             csrf_token=csrf_token)
         user_settings = user_services.get_user_settings(self.owner_id)
         self.assertEqual(
@@ -306,8 +312,9 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.assertIsNone(user_settings.default_dashboard)
         self.put_json(
             feconf.PREFERENCES_DATA_URL,
-            payload={'update_type': 'default_dashboard',
-                     'data': constants.DASHBOARD_TYPE_CREATOR},
+            {
+                'update_type': 'default_dashboard',
+                'data': constants.DASHBOARD_TYPE_CREATOR},
             csrf_token=csrf_token)
         user_settings = user_services.get_user_settings(self.owner_id)
         self.assertEqual(
@@ -320,7 +327,7 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Invalid update type:'):
             self.put_json(
                 feconf.PREFERENCES_DATA_URL,
-                payload={'update_type': 'invalid_update_type'},
+                {'update_type': 'invalid_update_type'},
                 csrf_token=csrf_token)
         self.logout()
 
@@ -357,8 +364,9 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
             },
             csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(user_bio_response['status_code'], 400)
-        self.assertIn('User bio exceeds maximum character limit: 2000',
-                      user_bio_response['error'])
+        self.assertIn(
+            'User bio exceeds maximum character limit: 2000',
+            user_bio_response['error'])
         self.logout()
 
 
@@ -500,7 +508,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         preferences of the user.
         """
 
-        self.signup(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -791,6 +799,98 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
             self.delete_json('/delete-account-handler', expected_status_int=404)
 
 
+class ExportAccountHandlerTests(test_utils.GenericTestBase):
+    GENERIC_DATE = datetime.datetime(2019, 5, 20)
+    GENERIC_EPOCH = utils.get_time_in_millisecs(GENERIC_DATE)
+
+    def setUp(self):
+        super(ExportAccountHandlerTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+
+        user_models.UserSubscriptionsModel(
+            id=self.get_user_id_from_email(self.EDITOR_EMAIL),
+            creator_ids=[],
+            collection_ids=[],
+            activity_ids=[],
+            general_feedback_thread_ids=[]).put()
+
+    def test_export_account_handler(self):
+        # Update user settings to constants.
+        user_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        user_settings = user_services.get_user_settings(user_id)
+        user_settings.last_agreed_to_terms = self.GENERIC_DATE
+        user_settings.last_logged_in = self.GENERIC_DATE
+        user_settings.validate()
+        user_models.UserSettingsModel(
+            id=user_settings.user_id,
+            gae_id=user_settings.gae_id,
+            email=user_settings.email,
+            role=user_settings.role,
+            username=user_settings.username,
+            normalized_username=user_settings.normalized_username,
+            last_agreed_to_terms=user_settings.last_agreed_to_terms,
+            last_started_state_editor_tutorial=(
+                user_settings.last_started_state_editor_tutorial),
+            last_started_state_translation_tutorial=(
+                user_settings.last_started_state_translation_tutorial),
+            last_logged_in=user_settings.last_logged_in,
+            last_edited_an_exploration=user_settings.last_edited_an_exploration,
+            last_created_an_exploration=(
+                user_settings.last_created_an_exploration),
+            profile_picture_data_url=user_settings.profile_picture_data_url,
+            default_dashboard=user_settings.default_dashboard,
+            creator_dashboard_display_pref=(
+                user_settings.creator_dashboard_display_pref),
+            user_bio=user_settings.user_bio,
+            subject_interests=user_settings.subject_interests,
+            first_contribution_msec=user_settings.first_contribution_msec,
+            preferred_language_codes=user_settings.preferred_language_codes,
+            preferred_site_language_code=(
+                user_settings.preferred_site_language_code),
+            preferred_audio_language_code=(
+                user_settings.preferred_audio_language_code),
+            deleted=user_settings.deleted
+        ).put()
+
+        constants_swap = self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True)
+        time_swap = self.swap(
+            user_services, 'record_user_logged_in', lambda *args: None)
+
+        with constants_swap, time_swap:
+            data = self.get_custom_response(
+                '/export-account-handler', 'text/plain')
+
+            # Check downloaded zip file.
+            filename = 'oppia_takeout_data.zip'
+            self.assertEqual(
+                data.headers['Content-Disposition'],
+                'attachment; filename=%s' % filename)
+            zf_saved = zipfile.ZipFile(
+                python_utils.string_io(buffer_value=data.body))
+            self.assertEqual(
+                zf_saved.namelist(),
+                [
+                    'oppia_takeout_data.json',
+                    'images/user_settings_profile_picture.png'
+                ]
+            )
+
+    def test_export_account_handler_disabled_logged_in(self):
+        with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', False):
+            self.get_json('/export-account-handler', expected_status_int=404)
+
+    def test_export_account_hander_disabled_logged_out(self):
+        self.logout()
+        with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', False):
+            self.get_json('/export-account-handler', expected_status_int=401)
+
+    def test_export_account_handler_enabled_logged_out(self):
+        self.logout()
+        with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True):
+            self.get_json('/export-account-handler', expected_status_int=401)
+
+
 class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
 
     def test_get_pending_account_deletion_page(self):
@@ -800,14 +900,14 @@ class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
 
     def test_get_pending_account_deletion_page_disabled(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
-            self.get_html_response('/pending-account-deletion',
-                                   expected_status_int=404)
+            self.get_html_response(
+                '/pending-account-deletion', expected_status_int=404)
 
 
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):
 
     def test_username_check(self):
-        self.signup('abc@example.com', username='abc')
+        self.signup('abc@example.com', 'abc')
 
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -878,7 +978,7 @@ class SiteLanguageHandlerTests(test_utils.GenericTestBase):
         self.assertIsNone(user_settings.preferred_site_language_code)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            feconf.SITE_LANGUAGE_DATA_URL, payload={'site_language_code': 'en'},
+            feconf.SITE_LANGUAGE_DATA_URL, {'site_language_code': 'en'},
             csrf_token=csrf_token)
         user_settings = user_services.get_user_settings(
             self.editor_id, strict=True)

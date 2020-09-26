@@ -18,6 +18,20 @@
 
 // Individual object editor directives are in extensions/objects/templates.
 
+import { CustomSchema } from 'services/schema-default-value.service';
+
+interface ObjectEditorCustomScope extends ng.IScope {
+  objType?: string;
+  schema: CustomSchema;
+  initArgs?: Object;
+  getInitArgs?: (() => Object);
+  alwaysEditable?: boolean;
+  isEditable?: boolean;
+  getAlwaysEditable?: (() => boolean);
+  getIsEditable?: (() => boolean);
+  getSchema?: (() => CustomSchema);
+}
+
 angular.module('oppia').directive('objectEditor', [
   '$compile', '$log', function($compile, $log) {
     return {
@@ -26,9 +40,10 @@ angular.module('oppia').directive('objectEditor', [
         initArgs: '=',
         isEditable: '@',
         objType: '@',
+        getSchema: '&schema',
         value: '='
       },
-      link: function(scope: ICustomScope, element) {
+      link: function(scope: ObjectEditorCustomScope, element) {
         // Converts a camel-cased string to a lower-case hyphen-separated
         // string.
         var directiveName = scope.objType.replace(
@@ -47,7 +62,7 @@ angular.module('oppia').directive('objectEditor', [
             '<' + directiveName +
             '-editor get-always-editable="getAlwaysEditable()"' +
             ' get-init-args="getInitArgs()" get-is-editable="getIsEditable()"' +
-            ' obj-type="objType" value="value"></' +
+            ' get-schema="getSchema()" value="value"></' +
             directiveName + '-editor>');
           $compile(element.contents())(scope);
         } else {

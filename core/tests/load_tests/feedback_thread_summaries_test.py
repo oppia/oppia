@@ -79,6 +79,6 @@ class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
 
         start = time.time()
         # Fetch the summaries of all the threads.
-        feedback_services.get_thread_summaries(self.user_id, thread_ids)
+        feedback_services.get_exp_thread_summaries(self.user_id, thread_ids)
         elapsed_time = time.time() - start
         self.assertLessEqual(elapsed_time, 1.7)

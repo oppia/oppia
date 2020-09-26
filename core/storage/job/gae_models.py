@@ -97,15 +97,21 @@ class JobModel(base_models.BaseModel):
         """JobModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """JobModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'job_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_queued_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_started_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'time_finished_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'status_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'metadata': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'output': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'error': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'has_been_cleaned_up': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'additional_job_params': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @property
     def is_cancelable(self):
@@ -187,6 +193,7 @@ class ContinuousComputationModel(base_models.BaseModel):
     The id of each instance of this model is the name of the continuous
     computation manager class.
     """
+
     # The current status code for the computation.
     status_code = ndb.StringProperty(
         indexed=True,
@@ -218,12 +225,14 @@ class ContinuousComputationModel(base_models.BaseModel):
         """ContinuousComputationModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ContinuousComputationModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'status_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'active_realtime_layer_index':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_started_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_finished_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_stopped_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })

@@ -16,17 +16,31 @@
  * @fileoverview Unit tests for QuestionsListService.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
+import { QuestionBackendApiService } from
+  'domain/question/question-backend-api.service.ts';
 import { QuestionSummaryForOneSkillObjectFactory } from
   'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { QuestionSummaryObjectFactory } from
   'domain/question/QuestionSummaryObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
+
+import { Subscription } from 'rxjs';
 
 require('services/csrf-token.service.ts');
 
 describe('Questions List Service', function() {
   var qls = null;
   var $q, $httpBackend;
+  var questionBackendApiService = null;
+  var httpTestingController = null;
+
+  var testSubscriptions = null;
+  var quesionSummariesInitializedSpy = null;
+
   var sampleResponse = {
     question_summary_dicts: [{
       skill_descriptions: [],
@@ -41,8 +55,14 @@ describe('Questions List Service', function() {
     next_start_cursor: null
   };
   var CsrfService;
-  var broadcastSpy;
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    questionBackendApiService = TestBed.get(QuestionBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
@@ -55,6 +75,7 @@ describe('Questions List Service', function() {
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
+    $provide.value('QuestionBackendApiService', questionBackendApiService);
   }));
   beforeEach(angular.mock.inject(function($injector, _$q_, $rootScope) {
     qls = $injector.get('QuestionsListService');
@@ -68,9 +89,21 @@ describe('Questions List Service', function() {
       deferred.resolve('sample-csrf-token');
       return deferred.promise;
     });
-
-    broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
   }));
+
+  beforeEach(() => {
+    quesionSummariesInitializedSpy = jasmine.createSpy(
+      'questionSummariesInitialized');
+    testSubscriptions = new Subscription();
+    testSubscriptions.add(qls.onQuestionSummariesInitialized.subscribe(
+      quesionSummariesInitializedSpy
+    ));
+  });
+
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+    httpTestingController.verify();
+  });
 
   it('should handle page number changes', function() {
     expect(qls.getCurrentPageNumber()).toBe(0);
@@ -94,87 +127,103 @@ describe('Questions List Service', function() {
       $httpBackend.verifyNoOutstandingRequest();
     });
 
-  it('should get question summaries twice with history reset', function() {
-    var skillIds = ['1'];
-    $httpBackend.expect(
-      'GET', '/questions_list_handler/1?cursor=').respond(
-      sampleResponse);
-    qls.getQuestionSummariesAsync(skillIds, true, true);
-    $httpBackend.flush();
+  it('should get question summaries twice with history reset',
+    fakeAsync(() => {
+      var skillIds = ['1'];
+      qls.getQuestionSummariesAsync(skillIds, true, true);
+      let req = httpTestingController.expectOne(
+        '/questions_list_handler/1?cursor=');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleResponse);
 
-    expect(qls.getCurrentPageNumber()).toBe(0);
-    expect(qls.isLastQuestionBatch()).toBe(true);
+      flushMicrotasks();
 
-    $httpBackend.expect(
-      'GET', '/questions_list_handler/1?cursor=').respond(
-      sampleResponse);
-    qls.getQuestionSummariesAsync(skillIds, true, true);
-    $httpBackend.flush();
-    expect(broadcastSpy).toHaveBeenCalledTimes(2);
-  });
+      expect(qls.getCurrentPageNumber()).toBe(0);
+      expect(qls.isLastQuestionBatch()).toBe(true);
+
+      qls.getQuestionSummariesAsync(skillIds, true, true);
+      req = httpTestingController.expectOne(
+        '/questions_list_handler/1?cursor=');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleResponse);
+      flushMicrotasks();
+
+      expect(quesionSummariesInitializedSpy).toHaveBeenCalledTimes(2);
+    })
+  );
 
   it('should not get question summaries twice when page number doesn\'t' +
-    ' increase', function() {
+    ' increase', fakeAsync(() => {
     var skillIds = ['1'];
-    $httpBackend.expect(
-      'GET', '/questions_list_handler/1?cursor=').respond(
-      sampleResponse);
     qls.getQuestionSummariesAsync(skillIds, true, false);
-    $httpBackend.flush();
+    let req = httpTestingController.expectOne(
+      '/questions_list_handler/1?cursor=');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleResponse);
+
+    flushMicrotasks();
 
     expect(qls.getCurrentPageNumber()).toBe(0);
     expect(qls.isLastQuestionBatch()).toBe(true);
 
-    // Try to get questions again before incresing pagenumber
+    // Try to get questions again before incresing pagenumber.
     qls.getQuestionSummariesAsync(skillIds, true, true);
-    $httpBackend.verifyNoOutstandingRequest();
+    req = httpTestingController.expectOne(
+      '/questions_list_handler/1?cursor=');
+    flushMicrotasks();
+    httpTestingController.verify();
 
-    // Increase page number
+    // Increase page number.
     qls.incrementPageNumber();
     expect(qls.getCurrentPageNumber()).toBe(1);
     expect(qls.isLastQuestionBatch()).toBe(false);
 
-    $httpBackend.expect(
-      'GET', '/questions_list_handler/1?cursor=').respond(
-      sampleResponse);
     qls.getQuestionSummariesAsync(skillIds, true, false);
-    $httpBackend.flush();
-    expect(broadcastSpy).toHaveBeenCalledTimes(2);
-  });
+    req = httpTestingController.expectOne(
+      '/questions_list_handler/1?cursor=');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleResponse);
+    flushMicrotasks();
+    expect(quesionSummariesInitializedSpy).toHaveBeenCalledTimes(2);
+  }));
 
   it('should get more than one question summary with history reseted',
-    function() {
+    fakeAsync(() => {
       var skillIds = ['1', '2'];
-      $httpBackend.expect(
-        'GET', '/questions_list_handler/1%2C2?cursor=').respond(
-        sampleResponse);
       qls.getQuestionSummariesAsync(skillIds, true, true);
-      $httpBackend.flush();
+      let req = httpTestingController.expectOne(
+        '/questions_list_handler/1%2C2?cursor=');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleResponse);
+      flushMicrotasks();
 
       expect(qls.getCurrentPageNumber()).toBe(0);
       expect(qls.isLastQuestionBatch()).toBe(true);
-      expect(broadcastSpy).toHaveBeenCalled();
+      expect(quesionSummariesInitializedSpy).toHaveBeenCalled();
 
-      $httpBackend.expect(
-        'GET', '/questions_list_handler/1%2C2?cursor=').respond(
-        sampleResponse);
       qls.getQuestionSummariesAsync(skillIds, true, true);
-      $httpBackend.flush();
-    });
+      req = httpTestingController.expectOne(
+        '/questions_list_handler/1%2C2?cursor=');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleResponse);
+      flushMicrotasks();
+    })
+  );
 
-  it('should get cached question summaries', function() {
+  it('should get cached question summaries', fakeAsync(() => {
     var skillIds = ['1'];
-    $httpBackend.expect(
-      'GET', '/questions_list_handler/1?cursor=').respond(
-      sampleResponse);
     qls.getQuestionSummariesAsync(skillIds, true, true);
-    $httpBackend.flush();
+    let req = httpTestingController.expectOne(
+      '/questions_list_handler/1?cursor=');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleResponse);
+    flushMicrotasks();
 
     expect(qls.getCurrentPageNumber()).toBe(0);
     expect(qls.isLastQuestionBatch()).toBe(true);
-    expect(broadcastSpy).toHaveBeenCalledTimes(1);
+    expect(quesionSummariesInitializedSpy).toHaveBeenCalledTimes(1);
 
     var cachedQuestionSummaries = qls.getCachedQuestionSummaries();
     expect(cachedQuestionSummaries[0]._questionSummary._questionId).toBe('0');
-  });
+  }));
 });

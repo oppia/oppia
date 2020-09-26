@@ -16,16 +16,16 @@
  * @fileoverview Constants for interactions extensions.
  */
 
-export class InteractionsExtensionsConstants {
+export const InteractionsExtensionsConstants = {
   // Minimum confidence required for a predicted answer group to be shown to
   // user. Generally a threshold of 0.7-0.8 is assumed to be a good one in
   // practice, however value need not be in those bounds.
-  public static CODE_REPL_PREDICTION_SERVICE_THRESHOLD = 0.7;
+  CODE_REPL_PREDICTION_SERVICE_THRESHOLD: 0.7,
 
-  public static GRAPH_INPUT_LEFT_MARGIN = 120;
+  GRAPH_INPUT_LEFT_MARGIN: 120,
 
   // Gives the staff-lines human readable values.
-  public static NOTE_NAMES_TO_MIDI_VALUES = {
+  NOTE_NAMES_TO_MIDI_VALUES: {
     A5: 81,
     G5: 79,
     F5: 77,
@@ -39,10 +39,10 @@ export class InteractionsExtensionsConstants {
     E4: 64,
     D4: 62,
     C4: 60
-  };
+  },
 
   // Minimum confidence required for a predicted answer group to be shown to
   // user. Generally a threshold of 0.7-0.8 is assumed to be a good one in
   // practice, however value need not be in those bounds.
-  public static TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD = 0.7;
-}
+  TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD: 0.7,
+} as const;

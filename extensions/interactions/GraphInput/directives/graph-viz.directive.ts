@@ -23,8 +23,11 @@
 require('interactions/GraphInput/directives/graph-detail.service.ts');
 require('services/contextual/device-info.service.ts');
 require('services/stateful/focus-manager.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
 
 require('interactions/interactions-extension.constants.ajs.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('graphViz', [
   function() {
@@ -46,14 +49,15 @@ angular.module('oppia').directive('graphViz', [
       template: require('./graph-viz.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$element', '$attrs', '$document',
-        'FocusManagerService', 'GraphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
-        'EVENT_NEW_CARD_AVAILABLE', 'DeviceInfoService',
+        '$document', '$element', 'DeviceInfoService', 'FocusManagerService',
+        'GraphDetailService', 'PlayerPositionService',
+        'GRAPH_INPUT_LEFT_MARGIN',
         function(
-            $scope, $element, $attrs, $document,
-            FocusManagerService, GraphDetailService, GRAPH_INPUT_LEFT_MARGIN,
-            EVENT_NEW_CARD_AVAILABLE, DeviceInfoService) {
+            $document, $element, DeviceInfoService, FocusManagerService,
+            GraphDetailService, PlayerPositionService,
+            GRAPH_INPUT_LEFT_MARGIN) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var _MODES = {
             MOVE: 0,
             ADD_EDGE: 1,
@@ -61,7 +65,7 @@ angular.module('oppia').directive('graphViz', [
             DELETE: 3
           };
           var vizContainer = $($element).find('.oppia-graph-viz-svg');
-          // Styling functions
+          // Styling functions.
           var DELETE_COLOR = 'red';
           var HOVER_COLOR = 'aqua';
           var SELECT_COLOR = 'orange';
@@ -218,7 +222,7 @@ angular.module('oppia').directive('graphViz', [
                 ' ' + (viewBoxHeight));
           };
           ctrl.toggleGraphOption = function(option) {
-            // Handle the case when we have two edges s -> d and d -> s
+            // Handle the case when we have two edges s -> d and d -> s.
             if (option === 'isDirected' && ctrl.graph[option]) {
               _deleteRepeatedUndirectedEdges();
             }
@@ -255,9 +259,9 @@ angular.module('oppia').directive('graphViz', [
 
           // TODO(czx): Consider if there's a neat way to write a reset()
           // function to clear bits of ctrl.state
-          // (e.g. currentlyDraggedVertex, addEdgeVertex)
+          // (e.g. currentlyDraggedVertex, addEdgeVertex).
 
-          // Vertex events
+          // ---- Vertex events ----
           ctrl.onClickVertex = function(index) {
             if (ctrl.state.currentMode === _MODES.DELETE) {
               if (ctrl.canDeleteVertex) {
@@ -348,7 +352,7 @@ angular.module('oppia').directive('graphViz', [
             }
           };
 
-          // Edge events
+          // ---- Edge events ----
           ctrl.onClickEdge = function(index) {
             if (ctrl.state.currentMode === _MODES.DELETE) {
               if (ctrl.canDeleteEdge) {
@@ -367,7 +371,7 @@ angular.module('oppia').directive('graphViz', [
             }
           };
 
-          // Document event
+          // ---- Document event ----
           ctrl.onMouseupDocument = function() {
             if (ctrl.isMobile) {
               return;
@@ -384,7 +388,7 @@ angular.module('oppia').directive('graphViz', [
               }
             }
           };
-          // Actions
+          // ---- Actions ----
           var beginAddEdge = function(startIndex) {
             ctrl.state.addEdgeVertex = startIndex;
           };
@@ -474,7 +478,7 @@ angular.module('oppia').directive('graphViz', [
 
           var deleteVertex = function(index) {
             // Using jQuery's map instead of normal array.map because
-            // it removes elements for which the callback returns null
+            // it removes elements for which the callback returns null.
             ctrl.graph.edges = $.map(ctrl.graph.edges, function(edge) {
               if (edge.src === index || edge.dst === index) {
                 return null;
@@ -526,9 +530,11 @@ angular.module('oppia').directive('graphViz', [
             ctrl.state.selectedEdge = null;
           };
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-              ctrl.state.currentMode = null;
-            });
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onNewCardAvailable.subscribe(
+                () => ctrl.state.currentMode = null
+              )
+            );
             // The current state of the UI and stuff like that.
             ctrl.state = {
               currentMode: _MODES.MOVE,
@@ -589,6 +595,9 @@ angular.module('oppia').directive('graphViz', [
             if (ctrl.isInteractionActive()) {
               ctrl.init();
             }
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

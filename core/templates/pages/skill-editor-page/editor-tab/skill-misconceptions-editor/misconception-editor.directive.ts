@@ -33,11 +33,11 @@ angular.module('oppia').directive('misconceptionEditor', [
         '/pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
         'misconception-editor.directive.html'),
       controller: [
-        '$scope', 'SkillUpdateService', 'SkillEditorStateService',
-        'MISCONCEPTION_NAME_CHAR_LIMIT',
+        '$scope', 'SkillEditorStateService', 'SkillUpdateService',
+        'MAX_CHARS_IN_MISCONCEPTION_NAME',
         function(
-            $scope, SkillUpdateService, SkillEditorStateService,
-            MISCONCEPTION_NAME_CHAR_LIMIT) {
+            $scope, SkillEditorStateService, SkillUpdateService,
+            MAX_CHARS_IN_MISCONCEPTION_NAME) {
           var ctrl = this;
           var nameMemento = null;
           var notesMemento = null;
@@ -143,8 +143,8 @@ angular.module('oppia').directive('misconceptionEditor', [
 
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
-            $scope.MISCONCEPTION_NAME_CHAR_LIMIT = (
-              MISCONCEPTION_NAME_CHAR_LIMIT);
+            $scope.MAX_CHARS_IN_MISCONCEPTION_NAME = (
+              MAX_CHARS_IN_MISCONCEPTION_NAME);
             $scope.nameEditorIsOpen = false;
             $scope.notesEditorIsOpen = false;
             $scope.feedbackEditorIsOpen = false;

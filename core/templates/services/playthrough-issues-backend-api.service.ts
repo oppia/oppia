@@ -15,87 +15,114 @@
 /**
  * @fileoverview Service for fetching issues and playthroughs from the backend.
  */
-require('domain/statistics/PlaythroughObjectFactory.ts');
-require('domain/statistics/PlaythroughIssueObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
 
-require('services/services.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('PlaythroughIssuesBackendApiService', [
-  '$http', '$q', 'PlaythroughIssueObjectFactory', 'PlaythroughObjectFactory',
-  'UrlInterpolationService', 'FETCH_ISSUES_URL', 'FETCH_PLAYTHROUGH_URL',
-  'RESOLVE_ISSUE_URL',
-  function(
-      $http, $q, PlaythroughIssueObjectFactory, PlaythroughObjectFactory,
-      UrlInterpolationService, FETCH_ISSUES_URL, FETCH_PLAYTHROUGH_URL,
-      RESOLVE_ISSUE_URL) {
-    /** @type {PlaythroughIssue[]} */
-    var cachedIssues = null;
+import {
+  PlaythroughIssueBackendDict,
+  PlaythroughIssue,
+  PlaythroughIssueObjectFactory
+} from 'domain/statistics/PlaythroughIssueObjectFactory.ts';
+import { ServicesConstants } from 'services/services.constants.ts';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service.ts';
 
-    var getFullIssuesUrl = function(explorationId) {
-      return UrlInterpolationService.interpolateUrl(
-        FETCH_ISSUES_URL, {
-          exploration_id: explorationId
+@Injectable({ providedIn: 'root' })
+export class PlaythroughIssuesBackendApiService {
+  private cachedIssues = null;
+
+  constructor(
+      private httpClient: HttpClient,
+      private playthroughIssueObjectFactory: PlaythroughIssueObjectFactory,
+      private urlInterpolationService: UrlInterpolationService) {}
+
+  fetchIssues(
+      explorationId: string,
+      explorationVersion: number): Promise<PlaythroughIssue[]> {
+    if (this.cachedIssues !== null) {
+      return Promise.resolve(this.cachedIssues);
+    }
+
+    return new Promise((resolve, reject) => {
+      this.httpClient.get<PlaythroughIssueBackendDict[]>(
+        this.getFetchIssuesUrl(explorationId), {
+          params: { exp_version: explorationVersion.toString() }}).toPromise()
+        .then(response => {
+          resolve(this.cachedIssues = response.map(
+            this.playthroughIssueObjectFactory.createFromBackendDict));
+        }, errorResponse => {
+          reject(errorResponse.error.error);
         });
-    };
+    });
+  }
 
-    var getFullPlaythroughUrl = function(expId, playthroughId) {
-      return UrlInterpolationService.interpolateUrl(
-        FETCH_PLAYTHROUGH_URL, {
-          exploration_id: expId,
-          playthrough_id: playthroughId
+  fetchPlaythrough(
+      explorationId: string,
+      playthroughId: string): Promise<PlaythroughIssue> {
+    return new Promise((resolve, reject) => {
+      this.httpClient.get<PlaythroughIssueBackendDict>(
+        this.getFetchPlaythroughUrl(explorationId, playthroughId)).toPromise()
+        .then(response => {
+          resolve(this.playthroughIssueObjectFactory.createFromBackendDict(
+            response));
+        }, errorResponse => {
+          reject(errorResponse.error.error);
         });
-    };
+    });
+  }
 
-    var getFullResolveIssueUrl = function(explorationId) {
-      return UrlInterpolationService.interpolateUrl(
-        RESOLVE_ISSUE_URL, {
-          exploration_id: explorationId
-        });
-    };
-    return {
-      fetchIssues: function(explorationId, explorationVersion) {
-        if (cachedIssues !== null) {
-          return $q.resolve(cachedIssues);
-        } else {
-          return $http.get(getFullIssuesUrl(explorationId), {
-            params: {
-              exp_version: explorationVersion
+  resolveIssue(
+      issueToResolve: PlaythroughIssue,
+      explorationId: string, explorationVersion: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.httpClient.post(this.getResolveIssueUrl(explorationId), {
+        exp_issue_dict: issueToResolve.toBackendDict(),
+        exp_version: explorationVersion
+      }).toPromise()
+        .then(() => {
+          if (this.cachedIssues !== null) {
+            const issueIndex = this.cachedIssues.findIndex(
+              issue => angular.equals(issue, issueToResolve));
+            if (issueIndex !== -1) {
+              this.cachedIssues.splice(issueIndex, 1);
+              resolve();
             }
-          }).then(function(response) {
-            var unresolvedIssueBackendDicts = response.data;
-            cachedIssues = unresolvedIssueBackendDicts.map(
-              PlaythroughIssueObjectFactory.createFromBackendDict);
-            return cachedIssues;
-          });
-        }
-      },
-      fetchPlaythrough: function(expId, playthroughId) {
-        return $http.get(getFullPlaythroughUrl(expId, playthroughId)).then(
-          function(response) {
-            var playthroughBackendDict = response.data;
-            return PlaythroughObjectFactory.createFromBackendDict(
-              playthroughBackendDict);
-          });
-      },
-      resolveIssue: function(issueToResolve, expId, expVersion) {
-        return $http.post(getFullResolveIssueUrl(expId), {
-          exp_issue_dict: issueToResolve.toBackendDict(),
-          exp_version: expVersion
-        }).then(function() {
-          var issueIndex = cachedIssues !== null ?
-            cachedIssues.findIndex(function(issue) {
-              return angular.equals(issue, issueToResolve);
-            }) : -1;
-          if (issueIndex === -1) {
-            var invalidIssueError = new Error(
-              'An issue which was not fetched from the backend has been ' +
-              'resolved');
-            return $q.reject(invalidIssueError);
-          } else {
-            cachedIssues.splice(issueIndex, 1);
           }
+          reject(
+            'An issue which was not fetched from the backend ' +
+            'has been resolved');
+        }, errorResponse => {
+          reject(errorResponse.error.error);
         });
-      },
-    };
-  }]);
+    });
+  }
+
+  private getFetchIssuesUrl(explorationId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      ServicesConstants.FETCH_ISSUES_URL, {
+        exploration_id: explorationId
+      });
+  }
+
+  private getFetchPlaythroughUrl(
+      explorationId: string, playthroughId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      ServicesConstants.FETCH_PLAYTHROUGH_URL, {
+        exploration_id: explorationId,
+        playthrough_id: playthroughId
+      });
+  }
+
+  private getResolveIssueUrl(explorationId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      ServicesConstants.RESOLVE_ISSUE_URL, {
+        exploration_id: explorationId
+      });
+  }
+}
+
+angular.module('oppia').factory(
+  'PlaythroughIssuesBackendApiService',
+  downgradeInjectable(PlaythroughIssuesBackendApiService));

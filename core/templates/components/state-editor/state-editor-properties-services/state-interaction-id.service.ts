@@ -16,7 +16,7 @@
  * @fileoverview A data service that stores the current interaction id.
  */
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
 import { StatePropertyService } from
@@ -28,10 +28,15 @@ import { UtilsService } from 'services/utils.service';
   providedIn: 'root'
 })
 // TODO(sll): Add validation.
-export class StateInteractionIdService extends StatePropertyService {
+export class StateInteractionIdService extends StatePropertyService<string> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveInteractionId';
+  }
+  private _interactionIdChanged = new EventEmitter<string>();
+
+  get onInteractionIdChanged(): EventEmitter<string> {
+    return this._interactionIdChanged;
   }
 }
 

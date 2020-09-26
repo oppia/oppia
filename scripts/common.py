@@ -26,39 +26,111 @@ import shutil
 import socket
 import subprocess
 import sys
+import time
 
+import feconf
 import python_utils
 import release_constants
 
-PSUTIL_VERSION = '5.6.7'
 
 CURRENT_PYTHON_BIN = sys.executable
-NODE_VERSION = '10.18.0'
+
+# Versions of libraries used in devflow.
+COVERAGE_VERSION = '5.1'
+ESPRIMA_VERSION = '4.0.1'
+ISORT_VERSION = '4.3.21'
+PYCODESTYLE_VERSION = '2.5.0'
+PSUTIL_VERSION = '5.7.0'
+PYLINT_VERSION = '1.9.5'
+PYLINT_QUOTES_VERSION = '0.1.8'
+PYGITHUB_VERSION = '1.45'
+WEBTEST_VERSION = '2.0.35'
+PIP_TOOLS_VERSION = '5.3.1'
+
+# Node version.
+NODE_VERSION = '12.16.2'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
-YARN_VERSION = '1.22.0'
+YARN_VERSION = '1.22.4'
 
-COVERAGE_VERSION = '4.5.4'
+# Versions of libraries used in backend.
+PILLOW_VERSION = '6.2.2'
+
+# We use redis 6.0.5 instead of the latest stable build of redis (6.0.6) because
+# there is a `make test` bug in redis 6.0.6 where the solution has not been
+# released. This is explained in this issue:
+# https://github.com/redis/redis/issues/7540.
+# IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
+# 1. Download the new version of the redis cli.
+# 2. Extract the cli in the folder that it was downloaded, most likely
+#    Downloads/.
+# 3. Change directories into the folder you extracted, titled
+#    redis-<new version>/ and change into that directory:
+#    cd redis-<new version>/
+# 4. From the top level of the redis-<new version> directory,
+#    run `make test`.
+# 5. All of the tests should pass with an [ok] status with no error codes. The
+#    final output should be 'All tests pass'.
+# 6. Be sure to leave a note in the PR description to confirm that you have read
+#    this message, and that all of the `make test` tests pass before you commit
+#    the upgrade to develop.
+# 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
+REDIS_CLI_VERSION = '6.0.5'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
+OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
-GOOGLE_APP_ENGINE_HOME = os.path.join(
-    OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine')
+THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
-    OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0', 'google-cloud-sdk')
+    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-304.0.0', 'google-cloud-sdk')
+GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
+    GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
+GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
+GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
+PYLINT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylint-%s' % PYLINT_VERSION)
+PYCODESTYLE_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'pycodestyle-%s' % PYCODESTYLE_VERSION)
+PYLINT_QUOTES_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % PYLINT_QUOTES_VERSION)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
 PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
+REDIS_SERVER_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
+    'src', 'redis-server')
+REDIS_CLI_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
+    'src', 'redis-cli')
+
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
 HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
+USER_PREFERENCES = {'open_new_tab_in_browser': None}
+
+FECONF_PATH = os.path.join('feconf.py')
+CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
+MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
+REDIS_CONF_PATH = os.path.join('redis.conf')
+# Path for the dump file the redis server autogenerates. It contains data
+# used by the Redis server.
+REDIS_DUMP_PATH = os.path.join(CURR_DIR, 'dump.rdb')
+# The requirements.txt file is auto-generated and contains a deterministic list
+# of all libraries and versions that should exist in the
+# 'third_party/python_libs' directory.
+# NOTE: Developers should NOT modify this file.
+COMPILED_REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.txt')
+# The precompiled requirements file is the one that developers should be
+# modifying. It is the file that we use to recompile the
+# "requirements.txt" file so that all installations using "requirements.txt"
+# will be identical.
+REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.in')
 
 
 def is_windows_os():
@@ -131,6 +203,15 @@ def require_cwd_to_be_oppia(allow_deploy_dir=False):
 
 def open_new_tab_in_browser_if_possible(url):
     """Opens the given URL in a new browser tab, if possible."""
+    if USER_PREFERENCES['open_new_tab_in_browser'] is None:
+        python_utils.PRINT(
+            '\nDo you want the url to be opened in the browser? '
+            'Confirm by entering y/ye/yes.')
+        USER_PREFERENCES['open_new_tab_in_browser'] = python_utils.INPUT()
+    if USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:
+        python_utils.PRINT(
+            'Please open the following link in browser: %s' % url)
+        return
     browser_cmds = ['chromium-browser', 'google-chrome', 'firefox']
     for cmd in browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
@@ -220,6 +301,17 @@ def get_current_release_version_number(release_branch_name):
         raise Exception('Invalid branch name: %s.' % release_branch_name)
 
 
+def is_current_branch_a_hotfix_branch():
+    """Checks if the current branch is a hotfix branch.
+
+    Returns:
+        bool. Whether the current branch is hotfix branch.
+    """
+    current_branch_name = get_current_branch_name()
+    return bool(
+        re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
+
+
 def is_current_branch_a_release_branch():
     """Returns whether the current branch is a release branch.
 
@@ -279,7 +371,11 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
                 'git@github.com:oppia/release-scripts.git'])
 
     with CD(release_scripts_dirpath):
+        python_utils.PRINT('Verifying that ../release-scripts repo is clean...')
         verify_local_repo_is_clean()
+        python_utils.PRINT(
+            'Verifying that user is on master branch in '
+            '../release-scripts repo...')
         verify_current_branch_name('master')
 
         # Update the local repo.
@@ -294,7 +390,7 @@ def is_port_open(port):
     Args:
         port: int. The port number.
 
-    Return:
+    Returns:
         bool. True if port is open else False.
     """
     with contextlib.closing(
@@ -384,7 +480,7 @@ def get_personal_access_token():
         str. The personal access token for the GitHub id of user.
 
     Raises:
-        Exception: Personal access token is None.
+        Exception. Personal access token is None.
     """
     personal_access_token = getpass.getpass(
         prompt=(
@@ -406,8 +502,8 @@ def check_blocking_bug_issue_count(repo):
         repo: github.Repository.Repository. The PyGithub object for the repo.
 
     Raises:
-        Exception: Number of unresolved blocking bugs is not zero.
-        Exception: The blocking bug milestone is closed.
+        Exception. Number of unresolved blocking bugs is not zero.
+        Exception. The blocking bug milestone is closed.
     """
     blocking_bugs_milestone = repo.get_milestone(
         number=release_constants.BLOCKING_BUG_MILESTONE_NUMBER)
@@ -431,8 +527,8 @@ def check_prs_for_current_release_are_released(repo):
         repo: github.Repository.Repository. The PyGithub object for the repo.
 
     Raises:
-        Exception: Some pull requests for current release do not have a
-            PR: released label.
+        Exception. Some pull requests for current release do not have a
+            "PR: released" label.
     """
     current_release_label = repo.get_label(
         release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
@@ -533,6 +629,66 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
         os.remove(filename)
         shutil.move(backup_filename, filename)
         raise
+
+
+def wait_for_port_to_be_open(port_number):
+    """Wait until the port is open and exit if port isn't open after
+    1000 seconds.
+
+    Args:
+        port_number: int. The port number to wait.
+    """
+    waited_seconds = 0
+    while (not is_port_open(port_number)
+           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
+        time.sleep(1)
+        waited_seconds += 1
+    if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
+            and not is_port_open(port_number)):
+        python_utils.PRINT(
+            'Failed to start server on port %s, exiting ...' %
+            port_number)
+        sys.exit(1)
+
+
+def start_redis_server():
+    """Start the redis server with the daemonize argument to prevent
+    the redis-server from exiting on its own.
+    """
+    if is_windows_os():
+        raise Exception(
+            'The redis command line interface is not installed because your '
+            'machine is on the Windows operating system. The redis server '
+            'cannot start.')
+
+    # Check if a redis dump file currently exists. This file contains residual
+    # data from a previous run of the redis server. If it exists, removes the
+    # dump file so that the redis server starts with a clean slate.
+    if os.path.exists(REDIS_DUMP_PATH):
+        os.remove(REDIS_DUMP_PATH)
+
+    # Redis-cli is only required in a development environment.
+    python_utils.PRINT('Starting Redis development server.')
+    # Start the redis local development server. Redis doesn't run on
+    # Windows machines.
+    subprocess.call([
+        REDIS_SERVER_PATH, REDIS_CONF_PATH,
+        '--daemonize', 'yes'
+    ])
+    wait_for_port_to_be_open(feconf.REDISPORT)
+
+
+def stop_redis_server():
+    """Stops the redis server by shutting it down."""
+    if is_windows_os():
+        raise Exception(
+            'The redis command line interface is not installed because your '
+            'machine is on the Windows operating system. There is no redis '
+            'server to shutdown.')
+
+    python_utils.PRINT('Cleaning up the redis_servers.')
+    # Shutdown the redis server before exiting.
+    subprocess.call([REDIS_CLI_PATH, 'shutdown'])
 
 
 class CD(python_utils.OBJECT):

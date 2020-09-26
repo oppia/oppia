@@ -47,11 +47,9 @@ export class CollectionValidationService {
 
   // Validates that the tags for the collection are in the proper format,
   // returns true if all tags are in the correct format.
-  validateTagFormat(tags: string[]) {
+  validateTagFormat(tags: string[]): boolean {
     // Check to ensure that all tags follow the format specified in
     // TAG_REGEX.
-    // @ts-ignore: TODO(#7434): Remove this ignore after we find a way to get
-    // rid of the TS2339 error on AppConstants.
     var tagRegex = new RegExp(AppConstants.TAG_REGEX);
     return tags.every(function(tag) {
       return tag.match(tagRegex);
@@ -60,22 +58,20 @@ export class CollectionValidationService {
 
   // Validates that the tags for the collection do not have duplicates,
   // returns true if there are no duplicates.
-  validateDuplicateTags(tags: string[]) {
+  validateDuplicateTags(tags: string[]): boolean {
     return tags.every((tag: string, idx: number) => {
       return tags.indexOf(tag, idx + 1) === -1;
     });
   }
   // Validates that the tags for the collection are normalized,
   // returns true if all tags were normalized.
-  validateTagsNormalized(tags: string[]) {
+  validateTagsNormalized(tags: string[]): boolean {
     return tags.every((tag: string) => {
       return tag === tag.trim().replace(/\s+/g, ' ');
     });
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a list with varying element types.
-  _validateCollection(collection: Collection, isPublic: boolean): any {
+  _validateCollection(collection: Collection, isPublic: boolean): string[] {
     // NOTE TO DEVELOPERS: Please ensure that this validation logic is the
     // same as that in core.domain.collection_domain.Collection.validate().
     var issues = [];
@@ -112,9 +108,7 @@ export class CollectionValidationService {
    * match the validations performed in the backend. This function is
    * expensive, so it should be called sparingly.
    */
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a list with varying element types.
-  findValidationIssuesForPrivateCollection(collection: Collection): any {
+  findValidationIssuesForPrivateCollection(collection: Collection): string[] {
     return this._validateCollection(collection, false);
   }
 
@@ -124,7 +118,7 @@ export class CollectionValidationService {
    * public collections. This function is expensive, so it should be called
    * sparingly.
    */
-  findValidationIssuesForPublicCollection(collection: Collection): any {
+  findValidationIssuesForPublicCollection(collection: Collection): string[] {
     return this._validateCollection(collection, true);
   }
 

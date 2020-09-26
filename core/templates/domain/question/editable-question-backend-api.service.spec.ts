@@ -31,8 +31,7 @@ describe('Editable question backend API service', function() {
   var EditableQuestionBackendApiService = null;
   var QuestionObjectFactory;
   var sampleDataResults = null;
-  var $rootScope = null;
-  var $scope = null;
+  var sampleDataResultsObjects = null;
   var $httpBackend = null;
   var CsrfService = null;
 
@@ -51,8 +50,6 @@ describe('Editable question backend API service', function() {
     EditableQuestionBackendApiService = $injector.get(
       'EditableQuestionBackendApiService');
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
 
@@ -62,7 +59,7 @@ describe('Editable question backend API service', function() {
       return deferred.promise;
     });
 
-    // Sample question object returnable from the backend
+    // Sample question object returnable from the backend.
     sampleDataResults = {
       question_dict: {
         id: '0',
@@ -76,7 +73,15 @@ describe('Editable question backend API service', function() {
           interaction: {
             answer_groups: [],
             confirmed_unclassified_answers: [],
-            customization_args: {},
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'ca_placeholder_0',
+                  unicode_str: ''
+                }
+              },
+              rows: { value: 1 }
+            },
             default_outcome: {
               dest: null,
               feedback: {
@@ -112,6 +117,13 @@ describe('Editable question backend API service', function() {
       },
       associated_skill_dicts: []
     };
+
+    sampleDataResultsObjects = {
+      questionObject:
+        QuestionObjectFactory.createFromBackendDict(
+          sampleDataResults.question_dict),
+      associated_skill_dicts: []
+    };
   }));
 
   afterEach(function() {
@@ -123,15 +135,20 @@ describe('Editable question backend API service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
+    let imageBlob = new Blob(
+      ['data:image/png;base64,xyz'], {type: 'image/png'});
+    let imageData = {
+      filename: 'image.png',
+      imageBlob: imageBlob
+    };
     var skillsId = ['0', '01', '02'];
     var skillDifficulties = [1, 1, 2];
-    var questionDict = QuestionObjectFactory.createFromBackendDict(
-      sampleDataResults.question_dict);
+    var questionObject = sampleDataResultsObjects.questionObject;
 
     $httpBackend.expectPOST('/question_editor_handler/create_new').respond(
       200, {question_id: '0'});
     EditableQuestionBackendApiService.createQuestion(
-      skillsId, skillDifficulties, questionDict).then(
+      skillsId, skillDifficulties, questionObject, [imageData]).then(
       successHandler, failHandler);
     $httpBackend.flush();
 
@@ -146,13 +163,18 @@ describe('Editable question backend API service', function() {
 
       var skillsId = ['0', '01', '02'];
       var skillDifficulties = [1, 1, 2];
-      var questionDict = QuestionObjectFactory.createFromBackendDict(
-        sampleDataResults.question_dict);
+      var questionObject = sampleDataResultsObjects.questionObject;
+      let imageBlob = new Blob(
+        ['data:image/png;base64,xyz'], {type: 'image/png'});
+      let imageData = {
+        filename: 'image.png',
+        imageBlob: imageBlob
+      };
 
       $httpBackend.expectPOST('/question_editor_handler/create_new').respond(
         500, 'Error creating a new question.');
       EditableQuestionBackendApiService.createQuestion(
-        skillsId, skillDifficulties, questionDict).then(
+        skillsId, skillDifficulties, questionObject, [imageData]).then(
         successHandler, failHandler);
       $httpBackend.flush();
 
@@ -173,7 +195,7 @@ describe('Editable question backend API service', function() {
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(
-        sampleDataResults);
+        sampleDataResultsObjects);
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
@@ -206,7 +228,7 @@ describe('Editable question backend API service', function() {
 
       EditableQuestionBackendApiService.fetchQuestion('0').then(
         function(data) {
-          question = data.question_dict;
+          question = data.questionObject.toBackendDict(false);
         });
       $httpBackend.flush();
       question.question_state_data.content.html = 'New Question Content';
@@ -218,7 +240,7 @@ describe('Editable question backend API service', function() {
       $httpBackend.expect('PUT', '/question_editor_handler/data/0').respond(
         questionWrapper);
 
-      // Send a request to update question
+      // Send a request to update question.
       EditableQuestionBackendApiService.updateQuestion(
         question.id, question.version, 'Question Data is updated', []
       ).then(successHandler, failHandler);

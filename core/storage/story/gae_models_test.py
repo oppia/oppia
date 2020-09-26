@@ -37,26 +37,8 @@ class StoryModelTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_has_reference_to_user_id(self):
-        story_instance = story_models.StoryModel(
-            id='id',
-            title='title',
-            description='description',
-            notes='notes',
-            story_contents_schema_version=(
-                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
-            corresponding_topic_id='topic_id',
-            language_code='language_code')
-        story_instance.commit(
-            'committer_id', 'commit_message', [{'cmd': 'test_command'}])
-        self.assertTrue(
-            story_models.StoryModel.has_reference_to_user_id('committer_id'))
         self.assertFalse(
-            story_models.StoryModel.has_reference_to_user_id('x_id'))
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            story_models.StoryModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
+            story_models.StoryModel.has_reference_to_user_id('any_id'))
 
     def test_story_model(self):
         """Method to test the StoryModel."""
@@ -73,7 +55,8 @@ class StoryModelTest(test_utils.GenericTestBase):
             story_contents_schema_version=(
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
             corresponding_topic_id='topic_id',
-            language_code='language_code')
+            language_code='language_code',
+            url_fragment='title')
         story_instance.commit(committer_id, commit_message, commit_cmds)
         story_by_id = story_models.StoryModel.get_by_id('id')
 
@@ -82,6 +65,32 @@ class StoryModelTest(test_utils.GenericTestBase):
         self.assertEqual(story_by_id.notes, 'notes')
         self.assertEqual(story_by_id.language_code, 'language_code')
         self.assertEqual(story_by_id.title, 'title')
+        self.assertEqual(story_by_id.url_fragment, 'title')
+
+    def test_get_by_url_fragment(self):
+        committer_id = 'test_committer_id'
+        commit_message = 'test_commit_message'
+        commit_cmds = [{'cmd': 'test_command'}]
+
+        story_instance = story_models.StoryModel(
+            id='id',
+            title='title',
+            description='description',
+            notes='notes',
+            story_contents_schema_version=(
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+            corresponding_topic_id='topic_id',
+            language_code='language_code',
+            url_fragment='unique-url')
+        story_instance.commit(committer_id, commit_message, commit_cmds)
+        story_by_id = story_models.StoryModel.get_by_url_fragment('unique-url')
+
+        self.assertEqual(story_by_id.description, 'description')
+        self.assertEqual(story_by_id.id, 'id')
+        self.assertEqual(story_by_id.notes, 'notes')
+        self.assertEqual(story_by_id.language_code, 'language_code')
+        self.assertEqual(story_by_id.title, 'title')
+        self.assertEqual(story_by_id.url_fragment, 'unique-url')
 
 
 class StoryCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
@@ -94,8 +103,7 @@ class StoryCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         commit = story_models.StoryCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'username', 'msg',
-            'create', [{}],
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.story_id = 'b'
         commit.put()
@@ -119,11 +127,6 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
         self.assertFalse(
             story_models.StorySummaryModel.has_reference_to_user_id('any_id'))
 
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            story_models.StorySummaryModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
-
     def test_story_summary_model(self):
         """Method to test the StorySummaryModel."""
 
@@ -134,13 +137,20 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             story_model_last_updated=datetime.datetime.utcnow(),
             story_model_created_on=datetime.datetime.utcnow(),
             language_code='language_code',
-            node_count=2,
-            version=1)
+            node_titles=['Chapter 1'],
+            thumbnail_filename='image.svg',
+            thumbnail_bg_color='#F8BF74',
+            version=1,
+            url_fragment='story-summary-frag')
         story_summary_model.put()
         story_summary_by_id = story_models.StorySummaryModel.get_by_id('id')
 
         self.assertEqual(story_summary_by_id.description, 'description')
         self.assertEqual(story_summary_by_id.title, 'title')
         self.assertEqual(story_summary_by_id.language_code, 'language_code')
-        self.assertEqual(story_summary_by_id.node_count, 2)
+        self.assertEqual(story_summary_by_id.node_titles, ['Chapter 1'])
+        self.assertEqual(story_summary_by_id.thumbnail_bg_color, '#F8BF74')
+        self.assertEqual(story_summary_by_id.thumbnail_filename, 'image.svg')
         self.assertEqual(story_summary_by_id.version, 1)
+        self.assertEqual(
+            story_summary_by_id.url_fragment, 'story-summary-frag')

@@ -30,7 +30,6 @@ describe('Exploration Player State Service', () => {
   let PlaythroughIssuesService = null;
   let PlaythroughService = null;
   let StatsReportingService = null;
-  let ReadOnlyExplorationBackendApiService = null;
   let $rootScope = null;
   let $q = null;
 
@@ -51,7 +50,7 @@ describe('Exploration Player State Service', () => {
         getExplorationVersionFromUrl: () => {
           return null;
         },
-        getStoryIdInPlayer: () => {
+        getStoryUrlFragmentFromLearnerUrl: () => {
           return '1';
         },
         getUrlParams: () => {
@@ -72,17 +71,6 @@ describe('Exploration Player State Service', () => {
       $provide.constant('EXPLORATION_MODE', {
         OTHER: false
       });
-      $provide.factory(
-        'ReadOnlyExplorationBackendApiService', ['$q', ($q) => {
-          return {
-            loadExploration: () => {
-              return $q.resolve();
-            },
-            loadLatestExploration: () => {
-              return $q.resolve();
-            }
-          };
-        }]);
       $provide.value('StatsReportingService', {
         initSession: $.noop
       });
@@ -134,17 +122,16 @@ describe('Exploration Player State Service', () => {
     StatsReportingService = _StatsReportingService_;
     PlaythroughIssuesService = _PlaythroughIssuesService_;
     PlaythroughService = _PlaythroughService_;
-    ReadOnlyExplorationBackendApiService = (
-      _ReadOnlyExplorationBackendApiService_);
     ExplorationPlayerStateService = _ExplorationPlayerStateService_;
   }));
 
-  it('should properly initialize player', (done) => {
+  it('should properly initialize player', () => {
     let deferred = $q.defer();
     deferred.resolve([{
       version: 1,
       exploration: {
-        title: 'exploration title'
+        title: 'exploration title',
+        states: {}
       },
       session_id: '123'
     }, {}, {}]);
@@ -167,7 +154,8 @@ describe('Exploration Player State Service', () => {
       expect(version).toEqual(1);
       callback();
     });
-    ExplorationPlayerStateService.initializePlayer(() => done());
-    $rootScope.$apply();
+    ExplorationPlayerStateService.initializePlayer(() => {
+      $rootScope.$apply();
+    });
   });
 });

@@ -40,7 +40,9 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(enum.first, 'first')
         self.assertEqual(enum.second, 'second')
         self.assertEqual(enum.third, 'third')
-        with self.assertRaises(AttributeError):
+        with self.assertRaisesRegexp(
+            AttributeError,
+            'type object \'Enum\' has no attribute \'fourth\''):
             enum.fourth  # pylint: disable=pointless-statement
 
     def test_get_comma_sep_string_from_list(self):
@@ -77,7 +79,10 @@ class UtilsTests(test_utils.GenericTestBase):
             yaml_dict = utils.dict_from_yaml(yaml_str)
             self.assertEqual(adict, yaml_dict)
 
-        with self.assertRaises(utils.InvalidInputException):
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'while parsing a flow node\n'
+            'expected the node content, but found \'<stream end>\'\n'):
             yaml_str = utils.dict_from_yaml('{')
 
     def test_recursively_remove_key(self):
@@ -236,6 +241,29 @@ class UtilsTests(test_utils.GenericTestBase):
                 datetime.datetime(2016, 12, 1, 0, 0, 3),
                 initial_time))
 
+    def test_conversion_between_string_and_naive_datetime_object(self):
+        """Tests to make sure converting a naive datetime object to a string and
+        back doesn't alter the naive datetime object data.
+        """
+        now = datetime.datetime.utcnow()
+        self.assertEqual(
+            utils.convert_string_to_naive_datetime_object(
+                utils.convert_naive_datetime_to_string(now)),
+            now)
+
+    def test_datetime_conversion_to_string_returns_correct_format(self):
+        initial_time = datetime.datetime(2016, 12, 1, 1, 2, 3)
+        self.assertEqual(
+            utils.convert_naive_datetime_to_string(initial_time),
+            '12/01/2016, 01:02:03:000000')
+
+    def test_string_to_datetime_conversion_returns_correct_datetime(self):
+        time_string = '12/01/2016, 01:02:03:000000'
+        initial_time = datetime.datetime(2016, 12, 1, 1, 2, 3)
+        self.assertEqual(
+            utils.convert_string_to_naive_datetime_object(time_string),
+            initial_time)
+
     def test_get_hashable_value(self):
         json1 = ['foo', 'bar', {'baz': 3}]
         json2 = ['fee', {'fie': ['foe', 'fum']}]
@@ -266,6 +294,73 @@ class UtilsTests(test_utils.GenericTestBase):
         name = 0
         with self.assertRaisesRegexp(Exception, '0 must be a string.'):
             utils.require_valid_name(name, 'name_type')
+
+    def test_require_valid_meta_tag_content(self):
+        meta_tag_content = 'name'
+        utils.require_valid_meta_tag_content(meta_tag_content)
+
+        non_string_meta_tag_content = 0
+        invalid_type_error = (
+            'Expected meta tag content to be a string, received 0')
+        with self.assertRaisesRegexp(Exception, invalid_type_error):
+            utils.require_valid_meta_tag_content(non_string_meta_tag_content)
+        lengthy_meta_tag_content = 'a' * 200
+        max_length_error = (
+            'Meta tag content should not be longer than %s characters.'
+            % constants.MAX_CHARS_IN_META_TAG_CONTENT)
+        with self.assertRaisesRegexp(Exception, max_length_error):
+            utils.require_valid_meta_tag_content(lengthy_meta_tag_content)
+
+    def test_require_valid_url_fragment(self):
+        name = 'name'
+        utils.require_valid_url_fragment(name, 'name-type', 20)
+
+        name_with_spaces = 'name with spaces'
+        name_with_spaces_expected_error = (
+            'name-type field contains invalid characters. Only '
+            'lowercase words separated by hyphens are allowed. '
+            'Received name with spaces.')
+        with self.assertRaisesRegexp(
+            Exception, name_with_spaces_expected_error):
+            utils.require_valid_url_fragment(
+                name_with_spaces, 'name-type', 20)
+
+        name_in_caps = 'NAME'
+        name_in_caps_expected_error = (
+            'name-type field contains invalid characters. Only '
+            'lowercase words separated by hyphens are allowed. Received NAME.')
+        with self.assertRaisesRegexp(Exception, name_in_caps_expected_error):
+            utils.require_valid_url_fragment(
+                name_in_caps, 'name-type', 20)
+
+        name_with_numbers = 'nam3'
+        name_with_numbers_expected_error = (
+            'name-type field contains invalid characters. Only '
+            'lowercase words separated by hyphens are allowed. Received nam3.')
+        with self.assertRaisesRegexp(
+            Exception, name_with_numbers_expected_error):
+            utils.require_valid_url_fragment(
+                name_with_numbers, 'name-type', 20)
+
+        long_name = 'a-really-really-really-lengthy-name'
+        long_name_expected_error = (
+            'name-type field should not exceed 10 characters, '
+            'received %s' % long_name)
+        with self.assertRaisesRegexp(Exception, long_name_expected_error):
+            utils.require_valid_url_fragment(
+                long_name, 'name-type', 10)
+
+        empty_name = ''
+        empty_name_expected_error = 'name-type field should not be empty.'
+        with self.assertRaisesRegexp(Exception, empty_name_expected_error):
+            utils.require_valid_url_fragment(empty_name, 'name-type', 20)
+
+        non_string_name = 0
+        non_string_name_expected_error = (
+            'name-type field must be a string. Received 0.')
+        with self.assertRaisesRegexp(
+            Exception, non_string_name_expected_error):
+            utils.require_valid_url_fragment(non_string_name, 'name-type', 20)
 
     def test_validate_convert_to_hash(self):
         with self.assertRaisesRegexp(
@@ -329,6 +424,13 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.get_supported_audio_language_description(
                 invalid_language_code)
 
+    def test_is_pseudonymous_id(self):
+        self.assertTrue(utils.is_pseudonymous_id('pid_' + 'a' * 32))
+        self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 32))
+        self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 31 + 'A'))
+        self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 31))
+        self.assertFalse(utils.is_pseudonymous_id('a' * 36))
+
     def test_snake_case_to_camel_case(self):
         camel_case_str1 = utils.snake_case_to_camel_case('user_id_number')
         camel_case_str2 = utils.snake_case_to_camel_case('hello_world')
@@ -336,3 +438,44 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(camel_case_str1, 'userIdNumber')
         self.assertEqual(camel_case_str2, 'helloWorld')
         self.assertEqual(camel_case_str3, 'test1')
+
+    def _assert_valid_thumbnail_filename(
+            self, expected_error_substring, thumbnail_filename):
+        """Helper method for test_require_valid_thumbnail_filename."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            utils.require_valid_thumbnail_filename(
+                thumbnail_filename)
+
+    def test_require_valid_thumbnail_filename(self):
+        """Test thumbnail filename validation."""
+        self._assert_valid_thumbnail_filename(
+            'Expected thumbnail filename to be a string, received 10', 10)
+        self._assert_valid_thumbnail_filename(
+            'Thumbnail filename should not start with a dot.', '.name')
+        self._assert_valid_thumbnail_filename(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file/name')
+        self._assert_valid_thumbnail_filename(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file..name')
+        self._assert_valid_thumbnail_filename(
+            'Thumbnail filename should include an extension.', 'name')
+        self._assert_valid_thumbnail_filename(
+            'Expected a filename ending in svg, received name.jpg', 'name.jpg')
+        filename = 'filename.svg'
+        utils.require_valid_thumbnail_filename(filename)
+
+    def test_get_time_in_millisecs(self):
+        dt = datetime.datetime(2020, 6, 15)
+        msecs = utils.get_time_in_millisecs(dt)
+        self.assertEqual(
+            dt,
+            datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))
+
+    def test_get_time_in_millisecs_with_complicated_time(self):
+        dt = datetime.datetime(2020, 6, 15, 5, 18, 23, microsecond=123456)
+        msecs = utils.get_time_in_millisecs(dt)
+        self.assertEqual(
+            dt,
+            datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))

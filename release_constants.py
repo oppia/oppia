@@ -51,10 +51,7 @@ RELEASE_ROTA_URL = (
     'https://github.com/oppia/oppia/wiki/Release-Schedule#'
     'release-coordinators-and-qa-coordinators-for-upcoming-releases')
 
-REPEATABLE_JOBS_SPREADSHEETS_URL = (
-    'https://docs.google.com/spreadsheets/d/'
-    '1cSoVEwFyT-Q6d7yonbB0N-ElYGCFz5feMWXZXsv16_Y/edit#gid=1262496785')
-ONE_TIME_JOBS_SPREADSHEET_URL = (
+JOBS_SPREADSHEETS_URL = (
     'https://docs.google.com/spreadsheets/d/'
     '1Wegd0rZhVOm3Q3VCIw0xMbLC7IWtRyrEahiPn61Fhoo/edit#gid=948463314')
 
@@ -68,3 +65,19 @@ RELEASE_NOTES_TEMPLATE_URL = (
 RELEASE_NOTES_EXAMPLE_URL = (
     'https://docs.google.com/document/d/'
     '1OUwgMPNORABJAz7DS0iuDUr5A2FxcXg4Y5-qUEdgo-M/edit#heading=h.l3dbee3s55ti')
+JOBS_FORM_URL = 'https://goo.gl/forms/XIj00RJ2h5L55XzU2'
+
+OPPIA_DEV_GROUP_URL = 'https://groups.google.com/forum/#!forum/oppia-dev'
+
+NEW_RELEASE_URL = 'https://github.com/oppia/oppia/releases/new'
+GITHUB_RELEASE_TAB_URL = 'https://github.com/oppia/oppia/releases'
+
+INVALID_EMAIL_SUFFIX = 'users.noreply.github.com'
+
+NEW_AUTHORS_HEADER = '### New Authors:\n'
+EXISTING_AUTHORS_HEADER = '### Existing Authors:\n'
+NEW_CONTRIBUTORS_HEADER = '### New Contributors:\n'
+EMAIL_HEADER = '### Email C&P Blurbs about authors:\n'
+CHANGELOG_HEADER = '### Changelog:\n'
+COMMIT_HISTORY_HEADER = '### Commit History:\n'
+ISSUES_HEADER = '### Issues mentioned in commits:\n'

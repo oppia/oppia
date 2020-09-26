@@ -16,18 +16,20 @@
  * @fileoverview Unit tests for SuggestionObjectFactory.
  */
 
+import { TestBed } from '@angular/core/testing';
+
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
 
-describe('Suggestion object factory', () => {
+describe('SuggestionObjectFactory', () => {
   let suggestionObjectFactory: SuggestionObjectFactory;
 
   beforeEach(() => {
-    suggestionObjectFactory = new SuggestionObjectFactory();
+    suggestionObjectFactory = TestBed.get(SuggestionObjectFactory);
   });
 
   it('should create a new suggestion from a backend dict.', () => {
-    var suggestionBackendDict = {
+    let suggestionBackendDict = {
       suggestion_id: 'exploration.exp1.thread1',
       suggestion_type: 'edit_exploration_state_content',
       target_type: 'exploration',
@@ -39,12 +41,16 @@ describe('Suggestion object factory', () => {
         cmd: 'edit_state_property',
         property_name: 'content',
         state_name: 'state_1',
-        new_value: 'new suggestion content',
-        old_value: 'old suggestion content'
+        new_value: {
+          html: 'new suggestion content'
+        },
+        old_value: {
+          html: 'old suggestion content'
+        }
       },
-      last_updated: 1000
+      last_updated_msecs: 1000
     };
-    var suggestion = suggestionObjectFactory.createFromBackendDict(
+    let suggestion = suggestionObjectFactory.createFromBackendDict(
       suggestionBackendDict);
     expect(suggestion.suggestionType).toEqual('edit_exploration_state_content');
     expect(suggestion.targetType).toEqual('exploration');
@@ -53,9 +59,9 @@ describe('Suggestion object factory', () => {
     expect(suggestion.status).toEqual('accepted');
     expect(suggestion.authorName).toEqual('author');
     expect(suggestion.stateName).toEqual('state_1');
-    expect(suggestion.newValue).toEqual('new suggestion content');
-    expect(suggestion.oldValue).toEqual('old suggestion content');
-    expect(suggestion.lastUpdated).toEqual(1000);
+    expect(suggestion.newValue.html).toEqual('new suggestion content');
+    expect(suggestion.oldValue.html).toEqual('old suggestion content');
+    expect(suggestion.lastUpdatedMsecs).toEqual(1000);
     expect(suggestion.getThreadId()).toEqual('exploration.exp1.thread1');
   });
 });

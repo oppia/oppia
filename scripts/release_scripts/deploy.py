@@ -33,19 +33,21 @@ IMPORTANT NOTES:
 
     where [app_name] is the name of your app. Note that the root folder MUST be
     named 'oppia'.
+
+3.  If you want to start the production server in the maintenance mode (the site
+    will only work for super admins) add a --maintenance_mode flag.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-# Pylint has issues with the import order of argparse.
-# pylint: disable=wrong-import-order
 import argparse
 import datetime
 import os
 import shutil
 import subprocess
 import sys
+import time
 
 import python_utils
 import release_constants
@@ -53,21 +55,21 @@ from scripts import common
 from scripts import install_third_party_libs
 from scripts.release_scripts import gcloud_adapter
 from scripts.release_scripts import update_configs
-# pylint: enable=wrong-import-order
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+_PY_GITHUB_PATH = os.path.join(
+    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
 sys.path.insert(0, _PY_GITHUB_PATH)
 
-# pylint: disable=wrong-import-position
-import github # isort:skip
-# pylint: enable=wrong-import-position
+import github  # isort:skip pylint: disable=wrong-import-position
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--app_name', help='name of the app to deploy to', type=str)
 _PARSER.add_argument(
     '--version', help='version to deploy', type=str)
+_PARSER.add_argument(
+    '--maintenance_mode', action='store_true', default=False)
 
 APP_NAME_OPPIASERVER = 'oppiaserver'
 APP_NAME_OPPIATESTSERVER = 'oppiatestserver'
@@ -75,11 +77,10 @@ BUCKET_NAME_SUFFIX = '-resources'
 
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
+APP_DEV_YAML_PATH = os.path.join('.', 'app_dev.yaml')
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
 INDEX_YAML_PATH = os.path.join('.', 'index.yaml')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
-FECONF_PATH = os.path.join('.', 'feconf.py')
-CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
 
 FILES_AT_ROOT = ['favicon.ico', 'robots.txt']
 IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
@@ -99,19 +100,19 @@ def preprocess_release(app_name, deploy_data_path):
     in execute_deployment function. Currently it does the following:
 
     (1) Substitutes files from the per-app deployment data.
-    (2) Change the DEV_MODE constant in assets/constants.ts.
-    (3) Change GCS_RESOURCE_BUCKET in assets/constants.ts.
-    (4) Removes the "version" field from app.yaml, since gcloud does not like
-        it (when deploying).
+    (2) Changes GCS_RESOURCE_BUCKET in assets/constants.ts.
+    (3) Updates project id for vpc_access_connector in app_dev.yaml.
 
     Args:
         app_name: str. Name of the app to deploy.
         deploy_data_path: str. Path for deploy data directory.
 
     Raises:
-        Exception: Could not find deploy data directory.
-        Exception: Could not find source path.
-        Exception: Could not find destination path.
+        Exception. Could not find deploy data directory.
+        Exception. Could not find source path.
+        Exception. Could not find destination path.
+        Exception. Constants file has invalid GCS_RESOURCE_BUCKET.
+        Exception. The vpc_access_connector line is missing in app_dev.yaml.
     """
     if not os.path.exists(deploy_data_path):
         raise Exception(
@@ -119,7 +120,7 @@ def preprocess_release(app_name, deploy_data_path):
 
     # Copies files in root folder to assets/.
     for filename in FILES_AT_ROOT:
-        src = os.path.join(deploy_data_path, filename)
+        src = os.path.join(deploy_data_path, 'assets', filename)
         dst = os.path.join(os.getcwd(), 'assets', filename)
         if not os.path.exists(src):
             raise Exception(
@@ -133,7 +134,7 @@ def preprocess_release(app_name, deploy_data_path):
 
     # Copies files in images to /assets/images.
     for dir_name in IMAGE_DIRS:
-        src_dir = os.path.join(deploy_data_path, 'images', dir_name)
+        src_dir = os.path.join(deploy_data_path, 'assets', 'images', dir_name)
         dst_dir = os.path.join(os.getcwd(), 'assets', 'images', dir_name)
 
         if not os.path.exists(src_dir):
@@ -147,21 +148,35 @@ def preprocess_release(app_name, deploy_data_path):
             dst = os.path.join(dst_dir, filename)
             shutil.copyfile(src, dst)
 
-    # Changes the DEV_MODE constant in assets/constants.ts.
     with python_utils.open_file(
-        os.path.join(CONSTANTS_FILE_PATH), 'r') as assets_file:
-        content = assets_file.read()
+        os.path.join(common.CONSTANTS_FILE_PATH), 'r') as assets_file:
+        common_content = assets_file.read()
+
+    with python_utils.open_file(
+        os.path.join(APP_DEV_YAML_PATH), 'r') as app_dev_file:
+        app_dev_content = app_dev_file.read()
+
+    assert '"DEV_MODE": true' in common_content, 'Invalid DEV_MODE'
+    assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in common_content, (
+        'Invalid value for GCS_RESOURCE_BUCKET_NAME in %s' % (
+            common.CONSTANTS_FILE_PATH))
+
+    assert 'vpc_access_connector:\n  name: projects/PROJECT_ID' in (
+        app_dev_content), (
+            '"name: projects/PROJECT_ID" string is missing in app_dev.yaml')
+
     bucket_name = app_name + BUCKET_NAME_SUFFIX
-    assert '"DEV_MODE": true' in content
-    assert '"GCS_RESOURCE_BUCKET_NAME": "None-resources",' in content
-    os.remove(os.path.join(CONSTANTS_FILE_PATH))
-    content = content.replace('"DEV_MODE": true', '"DEV_MODE": false')
-    content = content.replace(
-        '"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
+    common.inplace_replace_file(
+        common.CONSTANTS_FILE_PATH,
+        r'"GCS_RESOURCE_BUCKET_NAME": "None-resources",',
         '"GCS_RESOURCE_BUCKET_NAME": "%s",' % bucket_name)
+
+    updated_app_dev_content = app_dev_content.replace(
+        'vpc_access_connector:\n  name: projects/PROJECT_ID',
+        'vpc_access_connector:\n  name: projects/%s' % app_name)
     with python_utils.open_file(
-        os.path.join(CONSTANTS_FILE_PATH), 'w+') as new_assets_file:
-        new_assets_file.write(content)
+        os.path.join(APP_DEV_YAML_PATH), 'w') as app_dev_file:
+        app_dev_file.write(updated_app_dev_content)
 
 
 def check_errors_in_a_page(url_to_check, msg_to_confirm):
@@ -174,7 +189,6 @@ def check_errors_in_a_page(url_to_check, msg_to_confirm):
     Returns:
         bool. Whether the page has errors or not.
     """
-
     common.open_new_tab_in_browser_if_possible(url_to_check)
     while True:
         python_utils.PRINT(
@@ -196,7 +210,7 @@ def update_and_check_indexes(app_name):
         app_name: str. The name of the app to deploy.
 
     Raises:
-        Exception: All indexes are not serving on the indexes page.
+        Exception. All indexes are not serving on the indexes page.
     """
     # Update indexes, then prompt for a check that they are all serving
     # before continuing with the deployment.
@@ -207,25 +221,33 @@ def update_and_check_indexes(app_name):
         'https://console.cloud.google.com/datastore/indexes'
         '?project=%s') % app_name
     gcloud_adapter.update_indexes(INDEX_YAML_PATH, app_name)
-    if not gcloud_adapter.check_all_indexes_are_serving(app_name):
-        common.open_new_tab_in_browser_if_possible(indexes_page_url)
-        raise Exception(
-            'Please wait for all indexes to serve, then run this '
-            'script again to complete the deployment. For details, '
-            'visit the indexes page. Exiting.')
+
+    counter = 1
+    while not gcloud_adapter.check_all_indexes_are_serving(app_name):
+        if counter == 1:
+            common.open_new_tab_in_browser_if_possible(indexes_page_url)
+            python_utils.PRINT('Waiting for all indexes to serve...')
+        counter += 1
+        time.sleep(30)
 
 
-def build_scripts():
-    """Builds and Minifies all the scripts.
+def build_scripts(maintenance_mode):
+    """Builds and minifies all the scripts.
+
+    Args:
+        maintenance_mode: bool. Whether to enable the maintenance mode.
 
     Raises:
-        Exception: The build process fails.
+        Exception. The build process fails.
     """
     # Do a build, while outputting to the terminal.
     python_utils.PRINT('Building and minifying scripts...')
-    build_process = subprocess.Popen(
-        ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'],
-        stdout=subprocess.PIPE)
+    build_command = [
+        'python', '-m', 'scripts.build', '--prod_env',
+        '--source_maps', '--deploy_mode']
+    if maintenance_mode:
+        build_command.append('--maintenance_mode')
+    build_process = subprocess.Popen(build_command, stdout=subprocess.PIPE)
     while True:
         line = build_process.stdout.readline().strip()
         if not line:
@@ -267,11 +289,20 @@ def flush_memcache(app_name):
         app_name: str. The name of the app to deploy.
     """
     memcache_url = (
-        'https://pantheon.corp.google.com/appengine/memcache?'
-        'project=%s') % app_name
-    if not gcloud_adapter.flush_memcache(app_name):
-        python_utils.PRINT('Memcache flushing failed. Please do it manually.')
-        common.open_new_tab_in_browser_if_possible(memcache_url)
+        'https://console.cloud.google.com/appengine/memcache?'
+        'src=ac&project=%s') % app_name
+    common.open_new_tab_in_browser_if_possible(memcache_url)
+    common.ask_user_to_confirm('Please flush the memcache.')
+
+    admin_misc_tab_url = None
+    if app_name == APP_NAME_OPPIASERVER:
+        admin_misc_tab_url = 'https://www.oppia.org/admin#/misc'
+    else:
+        admin_misc_tab_url = 'https://%s.appspot.com/admin#/misc' % app_name
+
+    if admin_misc_tab_url:
+        common.open_new_tab_in_browser_if_possible(admin_misc_tab_url)
+        common.ask_user_to_confirm('Please flush the cache on Oppia website.')
 
 
 def switch_version(app_name, current_release_version):
@@ -285,18 +316,26 @@ def switch_version(app_name, current_release_version):
         Exception. The library page does not load correctly.
     """
     release_version_library_url = (
-        'https://%s-dot-%s.appspot.com/library' % (
+        'https://%s-dot-%s.appspot.com/community-library' % (
             current_release_version, app_name))
     library_page_loads_correctly = check_errors_in_a_page(
         release_version_library_url, 'Library page is loading correctly?')
-    if library_page_loads_correctly:
-        gcloud_adapter.switch_version(
-            app_name, current_release_version)
-        python_utils.PRINT('Successfully migrated traffic to release version!')
-    else:
+
+    if not library_page_loads_correctly:
         raise Exception(
             'Aborting version switch due to issues in library page '
             'loading.')
+
+    version_switch = release_constants.AFFIRMATIVE_CONFIRMATIONS[0]
+    if common.is_current_branch_a_hotfix_branch():
+        python_utils.PRINT('Do you want to switch version?')
+        version_switch = python_utils.INPUT()
+
+    if version_switch in release_constants.AFFIRMATIVE_CONFIRMATIONS:
+        gcloud_adapter.switch_version(
+            app_name, current_release_version)
+        python_utils.PRINT(
+            'Successfully migrated traffic to release version!')
 
 
 def check_breakage(app_name, current_release_version):
@@ -342,9 +381,9 @@ def check_travis_and_circleci_tests(current_branch_name):
         current_branch_name: str. The name of current branch.
 
     Raises:
-        Exception: The latest commit on release/test branch locally does not
+        Exception. The latest commit on release/test branch locally does not
             match the latest commit on local fork or upstream.
-        Exception: The travis or circleci tests are failing on release/test
+        Exception. The travis or circleci tests are failing on release/test
             branch.
     """
     local_sha = subprocess.check_output([
@@ -365,7 +404,7 @@ def check_travis_and_circleci_tests(current_branch_name):
             'not match the latest commit on Oppia repo.')
 
     python_utils.PRINT('\nEnter your GitHub username.\n')
-    github_username = python_utils.INPUT().lower()
+    github_username = python_utils.INPUT().lower().strip()
 
     travis_url = 'https://travis-ci.org/%s/oppia/branches' % github_username
     circleci_url = 'https://circleci.com/gh/%s/workflows/oppia' % (
@@ -374,7 +413,7 @@ def check_travis_and_circleci_tests(current_branch_name):
     try:
         python_utils.url_open(travis_url)
     except Exception:
-        travis_url = 'https://travis-ci.org/oppia/oppia/branches'
+        travis_url = 'https://travis-ci.com/oppia/oppia/branches'
 
     try:
         python_utils.url_open(circleci_url)
@@ -399,38 +438,71 @@ def check_travis_and_circleci_tests(current_branch_name):
             'Please fix the circleci tests before deploying.')
 
 
-def create_release_doc():
-    """Asks the co-ordinator to create a doc for the current release."""
+def check_release_doc():
+    """Asks the co-ordinator to create a doc for the current release.
+    or update the doc for the hotfix.
+    """
+    message = (
+        'Please create a dedicated section for this release in the '
+        'release tracking document created by the QA Lead.\n'
+        'The three tabs in your browser point to: '
+        'Release drive url, template for the release notes, example of '
+        'release notes from previous release.')
+    if common.is_current_branch_a_hotfix_branch():
+        message = (
+            'Please ensure you note down the notes for the hotfix in the '
+            'release tracking document created by the QA Lead for the release '
+            'corresponding to the hotfix.\n'
+            'The three tabs in your browser point to: '
+            'Release drive url, template for the release notes, example of '
+            'release notes from previous release.')
+
     common.open_new_tab_in_browser_if_possible(
         release_constants.RELEASE_DRIVE_URL)
     common.open_new_tab_in_browser_if_possible(
         release_constants.RELEASE_NOTES_TEMPLATE_URL)
     common.open_new_tab_in_browser_if_possible(
         release_constants.RELEASE_NOTES_EXAMPLE_URL)
-    common.ask_user_to_confirm(
-        'Please create a dedicated section for this release in the '
-        'release tracking document created by the QA Lead.\n'
-        'The three tabs in your browser point to: '
-        'Release drive url, template for the release notes, example of release '
-        'notes from previous release.')
+    common.ask_user_to_confirm(message)
+
+
+def update_configs_in_deploy_data(
+        app_name, release_dir_path, deploy_data_path, personal_access_token):
+    """Updates feconf and constants file in deploy data to match the config
+    files in release scripts.
+
+    Args:
+        app_name: str. The name of the app to deploy.
+        release_dir_path: str. Path of directory where all files are copied
+            for release.
+        deploy_data_path: str. Path for deploy data directory.
+        personal_access_token: str. The personal access token for the
+            GitHub id of user.
+    """
+    if app_name == APP_NAME_OPPIASERVER:
+        update_configs.main(
+            release_dir_path, deploy_data_path, personal_access_token, True)
+    else:
+        update_configs.main(
+            release_dir_path, deploy_data_path, personal_access_token, False)
 
 
 def execute_deployment():
     """Executes the deployment process after doing the prerequisite checks.
 
     Raises:
-        Exception: App name is invalid.
-        Exception: Custom version is used with production app.
-        Exception: App name is not specified.
-        Exception: The deployment script is not run from a release or test
+        Exception. App name is invalid.
+        Exception. Custom version is used with production app.
+        Exception. App name is not specified.
+        Exception. The deployment script is not run from a release or test
             branch.
-        Exception: The deployment script is run for prod server from a test
+        Exception. The deployment script is run for prod server from a test
             branch.
-        Exception: Current release version has '.' character.
-        Exception: Last commit message is invalid.
-        Exception: The mailgun API key is not added before deployment.
-        Exception: Could not find third party directory.
-        Exception: Invalid directory accessed during deployment.
+        Exception. Current release version has '.' character.
+        Exception. Last commit message is invalid.
+        Exception. The mailgun API key is not added before deployment.
+        Exception. Could not find third party directory.
+        Exception. Invalid directory accessed during deployment.
     """
     parsed_args = _PARSER.parse_args()
     custom_version = None
@@ -480,89 +552,87 @@ def execute_deployment():
     if '.' in current_release_version:
         raise Exception('Current release version has \'.\' character.')
 
+    assert len(current_release_version) <= 25, (
+        'The length of the "version" arg should be less than or '
+        'equal to 25 characters.')
+
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
     common.ensure_release_scripts_folder_exists_and_is_up_to_date()
     gcloud_adapter.require_gcloud_to_be_available()
-    try:
-        if app_name == APP_NAME_OPPIASERVER:
-            create_release_doc()
-            release_version_number = common.get_current_release_version_number(
-                current_branch_name)
-            last_commit_message = subprocess.check_output(
-                'git log -1 --pretty=%B'.split())
+
+    personal_access_token = None
+    if app_name == APP_NAME_OPPIASERVER:
+        check_release_doc()
+        release_version_number = common.get_current_release_version_number(
+            current_branch_name)
+        last_commit_message = subprocess.check_output(
+            'git log -1 --pretty=%B'.split())
+        personal_access_token = common.get_personal_access_token()
+        if not common.is_current_branch_a_hotfix_branch():
             if not last_commit_message.startswith(
                     'Update authors and changelog for v%s' % (
                         release_version_number)):
                 raise Exception(
-                    'Invalid last commit message: %s.' % last_commit_message)
-
-            check_travis_and_circleci_tests(current_branch_name)
-
-            personal_access_token = common.get_personal_access_token()
+                    'Invalid last commit message: %s.' % (
+                        last_commit_message))
             g = github.Github(personal_access_token)
             repo = g.get_organization('oppia').get_repo('oppia')
             common.check_blocking_bug_issue_count(repo)
             common.check_prs_for_current_release_are_released(repo)
-            update_configs.main(personal_access_token)
-            with python_utils.open_file(FECONF_PATH, 'r') as f:
-                feconf_contents = f.read()
-                if ('MAILGUN_API_KEY' not in feconf_contents or
-                        'MAILGUN_API_KEY = None' in feconf_contents):
-                    raise Exception(
-                        'The mailgun API key must be added before deployment.')
-        if not os.path.exists(THIRD_PARTY_DIR):
+
+        check_travis_and_circleci_tests(current_branch_name)
+
+    if not os.path.exists(THIRD_PARTY_DIR):
+        raise Exception(
+            'Could not find third_party directory at %s. Please run '
+            'install_third_party_libs.py prior to running this script.'
+            % THIRD_PARTY_DIR)
+
+    current_git_revision = subprocess.check_output(
+        ['git', 'rev-parse', 'HEAD']).strip()
+
+    # Create a folder in which to save the release candidate.
+    python_utils.PRINT('Ensuring that the release directory parent exists')
+    common.ensure_directory_exists(os.path.dirname(release_dir_path))
+
+    # Copy files to the release directory. Omits the .git subfolder.
+    python_utils.PRINT('Copying files to the release directory')
+    shutil.copytree(
+        os.getcwd(), release_dir_path,
+        ignore=shutil.ignore_patterns('.git'))
+
+    # Change the current directory to the release candidate folder.
+    with common.CD(release_dir_path):
+        if not os.getcwd().endswith(release_dir_name):
             raise Exception(
-                'Could not find third_party directory at %s. Please run '
-                'install_third_party_libs.py prior to running this script.'
-                % THIRD_PARTY_DIR)
+                'Invalid directory accessed during deployment: %s'
+                % os.getcwd())
 
-        current_git_revision = subprocess.check_output(
-            ['git', 'rev-parse', 'HEAD']).strip()
+        python_utils.PRINT('Changing directory to %s' % os.getcwd())
 
-        # Create a folder in which to save the release candidate.
-        python_utils.PRINT('Ensuring that the release directory parent exists')
-        common.ensure_directory_exists(os.path.dirname(release_dir_path))
+        update_configs_in_deploy_data(
+            app_name, release_dir_path, deploy_data_path, personal_access_token)
 
-        # Copy files to the release directory. Omits the .git subfolder.
-        python_utils.PRINT('Copying files to the release directory')
-        shutil.copytree(
-            os.getcwd(), release_dir_path,
-            ignore=shutil.ignore_patterns('.git'))
+        python_utils.PRINT('Preprocessing release...')
+        preprocess_release(app_name, deploy_data_path)
 
-        # Change the current directory to the release candidate folder.
-        with common.CD(release_dir_path):
-            if not os.getcwd().endswith(release_dir_name):
-                raise Exception(
-                    'Invalid directory accessed during deployment: %s'
-                    % os.getcwd())
+        update_and_check_indexes(app_name)
+        build_scripts(parsed_args.maintenance_mode)
+        deploy_application_and_write_log_entry(
+            app_name, current_release_version,
+            current_git_revision)
 
-            python_utils.PRINT('Changing directory to %s' % os.getcwd())
+        python_utils.PRINT('Returning to oppia/ root directory.')
 
-            python_utils.PRINT('Preprocessing release...')
-            preprocess_release(app_name, deploy_data_path)
+    switch_version(app_name, current_release_version)
+    flush_memcache(app_name)
+    check_breakage(app_name, current_release_version)
 
-            update_and_check_indexes(app_name)
-            build_scripts()
-            deploy_application_and_write_log_entry(
-                app_name, current_release_version,
-                current_git_revision)
-
-            python_utils.PRINT('Returning to oppia/ root directory.')
-
-        switch_version(app_name, current_release_version)
-        flush_memcache(app_name)
-        check_breakage(app_name, current_release_version)
-
-        python_utils.PRINT('Done!')
-    finally:
-        common.run_cmd([
-            'git', 'checkout', '--',
-            update_configs.LOCAL_FECONF_PATH,
-            update_configs.LOCAL_CONSTANTS_PATH])
+    python_utils.PRINT('Done!')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when deploy.py is used as a script.
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     execute_deployment()

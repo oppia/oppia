@@ -18,6 +18,11 @@
  * keeps no mementos.
  */
 
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+
+require(
+  'pages/exploration-editor-page/editor-tab/templates/' +
+  'modal-templates/confirm-delete-state-modal.controller.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
@@ -34,28 +39,34 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
+require(
+  'pages/exploration-editor-page/services/state-editor-refresh.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/validators.service.ts');
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('ExplorationStatesService', [
-  '$filter', '$injector', '$location', '$q', '$rootScope', '$uibModal',
+  '$filter', '$injector', '$location', '$q', '$uibModal',
   'AlertsService', 'AngularNameService', 'AnswerClassificationService',
   'ChangeListService', 'ContextService', 'ExplorationInitStateNameService',
-  'SolutionValidityService', 'StateEditorService', 'StatesObjectFactory',
-  'UrlInterpolationService', 'ValidatorsService',
+  'SolutionValidityService', 'StateEditorRefreshService', 'StateEditorService',
+  'StatesObjectFactory', 'UrlInterpolationService', 'ValidatorsService',
   function(
-      $filter, $injector, $location, $q, $rootScope, $uibModal,
+      $filter, $injector, $location, $q, $uibModal,
       AlertsService, AngularNameService, AnswerClassificationService,
       ChangeListService, ContextService, ExplorationInitStateNameService,
-      SolutionValidityService, StateEditorService, StatesObjectFactory,
-      UrlInterpolationService, ValidatorsService) {
+      SolutionValidityService, StateEditorRefreshService, StateEditorService,
+      StatesObjectFactory, UrlInterpolationService, ValidatorsService) {
     var _states = null;
 
     var stateAddedCallbacks = [];
     var stateDeletedCallbacks = [];
     var stateRenamedCallbacks = [];
     var stateInteractionSavedCallbacks = [];
+    /** @private */
+    var refreshGraphEventEmitter = new EventEmitter();
 
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -100,6 +111,10 @@ angular.module('oppia').factory('ExplorationStatesService', [
       },
       written_translations: function(writtenTranslations) {
         return writtenTranslations.toBackendDict();
+      },
+      widget_customization_args: function(customizationArgs) {
+        return Interaction.convertCustomizationArgsToBackendDict(
+          customizationArgs);
       }
     };
 
@@ -114,6 +129,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
       param_changes: ['paramChanges'],
       param_specs: ['paramSpecs'],
       hints: ['interaction', 'hints'],
+      next_content_id_index: ['nextContentIdIndex'],
       solicit_answer_details: ['solicitAnswerDetails'],
       solution: ['interaction', 'solution'],
       widget_id: ['interaction', 'id'],
@@ -149,6 +165,10 @@ angular.module('oppia').factory('ExplorationStatesService', [
           contentIds.add(solution.explanation.getContentId());
         }
         return contentIds;
+      },
+      widget_customization_args: function(customizationArgs) {
+        return new Set(
+          Interaction.getCustomizationArgContentIds(customizationArgs));
       }
     };
 
@@ -162,7 +182,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
     var _setState = function(stateName, stateData, refreshGraph) {
       _states.setState(stateName, angular.copy(stateData));
       if (refreshGraph) {
-        $rootScope.$broadcast('refreshGraph');
+        refreshGraphEventEmitter.emit();
       }
     };
 
@@ -174,11 +194,12 @@ angular.module('oppia').factory('ExplorationStatesService', [
           propertyRef = propertyRef[key];
         });
       } catch (e) {
-        var additionalInfo = ('\nUndefined states error debug logs:' +
+        var additionalInfo = (
+          '\nUndefined states error debug logs:' +
           '\nRequested state name: ' + stateName +
           '\nExploration ID: ' + ContextService.getExplorationId() +
           '\nChange list: ' + JSON.stringify(
-          ChangeListService.getChangeList()) +
+            ChangeListService.getChangeList()) +
           '\nAll states names: ' + _states.getStateNames());
         e.message += additionalInfo;
         throw e;
@@ -309,8 +330,12 @@ angular.module('oppia').factory('ExplorationStatesService', [
       saveInteractionId: function(stateName, newInteractionId) {
         saveStateProperty(stateName, 'widget_id', newInteractionId);
         stateInteractionSavedCallbacks.forEach(function(callback) {
-          callback(stateName);
+          callback(_states.getState(stateName));
         });
+      },
+      saveNextContentIdIndex: function(stateName, newNextContentIdIndex) {
+        saveStateProperty(
+          stateName, 'next_content_id_index', newNextContentIdIndex);
       },
       getInteractionCustomizationArgsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'widget_customization_args');
@@ -320,7 +345,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         saveStateProperty(
           stateName, 'widget_customization_args', newCustomizationArgs);
         stateInteractionSavedCallbacks.forEach(function(callback) {
-          callback(stateName);
+          callback(_states.getState(stateName));
         });
       },
       getInteractionAnswerGroupsMemento: function(stateName) {
@@ -329,7 +354,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
         saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
         stateInteractionSavedCallbacks.forEach(function(callback) {
-          callback(stateName);
+          callback(_states.getState(stateName));
         });
       },
       getConfirmedUnclassifiedAnswersMemento: function(stateName) {
@@ -340,7 +365,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         saveStateProperty(
           stateName, 'confirmed_unclassified_answers', newAnswers);
         stateInteractionSavedCallbacks.forEach(function(callback) {
-          callback(stateName);
+          callback(_states.getState(stateName));
         });
       },
       getInteractionDefaultOutcomeMemento: function(stateName) {
@@ -402,7 +427,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         stateAddedCallbacks.forEach(function(callback) {
           callback(newStateName);
         });
-        $rootScope.$broadcast('refreshGraph');
+        refreshGraphEventEmitter.emit();
         if (successCallback) {
           successCallback(newStateName);
         }
@@ -425,22 +450,10 @@ angular.module('oppia').factory('ExplorationStatesService', [
             '/pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/confirm-delete-state-modal.template.html'),
           backdrop: true,
-          controller: [
-            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-              $scope.deleteStateWarningText = (
-                'Are you sure you want to delete the card "' +
-                deleteStateName + '"?');
-
-              $scope.reallyDelete = function() {
-                $uibModalInstance.close();
-              };
-
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss();
-                AlertsService.clearWarnings();
-              };
-            }
-          ]
+          resolve: {
+            deleteStateName: () => deleteStateName
+          },
+          controller: 'ConfirmDeleteStateModalController'
         }).result.then(function() {
           _states.deleteState(deleteStateName);
 
@@ -455,14 +468,12 @@ angular.module('oppia').factory('ExplorationStatesService', [
             callback(deleteStateName);
           });
           $location.path('/gui/' + StateEditorService.getActiveStateName());
-          $rootScope.$broadcast('refreshGraph');
+          refreshGraphEventEmitter.emit();
           // This ensures that if the deletion changes rules in the current
           // state, they get updated in the view.
-          $rootScope.$broadcast('refreshStateEditor');
+          StateEditorRefreshService.onRefreshStateEditor.emit();
         }, function() {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
+          AlertsService.clearWarnings();
         });
       },
       renameState: function(oldStateName, newStateName) {
@@ -496,7 +507,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
         stateRenamedCallbacks.forEach(function(callback) {
           callback(oldStateName, newStateName);
         });
-        $rootScope.$broadcast('refreshGraph');
+        refreshGraphEventEmitter.emit();
       },
       registerOnStateAddedCallback: function(callback) {
         stateAddedCallbacks.push(callback);
@@ -509,6 +520,9 @@ angular.module('oppia').factory('ExplorationStatesService', [
       },
       registerOnStateInteractionSavedCallback: function(callback) {
         stateInteractionSavedCallbacks.push(callback);
+      },
+      get onRefreshGraph() {
+        return refreshGraphEventEmitter;
       }
     };
   }

@@ -18,6 +18,9 @@
 
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
@@ -76,19 +79,29 @@ require(
   'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
 require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
-require('components/question-directives/question-player/' +
+require(
+  'components/question-directives/question-player/' +
   'question-player.constants.ajs.ts');
+require(
+  'components/question-directives/question-player/' +
+  'question-player-concept-card-modal.controller.ts');
+require(
+  'components/question-directives/question-player/services/' +
+  'question-player-state.service.ts');
+require(
+  'components/question-directives/question-player/' +
+  'skill-mastery-modal.controller.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'attribution-guide.directive.ts');
+  'attribution-guide.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
+  'background-banner.component.ts');
 require('components/concept-card/concept-card.directive.ts');
-require('components/skill-mastery/skill-mastery.directive.ts');
+require('components/skill-mastery/skill-mastery.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'conversation-skin.directive.ts');
@@ -102,12 +115,13 @@ require(
   'pages/exploration-player-page/layout-directives/' +
   'learner-view-info.directive.ts');
 
-require('domain/question/question-backend-api.service.ts');
 require('domain/skill/skill-mastery-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/alerts.service.ts');
 require('services/user.service.ts');
-require('services/contextual/url.service.ts');
+require(
+  'pages/exploration-player-page/services/exploration-player-state.service.ts');
+
+import { Subscription } from 'rxjs';
 
 require('pages/interaction-specs.constants.ajs.ts');
 
@@ -126,28 +140,25 @@ angular.module('oppia').directive('questionPlayer', [
         'question-player.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
-        '$scope', '$sce', '$rootScope', '$location',
-        '$sanitize', '$uibModal', '$window',
-        'AlertsService', 'HtmlEscaperService',
-        'QuestionBackendApiService', 'SkillMasteryBackendApiService',
-        'UrlService', 'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
+        '$location', '$sanitize', '$sce', '$scope', '$uibModal', '$window',
+        'ExplorationPlayerStateService', 'PlayerPositionService',
+        'QuestionPlayerStateService', 'SkillMasteryBackendApiService',
+        'UserService', 'COLORS_FOR_PASS_FAIL_MODE', 'HASH_PARAM',
         'MAX_MASTERY_GAIN_PER_QUESTION', 'MAX_MASTERY_LOSS_PER_QUESTION',
-        'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
-        'VIEW_HINT_PENALTY_FOR_MASTERY',
-        'WRONG_ANSWER_PENALTY', 'WRONG_ANSWER_PENALTY_FOR_MASTERY',
+        'MAX_SCORE_PER_QUESTION', 'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
+        'VIEW_HINT_PENALTY_FOR_MASTERY', 'WRONG_ANSWER_PENALTY',
+        'WRONG_ANSWER_PENALTY_FOR_MASTERY',
         function(
-            HASH_PARAM, MAX_SCORE_PER_QUESTION,
-            $scope, $sce, $rootScope, $location,
-            $sanitize, $uibModal, $window,
-            AlertsService, HtmlEscaperService,
-            QuestionBackendApiService, SkillMasteryBackendApiService,
-            UrlService, UserService, COLORS_FOR_PASS_FAIL_MODE,
+            $location, $sanitize, $sce, $scope, $uibModal, $window,
+            ExplorationPlayerStateService, PlayerPositionService,
+            QuestionPlayerStateService, SkillMasteryBackendApiService,
+            UserService, COLORS_FOR_PASS_FAIL_MODE, HASH_PARAM,
             MAX_MASTERY_GAIN_PER_QUESTION, MAX_MASTERY_LOSS_PER_QUESTION,
-            QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
-            VIEW_HINT_PENALTY_FOR_MASTERY,
-            WRONG_ANSWER_PENALTY, WRONG_ANSWER_PENALTY_FOR_MASTERY) {
+            MAX_SCORE_PER_QUESTION, QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
+            VIEW_HINT_PENALTY_FOR_MASTERY, WRONG_ANSWER_PENALTY,
+            WRONG_ANSWER_PENALTY_FOR_MASTERY) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var initResults = function() {
             $scope.resultsLoaded = false;
             ctrl.currentQuestion = 0;
@@ -180,8 +191,15 @@ angular.module('oppia').directive('questionPlayer', [
           ctrl.getActionButtonIconHtml = function(actionButtonType) {
             var iconHtml = '';
             if (actionButtonType === 'BOOST_SCORE') {
-              iconHtml = '<img class="action-button-icon" src="' +
-              getStaticImageUrl('/icons/rocket@2x.png') + '"/>';
+              iconHtml = `<picture>
+              <source type="image/webp" 
+              srcset="${getStaticImageUrl('/icons/rocket@2x.webp')}">
+              <source type="image/png" 
+              srcset="${getStaticImageUrl('/icons/rocket@2x.png')}">
+              <img alt=""
+                   class="action-button-icon" 
+                   src="${getStaticImageUrl('/icons/rocket@2x.png')}"/>
+              </picture>`;
             } else if (actionButtonType === 'RETRY_SESSION') {
               iconHtml = '<i class="material-icons md-36 ' +
               'action-button-icon">&#xE5D5</i>';
@@ -201,7 +219,8 @@ angular.module('oppia').directive('questionPlayer', [
           };
 
           ctrl.showActionButtonsFooter = function() {
-            return (ctrl.questionPlayerConfig.resultActionButtons &&
+            return (
+              ctrl.questionPlayerConfig.resultActionButtons &&
               ctrl.questionPlayerConfig.resultActionButtons.length > 0);
           };
 
@@ -230,39 +249,15 @@ angular.module('oppia').directive('questionPlayer', [
                 '/components/concept-card/concept-card-modal.template.html'
               ),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', '$window',
-                'UrlService',
-                function(
-                    $scope, $uibModalInstance, $window,
-                    UrlService) {
-                  $scope.skillIds = skillIds;
-                  $scope.skills = skills;
-                  $scope.index = 0;
-                  $scope.currentSkill = $scope.skills[$scope.index];
-                  $scope.isInTestMode = true;
-
-                  $scope.isLastConceptCard = function() {
-                    return $scope.index === $scope.skills.length - 1;
-                  };
-
-                  $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-
-                  $scope.goToNextConceptCard = function() {
-                    $scope.index++;
-                    $scope.currentSkill = $scope.skills[$scope.index];
-                  };
-
-                  $scope.retryTest = function() {
-                    $window.location.replace(UrlService.getPathname());
-                  };
-                }
-              ]
+              resolve: {
+                skills: () => skills,
+                skillIds: () => skillIds,
+              },
+              controller: 'QuestionPlayerConceptCardModalController'
             }).result.then(function() {}, function() {
-              // This callback is triggered when the Cancel button is
-              // clicked. No further action is needed.
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -313,7 +308,8 @@ angular.module('oppia').directive('questionPlayer', [
           };
 
           var isInPassOrFailMode = function() {
-            return (ctrl.questionPlayerConfig.questionPlayerMode &&
+            return (
+              ctrl.questionPlayerConfig.questionPlayerMode &&
               ctrl.questionPlayerConfig.questionPlayerMode.modeType ===
               QUESTION_PLAYER_MODE.PASS_FAIL_MODE);
           };
@@ -378,14 +374,14 @@ angular.module('oppia').directive('questionPlayer', [
               if (questionData.viewedSolution) {
                 questionScore = 0.0;
               } else {
-                // If questionScore goes negative, set it to 0
+                // If questionScore goes negative, set it to 0.
                 questionScore = Math.max(
                   0, questionScore - totalHintsPenalty - wrongAnswerPenalty);
               }
-              // Calculate total score
+              // Calculate total score.
               ctrl.totalScore += questionScore;
 
-              // Calculate scores per skill
+              // Calculate scores per skill.
               if (!(questionData.linkedSkillIds)) {
                 continue;
               }
@@ -514,55 +510,52 @@ angular.module('oppia').directive('questionPlayer', [
 
           ctrl.reviewConceptCardAndRetryTest = function() {
             if (!ctrl.failedSkillIds || ctrl.failedSkillIds.length === 0) {
-              throw Error('No failed skills');
+              throw new Error('No failed skills');
             }
             openConceptCardModal(ctrl.failedSkillIds);
           };
 
           ctrl.openSkillMasteryModal = function(skillId) {
+            var masteryPerSkillMapping = ctrl.masteryPerSkillMapping;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/question-directives/question-player/' +
                 'skill-mastery-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function(
-                    $scope, $uibModalInstance) {
-                  $scope.skillId = skillId;
-                  $scope.userIsLoggedIn = ctrl.userIsLoggedIn;
-                  if ($scope.userIsLoggedIn) {
-                    $scope.masteryChange = ctrl.masteryPerSkillMapping[skillId];
-                  }
-
-                  $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-
-                  $scope.openConceptCardModal = function(skillId) {
-                    openConceptCardModal([skillId]);
-                  };
-                }
-              ]
+              resolve: {
+                masteryPerSkillMapping: () => masteryPerSkillMapping,
+                openConceptCardModal: () => openConceptCardModal,
+                skillId: () => skillId,
+                userIsLoggedIn: () => ctrl.userIsLoggedIn,
+              },
+              controller: 'SkillMasteryModalController'
             }).result.then(function() {}, function() {
-              // This callback is triggered when the Cancel button is
-              // clicked. No further action is needed.
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
           ctrl.$onInit = function() {
-            $rootScope.$on('currentQuestionChanged', function(event, result) {
-              updateCurrentQuestion(result + 1);
-            });
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onCurrentQuestionChange.subscribe(
+                result => updateCurrentQuestion(result + 1)
+              )
+            );
 
-            $rootScope.$on('totalQuestionsReceived', function(event, result) {
-              updateTotalQuestions(result);
-            });
+            ctrl.directiveSubscriptions.add(
+              ExplorationPlayerStateService.onTotalQuestionsReceived.subscribe(
+                result => updateTotalQuestions(result)
+              )
+            );
 
-            $rootScope.$on('questionSessionCompleted', function(event, result) {
-              $location.hash(HASH_PARAM +
-                encodeURIComponent(JSON.stringify(result)));
-            });
+            ctrl.directiveSubscriptions.add(
+              QuestionPlayerStateService.onQuestionSessionCompleted.subscribe(
+                (result) => {
+                  $location.hash(
+                    HASH_PARAM + encodeURIComponent(JSON.stringify(result)));
+                })
+            );
 
             $scope.$on('$locationChangeSuccess', function(event) {
               var hashContent = $location.hash();
@@ -591,6 +584,10 @@ angular.module('oppia').directive('questionPlayer', [
             // called in $scope.$on when some external events are triggered.
             initResults();
             ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
+          };
+
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

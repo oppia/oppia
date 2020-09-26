@@ -21,17 +21,26 @@
  */
 
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+
+require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
   'interactions/PencilCodeEditor/directives/' +
   'pencil-code-editor-rules.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('services/html-escaper.service.ts');
+require(
+  'interactions/interaction-attributes-extractor.service.ts');
 require('services/stateful/focus-manager.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
-  '$timeout', 'HtmlEscaperService', 'EVENT_NEW_CARD_AVAILABLE',
-  function($timeout, HtmlEscaperService, EVENT_NEW_CARD_AVAILABLE) {
+  '$timeout', 'InteractionAttributesExtractorService', 'PlayerPositionService',
+  function(
+      $timeout, InteractionAttributesExtractorService, PlayerPositionService) {
     return {
       restrict: 'E',
       scope: {},
@@ -41,13 +50,13 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
       template: require('./pencil-code-editor-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', '$element', '$uibModal',
+        '$attrs', '$element', '$uibModal', 'CurrentInteractionService',
         'FocusManagerService', 'PencilCodeEditorRulesService',
-        'CurrentInteractionService',
-        function($scope, $attrs, $element, $uibModal,
-            FocusManagerService, PencilCodeEditorRulesService,
-            CurrentInteractionService) {
+        function(
+            $attrs, $element, $uibModal, CurrentInteractionService,
+            FocusManagerService, PencilCodeEditorRulesService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var iframeDiv, pce;
           ctrl.reset = function() {
             $uibModal.open({
@@ -55,17 +64,7 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
                 './pencil-code-reset-confirmation.directive.html'),
               backdrop: 'static',
               keyboard: false,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss();
-                  };
-
-                  $scope.resetCode = function() {
-                    $uibModalInstance.close();
-                  };
-                }]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               pce.setCode(ctrl.initialCode);
             }, function() {
@@ -80,18 +79,28 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
             return pce.getCode().replace(/\t/g, '  ');
           };
           ctrl.$onInit = function() {
-            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-              ctrl.interactionIsActive = false;
-              pce.hideMiddleButton();
-              pce.hideToggleButton();
-              pce.setReadOnly();
-            });
+            ctrl.directiveSubscriptions.add(
+              PlayerPositionService.onNewCardAvailable.subscribe(
+                () => {
+                  ctrl.interactionIsActive = false;
+                  pce.hideMiddleButton();
+                  pce.hideToggleButton();
+                  pce.setReadOnly();
+                }
+              )
+            );
             iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
             pce = new PencilCodeEmbed(iframeDiv);
             ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
 
+            const {
+              initialCode
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'PencilCodeEditor',
+              $attrs
+            );
             ctrl.initialCode = ctrl.interactionIsActive ?
-              HtmlEscaperService.escapedJsonToObj($attrs.initialCodeWithValue) :
+              initialCode :
               ctrl.getLastAnswer().code;
 
             pce.beginLoad(ctrl.initialCode);
@@ -144,24 +153,29 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
               if (errorIsHappening || hasSubmittedAnswer) {
                 return;
               }
+              // The first argument in the method below gets executed in the
+              // pencilcode output-frame iframe context. The code input by the
+              // user is sanitized by pencilcode so there is no security
+              // issue in this case.
+              pce.eval(
+                'document.body.innerHTML', // disable-bad-pattern-check
+                function(pencilCodeHtml) {
+                  var normalizedCode = getNormalizedCode();
 
-              pce.eval('document.body.innerHTML', function(pencilCodeHtml) {
-                var normalizedCode = getNormalizedCode();
+                  // Get all the divs, and extract their textual content.
+                  var output = $.map(
+                    $(pencilCodeHtml).filter('div'), function(elem) {
+                      return $(elem).text();
+                    }).join('\n');
 
-                // Get all the divs, and extract their textual content.
-                var output = $.map(
-                  $(pencilCodeHtml).filter('div'), function(elem) {
-                    return $(elem).text();
-                  }).join('\n');
-
-                hasSubmittedAnswer = true;
-                CurrentInteractionService.onSubmit({
-                  code: normalizedCode,
-                  output: output || '',
-                  evaluation: '',
-                  error: ''
-                }, PencilCodeEditorRulesService);
-              }, true);
+                  hasSubmittedAnswer = true;
+                  CurrentInteractionService.onSubmit({
+                    code: normalizedCode,
+                    output: output || '',
+                    evaluation: '',
+                    error: ''
+                  }, PencilCodeEditorRulesService);
+                }, true);
             });
 
             pce.on('error', function(error) {
@@ -187,6 +201,9 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
             });
 
             CurrentInteractionService.registerCurrentInteraction(null, null);
+          };
+          ctrl.$onDestroy = function() {
+            ctrl.directiveSubscriptions.unsubscribe();
           };
         }
       ]

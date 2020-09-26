@@ -39,7 +39,7 @@ import python_utils
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
 
 
-class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
+class TrainedClassifierHandlerTests(test_utils.EmailTestBase):
     """Test the handler for storing job result of training job."""
 
     def setUp(self):
@@ -132,6 +132,7 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
 
         class FakeTrainingJob(python_utils.OBJECT):
             """Fake training class to invoke failed job functions."""
+
             def __init__(self):
                 self.status = feconf.TRAINING_JOB_STATUS_FAILED
 
@@ -167,11 +168,11 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
 
                 # Check that there are no sent emails to either
                 # email address before posting json.
-                messages = self.mail_stub.get_sent_messages(
-                    to=feconf.ADMIN_EMAIL_ADDRESS)
+                messages = self._get_sent_email_messages(
+                    feconf.ADMIN_EMAIL_ADDRESS)
                 self.assertEqual(len(messages), 0)
-                messages = self.mail_stub.get_sent_messages(
-                    to='moderator@example.com')
+                messages = self._get_sent_email_messages(
+                    'moderator@example.com')
                 self.assertEqual(len(messages), 0)
 
                 # Post ML Job.
@@ -180,13 +181,13 @@ class TrainedClassifierHandlerTests(test_utils.GenericTestBase):
                     expected_status_int=500)
 
                 # Check that there are now emails sent.
-                messages = self.mail_stub.get_sent_messages(
-                    to=feconf.ADMIN_EMAIL_ADDRESS)
+                messages = self._get_sent_email_messages(
+                    feconf.ADMIN_EMAIL_ADDRESS)
                 expected_subject = 'Failed ML Job'
                 self.assertEqual(len(messages), 1)
                 self.assertEqual(messages[0].subject.decode(), expected_subject)
-                messages = self.mail_stub.get_sent_messages(
-                    to='moderator@example.com')
+                messages = self._get_sent_email_messages(
+                    'moderator@example.com')
                 self.assertEqual(len(messages), 1)
                 self.assertEqual(messages[0].subject.decode(), expected_subject)
 

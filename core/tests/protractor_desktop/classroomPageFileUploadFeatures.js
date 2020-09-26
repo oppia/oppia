@@ -33,49 +33,80 @@ describe('Classroom page functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     classroomPage = new ClassroomPage.ClassroomPage();
     libraryPage = new LibraryPage.LibraryPage();
-    topicsAndSkillsDashboardPage =
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
-    topicEditorPage =
-      new TopicEditorPage.TopicEditorPage();
+    topicsAndSkillsDashboardPage = (
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
+    topicEditorPage = (
+      new TopicEditorPage.TopicEditorPage());
 
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
+    await adminPage.editConfigProperty(
+      'Make classroom page accessible.',
+      'Boolean', async function(elem) {
+        await elem.setValue(true);
+      });
   });
 
-  beforeEach(function() {
-    users.login('creator@classroomPage.com');
+  beforeEach(async function() {
+    await users.login('creator@classroomPage.com');
   });
 
-  it('should add a new published topic to the Math classroom', function() {
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
-    topicEditorPage.submitTopicThumbnail('../data/img.png');
-    topicEditorPage.saveTopic('Added thumbnail.');
-    browser.getCurrentUrl().then(function(url) {
+  it('should add a new published topic to the Math classroom',
+    async function() {
+      var handle = await browser.getWindowHandle();
+      await topicsAndSkillsDashboardPage.get();
+      await topicsAndSkillsDashboardPage.createTopic(
+        'Topic 1', 'topic-one', 'Description', false);
+      await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
+      await topicEditorPage.updateMetaTagContent('topic meta tag');
+      await topicEditorPage.saveTopic('Added thumbnail.');
+      var url = await browser.getCurrentUrl();
       var topicId = url.split('/')[4].slice(0, -1);
-      adminPage.editConfigProperty(
-        'The set of topic IDs for each classroom page.',
+      await general.closeCurrentTabAndSwitchTo(handle);
+      await adminPage.editConfigProperty(
+        'The details for each classroom page.',
         'List',
-        function(elem) {
-          elem.editItem(0, 'Dictionary').editEntry(1, 'List').addItem(
-            'Unicode').setValue(topicId);
+        async function(elem) {
+          elem = await elem.editItem(0, 'Dictionary');
+          elem = await elem.editEntry(4, 'List');
+          elem = await elem.addItem('Unicode');
+          await elem.setValue(topicId);
         });
-      classroomPage.get('Math');
-      classroomPage.expectNumberOfTopicsToBe(0);
-      topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
-      topicEditorPage.publishTopic();
-      classroomPage.get('Math');
-      classroomPage.expectNumberOfTopicsToBe(1);
-    });
-    users.logout();
-  });
+      await classroomPage.get('math');
+      await classroomPage.expectNumberOfTopicsToBe(0);
+      await topicsAndSkillsDashboardPage.get();
+      (
+        await
+        topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+          'Skill 1', 'Concept card explanation', false));
+      await topicsAndSkillsDashboardPage.get();
+      await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+      await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+      await topicsAndSkillsDashboardPage.get();
+      await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+      await topicEditorPage.addSubtopic(
+        'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
+        'Subtopic content');
+      await topicEditorPage.saveTopic('Added subtopic.');
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+      await topicEditorPage.navigateToTopicEditorTab();
+      await topicEditorPage.navigateToReassignModal();
+
+      await topicEditorPage.dragSkillToSubtopic('Skill 1', 0);
+      await topicEditorPage.saveRearrangedSkills();
+      await topicEditorPage.saveTopic('Added skill to subtopic.');
+
+      await topicEditorPage.publishTopic();
+      await classroomPage.get('math');
+      await classroomPage.expectNumberOfTopicsToBe(1);
+      await users.logout();
+    });
+
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });

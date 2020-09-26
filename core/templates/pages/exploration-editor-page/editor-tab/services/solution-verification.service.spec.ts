@@ -112,10 +112,19 @@ describe('Solution Verification Service', function() {
               refresher_exploration_id: null
             },
             rule_specs: [{
-              inputs: {x: 'abc'},
-              rule_type: 'Contains'
-            }]
+              rule_type: 'Contains',
+              inputs: {x: 'abc'}
+            }],
           }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: 'First State',
             feedback: {
@@ -177,6 +186,15 @@ describe('Solution Verification Service', function() {
               refresher_exploration_id: null
             }
           }],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
           default_outcome: {
             dest: 'default',
             feedback: {
@@ -211,17 +229,17 @@ describe('Solution Verification Service', function() {
     siis.savedMemento = 'TextInput';
     ess.saveSolution('First State', sof.createNew(false, 'abc', 'nothing'));
 
-    expect(
-      svs.verifySolution('First State', state.interaction,
-        ess.getState('First State').interaction.solution.correctAnswer)
+    expect(svs.verifySolution(
+      'First State', state.interaction,
+      ess.getState('First State').interaction.solution.correctAnswer)
     ).toBe(true);
 
     see.setInQuestionMode(true);
     state.interaction.answerGroups[0].outcome.dest = 'First State';
     state.interaction.answerGroups[0].outcome.labelledAsCorrect = true;
-    expect(
-      svs.verifySolution('First State', state.interaction,
-        ess.getState('First State').interaction.solution.correctAnswer)
+    expect(svs.verifySolution(
+      'First State', state.interaction,
+      ess.getState('First State').interaction.solution.correctAnswer)
     ).toBe(true);
   });
 
@@ -236,9 +254,9 @@ describe('Solution Verification Service', function() {
     siis.savedMemento = 'TextInput';
     ess.saveSolution('First State', sof.createNew(false, 'xyz', 'nothing'));
 
-    expect(
-      svs.verifySolution('First State', state.interaction,
-        ess.getState('First State').interaction.solution.correctAnswer)
+    expect(svs.verifySolution(
+      'First State', state.interaction,
+      ess.getState('First State').interaction.solution.correctAnswer)
     ).toBe(false);
   });
 });

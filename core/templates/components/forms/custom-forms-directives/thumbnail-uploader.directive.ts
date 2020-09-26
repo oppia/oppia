@@ -16,14 +16,16 @@
  * @fileoverview Directive for uploading images.
  */
 
-import Cropper from 'cropperjs';
-
 require(
   'components/common-layout-directives/common-elements/' +
   'alert-message.directive.ts');
-require('cropperjs/dist/cropper.min.css');
-require('domain/utilities/url-interpolation.service.ts');
+require(
+  'components/forms/custom-forms-directives/' +
+  'edit-thumbnail-modal.controller.ts');
 
+require('domain/utilities/url-interpolation.service.ts');
+require('pages/exploration-player-page/services/image-preloader.service.ts');
+require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/image-upload-helper.service.ts');
@@ -34,25 +36,90 @@ angular.module('oppia').directive('thumbnailUploader', [
       restrict: 'E',
       scope: {
         disabled: '=',
-        editableThumbnailDataUrl: '=',
+        useLocalStorage: '=',
+        getAllowedBgColors: '&allowedBgColors',
+        getAspectRatio: '&aspectRatio',
+        getBgColor: '&bgColor',
+        getFilename: '&filename',
+        getPreviewDescription: '&previewDescription',
+        getPreviewDescriptionBgColor: '&previewDescriptionBgColor',
+        getPreviewFooter: '&previewFooter',
+        getPreviewTitle: '&previewTitle',
+        updateBgColor: '=',
         updateFilename: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/custom-forms-directives/' +
         'thumbnail-uploader.directive.html'),
-      controller: ['$scope', '$uibModal',
+      controller: ['$rootScope', '$scope', '$uibModal',
         'AlertsService', 'ContextService', 'CsrfTokenService',
-        'ImageUploadHelperService',
-        function($scope, $uibModal,
+        'ImageLocalStorageService', 'ImageUploadHelperService',
+        function(
+            $rootScope, $scope, $uibModal,
             AlertsService, ContextService, CsrfTokenService,
-            ImageUploadHelperService) {
+            ImageLocalStorageService, ImageUploadHelperService) {
+          var placeholderImageDataUrl = (
+            UrlInterpolationService.getStaticImageUrl(
+              '/icons/story-image-icon.png'));
+          var uploadedImage = null;
+          $scope.thumbnailIsLoading = false;
+          // $watch is required here to update the thumbnail image
+          // everytime the thumbnail filename changes (eg. draft is discarded).
+          // The trusted resource url for the thumbnail should not be directly
+          // bound to ngSrc because it can cause an infinite digest error.
+          // eslint-disable-next-line max-len
+          // https://github.com/angular/angular.js/blob/master/CHANGELOG.md#sce-
+          // This watcher is triggered only if the thumbnail filename of the
+          // model changes. It would change for the following operations:
+          // 1. Initial render of the page containing this directive.
+          // 2. When a thumbnail is uploaded.
+          // 3. When a saved draft is discarded.
+          $scope.$watch('getFilename()', function(filename) {
+            if (filename) {
+              $scope.editableThumbnailDataUrl = (
+                ImageUploadHelperService
+                  .getTrustedResourceUrlForThumbnailFilename(
+                    $scope.getFilename(),
+                    ContextService.getEntityType(),
+                    ContextService.getEntityId()));
+              uploadedImage = $scope.editableThumbnailDataUrl;
+            } else {
+              $scope.editableThumbnailDataUrl = placeholderImageDataUrl;
+              uploadedImage = null;
+            }
+            $scope.thumbnailIsLoading = false;
+          });
           $scope.showEditThumbnailModal = function() {
             if ($scope.disabled) {
               return;
             }
+            var openInUploadMode = true;
+            // This refers to the temporary thumbnail background
+            // color used for preview.
+            var tempBgColor = (
+              $scope.getBgColor() ||
+              $scope.getAllowedBgColors()[0]);
             var tempImageName = '';
+            var uploadedImageMimeType = '';
+            var dimensions = {
+              height: 0,
+              width: 0
+            };
+            var allowedBgColors = $scope.getAllowedBgColors();
+            var aspectRatio = $scope.getAspectRatio();
+            var getPreviewDescription = $scope.getPreviewDescription;
+            var getPreviewDescriptionBgColor = (
+              $scope.getPreviewDescriptionBgColor);
+            var getPreviewFooter = $scope.getPreviewFooter;
+            var getPreviewTitle = $scope.getPreviewTitle;
 
-            var saveTopicThumbnailImageData = function(imageURI) {
+            var saveThumbnailBgColor = function(newBgColor) {
+              if (newBgColor !== $scope.getBgColor()) {
+                $scope.updateBgColor(newBgColor);
+              }
+            };
+
+            var saveThumbnailImageData = function(imageURI, callback) {
               let resampledFile = null;
               resampledFile = (
                 ImageUploadHelperService.convertImageDataToImageFile(
@@ -61,10 +128,10 @@ angular.module('oppia').directive('thumbnailUploader', [
                 AlertsService.addWarning('Could not get resampled file.');
                 return;
               }
-              postImageToServer(resampledFile);
+              postImageToServer(resampledFile, callback);
             };
 
-            var postImageToServer = function(resampledFile) {
+            var postImageToServer = function(resampledFile, callback) {
               let form = new FormData();
               form.append('image', resampledFile);
               form.append('payload', JSON.stringify({
@@ -98,6 +165,7 @@ angular.module('oppia').directive('thumbnailUploader', [
                       .getTrustedResourceUrlForThumbnailFilename(
                         data.filename, ContextService.getEntityType(),
                         ContextService.getEntityId()));
+                  callback();
                 }).fail(function(data) {
                   // Remove the XSSI prefix.
                   var transformedData = data.responseText.substring(5);
@@ -109,76 +177,54 @@ angular.module('oppia').directive('thumbnailUploader', [
             };
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/modal-templates/' +
-                'edit-topic-thumbnail-modal.template.html'),
-              size: 'lg',
+                '/components/forms/custom-forms-directives/' +
+                'edit-thumbnail-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$timeout', '$uibModalInstance',
-                'ImageUploadHelperService',
-                function($scope, $timeout, $uibModalInstance,
-                    ImageUploadHelperService) {
-                  $scope.uploadedImage = null;
-                  $scope.invalidImageWarningIsShown = false;
-                  let cropper = null;
-
-                  $scope.initialiseCropper = function() {
-                    let thumbnailImage = (
-                      <HTMLImageElement>document.getElementById(
-                        'croppable-thumbnail'));
-                    cropper = new Cropper(thumbnailImage, {
-                      minContainerHeight: 405,
-                      minContainerWidth: 720,
-                      minCropBoxWidth: 180,
-                      aspectRatio: 16 / 9
-                    });
-                  };
-                  $scope.onFileChanged = function(file) {
-                    tempImageName = (
-                      ImageUploadHelperService.generateImageFilename(
-                        150, 150, 'png'));
-                    $('.oppia-thumbnail-uploader').fadeOut(function() {
-                      $scope.invalidImageWarningIsShown = false;
-
-                      var reader = new FileReader();
-                      reader.onload = function(e) {
-                        $scope.$apply(function() {
-                          $scope.uploadedImage = (<FileReader>e.target).result;
-                        });
-                        $scope.initialiseCropper();
-                      };
-                      reader.readAsDataURL(file);
-                      $timeout(function() {
-                        $('.oppia-thumbnail-uploader').fadeIn();
-                      }, 100);
-                    });
-                  };
-
-                  $scope.reset = function() {
-                    $scope.uploadedImage = null;
-                  };
-
-                  $scope.onInvalidImageLoaded = function() {
-                    $scope.uploadedImage = null;
-                    $scope.invalidImageWarningIsShown = true;
-                  };
-
-                  $scope.confirm = function() {
-                    var croppedImageDataUrl = (cropper
-                      .getCroppedCanvas()
-                      .toDataURL());
-                    $uibModalInstance.close(croppedImageDataUrl);
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
+              resolve: {
+                allowedBgColors: () => allowedBgColors,
+                aspectRatio: () => aspectRatio,
+                dimensions: () => dimensions,
+                getPreviewDescription: () => getPreviewDescription,
+                getPreviewDescriptionBgColor: (
+                  () => getPreviewDescriptionBgColor),
+                getPreviewFooter: () => getPreviewFooter,
+                getPreviewTitle: () => getPreviewTitle,
+                openInUploadMode: () => openInUploadMode,
+                uploadedImage: () => uploadedImage,
+                uploadedImageMimeType: () => uploadedImageMimeType,
+                tempBgColor: () => tempBgColor
+              },
+              controller: 'EditThumbnailModalController',
+            }).result.then(function(data) {
+              $scope.thumbnailIsLoading = true;
+              var filename = ImageUploadHelperService.generateImageFilename(
+                data.dimensions.height, data.dimensions.width, 'svg');
+              $scope.newThumbnailDataUrl = data.newThumbnailDataUrl;
+              if (!$scope.useLocalStorage) {
+                if (data.openInUploadMode) {
+                  tempImageName = (
+                    ImageUploadHelperService.generateImageFilename(
+                      data.dimensions.height, data.dimensions.width, 'svg'));
+                  saveThumbnailImageData(data.newThumbnailDataUrl, function() {
+                    uploadedImage = data.newThumbnailDataUrl;
+                    $scope.updateFilename(tempImageName);
+                    saveThumbnailBgColor(data.newBgColor);
+                    $rootScope.$apply();
+                  });
+                } else {
+                  saveThumbnailBgColor(data.newBgColor);
+                  $scope.thumbnailIsLoading = false;
                 }
-              ]
-            }).result.then(function(newThumbnailDataUrl) {
-              $scope.editableThumbnailDataUrl = newThumbnailDataUrl;
-              $scope.updateFilename(tempImageName);
-              saveTopicThumbnailImageData(newThumbnailDataUrl);
+              } else {
+                ImageLocalStorageService.saveImage(
+                  filename, data.newThumbnailDataUrl);
+                $scope.localStorageBgcolor = data.newBgColor;
+                ImageLocalStorageService.setThumbnailBgColor(data.newBgColor);
+              }
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
         }]

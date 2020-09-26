@@ -18,14 +18,16 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { QuestionSummaryForOneSkill, QuestionSummaryForOneSkillObjectFactory }
-  from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
+import {
+  QuestionSummaryForOneSkillBackendDict,
+  QuestionSummaryForOneSkillObjectFactory
+} from 'domain/question/QuestionSummaryForOneSkillObjectFactory';
 
 describe('Question summary for one skill object factory', () => {
   describe('QuestionSummaryForOneSkillObjectFactory', () => {
     let questionSummaryForOneSkillObjectFactory:
       QuestionSummaryForOneSkillObjectFactory = null;
-    let backendDict: any;
+    let backendDict: QuestionSummaryForOneSkillBackendDict;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
@@ -40,7 +42,9 @@ describe('Question summary for one skill object factory', () => {
         skill_difficulty: 0.6,
         summary: {
           id: 'question_id',
-          question_content: 'Question 1'
+          question_content: 'Question 1',
+          interaction_id: 'TextInput',
+          misconception_ids: []
         }
       };
     });

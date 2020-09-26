@@ -31,7 +31,9 @@ describe('Topic object factory', () => {
       id: 'sample_topic_id',
       name: 'Topic name',
       abbreviated_name: 'abbrev',
+      url_fragment: 'topic-one',
       thumbnail_filename: 'img.png',
+      thumbnail_bg_color: '#a33f40',
       description: 'Topic description',
       version: 1,
       uncategorized_skill_ids: ['skill_1', 'skill_2'],
@@ -52,10 +54,15 @@ describe('Topic object factory', () => {
       subtopics: [{
         id: 1,
         title: 'Title',
-        skill_ids: ['skill_3']
+        skill_ids: ['skill_3'],
+        thumbnail_filename: 'img.png',
+        thumbnail_bg_color: '#a33f40',
+        url_fragment: 'title'
       }],
       next_subtopic_id: 1,
-      language_code: 'en'
+      language_code: 'en',
+      meta_tag_content: 'topic meta tag content',
+      practice_tab_is_displayed: false
     };
     let skillIdToDescriptionDict = {
       skill_1: 'Description 1',
@@ -78,7 +85,6 @@ describe('Topic object factory', () => {
 
     expect(_sampleTopic.validate()).toEqual([
       'Topic name should not be empty.',
-      'Abbreviated name should not be empty.',
       'The story with id story_2 is present in both canonical ' +
       'and additional stories.',
       'The skill with id skill_1 is duplicated in the topic'
@@ -116,9 +122,13 @@ describe('Topic object factory', () => {
     let secondTopic = topicObjectFactory.create({
       id: 'topic_id_2',
       name: 'Another name',
+      abbreviated_name: 'abbrev',
+      url_fragment: 'topic-two',
+      thumbnail_filename: 'img.png',
+      thumbnail_bg_color: '#a33f40',
       description: 'Another description',
       language_code: 'en',
-      version: '15',
+      version: 15,
       canonical_story_references: [{
         story_id: 'story_10',
         story_is_published: true
@@ -132,8 +142,13 @@ describe('Topic object factory', () => {
       subtopics: [{
         id: 1,
         title: 'Title',
-        skill_ids: ['skill_1']
-      }]
+        skill_ids: ['skill_1'],
+        thumbnail_filename: 'img.png',
+        thumbnail_bg_color: '#a33f40',
+        url_fragment: 'title'
+      }],
+      practice_tab_is_displayed: false,
+      meta_tag_content: 'second topic meta tag content'
     }, {
       skill_1: 'Description 1',
       skill_2: 'Description 2',

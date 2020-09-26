@@ -90,6 +90,20 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
             exploration_stats_dict['num_completions_v2'],
             state_stats_mapping)
 
+    def test_create_default(self):
+        exploration_stats = (
+            stats_domain.ExplorationStats.create_default('exp_id1', 1, {}))
+
+        self.assertEqual(exploration_stats.exp_id, 'exp_id1')
+        self.assertEqual(exploration_stats.exp_version, 1)
+        self.assertEqual(exploration_stats.num_starts_v1, 0)
+        self.assertEqual(exploration_stats.num_starts_v2, 0)
+        self.assertEqual(exploration_stats.num_actual_starts_v1, 0)
+        self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
+        self.assertEqual(exploration_stats.num_completions_v1, 0)
+        self.assertEqual(exploration_stats.num_completions_v2, 0)
+        self.assertEqual(exploration_stats.state_stats_mapping, {})
+
     def test_to_dict(self):
         expected_exploration_stats_dict = {
             'exp_id': 'exp_id1',
@@ -263,6 +277,30 @@ class StateStatsTests(test_utils.GenericTestBase):
             state_stats.num_completions_v2,
             expected_state_stats.num_completions_v2)
 
+    def test_repr(self):
+        state_stats = stats_domain.StateStats(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+        self.assertEqual(
+            '%r' % (state_stats,),
+            'StateStats('
+            'total_answers_count_v1=1, total_answers_count_v2=2, '
+            'useful_feedback_count_v1=3, useful_feedback_count_v2=4, '
+            'total_hit_count_v1=5, total_hit_count_v2=6, '
+            'first_hit_count_v1=7, first_hit_count_v2=8, '
+            'num_times_solution_viewed_v2=9, '
+            'num_completions_v1=10, num_completions_v2=11)')
+
+    def test_str(self):
+        state_stats = stats_domain.StateStats(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+        self.assertEqual(
+            '%s' % (state_stats,),
+            'StateStats('
+            'total_answers_count=3, '
+            'useful_feedback_count=7, '
+            'total_hit_count=11, '
+            'first_hit_count=15, '
+            'num_times_solution_viewed=9, '
+            'num_completions=21)')
+
     def test_create_default(self):
         state_stats = stats_domain.StateStats.create_default()
         self.assertEqual(state_stats.total_answers_count_v1, 0)
@@ -276,6 +314,81 @@ class StateStatsTests(test_utils.GenericTestBase):
         self.assertEqual(state_stats.num_times_solution_viewed_v2, 0)
         self.assertEqual(state_stats.num_completions_v1, 0)
         self.assertEqual(state_stats.num_completions_v2, 0)
+
+    def test_equality(self):
+        state_stats_a = stats_domain.StateStats.create_default()
+        state_stats_b = stats_domain.StateStats.create_default()
+        state_stats_c = stats_domain.StateStats.create_default()
+
+        self.assertEqual(state_stats_a, state_stats_b)
+        self.assertEqual(state_stats_b, state_stats_c)
+        self.assertEqual(state_stats_a, state_stats_c)
+
+        state_stats_a.total_answers_count_v1 += 1
+        self.assertEqual(state_stats_b, state_stats_c)
+        self.assertNotEqual(state_stats_a, state_stats_b)
+        self.assertNotEqual(state_stats_a, state_stats_c)
+
+        state_stats_b.total_answers_count_v1 += 1
+        state_stats_c.total_answers_count_v1 += 1
+
+        self.assertEqual(state_stats_a, state_stats_b)
+        self.assertEqual(state_stats_b, state_stats_c)
+        self.assertEqual(state_stats_a, state_stats_c)
+
+    def test_equality_with_different_class(self):
+        class DifferentStats(python_utils.OBJECT):
+            """A different class."""
+
+            pass
+
+        state_stats = stats_domain.StateStats.create_default()
+        different_stats = DifferentStats()
+
+        self.assertFalse(state_stats == different_stats)
+
+    def test_hash(self):
+        state_stats = stats_domain.StateStats.create_default()
+        with self.assertRaisesRegexp(TypeError, 'unhashable'):
+            unused_hash = hash(state_stats)
+
+    def test_aggregate_from_state_stats(self):
+        state_stats = stats_domain.StateStats(
+            100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100)
+        other_state_stats = stats_domain.StateStats(
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+
+        state_stats.aggregate_from(other_state_stats)
+
+        self.assertEqual(
+            state_stats,
+            stats_domain.StateStats(
+                101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111))
+
+    def test_aggregate_from_session_state_stats(self):
+        state_stats = stats_domain.StateStats(
+            10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10)
+        session_state_stats = stats_domain.SessionStateStats(
+            1, 2, 3, 4, 5, 6)
+
+        state_stats.aggregate_from(session_state_stats)
+
+        self.assertEqual(
+            state_stats,
+            stats_domain.StateStats(
+                10, 11, 10, 12, 10, 13, 10, 14, 15, 10, 16))
+
+    def test_aggregate_from_different_stats(self):
+        class DifferentStats(python_utils.OBJECT):
+            """A different class."""
+
+            pass
+
+        state_stats = stats_domain.StateStats.create_default()
+        different_stats = DifferentStats()
+
+        with self.assertRaisesRegexp(TypeError, 'can not be aggregated from'):
+            state_stats.aggregate_from(different_stats)
 
     def test_to_dict(self):
         state_stats_dict = {
@@ -337,6 +450,110 @@ class StateStatsTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             state_stats.to_frontend_dict(), expected_state_stats_dict)
+
+
+class SessionStateStatsTests(test_utils.GenericTestBase):
+    """Tests the SessionStateStats domain object."""
+
+    def test_from_dict(self):
+        session_state_stats_dict = {
+            'total_answers_count': 10,
+            'useful_feedback_count': 4,
+            'total_hit_count': 18,
+            'first_hit_count': 7,
+            'num_times_solution_viewed': 2,
+            'num_completions': 2
+        }
+        session_state_stats = stats_domain.SessionStateStats(10, 4, 18, 7, 2, 2)
+        expected_session_state_stats = stats_domain.SessionStateStats.from_dict(
+            session_state_stats_dict)
+        self.assertEqual(
+            session_state_stats.total_answers_count,
+            expected_session_state_stats.total_answers_count)
+        self.assertEqual(
+            session_state_stats.useful_feedback_count,
+            expected_session_state_stats.useful_feedback_count)
+        self.assertEqual(
+            session_state_stats.total_hit_count,
+            expected_session_state_stats.total_hit_count)
+        self.assertEqual(
+            session_state_stats.first_hit_count,
+            expected_session_state_stats.first_hit_count)
+        self.assertEqual(
+            session_state_stats.num_times_solution_viewed,
+            expected_session_state_stats.num_times_solution_viewed)
+        self.assertEqual(
+            session_state_stats.num_completions,
+            expected_session_state_stats.num_completions)
+
+    def test_repr(self):
+        session_state_stats = stats_domain.SessionStateStats(1, 2, 3, 4, 5, 6)
+        self.assertEqual(
+            '%r' % (session_state_stats,),
+            'SessionStateStats('
+            'total_answers_count=1, '
+            'useful_feedback_count=2, '
+            'total_hit_count=3, '
+            'first_hit_count=4, '
+            'num_times_solution_viewed=5, '
+            'num_completions=6)')
+
+    def test_create_default(self):
+        session_state_stats = stats_domain.SessionStateStats.create_default()
+        self.assertEqual(session_state_stats.total_answers_count, 0)
+        self.assertEqual(session_state_stats.useful_feedback_count, 0)
+        self.assertEqual(session_state_stats.total_hit_count, 0)
+        self.assertEqual(session_state_stats.total_answers_count, 0)
+        self.assertEqual(session_state_stats.num_times_solution_viewed, 0)
+        self.assertEqual(session_state_stats.num_completions, 0)
+
+    def test_equality(self):
+        session_state_stats_a = stats_domain.SessionStateStats.create_default()
+        session_state_stats_b = stats_domain.SessionStateStats.create_default()
+        session_state_stats_c = stats_domain.SessionStateStats.create_default()
+
+        self.assertEqual(session_state_stats_a, session_state_stats_b)
+        self.assertEqual(session_state_stats_b, session_state_stats_c)
+        self.assertEqual(session_state_stats_a, session_state_stats_c)
+
+        session_state_stats_a.total_answers_count += 1
+        self.assertEqual(session_state_stats_b, session_state_stats_c)
+        self.assertNotEqual(session_state_stats_a, session_state_stats_b)
+        self.assertNotEqual(session_state_stats_a, session_state_stats_c)
+
+        session_state_stats_b.total_answers_count += 1
+        session_state_stats_c.total_answers_count += 1
+
+        self.assertEqual(session_state_stats_a, session_state_stats_b)
+        self.assertEqual(session_state_stats_b, session_state_stats_c)
+        self.assertEqual(session_state_stats_a, session_state_stats_c)
+
+    def test_equality_with_different_class(self):
+        class DifferentStats(python_utils.OBJECT):
+            """A different class."""
+
+            pass
+
+        session_state_stats = stats_domain.SessionStateStats.create_default()
+        different_stats = DifferentStats()
+
+        self.assertFalse(session_state_stats == different_stats)
+
+    def test_hash(self):
+        session_state_stats = stats_domain.SessionStateStats.create_default()
+        with self.assertRaisesRegexp(TypeError, 'unhashable'):
+            unused_hash = hash(session_state_stats)
+
+    def test_to_dict(self):
+        self.assertEqual(
+            stats_domain.SessionStateStats(1, 2, 3, 4, 5, 6).to_dict(), {
+                'total_answers_count': 1,
+                'useful_feedback_count': 2,
+                'total_hit_count': 3,
+                'first_hit_count': 4,
+                'num_times_solution_viewed': 5,
+                'num_completions': 6
+            })
 
 
 class ExplorationIssuesTests(test_utils.GenericTestBase):
@@ -658,7 +875,10 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         super(ExplorationIssueTests, self).setUp()
 
         self.exp_issue = stats_domain.ExplorationIssue(
-            'EarlyQuit', {}, [], 1, True)
+            'EarlyQuit', {
+                'state_name': {'value': ''},
+                'time_spent_in_exp_in_msecs': {'value': 0}
+            }, [], 1, True)
 
     def _dummy_convert_issue_v1_dict_to_v2_dict(self, issue_dict):
         """A test implementation of schema conversion function. It sets all the
@@ -672,7 +892,16 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         return issue_dict
 
     def test_to_dict(self):
-        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
+        exp_issue = stats_domain.ExplorationIssue(
+            'EarlyQuit',
+            {
+                'time_spent_in_exp_in_msecs': {
+                    'value': 0
+                },
+                'state_name': {
+                    'value': ''
+                }
+            }, [], 1, True)
         exp_issue_dict = exp_issue.to_dict()
         expected_customization_args = {
             'time_spent_in_exp_in_msecs': {
@@ -734,7 +963,16 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
     def test_update_exp_issue_from_model(self):
         """Test the migration of exploration issue domain objects."""
-        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
+        exp_issue = stats_domain.ExplorationIssue(
+            'EarlyQuit',
+            {
+                'time_spent_in_exp_in_msecs': {
+                    'value': 0
+                },
+                'state_name': {
+                    'value': ''
+                }
+            }, [], 1, True)
         exp_issue_dict = exp_issue.to_dict()
         stats_models.ExplorationIssuesModel.create(
             'exp_id', 1, [exp_issue_dict])
@@ -762,7 +1000,10 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
         # For other issue types, no changes happen during migration.
         exp_issue1 = stats_domain.ExplorationIssue(
-            'MultipleIncorrectSubmissions', {}, [], 1, True)
+            'MultipleIncorrectSubmissions', {
+                'state_name': {'value': ''},
+                'num_times_answered_incorrectly': {'value': 7}
+            }, [], 1, True)
         exp_issue_dict1 = exp_issue1.to_dict()
 
         stats_models.ExplorationIssuesModel.create(
@@ -812,14 +1053,20 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             'exp_id', 1)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            r'unsupported operand type\(s\) for \+=: \'NoneType\' and \'int\''):
             stats_services.get_exp_issues_from_model(exp_issues_model)
 
     def test_actual_update_exp_issue_from_model_raises_error(self):
         exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
         exp_issue_dict = exp_issue.to_dict()
 
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The _convert_issue_v1_dict_to_v2_dict\(\) method is missing from '
+            r'the derived class. It should be implemented in the '
+            r'derived class.'):
             stats_domain.ExplorationIssue.update_exp_issue_from_model(
                 exp_issue_dict)
 
@@ -857,7 +1104,6 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             self.exp_issue.validate()
 
 
-
 class LearnerActionTests(test_utils.GenericTestBase):
     """Tests the LearnerAction domain object."""
 
@@ -865,7 +1111,11 @@ class LearnerActionTests(test_utils.GenericTestBase):
         super(LearnerActionTests, self).setUp()
 
         self.learner_action = stats_domain.LearnerAction(
-            'ExplorationStart', {}, 1)
+            'ExplorationStart', {
+                'state_name': {
+                    'value': ''
+                }
+            }, 1)
 
     def _dummy_convert_action_v1_dict_to_v2_dict(self, action_dict):
         """A test implementation of schema conversion function."""
@@ -877,7 +1127,13 @@ class LearnerActionTests(test_utils.GenericTestBase):
         return action_dict
 
     def test_to_dict(self):
-        learner_action = stats_domain.LearnerAction('ExplorationStart', {}, 1)
+        learner_action = stats_domain.LearnerAction(
+            'ExplorationStart',
+            {
+                'state_name': {
+                    'value': ''
+                }
+            }, 1)
         learner_action_dict = learner_action.to_dict()
         expected_customization_args = {
             'state_name': {
@@ -997,14 +1253,20 @@ class LearnerActionTests(test_utils.GenericTestBase):
 
         playthrough_model = stats_models.PlaythroughModel.get(playthrough_id)
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            r'unsupported operand type\(s\) for \+=: \'NoneType\' and \'int\''):
             stats_services.get_playthrough_from_model(playthrough_model)
 
     def test_actual_update_learner_action_from_model_raises_error(self):
         learner_action = stats_domain.LearnerAction('ExplorationStart', {}, 1)
         learner_action_dict = learner_action.to_dict()
 
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            r'The _convert_action_v1_dict_to_v2_dict\(\) method is missing from'
+            r' the derived class. It should be implemented in the '
+            r'derived class.'):
             stats_domain.LearnerAction.update_learner_action_from_model(
                 learner_action_dict)
 
@@ -1507,6 +1769,7 @@ class CategorizedAnswerFrequencyListsDomainTests(test_utils.GenericTestBase):
     """Tests CategorizedAnswerFrequencyLists for basic domain object
     operations.
     """
+
     ANSWER_A = stats_domain.AnswerOccurrence('answer a', 3)
     ANSWER_B = stats_domain.AnswerOccurrence('answer b', 2)
     ANSWER_C = stats_domain.AnswerOccurrence('answer c', 1)

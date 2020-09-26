@@ -24,15 +24,18 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ExplorationDraft, ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
+import {
+  ExplorationChangeList,
+  ExplorationDraft,
+  ExplorationDraftObjectFactory
+} from 'domain/exploration/ExplorationDraftObjectFactory';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocalStorageService {
-  constructor(private explorationDraftObjectFactory:
-                  ExplorationDraftObjectFactory) {}
+  constructor(
+    private explorationDraftObjectFactory: ExplorationDraftObjectFactory) {}
 
   // Check that local storage exists and works as expected.
   // If it does storage stores the localStorage object,
@@ -74,9 +77,8 @@ export class LocalStorageService {
    * @param {List} changeList - The exploration change list to be saved.
    * @param {Integer} draftChangeListId - The id of the draft to be saved.
    */
-  // TODO(#7176): Replace 'any' with the exact type.
   saveExplorationDraft(
-      explorationId: string, changeList: any,
+      explorationId: string, changeList: ExplorationChangeList[],
       draftChangeListId: number): void {
     let localSaveKey = this._createExplorationDraftKey(explorationId);
     if (this.isStorageAvailable()) {

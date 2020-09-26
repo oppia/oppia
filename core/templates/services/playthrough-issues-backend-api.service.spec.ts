@@ -16,199 +16,256 @@
  * @fileoverview Unit tests for the issues backend api service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// PlaythroughIssuesBackendApiService.ts is upgraded to Angular 8.
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
-import { PlaythroughIssueObjectFactory } from
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+
+import { PlaythroughIssuesBackendApiService } from
+  'services/playthrough-issues-backend-api.service';
+import { PlaythroughIssueBackendDict, PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
-import { PlaythroughObjectFactory } from
-  'domain/statistics/PlaythroughObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 
-require('services/playthrough-issues-backend-api.service.ts');
+describe('PlaythroughIssuesBackendApiService', () => {
+  let httpTestingController: HttpTestingController = null;
+  let playthroughIssuesBackendApiService:
+    PlaythroughIssuesBackendApiService = null;
+  let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory = null;
 
-describe('PlaythroughIssuesBackendApiService', function() {
-  var PlaythroughIssuesBackendApiService = null;
-  var $httpBackend = null;
-  var PlaythroughIssueObjectFactory = null;
-  var PlaythroughObjectFactory = null;
-  var CsrfService = null;
-  var backendIssues = [{
+  let backendIssues: PlaythroughIssueBackendDict[] = [{
     issue_type: 'MultipleIncorrectSubmissions',
     issue_customization_args: {
-      state_name: {
-        value: 'state_name1'
-      },
-      num_times_answered_incorrectly: {
-        value: 7
-      }
+      state_name: { value: 'state_name1' },
+      num_times_answered_incorrectly: { value: 7 }
     },
     playthrough_ids: ['playthrough_id2'],
     schema_version: 1,
     is_valid: true
   }];
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector, $q) {
-    PlaythroughIssuesBackendApiService =
-      $injector.get('PlaythroughIssuesBackendApiService');
-    $httpBackend = $injector.get('$httpBackend');
-    PlaythroughIssueObjectFactory = $injector.get(
-      'PlaythroughIssueObjectFactory');
-    PlaythroughObjectFactory = $injector.get('PlaythroughObjectFactory');
-
-    CsrfService = $injector.get('CsrfTokenService');
-
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
-    });
-  }));
-
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  beforeEach(() => {
+    TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
+    httpTestingController = TestBed.get(HttpTestingController);
+    playthroughIssuesBackendApiService = TestBed.get(
+      PlaythroughIssuesBackendApiService);
+    playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
   });
 
-  describe('.fetch', function() {
-    it('returns the issues data provided by the backend', function() {
-      var successHandler = jasmine.createSpy('success');
-      var failureHandler = jasmine.createSpy('failure');
-      $httpBackend.expectGET(
-        '/issuesdatahandler/7?exp_version=1'
-      ).respond(backendIssues);
+  afterEach(() => {
+    httpTestingController.verify();
+  });
 
-      PlaythroughIssuesBackendApiService.fetchIssues('7', 1).then(
-        successHandler, failureHandler);
-      $httpBackend.flush();
+  describe('.fetch', () => {
+    it('should return the issues data provided by the backend', fakeAsync(
+      () => {
+        let successHandler = jasmine.createSpy('success');
+        let failureHandler = jasmine.createSpy('failure');
 
-      expect(successHandler).toHaveBeenCalledWith(
-        backendIssues.map(PlaythroughIssueObjectFactory.createFromBackendDict));
-      expect(failureHandler).not.toHaveBeenCalled();
-    });
-
-    it('should not fetch an issue when another issue was already fetched',
-      function() {
-        var successHandler = jasmine.createSpy('success');
-        var failureHandler = jasmine.createSpy('failure');
-        $httpBackend.expectGET(
-          '/issuesdatahandler/7?exp_version=1'
-        ).respond(backendIssues);
-
-        PlaythroughIssuesBackendApiService.fetchIssues('7', 1).then(
+        playthroughIssuesBackendApiService.fetchIssues('7', 1).then(
           successHandler, failureHandler);
-        $httpBackend.flush();
+
+        let req = httpTestingController.expectOne(
+          '/issuesdatahandler/7?exp_version=1');
+        expect(req.request.method).toEqual('GET');
+        req.flush(backendIssues);
+        flushMicrotasks();
 
         expect(successHandler).toHaveBeenCalledWith(
           backendIssues.map(
-            PlaythroughIssueObjectFactory.createFromBackendDict));
+            playthroughIssueObjectFactory.createFromBackendDict));
         expect(failureHandler).not.toHaveBeenCalled();
+      }));
 
-        // Try to fetch another issue
-        PlaythroughIssuesBackendApiService.fetchIssues('8', 1).then(
-          successHandler, failureHandler);
-
-        expect(successHandler).toHaveBeenCalledWith(
-          backendIssues.map(
-            PlaythroughIssueObjectFactory.createFromBackendDict));
-        expect(failureHandler).not.toHaveBeenCalled();
-      });
-
-    it('returns the playthrough data provided by the backend', function() {
-      var backendPlaythrough = {
-        exp_id: 'exp_id1',
-        exp_version: 1,
-        issue_type: 'EarlyQuit',
-        issue_customization_args: {
-          state_name: {
-            value: 'state_name1'
-          },
-          time_spent_in_exp_in_msecs: {
-            value: 200
-          }
-        },
-        actions: [{
-          action_type: 'ExplorationStart',
-          action_customization_args: {
-            state_name: {
-              value: 'state_name1'
-            }
-          },
-          schema_version: 1
-        }]
-      };
-
-      var successHandler = jasmine.createSpy('success');
-      var failureHandler = jasmine.createSpy('failure');
-      $httpBackend.expectGET(
-        '/playthroughdatahandler/7/1'
-      ).respond(backendPlaythrough);
-
-      PlaythroughIssuesBackendApiService.fetchPlaythrough('7', '1').then(
-        successHandler, failureHandler);
-      $httpBackend.flush();
-
-      expect(successHandler).toHaveBeenCalledWith(
-        PlaythroughObjectFactory.createFromBackendDict(backendPlaythrough));
-      expect(failureHandler).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('.resolve', function() {
-    it('should resolve an issue', function() {
-      var successHandler = jasmine.createSpy('success');
-      var failureHandler = jasmine.createSpy('failure');
-      var explorationId = '7';
-      var playthroughIssue = PlaythroughIssueObjectFactory
-        .createFromBackendDict(backendIssues[0]);
-      $httpBackend.expectGET(
-        '/issuesdatahandler/7?exp_version=1'
-      ).respond(backendIssues);
-      $httpBackend.expectPOST('/resolveissuehandler/' + explorationId)
-        .respond(200);
-
-      PlaythroughIssuesBackendApiService.fetchIssues('7', 1).then(
-        function() {
-          PlaythroughIssuesBackendApiService.resolveIssue(
-            playthroughIssue, explorationId, 1).then(
-            successHandler, failureHandler);
-
-          // resolveIssue does not return any resolve promise method.
-          expect(successHandler).not.toHaveBeenCalled();
-          expect(failureHandler).not.toHaveBeenCalled();
-        });
-      $httpBackend.flush();
-    });
-
-    it('should use the rejection handler when try to get non fetched issue',
-      function() {
-        var explorationId = '7';
-        var playthroughIssue = PlaythroughIssueObjectFactory
-          .createFromBackendDict(backendIssues[0]);
-
+    it('should use the rejection handler if the backend request failed.',
+      fakeAsync(() => {
         var successHandler = jasmine.createSpy('success');
         var failHandler = jasmine.createSpy('fail');
 
-        $httpBackend.expectPOST('/resolveissuehandler/' + explorationId)
-          .respond(200);
-        PlaythroughIssuesBackendApiService.resolveIssue(
-          playthroughIssue, explorationId, 1).then(successHandler, failHandler);
-        $httpBackend.flush();
+        playthroughIssuesBackendApiService.fetchIssues('7', 1).then(
+          successHandler, failHandler);
+
+        var req = httpTestingController.expectOne(
+          '/issuesdatahandler/7?exp_version=1');
+        expect(req.request.method).toEqual('GET');
+        req.flush({
+          error: 'Some error in the backend.'
+        }, {
+          status: 500, statusText: 'Internal Server Error'
+        });
+
+        flushMicrotasks();
 
         expect(successHandler).not.toHaveBeenCalled();
-        expect(failHandler)
-          .toHaveBeenCalledWith(
-            new Error('An issue which was not fetched from the backend has ' +
-            'been resolved'));
+        expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+      })
+    );
+
+    it('should not fetch an issue when another issue was already fetched',
+      fakeAsync(() => {
+        let successHandler = jasmine.createSpy('success');
+        let failureHandler = jasmine.createSpy('failure');
+
+        playthroughIssuesBackendApiService.fetchIssues('7', 1).then(
+          successHandler, failureHandler);
+
+        let req = httpTestingController.expectOne(
+          '/issuesdatahandler/7?exp_version=1');
+        expect(req.request.method).toEqual('GET');
+        req.flush(backendIssues);
+        flushMicrotasks();
+
+        expect(successHandler).toHaveBeenCalledWith(
+          backendIssues.map(
+            playthroughIssueObjectFactory.createFromBackendDict));
+        expect(failureHandler).not.toHaveBeenCalled();
+
+        // Try to fetch another issue.
+        playthroughIssuesBackendApiService.fetchIssues('8', 1).then(
+          successHandler, failureHandler);
+
+        flushMicrotasks();
+
+        expect(successHandler).toHaveBeenCalledWith(backendIssues.map(
+          playthroughIssueObjectFactory.createFromBackendDict));
+        expect(failureHandler).not.toHaveBeenCalled();
+      }));
+
+    it('should return the playthrough data provided by the backend', fakeAsync(
+      () => {
+        let backendPlaythrough: PlaythroughIssueBackendDict = {
+          issue_type: 'EarlyQuit',
+          issue_customization_args: {
+            state_name: { value: 'state_name1' },
+            time_spent_in_exp_in_msecs: { value: 200 }
+          },
+          playthrough_ids: ['pID'],
+          schema_version: 2,
+          is_valid: true
+        };
+
+        let successHandler = jasmine.createSpy('success');
+        let failureHandler = jasmine.createSpy('failure');
+
+        playthroughIssuesBackendApiService.fetchPlaythrough('7', '1').then(
+          successHandler, failureHandler);
+        let req = httpTestingController.expectOne(
+          '/playthroughdatahandler/7/1');
+        expect(req.request.method).toEqual('GET');
+        req.flush(backendPlaythrough);
+        flushMicrotasks();
+
+        expect(successHandler).toHaveBeenCalledWith(
+          playthroughIssueObjectFactory.createFromBackendDict(
+            backendPlaythrough));
+        expect(failureHandler).not.toHaveBeenCalled();
+      }));
+  });
+
+  it('should use the rejection handler if the backend request failed.',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      playthroughIssuesBackendApiService.fetchPlaythrough('7', '1').then(
+        successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        '/playthroughdatahandler/7/1');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Some error in the backend.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
       });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+    })
+  );
+
+  describe('.resolve', () => {
+    it('should resolve an issue', fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failureHandler = jasmine.createSpy('failure');
+      let explorationId = '7';
+      let playthroughIssue = playthroughIssueObjectFactory
+        .createFromBackendDict(backendIssues[0]);
+
+      playthroughIssuesBackendApiService.fetchIssues('7', 1)
+        .then(() => playthroughIssuesBackendApiService.resolveIssue(
+          playthroughIssue, explorationId, 1))
+        .then(successHandler, failureHandler);
+      let req = httpTestingController.expectOne(
+        '/issuesdatahandler/7?exp_version=1');
+      expect(req.request.method).toEqual('GET');
+      req.flush(backendIssues);
+      flushMicrotasks();
+
+      req = httpTestingController.expectOne(
+        '/resolveissuehandler/7');
+      req.flush(backendIssues);
+      flushMicrotasks();
+
+      // Function resolveIssue does not return a value.
+      expect(successHandler).toHaveBeenCalled();
+      expect(failureHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should use the rejection handler if the backend request failed.',
+      fakeAsync(() => {
+        var successHandler = jasmine.createSpy('success');
+        var failHandler = jasmine.createSpy('fail');
+        let explorationId = '7';
+        let playthroughIssue = playthroughIssueObjectFactory
+          .createFromBackendDict(backendIssues[0]);
+
+        playthroughIssuesBackendApiService.fetchIssues('7', 1)
+          .then(() => playthroughIssuesBackendApiService.resolveIssue(
+            playthroughIssue, explorationId, 1))
+          .then(successHandler, failHandler);
+
+        let req = httpTestingController.expectOne(
+          '/issuesdatahandler/7?exp_version=1');
+        expect(req.request.method).toEqual('GET');
+        req.flush(backendIssues);
+        flushMicrotasks();
+
+        req = httpTestingController.expectOne(
+          '/resolveissuehandler/7');
+        expect(req.request.method).toEqual('POST');
+        req.flush({
+          error: 'Some error in the backend.'
+        }, {
+          status: 500, statusText: 'Internal Server Error'
+        });
+
+        flushMicrotasks();
+
+        expect(successHandler).not.toHaveBeenCalled();
+        expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+      })
+    );
+
+    it('should use the rejection handler when try to get non fetched issue',
+      fakeAsync(() => {
+        let successHandler = jasmine.createSpy('success');
+        let failHandler = jasmine.createSpy('fail');
+        let explorationId = '7';
+        let playthroughIssue = playthroughIssueObjectFactory
+          .createFromBackendDict(backendIssues[0]);
+
+        playthroughIssuesBackendApiService.resolveIssue(
+          playthroughIssue, explorationId, 1).then(successHandler, failHandler);
+        let req = httpTestingController.expectOne(
+          '/resolveissuehandler/' + explorationId);
+        expect(req.request.method).toEqual('POST');
+        req.flush(backendIssues);
+        flushMicrotasks();
+
+        expect(successHandler).not.toHaveBeenCalled();
+        expect(failHandler).toHaveBeenCalledWith(
+          'An issue which was not fetched from the backend has been resolved');
+      }));
   });
 });

@@ -34,9 +34,10 @@ class ExplorationRecommendationsModel(
 
     Instances of this class are keyed by exploration id.
     """
+
     # Ids of recommended explorations.
     recommended_exploration_ids = ndb.StringProperty(
-        repeated=True, indexed=False)
+        repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -45,10 +46,13 @@ class ExplorationRecommendationsModel(
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'recommended_exploration_ids':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
@@ -57,19 +61,12 @@ class ExplorationRecommendationsModel(
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
+                should be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
         """
         return False
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """ExplorationRecommendationsModel doesn't have any field with user
-        ID.
-        """
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
 
 class TopicSimilaritiesModel(base_models.BaseModel):
@@ -84,6 +81,7 @@ class TopicSimilaritiesModel(base_models.BaseModel):
     Currently, topics are the same as the default categories. However, this may
     change in the future.
     """
+
     content = ndb.JsonProperty(required=True)
 
     @staticmethod
@@ -93,12 +91,9 @@ class TopicSimilaritiesModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @staticmethod
-    def get_export_policy():
+    @classmethod
+    def get_export_policy(cls):
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """TopicSimilaritiesModel doesn't have any field with user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+        return dict(super(cls, cls).get_export_policy(), **{
+            'content': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })

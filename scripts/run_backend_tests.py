@@ -44,7 +44,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
-import datetime
 import importlib
 import inspect
 import multiprocessing
@@ -54,41 +53,26 @@ import subprocess
 import sys
 import threading
 import time
+import unittest
 
 import python_utils
 
 from . import common
-from . import setup
-from . import setup_gae
-
+from . import concurrent_task_utils
+from . import install_third_party_libs
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.OPPIA_TOOLS_DIR, 'pylint-1.9.4'),
-    os.path.join(
-        common.OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine'),
-    os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.33'),
-    os.path.join(
-        common.OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine',
-        'lib', 'webob_0_9'),
-    os.path.join(common.OPPIA_TOOLS_DIR, 'browsermob-proxy-0.7.1'),
-    os.path.join(common.OPPIA_TOOLS_DIR, 'selenium-3.13.0'),
-    os.path.join(common.OPPIA_TOOLS_DIR, 'Pillow-6.0.0'),
+    common.GOOGLE_APP_ENGINE_SDK_HOME,
+    os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-%s' % common.WEBTEST_VERSION),
+    os.path.join(common.OPPIA_TOOLS_DIR, 'Pillow-%s' % common.PILLOW_VERSION),
     os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-%s' % common.PSUTIL_VERSION),
+    os.path.join(
+        common.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common.PYGITHUB_VERSION),
+    os.path.join(
+        common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
     common.CURR_DIR,
-    os.path.join(common.THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.5'),
-    os.path.join(common.THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'bleach-3.1.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'callbacks-0.3.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'graphy-1.0.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'html5lib-python-1.0.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'mutagen-1.42.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'simplejson-3.16.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'six-1.12.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'soupsieve-1.9.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'webencodings-0.5.1'),
+    common.THIRD_PARTY_PYTHON_LIBS_DIR
 ]
 
 COVERAGE_DIR = os.path.join(
@@ -99,15 +83,12 @@ COVERAGE_MODULE_PATH = os.path.join(
     'coverage-%s' % common.COVERAGE_VERSION, 'coverage')
 
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
-LOG_LOCK = threading.Lock()
-ALL_ERRORS = []
 # This should be the same as core.test_utils.LOG_LINE_PREFIX.
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
-MAX_CONCURRENT_RUNS = 25
-
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Run this script from the oppia root folder:
     python -m scripts.run_backend_tests
 IMPORTANT: Only one of --test_path and --test_target should be specified.
@@ -137,19 +118,6 @@ _PARSER.add_argument(
     action='store_true')
 
 
-def log(message, show_time=False):
-    """Logs a message to the terminal.
-
-    If show_time is True, prefixes the message with the current time.
-    """
-    with LOG_LOCK:
-        if show_time:
-            python_utils.PRINT(
-                datetime.datetime.utcnow().strftime('%H:%M:%S'), message)
-        else:
-            python_utils.PRINT(message)
-
-
 def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     """Runs a shell command and captures the stdout and stderr output.
 
@@ -164,11 +132,12 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     last_stdout = last_stdout_str.split('\n')
 
     if LOG_LINE_PREFIX in last_stdout_str:
-        log('')
+        concurrent_task_utils.log('')
         for line in last_stdout:
             if line.startswith(LOG_LINE_PREFIX):
-                log('INFO: %s' % line[len(LOG_LINE_PREFIX):])
-        log('')
+                concurrent_task_utils.log(
+                    'INFO: %s' % line[len(LOG_LINE_PREFIX):])
+        concurrent_task_utils.log('')
 
     result = '%s%s' % (last_stdout_str, last_stderr_str)
 
@@ -176,39 +145,6 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
         raise Exception('Error %s\n%s' % (p.returncode, result))
 
     return result
-
-
-class TaskThread(threading.Thread):
-    """Runs a task in its own thread."""
-
-    def __init__(self, func, verbose, semaphore, name=None):
-        super(TaskThread, self).__init__()
-        self.func = func
-        self.output = None
-        self.exception = None
-        self.verbose = verbose
-        self.name = name
-        self.semaphore = semaphore
-        self.finished = False
-
-    def run(self):
-        try:
-            self.output = self.func()
-            if self.verbose:
-                log('LOG %s:' % self.name, show_time=True)
-                log(self.output)
-                log('----------------------------------------')
-            log('FINISHED %s: %.1f secs' %
-                (self.name, time.time() - self.start_time), show_time=True)
-        except Exception as e:
-            self.exception = e
-            if 'KeyboardInterrupt' not in python_utils.convert_to_bytes(
-                    self.exception.args[0]):
-                log('ERROR %s: %.1f secs' %
-                    (self.name, time.time() - self.start_time), show_time=True)
-        finally:
-            self.semaphore.release()
-            self.finished = True
 
 
 class TestingTaskSpec(python_utils.OBJECT):
@@ -228,60 +164,10 @@ class TestingTaskSpec(python_utils.OBJECT):
         else:
             exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
-        return run_shell_cmd(exc_list)
+        result = run_shell_cmd(exc_list)
 
-
-def _check_all_tasks(tasks):
-    """Checks the results of all tasks."""
-    running_tasks_data = []
-
-    for task in tasks:
-        if task.isAlive():
-            running_tasks_data.append('  %s (started %s)' % (
-                task.name,
-                time.strftime('%H:%M:%S', time.localtime(task.start_time))
-            ))
-
-        if task.exception:
-            ALL_ERRORS.append(task.exception)
-
-    if running_tasks_data:
-        log('----------------------------------------')
-        log('Tasks still running:')
-        for task_details in running_tasks_data:
-            log(task_details)
-
-
-def _execute_tasks(tasks, semaphore):
-    """Starts all tasks and checks the results.
-    Runs no more than the allowable limit defined in the semaphore.
-
-    Args:
-        tasks: list(TestingTaskSpec). The tasks to run.
-        semaphore: threading.Semaphore. The object that controls how many tasks
-            can run at any time.
-    """
-    remaining_tasks = [] + tasks
-    currently_running_tasks = []
-
-    while remaining_tasks:
-        task = remaining_tasks.pop()
-        semaphore.acquire()
-        task.start()
-        task.start_time = time.time()
-        currently_running_tasks.append(task)
-
-        if len(remaining_tasks) % 5 == 0:
-            if remaining_tasks:
-                log('----------------------------------------')
-                log('Number of unstarted tasks: %s' % len(remaining_tasks))
-            _check_all_tasks(currently_running_tasks)
-        log('----------------------------------------')
-
-    for task in currently_running_tasks:
-        task.join()
-
-    _check_all_tasks(currently_running_tasks)
+        return [concurrent_task_utils.TaskResult(
+            None, None, None, [result])]
 
 
 def _get_all_test_targets(test_path=None, include_load_tests=True):
@@ -304,10 +190,7 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
         python_module = importlib.import_module(test_target_path)
         for name, clazz in inspect.getmembers(
                 python_module, predicate=inspect.isclass):
-            all_base_classes = [base_class.__name__ for base_class in
-                                (inspect.getmro(clazz))]
-            # Check that it is a subclass of 'AppEngineTestBase'.
-            if 'AppEngineTestBase' in all_base_classes:
+            if unittest.TestCase in inspect.getmro(clazz):
                 class_names.append(name)
 
         return [
@@ -343,8 +226,9 @@ def main(args=None):
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    setup.main(args=[])
-    setup_gae.main(args=[])
+    # Make sure that third-party libraries are up-to-date before running tests,
+    # otherwise import errors may result.
+    install_third_party_libs.main()
 
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
@@ -366,8 +250,8 @@ def main(args=None):
                 os.path.join(
                     common.OPPIA_TOOLS_DIR,
                     'coverage-%s' % common.COVERAGE_VERSION)):
-            raise Exception('Coverage is not installed, please run the start '
-                            'script.')
+            raise Exception(
+                'Coverage is not installed, please run the start script.')
 
         pythonpath_components = [COVERAGE_DIR]
         if os.environ.get('PYTHONPATH'):
@@ -376,8 +260,8 @@ def main(args=None):
         os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath_components)
 
     if parsed_args.test_target and parsed_args.test_path:
-        raise Exception('At most one of test_path and test_target '
-                        'should be specified.')
+        raise Exception(
+            'At most one of test_path and test_target should be specified.')
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
     if parsed_args.test_target and '/' in parsed_args.test_target:
@@ -405,7 +289,8 @@ def main(args=None):
             include_load_tests=include_load_tests)
 
     # Prepare tasks.
-    concurrent_count = min(multiprocessing.cpu_count(), MAX_CONCURRENT_RUNS)
+    max_concurrent_runs = 25
+    concurrent_count = min(multiprocessing.cpu_count(), max_concurrent_runs)
     semaphore = threading.Semaphore(concurrent_count)
 
     task_to_taskspec = {}
@@ -413,20 +298,22 @@ def main(args=None):
     for test_target in all_test_targets:
         test = TestingTaskSpec(
             test_target, parsed_args.generate_coverage_report)
-        task = TaskThread(
-            test.run, parsed_args.verbose, semaphore, name=test_target)
+        task = concurrent_task_utils.create_task(
+            test.run, parsed_args.verbose, semaphore, name=test_target,
+            report_enabled=False)
         task_to_taskspec[task] = test
         tasks.append(task)
 
     task_execution_failed = False
     try:
-        _execute_tasks(tasks, semaphore)
+        concurrent_task_utils.execute_tasks(tasks, semaphore)
     except Exception:
         task_execution_failed = True
 
     for task in tasks:
         if task.exception:
-            log(python_utils.convert_to_bytes(task.exception.args[0]))
+            concurrent_task_utils.log(
+                python_utils.convert_to_bytes(task.exception.args[0]))
 
     python_utils.PRINT('')
     python_utils.PRINT('+------------------+')
@@ -485,7 +372,8 @@ def main(args=None):
         else:
             try:
                 tests_run_regex_match = re.search(
-                    r'Ran ([0-9]+) tests? in ([0-9\.]+)s', task.output)
+                    r'Ran ([0-9]+) tests? in ([0-9\.]+)s',
+                    task.task_results[0].get_report()[0])
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
                 python_utils.PRINT(
@@ -494,7 +382,7 @@ def main(args=None):
             except Exception:
                 python_utils.PRINT(
                     'An unexpected error occurred. '
-                    'Task output:\n%s' % task.output)
+                    'Task output:\n%s' % task.task_results[0].get_report()[0])
 
         total_count += test_count
 

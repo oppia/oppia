@@ -16,13 +16,15 @@
  * @fileoverview Tests for LearnerDashboardActivityIdsObjectFactory.
  */
 
-import { LearnerDashboardActivityIdsObjectFactory } from
-  'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
+import {
+  LearnerDashboardActivityIdsDict,
+  LearnerDashboardActivityIdsObjectFactory
+} from 'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
 
 describe('Learner dashboard activity ids object factory', () => {
   let learnerDashboardActivityIdsObjectFactory:
     LearnerDashboardActivityIdsObjectFactory;
-  let learnerDashboardActivityIdsDict: any;
+  let learnerDashboardActivityIdsDict: LearnerDashboardActivityIdsDict;
 
   beforeEach(() => {
     learnerDashboardActivityIdsObjectFactory = (
@@ -38,7 +40,7 @@ describe('Learner dashboard activity ids object factory', () => {
   });
 
   it('should check if activity id is present among learner dashboard ' +
-     ' activity ids', () => {
+     'activity ids', () => {
     var learnerDashboardActivityIds = (
       learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
         learnerDashboardActivityIdsDict));

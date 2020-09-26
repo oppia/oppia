@@ -15,42 +15,81 @@
 /**
  * @fileoverview Unit tests for expression-syntax-tree.service.ts
  */
+import { TestBed } from '@angular/core/testing';
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-
-require('App.ts');
-require('expressions/expression-syntax-tree.service.ts');
+import { ExpressionSyntaxTreeService, ExpressionError,
+  ExprUndefinedVarError, ExprWrongArgTypeError,
+  ExprWrongNumArgsError } from
+  'expressions/expression-syntax-tree.service.ts';
 
 describe('Expression syntax tree service', () => {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
   describe('expression syntax tree service', () => {
-    let ExpressionSyntaxTreeService = null;
+    let expressionSyntaxTreeService: ExpressionSyntaxTreeService;
 
-    beforeEach(angular.mock.inject(($injector) => {
-      ExpressionSyntaxTreeService =
-          $injector.get('ExpressionSyntaxTreeService');
-    }));
+    beforeEach(() => {
+      expressionSyntaxTreeService = TestBed.get(ExpressionSyntaxTreeService);
+    });
 
     it('should throw if environment is not found', () => {
-      expect(() => ExpressionSyntaxTreeService.lookupEnvs('', [])).toThrow();
+      expect(() => expressionSyntaxTreeService.lookupEnvs('test', [{}]))
+        .toThrowMatching(
+          // Jasmine has no built-in matcher for classes derived from Error.
+          e => e.toString() === 'ExprUndefinedVarError: test not found in [{}]'
+        );
     });
 
     it('should return the correct environment if exists', () => {
       const expected = 'bar';
-      const actual =
-          ExpressionSyntaxTreeService.lookupEnvs('foo', [{foo: 'bar'}]);
+      const actual = <string> expressionSyntaxTreeService.lookupEnvs('foo', [
+        {foo: 'bar'}
+      ]);
 
       expect(expected).toBe(actual);
+    });
+  });
+
+  describe('ExpressionError', () => {
+    let expressionError: ExpressionError;
+
+    it('should extend Error object', () => {
+      expressionError = new ExpressionError();
+
+      expect(expressionError.name).toBe('ExpressionError');
+      expect(expressionError instanceof Error).toBe(true);
+    });
+  });
+
+  describe('ExprUndefinedVarError', () => {
+    let exprUndefinedVarError: ExprUndefinedVarError;
+
+    it('should extend ExpressionError class', () => {
+      const exampleVar = undefined;
+      exprUndefinedVarError = new ExprUndefinedVarError(exampleVar, []);
+
+      expect(exprUndefinedVarError.name).toBe('ExprUndefinedVarError');
+      expect(exprUndefinedVarError instanceof ExpressionError).toBe(true);
+    });
+  });
+
+  describe('ExprWrongNumArgsError', () => {
+    let exprWrongNumArgsError: ExprWrongNumArgsError;
+
+    it('should extend ExpressionError class', () => {
+      exprWrongNumArgsError = new ExprWrongNumArgsError([], 0, 1);
+
+      expect(exprWrongNumArgsError.name).toBe('ExprWrongNumArgsError');
+      expect(exprWrongNumArgsError instanceof ExpressionError).toBe(true);
+    });
+  });
+
+  describe('ExprWrongArgTypeError', () => {
+    let exprWrongArgTypeError: ExprWrongArgTypeError;
+
+    it('should extend ExpressionError class', () => {
+      exprWrongArgTypeError = new ExprWrongArgTypeError(undefined, '0', '1');
+
+      expect(exprWrongArgTypeError.name).toBe('ExprWrongArgTypeError');
+      expect(exprWrongArgTypeError instanceof ExpressionError).toBe(true);
     });
   });
 });

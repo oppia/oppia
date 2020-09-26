@@ -21,19 +21,13 @@ require(
   'components/question-directives/questions-list/' +
   'questions-list.directive.ts');
 
-require('components/entity-creation-services/question-creation.service.ts');
-require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/question/editable-question-backend-api.service.ts');
-require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/editable-skill-backend-api.service.ts');
-require('domain/skill/MisconceptionObjectFactory.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/alerts.service.ts');
 require('services/questions-list.service.ts');
-require('services/contextual/url.service.ts');
+
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -44,23 +38,11 @@ angular.module('oppia').directive('questionsTab', [
         '/pages/skill-editor-page/questions-tab/' +
         'skill-questions-tab.directive.html'),
       controller: [
-        '$scope', '$http', '$q', '$uibModal', '$window', 'AlertsService',
-        'SkillEditorStateService', 'QuestionCreationService', 'UrlService',
-        'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
-        'MisconceptionObjectFactory', 'QuestionObjectFactory',
-        'QuestionsListService',
-        'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
-        'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
-        'NUM_QUESTIONS_PER_PAGE', function(
-            $scope, $http, $q, $uibModal, $window, AlertsService,
-            SkillEditorStateService, QuestionCreationService, UrlService,
-            EditableQuestionBackendApiService, EditableSkillBackendApiService,
-            MisconceptionObjectFactory, QuestionObjectFactory,
-            QuestionsListService,
-            StateEditorService, QuestionUndoRedoService, UndoRedoService,
-            EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
-            NUM_QUESTIONS_PER_PAGE) {
+        '$scope', 'QuestionsListService', 'SkillEditorStateService',
+        function(
+            $scope, QuestionsListService, SkillEditorStateService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var _init = function() {
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.getQuestionSummariesAsync =
@@ -75,9 +57,15 @@ angular.module('oppia').directive('questionsTab', [
           };
           ctrl.$onInit = function() {
             _init();
-            $scope.$on(EVENT_SKILL_INITIALIZED, _init);
-            $scope.$on(EVENT_SKILL_REINITIALIZED, _init);
+            ctrl.directiveSubscriptions.add(
+              SkillEditorStateService.onSkillChange.subscribe(
+                () => _init())
+            );
           };
+
+          $scope.$on('$destroy', function() {
+            ctrl.directiveSubscriptions.unsubscribe();
+          });
         }
       ]
     };

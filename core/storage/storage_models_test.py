@@ -22,6 +22,7 @@ import inspect
 from core.domain import takeout_service
 from core.platform import models
 from core.tests import test_utils
+import python_utils
 
 (
     base_models, collection_models, email_models,
@@ -80,15 +81,6 @@ class StorageModelsTest(test_utils.GenericTestBase):
         for clazz in self._get_model_classes():
             if clazz.__name__ in self.BASE_CLASSES:
                 continue
-            base_classes = [base.__name__ for base in inspect.getmro(clazz)]
-            # BaseSnapshotMetadataModel and models that inherit from it
-            # adopt the policy of the associated VersionedModel.
-            if 'BaseSnapshotMetadataModel' in base_classes:
-                continue
-            # BaseSnapshotContentModel and models that inherit from it
-            # adopt the policy of the associated VersionedModel.
-            if 'BaseSnapshotContentModel' in base_classes:
-                continue
             yield clazz
 
     def test_all_model_module_names_unique(self):
@@ -109,18 +101,16 @@ class StorageModelsTest(test_utils.GenericTestBase):
                 self.fail(msg='get_deletion_policy is not defined for %s' % (
                     clazz.__name__))
 
-    def test_base_models_do_not_have_get_deletion_policy(self):
-        for clazz in self._get_model_classes():
-            if clazz.__name__ in self.BASE_CLASSES:
-                with self.assertRaises(NotImplementedError):
-                    clazz.get_deletion_policy()
-
     def test_base_or_versioned_child_classes_have_has_reference_to_user_id(
             self):
         for clazz in self._get_base_or_versioned_model_child_classes():
             if (clazz.get_deletion_policy() ==
                     base_models.DELETION_POLICY.NOT_APPLICABLE):
-                with self.assertRaises(NotImplementedError):
+                with self.assertRaisesRegexp(
+                    NotImplementedError,
+                    r'The has_reference_to_user_id\(\) method is missing from '
+                    r'the derived class. It should be implemented in the '
+                    r'derived class.'):
                     clazz.has_reference_to_user_id('any_id')
             else:
                 try:
@@ -130,29 +120,6 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     self.fail(
                         msg='has_reference_to_user_id is not defined for %s' % (
                             clazz.__name__))
-
-    def test_all_model_classes_have_get_user_id_migration_policy(self):
-        for clazz in self._get_base_or_versioned_model_child_classes():
-            try:
-                self.assertIn(
-                    clazz.get_user_id_migration_policy(),
-                    base_models.USER_ID_MIGRATION_POLICY.__dict__)
-            except NotImplementedError:
-                self.fail(
-                    msg='get_user_id_migration_policy is not defined for %s'
-                    % clazz.__name__)
-
-    def test_model_classes_have_get_user_id_migration_field(self):
-        for clazz in self._get_base_or_versioned_model_child_classes():
-            if (clazz.get_user_id_migration_policy() ==
-                    base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD):
-                self.assertTrue(hasattr(clazz, 'get_user_id_migration_field'))
-
-    def test_model_classes_have_migrate_model(self):
-        for clazz in self._get_base_or_versioned_model_child_classes():
-            if (clazz.get_user_id_migration_policy() ==
-                    base_models.USER_ID_MIGRATION_POLICY.CUSTOM):
-                self.assertTrue(hasattr(clazz, 'migrate_model'))
 
     def test_get_models_which_should_be_exported(self):
         """Ensure that the set of models to export is the set of models with
@@ -164,50 +131,36 @@ class StorageModelsTest(test_utils.GenericTestBase):
             for clazz in self._get_model_classes()
             if not clazz.__name__ in self.BASE_CLASSES
         ]
-        models_with_export = (takeout_service
-                              .get_models_which_should_be_exported())
-        unimplemented_models = set()
+        models_with_export = (
+            takeout_service.get_models_which_should_be_exported())
         for model in all_models:
             export_policy = model.get_export_policy()
             if model in models_with_export:
-                self.assertEqual(
-                    base_models.EXPORT_POLICY.CONTAINS_USER_DATA,
-                    export_policy
-                )
-            elif export_policy == base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED:
-                unimplemented_models.add(model)
+                self.assertIn(
+                    base_models.EXPORT_POLICY.EXPORTED, export_policy.values())
             else:
-                self.assertEqual(
-                    base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                    export_policy
-                )
-        # TODO(#8523): This list should not be modified under any circumstance.
-        # The export_data functions for the models in this list will eventually
-        # be implemented, and the TO_BE_IMPLEMENTED value will be removed.
-        # Contact @varun-tandon for more information.
-        expected_unimplemented = {
-            collection_models.CollectionRightsSnapshotContentModel,
-            collection_models.CollectionRightsSnapshotMetadataModel,
-            collection_models.CollectionSnapshotContentModel,
-            collection_models.CollectionSnapshotMetadataModel,
-            collection_models.CollectionCommitLogEntryModel,
-            skill_models.SkillSnapshotMetadataModel,
-            skill_models.SkillSnapshotContentModel,
-            topic_models.SubtopicPageSnapshotContentModel,
-            topic_models.SubtopicPageSnapshotMetadataModel,
-            topic_models.TopicRightsSnapshotContentModel,
-            topic_models.TopicRightsSnapshotMetadataModel,
-            topic_models.TopicSnapshotContentModel,
-            topic_models.TopicSnapshotMetadataModel,
-            story_models.StorySnapshotContentModel,
-            story_models.StorySnapshotMetadataModel,
-            question_models.QuestionSnapshotContentModel,
-            question_models.QuestionSnapshotMetadataModel,
-            exploration_models.ExplorationRightsSnapshotContentModel,
-            exploration_models.ExplorationRightsSnapshotMetadataModel,
-            exploration_models.ExplorationSnapshotContentModel,
-            exploration_models.ExplorationSnapshotMetadataModel,
-            config_models.ConfigPropertySnapshotContentModel,
-            config_models.ConfigPropertySnapshotMetadataModel
-        }
-        self.assertEqual(unimplemented_models, expected_unimplemented)
+                self.assertNotIn(
+                    base_models.EXPORT_POLICY.EXPORTED, export_policy.values())
+
+    def test_all_fields_have_export_policy(self):
+        """Ensure every field in every model has an export policy defined."""
+        all_models = [
+            clazz
+            for clazz in self._get_model_classes()
+            if not clazz.__name__ in self.BASE_CLASSES
+        ]
+        for model in all_models:
+            export_policy = model.get_export_policy()
+            self.assertEqual(
+                sorted([
+                    python_utils.UNICODE(prop) for prop
+                    in model._properties]), # pylint: disable=protected-access
+                sorted(export_policy.keys())
+            )
+            self.assertTrue(
+                set(export_policy.values()).issubset(
+                    {
+                        base_models.EXPORT_POLICY.EXPORTED,
+                        base_models.EXPORT_POLICY.NOT_APPLICABLE
+                    })
+            )

@@ -15,6 +15,7 @@
 /**
  * @fileoverview Directive for the skill selector editor.
  */
+
 require(
   'components/skill-selector/skill-selector.directive.ts');
 require('domain/skill/skill-domain.constants.ajs.ts');
@@ -39,11 +40,11 @@ angular.module('oppia').directive('skillSelectorEditor', [
           var ctrl = this;
           ctrl.selectSkill = function(skillId, skillDescription) {
             ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
-            ctrl.value = {
-              id: skillId,
-              description: skillDescription
-            };
+            ctrl.value = skillId;
           };
+          ctrl.validators = [{
+            id: 'is_nonempty'
+          }];
           ctrl.$onInit = function() {
             $scope.$on('$destroy', function() {
               ContextService.removeCustomEntityContext();
@@ -51,7 +52,7 @@ angular.module('oppia').directive('skillSelectorEditor', [
             ctrl.skills = [];
             if (ctrl.value) {
               ContextService.setCustomEntityContext(
-                ENTITY_TYPE.SKILL, ctrl.value.id);
+                ENTITY_TYPE.SKILL, ctrl.value);
             }
             $http.get(FETCH_SKILLS_URL_TEMPLATE).then(function(response) {
               ctrl.skills = angular.copy(response.data.skills);

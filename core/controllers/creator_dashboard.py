@@ -45,9 +45,26 @@ import utils
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.suggestion])
 
-EXPLORATION_ID_KEY = 'explorationId'
-COLLECTION_ID_KEY = 'collectionId'
-QUESTION_ID_KEY = 'questionId'
+EXPLORATION_ID_KEY = 'exploration_id'
+COLLECTION_ID_KEY = 'collection_id'
+
+
+class OldNotificationsDashboardRedirectPage(base.BaseHandler):
+    """Redirects the old notifications dashboard URL to the new one."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.NOTIFICATIONS_DASHBOARD_URL, permanent=True)
+
+
+class OldContributorDashboardRedirectPage(base.BaseHandler):
+    """Redirects the old contributor dashboard URL to the new one."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect('/contributor-dashboard', permanent=True)
 
 
 class NotificationsDashboardPage(base.BaseHandler):
@@ -103,6 +120,15 @@ class NotificationsDashboardHandler(base.BaseHandler):
             'recent_notifications': recent_notifications,
         })
         self.render_json(self.values)
+
+
+class OldCreatorDashboardRedirectPage(base.BaseHandler):
+    """Redirects the old creator dashboard URL to the new one."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.CREATOR_DASHBOARD_URL, permanent=True)
 
 
 class CreatorDashboardPage(base.BaseHandler):
@@ -167,10 +193,9 @@ class CreatorDashboardHandler(base.BaseHandler):
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
 
-        if constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            topic_summaries = topic_services.get_all_topic_summaries()
-            topic_summary_dicts = [
-                summary.to_dict() for summary in topic_summaries]
+        topic_summaries = topic_services.get_all_topic_summaries()
+        topic_summary_dicts = [
+            summary.to_dict() for summary in topic_summaries]
 
         if role_services.ACTION_CREATE_COLLECTION in self.user.actions:
             for collection_summary in subscribed_collection_summaries:
@@ -182,7 +207,7 @@ class CreatorDashboardHandler(base.BaseHandler):
                     'category': collection_summary.category,
                     'objective': collection_summary.objective,
                     'language_code': collection_summary.language_code,
-                    'last_updated': utils.get_time_in_millisecs(
+                    'last_updated_msec': utils.get_time_in_millisecs(
                         collection_summary.collection_model_last_updated),
                     'created_on': utils.get_time_in_millisecs(
                         collection_summary.collection_model_created_on),
@@ -292,12 +317,11 @@ class CreatorDashboardHandler(base.BaseHandler):
             'threads_for_suggestions_to_review_list': (
                 threads_linked_to_suggestions_which_can_be_reviewed),
             'created_suggestions_list': suggestion_dicts_created_by_user,
-            'suggestions_to_review_list': suggestion_dicts_which_can_be_reviewed
+            'suggestions_to_review_list': (
+                suggestion_dicts_which_can_be_reviewed),
+            'topic_summary_dicts': topic_summary_dicts
         })
-        if constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            self.values.update({
-                'topic_summary_dicts': topic_summary_dicts
-            })
+
         self.render_json(self.values)
 
     @acl_decorators.can_access_creator_dashboard

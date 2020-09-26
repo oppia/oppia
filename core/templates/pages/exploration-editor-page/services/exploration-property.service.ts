@@ -18,14 +18,18 @@
  * with base class as ExplorationPropertyService.
  */
 
+import { EventEmitter } from '@angular/core';
+
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').factory('ExplorationPropertyService', [
-  '$log', '$rootScope', 'AlertsService', 'ChangeListService',
-  function($log, $rootScope, AlertsService, ChangeListService) {
+  '$log', 'AlertsService', 'ChangeListService',
+  function($log, AlertsService, ChangeListService) {
     // Public base API for data services corresponding to exploration properties
     // (title, category, etc.)
+
+    var _explorationPropertyChangedEventEmitter = new EventEmitter();
 
     var BACKEND_CONVERSIONS = {
       param_changes: function(paramChanges) {
@@ -41,7 +45,7 @@ angular.module('oppia').factory('ExplorationPropertyService', [
     return {
       init: function(value) {
         if (this.propertyName === null) {
-          throw 'Exploration property name cannot be null.';
+          throw new Error('Exploration property name cannot be null.');
         }
 
         $log.info('Initializing exploration ' + this.propertyName + ':', value);
@@ -54,7 +58,7 @@ angular.module('oppia').factory('ExplorationPropertyService', [
         // determined by the frontend change list.
         this.savedMemento = angular.copy(value);
 
-        $rootScope.$broadcast('explorationPropertyChanged');
+        _explorationPropertyChangedEventEmitter.emit();
       },
       // Returns whether the current value has changed from the memento.
       hasChanged: function() {
@@ -79,7 +83,7 @@ angular.module('oppia').factory('ExplorationPropertyService', [
       // change list, and updates the memento to the displayed value.
       saveDisplayedValue: function() {
         if (this.propertyName === null) {
-          throw 'Exploration property name cannot be null.';
+          throw new Error('Exploration property name cannot be null.');
         }
 
         this.displayed = this._normalize(this.displayed);
@@ -105,11 +109,15 @@ angular.module('oppia').factory('ExplorationPropertyService', [
           this.propertyName, newBackendValue, oldBackendValue);
         this.savedMemento = angular.copy(this.displayed);
 
-        $rootScope.$broadcast('explorationPropertyChanged');
+        _explorationPropertyChangedEventEmitter.emit();
       },
       // Reverts the displayed value to the saved memento.
       restoreFromMemento: function() {
         this.displayed = angular.copy(this.savedMemento);
+      },
+
+      get onExplorationPropertyChanged() {
+        return _explorationPropertyChangedEventEmitter;
       }
     };
   }

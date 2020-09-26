@@ -16,8 +16,52 @@
  * @fileoverview Service to send changes to a collection to the backend.
  */
 
-require('domain/collection/read-only-collection-backend-api.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
+import { Collection, CollectionBackendDict, CollectionObjectFactory } from
+  'domain/collection/CollectionObjectFactory';
+import { CollectionEditorPageConstants } from
+  'pages/collection-editor-page/collection-editor-page.constants';
+import { ReadOnlyCollectionBackendApiService } from
+  'domain/collection/read-only-collection-backend-api.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
+interface EditableCollectionBackendResponse {
+  collection: CollectionBackendDict;
+}
+
+interface AddNodeCollectionChange {
+  'cmd': 'add_collection_node';
+  'exploration_id': string;
+}
+
+interface SwapNodesCollectionChange {
+  'cmd': 'swap_nodes';
+  'first_index': number;
+  'second_index': number;
+}
+
+interface DeleteNodeCollectionChange {
+  'cmd': 'delete_collection_node',
+  'exploration_id': string;
+}
+
+interface EditCollectionPropertyChange {
+  'cmd': 'edit_collection_property';
+  'property_name': string;
+  'exploration_id': string;
+  'new_value': Object;
+  'old_value': Object;
+}
+
+type CollectionChange = (
+  AddNodeCollectionChange |
+  SwapNodesCollectionChange |
+  DeleteNodeCollectionChange |
+  EditCollectionPropertyChange);
 
 // TODO(bhenning): I think that this might be better merged with the
 // CollectionBackendApiService. However, that violates the principle of a
@@ -31,92 +75,105 @@ require('domain/utilities/url-interpolation.service.ts');
 // Discuss and decide whether this is a good approach and then remove this TODO
 // after deciding and acting upon the decision (which would mean implementing
 // it if it's agreed upon).
-angular.module('oppia').factory('EditableCollectionBackendApiService', [
-  '$http', '$q', 'ReadOnlyCollectionBackendApiService',
-  'UrlInterpolationService',
-  'EDITABLE_COLLECTION_DATA_URL_TEMPLATE',
-  function($http, $q, ReadOnlyCollectionBackendApiService,
-      UrlInterpolationService,
-      EDITABLE_COLLECTION_DATA_URL_TEMPLATE) {
-    var _fetchCollection = function(
-        collectionId, successCallback, errorCallback) {
-      var collectionDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
-          collection_id: collectionId
-        });
-
-      $http.get(collectionDataUrl).then(function(response) {
-        var collection = angular.copy(response.data.collection);
-        if (successCallback) {
-          successCallback(collection);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
+@Injectable({
+  providedIn: 'root'
+})
+export class EditableCollectionBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private readOnlyCollectionService: ReadOnlyCollectionBackendApiService,
+    private collectionObjectFactory: CollectionObjectFactory,
+    private urlInterpolationService: UrlInterpolationService) {}
+  private _fetchCollection(
+      collectionId: string,
+      successCallback: (value: Collection) => void,
+      errorCallback: (reason: string) => void): void {
+    var collectionDataUrl = this.urlInterpolationService.interpolateUrl(
+      CollectionEditorPageConstants.EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
+        collection_id: collectionId
       });
-    };
 
-    var _updateCollection = function(
-        collectionId, collectionVersion, commitMessage, changeList,
-        successCallback, errorCallback) {
-      var editableCollectionDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
-          collection_id: collectionId
-        });
-
-      var putData = {
-        version: collectionVersion,
-        commit_message: commitMessage,
-        change_list: changeList
-      };
-      $http.put(editableCollectionDataUrl, putData).then(function(response) {
-        // The returned data is an updated collection dict.
-        var collection = angular.copy(response.data.collection);
-
-        // Update the ReadOnlyCollectionBackendApiService's cache with the new
-        // collection.
-        ReadOnlyCollectionBackendApiService.cacheCollection(
-          collectionId, collection);
-
-        if (successCallback) {
-          successCallback(collection);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    return {
-      fetchCollection: function(collectionId) {
-        return $q(function(resolve, reject) {
-          _fetchCollection(collectionId, resolve, reject);
-        });
-      },
-
-      /**
-       * Updates a collection in the backend with the provided collection ID.
-       * The changes only apply to the collection of the given version and the
-       * request to update the collection will fail if the provided collection
-       * version is older than the current version stored in the backend. Both
-       * the changes and the message to associate with those changes are used
-       * to commit a change to the collection. The new collection is passed to
-       * the success callback, if one is provided to the returned promise
-       * object. Errors are passed to the error callback, if one is provided.
-       * Finally, if the update is successful, the returned collection will be
-       * cached within the CollectionBackendApiService to ensure the cache is
-       * not out-of-date with any updates made by this backend API service.
-       */
-      updateCollection: function(
-          collectionId, collectionVersion, commitMessage, changeList) {
-        return $q(function(resolve, reject) {
-          _updateCollection(
-            collectionId, collectionVersion, commitMessage, changeList,
-            resolve, reject);
-        });
+    this.http.get<EditableCollectionBackendResponse>(
+      collectionDataUrl).toPromise().then(response => {
+      var collectionObject = this.collectionObjectFactory.create(
+        response.collection);
+      if (successCallback) {
+        successCallback(collectionObject);
       }
-    };
+    }, errorResponse => {
+      if (errorCallback) {
+        errorCallback(errorResponse.error.error);
+      }
+    });
   }
-]);
+
+  private _updateCollection(
+      collectionId: string, collectionVersion: number,
+      commitMessage: string, changeList: CollectionChange[],
+      successCallback: (value: Collection) => void,
+      errorCallback: (reason: string) => void): void {
+    var editableCollectionDataUrl = this.urlInterpolationService.interpolateUrl(
+      CollectionEditorPageConstants.EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
+        collection_id: collectionId
+      });
+
+    var putData = {
+      version: collectionVersion,
+      commit_message: commitMessage,
+      change_list: changeList
+    };
+    this.http.put<EditableCollectionBackendResponse>(
+      editableCollectionDataUrl, putData).toPromise().then(response => {
+      // The returned data is an updated collection dict.
+      var collectionObject = this.collectionObjectFactory.create(
+        response.collection);
+
+      // Update the ReadOnlyCollectionBackendApiService's cache with the new
+      // collection.
+      this.readOnlyCollectionService.cacheCollection(
+        collectionId, collectionObject);
+
+      if (successCallback) {
+        successCallback(collectionObject);
+      }
+    }, errorResponse => {
+      if (errorCallback) {
+        errorCallback(errorResponse.error.error);
+      }
+    });
+  }
+
+  fetchCollection(collectionId: string): Promise<Collection> {
+    return new Promise((resolve, reject) => {
+      this._fetchCollection(collectionId, resolve, reject);
+    });
+  }
+
+  /**
+   * Updates a collection in the backend with the provided collection ID.
+   * The changes only apply to the collection of the given version and the
+   * request to update the collection will fail if the provided collection
+   * version is older than the current version stored in the backend. Both
+   * the changes and the message to associate with those changes are used
+   * to commit a change to the collection. The new collection is passed to
+   * the success callback, if one is provided to the returned promise
+   * object. Errors are passed to the error callback, if one is provided.
+   * Finally, if the update is successful, the returned collection will be
+   * cached within the CollectionBackendApiService to ensure the cache is
+   * not out-of-date with any updates made by this backend API service.
+   */
+  updateCollection(
+      collectionId: string, collectionVersion: number,
+      commitMessage: string,
+      changeList: CollectionChange[]): Promise<Collection> {
+    return new Promise((resolve, reject) => {
+      this._updateCollection(
+        collectionId, collectionVersion, commitMessage, changeList,
+        resolve, reject);
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'EditableCollectionBackendApiService',
+  downgradeInjectable(EditableCollectionBackendApiService));

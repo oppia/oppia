@@ -16,6 +16,8 @@
  * @fileoverview Service to operate the playback of audio.
  */
 
+import { EventEmitter } from '@angular/core';
+
 angular.module('oppia').factory('AudioPlayerService', [
   '$q', '$timeout', 'AssetsBackendApiService', 'AudioTranslationManagerService',
   'ContextService', 'ngAudio',
@@ -24,7 +26,8 @@ angular.module('oppia').factory('AudioPlayerService', [
       ContextService, ngAudio) {
     var _currentTrackFilename = null;
     var _currentTrack = null;
-    var _currentTrackDuration = null;
+
+    var _autoplayAudioEventEmitter = new EventEmitter();
 
     var _load = function(
         filename, successCallback, errorCallback) {
@@ -36,7 +39,7 @@ angular.module('oppia').factory('AudioPlayerService', [
             _currentTrack = ngAudio.load(blobUrl);
             _currentTrackFilename = filename;
 
-            // ngAudio doesn't seem to provide any way of detecting
+            // Directive ngAudio doesn't seem to provide any way of detecting
             // when native audio object has finished loading -- see
             // https://github.com/danielstern/ngAudio/issues/139. It seems
             // that after creating an ngAudio object, the native audio
@@ -89,9 +92,24 @@ angular.module('oppia').factory('AudioPlayerService', [
     var _rewind = function(seconds) {
       if (_currentTrack) {
         var currentSeconds = _currentTrack.progress * _currentTrack.duration;
-        var rewindedProgress =
-          (currentSeconds - seconds) / _currentTrack.duration;
-        _currentTrack.progress = rewindedProgress;
+        if (currentSeconds - seconds > 0) {
+          var rewindedProgress = (
+            (currentSeconds - seconds) / _currentTrack.duration);
+          _currentTrack.progress = rewindedProgress;
+        } else {
+          _currentTrack.progress = 0;
+        }
+      }
+    };
+
+    var _forward = function(seconds) {
+      if (_currentTrack) {
+        var currentSeconds = _currentTrack.progress * _currentTrack.duration;
+        if (currentSeconds + seconds < _currentTrack.duration) {
+          var forwardedProgress = (
+            (currentSeconds + seconds) / _currentTrack.duration);
+          _currentTrack.progress = forwardedProgress;
+        }
       }
     };
 
@@ -112,6 +130,9 @@ angular.module('oppia').factory('AudioPlayerService', [
       },
       rewind: function(seconds) {
         _rewind(seconds);
+      },
+      forward: function(seconds) {
+        _forward(seconds);
       },
       getCurrentTime: function() {
         if (_currentTrack) {
@@ -147,6 +168,9 @@ angular.module('oppia').factory('AudioPlayerService', [
       clear: function() {
         _currentTrack = null;
         _currentTrackFilename = null;
+      },
+      get onAutoplayAudio() {
+        return _autoplayAudioEventEmitter;
       }
     };
   }

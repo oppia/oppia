@@ -17,20 +17,19 @@
  * Interaction.
  */
 
-var objects = require('../../objects/protractor.js');
-
 var customizeInteraction = function() {
   // There are no customizations.
 };
 
-var expectInteractionDetailsToMatch = function(elem) {
+var expectInteractionDetailsToMatch = async function(elem) {
   expect(
-    elem.element(by.tagName('oppia-interactive-number-with-units')).isPresent()
+    await elem.element(by.tagName(
+      'oppia-interactive-number-with-units')).isPresent()
   ).toBe(true);
 };
 
-var submitAnswer = function(elem, answer) {
-  elem.element(by.tagName('oppia-interactive-number-with-units')).
+var submitAnswer = async function(elem, answer) {
+  await elem.element(by.tagName('oppia-interactive-number-with-units')).
     element(by.tagName('input')).sendKeys(answer + '\n');
 };
 

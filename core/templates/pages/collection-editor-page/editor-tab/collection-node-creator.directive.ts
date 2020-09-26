@@ -16,8 +16,6 @@
  * @fileoverview Directive for creating a new collection node.
  */
 
-require('domain/collection/CollectionNodeObjectFactory.ts');
-require('domain/collection/collection-update.service.ts');
 require('domain/collection/search-explorations-backend-api.service.ts');
 require('domain/summary/exploration-summary-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -41,19 +39,17 @@ angular.module('oppia').directive('collectionNodeCreator', [
         'collection-node-creator.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$window', '$filter', 'AlertsService',
-        'ValidatorsService', 'CollectionEditorStateService',
-        'CollectionLinearizerService', 'CollectionUpdateService',
-        'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
+        '$filter', '$http', 'AlertsService',
+        'CollectionEditorStateService', 'CollectionLinearizerService',
+        'ExplorationSummaryBackendApiService',
         'SearchExplorationsBackendApiService', 'SiteAnalyticsService',
-        'INVALID_NAME_CHARS',
+        'ValidatorsService', 'INVALID_NAME_CHARS',
         function(
-            $http, $window, $filter, AlertsService,
-            ValidatorsService, CollectionEditorStateService,
-            CollectionLinearizerService, CollectionUpdateService,
-            CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
+            $filter, $http, AlertsService,
+            CollectionEditorStateService, CollectionLinearizerService,
+            ExplorationSummaryBackendApiService,
             SearchExplorationsBackendApiService, SiteAnalyticsService,
-            INVALID_NAME_CHARS) {
+            ValidatorsService, INVALID_NAME_CHARS) {
           var ctrl = this;
           /**
            * Fetches a list of exploration metadata dicts from backend, given
@@ -65,14 +61,13 @@ angular.module('oppia').directive('collectionNodeCreator', [
               ctrl.searchQueryHasError = false;
               return SearchExplorationsBackendApiService.fetchExplorations(
                 searchQuery
-              ).then(function(explorationMetadataBackendDict) {
+              ).then(function(explorationMetadataList) {
                 var options = [];
-                explorationMetadataBackendDict.collection_node_metadata_list.
-                  map(function(item) {
-                    if (!ctrl.collection.containsCollectionNode(item.id)) {
-                      options.push(item.title + ' (' + item.id + ')');
-                    }
-                  });
+                explorationMetadataList.map(function(item) {
+                  if (!ctrl.collection.containsCollectionNode(item.id)) {
+                    options.push(item.title + ' (' + item.id + ')');
+                  }
+                });
                 return options;
               }, function() {
                 AlertsService.addWarning(
@@ -155,7 +150,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
               title: title
             }).then(function(response) {
               ctrl.newExplorationTitle = '';
-              var newExplorationId = response.data.explorationId;
+              var newExplorationId = response.data.exploration_id;
 
               SiteAnalyticsService
                 .registerCreateNewExplorationInCollectionEvent(

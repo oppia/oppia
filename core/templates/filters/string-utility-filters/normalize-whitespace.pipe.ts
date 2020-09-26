@@ -16,15 +16,18 @@
  * @fileoverview NormalizeWhitespace pipe for Oppia.
  */
 
+import { Injectable, Pipe, PipeTransform } from '@angular/core';
 import { UtilsService } from 'services/utils.service';
-import { Pipe, PipeTransform } from '@angular/core';
 
 // Pipe that removes whitespace from the beginning and end of a string, and
 // replaces interior whitespace with a single space character.
+@Injectable({
+  providedIn: 'root'
+})
 @Pipe({name: 'normalizeWhitespace'})
 export class NormalizeWhitespacePipe implements PipeTransform {
   constructor(private utilsService: UtilsService) {}
-  transform(input: any): any {
+  transform(input: string): string {
     if (this.utilsService.isString(input)) {
       // Remove whitespace from the beginning and end of the string, and
       // replace interior whitespace with a single space character.

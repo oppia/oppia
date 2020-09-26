@@ -1,6 +1,6 @@
-<div style="height: 100%;">
+<div class="h-100">
   <div ng-if="!$ctrl.solutionEditorIsOpen"
-       style="height: 100%;"
+       class="h-100"
        ng-attr-title="Edit solution">
     <div class="oppia-readonly-rule-tile"
          ng-class="{'oppia-editable-section': true}">
@@ -12,7 +12,7 @@
           </i>
         </div>
         <strong>
-          <[StateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One']> solution is...
+          <[$ctrl.StateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One']> solution is...
         </strong>
         <span>
           <angular-html-bind html-data="$ctrl.getAnswerHtml()">

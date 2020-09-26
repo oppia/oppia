@@ -17,9 +17,13 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+
+import { LoggerService } from 'services/contextual/logger.service';
 import { SchemaDefaultValueService } from
   'services/schema-default-value.service';
-import { LoggerService } from 'services/contextual/logger.service';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 describe('Schema Default Value Service', () => {
   let sdvs, ls;
@@ -65,6 +69,12 @@ describe('Schema Default Value Service', () => {
       }]
     };
     expect(sdvs.getDefaultValue(schema)).toEqual([false, 0]);
+
+    let schema2 = {
+      type: 'list',
+      items: ''
+    };
+    expect(sdvs.getDefaultValue(schema2)).toEqual([]);
   });
 
   it('should get default value if schema type is dict', () => {
@@ -106,6 +116,26 @@ describe('Schema Default Value Service', () => {
     expect(sdvs.getDefaultValue(schema)).toBe(0);
   });
 
+  it('should get default value if schema type SubtitledHtml', () => {
+    let schema = {
+      type: 'custom',
+      obj_type: 'SubtitledHtml'
+    };
+    expect(
+      sdvs.getDefaultValue(schema)
+    ).toEqual(new SubtitledHtml('', null));
+  });
+
+  it('should get default value if schema type is SubtitledUnicode', () => {
+    let schema = {
+      type: 'custom',
+      obj_type: 'SubtitledUnicode'
+    };
+    expect(
+      sdvs.getDefaultValue(schema)
+    ).toEqual(new SubtitledUnicode('', null));
+  });
+
   it('should not get default value if schema type is invalid', () => {
     var loggerErrorSpy = spyOn(ls, 'error').and.callThrough();
     const schema = {
@@ -114,6 +144,6 @@ describe('Schema Default Value Service', () => {
 
     expect(sdvs.getDefaultValue(schema)).toBeUndefined();
     expect(loggerErrorSpy).toHaveBeenCalledWith(
-      'Invalid schema type: invalid');
+      'Invalid schema: ' + JSON.stringify(schema));
   });
 });

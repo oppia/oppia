@@ -17,30 +17,53 @@
    domain objects.
  */
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import { SuggestionsService } from 'services/suggestions.service';
+
+interface SuggestionChangeValue {
+  html: string;
+}
+
+interface SuggestionChangeBackendDict {
+  'state_name': string;
+  'new_value': SuggestionChangeValue;
+  'old_value': SuggestionChangeValue;
+}
+
+export interface SuggestionBackendDict {
+  'suggestion_type': string;
+  'suggestion_id': string;
+  'target_type': string;
+  'target_id': string;
+  'status': string;
+  'author_name': string;
+  'change': SuggestionChangeBackendDict;
+  'last_updated_msecs': number;
+}
 
 export class Suggestion {
   suggestionType: string;
   suggestionId: string;
+  threadId: string;
   targetType: string;
   targetId: string;
   status: string;
   authorName: string;
   stateName: string;
-  // TODO(#7165): Replace 'any' with the exact type.
-  newValue: any;
-  // TODO(#7165): Replace 'any' with the exact type.
-  oldValue: any;
-  lastUpdated: number;
+  newValue: SuggestionChangeValue;
+  oldValue: SuggestionChangeValue;
+  lastUpdatedMsecs: number;
 
   constructor(
-      suggestionType: string, suggestionId: string, targetType: string,
-      targetId: string, status: string, authorName: string,
-      stateName: string, newValue: string, oldValue: string,
-      lastUpdated: number) {
+      suggestionType: string, suggestionId: string, threadId: string,
+      targetType: string, targetId: string, status: string, authorName: string,
+      stateName: string, newValue: SuggestionChangeValue,
+      oldValue: SuggestionChangeValue, lastUpdatedMsecs: number) {
     this.suggestionType = suggestionType;
     this.suggestionId = suggestionId;
+    this.threadId = threadId;
     this.targetType = targetType;
     this.targetId = targetId;
     this.status = status;
@@ -48,32 +71,30 @@ export class Suggestion {
     this.stateName = stateName;
     this.newValue = newValue;
     this.oldValue = oldValue;
-    this.lastUpdated = lastUpdated;
+    this.lastUpdatedMsecs = lastUpdatedMsecs;
   }
 
   getThreadId(): string {
-    return this.suggestionId;
+    return this.threadId;
   }
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({providedIn: 'root'})
 export class SuggestionObjectFactory {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'suggestionBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(suggestionBackendDict: any): Suggestion {
+  constructor(private suggestionsService: SuggestionsService) {}
+  createFromBackendDict(
+      suggestionBackendDict: SuggestionBackendDict): Suggestion {
+    let threadId = this.suggestionsService.getThreadIdFromSuggestionBackendDict(
+      suggestionBackendDict);
     return new Suggestion(
       suggestionBackendDict.suggestion_type,
-      suggestionBackendDict.suggestion_id, suggestionBackendDict.target_type,
-      suggestionBackendDict.target_id, suggestionBackendDict.status,
-      suggestionBackendDict.author_name,
+      suggestionBackendDict.suggestion_id, threadId,
+      suggestionBackendDict.target_type, suggestionBackendDict.target_id,
+      suggestionBackendDict.status, suggestionBackendDict.author_name,
       suggestionBackendDict.change.state_name,
       suggestionBackendDict.change.new_value,
       suggestionBackendDict.change.old_value,
-      suggestionBackendDict.last_updated);
+      suggestionBackendDict.last_updated_msecs);
   }
 }
 

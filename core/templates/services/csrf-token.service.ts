@@ -28,9 +28,9 @@ import $ from 'jquery';
   providedIn: 'root'
 })
 export class CsrfTokenService {
-  tokenPromise = null;
+  tokenPromise: PromiseLike<string> = null;
 
-  initializeToken() {
+  initializeToken(): void {
     if (this.tokenPromise !== null) {
       throw new Error('Token request has already been made');
     }
@@ -42,17 +42,17 @@ export class CsrfTokenService {
       url: '/csrfhandler',
       type: 'GET',
       dataType: 'text',
-      dataFilter: function(data: any) {
+      dataFilter: function(data: string) {
         // Remove the protective XSSI (cross-site scripting inclusion) prefix.
         let actualData = data.substring(5);
         return JSON.parse(actualData);
       },
-    }).then(function(response: any) {
+    }).then(function(response: {token: string}) {
       return response.token;
     });
   }
 
-  getTokenAsync() {
+  getTokenAsync(): PromiseLike<string> {
     if (this.tokenPromise === null) {
       throw new Error('Token needs to be initialized');
     }
