@@ -28,8 +28,6 @@ from core.platform import models
 import feconf
 import python_utils
 
-from google.appengine.datastore import datastore_query
-
 (improvements_models,) = (
     models.Registry.import_models([models.NAMES.improvements]))
 datastore_services = models.Registry.import_datastore_services()

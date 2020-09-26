@@ -25,7 +25,6 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 transaction_services = models.Registry.import_transaction_services()
@@ -367,7 +366,8 @@ class BaseModel(ndb.Model):
                     this batch.
         """
         if urlsafe_start_cursor:
-            start_cursor = datastore_services.make_cursor(urlsafe=urlsafe_start_cursor)
+            start_cursor = (
+                datastore_services.make_cursor(urlsafe=urlsafe_start_cursor))
         else:
             start_cursor = None
 

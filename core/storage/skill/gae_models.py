@@ -20,7 +20,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.platform import models
 
-from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models, user_models,) = models.Registry.import_models([
