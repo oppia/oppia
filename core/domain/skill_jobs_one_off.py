@@ -116,3 +116,39 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+
+class SkillCommitCmdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """This job is used to migrate the old commit cmds in skill commit log
+    model to the latest cmd format.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillCommitLogEntryModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        updated_commit_cmds = []
+        update_required = False
+        for commit_cmd_dict in item.commit_cmds:
+            updated_commit_cmd_dict = {}
+            for cmd_key, cmd_val in commit_cmd_dict.items():
+                if cmd_key == 'explanation':
+                    update_required = True
+                    updated_commit_cmd_dict['explanations'] = cmd_val
+                else:
+                    updated_commit_cmd_dict[cmd_key] = cmd_val
+            updated_commit_cmds.append(updated_commit_cmd_dict)
+
+        if update_required:
+            item.commit_cmds = updated_commit_cmds
+            item.put(update_last_updated_time=False)
+            yield ('Commit Commands Updated', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, sum(ast.literal_eval(v) for v in values))
