@@ -2216,6 +2216,7 @@ class PopulateContributionStatsOneOffJobTests(
             .enqueue(job_id)
         )
         self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off
