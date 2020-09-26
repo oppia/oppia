@@ -57,7 +57,7 @@ def get_access_token(scopes):
 
     Returns:
         tuple(str, float). The token string and expiration time in seconds since
-            the epoch.
+        the epoch.
     """
     return app_identity.get_access_token(scopes)
 
