@@ -36,35 +36,6 @@ TextProperty = ndb.TextProperty
 UserProperty = ndb.UserProperty
 
 
-def query_everything():
-    """Returns a query that targets every single entity in the datastore."""
-    return ndb.Query()
-
-
-def all_of(*nodes):
-    """Returns a query node which performs a boolean AND on their conditions.
-
-    Args:
-        *nodes: ndb.Node. The nodes to combine.
-
-    Returns:
-        ndb.Node. A node combining the conditions using boolean AND.
-    """
-    return ndb.AND(*nodes)
-
-
-def any_of(*nodes):
-    """Returns a query node which performs a boolean OR on their conditions.
-
-    Args:
-        *nodes: ndb.Node. The nodes to combine.
-
-    Returns:
-        ndb.Node. A node combining the conditions using boolean OR.
-    """
-    return ndb.OR(*nodes)
-
-
 def put_multi(models):
     """Stores a sequence of Model instances.
 
@@ -124,6 +95,35 @@ def transaction(callback):
     """
     return ndb.transaction(
         callback, xg=True, propagation=ndb.TransactionOptions.ALLOWED)
+
+
+def query_everything():
+    """Returns a query that targets every single entity in the datastore."""
+    return ndb.Query()
+
+
+def all_of(*nodes):
+    """Returns a query node which performs a boolean AND on their conditions.
+
+    Args:
+        *nodes: ndb.Node. The nodes to combine.
+
+    Returns:
+        ndb.Node. A node combining the conditions using boolean AND.
+    """
+    return ndb.AND(*nodes)
+
+
+def any_of(*nodes):
+    """Returns a query node which performs a boolean OR on their conditions.
+
+    Args:
+        *nodes: ndb.Node. The nodes to combine.
+
+    Returns:
+        ndb.Node. A node combining the conditions using boolean OR.
+    """
+    return ndb.OR(*nodes)
 
 
 def make_cursor(urlsafe_cursor=None):
