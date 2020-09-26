@@ -103,7 +103,6 @@ describe('Full exploration editor', function() {
       await action.click('Hide Height Warning icon', hideHeightWarningIcon);
       await waitFor.invisibilityOf(
         heightMessage, 'Height message taking too long to disappear.');
-      expect(await heightMessage.isPresent()).toBe(false);
 
       await users.logout();
     });
