@@ -29,8 +29,6 @@ from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 import python_utils
 
-BadFilterError = datastore_errors.BadFilterError
-
 
 def make_cursor(urlsafe_cursor=None):
     """Makes an immutable cursor that points to a relative position in a query.
@@ -125,6 +123,7 @@ def mock_datetime_for_datastore(self, mocked_now):
     Yields:
         None. Empty yield statement.
     """
+
     if not isinstance(mocked_now, datetime.datetime):
         raise Exception('mocked_now must be a datetime, got: %r' % mocked_now)
 

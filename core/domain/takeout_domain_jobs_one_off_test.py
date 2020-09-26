@@ -84,7 +84,7 @@ class SnapshotMetadataCommitMsgMigrationOneOffJobTests(
 
             # Try a query on the unindexed field and observe failure.
             with self.assertRaisesRegexp(
-                datastore_services.BadFilterError,
+                Exception,
                 'invalid filter: Cannot query for unindexed property None.'):
                 model_class.query(model_class.commit_message == 'test1')
 
