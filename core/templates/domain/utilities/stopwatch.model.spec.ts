@@ -17,7 +17,6 @@
  */
 
 import { Stopwatch } from 'domain/utilities/stopwatch.model';
-import { LoggerService } from 'services/contextual/logger.service';
 
 describe('Stopwatch model', () => {
   let nowSpy = null;

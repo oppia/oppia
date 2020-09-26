@@ -35,7 +35,6 @@ import { PlaythroughBackendApiService } from
   'domain/statistics/playthrough-backend-api.service';
 import { ServicesConstants } from 'services/services.constants';
 import { Stopwatch } from 'domain/utilities/stopwatch.model';
-import { LoggerService } from './contextual/logger.service';
 
 class CyclicStateTransitionsTracker {
   /** A path of visited states without any repeats. */
