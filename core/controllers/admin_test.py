@@ -52,10 +52,12 @@ import feconf
 import utils
 
 (
-    exp_models, job_models, opportunity_models, audit_models,
-    suggestion_models) = models.Registry.import_models(
-        [models.NAMES.exploration, models.NAMES.job, models.NAMES.opportunity,
-         models.NAMES.audit, models.NAMES.suggestion])
+    audit_models, exp_models, job_models,
+    opportunity_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.audit, models.NAMES.exploration, models.NAMES.job,
+    models.NAMES.opportunity, models.NAMES.user
+])
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
@@ -2275,3 +2277,27 @@ class MemoryCacheAdminHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/memorycacheadminhandler')
         self.assertEqual(response['total_keys_stored'], 0)
+
+
+class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
+    """Tests NumberOfDeletionRequestsHandler."""
+
+    def setUp(self):
+        super(NumberOfDeletionRequestsHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+    def test_get_with_no_deletion_request_returns_zero(self):
+        response = self.get_json('/numberofdeletionrequestshandler')
+        self.assertEqual(response['number_of_pending_deletion_models'], 0)
+
+    def test_get_with_two_deletion_request_returns_two(self):
+        user_models.PendingDeletionRequestModel(
+            id='id1', email='id1@email.com', role='role'
+        ).put()
+        user_models.PendingDeletionRequestModel(
+            id='id2', email='id2@email.com', role='role'
+        ).put()
+
+        response = self.get_json('/numberofdeletionrequestshandler')
+        self.assertEqual(response['number_of_pending_deletion_models'], 2)
