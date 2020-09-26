@@ -81,9 +81,9 @@ def transaction(callback):
     """Run a callback in a transaction.
 
     To pass arguments to a callback function, use a lambda, for example:
-        def my_callback(key, inc):
-            ...
-        transaction(lambda: my_callback(Key(...), 1))
+
+    def my_callback(key, inc): do_something()
+    transaction(lambda: my_callback(Key(...), 1))
 
     Args:
         callback: callable. A function or tasklet to be called.
@@ -93,7 +93,7 @@ def transaction(callback):
 
     Raises:
         Exception. Whatever callback() raises, or
-        datastore_errors.TransactionFailedError when the transaction failed.
+            datastore_errors.TransactionFailedError when the transaction failed.
     """
     return ndb.transaction(
         callback, xg=True, propagation=ndb.TransactionOptions.ALLOWED)
