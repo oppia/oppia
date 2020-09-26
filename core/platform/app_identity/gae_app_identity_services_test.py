@@ -53,10 +53,9 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
             app_identity.get_default_gcs_bucket_name())
 
     def test_get_access_token(self):
-        token, expires_on = gae_app_identity_services.get_access_token(
+        token = gae_app_identity_services.get_access_token(
             'https://www.googleapis.com/auth/datastore')
         self.assertIsInstance(token, python_utils.UNICODE)
-        self.assertIsInstance(expires_on, int)
 
     def test_get_default_gcs_bucket_name(self):
         self.assertEqual(

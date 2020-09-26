@@ -38,7 +38,7 @@ def get_application_id():
     return app_identity.get_application_id()
 
 
-def get_access_token(scopes):
+def get_access_token(scope):
     """The OAuth 2.0 access token to act on behalf of the application.
 
     This token will be cached.
@@ -52,14 +52,13 @@ def get_access_token(scopes):
     caches access tokens using both an in-process cache and memcache.
 
     Args:
-        scopes: str | list(str). The requested API scope as a string, or a list
-            of strings.
+        scope: str. The requested API scope as a string.
 
     Returns:
-        tuple(str, float). The token string and expiration time in seconds since
-        the epoch.
+        str. The token as a string.
     """
-    return app_identity.get_access_token(scopes)
+    token, unused_expiration_time = app_identity.get_access_token(scope)
+    return token
 
 
 def get_gcs_resource_bucket_name():
@@ -83,15 +82,6 @@ def get_gcs_resource_bucket_name():
         return get_application_id() + _GCS_RESOURCE_BUCKET_NAME_SUFFIX
 
 
-def get_default_gcs_bucket_name(deadline=None):
-    """Gets the default Google Cloud Storage bucket name for the app.
-
-    Args:
-        deadline: float | None. Optional deadline in seconds for the operation;
-            the default value is a system-specific deadline, typically 5
-            seconds.
-
-    Returns:
-        str. Default bucket name for the app.
-    """
-    return app_identity.get_default_gcs_bucket_name(deadline=deadline)
+def get_default_gcs_bucket_name():
+    """Gets the default Google Cloud Storage bucket name for the app."""
+    return app_identity.get_default_gcs_bucket_name()
