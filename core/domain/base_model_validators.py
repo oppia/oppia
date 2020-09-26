@@ -262,8 +262,8 @@ class BaseModelValidator(python_utils.OBJECT):
                     cls._add_error(
                         '%s %s' % (field_name, ERROR_CATEGORY_FIELD_CHECK),
                         'Entity id %s: based on field %s having'
-                        ' value %s, expected model %s with id %s but it doesn\'t'
-                        ' exist' % (
+                        ' value %s, expected model %s with id %s but it '
+                        'doesn\'t exist' % (
                             item.id, field_name, model_id,
                             model_class.__name__, model_id))
 
