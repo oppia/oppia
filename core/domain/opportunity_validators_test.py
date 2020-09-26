@@ -45,6 +45,7 @@ import python_utils
             models.NAMES.exploration, models.NAMES.opportunity,
             models.NAMES.skill, models.NAMES.story,
             models.NAMES.topic]))
+datastore_services = models.Registry.import_datastore_services()
 
 
 class ExplorationOpportunitySummaryModelValidatorTests(
@@ -184,7 +185,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=True)
 
@@ -368,7 +369,7 @@ class SkillOpportunityModelValidatorTests(test_utils.AuditJobsTestBase):
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
-        with self.mock_datetime_for_audit(mocked_datetime):
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=True)
 
