@@ -175,9 +175,12 @@ def main():
         get_e2e_test_filenames_from_protractor_conf_file())
 
     if not protractor_test_suite_files == protractor_conf_test_suites:
+        missing_files = (
+            set(protractor_test_suite_files) - set(protractor_conf_test_suites))
         raise Exception(
             'One or more test file from protractor or protractor_desktop '
-            'directory is missing from protractor.conf.js')
+            'directory is missing from protractor.conf.js: %s' % (
+                ', '.join(sorted(missing_files)),))
     python_utils.PRINT('Done!')
 
     python_utils.PRINT('Checking e2e tests are captured in .travis.yml...')
