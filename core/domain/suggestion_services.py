@@ -853,34 +853,3 @@ def get_community_contribution_stats():
 
     return create_community_contribution_stats_from_model(
         community_contribution_stats_model)
-
-
-def update_community_contribution_stats(community_contribution_stats):
-    """Updates the CommunityContributionStatsModel using
-    community_contribution_stats.
-
-    Args:
-        community_contribution_stats: CommunityContributionStats. The
-            domain object that will be used to update the
-            CommunityContributionStatsModel.
-    """
-
-    community_contribution_stats.validate()
-
-    stats_model = suggestion_models.CommunityContributionStatsModel.get()
-
-    stats_model.translation_reviewer_counts_by_lang_code = (
-        community_contribution_stats.translation_reviewer_counts_by_lang_code
-    )
-    stats_model.translation_suggestion_counts_by_lang_code = (
-        community_contribution_stats
-        .translation_suggestion_counts_by_lang_code
-    )
-    stats_model.question_reviewer_count = (
-        community_contribution_stats.question_reviewer_count
-    )
-    stats_model.question_suggestion_count = (
-        community_contribution_stats.question_suggestion_count
-    )
-
-    stats_model.put()

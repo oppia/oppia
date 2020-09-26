@@ -2358,7 +2358,7 @@ class PopulateCommunityContributionStatsOneOffJobTests(
             self.sample_language_code)
         self._assert_community_contribution_stats_is_in_default_state()
         expected_output = [
-            '[u\'suggestion_translate_content_%s\', 2]' % (
+            '[u\'suggestion.translate_content.%s\', 2]' % (
                 self.sample_language_code)
         ]
 
@@ -2379,8 +2379,8 @@ class PopulateCommunityContributionStatsOneOffJobTests(
         self._create_translation_suggestion_with_language_code('hi')
         self._create_translation_suggestion_with_language_code('en')
         expected_output = [
-            '[u\'suggestion_translate_content_hi\', 1]',
-            '[u\'suggestion_translate_content_en\', 1]'
+            '[u\'suggestion.translate_content.hi\', 1]',
+            '[u\'suggestion.translate_content.en\', 1]'
         ]
 
         self._run_job_and_verify_output(expected_output)
@@ -2407,7 +2407,7 @@ class PopulateCommunityContributionStatsOneOffJobTests(
             self.reviewer_2_id, self.sample_language_code)
         self._assert_community_contribution_stats_is_in_default_state()
         expected_output = [
-            '[u\'reviewer_translation_%s\', 2]' % self.sample_language_code
+            '[u\'reviewer.translation.%s\', 2]' % self.sample_language_code
         ]
 
         self._run_job_and_verify_output(expected_output)
@@ -2430,8 +2430,8 @@ class PopulateCommunityContributionStatsOneOffJobTests(
             self.reviewer_2_id, 'en')
         self._assert_community_contribution_stats_is_in_default_state()
         expected_output = [
-            '[u\'reviewer_translation_hi\', 1]',
-            '[u\'reviewer_translation_en\', 1]'
+            '[u\'reviewer.translation.hi\', 1]',
+            '[u\'reviewer.translation.en\', 1]'
         ]
 
         self._run_job_and_verify_output(expected_output)
@@ -2454,7 +2454,7 @@ class PopulateCommunityContributionStatsOneOffJobTests(
         self._create_question_suggestion_with_skill_id('skill_1')
         self._create_question_suggestion_with_skill_id('skill_2')
         self._assert_community_contribution_stats_is_in_default_state()
-        expected_output = ['[u\'suggestion_add_question_en\', 2]']
+        expected_output = ['[u\'suggestion.add_question.en\', 2]']
 
         self._run_job_and_verify_output(expected_output)
 
@@ -2470,7 +2470,7 @@ class PopulateCommunityContributionStatsOneOffJobTests(
         user_services.allow_user_to_review_question(self.reviewer_1_id)
         user_services.allow_user_to_review_question(self.reviewer_2_id)
         self._assert_community_contribution_stats_is_in_default_state()
-        expected_output = ['[u\'reviewer_question\', 2]']
+        expected_output = ['[u\'reviewer.question.en\', 2]']
 
         self._run_job_and_verify_output(expected_output)
 
@@ -2500,12 +2500,12 @@ class PopulateCommunityContributionStatsOneOffJobTests(
             self.reviewer_2_id, 'en')
         self._assert_community_contribution_stats_is_in_default_state()
         expected_output = [
-            '[u\'reviewer_translation_en\', 1]',
-            '[u\'reviewer_translation_hi\', 2]',
-            '[u\'reviewer_question\', 2]',
-            '[u\'suggestion_add_question_en\', 2]',
-            '[u\'suggestion_translate_content_en\', 2]',
-            '[u\'suggestion_translate_content_hi\', 1]'
+            '[u\'reviewer.translation.en\', 1]',
+            '[u\'reviewer.translation.hi\', 2]',
+            '[u\'reviewer.question.en\', 2]',
+            '[u\'suggestion.add_question.en\', 2]',
+            '[u\'suggestion.translate_content.en\', 2]',
+            '[u\'suggestion.translate_content.hi\', 1]'
         ]
 
         self._run_job_and_verify_output(expected_output)
@@ -2537,18 +2537,3 @@ class PopulateCommunityContributionStatsOneOffJobTests(
                 community_contribution_stats
                 .translation_reviewer_counts_by_lang_code['en']
             ), 1)
-
-    def test_job_produces_validation_error_for_invalid_contribution_stats_model(
-            self):
-        user_services.allow_user_to_review_question(self.reviewer_1_id)
-        stats_model = suggestion_models.CommunityContributionStatsModel.get()
-        stats_model.question_suggestion_count = -1
-        stats_model.put()
-        expected_output = [
-            u'[u\'community_contribution_stats_validation_error\', '
-            'u\'Community contribution stats failed validation: Expected the '
-            'question suggestion count to be non-negative, recieved: %s.\']' % (
-                stats_model.question_suggestion_count)
-        ]
-
-        self._run_job_and_verify_output(expected_output)

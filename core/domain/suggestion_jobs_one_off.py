@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import logging
 
+from constants import constants
 from core import jobs
 from core.domain import html_validation_service
 from core.domain import suggestion_services
@@ -246,6 +247,12 @@ class PopulateCommunityContributionStatsOneOffJob(
     """
 
     _VALIDATION_ERROR_KEY = 'community_contribution_stats_validation_error'
+    ITEM_TYPE_REVIEWER = 'reviewer'
+    ITEM_TYPE_SUGGESTION = 'suggestion'
+    ITEM_CATEGORY_QUESTION = 'question'
+    ITEM_CATEGORY_TRANSLATION = 'translation'
+    KEY_DELIMITER = '.'
+
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -268,66 +275,86 @@ class PopulateCommunityContributionStatsOneOffJob(
                         item.status != suggestion_models.STATUS_IN_REVIEW):
                 return
             suggestion = suggestion_services.get_suggestion_from_model(item)
-            yield ('suggestion_%s_%s' % (
-                suggestion.suggestion_type, suggestion.language_code), item.id)
+            yield ('%s%s%s%s%s' % (
+                (
+                    PopulateCommunityContributionStatsOneOffJob
+                    .ITEM_TYPE_SUGGESTION
+                ), PopulateCommunityContributionStatsOneOffJob.KEY_DELIMITER,
+                suggestion.suggestion_type,
+                PopulateCommunityContributionStatsOneOffJob.KEY_DELIMITER,
+                suggestion.language_code), 1)
 
         else:
             if item.can_review_translation_for_language_codes:
                 for language_code in (
                         item.can_review_translation_for_language_codes):
-                    yield ('reviewer_translation_%s' % language_code, item.id)
+                    yield ('%s%s%s%s%s' % (
+                        (
+                            PopulateCommunityContributionStatsOneOffJob
+                            .ITEM_TYPE_REVIEWER
+                        ),
+                        (
+                            PopulateCommunityContributionStatsOneOffJob
+                            .KEY_DELIMITER
+                        ),
+                        (
+                            PopulateCommunityContributionStatsOneOffJob
+                            .ITEM_CATEGORY_TRANSLATION
+                        ),
+                        (
+                            PopulateCommunityContributionStatsOneOffJob
+                            .KEY_DELIMITER
+                        ),
+                        language_code), 1)
             if item.can_review_questions:
-                yield ('reviewer_question', item.id)
+                yield ('%s%s%s%s%s' % (
+                    (
+                        PopulateCommunityContributionStatsOneOffJob
+                        .ITEM_TYPE_REVIEWER
+                    ),
+                    PopulateCommunityContributionStatsOneOffJob.KEY_DELIMITER,
+                    (
+                        PopulateCommunityContributionStatsOneOffJob
+                        .ITEM_CATEGORY_QUESTION
+                    ),
+                    PopulateCommunityContributionStatsOneOffJob.KEY_DELIMITER,
+                    constants.DEFAULT_LANGUAGE_CODE), 1)
 
     @staticmethod
     def reduce(key, values):
-        community_contribution_stats = (
-            suggestion_services.get_community_contribution_stats()
+        community_contribution_stats_model = (
+            suggestion_models.CommunityContributionStatsModel.get()
         )
-        keys = key.split('_')
+        item_type, item_category, language_code = key.split(
+            PopulateCommunityContributionStatsOneOffJob.KEY_DELIMITER)
 
         # Update the reviewer counts.
-        if keys[0] == 'reviewer':
-            if keys[1] == 'question':
-                community_contribution_stats.question_reviewer_count = len(
-                    values)
-            elif keys[1] == 'translation':
+        if item_type == (
+                PopulateCommunityContributionStatsOneOffJob.ITEM_TYPE_REVIEWER):
+            if item_category == (
+                    PopulateCommunityContributionStatsOneOffJob
+                    .ITEM_CATEGORY_QUESTION):
+                community_contribution_stats_model.question_reviewer_count = (
+                    len(values))
+            elif item_category == (
+                    PopulateCommunityContributionStatsOneOffJob
+                    .ITEM_CATEGORY_TRANSLATION):
                 (
-                    community_contribution_stats
-                    .set_translation_reviewer_count_for_language_code(
-                        keys[-1], len(values))
-                )
+                    community_contribution_stats_model
+                    .translation_reviewer_counts_by_lang_code[language_code]
+                ) = len(values)
         # Update the suggestion counts.
         else:
-            # Get the expected key for each suggestion type.
-            question_suggestion_keys = (
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION.split('_')
-            )
-            translation_suggestion_keys = (
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT.split('_')
-            )
-            if keys[1] == question_suggestion_keys[0]:
-                community_contribution_stats.question_suggestion_count = len(
-                    values)
-            elif keys[1] == translation_suggestion_keys[0]:
+            if item_category == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
+                community_contribution_stats_model.question_suggestion_count = (
+                    len(values))
+            elif item_category == (
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
                 (
-                    community_contribution_stats
-                    .set_translation_suggestion_count_for_language_code(
-                        keys[-1], len(values))
-                )
-        # Make sure the counts that have been updated are valid.
-        try:
-            community_contribution_stats.validate()
-        except Exception as e:
-            logging.error(
-                'Community contribution stats failed validation: %s' % e
-            )
-            yield (
-                PopulateCommunityContributionStatsOneOffJob
-                ._VALIDATION_ERROR_KEY,
-                'Community contribution stats failed validation: %s' % e
-            )
-            return
-        suggestion_services.update_community_contribution_stats(
-            community_contribution_stats)
+                    community_contribution_stats_model
+                    .translation_suggestion_counts_by_lang_code[language_code]
+                ) = len(values)
+
+        community_contribution_stats_model.put()
+
         yield (key, len(values))
