@@ -29,6 +29,10 @@ from google.appengine.datastore import datastore_query
 from google.appengine.datastore import datastore_stub_util
 from google.appengine.ext import ndb
 
+Model = ndb.Model
+
+DateTimeProperty = ndb.DateTimeProperty
+
 
 def make_cursor(urlsafe_cursor=None):
     """Makes an immutable cursor that points to a relative position in a query.
