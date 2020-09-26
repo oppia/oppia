@@ -19,8 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-
 from constants import constants
 from core.platform.app_identity import gae_app_identity_services
 from core.tests import test_utils
