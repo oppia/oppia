@@ -152,3 +152,27 @@ class SkillCommitCmdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, sum(ast.literal_eval(v) for v in values))
+
+
+class MissingSkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """This job is used to delete skill commit log models for which skill models
+    are missing.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillCommitLogEntryModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        skill = skill_fetchers.get_skill_by_id(item.skill_id, strict=False)
+        if skill is None:
+            item.delete(feconf.SYSTEM_COMMITTER_ID, 'Delete model')
+            yield ('Skill Commit Model deleted', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, sum(ast.literal_eval(v) for v in values))

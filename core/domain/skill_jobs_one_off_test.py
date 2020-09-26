@@ -352,3 +352,60 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'cmd': 'update_skill_property', 'new_value': 'Test description',
                 'old_value': '', 'property_name': 'description'
             }])
+
+
+class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    SKILL_ID = 'skill_id'
+
+    def setUp(self):
+        super(MissingSkillMigrationOneOffJobTests, self).setUp()
+
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.set_admins([self.ALBERT_NAME])
+
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+
+        skill = skill_domain.Skill.create_default_skill(
+            self.SKILL_ID, 'A description', rubrics)
+        skill_services.save_new_skill(self.albert_id, skill)
+
+        self.model_instance = (
+            skill_models.SkillCommitLogEntryModel.get_by_id(
+                'skill-skill_id-1'))
+
+        self.process_and_flush_pending_tasks()
+
+    def test_standard_operation(self):
+        job_id = (
+            skill_jobs_one_off.MissingSkillMigrationOneOffJob.create_new())
+        skill_jobs_one_off.MissingSkillMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = skill_jobs_one_off.MissingSkillMigrationOneOffJob.get_output(
+            job_id)
+        self.assertEqual(output, [])
+        self.assertFalse(self.model_instance.deleted)
+
+    def test_invalid_command(self):
+        skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
+        skill_model.delete(self.albert_id, 'Delete Model')
+        job_id = (
+            skill_jobs_one_off.MissingSkillMigrationOneOffJob.create_new())
+        skill_jobs_one_off.MissingSkillMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = skill_jobs_one_off.MissingSkillMigrationOneOffJob.get_output(
+            job_id)
+        self.assertEqual(output, [])
+        self.assertFalse(self.model_instance.deleted)
