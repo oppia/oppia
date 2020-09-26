@@ -33,8 +33,9 @@ def make_cursor(urlsafe=None):
     A cursor should only be used on a query with an identical signature to the
     one that produced it or on a query with its sort order reversed.
 
-    A Cursor constructed with no arguments points the If such a Cursor is used
-    as an end_cursor no results will ever be returned.
+    A Cursor constructed with no arguments points the first result of any
+    query. If such a Cursor is used as an end_cursor no results will ever be
+    returned.
 
     Args:
         urlsafe: str. A base64-encoded serialization of a cursor. If None, the
