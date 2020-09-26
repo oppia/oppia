@@ -3224,15 +3224,14 @@ class CommunityContributionStatsModelValidator(
             .filter(suggestion_models.GeneralSuggestionModel.status == (
                 suggestion_models.STATUS_IN_REVIEW))
             .filter(
-                    suggestion_models.GeneralSuggestionModel
-                    .suggestion_type
-            ) == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+                suggestion_models.GeneralSuggestionModel.suggestion_type == (
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT))
         )
         for language_code in supported_language_codes:
             expected_translation_suggestion_count = (
                 all_translation_suggestion_models_in_review.filter(
                     suggestion_models.GeneralSuggestionModel.language_code == (
-                        language_code)
+                        language_code))
                 .count()
             )
             if language_code in item.translation_suggestion_counts_by_lang_code:
