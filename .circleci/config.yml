@@ -143,8 +143,8 @@ jobs:
       - attach_workspace:
           at: /home/circleci/
       - run:
-        name: Install dependencies
-        command: python -m scripts.install_third_party_libs
+          name: Install dependencies
+          command: python -m scripts.install_third_party_libs
       - run:
           name: Run e2e navigation test
           command: |
