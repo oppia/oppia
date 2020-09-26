@@ -71,6 +71,7 @@ import webtest
         models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
         models.NAMES.story, models.NAMES.topic]))
 current_user_services = models.Registry.import_current_user_services()
+datastore_services = models.Registry.import_datastore_services()
 email_services = models.Registry.import_email_services()
 memory_cache_services = models.Registry.import_cache_services()
 
@@ -2341,8 +2342,8 @@ class AppEngineTestBase(TestBase):
 
     def _delete_all_models(self):
         """Deletes all models from the NDB datastore."""
-        from google.appengine.ext import ndb
-        ndb.delete_multi(ndb.Query().iter(keys_only=True))
+        datastore_services.delete_multi(
+            datastore_services.query_everything().iter(keys_only=True))
 
     def setUp(self):
         empty_environ()

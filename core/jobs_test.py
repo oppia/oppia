@@ -34,13 +34,13 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from google.appengine.ext import ndb
 from mapreduce import input_readers
 
 (base_models, exp_models, stats_models, job_models) = (
     models.Registry.import_models([
         models.NAMES.base_model, models.NAMES.exploration,
         models.NAMES.statistics, models.NAMES.job]))
+datastore_services = models.Registry.import_datastore_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -518,13 +518,13 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 SUM_MODEL_ID = 'all_data_id'
 
 
-class MockNumbersModel(ndb.Model):
-    number = ndb.IntegerProperty()
+class MockNumbersModel(datastore_services.Model):
+    number = datastore_services.IntegerProperty()
 
 
-class MockSumModel(ndb.Model):
-    total = ndb.IntegerProperty(default=0)
-    failed = ndb.BooleanProperty(default=False)
+class MockSumModel(datastore_services.Model):
+    total = datastore_services.IntegerProperty(default=0)
+    failed = datastore_services.BooleanProperty(default=False)
 
 
 class TestDeferredJobManager(jobs.BaseDeferredJobManager):
@@ -996,7 +996,7 @@ class TwoClassesMapReduceJobIntegrationTests(test_utils.GenericTestBase):
 
 class MockStartExplorationRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    count = ndb.IntegerProperty(default=0)
+    count = datastore_services.IntegerProperty(default=0)
 
 
 class MockStartExplorationMRJobManager(

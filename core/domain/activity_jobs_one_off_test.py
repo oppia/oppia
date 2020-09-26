@@ -40,8 +40,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from google.appengine.ext import ndb
-
+datastore_services = models.Registry.import_datastore_services()
 gae_search_services = models.Registry.import_search_services()
 
 (
@@ -538,7 +537,7 @@ class MockCollectionCommitLogEntryModel(
         collection_models.CollectionCommitLogEntryModel):
     """Mock CollectionCommitLogEntryModel so that it allows to set username."""
 
-    username = ndb.StringProperty(indexed=True, required=False)
+    username = datastore_services.StringProperty(indexed=True, required=False)
 
 
 class RemoveCommitUsernamesOneOffJobTests(test_utils.GenericTestBase):

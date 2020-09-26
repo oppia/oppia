@@ -41,10 +41,9 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from google.appengine.ext import ndb
-
 (user_models, feedback_models, exp_models) = models.Registry.import_models(
     [models.NAMES.user, models.NAMES.feedback, models.NAMES.exploration])
+datastore_services = models.Registry.import_datastore_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 search_services = models.Registry.import_search_services()
 
@@ -1577,7 +1576,8 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
 class MockUserSettingsModel(user_models.UserSettingsModel):
     """Mock UserSettingsModel so that it allows to set `gae_user_id`."""
 
-    gae_user_id = ndb.StringProperty(indexed=False, required=False)
+    gae_user_id = (
+        datastore_services.StringProperty(indexed=False, required=False))
 
 
 class RemoveGaeUserIdOneOffJobTests(test_utils.GenericTestBase):

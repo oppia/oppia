@@ -32,8 +32,6 @@ from core.platform import models
 import feconf
 import python_utils
 
-from google.appengine.ext import ndb
-
 (feedback_models, email_models, suggestion_models) = (
     models.Registry.import_models(
         [models.NAMES.feedback, models.NAMES.email, models.NAMES.suggestion]))
@@ -333,7 +331,7 @@ def _get_threads_user_info_keys(thread_ids):
         thread_ids: list(str). The ids of the threads.
 
     Returns:
-        list(ndb.Keys). The keys of the feedback thread user model.
+        list(datastore_services.Keys). The keys of the feedback thread user model.
     """
     if thread_ids:
         return feedback_models.GeneralFeedbackThreadUserModel.query(
@@ -361,14 +359,14 @@ def delete_threads_for_multiple_entities(entity_type, entity_ids):
     for thread in threads:
         for message in get_messages(thread.id):
             model_keys.append(
-                ndb.Key(feedback_models.GeneralFeedbackMessageModel, message.id)
+                datastore_services.Key(feedback_models.GeneralFeedbackMessageModel, message.id)
             )
         model_keys.append(
-            ndb.Key(feedback_models.GeneralFeedbackThreadModel, thread.id)
+            datastore_services.Key(feedback_models.GeneralFeedbackThreadModel, thread.id)
         )
         if thread.has_suggestion:
             model_keys.append(
-                ndb.Key(suggestion_models.GeneralSuggestionModel, thread.id)
+                datastore_services.Key(suggestion_models.GeneralSuggestionModel, thread.id)
             )
 
     model_keys += _get_threads_user_info_keys([thread.id for thread in threads])
@@ -376,10 +374,10 @@ def delete_threads_for_multiple_entities(entity_type, entity_ids):
     if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
         for entity_id in entity_ids:
             model_keys.append(
-                ndb.Key(feedback_models.FeedbackAnalyticsModel, entity_id)
+                datastore_services.Key(feedback_models.FeedbackAnalyticsModel, entity_id)
             )
 
-    ndb.delete_multi(model_keys)
+    datastore_services.delete_multi(model_keys)
 
 
 def update_messages_read_by_the_user(user_id, thread_id, message_ids):

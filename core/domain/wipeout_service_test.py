@@ -38,8 +38,6 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from google.appengine.ext import ndb
-
 (
     base_models, collection_models, exp_models,
     feedback_models, improvements_models, question_models,
@@ -51,6 +49,8 @@ from google.appengine.ext import ndb
     models.NAMES.skill, models.NAMES.story, models.NAMES.suggestion,
     models.NAMES.topic, models.NAMES.user
 ])
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
@@ -1313,7 +1313,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
                     text='Some text'
                 )
             )
-        ndb.put_multi(feedback_thread_models + feedback_message_models)
+        datastore_services.put_multi(feedback_thread_models + feedback_message_models)
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))

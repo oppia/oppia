@@ -23,6 +23,83 @@ from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 
+Model = ndb.Model
+Key = ndb.Key
+
+BooleanProperty = ndb.BooleanProperty
+FloatProperty = ndb.FloatProperty
+IntegerProperty = ndb.IntegerProperty
+StringProperty = ndb.StringProperty
+TextProperty = ndb.TextProperty
+JsonProperty = ndb.JsonProperty
+DateTimeProperty = ndb.DateTimeProperty
+UserProperty = ndb.UserProperty
+
+
+def query_everything():
+    """Returns a query that targets every single entity in the datastore."""
+    return ndb.Query()
+
+
+def any_of(*nodes):
+    """Returns a query node which performs a boolean OR on their conditions.
+
+    Args:
+        *nodes: ndb.Node. The nodes to combine.
+
+    Returns:
+        ndb.Node. A node combining the conditions using boolean OR.
+    """
+    return ndb.OR(*nodes)
+
+
+def put_multi(models):
+    """Stores a sequence of Model instances.
+
+    Args:
+        entities: datastore_services.Model. A sequence of Model instances.
+
+    Returns:
+        A list with the stored keys.
+    """
+    return ndb.put_multi(models)
+
+
+def delete_multi(keys):
+    """Deletes a sequence of keys.
+
+    Args:
+        keys: list(str). A sequence of keys.
+
+    Returns:
+        list(None). A list of Nones, one per deleted model.
+    """
+    return ndb.delete_multi(keys)
+
+
+def transaction(callback, **context_options):
+    """Run a callback in a transaction.
+
+    Note:
+        To pass arguments to a callback function, use a lambda, e.g.
+        def my_callback(key, inc):
+            ...
+        transaction(lambda: my_callback(Key(...), 1))
+
+    Args:
+        callback: A function or tasklet to be called.
+
+    Returns:
+        Whatever callback() returns.
+
+    Raises:
+        Whatever callback() raises; datastore_errors.TransactionFailedError
+        if the transaction failed.
+    """
+    return ndb.transaction(
+        callback, xg=True, propagation=ndb.TransactionOptions.ALLOWED)
+
+
 def make_cursor(urlsafe_cursor=None):
     """Makes an immutable cursor that points to a relative position in a query.
 
@@ -78,3 +155,5 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
         start_index = start_index + len(entity_ids)
 
     return all_models_grouped_by_model_type
+
+

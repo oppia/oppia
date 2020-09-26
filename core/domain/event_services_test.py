@@ -29,16 +29,15 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from google.appengine.ext import ndb
-
 (stats_models, feedback_models) = models.Registry.import_models([
     models.NAMES.statistics, models.NAMES.feedback])
 
+datastore_services = models.Registry.import_datastore_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-class MockNumbersModel(ndb.Model):
-    number = ndb.IntegerProperty()
+class MockNumbersModel(datastore_services.Model):
+    number = datastore_services.IntegerProperty()
 
 
 class BaseEventHandlerTests(test_utils.GenericTestBase):

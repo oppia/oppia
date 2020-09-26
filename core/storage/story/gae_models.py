@@ -20,10 +20,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.platform import models
 
-from google.appengine.ext import ndb
-
 (base_models, user_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class StorySnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -50,30 +49,30 @@ class StoryModel(base_models.VersionedModel):
     ALLOW_REVERT = False
 
     # The title of the story.
-    title = ndb.StringProperty(required=True, indexed=True)
+    title = datastore_services.StringProperty(required=True, indexed=True)
     # The thumbnail filename of the story.
-    thumbnail_filename = ndb.StringProperty(indexed=True)
+    thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # The thumbnail background color of the story.
-    thumbnail_bg_color = ndb.StringProperty(indexed=True)
+    thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
     # A high-level description of the story.
-    description = ndb.StringProperty(indexed=False)
+    description = datastore_services.StringProperty(indexed=False)
     # A set of notes, that describe the characters, main storyline, and setting.
-    notes = ndb.TextProperty(indexed=False)
+    notes = datastore_services.TextProperty(indexed=False)
     # The ISO 639-1 code for the language this story is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = datastore_services.StringProperty(required=True, indexed=True)
     # The story contents dict specifying the list of story nodes and the
     # connection between them. Modelled by class StoryContents
     # (see story_domain.py for its current schema).
-    story_contents = ndb.JsonProperty(default={}, indexed=False)
+    story_contents = datastore_services.JsonProperty(default={}, indexed=False)
     # The schema version for the story_contents.
     story_contents_schema_version = (
-        ndb.IntegerProperty(required=True, indexed=True))
+        datastore_services.IntegerProperty(required=True, indexed=True))
     # The topic id to which the story belongs.
-    corresponding_topic_id = ndb.StringProperty(indexed=True, required=True)
+    corresponding_topic_id = datastore_services.StringProperty(indexed=True, required=True)
     # The url fragment for the story.
-    url_fragment = ndb.StringProperty(required=True, indexed=True)
+    url_fragment = datastore_services.StringProperty(required=True, indexed=True)
     # The content of the meta tag in the Story viewer page.
-    meta_tag_content = ndb.StringProperty(indexed=True)
+    meta_tag_content = datastore_services.StringProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -166,7 +165,7 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the story being edited.
-    story_id = ndb.StringProperty(indexed=True, required=True)
+    story_id = datastore_services.StringProperty(indexed=True, required=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -213,28 +212,28 @@ class StorySummaryModel(base_models.BaseModel):
     """
 
     # The title of the story.
-    title = ndb.StringProperty(required=True, indexed=True)
+    title = datastore_services.StringProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this story is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = datastore_services.StringProperty(required=True, indexed=True)
     # A high-level description of the story.
-    description = ndb.StringProperty(required=True, indexed=True)
+    description = datastore_services.StringProperty(required=True, indexed=True)
     # Time when the story model was last updated (not to be
     # confused with last_updated, which is the time when the
     # story *summary* model was last updated).
-    story_model_last_updated = ndb.DateTimeProperty(required=True, indexed=True)
+    story_model_last_updated = datastore_services.DateTimeProperty(required=True, indexed=True)
     # Time when the story model was created (not to be confused
     # with created_on, which is the time when the story *summary*
     # model was created).
-    story_model_created_on = ndb.DateTimeProperty(required=True, indexed=True)
+    story_model_created_on = datastore_services.DateTimeProperty(required=True, indexed=True)
     # The titles of the nodes in the story, in the same order as present there.
-    node_titles = ndb.StringProperty(repeated=True, indexed=False)
+    node_titles = datastore_services.StringProperty(repeated=True, indexed=False)
     # The thumbnail filename of the story.
-    thumbnail_filename = ndb.StringProperty(indexed=True)
+    thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # The thumbnail background color of the story.
-    thumbnail_bg_color = ndb.StringProperty(indexed=True)
-    version = ndb.IntegerProperty(required=True)
+    thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
+    version = datastore_services.IntegerProperty(required=True)
     # The url fragment for the story.
-    url_fragment = ndb.StringProperty(required=True, indexed=True)
+    url_fragment = datastore_services.StringProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
