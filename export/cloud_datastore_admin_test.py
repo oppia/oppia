@@ -17,8 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-
 from core.tests import test_utils
 from export import cloud_datastore_admin
 
@@ -57,7 +55,7 @@ class ExportToCloudDatastoreHandlerTests(test_utils.GenericTestBase):
             *. A one-time use context manager.
         """
         response = requests.Response()
-        response._content = content # pylint: disable=protected-member
+        response._content = content # pylint: disable=protected-access
         response.status_code = status_code
         return self.swap(requests, 'request', lambda *args, **kwargs: response)
 
