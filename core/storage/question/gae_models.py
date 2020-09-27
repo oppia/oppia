@@ -26,12 +26,12 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models, skill_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.skill
 ])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -331,7 +331,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         ) * question_count
 
         if not start_cursor == '':
-            cursor = datastore_query.Cursor(urlsafe=start_cursor)
+            cursor = datastore_services.make_cursor(urlsafe_cursor=start_cursor)
             question_skill_link_models, next_cursor, more = cls.query(
                 cls.skill_id.IN(skill_ids)
                 # Order by cls.key is needed alongside cls.last_updated so as to

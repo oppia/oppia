@@ -92,6 +92,7 @@ ONE_OFF_JOB_MANAGERS = [
     story_jobs_one_off.RegenerateStorySummaryOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
     suggestion_jobs_one_off.PopulateSuggestionLanguageCodeMigrationOneOffJob,
+    suggestion_jobs_one_off.PopulateContributionStatsOneOffJob,
     suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,
     takeout_domain_jobs_one_off.SnapshotMetadataCommitMsgMigrationOneOffJob,
