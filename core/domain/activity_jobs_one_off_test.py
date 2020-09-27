@@ -2326,7 +2326,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING PARENT MODEL--CollectionSnapshotMetadataModel',
+                'MISSING PARENT MODEL-CollectionSnapshotMetadataModel',
                 ['collection_id0-1']
             ],
             [
@@ -2348,7 +2348,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING PARENT MODEL--ExplorationRightsSnapshotMetadataModel',
+                'MISSING PARENT MODEL-ExplorationRightsSnapshotMetadataModel',
                 ['exp_id0-1']
             ],
             [
@@ -2370,7 +2370,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING PARENT MODEL--QuestionSnapshotMetadataModel',
+                'MISSING PARENT MODEL-QuestionSnapshotMetadataModel',
                 ['question_id0-1']
             ],
             [
@@ -2392,7 +2392,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING PARENT MODEL--SkillSnapshotMetadataModel',
+                'MISSING PARENT MODEL-SkillSnapshotMetadataModel',
                 ['skill_id0-1']
             ],
             [
@@ -2414,7 +2414,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING PARENT MODEL--StorySnapshotMetadataModel',
+                'MISSING PARENT MODEL-StorySnapshotMetadataModel',
                 ['story_id0-1']
             ],
             [
@@ -2436,7 +2436,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING PARENT MODEL--TopicSnapshotMetadataModel',
+                'MISSING PARENT MODEL-TopicSnapshotMetadataModel',
                 ['topic_id0-1']
             ],
             [
@@ -2458,7 +2458,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING PARENT MODEL--SubtopicPageSnapshotMetadataModel',
+                'MISSING PARENT MODEL-SubtopicPageSnapshotMetadataModel',
                 ['topic_id0-1-1']
             ],
             [
@@ -2480,7 +2480,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING PARENT MODEL--TopicRightsSnapshotMetadataModel',
+                'MISSING PARENT MODEL-TopicRightsSnapshotMetadataModel',
                 ['topic_rights_id0-1']
             ],
             [

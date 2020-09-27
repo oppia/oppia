@@ -729,7 +729,7 @@ class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
         else:
             yield ('FOUND COMMIT LOGS-%s' % class_name, snapshot_model.id)
         if parent_model is None:
-            yield ('MISSING PARENT MODEL--%s' % class_name, snapshot_model.id)
+            yield ('MISSING PARENT MODEL-%s' % class_name, snapshot_model.id)
         else:
             yield ('FOUND PARENT MODEL-%s' % class_name, snapshot_model.id)
 
