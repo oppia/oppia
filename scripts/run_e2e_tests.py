@@ -257,14 +257,12 @@ def setup_and_install_dependencies(skip_install):
 
 
 def build_js_files(
-        dev_mode_setting, build_only=False, deparallelize_terser=False,
-        source_maps=False):
+        dev_mode_setting, deparallelize_terser=False, source_maps=False):
     """Build the javascript files.
 
     Args:
         dev_mode_setting: bool. Represents whether to run the related commands
             in dev mode.
-        build_only: bool. Represents whether to run the build and exit.
         deparallelize_terser: bool. Represents whether to use webpack
             compilation config that disables parallelism on terser plugin.
         source_maps: bool. Represents whether to use source maps while
@@ -283,8 +281,6 @@ def build_js_files(
     else:
         build.main(args=[])
         run_webpack_compilation(source_maps=source_maps)
-    if build_only:
-        sys.exit(0)
 
 
 @contextlib.contextmanager
@@ -546,32 +542,33 @@ def main(args=None):
         build.modify_constants(prod_env=parsed_args.prod_env)
     else:
         build_js_files(
-            dev_mode, build_only=parsed_args.build_only,
-            deparallelize_terser=parsed_args.deparallelize_terser,
+            dev_mode, deparallelize_terser=parsed_args.deparallelize_terser,
             source_maps=parsed_args.source_maps)
-    version = parsed_args.chrome_driver_version or get_chrome_driver_version()
-    python_utils.PRINT('\n\nCHROMEDRIVER VERSION: %s\n\n' % version)
-    start_webdriver_manager(version)
+    if not parsed_args.build_only:
+        version = (
+            parsed_args.chrome_driver_version or get_chrome_driver_version())
+        python_utils.PRINT('\n\nCHROMEDRIVER VERSION: %s\n\n' % version)
+        start_webdriver_manager(version)
 
-    portserver_process = start_portserver()
-    atexit.register(cleanup_portserver, portserver_process)
-    start_google_app_engine_server(dev_mode, parsed_args.server_log_level)
+        portserver_process = start_portserver()
+        atexit.register(cleanup_portserver, portserver_process)
+        start_google_app_engine_server(dev_mode, parsed_args.server_log_level)
 
-    common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
-    common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
-    ensure_screenshots_dir_is_removed()
-    commands = [common.NODE_BIN_PATH]
-    if parsed_args.debug_mode:
-        commands.append('--inspect-brk')
-    # This flag ensures tests fail if waitFor calls time out.
-    commands.append('--unhandled-rejections=strict')
-    commands.append(PROTRACTOR_BIN_PATH)
-    commands.extend(get_e2e_test_parameters(
-        parsed_args.sharding_instances, parsed_args.suite, dev_mode))
+        common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
+        common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
+        ensure_screenshots_dir_is_removed()
+        commands = [common.NODE_BIN_PATH]
+        if parsed_args.debug_mode:
+            commands.append('--inspect-brk')
+        # This flag ensures tests fail if waitFor calls time out.
+        commands.append('--unhandled-rejections=strict')
+        commands.append(PROTRACTOR_BIN_PATH)
+        commands.extend(get_e2e_test_parameters(
+            parsed_args.sharding_instances, parsed_args.suite, dev_mode))
 
-    p = subprocess.Popen(commands)
-    p.communicate()
-    sys.exit(p.returncode)
+        p = subprocess.Popen(commands)
+        p.communicate()
+        sys.exit(p.returncode)
 
 
 if __name__ == '__main__':  # pragma: no cover
