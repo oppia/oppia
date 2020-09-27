@@ -148,9 +148,9 @@ jobs:
       - checkout
       - merge_target_branch
       - install_chrome
-      - webpack_build
       - attach_workspace:
           at: /home/circleci/
+      - webpack_build
       - run:
           name: Run e2e navigation test
           command: |
@@ -177,9 +177,9 @@ jobs:
       - check_release_changelog_update_branch
       - merge_target_branch
       - install_chrome
-      - webpack_build
       - attach_workspace:
           at: /home/circleci/
+      - webpack_build
       - run:
           name: Run e2e publication test
           command: |
@@ -208,9 +208,9 @@ jobs:
       - check_release_changelog_update_branch
       - merge_target_branch
       - install_chrome
-      - webpack_build
       - attach_workspace:
           at: /home/circleci/
+      - webpack_build
       - run:
           name: Run e2e users test
           command: |
@@ -242,9 +242,9 @@ jobs:
       - check_release_changelog_update_branch
       - merge_target_branch
       - install_chrome
-      - webpack_build
       - attach_workspace:
           at: /home/circleci/
+      - webpack_build
       - run:
           name: Run e2e file upload features test
           command: |
@@ -269,9 +269,9 @@ jobs:
       - check_release_changelog_update_branch
       - merge_target_branch
       - install_chrome
-      - webpack_build
       - attach_workspace:
           at: /home/circleci/
+      - webpack_build
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
