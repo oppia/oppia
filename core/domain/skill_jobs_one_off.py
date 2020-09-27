@@ -170,7 +170,7 @@ class MissingSkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         skill = skill_fetchers.get_skill_by_id(item.skill_id, strict=False)
         if skill is None:
-            item.delete(feconf.SYSTEM_COMMITTER_ID, 'Delete model')
+            item.delete()
             yield ('Skill Commit Model deleted', 1)
 
     @staticmethod

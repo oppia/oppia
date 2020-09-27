@@ -94,8 +94,8 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION)
 
         output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(job_id)
-        expected = [['skill_migrated',
-                     ['1 skills successfully migrated.']]]
+        expected = [[u'skill_migrated',
+                     [u'1 skills successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_skips_deleted_skill(self):
@@ -128,8 +128,8 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             skill_fetchers.get_skill_by_id(self.SKILL_ID)
 
         output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(job_id)
-        expected = [['skill_deleted',
-                     ['Encountered 1 deleted skills.']]]
+        expected = [[u'skill_deleted',
+                     [u'Encountered 1 deleted skills.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_converts_old_skill(self):
@@ -194,8 +194,8 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION)
 
         output = skill_jobs_one_off.SkillMigrationOneOffJob.get_output(job_id)
-        expected = [['skill_migrated',
-                     ['1 skills successfully migrated.']]]
+        expected = [[u'skill_migrated',
+                     [u'1 skills successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_skips_updated_skill_failing_validation(self):
@@ -223,8 +223,8 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         # If the skill had been successfully migrated, this would include a
         # 'successfully migrated' message. Its absence means that the skill
         # could not be processed.
-        expected = [['validation_error',
-                     ['Skill %s failed validation: \'unicode\' object has '
+        expected = [[u'validation_error',
+                     [u'Skill %s failed validation: \'unicode\' object has '
                       'no attribute \'validate\'' % (self.SKILL_ID)]]]
         self.assertEqual(
             expected, [ast.literal_eval(x) for x in output])
@@ -309,7 +309,26 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'old_value': '', 'property_name': 'description'
             }])
 
-    def test_invalid_command(self):
+    def test_migration_job_skips_deleted_model(self):
+        self.model_instance_1.commit_cmds = [{
+            'difficulty': 'Easy', 'cmd': 'update_rubrics',
+            'explanation': ['New explanation']
+        }, {
+            'cmd': 'update_skill_property', 'new_value': 'Test description',
+            'old_value': '', 'property_name': 'description'
+        }]
+        self.model_instance_1.put()
+        self.model_instance_1.delete()
+        job_id = (
+            skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.create_new())
+        skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.get_output(
+            job_id)
+        self.assertEqual(output, [])
+
+    def test_migration_job_updates_invalid_command(self):
         self.model_instance_1.commit_cmds = [{
             'difficulty': 'Easy', 'cmd': 'update_rubrics',
             'explanation': ['New explanation']
@@ -397,15 +416,41 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(output, [])
         self.assertFalse(self.model_instance.deleted)
 
-    def test_invalid_command(self):
+    def test_migration_job_skips_deleted_model(self):
         skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
         skill_model.delete(self.albert_id, 'Delete Model')
-        job_id = (
-            skill_jobs_one_off.MissingSkillMigrationOneOffJob.create_new())
-        skill_jobs_one_off.MissingSkillMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+        self.model_instance.delete()
 
-        output = skill_jobs_one_off.MissingSkillMigrationOneOffJob.get_output(
-            job_id)
-        self.assertEqual(output, [])
-        self.assertFalse(self.model_instance.deleted)
+        def mock_get_skill_by_id(unused_skill_id, strict=True, version=None): # pylint: disable=unused-argument
+            return None
+
+        with self.swap(skill_fetchers, 'get_skill_by_id', mock_get_skill_by_id):
+            job_id = (
+                skill_jobs_one_off
+                .SkillCommitCmdMigrationOneOffJob.create_new())
+            skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
+
+            output = (
+                skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.get_output(
+                    job_id))
+            self.assertEqual(output, [])
+
+    def test_migration_job_removes_commit_log_model_if_skill_model_is_missing(
+            self):
+        def mock_get_skill_by_id(unused_skill_id, strict=True, version=None): # pylint: disable=unused-argument
+            return None
+        with self.swap(skill_fetchers, 'get_skill_by_id', mock_get_skill_by_id):
+            job_id = (
+                skill_jobs_one_off.MissingSkillMigrationOneOffJob.create_new())
+            skill_jobs_one_off.MissingSkillMigrationOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
+
+            output = (
+                skill_jobs_one_off.MissingSkillMigrationOneOffJob.get_output(
+                    job_id))
+            self.assertEqual(output, ['[u\'Skill Commit Model deleted\', 1]'])
+            self.model_instance = (
+                skill_models.SkillCommitLogEntryModel.get_by_id(
+                    'skill-skill_id-1'))
+            self.assertIsNone(self.model_instance)
