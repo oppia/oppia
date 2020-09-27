@@ -47,7 +47,6 @@ angular.module('oppia').directive('oppiaRoot', [
 
             // The next line allows the transcluded content to start executing.
             $scope.initialized = true;
-            $scope.$apply();
           };
         }]
     };
