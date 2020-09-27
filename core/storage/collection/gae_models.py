@@ -25,6 +25,7 @@ from constants import constants
 import core.storage.base_model.gae_models as base_models
 import feconf
 import python_utils
+import utils
 
 from google.appengine.ext import ndb
 
@@ -107,7 +108,7 @@ class CollectionModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+        return False
 
     @classmethod
     def get_collection_count(cls):
@@ -281,14 +282,12 @@ class CollectionRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return (
-            cls.query(ndb.OR(
-                cls.owner_ids == user_id,
-                cls.editor_ids == user_id,
-                cls.voice_artist_ids == user_id,
-                cls.viewer_ids == user_id
-            )).get(keys_only=True) is not None
-            or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+        return cls.query(ndb.OR(
+            cls.owner_ids == user_id,
+            cls.editor_ids == user_id,
+            cls.voice_artist_ids == user_id,
+            cls.viewer_ids == user_id
+        )).get(keys_only=True) is not None
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Updates the collection rights model by applying the given
@@ -336,6 +335,15 @@ class CollectionRightsModel(base_models.VersionedModel):
         if 'translator_ids' in model_dict and model_dict['translator_ids']:
             model_dict['voice_artist_ids'] = model_dict['translator_ids']
             model_dict['translator_ids'] = []
+
+        # We need to remove pseudonymous IDs from all the fields that contain
+        # user IDs.
+        for field_name in (
+                'owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids'):
+            model_dict[field_name] = [
+                user_id for user_id in model_dict[field_name]
+                if not utils.is_pseudonymous_id(user_id)
+            ]
 
         return model_dict
 

@@ -28,14 +28,11 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
-
-USER_ID_RANDOM_PART_LENGTH = 32
-USER_ID_LENGTH = 36
 
 
 class UserSettingsModel(base_models.BaseModel):
@@ -282,7 +279,7 @@ class UserSettingsModel(base_models.BaseModel):
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = 'uid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
-                for _ in python_utils.RANGE(USER_ID_RANDOM_PART_LENGTH))
+                for _ in python_utils.RANGE(feconf.USER_ID_RANDOM_PART_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
 
@@ -843,7 +840,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
     """
 
     # IDs of activities (e.g., explorations) that this user subscribes to.
-    # TODO(bhenning): Rename this to exploration_ids and perform a migration.
+    # TODO(#10727): Rename this to exploration_ids and perform a migration.
     activity_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of collections that this user subscribes to.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
@@ -1853,7 +1850,7 @@ class UserQueryModel(base_models.BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        cursor = datastore_query.Cursor(urlsafe=cursor)
+        cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
         query_models, next_cursor, more = (
             cls.query().order(-cls.created_on).
             fetch_page(page_size, start_cursor=cursor))
@@ -2311,10 +2308,10 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     """
 
     # The email of the user.
-    email = ndb.StringProperty(required=True)
+    email = ndb.StringProperty(required=True, indexed=True)
     # Role of the user. Needed to decide which storage models have to be deleted
     # for it.
-    role = ndb.StringProperty(required=True)
+    role = ndb.StringProperty(required=True, indexed=True)
     # Whether the deletion is completed.
     deletion_complete = ndb.BooleanProperty(default=False, indexed=True)
 
@@ -2323,23 +2320,24 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     # IDs of all the private collections created by this user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
-    # A dict mapping model IDs to pseudonymous user IDs. Each type of activity
-    # is grouped under different key (story, skill, question), the keys need to
-    # be from the core.platform.models.NAMES enum. For each activity, we use
-    # a different pseudonymous user ID. Note that all these pseudonymous
-    # user IDs originate from the same about-to-be-deleted user. If a key is
-    # absent from the activity_mappings dict, this means that for this activity
-    # type the mappings are not yet generated.
+    # A dict mapping model IDs to pseudonymous user IDs. Each type of entity
+    # is grouped under different key (e.g. config, feedback, story, skill,
+    # question), the keys need to be from the core.platform.models.NAMES enum.
+    # For each entity, we use a different pseudonymous user ID. Note that all
+    # these pseudonymous user IDs originate from the same about-to-be-deleted
+    # user. If a key is absent from the pseudonymizable_entity_mappings dict,
+    # this means that for this activity type the mappings are not yet generated.
     # Example structure: {
-    #     'skill': {'skill_id': 'pseudo_user_id_1'},
+    #     'config': {'some_config': 'pseudo_user_id_1'},
+    #     'skill': {'skill_id': 'pseudo_user_id_2'},
     #     'story': {
-    #         'story_1_id': 'pseudo_user_id_2',
-    #         'story_2_id': 'pseudo_user_id_3',
-    #         'story_3_id': 'pseudo_user_id_4'
+    #         'story_1_id': 'pseudo_user_id_3',
+    #         'story_2_id': 'pseudo_user_id_4',
+    #         'story_3_id': 'pseudo_user_id_5'
     #     },
     #     'question': {}
     # }
-    activity_mappings = ndb.JsonProperty(default={})
+    pseudonymizable_entity_mappings = ndb.JsonProperty(default={})
 
     @staticmethod
     def get_deletion_policy():
@@ -2359,7 +2357,8 @@ class PendingDeletionRequestModel(base_models.BaseModel):
             'deletion_complete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'collection_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'activity_mappings': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'pseudonymizable_entity_mappings': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'role': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
@@ -2410,7 +2409,7 @@ class PseudonymizedUserModel(base_models.BaseModel):
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = 'pid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
-                for _ in python_utils.RANGE(USER_ID_RANDOM_PART_LENGTH))
+                for _ in python_utils.RANGE(feconf.USER_ID_RANDOM_PART_LENGTH))
 
             if not cls.get_by_id(new_id):
                 return new_id

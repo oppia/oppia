@@ -167,13 +167,13 @@ class ClassifierTrainingJobModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [classifier_models.ClassifierTrainingJobModel]
 
 
-class StateTrainingJobsMappingModelAuditOneOffJob(
+class TrainingJobExplorationMappingModelAuditOneOffJob(
         ProdValidationAuditOneOffJob):
-    """Job that audits and validates StateTrainingJobsMappingModel."""
+    """Job that audits and validates TrainingJobExplorationMappingModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [classifier_models.StateTrainingJobsMappingModel]
+        return [classifier_models.TrainingJobExplorationMappingModel]
 
 
 class CollectionModelAuditOneOffJob(ProdValidationAuditOneOffJob):
@@ -609,6 +609,15 @@ class GeneralVoiceoverApplicationModelAuditOneOffJob(
         return [suggestion_models.GeneralVoiceoverApplicationModel]
 
 
+class CommunityContributionStatsModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates CommunityContributionStatsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.CommunityContributionStatsModel]
+
+
 class TopicModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates TopicModel."""
 
@@ -732,7 +741,12 @@ class UserNormalizedNameAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if len(values) > 1:
+        # If normalized name is not set, we do not compare it with normalized
+        # names for other users. It is not mandatory to set the normalized
+        # user names in UserSettingsModel since some users who have logged in
+        # but not completed the sign-up process may not have a username
+        # specified yet.
+        if key != 'None' and len(values) > 1:
             yield (
                 'failed validation check for normalized username check of '
                 'UserSettingsModel',

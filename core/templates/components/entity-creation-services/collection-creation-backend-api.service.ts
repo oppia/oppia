@@ -53,7 +53,7 @@ export class CollectionCreationBackendService {
   }
 
 
-  createCollection(): Promise<CollectionCreationResponse> {
+  async createCollectionAsync(): Promise<CollectionCreationResponse> {
     return new Promise((resolve, reject) => {
       this._createCollection(resolve, reject);
     });
