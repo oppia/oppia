@@ -146,7 +146,7 @@ class CleanupExplorationRecommendationsOneOffJob(
         exp_model = exp_models.ExplorationModel.get_by_id(item.id)
         if exp_model is None or exp_model.deleted:
             item.delete()
-            yield('Removed recommendation model', 1)
+            yield ('Removed recommendation model', 1)
             return
 
         fetched_exploration_model_instances = (
@@ -155,14 +155,14 @@ class CleanupExplorationRecommendationsOneOffJob(
 
         exp_ids_removed = []
         for exp_id, exp_instance in list(python_utils.ZIP(
-                item.activity_ids,
+                item.recommended_exploration_ids,
                 fetched_exploration_model_instances)):
             if exp_instance is None or exp_instance.deleted:
                 exp_ids_removed.append(exp_id)
                 item.recommended_exploration_ids.remove(exp_id)
         if exp_ids_removed:
             item.put()
-            yield ('Removed deleted exp ids from recommendations.', 1)
+            yield ('Removed deleted exp ids from recommendations', 1)
 
     @staticmethod
     def reduce(key, values):
