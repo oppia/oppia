@@ -81,7 +81,7 @@ describe('Exploration Summary Backend Api Service', function() {
       var sampleResults = [new ExplorationSummary(
         'Category 1', undefined, undefined, undefined, undefined, undefined,
         undefined, 'public', undefined, undefined, 'Title 1', undefined,
-        undefined)
+        undefined, undefined, undefined, undefined, undefined)
       ];
 
       var requestUrl = '/explorationsummarieshandler/data?' +
@@ -109,11 +109,11 @@ describe('Exploration Summary Backend Api Service', function() {
         new ExplorationSummary(
           'Category 1', undefined, undefined, undefined, undefined, undefined,
           undefined, 'public', undefined, undefined, 'Title 1', undefined,
-          undefined),
+          undefined, undefined, undefined, undefined, undefined),
         new ExplorationSummary(
           'Category 2', undefined, undefined, undefined, undefined, undefined,
           undefined, 'private', undefined, undefined, 'Title 2', undefined,
-          undefined)
+          undefined, undefined, undefined, undefined, undefined)
       ];
 
       var requestUrl = '/explorationsummarieshandler/data?' +

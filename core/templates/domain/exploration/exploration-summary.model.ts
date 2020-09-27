@@ -21,7 +21,7 @@ export interface ExplorationSummaryBackendDict {
   'community_owned': boolean;
   'last_updated_msec': number;
   'id': string;
-  'created_on': number;
+  'created_on_msec': number;
   'language_code': string;
   'objective': string;
   'status': string;
@@ -30,15 +30,10 @@ export interface ExplorationSummaryBackendDict {
   'title': string;
   'node_count': number;
   'tags': string[];
-  /*
-  'owner_ids': ;
-  'editor_ids': ;
-  'viewer_ids': ;
-  'contributor_ids': ;
-  'contributors_summary': ;
-  'version': ;
-  'collection_model_created_on': ;
-  'collection_model_last_updated': ; */
+  'activity_type': string;
+  'human_readable_contributors_summary': string;
+  'num_views': number;
+  'ratings': string;
 }
 
 export class ExplorationSummary {
@@ -55,7 +50,11 @@ export class ExplorationSummary {
     public thumbnailIconUrl: string,
     public title: string,
     public nodeCount: number,
-    public tags: string[]) {}
+    public tags: string[],
+    public activityType: string,
+    public humanReadableContributorsSummary: string,
+    public numViews: number,
+    public ratings: string) {}
 
   static createFromBackendDict(
       explorationSummaryDict: ExplorationSummaryBackendDict):
@@ -65,7 +64,7 @@ export class ExplorationSummary {
       explorationSummaryDict.community_owned,
       explorationSummaryDict.last_updated_msec,
       explorationSummaryDict.id,
-      explorationSummaryDict.created_on,
+      explorationSummaryDict.created_on_msec,
       explorationSummaryDict.language_code,
       explorationSummaryDict.objective,
       explorationSummaryDict.status,
@@ -73,7 +72,11 @@ export class ExplorationSummary {
       explorationSummaryDict.thumbnail_icon_url,
       explorationSummaryDict.title,
       explorationSummaryDict.node_count,
-      explorationSummaryDict.tags
+      explorationSummaryDict.tags,
+      explorationSummaryDict.activity_type,
+      explorationSummaryDict.human_readable_contributors_summary,
+      explorationSummaryDict.num_views,
+      explorationSummaryDict.ratings
     );
   }
 }
