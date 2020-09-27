@@ -32,6 +32,7 @@ from core.domain import exp_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import user_services
 from core.platform import models
@@ -2092,7 +2093,8 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
     SKILL_ID = 'skill_id0'
     STORY_ID = 'story_id0'
     TOPIC_ID = 'topic_id0'
-    # Note that the subtopic id is topicId-subtopicNum.
+    # The subtopic snapshot ID is in the format
+    # '<topicId>-<subtopicNum>-<version>'.
     SUBTOPIC_ID = 'topic_id0-1'
     TOPIC_RIGHTS_ID = 'topic_rights_id0'
     DUMMY_COMMIT_CMDS = [
@@ -2132,26 +2134,32 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
         return eval_output
 
     def test_correct_collection_models(self):
-        collection_models.CollectionSnapshotMetadataModel(
-            id='%s-1' % self.COLLECTION_ID,
-            committer_id=self.albert_id,
-            commit_type='edit',
-            commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
-        commit_model_id = 'collection-%s-%s' % (self.COLLECTION_ID, 1)
-        collection_models.CollectionCommitLogEntryModel(
-            id=commit_model_id,
-            collection_id=self.COLLECTION_ID,
-            user_id=self.albert_id,
-            commit_type='edit',
-            post_commit_status='public',
-            commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        rights_manager.create_new_collection_rights(
+            self.COLLECTION_ID, self.albert_id)
+
+        collection_model = collection_models.CollectionModel(
+            id=self.COLLECTION_ID,
+            category='category',
+            title='title',
+            objective='objective',
+            collection_contents={
+                'nodes': {}
+            },
+        )
+        collection_model.commit(
+            self.albert_id, 'collection model created', self.DUMMY_COMMIT_CMDS)
+
         actual_output = self._run_one_off_job()
 
         expected_output = [
             [
-                'FOUND COMMIT LOGS-CollectionSnapshotMetadataModel',
+                'COMMIT LOGS SHOULD NOT EXISTS-FOUND PARENT MODEL-' +
+                'CollectionRightsSnapshotMetadataModel',
+                ['collection_id0-1']
+            ],
+            [
+                'FOUND COMMIT LOGS-FOUND PARENT MODEL-' +
+                'CollectionSnapshotMetadataModel',
                 ['collection_id0-1']
             ]
         ]
@@ -2159,26 +2167,30 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_correct_exp_models(self):
-        exp_models.ExplorationRightsSnapshotMetadataModel(
-            id='%s-1' % self.EXP_ID,
-            committer_id=self.albert_id,
-            commit_type='edit',
-            commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
-        commit_model_id = 'exploration-%s-%s' % (self.EXP_ID, 1)
-        exp_models.ExplorationCommitLogEntryModel(
-            id=commit_model_id,
-            exploration_id=self.EXP_ID,
-            user_id=self.albert_id,
-            commit_type='edit',
-            post_commit_status='public',
-            commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        rights_manager.create_new_exploration_rights(
+            self.EXP_ID, self.albert_id)
+
+        exp_model = exp_models.ExplorationModel(
+            id=self.EXP_ID,
+            title='title',
+            category='category',
+            states_schema_version=1,
+            init_state_name='init_state_name'
+        )
+        exp_model.commit(
+            self.albert_id, 'exp model created', self.DUMMY_COMMIT_CMDS)
+
         actual_output = self._run_one_off_job()
 
         expected_output = [
             [
-                'FOUND COMMIT LOGS-ExplorationRightsSnapshotMetadataModel',
+                'COMMIT LOGS SHOULD NOT EXISTS-FOUND PARENT MODEL-' +
+                'ExplorationRightsSnapshotMetadataModel',
+                ['exp_id0-1']
+            ],
+            [
+                'FOUND COMMIT LOGS-FOUND PARENT MODEL-' +
+                'ExplorationSnapshotMetadataModel',
                 ['exp_id0-1']
             ]
         ]
@@ -2186,26 +2198,24 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_correct_question_models(self):
-        question_models.QuestionSnapshotMetadataModel(
-            id='%s-1' % self.QUESTION_ID,
-            committer_id=self.albert_id,
-            commit_type='edit',
-            commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
-        commit_model_id = 'question-%s-%s' % (self.QUESTION_ID, 1)
-        question_models.QuestionCommitLogEntryModel(
-            id=commit_model_id,
-            question_id=self.QUESTION_ID,
-            user_id=self.albert_id,
-            commit_type='edit',
-            post_commit_status='public',
-            commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        state = state_domain.State.create_default_state('ABC')
+        question_state_data = state.to_dict()
+        question_model = question_models.QuestionModel(
+            id=self.QUESTION_ID,
+            question_state_data=question_state_data,
+            question_state_data_schema_version=1,
+            language_code='en'
+        )
+
+        question_model.commit(
+            self.albert_id, 'question model created', self.DUMMY_COMMIT_CMDS)
+
         actual_output = self._run_one_off_job()
 
         expected_output = [
             [
-                'FOUND COMMIT LOGS-QuestionSnapshotMetadataModel',
+                'FOUND COMMIT LOGS-FOUND PARENT MODEL' +
+                '-QuestionSnapshotMetadataModel',
                 ['question_id0-1']
             ]
         ]
@@ -2213,26 +2223,27 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_correct_skill_models(self):
-        skill_models.SkillSnapshotMetadataModel(
-            id='%s-1' % self.SKILL_ID,
-            committer_id=self.albert_id,
-            commit_type='edit',
-            commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
-        commit_model_id = 'skill-%s-%s' % (self.SKILL_ID, 1)
-        skill_models.SkillCommitLogEntryModel(
-            id=commit_model_id,
-            skill_id=self.SKILL_ID,
-            user_id=self.albert_id,
-            commit_type='edit',
-            post_commit_status='public',
-            commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        skill_model = skill_models.SkillModel(
+            id=self.SKILL_ID,
+            description='description',
+            language_code='en',
+            misconceptions=[],
+            rubrics=[],
+            next_misconception_id=0,
+            misconceptions_schema_version=1,
+            rubric_schema_version=1,
+            skill_contents_schema_version=1,
+            all_questions_merged=False
+        )
+        skill_model.commit(
+            self.albert_id, 'skill model created', self.DUMMY_COMMIT_CMDS)
+
         actual_output = self._run_one_off_job()
 
         expected_output = [
             [
-                'FOUND COMMIT LOGS-SkillSnapshotMetadataModel',
+                'FOUND COMMIT LOGS-FOUND PARENT MODEL' +
+                '-SkillSnapshotMetadataModel',
                 ['skill_id0-1']
             ]
         ]
@@ -2240,26 +2251,23 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_correct_story_models(self):
-        story_models.StorySnapshotMetadataModel(
-            id='%s-1' % self.STORY_ID,
-            committer_id=self.albert_id,
-            commit_type='edit',
-            commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
-        commit_model_id = 'story-%s-%s' % (self.STORY_ID, 1)
-        story_models.StoryCommitLogEntryModel(
-            id=commit_model_id,
-            story_id=self.STORY_ID,
-            user_id=self.albert_id,
-            commit_type='edit',
-            post_commit_status='public',
-            commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
-        actual_output = self._run_one_off_job()
+        story_model = story_models.StoryModel(
+            id=self.STORY_ID,
+            title='title',
+            description='Story description',
+            language_code='en',
+            story_contents_schema_version=1,
+            corresponding_topic_id=self.TOPIC_ID,
+            url_fragment='story'
+        )
+        story_model.commit(
+            self.albert_id, 'story model created', self.DUMMY_COMMIT_CMDS)
 
+        actual_output = self._run_one_off_job()
         expected_output = [
             [
-                'FOUND COMMIT LOGS-StorySnapshotMetadataModel',
+                'FOUND COMMIT LOGS-FOUND PARENT MODEL' +
+                '-StorySnapshotMetadataModel',
                 ['story_id0-1']
             ]
         ]
@@ -2267,26 +2275,39 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_correct_topic_models(self):
-        topic_models.TopicSnapshotMetadataModel(
-            id='%s-1' % self.TOPIC_ID,
-            committer_id=self.albert_id,
-            commit_type='edit',
-            commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
-        commit_model_id = 'topic-%s-%s' % (self.TOPIC_ID, 1)
-        topic_models.TopicCommitLogEntryModel(
-            id=commit_model_id,
-            topic_id=self.TOPIC_ID,
-            user_id=self.albert_id,
-            commit_type='edit',
-            post_commit_status='public',
-            commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        topic_rights = topic_models.TopicRightsModel(
+            id=self.TOPIC_ID,
+            manager_ids=[],
+            topic_is_published=True
+        )
+        topic_rights.commit(
+            self.albert_id, 'topic rights model created',
+            [{'cmd': 'create_new'}])
+
+        topic_model = topic_models.TopicModel(
+            id=self.TOPIC_ID,
+            name='name',
+            url_fragment='name-two',
+            canonical_name='canonical_name',
+            next_subtopic_id=1,
+            language_code='en',
+            subtopic_schema_version=0,
+            story_reference_schema_version=0
+        )
+        topic_model.commit(
+            self.albert_id, 'topic model created', self.DUMMY_COMMIT_CMDS)
+
         actual_output = self._run_one_off_job()
 
         expected_output = [
             [
-                'FOUND COMMIT LOGS-TopicSnapshotMetadataModel',
+                'FOUND COMMIT LOGS-FOUND PARENT MODEL-' +
+                'TopicRightsSnapshotMetadataModel',
+                ['topic_id0-1']
+            ],
+            [
+                'FOUND COMMIT LOGS-FOUND PARENT MODEL-' +
+                'TopicSnapshotMetadataModel',
                 ['topic_id0-1']
             ]
         ]
@@ -2294,54 +2315,23 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_correct_subtopic_models(self):
-        topic_models.SubtopicPageSnapshotMetadataModel(
-            id='%s-1' % self.SUBTOPIC_ID,
-            committer_id=self.albert_id,
-            commit_type='edit',
-            commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
-        commit_model_id = 'subtopicpage-%s-%s' % (self.SUBTOPIC_ID, 1)
-        topic_models.SubtopicPageCommitLogEntryModel(
-            id=commit_model_id,
-            subtopic_page_id=self.SUBTOPIC_ID,
-            user_id=self.albert_id,
-            commit_type='edit',
-            post_commit_status='public',
-            commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
+        subtopic_page = topic_models.SubtopicPageModel(
+            id=self.SUBTOPIC_ID,
+            topic_id=self.TOPIC_ID,
+            page_contents={},
+            page_contents_schema_version=1,
+            language_code='en'
+        )
+        subtopic_page.commit(
+            self.albert_id, 'subtopic model created', self.DUMMY_COMMIT_CMDS)
+
         actual_output = self._run_one_off_job()
 
         expected_output = [
             [
-                'FOUND COMMIT LOGS-SubtopicPageSnapshotMetadataModel',
+                'FOUND COMMIT LOGS-FOUND PARENT MODEL' +
+                '-SubtopicPageSnapshotMetadataModel',
                 ['topic_id0-1-1']
-            ]
-        ]
-
-        self.assertItemsEqual(expected_output, actual_output)
-
-    def test_correct_topic_rights_models(self):
-        topic_models.TopicRightsSnapshotMetadataModel(
-            id='%s-1' % self.TOPIC_RIGHTS_ID,
-            committer_id=self.albert_id,
-            commit_type='edit',
-            commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
-        commit_model_id = 'rights-%s-%s' % (self.TOPIC_RIGHTS_ID, 1)
-        topic_models.TopicCommitLogEntryModel(
-            id=commit_model_id,
-            topic_id=self.TOPIC_RIGHTS_ID,
-            user_id=self.albert_id,
-            commit_type='edit',
-            post_commit_status='public',
-            commit_cmds=self.DUMMY_COMMIT_CMDS
-        ).put()
-        actual_output = self._run_one_off_job()
-
-        expected_output = [
-            [
-                'FOUND COMMIT LOGS-TopicRightsSnapshotMetadataModel',
-                ['topic_rights_id0-1']
             ]
         ]
 
@@ -2358,7 +2348,8 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING COMMIT LOGS-CollectionSnapshotMetadataModel',
+                'MISSING COMMIT LOGS-MISSING PARENT MODEL-' +
+                'CollectionSnapshotMetadataModel',
                 ['collection_id0-1']
             ]
         ]
@@ -2376,7 +2367,8 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING COMMIT LOGS-ExplorationRightsSnapshotMetadataModel',
+                'MISSING COMMIT LOGS-MISSING PARENT MODEL-' +
+                'ExplorationRightsSnapshotMetadataModel',
                 ['exp_id0-1']
             ]
         ]
@@ -2394,7 +2386,8 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING COMMIT LOGS-QuestionSnapshotMetadataModel',
+                'MISSING COMMIT LOGS-MISSING PARENT MODEL-' +
+                'QuestionSnapshotMetadataModel',
                 ['question_id0-1']
             ]
         ]
@@ -2412,7 +2405,8 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING COMMIT LOGS-SkillSnapshotMetadataModel',
+                'MISSING COMMIT LOGS-MISSING PARENT MODEL-' +
+                'SkillSnapshotMetadataModel',
                 ['skill_id0-1']
             ]
         ]
@@ -2430,7 +2424,8 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING COMMIT LOGS-StorySnapshotMetadataModel',
+                'MISSING COMMIT LOGS-MISSING PARENT MODEL-' +
+                'StorySnapshotMetadataModel',
                 ['story_id0-1']
             ]
         ]
@@ -2448,7 +2443,8 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING COMMIT LOGS-TopicSnapshotMetadataModel',
+                'MISSING COMMIT LOGS-MISSING PARENT MODEL-' +
+                'TopicSnapshotMetadataModel',
                 ['topic_id0-1']
             ]
         ]
@@ -2466,7 +2462,8 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING COMMIT LOGS-SubtopicPageSnapshotMetadataModel',
+                'MISSING COMMIT LOGS-MISSING PARENT MODEL-' +
+                'SubtopicPageSnapshotMetadataModel',
                 ['topic_id0-1-1']
             ]
         ]
@@ -2484,7 +2481,8 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'MISSING COMMIT LOGS-TopicRightsSnapshotMetadataModel',
+                'MISSING COMMIT LOGS-MISSING PARENT MODEL-' +
+                'TopicRightsSnapshotMetadataModel',
                 ['topic_rights_id0-1']
             ]
         ]
