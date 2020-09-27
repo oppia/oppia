@@ -90,7 +90,7 @@ class ExportToCloudDatastoreHandler(base.BaseHandler):
             response = (
                 requests.post(url, json=payload, headers=headers, timeout=60))
             response.raise_for_status()
-        except:
+        except Exception:
             logging.exception('Failed to initiate export.')
         else:
             logging.info(response.content)

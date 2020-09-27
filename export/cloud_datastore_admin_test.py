@@ -57,7 +57,7 @@ class ExportToCloudDatastoreHandlerTests(test_utils.GenericTestBase):
             *. A one-time use context manager.
         """
         response = requests.Response()
-        response._content = content
+        response._content = content # pylint: disable=protected-member
         response.status_code = status_code
         return self.swap(requests, 'request', lambda *args, **kwargs: response)
 
