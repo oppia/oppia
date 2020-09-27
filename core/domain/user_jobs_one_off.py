@@ -470,3 +470,24 @@ class RemoveGaeUserIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         """Implements the reduce function for this job."""
         yield (key, len(values))
+
+
+class CleanupUserSubscribersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that cleans up UserSubscribersModel by removing user id if it is
+    present in subscriber ids.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSubscribersModel]
+
+    @staticmethod
+    def map(item):
+        if not item.deleted and item.id in item.subscriber_ids:
+            item.subscriber_ids.remove(item.id)
+            item.put()
+            yield ('Cleaned up User Subscribers', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

@@ -1652,3 +1652,48 @@ class RemoveGaeUserIdOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             original_setting_model.last_updated,
             migrated_setting_model.last_updated)
+
+
+class CleanupUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CleanupUserSubscribersModelOneOffJobTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup('user@email', 'user')
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id = self.get_user_id_from_email('user@email')
+
+        subscription_services.subscribe_to_creator(self.user_id, self.owner_id)
+
+        self.model_instance = user_models.UserSubscribersModel.get_by_id(
+            self.owner_id)
+        self.process_and_flush_pending_tasks()
+
+    def test_standard_operation(self):
+        job_id = (
+            user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.create_new())
+        user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.get_output(
+                job_id))
+        self.assertEqual(output, [])
+
+    def test_job_removes_user_id_from_subscriber_ids(self):
+        self.model_instance.subscriber_ids.append(self.owner_id)
+        self.model_instance.put()
+        job_id = (
+            user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.create_new())
+        user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            user_jobs_one_off.CleanupUserSubscribersModelOneOffJob.get_output(
+                job_id))
+        self.assertEqual(output, ['[u\'Cleaned up User Subscribers\', 1]'])
+        self.model_instance = user_models.UserSubscribersModel.get_by_id(
+            self.owner_id)
+        self.assertTrue(self.user_id in self.model_instance.subscriber_ids)
+        self.assertTrue(self.owner_id not in self.model_instance.subscriber_ids)
