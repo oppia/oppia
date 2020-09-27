@@ -275,3 +275,90 @@ class RegenerateQuestionSummaryOneOffJobTests(test_utils.GenericTestBase):
         for x in output:
             self.assertRegexpMatches(
                 x, 'object has no attribute \'question_state_data\'')
+
+
+class MissingQuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    QUESTION_ID = 'question_id'
+
+    def setUp(self):
+        super(MissingQuestionMigrationOneOffJobTests, self).setUp()
+
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+        self.skill_id = 'skill_id'
+        self.save_new_skill(
+            self.skill_id, self.albert_id, description='Skill Description')
+
+        self.question = self.save_new_question(
+            self.QUESTION_ID, self.albert_id,
+            self._create_valid_question_data('ABC'), [self.skill_id])
+
+        self.model_instance = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-question_id-1'))
+
+        self.process_and_flush_pending_tasks()
+
+    def test_standard_operation(self):
+        job_id = (
+            question_jobs_one_off
+            .MissingQuestionMigrationOneOffJob.create_new())
+        question_jobs_one_off.MissingQuestionMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            question_jobs_one_off.MissingQuestionMigrationOneOffJob.get_output(
+                job_id))
+        self.assertEqual(output, [])
+        self.assertFalse(self.model_instance.deleted)
+
+    def test_migration_job_skips_deleted_model(self):
+        self.model_instance.delete()
+
+        def mock_get_question_by_id(unused_question_id, strict=True): # pylint: disable=unused-argument
+            return None
+
+        with self.swap(
+            question_services, 'get_question_by_id',
+            mock_get_question_by_id):
+            job_id = (
+                question_jobs_one_off
+                .MissingQuestionMigrationOneOffJob.create_new())
+            question_jobs_one_off.MissingQuestionMigrationOneOffJob.enqueue(
+                job_id)
+            self.process_and_flush_pending_tasks()
+
+            output = (
+                question_jobs_one_off
+                .MissingQuestionMigrationOneOffJob.get_output(job_id))
+            self.assertEqual(output, [])
+
+    def test_migration_job_removes_commit_log_model_if_skill_model_is_missing(
+            self):
+        def mock_get_question_by_id(unused_question_id, strict=True): # pylint: disable=unused-argument
+            return None
+
+        with self.swap(
+            question_services, 'get_question_by_id',
+            mock_get_question_by_id):
+            job_id = (
+                question_jobs_one_off
+                .MissingQuestionMigrationOneOffJob.create_new())
+            question_jobs_one_off.MissingQuestionMigrationOneOffJob.enqueue(
+                job_id)
+            self.process_and_flush_pending_tasks()
+
+            output = (
+                question_jobs_one_off
+                .MissingQuestionMigrationOneOffJob.get_output(job_id))
+            self.assertEqual(
+                output, ['[u\'Question Commit Model deleted\', 1]'])
+            self.model_instance = (
+                question_models.QuestionCommitLogEntryModel.get_by_id(
+                    'question-question_id-1'))
+            self.assertIsNone(self.model_instance)
