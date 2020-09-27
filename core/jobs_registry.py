@@ -79,6 +79,7 @@ ONE_OFF_JOB_MANAGERS = [
     question_jobs_one_off.QuestionMigrationOneOffJob,
     question_jobs_one_off.RegenerateQuestionSummaryOneOffJob,
     question_jobs_one_off.MissingQuestionMigrationOneOffJob,
+    question_jobs_one_off.RegenerateQuestionCommitAndSnapshotOneOffJob,
     recommendations_jobs_one_off.DeleteAllExplorationRecommendationsOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,

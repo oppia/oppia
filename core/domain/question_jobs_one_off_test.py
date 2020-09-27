@@ -362,3 +362,131 @@ class MissingQuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
                 question_models.QuestionCommitLogEntryModel.get_by_id(
                     'question-question_id-1'))
             self.assertIsNone(self.model_instance)
+
+
+class RegenerateQuestionCommitAndSnapshotOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    QUESTION_ID = 'question_id'
+
+    def setUp(self):
+        super(RegenerateQuestionCommitAndSnapshotOneOffJobTests, self).setUp()
+
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+        self.skill_id = 'skill_id'
+        self.save_new_skill(
+            self.skill_id, self.albert_id, description='Skill Description')
+
+        self.question = self.save_new_question(
+            self.QUESTION_ID, self.albert_id,
+            self._create_valid_question_data('ABC'), [self.skill_id])
+
+        self.process_and_flush_pending_tasks()
+
+    def test_standard_operation(self):
+        job_id = (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.create_new())
+        (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+
+    def test_migration_job_skips_deleted_model(self):
+        question_services.delete_question(
+            self.albert_id, self.QUESTION_ID)
+
+        job_id = (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.create_new())
+        (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+
+    def test_migration_job_regenerates_missing_commit_log_model(self):
+        commit_log_model = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-question_id-1'))
+        commit_log_model.delete()
+
+        job_id = (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.create_new())
+        (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.get_output(job_id))
+        commit_log_model = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-question_id-1'))
+        self.assertFalse(commit_log_model.deleted)
+        self.assertEqual(
+            output, ['[u\'Regenerated Question Commit Log Model\', 1]'])
+
+    def test_migration_job_regenerates_missing_snapshot_metadata_model(self):
+        snapshot_metadata_model = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                'question_id-1'))
+        snapshot_metadata_model.delete()
+
+        job_id = (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.create_new())
+        (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.get_output(job_id))
+        snapshot_metadata_model = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                'question_id-1'))
+        self.assertFalse(snapshot_metadata_model.deleted)
+        self.assertEqual(
+            output, ['[u\'Regenerated Question Snapshot Metadata Model\', 1]'])
+
+    def test_migration_job_regenerates_missing_snapshot_content_model(self):
+        snapshot_content_model = (
+            question_models.QuestionSnapshotContentModel.get_by_id(
+                'question_id-1'))
+        snapshot_content_model.delete()
+
+        job_id = (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.create_new())
+        (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            question_jobs_one_off
+            .RegenerateQuestionCommitAndSnapshotOneOffJob.get_output(job_id))
+        snapshot_content_model = (
+            question_models.QuestionSnapshotContentModel.get_by_id(
+                'question_id-1'))
+        self.assertFalse(snapshot_content_model.deleted)
+        self.assertEqual(
+            output, ['[u\'Regenerated Question Snapshot Content Model\', 1]'])
