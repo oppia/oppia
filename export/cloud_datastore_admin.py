@@ -53,19 +53,25 @@ class ExportToCloudDatastoreHandler(base.BaseHandler):
         """
 
         if not (self.is_cron_job or self.is_super_admin):
-            raise self.UnauthorizedUserException(
+            e = self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
+            logging.error(e)
+            raise e
 
         app_id = app_identity.get_application_id()
         if app_id != APP_NAME_OPPIASERVER:
-            raise self.PageNotFoundException(
+            e = self.PageNotFoundException(
                 'Export service has been pinged from a non-production '
                 'environment so the request has been ignored.')
+            logging.error(e)
+            raise e
 
         bucket = self.request.get('bucket')
         if not bucket.startswith(GCS_BUCKET_URL_PREFIX):
-            raise self.InvalidInputException(
+            e = self.InvalidInputException(
                 'bucket must begin with %s' % GCS_BUCKET_URL_PREFIX)
+            logging.error(e)
+            raise e
 
         access_token, unused_expiration_time = app_identity.get_access_token(
             'https://www.googleapis.com/auth/datastore')
@@ -91,7 +97,8 @@ class ExportToCloudDatastoreHandler(base.BaseHandler):
                 requests.post(url, json=payload, headers=headers, timeout=60))
             response.raise_for_status()
         except Exception:
-            logging.exception('Failed to initiate export.')
+            logging.exception('Failed to initiate export')
+            raise
         else:
             logging.info(response.content)
 

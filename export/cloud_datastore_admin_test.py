@@ -57,15 +57,14 @@ class ExportToCloudDatastoreHandlerTests(test_utils.GenericTestBase):
         response = requests.Response()
         response._content = content # pylint: disable=protected-access
         response.status_code = status_code
-        return self.swap(requests, 'request', lambda *args, **kwargs: response)
+        return self.swap(requests, 'post', lambda *args, **kwargs: response)
 
-    def mock_http_exception(self, exception_factory):
+    def mock_http_exception(self, error_message):
         """Return a context manager that mocks out all HTTP responses by raising
         an exception.
 
         Args:
-            exception_factory: callable. A function that returns an exception
-                object.
+            error_message: str. The content of the exception to raise.
 
         Returns:
             *. A one-time use context manager.
@@ -73,9 +72,9 @@ class ExportToCloudDatastoreHandlerTests(test_utils.GenericTestBase):
         def raise_exception(*unused_args, **unused_kwargs):
             """Always raises an exception."""
 
-            raise exception_factory()
+            raise Exception(error_message)
 
-        return self.swap(requests, 'request', raise_exception)
+        return self.swap(requests, 'post', raise_exception)
 
     def test_export_as_admin_succeeds(self):
         admin_ctx = self.login_context(self.ADMIN_EMAIL, is_super_admin=True)
@@ -98,30 +97,49 @@ class ExportToCloudDatastoreHandlerTests(test_utils.GenericTestBase):
                 headers=cron_job_headers)
         self.assertEqual(response.status_code, 200)
 
+    def test_export_when_http_request_raises_error_fails(self):
+        admin_ctx = self.login_context(self.ADMIN_EMAIL, is_super_admin=True)
+        prod_ctx = self.mock_production_environment()
+        http_mock = self.mock_http_exception('uh-oh!')
+
+        with admin_ctx, prod_ctx, http_mock:
+            response = self.testapp.get(
+                '/cloud_datastore_export?bucket=gs://abc',
+                expect_errors=True)
+        self.assertEqual(response.status_code, 500)
+
     def test_export_outside_of_prod_environment_fails(self):
         admin_ctx = self.login_context(self.ADMIN_EMAIL, is_super_admin=True)
 
         with admin_ctx:
-            with self.assertRaisesRegexp(Exception, '404 Not Found'):
-                self.testapp.get('/cloud_datastore_export?bucket=gs://abc')
+            response = self.testapp.get(
+                '/cloud_datastore_export?bucket=gs://abc', expect_errors=True)
+        self.assertEqual(response.status_code, 404)
 
-    def test_export_without_target_bucket_fails(self):
+    def test_export_with_no_bucket_fails(self):
         admin_ctx = self.login_context(self.ADMIN_EMAIL, is_super_admin=True)
         prod_ctx = self.mock_production_environment()
 
         with admin_ctx, prod_ctx:
-            with self.assertRaisesRegexp(Exception, 'Bad Request'):
-                self.testapp.get('/cloud_datastore_export')
+            response = self.testapp.get(
+                '/cloud_datastore_export', expect_errors=True)
+        self.assertEqual(response.status_code, 400)
 
-    def test_export_to_bucket_without_prefix_fails(self):
+    def test_export_with_bucket_missing_prefix_fails(self):
         admin_ctx = self.login_context(self.ADMIN_EMAIL, is_super_admin=True)
         prod_ctx = self.mock_production_environment()
 
         with admin_ctx, prod_ctx:
-            with self.assertRaisesRegexp(Exception, 'Bad Request'):
-                self.testapp.get('/cloud_datastore_export?bucket=abc')
+            response = self.testapp.get(
+                '/cloud_datastore_export?bucket=abc', expect_errors=True)
+        self.assertEqual(response.status_code, 400)
 
     def test_viewer_can_not_initiate_export(self):
-        with self.login_context(self.VIEWER_EMAIL, is_super_admin=False):
-            with self.assertRaisesRegexp(Exception, 'Unauthorized'):
-                self.testapp.get('/cloud_datastore_export?bucket=gs://abc')
+        non_admin_ctx = (
+            self.login_context(self.VIEWER_EMAIL, is_super_admin=False))
+        prod_ctx = self.mock_production_environment()
+
+        with non_admin_ctx, prod_ctx:
+            response = self.testapp.get(
+                '/cloud_datastore_export?bucket=gs://abc', expect_errors=True)
+        self.assertEqual(response.status_code, 401)
