@@ -722,21 +722,23 @@ class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
             commit_log_model = (
                 topic_models.TopicCommitLogEntryModel.get_by_id(
                     commit_log_id))
-        msg = ''
         if commit_log_model is None:
-            msg += missing_commit_log_msg
+            yield (
+                '%s%s' % (missing_commit_log_msg, class_name),
+                snapshot_model.id)
         else:
-            msg += 'FOUND COMMIT LOGS-'
+            yield ('FOUND COMMIT LOGS-%s' % class_name, snapshot_model.id)
         if parent_model is None:
-            msg += 'MISSING PARENT MODEL-'
+            yield ('MISSING PARENT MODEL--%s' % class_name, snapshot_model.id)
         else:
-            msg += 'FOUND PARENT MODEL-'
-        yield ('%s%s' % (msg, class_name), snapshot_model.id)
+            yield ('FOUND PARENT MODEL-%s' % class_name, snapshot_model.id)
 
     @staticmethod
     def reduce(key, values):
         """Implements the reduce function for this job."""
-        if key.startswith('FOUND COMMIT LOGS-FOUND PARENT MODEL'):
+        if key.startswith('FOUND COMMIT LOGS'):
+            yield (key, len(values))
+        elif key.startswith('FOUND PARENT MODEL'):
             yield (key, len(values))
         else:
             yield (key, values)
