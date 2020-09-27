@@ -33,7 +33,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 USER_ID_REGEX = 'uid_[a-z]{32}'
 
-MODEL_IDS_TO_SKIP = ['OppiaSuggestionBot']
+MODEL_IDS_TO_SKIP = ['OppiaSuggestionBot', 'OppiaMigrationBot']
 
 ERROR_CATEGORY_COMMIT_CMD_CHECK = 'commit cmd check'
 ERROR_CATEGORY_COMMIT_STATUS_CHECK = 'post commit status check'

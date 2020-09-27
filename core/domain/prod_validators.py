@@ -3543,10 +3543,7 @@ class UserSettingsModelValidator(base_model_validators.BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_contributions_ids', user_models.UserContributionsModel,
-                [item.id])]
+        return []
 
     @classmethod
     def _validate_time_fields_of_user_actions(cls, item):
