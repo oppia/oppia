@@ -102,7 +102,7 @@
 
 
 # Contributor Dashboard project.
-# TODO(#10779): Revert ownership to @sagangwee after 2020-09-08.
+# TODO(#10779): Revert ownership to @sagangwee after 2020-10-05.
 /core/controllers/contributor_dashboard*.py @DubeySandeep
 /core/domain/opportunity*.py @DubeySandeep
 /core/domain/voiceover_services*.py @DubeySandeep
