@@ -1,4 +1,4 @@
-# Copyright 2018 The Oppia Authors. All Rights Reserved.
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,107 +12,90 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Request handler for exporting backups.
+"""Configures a request handler for exporting backups."""
 
-Please see original reference here:
-
-https://cloud.google.com/datastore/docs/schedule-export
-"""
-
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import # pylint: disable=import-only-modules
+from __future__ import unicode_literals # pylint: disable=import-only-modules
 
 import datetime
-import http.client
-import json
 import logging
 
-from export import acl_decorators
+from core.controllers import base
 
 from google.appengine.api import app_identity
-from google.appengine.api import urlfetch
+import requests
 import webapp2
 
 APP_NAME_OPPIASERVER = 'oppiaserver'
+GCS_BUCKET_URL_PREFIX = 'gs://'
 
 
-class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
+class ExportToCloudDatastoreHandler(base.BaseHandler):
     """Request handler which supports triggering automatic exports of the
     entities that application stores in Google Cloud Datastore.
     """
 
-    @acl_decorators.can_perform_cron_tasks
+    GET_HANDLER_ERROR_RETURN_TYPE = 'json'
+
+    @property
+    def is_cron_job(self):
+        """Returns whether the request came from a cron job."""
+        return self.request.headers.get('X-AppEngine-Cron') is not None
+
     def get(self):
         """Triggers an export of Google Cloud Datastore.
 
         Export data described in request parameters.
 
         Raises:
-            AssertionError. Bucket url exists and doesn't start with 'gs://'.
+            UnauthorizedUserException. The user does not have credentials to
+                access the page.
         """
-        gcs_bucket_url_prefix = 'gs://'
 
-        access_token, _ = app_identity.get_access_token(
-            'https://www.googleapis.com/auth/datastore')
+        if not (self.is_cron_job or self.is_super_admin):
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to access this page.')
+
         app_id = app_identity.get_application_id()
-
         if app_id != APP_NAME_OPPIASERVER:
-            logging.error(
-                'Export service has been pinged. '
-                'Since this is not production, a real export request '
-                'has not been initiated.')
-            return
+            raise self.PageNotFoundException(
+                'Export service has been pinged from a non-production '
+                'environment so the request has been ignored.')
 
-        timestamp = datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S')
+        bucket = self.request.get('bucket')
+        if not bucket.startswith(GCS_BUCKET_URL_PREFIX):
+            raise self.InvalidInputException(
+                'bucket must begin with %s' % GCS_BUCKET_URL_PREFIX)
 
-        output_url_prefix = self.request.get('output_url_prefix')
-        assert output_url_prefix and output_url_prefix.startswith(
-            gcs_bucket_url_prefix)
+        access_token, unused_expiration_time = app_identity.get_access_token(
+            'https://www.googleapis.com/auth/datastore')
+        output_url_prefix = '%s/%s' % (
+            bucket, datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S'))
 
-        # Look for slash in the portion of the bucket URL that comes
-        # after 'gs://'. If not present, then only a bucket name has been
-        # provided and we append a trailing slash.
-        if '/' not in output_url_prefix[len(gcs_bucket_url_prefix):]:
-             # Only a bucket name has been provided - no prefix or trailing
-             # slash.
-            output_url_prefix += '/' + timestamp
-        else:
-            output_url_prefix += timestamp
-
-        entity_filter = {
-            'kinds': self.request.get_all('kind'),
-            'namespace_ids': self.request.get_all('namespace_id')
-        }
-        request = {
+        url = 'https://datastore.googleapis.com/v1/projects/%s:export' % app_id
+        payload = {
             'project_id': app_id,
             'output_url_prefix': output_url_prefix,
-            'entity_filter': entity_filter
+            'entity_filter': {
+                'kinds': self.request.get_all('kind'),
+                'namespace_ids': self.request.get_all('namespace_id'),
+            },
         }
         headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer %s' % access_token
+            b'Content-Type': b'application/json',
+            b'Authorization': b'Bearer %s' % access_token,
         }
-        url = 'https://datastore.googleapis.com/v1/projects/%s:export' % app_id
+
         try:
-            result = urlfetch.fetch(
-                url,
-                payload=json.dumps(request),
-                method=urlfetch.POST,
-                deadline=60,
-                headers=headers)
-            if result.status_code == http.client.OK:
-                logging.info(result.content)
-            elif result.status_code >= 500:
-                logging.error(result.content)
-            else:
-                logging.warning(result.content)
-            self.response.status_int = result.status_code
-        except urlfetch.Error:
+            response = (
+                requests.post(url, json=payload, headers=headers, timeout=60))
+            response.raise_for_status()
+        except:
             logging.exception('Failed to initiate export.')
-            self.response.status_int = http.client.INTERNAL_SERVER_ERROR
+        else:
+            logging.info(response.content)
 
 
-app = webapp2.WSGIApplication(  # pylint: disable=invalid-name
-    [
-        ('/cloud_datastore_export', ExportToCloudDatastoreHandler),
-    ], debug=True)
+app = webapp2.WSGIApplication( # pylint: disable=invalid-name
+    [('/cloud_datastore_export', ExportToCloudDatastoreHandler)],
+    debug=True)
