@@ -66,6 +66,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ViewableExplorationsAuditJob,
     exp_jobs_one_off.RemoveTranslatorIdsOneOffJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
+    feedback_jobs_one_off.CleanupFeedbackAnalyticsModelModelOneOffJob,
     (
         interaction_jobs_one_off
         .DragAndDropSortInputInteractionOneOffJob),

@@ -19,12 +19,15 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
+from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import feedback_jobs_one_off
 from core.domain import feedback_services
 from core.platform import models
 from core.tests import test_utils
 
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+(exp_models, feedback_models,) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
@@ -371,3 +374,61 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertIsNone(model.last_nonempty_message_author_id)
+
+
+class CleanupFeedbackAnalyticsModelModelOneOffJobTest(
+        test_utils.GenericTestBase):
+    """Tests for one-off job to clean up feedback analytics model."""
+
+    def setUp(self):
+        super(CleanupFeedbackAnalyticsModelModelOneOffJobTest, self).setUp()
+        self.signup('user@email', 'user')
+        self.user_id = self.get_user_id_from_email('user@email')
+
+        exp = exp_domain.Exploration.create_default_exploration(
+            '0',
+            title='title 0',
+            category='Art',
+        )
+        exp_services.save_new_exploration(self.user_id, exp)
+
+        feedback_models.FeedbackAnalyticsModel(id='0').put()
+
+    def test_standard_operation(self):
+        job_id = (
+            feedback_jobs_one_off
+            .CleanupFeedbackAnalyticsModelModelOneOffJob.create_new())
+        (
+            feedback_jobs_one_off
+            .CleanupFeedbackAnalyticsModelModelOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            feedback_jobs_one_off
+            .CleanupFeedbackAnalyticsModelModelOneOffJob.get_output(job_id))
+        self.assertEqual(output, [])
+
+        model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
+        self.assertFalse(model_instance is None)
+
+    def test_job_removes_analytics_model_for_deleted_explorations(self):
+        model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
+        self.assertFalse(model_instance is None)
+
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            self.user_id, 'Delete')
+        job_id = (
+            feedback_jobs_one_off
+            .CleanupFeedbackAnalyticsModelModelOneOffJob.create_new())
+        (
+            feedback_jobs_one_off
+            .CleanupFeedbackAnalyticsModelModelOneOffJob.enqueue(job_id))
+        self.process_and_flush_pending_tasks()
+
+        output = (
+            feedback_jobs_one_off
+            .CleanupFeedbackAnalyticsModelModelOneOffJob.get_output(job_id))
+        self.assertEqual(output, ['[u\'Deleted Feedback Analytics Model\', 1]'])
+
+        model_instance = feedback_models.FeedbackAnalyticsModel.get_by_id('0')
+        self.assertIsNone(model_instance)

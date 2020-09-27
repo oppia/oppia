@@ -21,7 +21,8 @@ from core import jobs
 from core.domain import feedback_services
 from core.platform import models
 
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+(exp_models, feedback_models,) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.feedback])
 
 
 class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -100,3 +101,27 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             thread_model.last_nonempty_message_author_id = message_author_id
             return True
         return False
+
+
+class CleanupFeedbackAnalyticsModelModelOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to remove feedback analytics models for
+    deleted explorations.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [feedback_models.FeedbackAnalyticsModel]
+
+    @staticmethod
+    def map(item):
+        if not item.deleted:
+            exp_model = exp_models.ExplorationModel.get_by_id(
+                item.id)
+            if exp_model is None or exp_model.deleted:
+                item.delete()
+                yield ('Deleted Feedback Analytics Model', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
