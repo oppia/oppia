@@ -21,17 +21,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 
-# This is a special app engine import fix for requests that causes the
-# request.post function to to use URLFetch which is required to make correct
-# requests to the Google App Engine development environment. More details can be
-# found here:
-# https://cloud.google.com/appengine/docs/standard/python/issue-requests#issuing_an_http_request
 from core.platform.taskqueue import cloud_tasks_emulator
-import requests_toolbelt.adapters.appengine
 
 import requests
 
-requests_toolbelt.adapters.appengine.monkeypatch()
 GOOGLE_APP_ENGINE_PORT = (
     os.environ['SERVER_PORT']
     if 'SERVER_PORT' in os.environ else '8181')
