@@ -101,6 +101,14 @@ commands:
               circleci-agent step halt
             fi
 
+  webpack_build:
+    description: "Build Javascript files"
+    steps:
+      - run:
+          name: Builds Javascript files
+          command: |
+            python -m scripts.run_e2e_tests --prod_env --build-only
+
 jobs:
   setup_and_typescript_tests:
     <<: *job_defaults
@@ -140,12 +148,13 @@ jobs:
       - checkout
       - merge_target_branch
       - install_chrome
+      - webpack_build
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Run e2e navigation test
           command: |
-            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
+            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --skip-build --suite="navigation"
       - check_release_changelog_update_branch
       - run:
           name: Run e2e admin page test
@@ -168,6 +177,7 @@ jobs:
       - check_release_changelog_update_branch
       - merge_target_branch
       - install_chrome
+      - webpack_build
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -198,6 +208,7 @@ jobs:
       - check_release_changelog_update_branch
       - merge_target_branch
       - install_chrome
+      - webpack_build
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -231,12 +242,13 @@ jobs:
       - check_release_changelog_update_branch
       - merge_target_branch
       - install_chrome
+      - webpack_build
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Run e2e file upload features test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="fileUploadFeatures"
       - run:
           name: Run e2e play voiceovers test
           command: |
@@ -257,12 +269,13 @@ jobs:
       - check_release_changelog_update_branch
       - merge_target_branch
       - install_chrome
+      - webpack_build
       - attach_workspace:
           at: /home/circleci/
       - run:
           name: Run e2e topics and skills dashboard test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --suite="topicsAndSkillsDashboard" --server_log_level=info
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --server_log_level=info
       - run:
           name: Run e2e topics and story editor
           command: |

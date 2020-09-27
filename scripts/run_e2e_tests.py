@@ -101,6 +101,11 @@ _PARSER.add_argument(
     help='If true, skips building files. The default value is false.',
     action='store_true')
 _PARSER.add_argument(
+    '--build-only',
+    help='If true, runs webpack build process and exits. The default '
+         'value is false.',
+    action='store_true')
+_PARSER.add_argument(
     '--sharding-instances', type=int, default=3,
     help='Sets the number of parallel browsers to open while sharding.'
          'Sharding must be disabled (either by passing in false to --sharding'
@@ -252,7 +257,8 @@ def setup_and_install_dependencies(skip_install):
 
 
 def build_js_files(
-        dev_mode_setting, deparallelize_terser=False, source_maps=False):
+        dev_mode_setting, build_only=False, deparallelize_terser=False,
+        source_maps=False):
     """Build the javascript files.
 
     Args:
@@ -276,6 +282,8 @@ def build_js_files(
     else:
         build.main(args=[])
         run_webpack_compilation(source_maps=source_maps)
+    if build_only:
+        sys.exit(1)
 
 
 @contextlib.contextmanager
@@ -537,7 +545,8 @@ def main(args=None):
         build.modify_constants(prod_env=parsed_args.prod_env)
     else:
         build_js_files(
-            dev_mode, deparallelize_terser=parsed_args.deparallelize_terser,
+            dev_mode, build_only=parsed_args.build_only,
+            deparallelize_terser=parsed_args.deparallelize_terser,
             source_maps=parsed_args.source_maps)
     version = parsed_args.chrome_driver_version or get_chrome_driver_version()
     python_utils.PRINT('\n\nCHROMEDRIVER VERSION: %s\n\n' % version)
