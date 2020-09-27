@@ -16,9 +16,11 @@
  * @fileoverview Unit tests for ExplorationSummaryBackendApiService.
  */
 import { UpgradedServices } from 'services/UpgradedServices';
+import { ExplorationSummary } from 'domain/exploration/exploration-summary.model';
 
 require('domain/summary/exploration-summary-backend-api.service.ts');
 require('services/csrf-token.service.ts');
+
 
 describe('Exploration Summary Backend Api Service', function() {
   var ExplorationSummaryBackendApiService = null;
@@ -76,12 +78,11 @@ describe('Exploration Summary Backend Api Service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
       var explorationIds = ['0', '1', '2'];
-      var sampleResults = [{
-        title: 'Title 1',
-        category: 'Category 1',
-        status: 'public',
-        language_code: 'en'
-      }];
+      var sampleResults = [new ExplorationSummary(
+        'Category 1', undefined, undefined, undefined, undefined, undefined,
+        undefined, 'public', undefined, undefined, 'Title 1', undefined,
+        undefined)
+      ];
 
       var requestUrl = '/explorationsummarieshandler/data?' +
         'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
@@ -104,17 +105,16 @@ describe('Exploration Summary Backend Api Service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
       var explorationIds = ['0', '1', '2'];
-      var sampleResults = [{
-        title: 'Title 1',
-        category: 'Category 1',
-        status: 'public',
-        language_code: 'en'
-      }, {
-        title: 'Title 2',
-        category: 'Category 2',
-        status: 'private',
-        language_code: 'en'
-      }];
+      var sampleResults = [
+        new ExplorationSummary(
+          'Category 1', undefined, undefined, undefined, undefined, undefined,
+          undefined, 'public', undefined, undefined, 'Title 1', undefined,
+          undefined),
+        new ExplorationSummary(
+          'Category 2', undefined, undefined, undefined, undefined, undefined,
+          undefined, 'private', undefined, undefined, 'Title 2', undefined,
+          undefined)
+      ];
 
       var requestUrl = '/explorationsummarieshandler/data?' +
         'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
